@@ -153,6 +153,10 @@ namespace SOS.Process.Jobs
                     _logger.LogInformation("Finish ensure collection exists");
                 }
 
+                _logger.LogInformation("Start disable indexing");
+                await _processedObservationRepository.DisableIndexingAsync();
+                _logger.LogInformation("Finish disable indexing");
+
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 //--------------------------------------
@@ -249,13 +253,10 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    if (newCollection)
-                    {
-                        _logger.LogInformation("Start creating indexes");
-                        await _processedObservationRepository.CreateIndexAsync();
-                        _logger.LogInformation("Finish creating indexes");
-                    }
-
+                    _logger.LogInformation("Start enable indexing");
+                    await _processedObservationRepository.EnableIndexingAsync();
+                    _logger.LogInformation("Finish enable indexing");
+                   
                     if (mode == JobRunModes.Full)
                     {
                         if (_runIncrementalAfterFull)

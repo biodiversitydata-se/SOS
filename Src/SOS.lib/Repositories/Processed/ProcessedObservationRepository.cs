@@ -47,16 +47,7 @@ namespace SOS.Lib.Repositories.Processed
                         .GeoShape(gs => gs
                             .Name(nn => nn.Location.PointWithBuffer)))));
 
-            if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
-            {
-                var updateSettingsResponse =
-                    await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
-                        p => p.IndexSettings(g => g.RefreshInterval(-1)));
-
-                return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
-            }
-
-            return false;
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid;
         }
 
         /// <summary>
@@ -96,8 +87,17 @@ namespace SOS.Lib.Repositories.Processed
             return items.Count();
         }
 
+        public async Task<bool> DisableIndexingAsync()
+        {
+            var updateSettingsResponse =
+                await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
+                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
+
+            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
+        }
+
         /// <inheritdoc />
-        public async Task CreateIndexAsync()
+        public async Task EnableIndexingAsync()
         {
             await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
                 p => p.IndexSettings(g => g.RefreshInterval(1)));

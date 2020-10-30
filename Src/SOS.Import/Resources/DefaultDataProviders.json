@@ -19,13 +19,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": true,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 1,
         "Identifier": "Artportalen",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing":  true
+        "HarvestFailPreventProcessing": true,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "ClamPortalObservations",
@@ -47,13 +45,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 2,
         "Identifier": "ClamGateway",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "KULObservations",
@@ -75,13 +71,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 3,
         "Identifier": "KUL",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "MvmObservations",
@@ -103,13 +97,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 4,
         "Identifier": "MVM",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "NorsObservations",
@@ -131,13 +123,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 5,
         "Identifier": "NORS",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "SersObservations",
@@ -159,13 +149,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 6,
         "Identifier": "SERS",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "VirtualHerbariumObservations",
@@ -187,13 +175,11 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 7,
         "Identifier": "VirtualHerbarium",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "SharkObservations",
@@ -215,13 +201,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 8,
         "Identifier": "SHARK",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -243,13 +227,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 9,
         "Identifier": "BirdRingingCentre",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -271,13 +253,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 10,
         "Identifier": "EntomologicalCollection",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -299,13 +279,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 11,
         "Identifier": "MalaiseTrap",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -327,13 +305,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 12,
         "Identifier": "Porpoises",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -355,13 +331,11 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 13,
         "Identifier": "ButterflyMonitoring",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     },
     {
         "Type": "DwcA",
@@ -383,14 +357,12 @@
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 14,
         "Identifier": "SharkZooplankton",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
-    },
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
+        },
     {
         "Type": "FishDataObservations",
         "IsActive": true,
@@ -411,12 +383,10 @@
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null,
-        "ProcessInfoInstance0": null,
-        "ProcessInfoInstance1": null,
         "Id": 15,
         "Identifier": "FishData",
         "EmlMetadata": null,
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "HarvestSchedule": "* * * * *"
     }
 ]

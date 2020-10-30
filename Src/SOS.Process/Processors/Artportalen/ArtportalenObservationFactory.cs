@@ -426,6 +426,11 @@ namespace SOS.Process.Processors.Artportalen
         }
         private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            {
+                return false;
+            }
+
             if (observationVerbatim.ProtectedBySystem)
             {
                 var regex = new Regex(@"^\d");
@@ -449,6 +454,11 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private GeoJsonGeometry DiffusePoint(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            {
+                return point;
+            }
+
             var originalPoint = point;
             var diffusedPoint = point;
             if(observationVerbatim.ProtectedBySystem)
@@ -481,6 +491,11 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private GeoJsonGeometry DiffusePolygon(GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            {
+                return polygon;
+            }
+
             var originalPoint = polygon;
             var diffusedPoint = polygon;
             if (observationVerbatim.ProtectedBySystem)

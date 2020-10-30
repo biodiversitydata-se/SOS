@@ -57,6 +57,7 @@ namespace SOS.Process.Processors.Nors
 
             var obs = new Observation
             {
+                DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
                 DatasetName = "NORS",

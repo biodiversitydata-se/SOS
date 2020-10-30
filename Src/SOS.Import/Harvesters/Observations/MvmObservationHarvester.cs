@@ -53,7 +53,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for MVM data provider");
                 _logger.LogInformation(GetMvmHarvestSettingsInfoString());
 

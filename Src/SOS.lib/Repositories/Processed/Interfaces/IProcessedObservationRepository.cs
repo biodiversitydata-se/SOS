@@ -53,10 +53,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds);
 
         /// <summary>
-        ///     Create search index
+        /// Turn of indexing
         /// </summary>
         /// <returns></returns>
-        Task CreateIndexAsync();
+        Task<bool> DisableIndexingAsync();
+
+        /// <summary>
+        ///     Turn on indexing
+        /// </summary>
+        /// <returns></returns>
+        Task EnableIndexingAsync();
 
         /// <summary>
         /// Get latest modified document date for passed provider
