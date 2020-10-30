@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Converters;
@@ -108,9 +109,39 @@ namespace SOS.Lib.Models.Shared
         public BsonDocument EmlMetadata { get; set; }
 
         /// <summary>
+        /// Cron expression to calculate next run
+        /// </summary>
+        public string HarvestSchedule { get; set; }
+
+        /// <summary>
+        /// Last harvest time
+        /// </summary>
+        public DateTime? LastSuccessfulHarvest { get; set; }
+
+        /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
         /// </summary>
         public bool HarvestFailPreventProcessing { get; set; }
+
+        /// <summary>
+        /// Indicates that provider is ready to harvest
+        /// </summary>
+        public bool IsReadyToHarvest
+        {
+            get
+            {
+                var expression  = CronExpression.Parse(string.IsNullOrEmpty(HarvestSchedule) ? "* * * * *" : HarvestSchedule);
+
+                var nextOccurrence = expression.GetNextOccurrence(LastSuccessfulHarvest?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime());
+
+                if (!nextOccurrence.HasValue)
+                {
+                    return false;
+                }
+
+                return IsActive && DateTime.UtcNow > nextOccurrence;
+            }
+        }
 
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
         {
