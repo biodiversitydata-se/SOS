@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
@@ -105,7 +105,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// EML metadata.
         /// </summary>
-        [JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
+        [System.Text.Json.Serialization.JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
         public BsonDocument EmlMetadata { get; set; }
 
         /// <summary>
@@ -126,6 +126,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Indicates that provider is ready to harvest
         /// </summary>
+        [JsonIgnore]
         public bool IsReadyToHarvest
         {
             get
