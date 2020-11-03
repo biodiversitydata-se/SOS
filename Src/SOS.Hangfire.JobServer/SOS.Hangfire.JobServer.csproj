@@ -49,7 +49,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.0.2" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="HangFire" Version="1.7.17" />
     <PackageReference Include="HangFire.Autofac" Version="2.3.1" />
     <PackageReference Include="HangFire.Mongo" Version="0.7.12" />

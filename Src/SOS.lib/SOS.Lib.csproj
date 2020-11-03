@@ -22,7 +22,7 @@
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.12.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.12.1" />
     <PackageReference Include="NGeoHash" Version="1.2.0" />
   </ItemGroup>
 
