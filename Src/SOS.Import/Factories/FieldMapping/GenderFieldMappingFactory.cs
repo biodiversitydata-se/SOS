@@ -63,34 +63,27 @@ namespace SOS.Import.Factories.FieldMapping
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
+            var dwcMappingSynonyms = GetDwcMappingSynonyms();
+            var dwcMappings = CreateDwcMappings(fieldMappingValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.DwcSex,
                 Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
-                Values = new List<ExternalSystemMappingValue>
-                {
-                    new ExternalSystemMappingValue
-                    {
-                        Value = "male", SosId = fieldMappingValues.Single(m => m.Value == "male").Id
-                    },
-                    new ExternalSystemMappingValue
-                    {
-                        Value = "female", SosId = fieldMappingValues.Single(m => m.Value == "female").Id
-                    },
-                    new ExternalSystemMappingValue
-                    {
-                        Value = "hermaphrodite",
-                        SosId = fieldMappingValues.Single(m => m.Value == "hermaphroditic").Id
-                    },
-                    new ExternalSystemMappingValue
-                    {
-                        Value = "undetermined", SosId = fieldMappingValues.Single(m => m.Value == "empty").Id
-                    }
-                }
+                Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
             };
 
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;
         }
+
+        private Dictionary<string, string> GetDwcMappingSynonyms()
+        {
+            return new Dictionary<string, string>
+            {
+                {"m", "male"},
+                {"f", "female"},
+            };
+        }
+
     }
 }

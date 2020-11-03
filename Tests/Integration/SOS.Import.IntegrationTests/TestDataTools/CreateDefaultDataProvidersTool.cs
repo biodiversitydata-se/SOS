@@ -38,7 +38,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.ArtportalenObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    SupportIncrementalHarvest = true,
+                    HarvestFailPreventProcessing = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -60,9 +63,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "eddie.vonwachenfeldt@slu.se",
                     Url = "http://musselportalen.se/",
                     Type = DataProviderType.ClamPortalObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -83,9 +87,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "peter.ljungberg@slu.se",
                     Url = "https://www.slu.se/kul/",
                     Type = DataProviderType.KULObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -106,9 +111,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "Lars.Sonesten@slu.se",
                     Url = "http://miljodata.slu.se/mvm/",
                     Type = DataProviderType.MvmObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -130,9 +136,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Url =
                         "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
                     Type = DataProviderType.NorsObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -155,9 +162,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Url =
                         "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
                     Type = DataProviderType.SersObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -179,9 +187,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "mossnisse@hotmail.com",
                     Url = "http://herbarium.emg.umu.se",
                     Type = DataProviderType.VirtualHerbariumObservations,
-                    IsActive = false,
-                    IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -205,7 +214,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.SharkObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -231,7 +241,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -256,7 +267,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -281,7 +293,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -306,7 +319,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -330,7 +344,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {
@@ -353,8 +368,56 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
+                },
+                new DataProvider
+                {
+                    Identifier = DataProviderIdentifiers.FishData,
+                    Name = "Fishdata2 (FD2)",
+                    SwedishName = "Fiskdata2 (FD2)",
+                    Organization = "Department of Aquatic Resources (SLU Aqua)",
+                    SwedishOrganization = "Havsfiskelaboratoriet, Institutionen för akvatiska resurser, SLU",
+                    Description = "The database Fishdata2 at the institute of Marine Research, Department of Aquatic Resources at SLU, stores quality assured data from environmental investigations and fishery investigations of marine fish and shellfish. It is the national provider of data for the European Data collection Framework (DCF), feeding data to eg. ICES international assessment work of fish and shellfish.",
+                    SwedishDescription = "Databasen Fiskdata 2 innehåller kvalitetssäkrad fångstdata och individdata om fisk och skaldjur insamlade under miljöövervakningsundersökningar eller fiskeriundersökningar. Fiskdata2 är den nationella plattformen för hantering av data som samlas in under EUs datainsamlingsförordning (DCF) och vidarebefodrar data till bl.a. Internationella havsforskningsrådets (ICES) arbete med beståndsuppskattning av fisk och skaldjur. Databasen administreras av Havsfiskelaboratoriet, Institutionen för akvatiska resurser, SLU.",
+                    ContactPerson = new ContactPerson
+                    {
+                        Email = "Malin.Werner@slu.se",
+                        FirstName = "Malin",
+                        LastName = "Werner"
+                    },
+                    ContactEmail = "Malin.Werner@slu.se",
+                    Url = "https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/",
+                    Type = DataProviderType.FishDataObservations,
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
+                },
+                new DataProvider
+                {
+                    Identifier = DataProviderIdentifiers.ForestInventory,
+                    Name = "Swedish National Forest Inventory: Presence-absence Vegetation data",
+                    SwedishName = "Riksskogstaxeringen",
+                    Organization = "Swedish National Forest Inventory, SLU",
+                    SwedishOrganization = "Riksskogstaxeringen, SLU",
+                    Description = "The Swedish National Forest Inventory (NFI) is a sample based field inventory performed by the Swedish University of Agricultural Sciences (SLU). The annual inventory is undertaken on sample plots and this forms the basis for a large number of estimates. Data is collected over the whole of Sweden and statistics is published for all land use classes except urban land and sea and fresh water. The data collection is focused on forest land and particularly productive forest landSince 2003 areas within formally protected land are included and since 2016 non –coniferiuos alpine forest was included. The sample plots are circular and are, for practical reasons, grouped into clusters (tracts). The tracts are square or rectangular in shape and are of different dimensions in different parts of the country. The density between tracts and the number of sample plots per tract also varies for different parts of the country, with a higher sample intensity in southern Sweden. Two thirds of the sample consists of permanent tracts and one third are temporary. The permanent tracts are revisited every 5 th year and the temporary tracts are only visited once. The real coordinates of the permanent sample plots are protected. The coordinate in this dataset is randomely obfuscated with 200-1000 m.",
+                    SwedishDescription = "-",
+                    ContactPerson = new ContactPerson
+                    {
+                        Email = "riksskogstaxeringen@slu.se",
+                        FirstName = "Jonas",
+                        LastName = "Dahlgren"
+                    },
+                    ContactEmail = "riksskogstaxeringen@slu.se",
+                    Url = "https://www.slu.se/riksskogstaxeringen",
+                    Type = DataProviderType.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *"
                 }
+
             };
 
             return dataProviders;
@@ -386,7 +449,9 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 dataProviderByIdentifier[DataProviderIdentifiers.MalaiseTrap],
                 dataProviderByIdentifier[DataProviderIdentifiers.Porpoises],
                 dataProviderByIdentifier[DataProviderIdentifiers.ButterflyMonitoring],
-                dataProviderByIdentifier[DataProviderIdentifiers.SharkZooplankton]
+                dataProviderByIdentifier[DataProviderIdentifiers.SharkZooplankton],
+                dataProviderByIdentifier[DataProviderIdentifiers.FishData],
+                dataProviderByIdentifier[DataProviderIdentifiers.ForestInventory]
             };
 
             for (var i = 0; i < dataProviders.Count; i++)
