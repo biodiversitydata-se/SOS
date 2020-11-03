@@ -25,6 +25,7 @@ namespace SOS.Administration.Api
         private static ImportConfiguration _importConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
 
+
         /// <summary>
         ///     Main
         /// </summary>
@@ -61,7 +62,6 @@ namespace SOS.Administration.Api
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
@@ -76,10 +76,22 @@ namespace SOS.Administration.Api
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
+                        // Since code below not getting values from secret storage, we do this work around
+                        foreach (var prop in hostContext.Properties)
+                        {
+                            if (prop.Value.GetType().Name.Equals("Startup"))
+                            {
+                                var startUp = (Startup)prop.Value;
+                                _verbatimDbConfiguration = startUp.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+                                _processDbConfiguration = startUp.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                                _importConfiguration = startUp.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+                            }
+                        }
+                        /* Not getting values from secrets storage
                         _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                         _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                         _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
-
+                        */
                         return new AutofacServiceProviderFactory(builder =>
                             builder
                                 .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
