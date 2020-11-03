@@ -1684,14 +1684,12 @@ namespace MvmService
         /// <param name="serviceEndpoint">The endpoint to configure</param>
         /// <param name="clientCredentials">The client credentials</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-
         public SpeciesObservationChangeServiceClient() :
             base(SpeciesObservationChangeServiceClient.GetDefaultBinding(), SpeciesObservationChangeServiceClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
         public SpeciesObservationChangeServiceClient(EndpointConfiguration endpointConfiguration) : 
                 base(SpeciesObservationChangeServiceClient.GetBindingForEndpoint(endpointConfiguration), SpeciesObservationChangeServiceClient.GetEndpointAddress(endpointConfiguration))
         {
@@ -1897,7 +1895,6 @@ namespace MvmService
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
-
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
             return SpeciesObservationChangeServiceClient.GetBindingForEndpoint(EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService);
@@ -1907,7 +1904,6 @@ namespace MvmService
         {
             return SpeciesObservationChangeServiceClient.GetEndpointAddress(EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService);
         }
-
         public enum EndpointConfiguration
         {
             

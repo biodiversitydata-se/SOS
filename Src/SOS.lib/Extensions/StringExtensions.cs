@@ -288,5 +288,16 @@ namespace SOS.Lib.Extensions
         {
             return !string.IsNullOrWhiteSpace(value);
         }
+
+
+        /// <summary>
+        /// Make sure first char is lower case
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToCamelCase(this string value)
+        {
+            return string.IsNullOrEmpty(value) ? string.Empty : char.ToLower(value[0]) + value.Substring(1);
+        }
     }
 }
