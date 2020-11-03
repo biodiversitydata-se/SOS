@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;

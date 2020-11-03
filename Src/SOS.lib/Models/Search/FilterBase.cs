@@ -10,21 +10,16 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
-        /// <summary>
-        /// Convert filter to string
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
-        }
+        
+
+        public IEnumerable<int> AreaIds { get; set; }
 
         public IEnumerable<int> CountyIds { get; set; }
 
         /// <summary>
-        ///     Geometry filter 
+        ///     Only get data from these providers
         /// </summary>
-        public GeometryFilter GeometryFilter { get; set; }
+        public IEnumerable<int> DataProviderIds { get; set; }
 
         /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.
@@ -32,21 +27,47 @@ namespace SOS.Lib.Models.Search
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        ///     Field mapping translation culture code.
+        ///     Available values.
+        ///     sv-SE (Swedish)
+        ///     en-GB (English)
+        /// </summary>
+        public string FieldTranslationCultureCode { get; set; }
+
+        /// <summary>
+        ///     Geometry filter 
+        /// </summary>
+        public GeometryFilter GeometryFilter { get; set; }
+
+        /// <summary>
+        ///     Gender to match. Queryable values are available in Field Mappings.
+        /// </summary>
+        public IEnumerable<int> GenderIds { get; set; }
+
+
+        /// <summary>
+        ///     Decides whether to search for the exact taxa or
+        ///     for the hierarchical underlying taxa.
+        /// </summary>
+        public bool IncludeUnderlyingTaxa { get; set; }
+
+        /// <summary>
         ///     True if any filter property is set.
         /// </summary>
         public bool IsFilterActive =>
+            (AreaIds?.Any() ?? false) ||
             (CountyIds?.Any() ?? false) ||
-            (GeometryFilter?.IsValid ?? false) ||
+            (DataProviderIds?.Any() ?? false) ||
             EndDate != null ||
+            (GeometryFilter?.IsValid ?? false) ||
+            (GenderIds?.Any() ?? false) ||
             (MunicipalityIds?.Any() ?? false) ||
             OnlyValidated.HasValue ||
             PositiveSightings.HasValue ||
             (ProvinceIds?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
-            (GenderIds?.Any() ?? false) ||
             StartDate != null ||
-            (TaxonIds?.Any() ?? false) ||
-            (AreaIds?.Any() ?? false);
+            (TaxonIds?.Any() ?? false);
 
         /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.
@@ -66,11 +87,6 @@ namespace SOS.Lib.Models.Search
         public bool? PositiveSightings { get; set; }
 
         /// <summary>
-        ///     Only get data from these providers
-        /// </summary>
-        public IEnumerable<int> DataProviderIds { get; set; }
-
-        /// <summary>
         ///     Provinces to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> ProvinceIds { get; set; }
@@ -81,9 +97,9 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     Gender to match. Queryable values are available in Field Mappings.
+        ///     If true the whole event timespan must be between StartDate and EndDate
         /// </summary>
-        public IEnumerable<int> GenderIds { get; set; }
+        public bool SearchOnlyBetweenDates { get; set; }
 
         /// <summary>
         ///     Observation start date specified in the ISO 8601 standard.
@@ -95,31 +111,20 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
-        /// <summary>
-        ///     Decides whether to search for the exact taxa or
-        ///     for the hierarchical underlying taxa.
-        /// </summary>
-        public bool IncludeUnderlyingTaxa { get; set; }
-
-        /// <summary>
-        ///     Field mapping translation culture code.
-        ///     Available values.
-        ///     sv-SE (Swedish)
-        ///     en-GB (English)
-        /// </summary>
-        public string FieldTranslationCultureCode { get; set; }
-
-        public IEnumerable<int> AreaIds { get; set; }
-
-        /// <summary>
-        ///     If true the whole event timespan must be between StartDate and EndDate
-        /// </summary>
-        public bool SearchOnlyBetweenDates { get; set; }
-
+        
         public FilterBase Clone()
         {
             var searchFilter = (FilterBase) MemberwiseClone();
             return searchFilter;
+        }
+
+        /// <summary>
+        /// Convert filter to string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
         }
     }
 }
