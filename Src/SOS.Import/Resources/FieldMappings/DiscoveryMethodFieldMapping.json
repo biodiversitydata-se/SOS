@@ -1,4 +1,5 @@
 {
+  "Id": 20,
   "Name": "DiscoveryMethod",
   "Localized": true,
   "Values": [
@@ -9,11 +10,11 @@
       "Translations": [
         {
           "CultureCode": "sv-SE",
-          "Value": " "
+          "Value": ""
         },
         {
           "CultureCode": "en-GB",
-          "Value": " "
+          "Value": ""
         }
       ]
     },
@@ -1612,6 +1613,5 @@
         }
       ]
     }
-  ],
-  "Id": 20
+  ]
 }
