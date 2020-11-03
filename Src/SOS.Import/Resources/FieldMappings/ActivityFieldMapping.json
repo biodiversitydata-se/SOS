@@ -1,3489 +1,3489 @@
 {
-    "Id": 1,
-    "Name": "Activity",
-    "Localized": true,
-    "Values": [
-        {
-            "Id": 0,
-            "Value": "empty",
-            "Localized": true,
-            "Category": {
-                "Id": 0,
-                "Name": "",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": ""
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": ""
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": " "
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": " "
-                }
-            ]
-        },
-        {
-            "Id": 1,
-            "Value": "nest with egg",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bo, ägg/ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "nest with egg"
-                }
-            ]
-        },
-        {
-            "Id": 2,
-            "Value": "nest with chick heard",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bo, hörda ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "nest with chick heard"
-                }
-            ]
-        },
-        {
-            "Id": 3,
-            "Value": "breeding failed",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "misslyckad häckning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "breeding failed"
-                }
-            ]
-        },
-        {
-            "Id": 4,
-            "Value": "incubating",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ruvande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "incubating"
-                }
-            ]
-        },
-        {
-            "Id": 5,
-            "Value": "egg shells",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äggskal"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "egg shells"
-                }
-            ]
-        },
-        {
-            "Id": 6,
-            "Value": "carrying food for young",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "föda åt ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "carrying food for young"
-                }
-            ]
-        },
-        {
-            "Id": 7,
-            "Value": "carrying faecal sac",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bär exkrementsäck"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "carrying faecal sac"
-                }
-            ]
-        },
-        {
-            "Id": 8,
-            "Value": "visiting occupied nest",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "besöker bebott bo"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "visiting occupied nest"
-                }
-            ]
-        },
-        {
-            "Id": 9,
-            "Value": "recently fledged young",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "pulli/nyligen flygga ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "recently fledged young"
-                }
-            ]
-        },
-        {
-            "Id": 10,
-            "Value": "recently used nest",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "nyligen använt bo"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "recently used nest"
-                }
-            ]
-        },
-        {
-            "Id": 11,
-            "Value": "distraction display",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "avledningsbeteende"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "distraction display"
-                }
-            ]
-        },
-        {
-            "Id": 12,
-            "Value": "nest building",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bobygge"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "nest building"
-                }
-            ]
-        },
-        {
-            "Id": 13,
-            "Value": "brood patch",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ruvfläckar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "brood patch"
-                }
-            ]
-        },
-        {
-            "Id": 14,
-            "Value": "agitated behaviour",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "upprörd, varnande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "agitated behaviour"
-                }
-            ]
-        },
-        {
-            "Id": 15,
-            "Value": "visit possible nest?",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bobesök?"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "visit possible nest?"
-                }
-            ]
-        },
-        {
-            "Id": 16,
-            "Value": "mating/mating ceremonies",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "parning/parningsceremonier"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "mating/mating ceremonies"
-                }
-            ]
-        },
-        {
-            "Id": 17,
-            "Value": "permanent territory",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "permanent revir"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "permanent territory"
-                }
-            ]
-        },
-        {
-            "Id": 18,
-            "Value": "pair in suitable habitat",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "par i lämplig häckbiotop"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "pair in suitable habitat"
-                }
-            ]
-        },
-        {
-            "Id": 19,
-            "Value": "display/song",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spel/sång"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "display/song"
-                }
-            ]
-        },
-        {
-            "Id": 20,
-            "Value": "in nesting habitat",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "obs i häcktid, lämplig biotop"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "in nesting habitat"
-                }
-            ]
-        },
-        {
-            "Id": 22,
-            "Value": "staging",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "rastande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "staging"
-                }
-            ]
-        },
-        {
-            "Id": 23,
-            "Value": "stationary",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "stationär"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "stationary"
-                }
-            ]
-        },
-        {
-            "Id": 24,
-            "Value": "flying overhead",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "förbiflygande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "flying overhead"
-                }
-            ]
-        },
-        {
-            "Id": 25,
-            "Value": "foraging",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "födosökande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "foraging"
-                }
-            ]
-        },
-        {
-            "Id": 26,
-            "Value": "display / song outside breeding",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spel/sång, ej häckning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "display / song outside breeding"
-                }
-            ]
-        },
-        {
-            "Id": 27,
-            "Value": "call",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "lockläte, övriga läten"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "call"
-                }
-            ]
-        },
-        {
-            "Id": 28,
-            "Value": "territory outside breeding",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "revir, ej häckning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "territory outside breeding"
-                }
-            ]
-        },
-        {
-            "Id": 29,
-            "Value": "ringed",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ringmärktes"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "ringed"
-                }
-            ]
-        },
-        {
-            "Id": 30,
-            "Value": "individually marked",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "individmärkt"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "individually marked"
-                }
-            ]
-        },
-        {
-            "Id": 31,
-            "Value": "migration attempt",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckförsök"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migration attempt"
-                }
-            ]
-        },
-        {
-            "Id": 32,
-            "Value": "migrating",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating"
-                }
-            ]
-        },
-        {
-            "Id": 33,
-            "Value": "migrating N",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande N"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating N"
-                }
-            ]
-        },
-        {
-            "Id": 34,
-            "Value": "migrating NE",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande NO"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating NE"
-                }
-            ]
-        },
-        {
-            "Id": 35,
-            "Value": "migrating E",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande O"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating E"
-                }
-            ]
-        },
-        {
-            "Id": 36,
-            "Value": "migrating SE",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande SO"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating SE"
-                }
-            ]
-        },
-        {
-            "Id": 37,
-            "Value": "migrating S",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande S"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating S"
-                }
-            ]
-        },
-        {
-            "Id": 38,
-            "Value": "migrating SW",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande SV"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating SW"
-                }
-            ]
-        },
-        {
-            "Id": 39,
-            "Value": "migrating W",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande V"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating W"
-                }
-            ]
-        },
-        {
-            "Id": 40,
-            "Value": "migrating NW",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sträckande NV"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating NW"
-                }
-            ]
-        },
-        {
-            "Id": 41,
-            "Value": "found dead",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "funnen död"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "found dead"
-                }
-            ]
-        },
-        {
-            "Id": 42,
-            "Value": "fresh trace",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "färska spår"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "fresh trace"
-                }
-            ]
-        },
-        {
-            "Id": 43,
-            "Value": "trace",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äldre spår"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "trace"
-                }
-            ]
-        },
-        {
-            "Id": 44,
-            "Value": "fresh faeces",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "färsk spillning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "fresh faeces"
-                }
-            ]
-        },
-        {
-            "Id": 45,
-            "Value": "faeces",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äldre spillning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "faeces"
-                }
-            ]
-        },
-        {
-            "Id": 46,
-            "Value": "fresh gnaw",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "färska gnagspår"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "fresh gnaw"
-                }
-            ]
-        },
-        {
-            "Id": 47,
-            "Value": "gnaw",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äldre gnagspår"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "gnaw"
-                }
-            ]
-        },
-        {
-            "Id": 48,
-            "Value": "gall",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "gall"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "gall"
-                }
-            ]
-        },
-        {
-            "Id": 49,
-            "Value": "mine",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "mina"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "mine"
-                }
-            ]
-        },
-        {
-            "Id": 50,
-            "Value": "cocoon",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "kokong"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "cocoon"
-                }
-            ]
-        },
-        {
-            "Id": 51,
-            "Value": "fragment",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "fragment"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "fragment"
-                }
-            ]
-        },
-        {
-            "Id": 52,
-            "Value": "display",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spel"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "display"
-                }
-            ]
-        },
-        {
-            "Id": 53,
-            "Value": "territorial",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "revirhävdande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "territorial"
-                }
-            ]
-        },
-        {
-            "Id": 54,
-            "Value": "egg laying",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äggläggande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "egg laying"
-                }
-            ]
-        },
-        {
-            "Id": 55,
-            "Value": "running/crawling",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "frispringande/krypande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "running/crawling"
-                }
-            ]
-        },
-        {
-            "Id": 56,
-            "Value": "free-flying",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "friflygande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "free-flying"
-                }
-            ]
-        },
-        {
-            "Id": 57,
-            "Value": "in water/swimming",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "i vatten/simmande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "in water/swimming"
-                }
-            ]
-        },
-        {
-            "Id": 58,
-            "Value": "digging",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "grävande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "digging"
-                }
-            ]
-        },
-        {
-            "Id": 59,
-            "Value": "old nest",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "gammalt bo"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "old nest"
-                }
-            ]
-        },
-        {
-            "Id": 60,
-            "Value": "hibernating",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dvala"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "hibernating"
-                }
-            ]
-        },
-        {
-            "Id": 61,
-            "Value": "trace of oestrous female",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spår från löpande hona"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "trace of oestrous female"
-                }
-            ]
-        },
-        {
-            "Id": 62,
-            "Value": "remains of prey/food",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bytes-/matrester"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "remains of prey/food"
-                }
-            ]
-        },
-        {
-            "Id": 63,
-            "Value": "remains of fur or hair",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "hårrester"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "remains of fur or hair"
-                }
-            ]
-        },
-        {
-            "Id": 64,
-            "Value": "shed skin",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ömsskinn"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "shed skin"
-                }
-            ]
-        },
-        {
-            "Id": 65,
-            "Value": "ill",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "sjuk"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "ill"
-                }
-            ]
-        },
-        {
-            "Id": 66,
-            "Value": "play",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "lek"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "play"
-                }
-            ]
-        },
-        {
-            "Id": 67,
-            "Value": "migrating fish",
-            "Localized": true,
-            "Category": {
-                "Id": 5,
-                "Name": "Migratory",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Sträckande/migrerande"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Migratory"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "vandrande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "migrating fish"
-                }
-            ]
-        },
-        {
-            "Id": 68,
-            "Value": "dead, collided with power line",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med kraftledning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with power line"
-                }
-            ]
-        },
-        {
-            "Id": 69,
-            "Value": "dead, collided with wind mill",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med vindkraftverk"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with wind mill"
-                }
-            ]
-        },
-        {
-            "Id": 70,
-            "Value": "dead, collided with window",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med fönster"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with window"
-                }
-            ]
-        },
-        {
-            "Id": 71,
-            "Value": "dead, collided with lighthouse",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med fyr"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with lighthouse"
-                }
-            ]
-        },
-        {
-            "Id": 72,
-            "Value": "road kill",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "trafikdödad"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "road kill"
-                }
-            ]
-        },
-        {
-            "Id": 73,
-            "Value": "dead, collided with aeroplane",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med flygplan"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with aeroplane"
-                }
-            ]
-        },
-        {
-            "Id": 74,
-            "Value": "dead, collided with fence",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död, krockat med staket"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead, collided with fence"
-                }
-            ]
-        },
-        {
-            "Id": 75,
-            "Value": "killed by electricity",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dödad av elektricitet"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "killed by electricity"
-                }
-            ]
-        },
-        {
-            "Id": 76,
-            "Value": "drowned in fishing net",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "drunknad i fiskenät"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "drowned in fishing net"
-                }
-            ]
-        },
-        {
-            "Id": 77,
-            "Value": "killed by predator",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dödad av predator"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "killed by predator"
-                }
-            ]
-        },
-        {
-            "Id": 78,
-            "Value": "dead due to disease/starvation",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "död av sjukdom/svält"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dead due to disease/starvation"
-                }
-            ]
-        },
-        {
-            "Id": 79,
-            "Value": "lactating",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ammande hondjur"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "lactating"
-                }
-            ]
-        },
-        {
-            "Id": 80,
-            "Value": "pregnant female",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dräktig hona"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "pregnant female"
-                }
-            ]
-        },
-        {
-            "Id": 81,
-            "Value": "signs of gnawing",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "gnagspor"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "signs of gnawing"
-                }
-            ]
-        },
-        {
-            "Id": 82,
-            "Value": "spawning",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "leking"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "spawning"
-                }
-            ]
-        },
-        {
-            "Id": 83,
-            "Value": "male with well developed epididymitis",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "handjur med väl utvecklade bitestikel"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "male with well developed epididymitis"
-                }
-            ]
-        },
-        {
-            "Id": 84,
-            "Value": "jump",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "hopp över vattenytan"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "jump"
-                }
-            ]
-        },
-        {
-            "Id": 85,
-            "Value": "female with offspring",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "obs av hona med unge/ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "female with offspring"
-                }
-            ]
-        },
-        {
-            "Id": 86,
-            "Value": "dormant",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "vilande"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dormant"
-                }
-            ]
-        },
-        {
-            "Id": 87,
-            "Value": "heard",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "hört"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "heard"
-                }
-            ]
-        },
-        {
-            "Id": 88,
-            "Value": "in breeding colours",
-            "Localized": true,
-            "Category": {
-                "Id": 3,
-                "Name": "Possible reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Möjlig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Possible reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "i lekdräkt"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "in breeding colours"
-                }
-            ]
-        },
-        {
-            "Id": 89,
-            "Value": "in water",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "i vatten"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "in water"
-                }
-            ]
-        },
-        {
-            "Id": 90,
-            "Value": "dispute between males",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "kamp mellan handjur"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dispute between males"
-                }
-            ]
-        },
-        {
-            "Id": 91,
-            "Value": "steady course, regular diving",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "konstant kurs, regelbunden dykning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "steady course, regular diving"
-                }
-            ]
-        },
-        {
-            "Id": 92,
-            "Value": "slow movement, long periods on the surface",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "långsam rörelse, lång tid vid ytan"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "slow movement, long periods on the surface"
-                }
-            ]
-        },
-        {
-            "Id": 93,
-            "Value": "approaching boat",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "närmanden mot båt"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "approaching boat"
-                }
-            ]
-        },
-        {
-            "Id": 94,
-            "Value": "winter habitat",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "på övervintringsplats"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "winter habitat"
-                }
-            ]
-        },
-        {
-            "Id": 95,
-            "Value": "building nest/used nest/nest",
-            "Localized": true,
-            "Category": {
-                "Id": 2,
-                "Name": "Probable reproduction",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Trolig reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Probable reproduction"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bobyggande/använd bo/bo"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "building nest/used nest/nest"
-                }
-            ]
-        },
-        {
-            "Id": 96,
-            "Value": "shot/killed",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "skjuten/avlivad"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "shot/killed"
-                }
-            ]
-        },
-        {
-            "Id": 97,
-            "Value": "sunbathing",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "solar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "sunbathing"
-                }
-            ]
-        },
-        {
-            "Id": 98,
-            "Value": "trace of adult with offspring",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spår av vuxet djur med unge/ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "trace of adult with offspring"
-                }
-            ]
-        },
-        {
-            "Id": 100,
-            "Value": "unsteady course/irregualr diving",
-            "Localized": true,
-            "Category": {
-                "Id": 4,
-                "Name": "Stationary",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Stationär"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Stationary"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "varierande kurs, oregelbunden dykning"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "unsteady course/irregualr diving"
-                }
-            ]
-        },
-        {
-            "Id": 101,
-            "Value": "breeding ground or offspring",
-            "Localized": true,
-            "Category": {
-                "Id": 1,
-                "Name": "Reproduction confirmed",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Säkerställd reproduktion"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Reproduction confirmed"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "yngelplats med ungar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "breeding ground or offspring"
-                }
-            ]
-        },
-        {
-            "Id": 102,
-            "Value": "killed by oil",
-            "Localized": true,
-            "Category": {
-                "Id": 7,
-                "Name": "Dead",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Död"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Dead"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dödad av olja"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "killed by oil"
-                }
-            ]
-        },
-        {
-            "Id": 103,
-            "Value": "tracks from climbing",
-            "Localized": true,
-            "Category": {
-                "Id": 6,
-                "Name": "Trace",
-                "Localized": true,
-                "Translations": [
-                    {
-                        "CultureCode": "sv-SE",
-                        "Value": "Spår"
-                    },
-                    {
-                        "CultureCode": "en-GB",
-                        "Value": "Trace"
-                    }
-                ]
-            },
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "spår från klättring"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "tracks from climbing"
-                }
-            ]
+  "Id": 1,
+  "Name": "Activity",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Value": "empty",
+      "Localized": true,
+      "Category": {
+        "Id": 0,
+        "Name": "",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": ""
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": ""
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": ""
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": ""
         }
-    ],
-    "ExternalSystemsMapping": [
+      ]
+    },
+    {
+      "Id": 1,
+      "Value": "nest with egg",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
         {
-            "Id": 0,
-            "Name": "Artportalen",
-            "Mappings": [
-                {
-                    "Key": "Id",
-                    "Description": "Id field mapping",
-                    "Values": [
-                        {
-                            "Value": 0,
-                            "SosId": 0
-                        },
-                        {
-                            "Value": 1,
-                            "SosId": 1
-                        },
-                        {
-                            "Value": 2,
-                            "SosId": 2
-                        },
-                        {
-                            "Value": 3,
-                            "SosId": 3
-                        },
-                        {
-                            "Value": 4,
-                            "SosId": 4
-                        },
-                        {
-                            "Value": 5,
-                            "SosId": 5
-                        },
-                        {
-                            "Value": 6,
-                            "SosId": 6
-                        },
-                        {
-                            "Value": 7,
-                            "SosId": 7
-                        },
-                        {
-                            "Value": 8,
-                            "SosId": 8
-                        },
-                        {
-                            "Value": 9,
-                            "SosId": 9
-                        },
-                        {
-                            "Value": 10,
-                            "SosId": 10
-                        },
-                        {
-                            "Value": 11,
-                            "SosId": 11
-                        },
-                        {
-                            "Value": 12,
-                            "SosId": 12
-                        },
-                        {
-                            "Value": 13,
-                            "SosId": 13
-                        },
-                        {
-                            "Value": 14,
-                            "SosId": 14
-                        },
-                        {
-                            "Value": 15,
-                            "SosId": 15
-                        },
-                        {
-                            "Value": 16,
-                            "SosId": 16
-                        },
-                        {
-                            "Value": 17,
-                            "SosId": 17
-                        },
-                        {
-                            "Value": 18,
-                            "SosId": 18
-                        },
-                        {
-                            "Value": 19,
-                            "SosId": 19
-                        },
-                        {
-                            "Value": 20,
-                            "SosId": 20
-                        },
-                        {
-                            "Value": 22,
-                            "SosId": 22
-                        },
-                        {
-                            "Value": 23,
-                            "SosId": 23
-                        },
-                        {
-                            "Value": 24,
-                            "SosId": 24
-                        },
-                        {
-                            "Value": 25,
-                            "SosId": 25
-                        },
-                        {
-                            "Value": 26,
-                            "SosId": 26
-                        },
-                        {
-                            "Value": 27,
-                            "SosId": 27
-                        },
-                        {
-                            "Value": 28,
-                            "SosId": 28
-                        },
-                        {
-                            "Value": 29,
-                            "SosId": 29
-                        },
-                        {
-                            "Value": 30,
-                            "SosId": 30
-                        },
-                        {
-                            "Value": 31,
-                            "SosId": 31
-                        },
-                        {
-                            "Value": 32,
-                            "SosId": 32
-                        },
-                        {
-                            "Value": 33,
-                            "SosId": 33
-                        },
-                        {
-                            "Value": 34,
-                            "SosId": 34
-                        },
-                        {
-                            "Value": 35,
-                            "SosId": 35
-                        },
-                        {
-                            "Value": 36,
-                            "SosId": 36
-                        },
-                        {
-                            "Value": 37,
-                            "SosId": 37
-                        },
-                        {
-                            "Value": 38,
-                            "SosId": 38
-                        },
-                        {
-                            "Value": 39,
-                            "SosId": 39
-                        },
-                        {
-                            "Value": 40,
-                            "SosId": 40
-                        },
-                        {
-                            "Value": 41,
-                            "SosId": 41
-                        },
-                        {
-                            "Value": 42,
-                            "SosId": 42
-                        },
-                        {
-                            "Value": 43,
-                            "SosId": 43
-                        },
-                        {
-                            "Value": 44,
-                            "SosId": 44
-                        },
-                        {
-                            "Value": 45,
-                            "SosId": 45
-                        },
-                        {
-                            "Value": 46,
-                            "SosId": 46
-                        },
-                        {
-                            "Value": 47,
-                            "SosId": 47
-                        },
-                        {
-                            "Value": 48,
-                            "SosId": 48
-                        },
-                        {
-                            "Value": 49,
-                            "SosId": 49
-                        },
-                        {
-                            "Value": 50,
-                            "SosId": 50
-                        },
-                        {
-                            "Value": 51,
-                            "SosId": 51
-                        },
-                        {
-                            "Value": 52,
-                            "SosId": 52
-                        },
-                        {
-                            "Value": 53,
-                            "SosId": 53
-                        },
-                        {
-                            "Value": 54,
-                            "SosId": 54
-                        },
-                        {
-                            "Value": 55,
-                            "SosId": 55
-                        },
-                        {
-                            "Value": 56,
-                            "SosId": 56
-                        },
-                        {
-                            "Value": 57,
-                            "SosId": 57
-                        },
-                        {
-                            "Value": 58,
-                            "SosId": 58
-                        },
-                        {
-                            "Value": 59,
-                            "SosId": 59
-                        },
-                        {
-                            "Value": 60,
-                            "SosId": 60
-                        },
-                        {
-                            "Value": 61,
-                            "SosId": 61
-                        },
-                        {
-                            "Value": 62,
-                            "SosId": 62
-                        },
-                        {
-                            "Value": 63,
-                            "SosId": 63
-                        },
-                        {
-                            "Value": 64,
-                            "SosId": 64
-                        },
-                        {
-                            "Value": 65,
-                            "SosId": 65
-                        },
-                        {
-                            "Value": 66,
-                            "SosId": 66
-                        },
-                        {
-                            "Value": 67,
-                            "SosId": 67
-                        },
-                        {
-                            "Value": 68,
-                            "SosId": 68
-                        },
-                        {
-                            "Value": 69,
-                            "SosId": 69
-                        },
-                        {
-                            "Value": 70,
-                            "SosId": 70
-                        },
-                        {
-                            "Value": 71,
-                            "SosId": 71
-                        },
-                        {
-                            "Value": 72,
-                            "SosId": 72
-                        },
-                        {
-                            "Value": 73,
-                            "SosId": 73
-                        },
-                        {
-                            "Value": 74,
-                            "SosId": 74
-                        },
-                        {
-                            "Value": 75,
-                            "SosId": 75
-                        },
-                        {
-                            "Value": 76,
-                            "SosId": 76
-                        },
-                        {
-                            "Value": 77,
-                            "SosId": 77
-                        },
-                        {
-                            "Value": 78,
-                            "SosId": 78
-                        },
-                        {
-                            "Value": 79,
-                            "SosId": 79
-                        },
-                        {
-                            "Value": 80,
-                            "SosId": 80
-                        },
-                        {
-                            "Value": 81,
-                            "SosId": 81
-                        },
-                        {
-                            "Value": 82,
-                            "SosId": 82
-                        },
-                        {
-                            "Value": 83,
-                            "SosId": 83
-                        },
-                        {
-                            "Value": 84,
-                            "SosId": 84
-                        },
-                        {
-                            "Value": 85,
-                            "SosId": 85
-                        },
-                        {
-                            "Value": 86,
-                            "SosId": 86
-                        },
-                        {
-                            "Value": 87,
-                            "SosId": 87
-                        },
-                        {
-                            "Value": 88,
-                            "SosId": 88
-                        },
-                        {
-                            "Value": 89,
-                            "SosId": 89
-                        },
-                        {
-                            "Value": 90,
-                            "SosId": 90
-                        },
-                        {
-                            "Value": 91,
-                            "SosId": 91
-                        },
-                        {
-                            "Value": 92,
-                            "SosId": 92
-                        },
-                        {
-                            "Value": 93,
-                            "SosId": 93
-                        },
-                        {
-                            "Value": 94,
-                            "SosId": 94
-                        },
-                        {
-                            "Value": 95,
-                            "SosId": 95
-                        },
-                        {
-                            "Value": 96,
-                            "SosId": 96
-                        },
-                        {
-                            "Value": 97,
-                            "SosId": 97
-                        },
-                        {
-                            "Value": 98,
-                            "SosId": 98
-                        },
-                        {
-                            "Value": 100,
-                            "SosId": 100
-                        },
-                        {
-                            "Value": 101,
-                            "SosId": 101
-                        },
-                        {
-                            "Value": 102,
-                            "SosId": 102
-                        },
-                        {
-                            "Value": 103,
-                            "SosId": 103
-                        }
-                    ]
-                }
-            ]
+          "CultureCode": "sv-SE",
+          "Value": "bo, ägg/ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest with egg"
         }
-    ]
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "nest with chick heard",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bo, hörda ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest with chick heard"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "breeding failed",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "misslyckad häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "breeding failed"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "incubating",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "incubating"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "egg shells",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äggskal"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg shells"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "carrying food for young",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "föda åt ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying food for young"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "carrying faecal sac",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bär exkrementsäck"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying faecal sac"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "visiting occupied nest",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "besöker bebott bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visiting occupied nest"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Value": "recently fledged young",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "pulli/nyligen flygga ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "recently fledged young"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Value": "recently used nest",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "nyligen använt bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "recently used nest"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "distraction display",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "avledningsbeteende"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "distraction display"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "nest building",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobygge"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest building"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "Value": "brood patch",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvfläckar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "brood patch"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Value": "agitated behaviour",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "upprörd, varnande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "agitated behaviour"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Value": "visit possible nest?",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobesök?"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visit possible nest?"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Value": "mating/mating ceremonies",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "parning/parningsceremonier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mating/mating ceremonies"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Value": "permanent territory",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "permanent revir"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "permanent territory"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Value": "pair in suitable habitat",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "par i lämplig häckbiotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pair in suitable habitat"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Value": "display/song",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel/sång"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display/song"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Value": "in nesting habitat",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "obs i häcktid, lämplig biotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in nesting habitat"
+        }
+      ]
+    },
+    {
+      "Id": 22,
+      "Value": "staging",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "rastande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "staging"
+        }
+      ]
+    },
+    {
+      "Id": 23,
+      "Value": "stationary",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "stationär"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "stationary"
+        }
+      ]
+    },
+    {
+      "Id": 24,
+      "Value": "flying overhead",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "förbiflygande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "flying overhead"
+        }
+      ]
+    },
+    {
+      "Id": 25,
+      "Value": "foraging",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "födosökande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "foraging"
+        }
+      ]
+    },
+    {
+      "Id": 26,
+      "Value": "display / song outside breeding",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel/sång, ej häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display / song outside breeding"
+        }
+      ]
+    },
+    {
+      "Id": 27,
+      "Value": "call",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "lockläte, övriga läten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "call"
+        }
+      ]
+    },
+    {
+      "Id": 28,
+      "Value": "territory outside breeding",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "revir, ej häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "territory outside breeding"
+        }
+      ]
+    },
+    {
+      "Id": 29,
+      "Value": "ringed",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ringmärktes"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "ringed"
+        }
+      ]
+    },
+    {
+      "Id": 30,
+      "Value": "individually marked",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "individmärkt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "individually marked"
+        }
+      ]
+    },
+    {
+      "Id": 31,
+      "Value": "migration attempt",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckförsök"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migration attempt"
+        }
+      ]
+    },
+    {
+      "Id": 32,
+      "Value": "migrating",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating"
+        }
+      ]
+    },
+    {
+      "Id": 33,
+      "Value": "migrating N",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande N"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating N"
+        }
+      ]
+    },
+    {
+      "Id": 34,
+      "Value": "migrating NE",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande NO"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating NE"
+        }
+      ]
+    },
+    {
+      "Id": 35,
+      "Value": "migrating E",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande O"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating E"
+        }
+      ]
+    },
+    {
+      "Id": 36,
+      "Value": "migrating SE",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande SO"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating SE"
+        }
+      ]
+    },
+    {
+      "Id": 37,
+      "Value": "migrating S",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande S"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating S"
+        }
+      ]
+    },
+    {
+      "Id": 38,
+      "Value": "migrating SW",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande SV"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating SW"
+        }
+      ]
+    },
+    {
+      "Id": 39,
+      "Value": "migrating W",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande V"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating W"
+        }
+      ]
+    },
+    {
+      "Id": 40,
+      "Value": "migrating NW",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande NV"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating NW"
+        }
+      ]
+    },
+    {
+      "Id": 41,
+      "Value": "found dead",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "funnen död"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "found dead"
+        }
+      ]
+    },
+    {
+      "Id": 42,
+      "Value": "fresh trace",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "färska spår"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fresh trace"
+        }
+      ]
+    },
+    {
+      "Id": 43,
+      "Value": "trace",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äldre spår"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "trace"
+        }
+      ]
+    },
+    {
+      "Id": 44,
+      "Value": "fresh faeces",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "färsk spillning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fresh faeces"
+        }
+      ]
+    },
+    {
+      "Id": 45,
+      "Value": "faeces",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äldre spillning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "faeces"
+        }
+      ]
+    },
+    {
+      "Id": 46,
+      "Value": "fresh gnaw",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "färska gnagspår"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fresh gnaw"
+        }
+      ]
+    },
+    {
+      "Id": 47,
+      "Value": "gnaw",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äldre gnagspår"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "gnaw"
+        }
+      ]
+    },
+    {
+      "Id": 48,
+      "Value": "gall",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "gall"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "gall"
+        }
+      ]
+    },
+    {
+      "Id": 49,
+      "Value": "mine",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "mina"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mine"
+        }
+      ]
+    },
+    {
+      "Id": 50,
+      "Value": "cocoon",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "kokong"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "cocoon"
+        }
+      ]
+    },
+    {
+      "Id": 51,
+      "Value": "fragment",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "fragment"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fragment"
+        }
+      ]
+    },
+    {
+      "Id": 52,
+      "Value": "display",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display"
+        }
+      ]
+    },
+    {
+      "Id": 53,
+      "Value": "territorial",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "revirhävdande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "territorial"
+        }
+      ]
+    },
+    {
+      "Id": 54,
+      "Value": "egg laying",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äggläggande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg laying"
+        }
+      ]
+    },
+    {
+      "Id": 55,
+      "Value": "running/crawling",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "frispringande/krypande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "running/crawling"
+        }
+      ]
+    },
+    {
+      "Id": 56,
+      "Value": "free-flying",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "friflygande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "free-flying"
+        }
+      ]
+    },
+    {
+      "Id": 57,
+      "Value": "in water/swimming",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i vatten/simmande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in water/swimming"
+        }
+      ]
+    },
+    {
+      "Id": 58,
+      "Value": "digging",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "grävande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "digging"
+        }
+      ]
+    },
+    {
+      "Id": 59,
+      "Value": "old nest",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "gammalt bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "old nest"
+        }
+      ]
+    },
+    {
+      "Id": 60,
+      "Value": "hibernating",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dvala"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "hibernating"
+        }
+      ]
+    },
+    {
+      "Id": 61,
+      "Value": "trace of oestrous female",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spår från löpande hona"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "trace of oestrous female"
+        }
+      ]
+    },
+    {
+      "Id": 62,
+      "Value": "remains of prey/food",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bytes-/matrester"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "remains of prey/food"
+        }
+      ]
+    },
+    {
+      "Id": 63,
+      "Value": "remains of fur or hair",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "hårrester"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "remains of fur or hair"
+        }
+      ]
+    },
+    {
+      "Id": 64,
+      "Value": "shed skin",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ömsskinn"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "shed skin"
+        }
+      ]
+    },
+    {
+      "Id": 65,
+      "Value": "ill",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sjuk"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "ill"
+        }
+      ]
+    },
+    {
+      "Id": 66,
+      "Value": "play",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "lek"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "play"
+        }
+      ]
+    },
+    {
+      "Id": 67,
+      "Value": "migrating fish",
+      "Localized": true,
+      "Category": {
+        "Id": 5,
+        "Name": "Migratory",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Sträckande/migrerande"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Migratory"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "vandrande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating fish"
+        }
+      ]
+    },
+    {
+      "Id": 68,
+      "Value": "dead, collided with power line",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med kraftledning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with power line"
+        }
+      ]
+    },
+    {
+      "Id": 69,
+      "Value": "dead, collided with wind mill",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med vindkraftverk"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with wind mill"
+        }
+      ]
+    },
+    {
+      "Id": 70,
+      "Value": "dead, collided with window",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med fönster"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with window"
+        }
+      ]
+    },
+    {
+      "Id": 71,
+      "Value": "dead, collided with lighthouse",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med fyr"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with lighthouse"
+        }
+      ]
+    },
+    {
+      "Id": 72,
+      "Value": "road kill",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "trafikdödad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "road kill"
+        }
+      ]
+    },
+    {
+      "Id": 73,
+      "Value": "dead, collided with aeroplane",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med flygplan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with aeroplane"
+        }
+      ]
+    },
+    {
+      "Id": 74,
+      "Value": "dead, collided with fence",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död, krockat med staket"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead, collided with fence"
+        }
+      ]
+    },
+    {
+      "Id": 75,
+      "Value": "killed by electricity",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dödad av elektricitet"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "killed by electricity"
+        }
+      ]
+    },
+    {
+      "Id": 76,
+      "Value": "drowned in fishing net",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "drunknad i fiskenät"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "drowned in fishing net"
+        }
+      ]
+    },
+    {
+      "Id": 77,
+      "Value": "killed by predator",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dödad av predator"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "killed by predator"
+        }
+      ]
+    },
+    {
+      "Id": 78,
+      "Value": "dead due to disease/starvation",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "död av sjukdom/svält"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dead due to disease/starvation"
+        }
+      ]
+    },
+    {
+      "Id": 79,
+      "Value": "lactating",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ammande hondjur"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "lactating"
+        }
+      ]
+    },
+    {
+      "Id": 80,
+      "Value": "pregnant female",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dräktig hona"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pregnant female"
+        }
+      ]
+    },
+    {
+      "Id": 81,
+      "Value": "signs of gnawing",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "gnagspor"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "signs of gnawing"
+        }
+      ]
+    },
+    {
+      "Id": 82,
+      "Value": "spawning",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "leking"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "spawning"
+        }
+      ]
+    },
+    {
+      "Id": 83,
+      "Value": "male with well developed epididymitis",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "handjur med väl utvecklade bitestikel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "male with well developed epididymitis"
+        }
+      ]
+    },
+    {
+      "Id": 84,
+      "Value": "jump",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "hopp över vattenytan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "jump"
+        }
+      ]
+    },
+    {
+      "Id": 85,
+      "Value": "female with offspring",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "obs av hona med unge/ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "female with offspring"
+        }
+      ]
+    },
+    {
+      "Id": 86,
+      "Value": "dormant",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "vilande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dormant"
+        }
+      ]
+    },
+    {
+      "Id": 87,
+      "Value": "heard",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "hört"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "heard"
+        }
+      ]
+    },
+    {
+      "Id": 88,
+      "Value": "in breeding colours",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i lekdräkt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in breeding colours"
+        }
+      ]
+    },
+    {
+      "Id": 89,
+      "Value": "in water",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i vatten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in water"
+        }
+      ]
+    },
+    {
+      "Id": 90,
+      "Value": "dispute between males",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "kamp mellan handjur"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dispute between males"
+        }
+      ]
+    },
+    {
+      "Id": 91,
+      "Value": "steady course, regular diving",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "konstant kurs, regelbunden dykning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "steady course, regular diving"
+        }
+      ]
+    },
+    {
+      "Id": 92,
+      "Value": "slow movement, long periods on the surface",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "långsam rörelse, lång tid vid ytan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "slow movement, long periods on the surface"
+        }
+      ]
+    },
+    {
+      "Id": 93,
+      "Value": "approaching boat",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "närmanden mot båt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "approaching boat"
+        }
+      ]
+    },
+    {
+      "Id": 94,
+      "Value": "winter habitat",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "på övervintringsplats"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "winter habitat"
+        }
+      ]
+    },
+    {
+      "Id": 95,
+      "Value": "building nest/used nest/nest",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobyggande/använd bo/bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "building nest/used nest/nest"
+        }
+      ]
+    },
+    {
+      "Id": 96,
+      "Value": "shot/killed",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "skjuten/avlivad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "shot/killed"
+        }
+      ]
+    },
+    {
+      "Id": 97,
+      "Value": "sunbathing",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "solar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "sunbathing"
+        }
+      ]
+    },
+    {
+      "Id": 98,
+      "Value": "trace of adult with offspring",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spår av vuxet djur med unge/ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "trace of adult with offspring"
+        }
+      ]
+    },
+    {
+      "Id": 100,
+      "Value": "unsteady course/irregualr diving",
+      "Localized": true,
+      "Category": {
+        "Id": 4,
+        "Name": "Stationary",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Stationär"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Stationary"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "varierande kurs, oregelbunden dykning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "unsteady course/irregualr diving"
+        }
+      ]
+    },
+    {
+      "Id": 101,
+      "Value": "breeding ground or offspring",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "yngelplats med ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "breeding ground or offspring"
+        }
+      ]
+    },
+    {
+      "Id": 102,
+      "Value": "killed by oil",
+      "Localized": true,
+      "Category": {
+        "Id": 7,
+        "Name": "Dead",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Död"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Dead"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dödad av olja"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "killed by oil"
+        }
+      ]
+    },
+    {
+      "Id": 103,
+      "Value": "tracks from climbing",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spår från klättring"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "tracks from climbing"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            },
+            {
+              "Value": 22,
+              "SosId": 22
+            },
+            {
+              "Value": 23,
+              "SosId": 23
+            },
+            {
+              "Value": 24,
+              "SosId": 24
+            },
+            {
+              "Value": 25,
+              "SosId": 25
+            },
+            {
+              "Value": 26,
+              "SosId": 26
+            },
+            {
+              "Value": 27,
+              "SosId": 27
+            },
+            {
+              "Value": 28,
+              "SosId": 28
+            },
+            {
+              "Value": 29,
+              "SosId": 29
+            },
+            {
+              "Value": 30,
+              "SosId": 30
+            },
+            {
+              "Value": 31,
+              "SosId": 31
+            },
+            {
+              "Value": 32,
+              "SosId": 32
+            },
+            {
+              "Value": 33,
+              "SosId": 33
+            },
+            {
+              "Value": 34,
+              "SosId": 34
+            },
+            {
+              "Value": 35,
+              "SosId": 35
+            },
+            {
+              "Value": 36,
+              "SosId": 36
+            },
+            {
+              "Value": 37,
+              "SosId": 37
+            },
+            {
+              "Value": 38,
+              "SosId": 38
+            },
+            {
+              "Value": 39,
+              "SosId": 39
+            },
+            {
+              "Value": 40,
+              "SosId": 40
+            },
+            {
+              "Value": 41,
+              "SosId": 41
+            },
+            {
+              "Value": 42,
+              "SosId": 42
+            },
+            {
+              "Value": 43,
+              "SosId": 43
+            },
+            {
+              "Value": 44,
+              "SosId": 44
+            },
+            {
+              "Value": 45,
+              "SosId": 45
+            },
+            {
+              "Value": 46,
+              "SosId": 46
+            },
+            {
+              "Value": 47,
+              "SosId": 47
+            },
+            {
+              "Value": 48,
+              "SosId": 48
+            },
+            {
+              "Value": 49,
+              "SosId": 49
+            },
+            {
+              "Value": 50,
+              "SosId": 50
+            },
+            {
+              "Value": 51,
+              "SosId": 51
+            },
+            {
+              "Value": 52,
+              "SosId": 52
+            },
+            {
+              "Value": 53,
+              "SosId": 53
+            },
+            {
+              "Value": 54,
+              "SosId": 54
+            },
+            {
+              "Value": 55,
+              "SosId": 55
+            },
+            {
+              "Value": 56,
+              "SosId": 56
+            },
+            {
+              "Value": 57,
+              "SosId": 57
+            },
+            {
+              "Value": 58,
+              "SosId": 58
+            },
+            {
+              "Value": 59,
+              "SosId": 59
+            },
+            {
+              "Value": 60,
+              "SosId": 60
+            },
+            {
+              "Value": 61,
+              "SosId": 61
+            },
+            {
+              "Value": 62,
+              "SosId": 62
+            },
+            {
+              "Value": 63,
+              "SosId": 63
+            },
+            {
+              "Value": 64,
+              "SosId": 64
+            },
+            {
+              "Value": 65,
+              "SosId": 65
+            },
+            {
+              "Value": 66,
+              "SosId": 66
+            },
+            {
+              "Value": 67,
+              "SosId": 67
+            },
+            {
+              "Value": 68,
+              "SosId": 68
+            },
+            {
+              "Value": 69,
+              "SosId": 69
+            },
+            {
+              "Value": 70,
+              "SosId": 70
+            },
+            {
+              "Value": 71,
+              "SosId": 71
+            },
+            {
+              "Value": 72,
+              "SosId": 72
+            },
+            {
+              "Value": 73,
+              "SosId": 73
+            },
+            {
+              "Value": 74,
+              "SosId": 74
+            },
+            {
+              "Value": 75,
+              "SosId": 75
+            },
+            {
+              "Value": 76,
+              "SosId": 76
+            },
+            {
+              "Value": 77,
+              "SosId": 77
+            },
+            {
+              "Value": 78,
+              "SosId": 78
+            },
+            {
+              "Value": 79,
+              "SosId": 79
+            },
+            {
+              "Value": 80,
+              "SosId": 80
+            },
+            {
+              "Value": 81,
+              "SosId": 81
+            },
+            {
+              "Value": 82,
+              "SosId": 82
+            },
+            {
+              "Value": 83,
+              "SosId": 83
+            },
+            {
+              "Value": 84,
+              "SosId": 84
+            },
+            {
+              "Value": 85,
+              "SosId": 85
+            },
+            {
+              "Value": 86,
+              "SosId": 86
+            },
+            {
+              "Value": 87,
+              "SosId": 87
+            },
+            {
+              "Value": 88,
+              "SosId": 88
+            },
+            {
+              "Value": 89,
+              "SosId": 89
+            },
+            {
+              "Value": 90,
+              "SosId": 90
+            },
+            {
+              "Value": 91,
+              "SosId": 91
+            },
+            {
+              "Value": 92,
+              "SosId": 92
+            },
+            {
+              "Value": 93,
+              "SosId": 93
+            },
+            {
+              "Value": 94,
+              "SosId": 94
+            },
+            {
+              "Value": 95,
+              "SosId": 95
+            },
+            {
+              "Value": 96,
+              "SosId": 96
+            },
+            {
+              "Value": 97,
+              "SosId": 97
+            },
+            {
+              "Value": 98,
+              "SosId": 98
+            },
+            {
+              "Value": 100,
+              "SosId": 100
+            },
+            {
+              "Value": 101,
+              "SosId": 101
+            },
+            {
+              "Value": 102,
+              "SosId": 102
+            },
+            {
+              "Value": 103,
+              "SosId": 103
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Extensions;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -108,6 +109,7 @@ namespace SOS.Import.Factories.FieldMapping
                 {"adult female", "adult"},
                 {"adult male", "adult"},
                 {"larva/nymph", "larva/nymph"},
+                {"nymph", "larva/nymph"},
                 {"larvae", "larvae"},
                 {"lv (larvae)", "larvae"},
                 {"larva", "larvae"},
