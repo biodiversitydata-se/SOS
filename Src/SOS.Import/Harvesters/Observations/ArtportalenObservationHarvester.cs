@@ -74,7 +74,7 @@ namespace SOS.Import.Harvesters.Observations
                 minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
             }
 
-            // If status still is initialized value success and maxid is greater than min id
+            // If maxid is greater than min id
             if (maxId > minId)
             {
                 var currentId = minId;

@@ -5,6 +5,7 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -54,8 +55,8 @@ namespace SOS.Observations.Api.Managers
                 filter = await _filterManager.PrepareFilter(filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
-                ProcessLocalizedFieldMappings(filter, processedObservations.Records);
-                ProcessNonLocalizedFieldMappings(filter, processedObservations.Records);
+                ProcessLocalizedFieldMappings(filter.FieldTranslationCultureCode, processedObservations.Records);
+                ProcessNonLocalizedFieldMappings(processedObservations.Records);
                 return processedObservations;
             }
             catch (Exception e)
@@ -160,13 +161,8 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
+        private void ProcessNonLocalizedFieldMappings(IEnumerable<object> processedObservations)
         {
-            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
-            {
-                return;
-            }
-
             foreach (var observation in processedObservations)
             {
                 if (observation is IDictionary<string, object> obs)
@@ -182,14 +178,18 @@ namespace SOS.Observations.Api.Managers
                     if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
                     {
                         var locationDictionary = locationObject as IDictionary<string, object>;
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Continent,
+                            nameof(Observation.Location.Continent));
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Country,
+                            nameof(Observation.Location.Country));
                         ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County,
                             nameof(Observation.Location.County));
                         ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Municipality,
                             nameof(Observation.Location.Municipality));
-                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province,
-                            nameof(Observation.Location.Province));
                         ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Parish,
                             nameof(Observation.Location.Parish));
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province,
+                            nameof(Observation.Location.Province));
                     }
 
                     if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject))
@@ -204,14 +204,14 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private void ProcessLocalizedFieldMappings(SearchFilter filter, IEnumerable<dynamic> processedObservations)
+        private void ProcessLocalizedFieldMappings(string fieldTranslationCultureCode, IEnumerable<dynamic> processedObservations)
         {
-            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
+            if (string.IsNullOrEmpty(fieldTranslationCultureCode))
             {
                 return;
             }
 
-            ProcessLocalizedFieldMappedReturnValues(processedObservations, filter.FieldTranslationCultureCode);
+            ProcessLocalizedFieldMappedReturnValues(processedObservations, fieldTranslationCultureCode);
         }
 
         private void ProcessLocalizedFieldMappedReturnValues(
@@ -243,6 +243,15 @@ namespace SOS.Observations.Api.Managers
                 {
                     if (observation is IDictionary<string, object> obs)
                     {
+                        if (obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
+                        {
+                            var eventDictionary = eventObject as IDictionary<string, object>;
+                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Biotope,
+                                nameof(Observation.Event.Biotope), cultureCode);
+                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Substrate,
+                                nameof(Observation.Event.Substrate), cultureCode);
+                        }
+
                         if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
                             out var occurrenceObject))
                         {
@@ -255,15 +264,6 @@ namespace SOS.Observations.Api.Managers
                                 nameof(Observation.Occurrence.LifeStage), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Unit,
                                 nameof(Observation.Occurrence.OrganismQuantityUnit), cultureCode);
-                        }
-
-                        if (obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
-                        {
-                            var eventDictionary = eventObject as IDictionary<string, object>;
-                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Biotope,
-                                nameof(Observation.Event.Biotope), cultureCode);
-                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Substrate,
-                                nameof(Observation.Event.Substrate), cultureCode);
                         }
 
                         if (obs.TryGetValue(nameof(Observation.Identification).ToLower(),
@@ -290,7 +290,7 @@ namespace SOS.Observations.Api.Managers
         {
             if (observationNode == null) return;
 
-            var camelCaseName = char.ToLower(fieldName[0]) + fieldName.Substring(1);
+            var camelCaseName = fieldName.ToCamelCase();
             if (observationNode.ContainsKey(camelCaseName))
             {
                 if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode && 
@@ -300,7 +300,7 @@ namespace SOS.Observations.Api.Managers
                     if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId &&
                         _fieldMappingManager.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
                     {
-                        fieldNode["Value"] = translatedValue;
+                        fieldNode["value"] = translatedValue;
                     }
                 }
             }
@@ -339,10 +339,10 @@ namespace SOS.Observations.Api.Managers
             string cultureCode)
         {
             if (observationNode == null) return;
-            var lowerCaseName = char.ToLower(fieldName[0]) + fieldName.Substring(1);
-            if (observationNode.ContainsKey(lowerCaseName))
+            var camelCaseName = fieldName.ToCamelCase();
+            if (observationNode.ContainsKey(camelCaseName))
             {
-                if (observationNode[lowerCaseName] is IDictionary<string, object> fieldNode &&
+                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode &&
                     fieldNode.ContainsKey("id"))
                 {
                     var id = (long) fieldNode["id"];
@@ -350,7 +350,7 @@ namespace SOS.Observations.Api.Managers
                         _fieldMappingManager.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, (int) id,
                             out var translatedValue))
                     {
-                        fieldNode["Value"] = translatedValue;
+                        fieldNode["value"] = translatedValue;
                     }
                 }
             }
