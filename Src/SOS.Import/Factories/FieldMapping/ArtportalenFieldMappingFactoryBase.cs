@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Extensions;
 using SOS.Import.Factories.FieldMapping.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -35,6 +36,7 @@ namespace SOS.Import.Factories.FieldMapping
         protected virtual ICollection<FieldMappingValue> ConvertToLocalizedFieldMappingValues(
             ICollection<MetadataEntity> metadataEntities)
         {
+            metadataEntities.TrimValues();
             var fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
             foreach (var group in metadataEntities.GroupBy(m => m.Id))
             {
@@ -67,6 +69,7 @@ namespace SOS.Import.Factories.FieldMapping
         protected virtual ICollection<FieldMappingValue> ConvertToNonLocalizedFieldMappingValues(
             ICollection<MetadataEntity> metadataEntities)
         {
+            metadataEntities.TrimValues();
             var fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
             foreach (var metadataEntity in metadataEntities)
             {
@@ -85,6 +88,7 @@ namespace SOS.Import.Factories.FieldMapping
         protected virtual ICollection<FieldMappingValue> ConvertToFieldMappingValuesWithCategory(
             ICollection<MetadataWithCategoryEntity> metadataWithCategoryEntities)
         {
+            metadataWithCategoryEntities.TrimValues();
             var fieldMappingValues = new List<FieldMappingValue>(metadataWithCategoryEntities.Count());
             foreach (var group in metadataWithCategoryEntities.GroupBy(m => m.Id))
             {
@@ -182,6 +186,11 @@ namespace SOS.Import.Factories.FieldMapping
 
             foreach (var fieldMappingValue in fieldMappingValues)
             {
+                if (fieldMappingValue.Value == "larva/nymph")
+                {
+                    int x = 8;
+                }
+
                 foreach (var fieldMappingTranslation in fieldMappingValue.Translations)
                 {
                     if (!string.IsNullOrWhiteSpace(fieldMappingTranslation.Value))

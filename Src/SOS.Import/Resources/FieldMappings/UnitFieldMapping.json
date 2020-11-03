@@ -1,439 +1,439 @@
 {
-    "Id": 11,
-    "Name": "Unit",
-    "Localized": true,
-    "Values": [
+  "Id": 11,
+  "Name": "Unit",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Value": "empty",
+      "Localized": true,
+      "Translations": [
         {
-            "Id": 0,
-            "Value": "empty",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": " "
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": " "
-                }
-            ]
+          "CultureCode": "sv-SE",
+          "Value": ""
         },
         {
-            "Id": 1,
-            "Value": "plants",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "plantor/tuvor"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "plants"
-                }
-            ]
-        },
-        {
-            "Id": 2,
-            "Value": "stems",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "stjälkar/strån/skott"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "stems"
-                }
-            ]
-        },
-        {
-            "Id": 3,
-            "Value": "skudd/stilker/strå",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bålar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "skudd/stilker/strå"
-                }
-            ]
-        },
-        {
-            "Id": 4,
-            "Value": "mycels",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "mycel"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "mycels"
-                }
-            ]
-        },
-        {
-            "Id": 5,
-            "Value": "fruit-bodies",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "fruktkroppar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "fruit-bodies"
-                }
-            ]
-        },
-        {
-            "Id": 6,
-            "Value": "m²",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "m²"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "m²"
-                }
-            ]
-        },
-        {
-            "Id": 7,
-            "Value": "dm²",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "dm²"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "dm²"
-                }
-            ]
-        },
-        {
-            "Id": 8,
-            "Value": "cm²",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "cm²"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "cm²"
-                }
-            ]
-        },
-        {
-            "Id": 9,
-            "Value": "ind.",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "ex."
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "ind."
-                }
-            ]
-        },
-        {
-            "Id": 10,
-            "Value": "colonies",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "kolonier"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "colonies"
-                }
-            ]
-        },
-        {
-            "Id": 11,
-            "Value": "lek scrape",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "lekgropar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "lek scrape"
-                }
-            ]
-        },
-        {
-            "Id": 12,
-            "Value": "egg clusters",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "äggklumpar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "egg clusters"
-                }
-            ]
-        },
-        {
-            "Id": 13,
-            "Value": "nests",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bon"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "nests"
-                }
-            ]
-        },
-        {
-            "Id": 14,
-            "Value": "nest/den",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "bon/lya"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "nest/den"
-                }
-            ]
-        },
-        {
-            "Id": 15,
-            "Value": "bushes",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "buskar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "bushes"
-                }
-            ]
-        },
-        {
-            "Id": 16,
-            "Value": "bat box",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "fladdermüsskassa"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "bat box"
-                }
-            ]
-        },
-        {
-            "Id": 17,
-            "Value": "capsules",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "kapslar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "capsules"
-                }
-            ]
-        },
-        {
-            "Id": 18,
-            "Value": "trees",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "träd"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "trees"
-                }
-            ]
-        },
-        {
-            "Id": 19,
-            "Value": "tussocks",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "tuvor"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "tussocks"
-                }
-            ]
-        },
-        {
-            "Id": 20,
-            "Value": "observations",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "observationer"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "observations"
-                }
-            ]
-        },
-        {
-            "Id": 21,
-            "Value": "registrations",
-            "Localized": true,
-            "Translations": [
-                {
-                    "CultureCode": "sv-SE",
-                    "Value": "registreringar"
-                },
-                {
-                    "CultureCode": "en-GB",
-                    "Value": "registrations"
-                }
-            ]
+          "CultureCode": "en-GB",
+          "Value": ""
         }
-    ],
-    "ExternalSystemsMapping": [
+      ]
+    },
+    {
+      "Id": 1,
+      "Value": "plants",
+      "Localized": true,
+      "Translations": [
         {
-            "Id": 0,
-            "Name": "Artportalen",
-            "Mappings": [
-                {
-                    "Key": "Id",
-                    "Description": "Id field mapping",
-                    "Values": [
-                        {
-                            "Value": 0,
-                            "SosId": 0
-                        },
-                        {
-                            "Value": 1,
-                            "SosId": 1
-                        },
-                        {
-                            "Value": 2,
-                            "SosId": 2
-                        },
-                        {
-                            "Value": 3,
-                            "SosId": 3
-                        },
-                        {
-                            "Value": 4,
-                            "SosId": 4
-                        },
-                        {
-                            "Value": 5,
-                            "SosId": 5
-                        },
-                        {
-                            "Value": 6,
-                            "SosId": 6
-                        },
-                        {
-                            "Value": 7,
-                            "SosId": 7
-                        },
-                        {
-                            "Value": 8,
-                            "SosId": 8
-                        },
-                        {
-                            "Value": 9,
-                            "SosId": 9
-                        },
-                        {
-                            "Value": 10,
-                            "SosId": 10
-                        },
-                        {
-                            "Value": 11,
-                            "SosId": 11
-                        },
-                        {
-                            "Value": 12,
-                            "SosId": 12
-                        },
-                        {
-                            "Value": 13,
-                            "SosId": 13
-                        },
-                        {
-                            "Value": 14,
-                            "SosId": 14
-                        },
-                        {
-                            "Value": 15,
-                            "SosId": 15
-                        },
-                        {
-                            "Value": 16,
-                            "SosId": 16
-                        },
-                        {
-                            "Value": 17,
-                            "SosId": 17
-                        },
-                        {
-                            "Value": 18,
-                            "SosId": 18
-                        },
-                        {
-                            "Value": 19,
-                            "SosId": 19
-                        },
-                        {
-                            "Value": 20,
-                            "SosId": 20
-                        },
-                        {
-                            "Value": 21,
-                            "SosId": 21
-                        }
-                    ]
-                }
-            ]
+          "CultureCode": "sv-SE",
+          "Value": "plantor/tuvor"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "plants"
         }
-    ]
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "stems",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "stjälkar/strån/skott"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "stems"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "skudd/stilker/strå",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bålar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "skudd/stilker/strå"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "mycels",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "mycel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mycels"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "fruit-bodies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "fruktkroppar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fruit-bodies"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "m²",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "m²"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "m²"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "dm²",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dm²"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dm²"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "cm²",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "cm²"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "cm²"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Value": "ind.",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ex."
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "ind."
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Value": "colonies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "kolonier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "colonies"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "lek scrape",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "lekgropar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "lek scrape"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "egg clusters",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äggklumpar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg clusters"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "Value": "nests",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bon"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nests"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Value": "nest/den",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bon/lya"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest/den"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Value": "bushes",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "buskar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "bushes"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Value": "bat box",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "fladdermüsskassa"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "bat box"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Value": "capsules",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "kapslar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "capsules"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Value": "trees",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "träd"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "trees"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Value": "tussocks",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "tuvor"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "tussocks"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Value": "observations",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "observationer"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "observations"
+        }
+      ]
+    },
+    {
+      "Id": 21,
+      "Value": "registrations",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "registreringar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "registrations"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            },
+            {
+              "Value": 21,
+              "SosId": 21
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

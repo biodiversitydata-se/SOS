@@ -10,11 +10,11 @@
       "Translations": [
         {
           "CultureCode": "sv-SE",
-          "Value": " "
+          "Value": ""
         },
         {
           "CultureCode": "en-GB",
-          "Value": " "
+          "Value": ""
         }
       ]
     },
@@ -365,7 +365,7 @@
     },
     {
       "Id": 24,
-      "Value": "larva/nymph ",
+      "Value": "larva/nymph",
       "Localized": true,
       "Translations": [
         {
@@ -374,7 +374,7 @@
         },
         {
           "CultureCode": "en-GB",
-          "Value": "larva/nymph "
+          "Value": "larva/nymph"
         }
       ]
     },
@@ -1307,720 +1307,724 @@
         {
           "Key": "lifeStage",
           "Description": "The lifeStage term (http://rs.tdwg.org/dwc/terms/lifeStage)",
-            "Values": [
-                {
-                    "Value": "ägg",
-                    "SosId": 1
-                },
-                {
-                    "Value": "egg",
-                    "SosId": 1
-                },
-                {
-                    "Value": "eg (egg)",
-                    "SosId": 1
-                },
-                {
-                    "Value": "eggs",
-                    "SosId": 1
-                },
-                {
-                    "Value": "female with eggs",
-                    "SosId": 1
-                },
-                {
-                    "Value": "pulli",
-                    "SosId": 2
-                },
-                {
-                    "Value": "nestling",
-                    "SosId": 2
-                },
-                {
-                    "Value": "pull",
-                    "SosId": 2
-                },
-                {
-                    "Value": "pull.",
-                    "SosId": 2
-                },
-                {
-                    "Value": "1K",
-                    "SosId": 3
-                },
-                {
-                    "Value": "1st calendar year",
-                    "SosId": 3
-                },
-                {
-                    "Value": "HY",
-                    "SosId": 3
-                },
-                {
-                    "Value": "HY (hatching year)",
-                    "SosId": 3
-                },
-                {
-                    "Value": "1K+",
-                    "SosId": 4
-                },
-                {
-                    "Value": "at least 1st calendar year",
-                    "SosId": 4
-                },
-                {
-                    "Value": "AHY",
-                    "SosId": 4
-                },
-                {
-                    "Value": "AHY (after hatching year)",
-                    "SosId": 4
-                },
-                {
-                    "Value": "2K",
-                    "SosId": 5
-                },
-                {
-                    "Value": "2nd calendar year",
-                    "SosId": 5
-                },
-                {
-                    "Value": "SY",
-                    "SosId": 5
-                },
-                {
-                    "Value": "SY (second year)",
-                    "SosId": 5
-                },
-                {
-                    "Value": "2K+",
-                    "SosId": 6
-                },
-                {
-                    "Value": "at least 2nd calendar year",
-                    "SosId": 6
-                },
-                {
-                    "Value": "ASY",
-                    "SosId": 6
-                },
-                {
-                    "Value": "ASY (after second year)",
-                    "SosId": 6
-                },
-                {
-                    "Value": "2K-",
-                    "SosId": 7
-                },
-                {
-                    "Value": "2nd calendar year or younger",
-                    "SosId": 7
-                },
-                {
-                    "Value": "3K",
-                    "SosId": 8
-                },
-                {
-                    "Value": "3rd calendar year",
-                    "SosId": 8
-                },
-                {
-                    "Value": "TH",
-                    "SosId": 8
-                },
-                {
-                    "Value": "TH (third year)",
-                    "SosId": 8
-                },
-                {
-                    "Value": "3K+",
-                    "SosId": 9
-                },
-                {
-                    "Value": "at least 3rd calendar year",
-                    "SosId": 9
-                },
-                {
-                    "Value": "ATH",
-                    "SosId": 9
-                },
-                {
-                    "Value": "ATH (after third year)",
-                    "SosId": 9
-                },
-                {
-                    "Value": "3K-",
-                    "SosId": 10
-                },
-                {
-                    "Value": "3rd calendar year or younger",
-                    "SosId": 10
-                },
-                {
-                    "Value": "4K",
-                    "SosId": 11
-                },
-                {
-                    "Value": "4th calendar year",
-                    "SosId": 11
-                },
-                {
-                    "Value": "4K+",
-                    "SosId": 12
-                },
-                {
-                    "Value": "at least 4th calendar year",
-                    "SosId": 12
-                },
-                {
-                    "Value": "4K-",
-                    "SosId": 13
-                },
-                {
-                    "Value": "4th calendar year or younger",
-                    "SosId": 13
-                },
-                {
-                    "Value": "5K",
-                    "SosId": 14
-                },
-                {
-                    "Value": "5th calendar year",
-                    "SosId": 14
-                },
-                {
-                    "Value": "5K+",
-                    "SosId": 15
-                },
-                {
-                    "Value": "at least 5th calendar year",
-                    "SosId": 15
-                },
-                {
-                    "Value": "5K-",
-                    "SosId": 16
-                },
-                {
-                    "Value": "5th calendar year or younger",
-                    "SosId": 16
-                },
-                {
-                    "Value": "6K",
-                    "SosId": 17
-                },
-                {
-                    "Value": "6th calendar year",
-                    "SosId": 17
-                },
-                {
-                    "Value": "6K+",
-                    "SosId": 18
-                },
-                {
-                    "Value": "at least 6th calendar year",
-                    "SosId": 18
-                },
-                {
-                    "Value": "6K-",
-                    "SosId": 19
-                },
-                {
-                    "Value": "6th calendar year or younger",
-                    "SosId": 19
-                },
-                {
-                    "Value": "7K",
-                    "SosId": 20
-                },
-                {
-                    "Value": "7th calendar year",
-                    "SosId": 20
-                },
-                {
-                    "Value": "7K+",
-                    "SosId": 21
-                },
-                {
-                    "Value": "at least 7th calendar year",
-                    "SosId": 21
-                },
-                {
-                    "Value": "7K-",
-                    "SosId": 22
-                },
-                {
-                    "Value": "7th calendar year or younger",
-                    "SosId": 22
-                },
-                {
-                    "Value": "adult",
-                    "SosId": 23
-                },
-                {
-                    "Value": "ad.",
-                    "SosId": 23
-                },
-                {
-                    "Value": "adults",
-                    "SosId": 23
-                },
-                {
-                    "Value": "ad (adult)",
-                    "SosId": 23
-                },
-                {
-                    "Value": "adult female",
-                    "SosId": 23
-                },
-                {
-                    "Value": "adult male",
-                    "SosId": 23
-                },
-                {
-                    "Value": "larv/nymf",
-                    "SosId": 24
-                },
-                {
-                    "Value": "larva/nymph ",
-                    "SosId": 24
-                },
-                {
-                    "Value": "puppa",
-                    "SosId": 25
-                },
-                {
-                    "Value": "pupa",
-                    "SosId": 25
-                },
-                {
-                    "Value": "juvenil",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juvenile",
-                    "SosId": 26
-                },
-                {
-                    "Value": "jv (juvenile)",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juv.",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juv",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juveniles",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juvenile female",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juvenile male",
-                    "SosId": 26
-                },
-                {
-                    "Value": "juveniles, males, fe",
-                    "SosId": 26
-                },
-                {
-                    "Value": "imago/adult",
-                    "SosId": 27
-                },
-                {
-                    "Value": "rom",
-                    "SosId": 28
-                },
-                {
-                    "Value": "årsyngel",
-                    "SosId": 29
-                },
-                {
-                    "Value": "0+",
-                    "SosId": 29
-                },
-                {
-                    "Value": "1+",
-                    "SosId": 30
-                },
-                {
-                    "Value": "larv",
-                    "SosId": 31
-                },
-                {
-                    "Value": "larvae",
-                    "SosId": 31
-                },
-                {
-                    "Value": "lv (larvae)",
-                    "SosId": 31
-                },
-                {
-                    "Value": "larva",
-                    "SosId": 31
-                },
-                {
-                    "Value": "årsunge",
-                    "SosId": 32
-                },
-                {
-                    "Value": "cub",
-                    "SosId": 32
-                },
-                {
-                    "Value": "fjolårsunge",
-                    "SosId": 33
-                },
-                {
-                    "Value": "yearling",
-                    "SosId": 33
-                },
-                {
-                    "Value": "vilstadium",
-                    "SosId": 34
-                },
-                {
-                    "Value": "rest",
-                    "SosId": 34
-                },
-                {
-                    "Value": "knoppbristning",
-                    "SosId": 35
-                },
-                {
-                    "Value": "bud burst",
-                    "SosId": 35
-                },
-                {
-                    "Value": "fullt utvecklade blad",
-                    "SosId": 36
-                },
-                {
-                    "Value": "fully developed leaf",
-                    "SosId": 36
-                },
-                {
-                    "Value": "blomknopp",
-                    "SosId": 37
-                },
-                {
-                    "Value": "flower bud",
-                    "SosId": 37
-                },
-                {
-                    "Value": "blomning",
-                    "SosId": 38
-                },
-                {
-                    "Value": "flowering",
-                    "SosId": 38
-                },
-                {
-                    "Value": "överblommad",
-                    "SosId": 39
-                },
-                {
-                    "Value": "overblown",
-                    "SosId": 39
-                },
-                {
-                    "Value": "i frukt",
-                    "SosId": 40
-                },
-                {
-                    "Value": "in fruit",
-                    "SosId": 40
-                },
-                {
-                    "Value": "fruiting",
-                    "SosId": 40
-                },
-                {
-                    "Value": "gulnande löv/blad",
-                    "SosId": 41
-                },
-                {
-                    "Value": "yellowing leaves",
-                    "SosId": 41
-                },
-                {
-                    "Value": "bladfällning, vissnar",
-                    "SosId": 42
-                },
-                {
-                    "Value": "leaf cutting",
-                    "SosId": 42
-                },
-                {
-                    "Value": "vinterståndare",
-                    "SosId": 43
-                },
-                {
-                    "Value": "winter stamen",
-                    "SosId": 43
-                },
-                {
-                    "Value": "med kapsel",
-                    "SosId": 44
-                },
-                {
-                    "Value": "with capsule",
-                    "SosId": 44
-                },
-                {
-                    "Value": "utan kapsel",
-                    "SosId": 45
-                },
-                {
-                    "Value": "without capsule",
-                    "SosId": 45
-                },
-                {
-                    "Value": "med groddkorn",
-                    "SosId": 46
-                },
-                {
-                    "Value": "sprout",
-                    "SosId": 46
-                },
-                {
-                    "Value": "med honorgan",
-                    "SosId": 47
-                },
-                {
-                    "Value": "with female parts",
-                    "SosId": 47
-                },
-                {
-                    "Value": "med hanorgan",
-                    "SosId": 48
-                },
-                {
-                    "Value": "with male parts",
-                    "SosId": 48
-                },
-                {
-                    "Value": "med apothecier",
-                    "SosId": 49
-                },
-                {
-                    "Value": "with apothecies",
-                    "SosId": 49
-                },
-                {
-                    "Value": "med perithecier",
-                    "SosId": 50
-                },
-                {
-                    "Value": "with perithecies",
-                    "SosId": 50
-                },
-                {
-                    "Value": "med soral",
-                    "SosId": 51
-                },
-                {
-                    "Value": "with soral",
-                    "SosId": 51
-                },
-                {
-                    "Value": "med isidier",
-                    "SosId": 52
-                },
-                {
-                    "Value": "with isidies",
-                    "SosId": 52
-                },
-                {
-                    "Value": "med schistisidier",
-                    "SosId": 53
-                },
-                {
-                    "Value": "with schistidies",
-                    "SosId": 53
-                },
-                {
-                    "Value": "frukt-/fröspridning",
-                    "SosId": 54
-                },
-                {
-                    "Value": "fruit/seed dispersal",
-                    "SosId": 54
-                },
-                {
-                    "Value": "anamorf",
-                    "SosId": 55
-                },
-                {
-                    "Value": "anamorph",
-                    "SosId": 55
-                },
-                {
-                    "Value": "juvenil2",
-                    "SosId": 56
-                },
-                {
-                    "Value": "juvenile2",
-                    "SosId": 56
-                },
-                {
-                    "Value": "teleomorf",
-                    "SosId": 57
-                },
-                {
-                    "Value": "teleomorph (perfect)",
-                    "SosId": 57
-                },
-                {
-                    "Value": "Nauplius larv",
-                    "SosId": 58
-                },
-                {
-                    "Value": "Nauplius larva",
-                    "SosId": 58
-                },
-                {
-                    "Value": "NP (Nauplius)",
-                    "SosId": 58
-                },
-                {
-                    "Value": "NP",
-                    "SosId": 58
-                },
-                {
-                    "Value": "Nauplius larvae",
-                    "SosId": 58
-                },
-                {
-                    "Value": "Copepodit",
-                    "SosId": 59
-                },
-                {
-                    "Value": "Copepodite",
-                    "SosId": 59
-                },
-                {
-                    "Value": "C1 (Copepodite I)",
-                    "SosId": 59
-                },
-                {
-                    "Value": "C2 (Copepodite II)",
-                    "SosId": 59
-                },
-                {
-                    "Value": "C3 (Copepodite III)",
-                    "SosId": 59
-                },
-                {
-                    "Value": "C4 (Copepodite IV)",
-                    "SosId": 59
-                },
-                {
-                    "Value": "C5 (Copepodite V)",
-                    "SosId": 59
-                },
-                {
-                    "Value": "Sub adult",
-                    "SosId": 60
-                },
-                {
-                    "Value": "immature",
-                    "SosId": 60
-                },
-                {
-                    "Value": "omogen",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subad.",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subad",
-                    "SosId": 60
-                },
-                {
-                    "Value": "sub-adult",
-                    "SosId": 60
-                },
-                {
-                    "Value": "sub-adults",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subadult male",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subadult",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subadults",
-                    "SosId": 60
-                },
-                {
-                    "Value": "sub adults",
-                    "SosId": 60
-                },
-                {
-                    "Value": "male, subadult",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subadult female",
-                    "SosId": 60
-                },
-                {
-                    "Value": "subadult male, femal",
-                    "SosId": 60
-                },
-                {
-                    "Value": "zygote",
-                    "SosId": 61
-                },
-                {
-                    "Value": "embryo",
-                    "SosId": 62
-                },
-                {
-                    "Value": "embryos",
-                    "SosId": 62
-                },
-                {
-                    "Value": "seed",
-                    "SosId": 63
-                },
-                {
-                    "Value": "spore",
-                    "SosId": 64
-                },
-                {
-                    "Value": "pollen",
-                    "SosId": 65
-                },
-                {
-                    "Value": "sporophyte",
-                    "SosId": 66
-                },
-                {
-                    "Value": "gametophyte",
-                    "SosId": 67
-                },
-                {
-                    "Value": "sperm",
-                    "SosId": 68
-                },
-                {
-                    "Value": "dormant",
-                    "SosId": 69
-                }
-            ]
+          "Values": [
+            {
+              "Value": "ägg",
+              "SosId": 1
+            },
+            {
+              "Value": "egg",
+              "SosId": 1
+            },
+            {
+              "Value": "eg (egg)",
+              "SosId": 1
+            },
+            {
+              "Value": "eggs",
+              "SosId": 1
+            },
+            {
+              "Value": "female with eggs",
+              "SosId": 1
+            },
+            {
+              "Value": "pulli",
+              "SosId": 2
+            },
+            {
+              "Value": "nestling",
+              "SosId": 2
+            },
+            {
+              "Value": "pull",
+              "SosId": 2
+            },
+            {
+              "Value": "pull.",
+              "SosId": 2
+            },
+            {
+              "Value": "1K",
+              "SosId": 3
+            },
+            {
+              "Value": "1st calendar year",
+              "SosId": 3
+            },
+            {
+              "Value": "HY",
+              "SosId": 3
+            },
+            {
+              "Value": "HY (hatching year)",
+              "SosId": 3
+            },
+            {
+              "Value": "1K+",
+              "SosId": 4
+            },
+            {
+              "Value": "at least 1st calendar year",
+              "SosId": 4
+            },
+            {
+              "Value": "AHY",
+              "SosId": 4
+            },
+            {
+              "Value": "AHY (after hatching year)",
+              "SosId": 4
+            },
+            {
+              "Value": "2K",
+              "SosId": 5
+            },
+            {
+              "Value": "2nd calendar year",
+              "SosId": 5
+            },
+            {
+              "Value": "SY",
+              "SosId": 5
+            },
+            {
+              "Value": "SY (second year)",
+              "SosId": 5
+            },
+            {
+              "Value": "2K+",
+              "SosId": 6
+            },
+            {
+              "Value": "at least 2nd calendar year",
+              "SosId": 6
+            },
+            {
+              "Value": "ASY",
+              "SosId": 6
+            },
+            {
+              "Value": "ASY (after second year)",
+              "SosId": 6
+            },
+            {
+              "Value": "2K-",
+              "SosId": 7
+            },
+            {
+              "Value": "2nd calendar year or younger",
+              "SosId": 7
+            },
+            {
+              "Value": "3K",
+              "SosId": 8
+            },
+            {
+              "Value": "3rd calendar year",
+              "SosId": 8
+            },
+            {
+              "Value": "TH",
+              "SosId": 8
+            },
+            {
+              "Value": "TH (third year)",
+              "SosId": 8
+            },
+            {
+              "Value": "3K+",
+              "SosId": 9
+            },
+            {
+              "Value": "at least 3rd calendar year",
+              "SosId": 9
+            },
+            {
+              "Value": "ATH",
+              "SosId": 9
+            },
+            {
+              "Value": "ATH (after third year)",
+              "SosId": 9
+            },
+            {
+              "Value": "3K-",
+              "SosId": 10
+            },
+            {
+              "Value": "3rd calendar year or younger",
+              "SosId": 10
+            },
+            {
+              "Value": "4K",
+              "SosId": 11
+            },
+            {
+              "Value": "4th calendar year",
+              "SosId": 11
+            },
+            {
+              "Value": "4K+",
+              "SosId": 12
+            },
+            {
+              "Value": "at least 4th calendar year",
+              "SosId": 12
+            },
+            {
+              "Value": "4K-",
+              "SosId": 13
+            },
+            {
+              "Value": "4th calendar year or younger",
+              "SosId": 13
+            },
+            {
+              "Value": "5K",
+              "SosId": 14
+            },
+            {
+              "Value": "5th calendar year",
+              "SosId": 14
+            },
+            {
+              "Value": "5K+",
+              "SosId": 15
+            },
+            {
+              "Value": "at least 5th calendar year",
+              "SosId": 15
+            },
+            {
+              "Value": "5K-",
+              "SosId": 16
+            },
+            {
+              "Value": "5th calendar year or younger",
+              "SosId": 16
+            },
+            {
+              "Value": "6K",
+              "SosId": 17
+            },
+            {
+              "Value": "6th calendar year",
+              "SosId": 17
+            },
+            {
+              "Value": "6K+",
+              "SosId": 18
+            },
+            {
+              "Value": "at least 6th calendar year",
+              "SosId": 18
+            },
+            {
+              "Value": "6K-",
+              "SosId": 19
+            },
+            {
+              "Value": "6th calendar year or younger",
+              "SosId": 19
+            },
+            {
+              "Value": "7K",
+              "SosId": 20
+            },
+            {
+              "Value": "7th calendar year",
+              "SosId": 20
+            },
+            {
+              "Value": "7K+",
+              "SosId": 21
+            },
+            {
+              "Value": "at least 7th calendar year",
+              "SosId": 21
+            },
+            {
+              "Value": "7K-",
+              "SosId": 22
+            },
+            {
+              "Value": "7th calendar year or younger",
+              "SosId": 22
+            },
+            {
+              "Value": "adult",
+              "SosId": 23
+            },
+            {
+              "Value": "ad.",
+              "SosId": 23
+            },
+            {
+              "Value": "adults",
+              "SosId": 23
+            },
+            {
+              "Value": "ad (adult)",
+              "SosId": 23
+            },
+            {
+              "Value": "adult female",
+              "SosId": 23
+            },
+            {
+              "Value": "adult male",
+              "SosId": 23
+            },
+            {
+              "Value": "larv/nymf",
+              "SosId": 24
+            },
+            {
+              "Value": "larva/nymph",
+              "SosId": 24
+            },
+            {
+              "Value": "nymph",
+              "SosId": 24
+            },
+            {
+              "Value": "puppa",
+              "SosId": 25
+            },
+            {
+              "Value": "pupa",
+              "SosId": 25
+            },
+            {
+              "Value": "juvenil",
+              "SosId": 26
+            },
+            {
+              "Value": "juvenile",
+              "SosId": 26
+            },
+            {
+              "Value": "jv (juvenile)",
+              "SosId": 26
+            },
+            {
+              "Value": "juv.",
+              "SosId": 26
+            },
+            {
+              "Value": "juv",
+              "SosId": 26
+            },
+            {
+              "Value": "juveniles",
+              "SosId": 26
+            },
+            {
+              "Value": "juvenile female",
+              "SosId": 26
+            },
+            {
+              "Value": "juvenile male",
+              "SosId": 26
+            },
+            {
+              "Value": "juveniles, males, fe",
+              "SosId": 26
+            },
+            {
+              "Value": "imago/adult",
+              "SosId": 27
+            },
+            {
+              "Value": "rom",
+              "SosId": 28
+            },
+            {
+              "Value": "årsyngel",
+              "SosId": 29
+            },
+            {
+              "Value": "0+",
+              "SosId": 29
+            },
+            {
+              "Value": "1+",
+              "SosId": 30
+            },
+            {
+              "Value": "larv",
+              "SosId": 31
+            },
+            {
+              "Value": "larvae",
+              "SosId": 31
+            },
+            {
+              "Value": "lv (larvae)",
+              "SosId": 31
+            },
+            {
+              "Value": "larva",
+              "SosId": 31
+            },
+            {
+              "Value": "årsunge",
+              "SosId": 32
+            },
+            {
+              "Value": "cub",
+              "SosId": 32
+            },
+            {
+              "Value": "fjolårsunge",
+              "SosId": 33
+            },
+            {
+              "Value": "yearling",
+              "SosId": 33
+            },
+            {
+              "Value": "vilstadium",
+              "SosId": 34
+            },
+            {
+              "Value": "rest",
+              "SosId": 34
+            },
+            {
+              "Value": "knoppbristning",
+              "SosId": 35
+            },
+            {
+              "Value": "bud burst",
+              "SosId": 35
+            },
+            {
+              "Value": "fullt utvecklade blad",
+              "SosId": 36
+            },
+            {
+              "Value": "fully developed leaf",
+              "SosId": 36
+            },
+            {
+              "Value": "blomknopp",
+              "SosId": 37
+            },
+            {
+              "Value": "flower bud",
+              "SosId": 37
+            },
+            {
+              "Value": "blomning",
+              "SosId": 38
+            },
+            {
+              "Value": "flowering",
+              "SosId": 38
+            },
+            {
+              "Value": "överblommad",
+              "SosId": 39
+            },
+            {
+              "Value": "overblown",
+              "SosId": 39
+            },
+            {
+              "Value": "i frukt",
+              "SosId": 40
+            },
+            {
+              "Value": "in fruit",
+              "SosId": 40
+            },
+            {
+              "Value": "fruiting",
+              "SosId": 40
+            },
+            {
+              "Value": "gulnande löv/blad",
+              "SosId": 41
+            },
+            {
+              "Value": "yellowing leaves",
+              "SosId": 41
+            },
+            {
+              "Value": "bladfällning, vissnar",
+              "SosId": 42
+            },
+            {
+              "Value": "leaf cutting",
+              "SosId": 42
+            },
+            {
+              "Value": "vinterståndare",
+              "SosId": 43
+            },
+            {
+              "Value": "winter stamen",
+              "SosId": 43
+            },
+            {
+              "Value": "med kapsel",
+              "SosId": 44
+            },
+            {
+              "Value": "with capsule",
+              "SosId": 44
+            },
+            {
+              "Value": "utan kapsel",
+              "SosId": 45
+            },
+            {
+              "Value": "without capsule",
+              "SosId": 45
+            },
+            {
+              "Value": "med groddkorn",
+              "SosId": 46
+            },
+            {
+              "Value": "sprout",
+              "SosId": 46
+            },
+            {
+              "Value": "med honorgan",
+              "SosId": 47
+            },
+            {
+              "Value": "with female parts",
+              "SosId": 47
+            },
+            {
+              "Value": "med hanorgan",
+              "SosId": 48
+            },
+            {
+              "Value": "with male parts",
+              "SosId": 48
+            },
+            {
+              "Value": "med apothecier",
+              "SosId": 49
+            },
+            {
+              "Value": "with apothecies",
+              "SosId": 49
+            },
+            {
+              "Value": "med perithecier",
+              "SosId": 50
+            },
+            {
+              "Value": "with perithecies",
+              "SosId": 50
+            },
+            {
+              "Value": "med soral",
+              "SosId": 51
+            },
+            {
+              "Value": "with soral",
+              "SosId": 51
+            },
+            {
+              "Value": "med isidier",
+              "SosId": 52
+            },
+            {
+              "Value": "with isidies",
+              "SosId": 52
+            },
+            {
+              "Value": "med schistisidier",
+              "SosId": 53
+            },
+            {
+              "Value": "with schistidies",
+              "SosId": 53
+            },
+            {
+              "Value": "frukt-/fröspridning",
+              "SosId": 54
+            },
+            {
+              "Value": "fruit/seed dispersal",
+              "SosId": 54
+            },
+            {
+              "Value": "anamorf",
+              "SosId": 55
+            },
+            {
+              "Value": "anamorph",
+              "SosId": 55
+            },
+            {
+              "Value": "juvenil2",
+              "SosId": 56
+            },
+            {
+              "Value": "juvenile2",
+              "SosId": 56
+            },
+            {
+              "Value": "teleomorf",
+              "SosId": 57
+            },
+            {
+              "Value": "teleomorph (perfect)",
+              "SosId": 57
+            },
+            {
+              "Value": "Nauplius larv",
+              "SosId": 58
+            },
+            {
+              "Value": "Nauplius larva",
+              "SosId": 58
+            },
+            {
+              "Value": "NP (Nauplius)",
+              "SosId": 58
+            },
+            {
+              "Value": "NP",
+              "SosId": 58
+            },
+            {
+              "Value": "Nauplius larvae",
+              "SosId": 58
+            },
+            {
+              "Value": "Copepodit",
+              "SosId": 59
+            },
+            {
+              "Value": "Copepodite",
+              "SosId": 59
+            },
+            {
+              "Value": "C1 (Copepodite I)",
+              "SosId": 59
+            },
+            {
+              "Value": "C2 (Copepodite II)",
+              "SosId": 59
+            },
+            {
+              "Value": "C3 (Copepodite III)",
+              "SosId": 59
+            },
+            {
+              "Value": "C4 (Copepodite IV)",
+              "SosId": 59
+            },
+            {
+              "Value": "C5 (Copepodite V)",
+              "SosId": 59
+            },
+            {
+              "Value": "Sub adult",
+              "SosId": 60
+            },
+            {
+              "Value": "immature",
+              "SosId": 60
+            },
+            {
+              "Value": "omogen",
+              "SosId": 60
+            },
+            {
+              "Value": "subad.",
+              "SosId": 60
+            },
+            {
+              "Value": "subad",
+              "SosId": 60
+            },
+            {
+              "Value": "sub-adult",
+              "SosId": 60
+            },
+            {
+              "Value": "sub-adults",
+              "SosId": 60
+            },
+            {
+              "Value": "subadult male",
+              "SosId": 60
+            },
+            {
+              "Value": "subadult",
+              "SosId": 60
+            },
+            {
+              "Value": "subadults",
+              "SosId": 60
+            },
+            {
+              "Value": "sub adults",
+              "SosId": 60
+            },
+            {
+              "Value": "male, subadult",
+              "SosId": 60
+            },
+            {
+              "Value": "subadult female",
+              "SosId": 60
+            },
+            {
+              "Value": "subadult male, femal",
+              "SosId": 60
+            },
+            {
+              "Value": "zygote",
+              "SosId": 61
+            },
+            {
+              "Value": "embryo",
+              "SosId": 62
+            },
+            {
+              "Value": "embryos",
+              "SosId": 62
+            },
+            {
+              "Value": "seed",
+              "SosId": 63
+            },
+            {
+              "Value": "spore",
+              "SosId": 64
+            },
+            {
+              "Value": "pollen",
+              "SosId": 65
+            },
+            {
+              "Value": "sporophyte",
+              "SosId": 66
+            },
+            {
+              "Value": "gametophyte",
+              "SosId": 67
+            },
+            {
+              "Value": "sperm",
+              "SosId": 68
+            },
+            {
+              "Value": "dormant",
+              "SosId": 69
+            }
+          ]
         }
       ]
     }
