@@ -21,15 +21,15 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
         private string SightingsFromBasics => @"
             SearchableSightings s WITH(NOLOCK)
-	        INNER JOIN SightingState ss ON s.SightingId = ss.SightingId";
+            INNER JOIN SightingState ss ON s.SightingId = ss.SightingId";
 
         private string SightingWhereBasics => @"
             s.TaxonId IS NOT NULL	 
-            AND (s.SightingTypeId = 0 OR s.SightingTypeId = 3)
+            AND s.SightingTypeId IN (0,3,8)
+            AND s.SightingTypeSearchGroupId IN (1,16,32,256)
 	        AND s.HiddenByProvider IS NULL
-	        AND s.ValidationStatusId <> 50   
-            AND s.SightingTypeSearchGroupId & 33 > 0
-	        AND ss.IsActive = 1
+	        AND s.ValidationStatusId <> 50
+            AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 --Published";
         
         /// <summary>
