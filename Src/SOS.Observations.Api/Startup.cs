@@ -335,11 +335,6 @@ namespace SOS.Observations.Api
                 }
             });
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            {
-                Authorization = new[] {new AllowAllConnectionsFilter()},
-                IgnoreAntiforgeryToken = true
-            });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();

@@ -35,26 +35,34 @@ namespace SOS.Import.Services
 
         public async Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId)
         {
-            var response = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
-                new GetSpeciesObservationChangeAsSpeciesRequest
-                {
-                    token = _mvmServiceConfiguration.Token,
-                    changedFrom = DateTime.MinValue,
-                    isChangedFromSpecified = false,
-                    changedTo = DateTime.MaxValue,
-                    isChangedToSpecified = false,
-                    changeId = getFromId,
-                    isChangedIdSpecified = true,
-                    maxReturnedChanges = _mvmServiceConfiguration.MaxReturnedChangesInOnePage
-                }
-            );
+            try
+            {
+                var response = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
+                    new GetSpeciesObservationChangeAsSpeciesRequest
+                    {
+                        token = _mvmServiceConfiguration.Token,
+                        changedFrom = DateTime.MinValue,
+                        isChangedFromSpecified = false,
+                        changedTo = DateTime.MaxValue,
+                        isChangedToSpecified = false,
+                        changeId = getFromId,
+                        isChangedIdSpecified = true,
+                        maxReturnedChanges = _mvmServiceConfiguration.MaxReturnedChangesInOnePage
+                    }
+                );
 
-            var result = response?.GetSpeciesObservationChangeAsSpeciesResult;
+                var result = response?.GetSpeciesObservationChangeAsSpeciesResult;
 
-            _logger.LogDebug(
-                $"Getting observations from MVM Service: From id: {getFromId}, Created: {result?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result?.DeletedSpeciesObservationGuids?.Length ?? 0}");
-            return new Tuple<long, IEnumerable<WebSpeciesObservation>>(result.MaxChangeId,
-                result.CreatedSpeciesObservations);
+                _logger.LogDebug(
+                    $"Getting observations from MVM Service: From id: {getFromId}, Created: {result?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result?.DeletedSpeciesObservationGuids?.Length ?? 0}");
+                return new Tuple<long, IEnumerable<WebSpeciesObservation>>(result.MaxChangeId,
+                    result.CreatedSpeciesObservations);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError($"Failed to get MVM observations from id: {getFromId}", e);
+               return new Tuple<long, IEnumerable<WebSpeciesObservation>>(0L, null);
+            }
         }
     }
 }
