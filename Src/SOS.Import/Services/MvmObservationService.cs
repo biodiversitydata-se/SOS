@@ -43,7 +43,7 @@ namespace SOS.Import.Services
             {
                 _logger.LogError(e, $"Failed to get MVM observations from id: {getFromId}, attempt: {attempt}");
                 // Give it up to tree attempts to get the data
-                if (attempt < 4)
+                if (attempt < 3)
                 {
                     return await GetAsync(getFromId, ++attempt);
                 }
