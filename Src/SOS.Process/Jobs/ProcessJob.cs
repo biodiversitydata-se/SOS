@@ -219,7 +219,7 @@ namespace SOS.Process.Jobs
                 //-----------------------------------------
                 _logger.LogInformation("Start updating process info for observations");
                await SaveProcessInfo(
-                    _processedObservationRepository.InactiveInstanceName,
+                   mode == JobRunModes.IncrementalActiveInstance ? _processedObservationRepository.ActiveInstanceName : _processedObservationRepository.InactiveInstanceName,
                     processStart,
                     providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
                     success ? RunStatus.Success : RunStatus.Failed,

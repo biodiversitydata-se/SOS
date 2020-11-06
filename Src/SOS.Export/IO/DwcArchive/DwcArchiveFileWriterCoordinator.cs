@@ -55,6 +55,11 @@ namespace SOS.Export.IO.DwcArchive
             DataProvider dataProvider,
             string batchId = "")
         {
+            if (!processedObservations?.Any() ?? true)
+            {
+                return true;
+            }
+
             // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
@@ -74,7 +79,7 @@ namespace SOS.Export.IO.DwcArchive
 
                 // Exclude sensitive species. Replace this implementation when the protected species implementation is finished.
                 var publicObservations =  processedObservations
-                    .Where(observation => !ProtectedSpeciesHelper.IsSensitiveSpecies(observation.Taxon.Id)).ToArray();
+                    .Where(observation => observation?.Taxon != null && !ProtectedSpeciesHelper.IsSensitiveSpecies(observation.Taxon.Id)).ToArray();
                 await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
                 return true;
             }

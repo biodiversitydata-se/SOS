@@ -26,6 +26,15 @@ namespace SOS.Process.Processors.ClamPortal
         private readonly IAreaHelper _areaHelper;
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
 
+        private async Task<int> ValidateAndSaveObservationsAsync(
+            DataProvider dataProvider,
+            ICollection<Observation> observations)
+        {
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+            return await CommitBatchAsync(dataProvider, observations);
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -67,15 +76,15 @@ namespace SOS.Process.Processors.ClamPortal
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                Observation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
+
+                    verbatimCount += await ValidateAndSaveObservationsAsync(dataProvider, observations);
+                   
                     await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
@@ -86,9 +95,7 @@ namespace SOS.Process.Processors.ClamPortal
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                verbatimCount += await ValidateAndSaveObservationsAsync(dataProvider, observations);
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
                 Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
             }
