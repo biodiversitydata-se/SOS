@@ -141,8 +141,8 @@ namespace SOS.Lib.Repositories.Processed
             // Init config
             InitializeConfiguration();
 
-            // Default use live instance
-            LiveMode = true;
+            // Default use non live instance
+            LiveMode = false;
         }
 
         /// <inheritdoc />

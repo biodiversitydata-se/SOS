@@ -109,6 +109,7 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task VerifyCollectionAsync(JobRunModes mode)
         {
+            _invalidObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             var collectionCreated = false;
             if (mode == JobRunModes.Full)
             {
