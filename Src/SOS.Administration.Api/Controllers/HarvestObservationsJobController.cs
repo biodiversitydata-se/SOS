@@ -142,6 +142,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [DisableRequestSizeLimit]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm] UploadDwcArchiveModelDto model)
         {

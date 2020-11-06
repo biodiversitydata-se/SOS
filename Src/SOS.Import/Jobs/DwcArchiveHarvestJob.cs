@@ -5,6 +5,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -48,7 +49,7 @@ namespace SOS.Import.Jobs
         {
             try
             {
-                _logger.LogInformation("Start DwC-A Harvest Job");
+                _logger.LogInformation($"Start DwC-A Harvest Job: {archivePath}");
                 var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(dataProviderId);
                 if (dataProvider == null)
                 {
@@ -59,6 +60,16 @@ namespace SOS.Import.Jobs
                 {
                     throw new Exception($"The data provider \"{dataProvider}\" is not a DwC-A provider");
                 }
+
+                _logger.LogInformation("Wait for DwC-A file to be ready");
+                Task fileReady = FileSystemHelper.IsFileReady(archivePath);
+                fileReady.Wait(TimeSpan.FromSeconds(60));
+                if (!fileReady.IsCompleted)
+                {
+                    _logger.LogError($"Couldn't open the file: {archivePath}");
+                    return false;
+                }
+                _logger.LogInformation($"DwC-A file is ready to be opened: {archivePath}");
 
                 var harvestInfoResult =
                     await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
