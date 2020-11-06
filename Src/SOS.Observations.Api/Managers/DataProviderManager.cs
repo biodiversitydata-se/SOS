@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.Managers
         public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive)
         {
             var dataProviderDtos = new List<DataProviderDto>();
-            var processInfo = await _processInfoManager.GetProcessInfoAsync(true);
+            var processInfos = await _processInfoManager.GetProcessInfoAsync(true);
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
             var selectedDataProviders = includeInactive
                 ? allDataProviders
@@ -48,8 +48,9 @@ namespace SOS.Observations.Api.Managers
             // Add process data
             foreach (var dataProvider in selectedDataProviders)
             {
+               
                 var providerInfo =
-                    processInfo?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
+                    processInfos?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
                 if (providerInfo != null)
                 {
                     dataProviderDtos.Add(DataProviderDto.Create(

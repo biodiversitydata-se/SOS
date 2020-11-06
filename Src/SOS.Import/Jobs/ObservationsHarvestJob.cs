@@ -229,7 +229,8 @@ namespace SOS.Import.Jobs
                 dp.IsActive 
             ).ToArray();
 
-            return await RunAsync(mode, activeProviders.Where(dp => 
+            return await RunAsync(mode, activeProviders.Where(dp =>
+                dp.IsReadyToHarvest &&
                 dp.IncludeInScheduledHarvest &&
                 (
                     mode.Equals(JobRunModes.Full) ||
