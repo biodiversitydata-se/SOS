@@ -82,7 +82,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 						WHEN p.Id IS NULL THEN null
 						ELSE p.FirstName + ' ' + p.LastName 
 					END AS RightsHolder,
-	                s.SiteId,
+	                si.SiteId,
 	                s.StageId,
 	                s.StartDate,
 	                s.StartTime,

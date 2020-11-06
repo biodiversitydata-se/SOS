@@ -10,7 +10,13 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
-        
+        public enum SightingTypeFilter
+        {
+            DoNotShowMerged,
+            ShowOnlyMerged,
+            ShowBoth,
+            DoNotShowSightingsInMerged
+        }
 
         public IEnumerable<int> AreaIds { get; set; }
 
@@ -101,6 +107,8 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public bool SearchOnlyBetweenDates { get; set; }
 
+        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+
         /// <summary>
         ///     Observation start date specified in the ISO 8601 standard.
         /// </summary>
@@ -111,7 +119,6 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
-        
         public FilterBase Clone()
         {
             var searchFilter = (FilterBase) MemberwiseClone();

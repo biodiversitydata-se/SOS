@@ -38,34 +38,31 @@ namespace SOS.Observations.Api.Repositories
         {
             var queryList = query.ToList();
 
-            if (filter is SearchFilterInternal)
-            {
-                var internalFilter = filter as SearchFilterInternal;
-                int[] sightingTypeSearchGroupFilter = null;
-                if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 2 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
-                }
+            int[] sightingTypeSearchGroupFilter = null;
 
-                queryList.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.sightingTypeSearchGroupId")
-                        .Terms(sightingTypeSearchGroupFilter)
-                    )
-                );
+            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
+            {
+                sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
             }
+            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
+            {
+                sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
+            }
+            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
+            {
+                sightingTypeSearchGroupFilter = new int[] { 0, 2 };
+            }
+            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
+            {
+                sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
+            }
+            
+            queryList.Add(q => q
+                .Terms(t => t
+                    .Field("artportalenInternal.sightingTypeSearchGroupId")
+                    .Terms(sightingTypeSearchGroupFilter)
+                )
+            );
 
             query = queryList;
             return query;
