@@ -225,15 +225,19 @@ namespace SOS.Import.Jobs
         [DisplayName("Harvest and process observations from active providers")]
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var providers = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
-                dp.IsActive &&
-                dp.IncludeInScheduledHarvest && 
-                (
-                        mode.Equals(JobRunModes.Full) || 
-                        dp.SupportIncrementalHarvest)
-                ).ToList();
+            var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
+                dp.IsActive 
+            ).ToArray();
 
-            return await RunAsync(mode, providers, providers, true, cancellationToken);
+            return await RunAsync(mode, activeProviders.Where(dp => 
+                dp.IncludeInScheduledHarvest &&
+                (
+                    mode.Equals(JobRunModes.Full) ||
+                    dp.SupportIncrementalHarvest)
+                ), 
+                activeProviders, 
+                true, 
+                cancellationToken);
         }
 
         /// <inheritdoc />
@@ -278,8 +282,6 @@ namespace SOS.Import.Jobs
             }
 
             return await RunAsync(JobRunModes.Full, harvestDataProviders.Select(p => p.Value), processDataProviders.Select(p => p.Value), true, cancellationToken);
-
-           
         }
 
         /// <inheritdoc />
