@@ -85,7 +85,7 @@ namespace SOS.Lib.Managers
 
             if ((observation.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
             {
-                observationValidation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
+                observationValidation.Defects.Add($"CoordinateUncertaintyInMeters exceeds max value 100 km ({observation.Location?.CoordinateUncertaintyInMeters ?? 0}m)");
             }
 
             if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
@@ -95,7 +95,7 @@ namespace SOS.Lib.Managers
             }
             else if (!observation.IsInEconomicZoneOfSweden)
             {
-                observationValidation.Defects.Add("Sighting outside Swedish economic zone");
+                observationValidation.Defects.Add($"Sighting outside Swedish economic zone (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})");
             }
 
             if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))

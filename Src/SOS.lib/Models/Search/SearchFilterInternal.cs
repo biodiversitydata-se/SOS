@@ -8,14 +8,6 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class SearchFilterInternal : SearchFilter
     {
-        public enum SightingTypeFilter
-        {
-            DoNotShowMerged,
-            ShowOnlyMerged,
-            ShowBoth,
-            DoNotShowSightingsInMerged
-        }
-
         public enum SightingDeterminationFilter
         {
             NoFilter,
@@ -62,7 +54,7 @@ namespace SOS.Lib.Models.Search
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+       
         public int? MaxAccuracy { get; set; }
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
