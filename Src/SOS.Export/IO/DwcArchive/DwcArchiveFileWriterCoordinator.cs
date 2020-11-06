@@ -64,12 +64,13 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
-                if (string.IsNullOrEmpty(dataProvider.Identifier)) return false;
+                if (string.IsNullOrEmpty(dataProvider?.Identifier)) return false;
                 if (batchId == null) batchId = "";
                 Dictionary<DwcaFilePart, string> filePathByFilePart;
                 lock (_initWriteCsvLock)
                 {
-                    if (!_dwcaFilePartsInfoByDataProvider.TryGetValue(dataProvider, out var dwcaFilePartsInfo))
+                    DwcaFilePartsInfo dwcaFilePartsInfo = null;
+                    if (!_dwcaFilePartsInfoByDataProvider?.TryGetValue(dataProvider, out dwcaFilePartsInfo) ?? true)
                     {
                         dwcaFilePartsInfo = CreateDwcaFilePartsInfo(dataProvider);
                     }
