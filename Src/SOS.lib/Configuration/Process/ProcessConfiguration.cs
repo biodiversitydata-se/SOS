@@ -21,9 +21,9 @@
         public bool RunIncrementalAfterFull { get; set; }
 
         /// <summary>
-        ///     Field mapping
+        ///     Vocabulary configuration
         /// </summary>
-        public FieldMappingConfiguration FieldMapping { get; set; }
+        public VocabularyConfiguration VocabularyConfiguration { get; set; }
 
         /// <summary>
         ///     taxon attribute service configuration

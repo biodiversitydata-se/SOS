@@ -24,7 +24,7 @@ namespace SOS.Import.IntegrationTests.Managers
 {
     public class DwcaDataValidationReportManagerTests : TestBase
     {
-        private FieldMappingResolverHelper CreateFieldMappingResolverHelper()
+        private VocabularyValueResolver CreateVocabularyValueResolver()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -34,9 +34,9 @@ namespace SOS.Import.IntegrationTests.Managers
                 processDbConfiguration.WriteBatchSize);
 
             var processedFieldMappingRepository =
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
-            return new FieldMappingResolverHelper(processedFieldMappingRepository,
-                new FieldMappingConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            return new VocabularyValueResolver(processedFieldMappingRepository,
+                new VocabularyConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
         }
 
         [Fact]
@@ -155,11 +155,11 @@ namespace SOS.Import.IntegrationTests.Managers
         {
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
             var processedFieldMappingRepository =
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
-            var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepository,
-                new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
+            var fieldMappingResolverHelper = new VocabularyValueResolver(processedFieldMappingRepository,
+                new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());

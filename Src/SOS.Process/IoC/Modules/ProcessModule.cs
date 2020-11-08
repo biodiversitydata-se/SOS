@@ -55,9 +55,9 @@ namespace SOS.Process.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Field mapping processing configuration
-            if (Configurations.ProcessConfiguration.FieldMapping != null)
+            if (Configurations.ProcessConfiguration.VocabularyConfiguration != null)
             {
-                builder.RegisterInstance(Configurations.ProcessConfiguration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configurations.ProcessConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();
             }
             if (Configurations.ProcessConfiguration.TaxonAttributeServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ProcessConfiguration.TaxonAttributeServiceConfiguration)
@@ -80,8 +80,8 @@ namespace SOS.Process.IoC.Modules
             // Helpers, single instance since static data
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
             builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
-            builder.RegisterType<FieldMappingDiffHelper>().As<IFieldMappingDiffHelper>().SingleInstance();
-            builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
+            builder.RegisterType<VocabulariesDiffHelper>().As<IVocabulariesDiffHelper>().SingleInstance();
+            builder.RegisterType<VocabularyValueResolver>().As<IVocabularyValueResolver>().SingleInstance();
 
             // Repositories source
             builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
@@ -112,7 +112,7 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>()
+            builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();

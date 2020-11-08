@@ -25,13 +25,13 @@ namespace SOS.Export.IO.DwcArchive
     public class DwcArchiveOccurrenceCsvWriter : IDwcArchiveOccurrenceCsvWriter
     {
         private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
-        private readonly IFieldMappingResolverHelper _fieldMappingResolverHelper;
+        private readonly IVocabularyValueResolver _vocabularyValueResolver;
 
         public DwcArchiveOccurrenceCsvWriter(
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             ILogger<DwcArchiveOccurrenceCsvWriter> logger)
         {
-            _fieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
+            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -67,7 +67,7 @@ namespace SOS.Export.IO.DwcArchive
                     elasticRetrievalStopwatch.Stop();
                     
                     // Convert observations to DwC format.
-                    _fieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations, Cultures.en_GB);
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB);
                     var dwcObservations = processedObservations.ToDarwinCore().ToArray();
 
                     // Write occurrence rows to CSV file.

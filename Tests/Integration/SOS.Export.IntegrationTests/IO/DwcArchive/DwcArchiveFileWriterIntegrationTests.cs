@@ -37,7 +37,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processDbConfiguration = GetProcessDbConfiguration();
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    CreateFieldMappingResolverHelper(CreateExportClient(processDbConfiguration)),
+                    CreateVocabularyValueResolver(CreateExportClient(processDbConfiguration)),
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
@@ -46,12 +46,12 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             return dwcArchiveFileWriter;
         }
 
-        private FieldMappingResolverHelper CreateFieldMappingResolverHelper(ProcessClient client)
+        private VocabularyValueResolver CreateVocabularyValueResolver(ProcessClient client)
         {
             var processedFieldMappingRepository =
-                new FieldMappingRepository(client, new NullLogger<FieldMappingRepository>());
-            return new FieldMappingResolverHelper(processedFieldMappingRepository,
-                new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
+                new VocabularyRepository(client, new NullLogger<VocabularyRepository>());
+            return new VocabularyValueResolver(processedFieldMappingRepository,
+                new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
 

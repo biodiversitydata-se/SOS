@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Controllers.V2
     {
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
-        private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly IVocabularyManager _vocabularyManager;
         private readonly ILogger<ObservationsController> _logger;
         private readonly IObservationManager _observationManager;
 
@@ -35,15 +35,15 @@ namespace SOS.Observations.Api.Controllers.V2
         ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
-        /// <param name="fieldMappingManager"></param>
+        /// <param name="vocabularyManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager,
-            IFieldMappingManager fieldMappingManager,
+            IVocabularyManager vocabularyManager,
             ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
+            _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

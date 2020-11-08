@@ -67,7 +67,7 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>()
+            builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
 
@@ -94,7 +94,7 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Helpers, static data => single instance 
-            builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
+            builder.RegisterType<VocabularyValueResolver>().As<IVocabularyValueResolver>().SingleInstance();
         }
     }
 }

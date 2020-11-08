@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using SOS.Lib.Constants;
-using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
@@ -260,7 +260,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Id.Should().Be(FieldMappingConstants.NoMappingFoundCustomValueIsUsedId);
+            result.Occurrence.Gender.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
             result.Occurrence.Gender.Value.Should().Be("Malle");
         }
 

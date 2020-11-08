@@ -7,13 +7,14 @@ using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
+using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.ClamPortal
 {
@@ -144,7 +145,7 @@ namespace SOS.Process.Processors.ClamPortal
                 default:
                     return new VocabularyValue
                     {
-                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = basisOfRecord
                     };
             }
@@ -165,7 +166,7 @@ namespace SOS.Process.Processors.ClamPortal
                 default:
                     return new VocabularyValue
                     {
-                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = accessRights
                     };
             }
@@ -192,7 +193,7 @@ namespace SOS.Process.Processors.ClamPortal
                 default:
                     return new VocabularyValue
                     {
-                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = occurrenceStatus
                     };
             }
@@ -213,7 +214,7 @@ namespace SOS.Process.Processors.ClamPortal
                 default:
                     return new VocabularyValue
                     {
-                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = quantityUnit
                     };
             }
@@ -234,7 +235,7 @@ namespace SOS.Process.Processors.ClamPortal
                 default:
                     return new VocabularyValue
                     {
-                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = institutionCode
                     };
             }
@@ -250,7 +251,7 @@ namespace SOS.Process.Processors.ClamPortal
             // todo - should we return null or NoMappingFoundCustomValueIsUsedId?
             return new VocabularyValue
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                 Value = lifeStage
             };
             //return null; // no valid values for LifeStage
@@ -269,7 +270,7 @@ namespace SOS.Process.Processors.ClamPortal
 
             return new VocabularyValue
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId,
                 Value = validationStatus
             };
         }

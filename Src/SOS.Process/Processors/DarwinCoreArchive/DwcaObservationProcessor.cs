@@ -30,15 +30,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IAreaHelper _areaHelper;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcaVerbatimRepository;
         private readonly ProcessConfiguration _processConfiguration;
-        private readonly IFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="dwcaVerbatimRepository"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="processedFieldMappingRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="processedVocabularyRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
@@ -46,19 +46,19 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="logger"></param>
         public DwcaObservationProcessor(IDarwinCoreArchiveVerbatimRepository dwcaVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingRepository processedFieldMappingRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyRepository processedVocabularyRepository,
+            IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<DwcaObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _dwcaVerbatimRepository =
                 dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ??
-                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedVocabularyRepository = processedVocabularyRepository ??
+                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processConfiguration =
                 processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
@@ -149,7 +149,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
                 taxa,
-                _processedFieldMappingRepository,
+                _processedVocabularyRepository,
                 _areaHelper);
             ICollection<Observation> sightings = new List<Observation>();
             using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);

@@ -46,9 +46,9 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
         private DwcArchiveOccurrenceCsvWriter CreateDwcArchiveOccurrenceCsvWriter()
         {
             var writer = new DwcArchiveOccurrenceCsvWriter(
-                new FieldMappingResolverHelper(
-                    ProcessedFieldMappingRepositoryStubFactory.Create().Object, 
-                    new FieldMappingConfiguration()),
+                new VocabularyValueResolver(
+                    VocabularyRepositoryStubFactory.Create().Object, 
+                    new VocabularyConfiguration()),
                 new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object);
             return writer;
         }

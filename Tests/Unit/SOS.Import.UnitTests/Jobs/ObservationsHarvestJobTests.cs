@@ -7,7 +7,7 @@ namespace SOS.Import.UnitTests.Managers
 {
     public class ObservationsHarvestJobTests
     {
-        private readonly Mock<IFieldMappingImportJob> _fieldMappingImportJobMock;
+        private readonly Mock<IVocabulariesImportJob> _vocabularyImportJobMock;
         private readonly Mock<IArtportalenHarvestJob> _artportalenHarvestJobMock;
         private readonly Mock<IClamPortalHarvestJob> _clamPortalHarvestJobMock;
         private readonly Mock<IKulHarvestJob> _kulHarvestJobMock;
@@ -36,7 +36,7 @@ namespace SOS.Import.UnitTests.Managers
         /// </summary>
         public ObservationsHarvestJobTests()
         {
-          _fieldMappingImportJobMock = new Mock<IFieldMappingImportJob>();
+          _vocabularyImportJobMock = new Mock<IVocabulariesImportJob>();
             _artportalenHarvestJobMock = new Mock<IArtportalenHarvestJob>();
             _clamPortalHarvestJobMock = new Mock<IClamPortalHarvestJob>();
             _kulHarvestJobMock = new Mock<IKulHarvestJob>();

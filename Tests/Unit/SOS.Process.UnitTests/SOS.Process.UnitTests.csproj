@@ -53,7 +53,7 @@
     <None Update="Resources\AllProcessedBasicTaxa.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\FieldMappings.msgpck">
+    <None Update="Resources\Vocabularies.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\MammaliaProcessedTaxa.msgpck">

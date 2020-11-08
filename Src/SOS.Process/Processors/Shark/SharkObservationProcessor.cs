@@ -32,18 +32,18 @@ namespace SOS.Process.Processors.Shark
         /// <param name="sharkObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public SharkObservationProcessor(ISharkObservationVerbatimRepository sharkObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<SharkObservationProcessor> logger) : 
-            base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
                                                   throw new ArgumentNullException(

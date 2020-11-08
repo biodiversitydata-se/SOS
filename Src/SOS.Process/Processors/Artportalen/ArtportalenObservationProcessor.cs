@@ -29,7 +29,7 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ProcessConfiguration _processConfiguration;
-        private readonly IFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly SemaphoreSlim _semaphore;
 
         /// <summary>
@@ -37,26 +37,26 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="artportalenVerbatimRepository"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="processedFieldMappingRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="processedVocabularyRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingRepository processedFieldMappingRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyRepository processedVocabularyRepository,
+            IVocabularyValueResolver vocabularyValueResolver,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ??
-                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedVocabularyRepository = processedVocabularyRepository ??
+                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _processConfiguration =
                 processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
@@ -100,7 +100,7 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository, mode != JobRunModes.Full);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full);
             // Get min and max id from db
 
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
@@ -112,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 await _semaphore.WaitAsync();
 
-                var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSizeWrite - 1;
+                var batchEndId = batchStartId + _processedVocabularyRepository.BatchSizeWrite - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;
@@ -208,7 +208,7 @@ namespace SOS.Process.Processors.Artportalen
         {
             var verbatimCount = 0;
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository, mode != JobRunModes.Full);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full);
             ICollection<Observation> observations = new List<Observation>();
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();

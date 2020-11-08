@@ -19,21 +19,21 @@ namespace SOS.Process.Processors
     public abstract class ObservationProcessorBase<TEntity>
     {
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
-        protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
+        protected readonly IVocabularyValueResolver vocabularyValueResolver;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly IValidationManager ValidationManager;
 
         protected ObservationProcessorBase(IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<TEntity> logger)
         {
             ProcessRepository = processedObservationRepository ??
                                 throw new ArgumentNullException(nameof(processedObservationRepository));
-            FieldMappingResolverHelper = fieldMappingResolverHelper ??
-                                         throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
+            this.vocabularyValueResolver = vocabularyValueResolver ??
+                                           throw new ArgumentNullException(nameof(vocabularyValueResolver));
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
             ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -102,11 +102,11 @@ namespace SOS.Process.Processors
         {
             try
             {
-                if (FieldMappingResolverHelper.Configuration.ResolveValues)
+                if (vocabularyValueResolver.Configuration.ResolveValues)
                 {
                     // used for testing purpose for easier debugging of field mapped data.
-                    FieldMappingResolverHelper
-                        .ResolveFieldMappedValues(
+                    vocabularyValueResolver
+                        .ResolveVocabularyMappedValues(
                             processedObservations); 
                 }
 
@@ -132,7 +132,7 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             string batchId = "")
         {
-            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations, Cultures.en_GB);
+            vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB);
             return await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
         }
 

@@ -33,8 +33,8 @@ namespace SOS.Process.UnitTests.Processors
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
-            _processedFieldMappingRepositoryMock = new Mock<IFieldMappingRepository>();
-            _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
+            _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
+            _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
@@ -43,8 +43,8 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
-        private readonly Mock<IFieldMappingRepository> _processedFieldMappingRepositoryMock;
-        private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
+        private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
+        private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
@@ -53,8 +53,8 @@ namespace SOS.Process.UnitTests.Processors
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
             _processedObservationRepositoryMock.Object,
-            _processedFieldMappingRepositoryMock.Object,
-            _fieldMappingResolverHelperMock.Object,
+            _vocabularyRepositoryMock.Object,
+            _vocabularyResolverMock.Object,
             _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _validationManagerMock.Object,
@@ -203,9 +203,9 @@ namespace SOS.Process.UnitTests.Processors
                 {0, new Taxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
             };
 
-            var fieldMappingById = new Dictionary<int, FieldMapping>
+            var fieldMappingById = new Dictionary<int, Vocabulary>
             {
-                {0, new FieldMapping {Id = 0, Name = "ActivityId"}}
+                {0, new Vocabulary {Id = 0, Name = "ActivityId"}}
             };
 
             //-----------------------------------------------------------------------------------------------------------

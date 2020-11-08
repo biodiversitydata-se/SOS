@@ -31,18 +31,18 @@ namespace SOS.Process.Processors.Kul
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public KulObservationProcessor(IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<KulObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(

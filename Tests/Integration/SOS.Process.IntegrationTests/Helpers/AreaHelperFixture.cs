@@ -34,9 +34,9 @@ namespace SOS.Process.IntegrationTests.Helpers
             var processedAreaRepository = new AreaRepository(
                 processClient,
                 new Mock<ILogger<AreaRepository>>().Object);
-            var processedFieldMappingRepository = new FieldMappingRepository(
+            var processedFieldMappingRepository = new VocabularyRepository(
                 processClient,
-                new NullLogger<FieldMappingRepository>());
+                new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(
                 processedAreaRepository,
                 processedFieldMappingRepository);

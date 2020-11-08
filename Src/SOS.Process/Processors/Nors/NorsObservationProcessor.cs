@@ -32,18 +32,18 @@ namespace SOS.Process.Processors.Nors
         /// <param name="norsObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<NorsObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

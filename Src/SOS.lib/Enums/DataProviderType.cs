@@ -7,7 +7,7 @@
     public enum DataProviderType
     {
         Areas = 1,
-        FieldMappings,
+        Vocabularies,
         Taxa,
         ArtportalenObservations,
         ClamPortalObservations,

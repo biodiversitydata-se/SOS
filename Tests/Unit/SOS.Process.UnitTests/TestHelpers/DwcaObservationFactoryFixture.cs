@@ -41,7 +41,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var processedAreaRepositoryStub =
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
-            var processedFieldMappingRepository = ProcessedFieldMappingRepositoryStubFactory.Create();
+            var processedFieldMappingRepository = VocabularyRepositoryStubFactory.Create();
             var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object, processedFieldMappingRepository.Object);
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,

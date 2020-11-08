@@ -32,7 +32,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
@@ -40,11 +40,11 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<VirtualHerbariumObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(

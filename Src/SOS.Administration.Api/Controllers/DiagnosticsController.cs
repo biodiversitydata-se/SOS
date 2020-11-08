@@ -19,28 +19,28 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class DiagnosticsController : ControllerBase, IDiagnosticsController
     {
-        private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
-        private readonly IFieldMappingHarvester _fieldMappingHarvester;
+        private readonly IVocabulariesDiffHelper _vocabulariesDiffHelper;
+        private readonly IVocabularyHarvester _vocabularyHarvester;
         private readonly ILogger<DiagnosticsController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="fieldMappingHarvester"></param>
-        /// <param name="fieldMappingDiffHelper"></param>
+        /// <param name="vocabularyHarvester"></param>
+        /// <param name="vocabulariesDiffHelper"></param>
         /// <param name="areaDiffHelper"></param>
         /// <param name="logger"></param>
         /// <param name="areaHarvester"></param>
         public DiagnosticsController(
-            IFieldMappingHarvester fieldMappingHarvester,
-            IFieldMappingDiffHelper fieldMappingDiffHelper,
+            IVocabularyHarvester vocabularyHarvester,
+            IVocabulariesDiffHelper vocabulariesDiffHelper,
             IAreaHarvester areaHarvester,
             ILogger<DiagnosticsController> logger)
         {
-            _fieldMappingHarvester =
-                fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
-            _fieldMappingDiffHelper =
-                fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
+            _vocabularyHarvester =
+                vocabularyHarvester ?? throw new ArgumentNullException(nameof(vocabularyHarvester));
+            _vocabulariesDiffHelper =
+                vocabulariesDiffHelper ?? throw new ArgumentNullException(nameof(vocabulariesDiffHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -48,18 +48,18 @@ namespace SOS.Administration.Api.Controllers
         ///     Get diff between generated, Json files and processed field mappings.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("FieldMappingDiffAsZipFile")]
+        [HttpGet("VocabularyDiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetFieldMappingsDiffAsZipFile()
+        public async Task<IActionResult> GetVocabulariesDiffAsZipFile()
         {
             try
             {
-                var fieldMappingFieldIds = Enum.GetValues(typeof(FieldMappingFieldId)).Cast<FieldMappingFieldId>();
-                var generatedFieldMappings =
-                    await _fieldMappingHarvester.CreateAllFieldMappingsAsync(fieldMappingFieldIds);
-                var zipBytes = await _fieldMappingDiffHelper.CreateDiffZipFile(generatedFieldMappings);
-                return File(zipBytes, "application/zip", "FieldMappingDiffBetweenVerbatimAndProcessed.zip");
+                var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
+                var generatedVocabularies =
+                    await _vocabularyHarvester.CreateAllVocabulariesAsync(vocabularyIds);
+                var zipBytes = await _vocabulariesDiffHelper.CreateDiffZipFile(generatedVocabularies);
+                return File(zipBytes, "application/zip", "VocabularyDiffBetweenVerbatimAndProcessed.zip");
             }
             catch (Exception e)
             {

@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentAssertions;
-using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;

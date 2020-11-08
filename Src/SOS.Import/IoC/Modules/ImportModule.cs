@@ -4,7 +4,7 @@ using SOS.Import.Containers;
 using SOS.Import.Containers.Interfaces;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
-using SOS.Import.Factories.FieldMapping;
+using SOS.Import.Factories.Vocabularies;
 using SOS.Import.Harvesters;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Harvesters.Observations;
@@ -119,7 +119,7 @@ namespace SOS.Import.IoC.Modules
 
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
@@ -151,7 +151,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingHarvester>().As<IFieldMappingHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<VocabularyHarvester>().As<IVocabularyHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationHarvester>().As<IFishDataObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
@@ -163,28 +163,28 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Add factories
-            builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<LifeStageFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<BiotopeFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<SubstrateFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<InstitutionFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<UnitFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<BasisOfRecordFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ContinentFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CountyFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<MunicipalityFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ParishFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ProvinceFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<TypeFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CountryFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<AccessRightsFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<OccurrenceStatusFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<EstablishmentMeansFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<AreaTypeFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<DiscoveryMethodFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<DeterminationMethodFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivityVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<GenderVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<LifeStageVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BiotopeVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SubstrateVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ValidationStatusVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<InstitutionVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<UnitVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BasisOfRecordVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ContinentVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CountyVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<MunicipalityVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ParishVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ProvinceVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<TypeVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CountryVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AccessRightsVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<OccurrenceStatusVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<EstablishmentMeansVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaTypeVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DiscoveryMethodVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DeterminationMethodVocabularyFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
@@ -208,7 +208,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalHarvestJob>().As<IClamPortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingImportJob>().As<IFieldMappingImportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataHarvestJob>().As<IFishDataHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<MvmHarvestJob>().As<IMvmHarvestJob>().InstancePerLifetimeScope();

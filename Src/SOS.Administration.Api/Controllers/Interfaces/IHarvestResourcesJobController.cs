@@ -25,6 +25,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         ///     Run import field mapping.
         /// </summary>
         /// <returns></returns>
-        IActionResult RunImportFieldMappingJob();
+        IActionResult RunImportVocabulariesJob();
     }
 }

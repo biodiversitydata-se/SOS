@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Processors
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
-            _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
+            _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ClamPortalObservationProcessor>>();
@@ -42,7 +42,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
-        private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
+        private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ClamPortalObservationProcessor>> _loggerMock;
@@ -51,7 +51,7 @@ namespace SOS.Process.UnitTests.Processors
             _clamObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
             _processedObservationRepositoryMock.Object,
-            _fieldMappingResolverHelperMock.Object, 
+            _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _validationManagerMock.Object,
             _loggerMock.Object);

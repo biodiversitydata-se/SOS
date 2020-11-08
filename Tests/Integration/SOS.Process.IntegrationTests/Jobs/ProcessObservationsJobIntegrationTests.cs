@@ -67,7 +67,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             
             var areaHelper = new AreaHelper(
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()),
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>()));
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>()));
            
             var taxonProcessedRepository =
                 new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
@@ -90,9 +90,9 @@ namespace SOS.Process.IntegrationTests.Jobs
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository =
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,
@@ -195,7 +195,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new DarwinCoreArchiveVerbatimRepository(verbatimClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 processedObservationRepository,
                 processedFieldMappingRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration()),
                 areaHelper,
                 processConfiguration,
                 dwcArchiveFileWriterCoordinator,

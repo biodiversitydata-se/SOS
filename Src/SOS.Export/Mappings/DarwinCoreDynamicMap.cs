@@ -1010,7 +1010,7 @@ namespace SOS.Export.Mappings
         }
 
         public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>
-            CreateFieldMappingDictionary()
+            CreateVocabularyDictionary()
         {
             var dic = new Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>();
 

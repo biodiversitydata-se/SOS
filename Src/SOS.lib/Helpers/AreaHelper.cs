@@ -11,7 +11,7 @@ using NetTopologySuite.Index.Strtree;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Cache;
@@ -30,23 +30,23 @@ namespace SOS.Lib.Helpers
 
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
-        private readonly IFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly STRtree<IFeature> _strTree;
-        private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
+        private IDictionary<VocabularyId, Dictionary<int, VocabularyValueInfo>> _vocabularyValueById;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="processedAreaRepository"></param>
-        /// <param name="processedFieldMappingRepository"></param>
+        /// <param name="processedVocabularyRepository"></param>
         public AreaHelper(
             IAreaRepository processedAreaRepository,
-            IFieldMappingRepository processedFieldMappingRepository)
+            IVocabularyRepository processedVocabularyRepository)
         {
             _processedAreaRepository = processedAreaRepository ??
                                        throw new ArgumentNullException(nameof(processedAreaRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ??
-                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedVocabularyRepository = processedVocabularyRepository ??
+                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _strTree = new STRtree<IFeature>();
 
             // Try to get saved cache
@@ -76,11 +76,11 @@ namespace SOS.Lib.Helpers
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
                 processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = VocabularyValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.County = Models.Processed.Observation.VocabularyValue.Create(positionLocation.County?.Id);
             processedObservation.Location.Municipality =
-                VocabularyValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.Parish = VocabularyValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.Province = VocabularyValue.Create(positionLocation.Province?.Id);
+                Models.Processed.Observation.VocabularyValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.Parish = Models.Processed.Observation.VocabularyValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.Province = Models.Processed.Observation.VocabularyValue.Create(positionLocation.Province?.Id);
             processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
@@ -119,9 +119,9 @@ namespace SOS.Lib.Helpers
         private async Task InitializeAsync()
         {
             // Get field mappings
-            var fieldMappings = (await _processedFieldMappingRepository.GetAllAsync()).ToArray();
+            var fieldMappings = (await _processedVocabularyRepository.GetAllAsync()).ToArray();
 
-            _fieldMappingValueById = fieldMappings.ToDictionary(m => m.Id,
+            _vocabularyValueById = fieldMappings.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
 
             // If tree already initialized, return
@@ -260,17 +260,17 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetGeoRegionFieldMappingDictionaries(
-            ICollection<FieldMapping> verbatimFieldMappings)
+        private IDictionary<VocabularyId, IDictionary<object, int>> GetGeoRegionVocabularyDictionaries(
+            ICollection<Vocabulary> verbatimFieldMappings)
         {
-            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
+            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
             foreach (var fieldMapping in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
             {
                 var fieldMappings =
                     fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
                 if (fieldMappings != null)
                 {
-                    var mapping = fieldMappings.Mappings.Single(m => m.Key == FieldMappingKeyFields.FeatureId);
+                    var mapping = fieldMappings.Mappings.Single(m => m.Key == VocabularyMappingKeyFields.FeatureId);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
                     dic.Add(fieldMapping.Id, sosIdByValue);
                 }
@@ -281,13 +281,13 @@ namespace SOS.Lib.Helpers
 
         public void AddValueDataToGeographicalFields(Observation observation)
         {
-            SetValue(observation?.Location?.County, _fieldMappingValueById[FieldMappingFieldId.County]);
-            SetValue(observation?.Location?.Municipality, _fieldMappingValueById[FieldMappingFieldId.Municipality]);
-            SetValue(observation?.Location?.Province, _fieldMappingValueById[FieldMappingFieldId.Province]);
-            SetValue(observation?.Location?.Parish, _fieldMappingValueById[FieldMappingFieldId.Parish]);
+            SetValue(observation?.Location?.County, _vocabularyValueById[VocabularyId.County]);
+            SetValue(observation?.Location?.Municipality, _vocabularyValueById[VocabularyId.Municipality]);
+            SetValue(observation?.Location?.Province, _vocabularyValueById[VocabularyId.Province]);
+            SetValue(observation?.Location?.Parish, _vocabularyValueById[VocabularyId.Parish]);
         }
 
-        private void SetValue(VocabularyValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
+        private void SetValue(Models.Processed.Observation.VocabularyValue val, IDictionary<int, VocabularyValueInfo> fieldMappingValueById)
         {
             if (val == null) return;
             if (fieldMappingValueById.TryGetValue(val.Id, out var fieldMappingValue))

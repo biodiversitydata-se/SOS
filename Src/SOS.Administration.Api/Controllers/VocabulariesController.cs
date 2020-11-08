@@ -18,20 +18,20 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class VocabulariesController : ControllerBase, IVocabulariesController
     {
-        private readonly IFieldMappingHarvester _fieldMappingHarvester;
+        private readonly IVocabularyHarvester _vocabularyHarvester;
         private readonly ILogger<VocabulariesController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="fieldMappingHarvester"></param>
+        /// <param name="vocabularyHarvester"></param>
         /// <param name="logger"></param>
         public VocabulariesController(
-            IFieldMappingHarvester fieldMappingHarvester,
+            IVocabularyHarvester vocabularyHarvester,
             ILogger<VocabulariesController> logger)
         {
-            _fieldMappingHarvester =
-                fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
+            _vocabularyHarvester =
+                vocabularyHarvester ?? throw new ArgumentNullException(nameof(vocabularyHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,13 +39,13 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("All/Create")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateAllFieldsMappingFilesAsync()
+        public async Task<IActionResult> CreateAllVocabulariesFilesAsync()
         {
             try
             {
-                var fieldMappingFieldIds = Enum.GetValues(typeof(FieldMappingFieldId)).Cast<FieldMappingFieldId>();
-                var zipBytes = await _fieldMappingHarvester.CreateFieldMappingsZipFileAsync(fieldMappingFieldIds);
-                return File(zipBytes, "application/zip", "AllFieldMappings.zip");
+                var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
+                var zipBytes = await _vocabularyHarvester.CreateVocabulariesZipFileAsync(vocabularyIds);
+                return File(zipBytes, "application/zip", "AllVocabularies.zip");
             }
             catch (Exception e)
             {
@@ -58,13 +58,13 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Single/Create")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
+        public async Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId)
         {
             try
             {
-                var fieldMappingFileTuple =
-                    await _fieldMappingHarvester.CreateFieldMappingFileAsync(fieldMappingFieldId);
-                return File(fieldMappingFileTuple.Bytes, "application/json", fieldMappingFileTuple.Filename);
+                var vocabularyFileTuple =
+                    await _vocabularyHarvester.CreateVocabularyFileAsync(vocabularyId);
+                return File(vocabularyFileTuple.Bytes, "application/json", vocabularyFileTuple.Filename);
             }
             catch (Exception e)
             {
