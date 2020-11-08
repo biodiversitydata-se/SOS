@@ -41,26 +41,6 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAllVocabulariesAsync()
-        {
-            try
-            {
-                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting term vocabularies");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
-        /// Get all term vocabularies.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("Terms")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabulariesAsync()
         {
             try
@@ -69,17 +49,17 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting term vocabularies");
+                _logger.LogError(e, "Error getting vocabularies");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <summary>
-        /// Get term vocabulary.
+        /// Get specific vocabulary.
         /// </summary>
         /// <param name="termId"></param>
         /// <returns></returns>
-        [HttpGet("Term/{termId}")]
+        [HttpGet("{termId}")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabularyAsync([FromRoute] FieldMappingFieldId termId)

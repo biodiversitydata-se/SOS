@@ -16,19 +16,19 @@ namespace SOS.Administration.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class TermDictionaryController : ControllerBase, ITermDictionaryController
+    public class VocabulariesController : ControllerBase, IVocabulariesController
     {
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
-        private readonly ILogger<TermDictionaryController> _logger;
+        private readonly ILogger<VocabulariesController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="fieldMappingHarvester"></param>
         /// <param name="logger"></param>
-        public TermDictionaryController(
+        public VocabulariesController(
             IFieldMappingHarvester fieldMappingHarvester,
-            ILogger<TermDictionaryController> logger)
+            ILogger<VocabulariesController> logger)
         {
             _fieldMappingHarvester =
                 fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
@@ -36,7 +36,7 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("AllFields/Create")]
+        [HttpPost("All/Create")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateAllFieldsMappingFilesAsync()
@@ -55,7 +55,7 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("SingleField/Create")]
+        [HttpPost("Single/Create")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
