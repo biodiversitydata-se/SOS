@@ -2,7 +2,6 @@
 using System.Linq;
 using FluentAssertions;
 using SOS.Lib.Constants;
-using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;

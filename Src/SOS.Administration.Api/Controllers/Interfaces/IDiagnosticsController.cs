@@ -12,6 +12,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         ///     Get diff between generated, verbatim and processed field mappings.
         /// </summary>
         /// <returns></returns>
-        Task<IActionResult> GetFieldMappingsDiffAsZipFile();
+        Task<IActionResult> GetVocabulariesDiffAsZipFile();
     }
 }

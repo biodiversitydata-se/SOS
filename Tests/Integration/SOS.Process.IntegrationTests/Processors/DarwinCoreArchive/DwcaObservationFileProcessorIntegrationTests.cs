@@ -91,9 +91,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             }
 
             var processedFieldMappingRepository =
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,
@@ -107,7 +107,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 dwcaVerbatimRepository.Object,
                 processedObservationRepository,
                 processedFieldMappingRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration()),
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository),
                 processConfiguration, 

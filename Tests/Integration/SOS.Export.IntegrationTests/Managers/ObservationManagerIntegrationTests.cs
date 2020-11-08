@@ -39,9 +39,9 @@ namespace SOS.Export.IntegrationTests.Managers
                     new Mock<ILogger<TaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
             var processedFieldMappingRepository =
-                new FieldMappingRepository(exportClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,

@@ -277,7 +277,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IAreaManager, AreaManager>();
             services.AddSingleton<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
-            services.AddSingleton<IFieldMappingManager, FieldMappingManager>();
+            services.AddSingleton<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
@@ -289,7 +289,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
-            services.AddSingleton<IFieldMappingRepository, FieldMappingRepository>();
+            services.AddSingleton<IVocabularyRepository, VocabularyRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();

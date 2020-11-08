@@ -110,14 +110,14 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             }
 
             var processedFieldMappingRepository =
-                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
                 processedObservationRepository,
                 processedFieldMappingRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration()),
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -133,9 +133,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedFieldMappingRepository =
-                new FieldMappingRepository(exportClient, new NullLogger<FieldMappingRepository>());
+                new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,

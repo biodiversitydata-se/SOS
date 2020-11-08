@@ -27,27 +27,27 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        #region FieldMapping
+        #region Vocabulary
 
         /// <inheritdoc />
-        [HttpPost("FieldMapping/Run")]
+        [HttpPost("Vocabularies/Run")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunImportFieldMappingJob()
+        public IActionResult RunImportVocabulariesJob()
         {
             try
             {
-                BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Import field mapping job was enqueued to Hangfire.");
+                BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
+                return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Enqueuing import field mapping job failed");
+                _logger.LogError(e, "Enqueuing import vocabularies job failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
-        #endregion FieldMapping
+        #endregion Vocabulary
 
         #region Areas
 

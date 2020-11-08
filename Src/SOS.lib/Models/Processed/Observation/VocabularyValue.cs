@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public static VocabularyValue Create(string val)
         {
             return new VocabularyValue
-                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
         protected bool Equals(VocabularyValue other)

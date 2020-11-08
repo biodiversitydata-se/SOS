@@ -18,19 +18,19 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class VocabulariesController : ControllerBase
     {
-        private readonly IFieldMappingManager _fieldMappingManager;
-        private readonly ILogger<ObservationsController> _logger;
+        private readonly IVocabularyManager _vocabularyManager;
+        private readonly ILogger<VocabulariesController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="fieldMappingManager"></param>
+        /// <param name="vocabularyManager"></param>
         /// <param name="logger"></param>
         public VocabulariesController(
-            IFieldMappingManager fieldMappingManager,
-            ILogger<ObservationsController> logger)
+            IVocabularyManager vocabularyManager,
+            ILogger<VocabulariesController> logger)
         {
-            _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
+            _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,13 +39,13 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<Vocabulary>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabulariesAsync()
         {
             try
             {
-                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
+                return new OkObjectResult(await _vocabularyManager.GetVocabulariesAsync());
             }
             catch (Exception e)
             {
@@ -62,11 +62,11 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{termId}")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabularyAsync([FromRoute] FieldMappingFieldId termId)
+        public async Task<IActionResult> GetVocabularyAsync([FromRoute] VocabularyId termId)
         {
             try
             {
-                var fieldMappings = await _fieldMappingManager.GetFieldMappingsAsync();
+                var fieldMappings = await _vocabularyManager.GetVocabulariesAsync();
                 var fieldMapping = fieldMappings.Single(f => f.Id == termId);
                 return new OkObjectResult(fieldMapping);
             }

@@ -17,6 +17,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
+using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Import.Managers
 {
@@ -25,29 +26,29 @@ namespace SOS.Import.Managers
     /// </summary>
     public class DwcaDataValidationReportManager : Interfaces.IDwcaDataValidationReportManager
     {
-        private readonly IFieldMappingResolverHelper _fieldMappingResolverHelper;
+        private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IValidationManager _validationManager;
-        private readonly IFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
         private Dictionary<int, Taxon> _taxonById;
-        private IDictionary<FieldMappingFieldId, IDictionary<object, int>> _dwcaFieldMappings;
-        private IDictionary<FieldMappingFieldId, FieldMapping> _fieldMappings;
+        private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
+        private IDictionary<VocabularyId, Vocabulary> _vocabularyById;
 
         public DwcaDataValidationReportManager(IDwcArchiveReader dwcArchiveReader,
-            IFieldMappingRepository processedFieldMappingRepository,
+            IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
             ILogger<DwcaDataValidationReportManager> logger)
         {
-            _fieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
+            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -60,11 +61,11 @@ namespace SOS.Import.Managers
             var taxa = await _processedTaxonRepository.GetAllAsync();
             _taxonById = taxa.ToDictionary(m => m.Id, m => m);
 
-            var allFieldMappings = await _processedFieldMappingRepository.GetAllAsync();
-            _fieldMappings = allFieldMappings.ToDictionary(f => f.Id, f => f);
-            _dwcaFieldMappings = DwcaObservationFactory.GetFieldMappingsDictionary(
+            var allVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            _vocabularyById = allVocabularies.ToDictionary(f => f.Id, f => f);
+            _dwcaVocabularyById = DwcaObservationFactory.GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
-                allFieldMappings,
+                allVocabularies,
                 true);
         }
 
@@ -84,7 +85,7 @@ namespace SOS.Import.Managers
             var dwcaObservationFactory = new DwcaObservationFactory(
                 dataProvider,
                 _taxonById,
-                _dwcaFieldMappings,
+                _dwcaVocabularyById,
                 _areaHelper);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
@@ -99,12 +100,12 @@ namespace SOS.Import.Managers
             int nrInvalidObservations = 0;
             var validationRemarksBuilder = new DwcaValidationRemarksBuilder();
             var observationDefects = new Dictionary<string, int>();
-            var processedFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>>();
-            var verbatimFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>>();
-            foreach (FieldMappingFieldId fieldMappingFieldId in (FieldMappingFieldId[])Enum.GetValues(typeof(FieldMappingFieldId)))
+            var processedFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, int>>();
+            var verbatimFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>>();
+            foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
             {
-                processedFieldValues.Add(fieldMappingFieldId, new Dictionary<VocabularyValue, int>());
-                verbatimFieldValues.Add(fieldMappingFieldId, new Dictionary<VocabularyValue, HashSet<string>>());
+                processedFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, int>());
+                verbatimFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, HashSet<string>>());
             }
             HashSet<string> nonMatchingScientificNames = new HashSet<string>();
             await foreach (var observationsBatch in observationsBatches)
@@ -115,7 +116,7 @@ namespace SOS.Import.Managers
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
-                    _fieldMappingResolverHelper.ResolveFieldMappedValues(new List<Observation>
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation});
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
@@ -197,7 +198,7 @@ namespace SOS.Import.Managers
                             Count = valuePair.Value,
                             Comment = "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
                         } ).ToList(),
-                    SosVocabulary = _fieldMappings[pair.Key].Values.Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
+                    SosVocabulary = _vocabularyById[pair.Key].Values.Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
                 }).ToList();
 
             var remarks = validationRemarksBuilder.CreateRemarks();
@@ -228,41 +229,41 @@ namespace SOS.Import.Managers
         private void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
             DwcObservationVerbatim verbatimObservation,
-            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>> processedFieldValues,
-            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
+            Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
+            Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
-            UpdateTermDictionaryValue(FieldMappingFieldId.LifeStage, verbatimObservation.LifeStage, processedObservation.Occurrence.LifeStage, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.AccessRights, verbatimObservation.AccessRights, processedObservation.AccessRights, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.Gender, verbatimObservation.Sex, processedObservation.Occurrence.Gender, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.ValidationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.Institution, verbatimObservation.InstitutionCode, processedObservation.InstitutionCode, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.Unit, verbatimObservation.OrganismQuantityType, processedObservation.Occurrence.OrganismQuantityUnit, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.BasisOfRecord, verbatimObservation.BasisOfRecord, processedObservation.BasisOfRecord, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.EstablishmentMeans, verbatimObservation.EstablishmentMeans, processedObservation.Occurrence.EstablishmentMeans, processedFieldValues, verbatimFieldValues);
-            UpdateTermDictionaryValue(FieldMappingFieldId.Type, verbatimObservation.Type, processedObservation.Type, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.LifeStage, verbatimObservation.LifeStage, processedObservation.Occurrence.LifeStage, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.AccessRights, verbatimObservation.AccessRights, processedObservation.AccessRights, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.Gender, verbatimObservation.Sex, processedObservation.Occurrence.Gender, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.ValidationStatus, verbatimObservation.IdentificationVerificationStatus, processedObservation.Identification.ValidationStatus, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.Institution, verbatimObservation.InstitutionCode, processedObservation.InstitutionCode, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.Unit, verbatimObservation.OrganismQuantityType, processedObservation.Occurrence.OrganismQuantityUnit, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.BasisOfRecord, verbatimObservation.BasisOfRecord, processedObservation.BasisOfRecord, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.EstablishmentMeans, verbatimObservation.EstablishmentMeans, processedObservation.Occurrence.EstablishmentMeans, processedFieldValues, verbatimFieldValues);
+            UpdateTermDictionaryValue(VocabularyId.Type, verbatimObservation.Type, processedObservation.Type, processedFieldValues, verbatimFieldValues);
         }
 
-        private void UpdateTermDictionaryValue(FieldMappingFieldId fieldMappingFieldId,
+        private void UpdateTermDictionaryValue(VocabularyId vocabularyId,
             string verbatimValue,
             VocabularyValue processedFieldMapValue,
-            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>> processedFieldValues,
-            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
+            Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
+            Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
             if (processedFieldMapValue != null)
             {
-                if (!processedFieldValues[fieldMappingFieldId].ContainsKey(processedFieldMapValue))
+                if (!processedFieldValues[vocabularyId].ContainsKey(processedFieldMapValue))
                 {
-                    processedFieldValues[fieldMappingFieldId].Add(processedFieldMapValue, 0);
+                    processedFieldValues[vocabularyId].Add(processedFieldMapValue, 0);
                 }
-                processedFieldValues[fieldMappingFieldId][processedFieldMapValue]++;
+                processedFieldValues[vocabularyId][processedFieldMapValue]++;
 
                 if (!string.IsNullOrWhiteSpace(verbatimValue))
                 {
-                    if (!verbatimFieldValues[fieldMappingFieldId].ContainsKey(processedFieldMapValue))
+                    if (!verbatimFieldValues[vocabularyId].ContainsKey(processedFieldMapValue))
                     {
-                        verbatimFieldValues[fieldMappingFieldId].Add(processedFieldMapValue, new HashSet<string>());
+                        verbatimFieldValues[vocabularyId].Add(processedFieldMapValue, new HashSet<string>());
                     }
-                    verbatimFieldValues[fieldMappingFieldId][processedFieldMapValue].Add(verbatimValue);
+                    verbatimFieldValues[vocabularyId][processedFieldMapValue].Add(verbatimValue);
                 }
             }
         }

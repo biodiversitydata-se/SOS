@@ -102,8 +102,8 @@ namespace SOS.Lib.Models.Verbatim.Shared
             {
                 case DataProviderType.Areas:
                     return nameof(Area);
-                case DataProviderType.FieldMappings:
-                    return nameof(FieldMapping);
+                case DataProviderType.Vocabularies:
+                    return nameof(Vocabulary);
                 case DataProviderType.Taxa:
                     return nameof(DarwinCoreTaxon);
                 default:

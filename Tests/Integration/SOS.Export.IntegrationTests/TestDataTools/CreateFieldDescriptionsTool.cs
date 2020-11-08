@@ -21,7 +21,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var dic = DarwinCoreDynamicMap.CreateFieldMappingDictionary();
+            var dic = DarwinCoreDynamicMap.CreateVocabularyDictionary();
             var sb = new StringBuilder();
             var fieldDescriptions = FieldDescriptionHelper.GetAllFieldDescriptions();
             var dwcFieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();

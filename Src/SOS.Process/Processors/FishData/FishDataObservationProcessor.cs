@@ -31,7 +31,7 @@ namespace SOS.Process.Processors.FishData
         /// <param name="fishDataObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
@@ -39,11 +39,11 @@ namespace SOS.Process.Processors.FishData
             IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<FishDataObservationProcessor> logger) : 
-                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(

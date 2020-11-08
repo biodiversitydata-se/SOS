@@ -27,7 +27,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         /// </summary>
         [Fact]
         [Trait("Category", "Tool")]
-        public async Task CreateFieldMappingsJsonFile()
+        public async Task CreateVocabulariesJsonFile()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

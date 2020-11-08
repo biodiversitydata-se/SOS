@@ -12,12 +12,12 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <summary>
         /// </summary>
         /// <returns></returns>
-        Task<IActionResult> CreateAllFieldsMappingFilesAsync();
+        Task<IActionResult> CreateAllVocabulariesFilesAsync();
 
         /// <summary>
         /// </summary>
-        /// <param name="fieldMappingFieldId"></param>
+        /// <param name="vocabularyId"></param>
         /// <returns></returns>
-        Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId);
+        Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId);
     }
 }

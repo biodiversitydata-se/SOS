@@ -11,7 +11,7 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
-using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -21,7 +21,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
+using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
 {
@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private const int DefaultCoordinateUncertaintyInMeters = 10000;
         private readonly IAreaHelper _areaHelper;
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymeName;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
@@ -43,12 +43,12 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public DwcaObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
+            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
-            _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
+            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
@@ -69,11 +69,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public static async Task<DwcaObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IFieldMappingRepository processedFieldMappingRepository,
+            IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper)
         {
-            var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
-            var fieldMappings = GetFieldMappingsDictionary(
+            var allFieldMappings = await processedVocabularyRepository.GetAllAsync();
+            var fieldMappings = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 allFieldMappings.ToArray(),
                 true);
@@ -117,9 +117,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             else if (verbatimObservation.ObservationExtendedMeasurementOrFacts.HasItems())
                 obs.MeasurementOrFacts = verbatimObservation.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             obs.AccessRights = GetSosId(verbatimObservation.AccessRights,
-                _fieldMappings[FieldMappingFieldId.AccessRights]);
+                _vocabularyById[VocabularyId.AccessRights]);
             obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord,
-                _fieldMappings[FieldMappingFieldId.BasisOfRecord]);
+                _vocabularyById[VocabularyId.BasisOfRecord]);
             obs.BibliographicCitation = verbatimObservation.BibliographicCitation;
             obs.CollectionCode = verbatimObservation.CollectionCode;
             obs.CollectionId = verbatimObservation.CollectionID;
@@ -130,7 +130,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.InformationWithheld = verbatimObservation.InformationWithheld;
             obs.InstitutionId = verbatimObservation.InstitutionID;
             obs.InstitutionCode = GetSosId(verbatimObservation.InstitutionCode,
-                _fieldMappings[FieldMappingFieldId.Institution]); // todo - Create DarwinCore field mapping.
+                _vocabularyById[VocabularyId.Institution]); // todo - Create DarwinCore field mapping.
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;
             obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified)?.ToUniversalTime();
@@ -138,7 +138,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.References = verbatimObservation.References;
             obs.RightsHolder = verbatimObservation.RightsHolder;
             obs.Type = GetSosId(verbatimObservation.Type,
-                _fieldMappings[FieldMappingFieldId.Type]); // todo - Create DarwinCore field mapping.
+                _vocabularyById[VocabularyId.Type]); // todo - Create DarwinCore field mapping.
 
             // todo - handle the following fields?
             // obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
@@ -343,7 +343,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatimObservation.IdentificationRemarks;
-            processedIdentification.ValidationStatus = GetSosId(verbatimObservation.IdentificationVerificationStatus, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            processedIdentification.ValidationStatus = GetSosId(verbatimObservation.IdentificationVerificationStatus, _vocabularyById[VocabularyId.ValidationStatus]);
             processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
             //processedIdentification.UncertainDetermination = !processedIdentification.Validated; // todo - is this correct?
             processedIdentification.IdentifiedBy = verbatimObservation.IdentifiedBy;
@@ -374,7 +374,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             var processedLocation = new Lib.Models.Processed.Observation.Location();
             processedLocation.Continent = GetSosId(
                 verbatimObservation.Continent,
-                _fieldMappings[FieldMappingFieldId.Continent],
+                _vocabularyById[VocabularyId.Continent],
                 (int) ContinentId.Europe,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
@@ -382,7 +382,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt() ?? DefaultCoordinateUncertaintyInMeters;
             processedLocation.Country = GetSosId(
                 verbatimObservation.Country,
-                _fieldMappings[FieldMappingFieldId.Country],
+                _vocabularyById[VocabularyId.Country],
                 (int) CountryId.Sweden,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CountryCode = verbatimObservation.CountryCode;
@@ -493,27 +493,27 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber ?? verbatimObservation.OccurrenceID;
             processedOccurrence.Disposition = verbatimObservation.Disposition;
             processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans,
-                _fieldMappings[FieldMappingFieldId.EstablishmentMeans]);
+                _vocabularyById[VocabularyId.EstablishmentMeans]);
             processedOccurrence.IndividualCount = verbatimObservation.IndividualCount;
             processedOccurrence.LifeStage = GetSosId(verbatimObservation.LifeStage,
-                _fieldMappings[FieldMappingFieldId.LifeStage]); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
+                _vocabularyById[VocabularyId.LifeStage]); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
             processedOccurrence.OccurrenceId = verbatimObservation.OccurrenceID;
             processedOccurrence.OccurrenceRemarks = verbatimObservation.OccurrenceRemarks;
             processedOccurrence.OccurrenceStatus = GetSosId(
                 verbatimObservation.OccurrenceStatus,
-                _fieldMappings[FieldMappingFieldId.OccurrenceStatus],
+                _vocabularyById[VocabularyId.OccurrenceStatus],
                 (int)OccurrenceStatusId.Present);
             processedOccurrence.OrganismQuantity = verbatimObservation.OrganismQuantity;
             processedOccurrence.OrganismQuantityUnit = GetSosId(verbatimObservation.OrganismQuantityType,
-                _fieldMappings[FieldMappingFieldId.Unit]); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
+                _vocabularyById[VocabularyId.Unit]); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
             processedOccurrence.OtherCatalogNumbers = verbatimObservation.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatimObservation.Preparations;
             processedOccurrence.RecordedBy = verbatimObservation.RecordedBy;
             processedOccurrence.RecordNumber = verbatimObservation.RecordNumber;
             processedOccurrence.Activity = GetSosId(verbatimObservation.ReproductiveCondition,
-                _fieldMappings[FieldMappingFieldId.Activity]); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
+                _vocabularyById[VocabularyId.Activity]); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
 
-            processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _fieldMappings[FieldMappingFieldId.Gender]);
+            processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Gender]);
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation =
                 false; // todo - Add the following logic? dyntaxaTaxonId == 0; // Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
@@ -635,7 +635,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             return new VocabularyValue
-                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
 
@@ -655,7 +655,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             return new VocabularyValue
-                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
+                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
         }
 
         private Lib.Models.Processed.Observation.Project CreateProcessedProject(Lib.Models.Verbatim.Artportalen.Project project)
@@ -874,29 +874,29 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         ///     Get field mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
-        /// <param name="allFieldMappings"></param>
+        /// <param name="allVocabularies"></param>
         /// <param name="convertValuesToLowercase"></param>
         /// <returns></returns>
-        public static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
+        public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
             ExternalSystemId externalSystemId,
-            ICollection<FieldMapping> allFieldMappings,
+            ICollection<Vocabulary> allVocabularies,
             bool convertValuesToLowercase)
         {
-            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
+            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
 
-            foreach (var fieldMapping in allFieldMappings)
+            foreach (var vocabulary in allVocabularies)
             {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                if (fieldMappings != null)
+                var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                if (vocabularies != null)
                 {
-                    var mapping = fieldMappings.Mappings.Single();
+                    var mapping = vocabularies.Mappings.Single();
                     var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
-                    dic.Add(fieldMapping.Id, sosIdByValue);
+                    dic.Add(vocabulary.Id, sosIdByValue);
                 }
             }
 
             // Add missing entries. Initialize with empty dictionary.
-            foreach (FieldMappingFieldId fieldMappingFieldId in (FieldMappingFieldId[])Enum.GetValues(typeof(FieldMappingFieldId)))
+            foreach (VocabularyId fieldMappingFieldId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
             {
                 if (!dic.ContainsKey(fieldMappingFieldId))
                 {
@@ -907,34 +907,34 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return dic;
         }
 
-        private static string GetMappingKey(FieldMappingFieldId fieldMappingFieldId)
+        private static string GetMappingKey(VocabularyId vocabularyId)
         {
-            switch (fieldMappingFieldId)
+            switch (vocabularyId)
             {
-                case FieldMappingFieldId.Gender:
+                case VocabularyId.Gender:
                     return "sex";
-                case FieldMappingFieldId.County:
+                case VocabularyId.County:
                     return "county";
-                case FieldMappingFieldId.Municipality:
+                case VocabularyId.Municipality:
                     return "municipality";
-                case FieldMappingFieldId.Province:
+                case VocabularyId.Province:
                     return "stateProvince";
-                case FieldMappingFieldId.BasisOfRecord:
+                case VocabularyId.BasisOfRecord:
                     return "basisOfRecord";
-                case FieldMappingFieldId.Continent:
+                case VocabularyId.Continent:
                     return "continent";
-                case FieldMappingFieldId.EstablishmentMeans:
+                case VocabularyId.EstablishmentMeans:
                     return "establishmentMeans";
-                case FieldMappingFieldId.OccurrenceStatus:
+                case VocabularyId.OccurrenceStatus:
                     return "occurrenceStatus";
-                case FieldMappingFieldId.AccessRights:
+                case VocabularyId.AccessRights:
                     return "accessRights";
-                case FieldMappingFieldId.Country:
+                case VocabularyId.Country:
                     return "country";
-                case FieldMappingFieldId.Type:
+                case VocabularyId.Type:
                     return "type";
                 default:
-                    throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");
+                    throw new ArgumentException($"No mapping exist for the field: {vocabularyId}");
             }
         }
 

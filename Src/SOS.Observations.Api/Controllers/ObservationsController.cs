@@ -11,13 +11,13 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Swagger;
-using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.Controllers
     {
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
-        private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly IVocabularyManager _vocabularyManager;
         private readonly ILogger<ObservationsController> _logger;
         private readonly IObservationManager _observationManager;
 
@@ -38,23 +38,23 @@ namespace SOS.Observations.Api.Controllers
         ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
-        /// <param name="fieldMappingManager"></param>
+        /// <param name="vocabularyManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager,
-            IFieldMappingManager fieldMappingManager,
+            IVocabularyManager vocabularyManager,
             ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
+            _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         [HttpPost("Search")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SearchAsync(
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
@@ -68,7 +68,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilterValidation = ValidateSearchFilter(filter);
                 var validationResult = Result.Combine(pagingArgumentsValidation, searchFilterValidation);
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                
+
                 SearchFilter searchFilter = filter.ToSearchFilter();
                 var result = await _observationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
@@ -77,15 +77,15 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Search error");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("SearchInternal")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchInternalAsync(
             [FromBody] SearchFilterInternalDto filter,
@@ -122,7 +122,7 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
-            [FromQuery] int take = 100, 
+            [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc
             )
@@ -333,7 +333,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var filterValidation = ValidateSearchFilter(filter);
-                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit:1, maxLimit:21);
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
                 if (paramsValidationResult.IsFailure)
@@ -463,9 +463,9 @@ namespace SOS.Observations.Api.Controllers
 
 
         [HttpGet("Provider/{providerId}/lastmodified")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<Vocabulary>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute]int providerId)
+        public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute] int providerId)
         {
             try
             {
@@ -487,13 +487,13 @@ namespace SOS.Observations.Api.Controllers
 
             return Result.Success(zoom);
         }
-        
+
         private Result ValidatePagingArguments(int skip, int take)
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
             if (take <= 0) return Result.Failure("Take must be greater than 0");
             if (skip + take > _observationManager.MaxNrElasticSearchAggregationBuckets)
-                return Result.Failure($"Skip+Take={skip+take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
+                return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
 
             return Result.Success();
         }
