@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -112,6 +116,39 @@ namespace SOS.Observations.Api.Managers
             }
 
             return dic;
+        }
+
+        public async Task<byte[]> GetVocabulariesZipFileAsync(IEnumerable<VocabularyId> vocabularyIds)
+        {
+            var vocabularies = await GetVocabulariesAsync();
+            var vocabularyIdsSet = new HashSet<VocabularyId>(vocabularyIds);
+            var zipFile = CreateZipFile(vocabularies.Where(m => vocabularyIdsSet.Contains(m.Id)));
+            return zipFile;
+        }
+
+        private byte[] CreateZipFile(IEnumerable<Vocabulary> vocabularies)
+        {
+            using var ms = new MemoryStream();
+            using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+            {
+                foreach (var vocabulary in vocabularies)
+                {
+                    var bytes = SerializeToJsonArray(vocabulary,
+                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }, Formatting.Indented);
+                    var zipEntry = archive.CreateEntry($"{vocabulary.Id}.json", CompressionLevel.Optimal);
+                    using var zipStream = zipEntry.Open();
+                    zipStream.Write(bytes, 0, bytes.Length);
+                }
+            }
+
+            return ms.ToArray();
+        }
+
+        private byte[] SerializeToJsonArray(object value, JsonSerializerSettings jsonSerializerSettings,
+            Formatting formatting)
+        {
+            var result = JsonConvert.SerializeObject(value, formatting, jsonSerializerSettings);
+            return Encoding.UTF8.GetBytes(result);
         }
     }
 }
