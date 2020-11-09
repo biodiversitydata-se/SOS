@@ -48,9 +48,9 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
 
         private VocabularyValueResolver CreateVocabularyValueResolver(ProcessClient client)
         {
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(client, new NullLogger<VocabularyRepository>());
-            return new VocabularyValueResolver(processedFieldMappingRepository,
+            return new VocabularyValueResolver(vocabularyRepository,
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 

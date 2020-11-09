@@ -38,10 +38,10 @@ namespace SOS.Export.IntegrationTests.Managers
                 new TaxonRepository(exportClient,
                     new Mock<ILogger<TaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
+                new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,

@@ -34,12 +34,12 @@ namespace SOS.Process.IntegrationTests.Helpers
             var processedAreaRepository = new AreaRepository(
                 processClient,
                 new Mock<ILogger<AreaRepository>>().Object);
-            var processedFieldMappingRepository = new VocabularyRepository(
+            var vocabularyRepository = new VocabularyRepository(
                 processClient,
                 new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(
                 processedAreaRepository,
-                processedFieldMappingRepository);
+                vocabularyRepository);
 
             return areaHelper;
         }
