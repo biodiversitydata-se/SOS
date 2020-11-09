@@ -73,11 +73,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IAreaHelper areaHelper)
         {
             var allFieldMappings = await processedVocabularyRepository.GetAllAsync();
-            var fieldMappings = GetVocabulariesDictionary(
+            var processedVocabularies = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 allFieldMappings.ToArray(),
                 true);
-            return new DwcaObservationFactory(dataProvider, taxa, fieldMappings, areaHelper);
+            return new DwcaObservationFactory(dataProvider, taxa, processedVocabularies, areaHelper);
         }
 
         public IEnumerable<Observation> CreateProcessedObservations(

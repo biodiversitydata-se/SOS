@@ -49,15 +49,15 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper =
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
-                    processedFieldMappingRepository);
+                    vocabularyRepository);
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
-                processedFieldMappingRepository,
+                vocabularyRepository,
                 areaHelper);
 
             return dwcaObservationFactory;

@@ -89,10 +89,10 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
-                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration());
+                new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,
@@ -177,7 +177,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
-                processedFieldMappingRepository,
+                vocabularyRepository,
                 fieldMappingResolverHelper,
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
@@ -194,8 +194,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             var dwcaProcessor = new DwcaObservationProcessor(
                 new DarwinCoreArchiveVerbatimRepository(verbatimClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 processedObservationRepository,
-                processedFieldMappingRepository,
-                new VocabularyValueResolver(processedFieldMappingRepository, new VocabularyConfiguration()),
+                vocabularyRepository,
+                new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 areaHelper,
                 processConfiguration,
                 dwcArchiveFileWriterCoordinator,

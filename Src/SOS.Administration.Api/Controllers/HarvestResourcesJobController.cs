@@ -27,27 +27,6 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        #region Vocabulary
-
-        /// <inheritdoc />
-        [HttpPost("Vocabularies/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunImportVocabulariesJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing import vocabularies job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        #endregion Vocabulary
 
         #region Areas
 
