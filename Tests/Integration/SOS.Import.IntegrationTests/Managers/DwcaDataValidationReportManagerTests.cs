@@ -33,9 +33,9 @@ namespace SOS.Import.IntegrationTests.Managers
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
 
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
-            return new VocabularyValueResolver(processedFieldMappingRepository,
+            return new VocabularyValueResolver(vocabularyRepository,
                 new VocabularyConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
         }
 
@@ -154,18 +154,18 @@ namespace SOS.Import.IntegrationTests.Managers
         private DwcaDataValidationReportManager CreateDwcaDataValidationReportManager()
         {
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
-            var processedFieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
-                    processedFieldMappingRepository);
-            var fieldMappingResolverHelper = new VocabularyValueResolver(processedFieldMappingRepository,
+                    vocabularyRepository);
+            var fieldMappingResolverHelper = new VocabularyValueResolver(vocabularyRepository,
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
-                processedFieldMappingRepository,
+                vocabularyRepository,
                 CreateValidationManager(),
                 areaHelper,
                 fieldMappingResolverHelper,

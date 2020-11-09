@@ -39,12 +39,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var fieldMappings = await fieldMappingRepository.GetAllAsync();
+            var processedVocabularies = await fieldMappingRepository.GetAllAsync();
             var serializerSettings = new JsonSerializerSettings
             {
                 Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
-            var strJson = JsonConvert.SerializeObject(fieldMappings, serializerSettings);
+            var strJson = JsonConvert.SerializeObject(processedVocabularies, serializerSettings);
             File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
 
@@ -69,9 +69,9 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var fieldMappings = await fieldMappingRepository.GetAllAsync();
+            var processedVocabularies = await fieldMappingRepository.GetAllAsync();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            var bin = MessagePackSerializer.Serialize(fieldMappings, options);
+            var bin = MessagePackSerializer.Serialize(processedVocabularies, options);
             File.WriteAllBytes(filePath, bin);
         }
     }

@@ -17,15 +17,15 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 {
     public class CreateVocabularyEnumsTool : TestBase
     {
-        private string CreateEnums(ICollection<Vocabulary> fieldMappings)
+        private string CreateEnums(ICollection<Vocabulary> processedVocabularies)
         {
             var sb = new StringBuilder();
-            foreach (var fieldMapping in fieldMappings)
+            foreach (var vocabularity in processedVocabularies)
             {
-                if (fieldMapping.Id == VocabularyId.Municipality ||
-                    fieldMapping.Id == VocabularyId.Parish)
+                if (vocabularity.Id == VocabularyId.Municipality ||
+                    vocabularity.Id == VocabularyId.Parish)
                     continue;
-                sb.Append(CreateEnum(fieldMapping));
+                sb.Append(CreateEnum(vocabularity));
                 sb.AppendLine();
             }
 
@@ -138,8 +138,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var fieldMappings = (await fieldMappingRepository.GetAllAsync()).ToArray();
-            var strEnums = CreateEnums(fieldMappings);
+            var processedVocabularies = (await fieldMappingRepository.GetAllAsync()).ToArray();
+            var strEnums = CreateEnums(processedVocabularies);
             File.WriteAllText(filePath, strEnums, Encoding.UTF8);
         }
     }

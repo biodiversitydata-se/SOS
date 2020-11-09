@@ -37,33 +37,6 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        [HttpPost("Daily")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyProcessJob(
-            [FromQuery] bool cleanStart = true,
-            [FromQuery] bool copyFromActiveOnFail = false,
-            [FromQuery] int hour = 0,
-            [FromQuery] int minute = 0)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<IProcessJob>(
-                    nameof(IProcessJob), job => job.RunAsync(
-                        cleanStart,
-                        copyFromActiveOnFail,
-                        JobCancellationToken.Null),
-                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-
-                return new OkObjectResult("Process job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding Process job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
 
         /// <inheritdoc />
         [HttpPost("Run")]

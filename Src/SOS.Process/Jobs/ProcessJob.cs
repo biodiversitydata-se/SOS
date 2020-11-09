@@ -54,22 +54,14 @@ namespace SOS.Process.Jobs
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
 
-        private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers,
-            List<DataProvider> allDataProviders)
-        {
-            return allDataProviders.Where(dataProvider =>
-                    dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
-                .ToList();
-        }
-
+       
         /// <summary>
-        /// Run process job
+        ///  Run process job
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
-        /// <param name="type"></param>
+        /// <param name="mode"></param>
         /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<bool> RunAsync(
@@ -186,6 +178,11 @@ namespace SOS.Process.Jobs
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
+                    if (!dataProvider.IsActive || (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
+                    {
+                        continue;
+                    }
+
                     var processor = _processorByType[dataProvider.Type];
                     processTaskByDataProvider.Add(dataProvider,
                         processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
@@ -429,13 +426,20 @@ namespace SOS.Process.Jobs
         {
             var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
             List<DataProvider> dataProvidersToProcess;
-            if (dataProviderIdOrIdentifiers != null && dataProviderIdOrIdentifiers.Count > 0)
+            if (dataProviderIdOrIdentifiers?.Any() ?? false)
             {
-                dataProvidersToProcess = GetDataProvidersToProcess(dataProviderIdOrIdentifiers, allDataProviders);
+                dataProvidersToProcess = allDataProviders.Where(dataProvider =>
+                        dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier) && 
+                        dataProvider.IsActive && 
+                        (mode == JobRunModes.Full || dataProvider.SupportIncrementalHarvest))
+                    .ToList();
             }
             else
             {
-                dataProvidersToProcess = allDataProviders;
+                dataProvidersToProcess = allDataProviders.Where(dataProvider =>
+                        dataProvider.IsActive &&
+                        (mode == JobRunModes.Full || dataProvider.SupportIncrementalHarvest))
+                    .ToList();
             }
 
             return await RunAsync(

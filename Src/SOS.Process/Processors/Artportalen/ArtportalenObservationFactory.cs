@@ -51,8 +51,8 @@ namespace SOS.Process.Processors.Artportalen
             bool incrementalMode)
         {
             var allFieldMappings = await processedVocabularyRepository.GetAllAsync();
-            var fieldMappings = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings, incrementalMode);
+            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
         }
 
         public ICollection<Observation> CreateProcessedObservations(
@@ -824,15 +824,15 @@ namespace SOS.Process.Processors.Artportalen
         {
             var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
 
-            foreach (var fieldMapping in allFieldMappings)
+            foreach (var vocabularity in allFieldMappings)
             {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                if (fieldMappings != null)
+                var processedVocabularies = vocabularity.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                if (processedVocabularies != null)
                 {
-                    var mappingKey = GetMappingKey(fieldMapping.Id);
-                    var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
+                    var mappingKey = GetMappingKey(vocabularity.Id);
+                    var mapping = processedVocabularies.Mappings.Single(m => m.Key == mappingKey);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(fieldMapping.Id, sosIdByValue);
+                    dic.Add(vocabularity.Id, sosIdByValue);
                 }
             }
 
