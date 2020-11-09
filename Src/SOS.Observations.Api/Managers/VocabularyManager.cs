@@ -77,12 +77,12 @@ namespace SOS.Observations.Api.Managers
             CreateLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<VocabularyId, Dictionary<int, Dictionary<string, string>>>();
-            var fieldMappings = await _processedVocabularyRepository.GetAllAsync();
-            foreach (var fieldMapping in fieldMappings.Where(m => m.Localized))
+            var processedVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            foreach (var vocabularity in processedVocabularies.Where(m => m.Localized))
             {
-                var fieldMappingFieldId = fieldMapping.Id;
+                var fieldMappingFieldId = vocabularity.Id;
                 dic.Add(fieldMappingFieldId, new Dictionary<int, Dictionary<string, string>>());
-                foreach (var fieldMappingValue in fieldMapping.Values)
+                foreach (var fieldMappingValue in vocabularity.Values)
                 {
                     dic[fieldMappingFieldId].Add(fieldMappingValue.Id, new Dictionary<string, string>());
                     foreach (var fieldMappingTranslation in fieldMappingValue.Translations)
@@ -100,12 +100,12 @@ namespace SOS.Observations.Api.Managers
             CreateNonLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<VocabularyId, Dictionary<int, string>>();
-            var fieldMappings = await _processedVocabularyRepository.GetAllAsync();
-            foreach (var fieldMapping in fieldMappings.Where(m => !m.Localized))
+            var processedVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            foreach (var vocabularity in processedVocabularies.Where(m => !m.Localized))
             {
-                var fieldMappingFieldId = fieldMapping.Id;
+                var fieldMappingFieldId = vocabularity.Id;
                 dic.Add(fieldMappingFieldId, new Dictionary<int, string>());
-                foreach (var fieldMappingValue in fieldMapping.Values)
+                foreach (var fieldMappingValue in vocabularity.Values)
                 {
                     dic[fieldMappingFieldId].Add(fieldMappingValue.Id, fieldMappingValue.Value);
                 }

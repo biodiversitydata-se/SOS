@@ -11,17 +11,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     public interface IProcessJobController
     {
         /// <summary>
-        ///     Add daily process job
-        /// </summary>
-        /// <param name="cleanStart"></param>
-        /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        IActionResult ScheduleDailyProcessJob(bool cleanStart, bool copyFromActiveOnFail,
-            int hour, int minute);
-
-        /// <summary>
         ///     Run process job
         /// </summary>
         /// <param name="cleanStart"></param>

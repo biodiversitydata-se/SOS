@@ -119,9 +119,9 @@ namespace SOS.Lib.Helpers
         private async Task InitializeAsync()
         {
             // Get field mappings
-            var fieldMappings = (await _processedVocabularyRepository.GetAllAsync()).ToArray();
+            var processedVocabularies = (await _processedVocabularyRepository.GetAllAsync()).ToArray();
 
-            _vocabularyValueById = fieldMappings.ToDictionary(m => m.Id,
+            _vocabularyValueById = processedVocabularies.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
 
             // If tree already initialized, return
@@ -264,15 +264,15 @@ namespace SOS.Lib.Helpers
             ICollection<Vocabulary> verbatimFieldMappings)
         {
             var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
-            foreach (var fieldMapping in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
+            foreach (var vocabularity in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
             {
-                var fieldMappings =
-                    fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
-                if (fieldMappings != null)
+                var processedVocabularies =
+                    vocabularity.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
+                if (processedVocabularies != null)
                 {
-                    var mapping = fieldMappings.Mappings.Single(m => m.Key == VocabularyMappingKeyFields.FeatureId);
+                    var mapping = processedVocabularies.Mappings.Single(m => m.Key == VocabularyMappingKeyFields.FeatureId);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(fieldMapping.Id, sosIdByValue);
+                    dic.Add(vocabularity.Id, sosIdByValue);
                 }
             }
 

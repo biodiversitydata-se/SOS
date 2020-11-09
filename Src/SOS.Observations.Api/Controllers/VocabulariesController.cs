@@ -66,9 +66,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var fieldMappings = await _vocabularyManager.GetVocabulariesAsync();
-                var fieldMapping = fieldMappings.Single(f => f.Id == termId);
-                return new OkObjectResult(fieldMapping);
+                var processedVocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                var vocabularity = processedVocabularies.Single(f => f.Id == termId);
+                return new OkObjectResult(vocabularity);
             }
             catch (Exception e)
             {
