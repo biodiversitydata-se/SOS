@@ -19,5 +19,11 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="vocabularyId"></param>
         /// <returns></returns>
         Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId);
+
+        /// <summary>
+        ///     Run import field mapping.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunImportVocabulariesJob();
     }
 }
