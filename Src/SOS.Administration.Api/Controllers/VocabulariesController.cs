@@ -3,11 +3,13 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -34,6 +36,7 @@ namespace SOS.Administration.Api.Controllers
                 vocabularyHarvester ?? throw new ArgumentNullException(nameof(vocabularyHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
 
         /// <inheritdoc />
         [HttpPost("All/Create")]
@@ -70,6 +73,24 @@ namespace SOS.Administration.Api.Controllers
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Import")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunImportVocabulariesJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
+                return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing import vocabularies job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }
