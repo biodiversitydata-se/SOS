@@ -126,14 +126,16 @@ namespace SOS.Observations.Api.Repositories
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
+            LiveMode = true;
+
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
 
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
                 ? $"{CurrentInstanceName.ToLower()}"
                 : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CurrentInstanceName.ToLower()}";
 
-            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry)); ;
         }
 
         private Tuple<IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, List<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
