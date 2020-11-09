@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Dtos.Vocabulary;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -35,17 +38,19 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get all term vocabularies.
+        /// Get all vocabularies.
         /// </summary>
         /// <returns></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(IEnumerable<Vocabulary>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<VocabularyDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabulariesAsync()
+        public async Task<IActionResult> GetVocabulariesAsync([FromQuery]bool includeSystemMappings = false)
         {
             try
             {
-                return new OkObjectResult(await _vocabularyManager.GetVocabulariesAsync());
+                var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                var dtos = vocabularies.ToVocabularyDtos(includeSystemMappings);
+                return new OkObjectResult(dtos);
             }
             catch (Exception e)
             {
@@ -55,20 +60,24 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get specific vocabulary.
+        /// Get a specific vocabulary.
         /// </summary>
-        /// <param name="termId"></param>
+        /// <param name="vocabularyId"></param>
+        /// <param name="includeSystemMappings"></param>
         /// <returns></returns>
-        [HttpGet("{termId}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [HttpGet("{vocabularyId}")]
+        [ProducesResponseType(typeof(VocabularyDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabularyAsync([FromRoute] VocabularyId termId)
+        public async Task<IActionResult> GetVocabularyAsync(
+            [FromRoute] VocabularyIdDto vocabularyId, 
+            [FromQuery] bool includeSystemMappings = false)
         {
             try
             {
-                var fieldMappings = await _vocabularyManager.GetVocabulariesAsync();
-                var fieldMapping = fieldMappings.Single(f => f.Id == termId);
-                return new OkObjectResult(fieldMapping);
+                var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                var vocabulary = vocabularies.Single(f => f.Id == (VocabularyId)vocabularyId);
+                var dto = vocabulary.ToVocabularyDto(includeSystemMappings);
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {
