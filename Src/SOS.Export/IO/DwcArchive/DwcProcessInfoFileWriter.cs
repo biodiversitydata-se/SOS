@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Xml;
 using SOS.Lib.Models.Processed.ProcessInfo;
 
@@ -45,18 +47,7 @@ namespace SOS.Export.IO.DwcArchive
                 // Add verbatim info
                 foreach (var providerInfo in processInfo.ProvidersInfo)
                 {
-                    var providerInfoNode = CreateProviderInfoNode(doc, "verbatim", providerInfo);
-
-                    if (providerInfo.MetadataInfo != null)
-                    {
-                        // Add verbatim info
-                        foreach (var metadata in providerInfo.MetadataInfo)
-                        {
-                            var metadataNode = CreateProviderInfoNode(doc, "metadata", metadata);
-
-                            providerInfoNode.AppendChild(metadataNode);
-                        }
-                    }
+                    var providerInfoNode = CreateProviderInfoNode(doc, "verbatim", providerInfo, processInfo.MetadataInfo);
 
                     processNode.AppendChild(providerInfoNode);
                 }
@@ -73,7 +64,7 @@ namespace SOS.Export.IO.DwcArchive
         /// <param name="nodeName"></param>
         /// <param name="providerInfo"></param>
         /// <returns></returns>
-        private static XmlNode CreateProviderInfoNode(XmlDocument doc, string nodeName, ProviderInfo providerInfo)
+        private static XmlNode CreateProviderInfoNode(XmlDocument doc, string nodeName, ProviderInfo providerInfo, IEnumerable<ProcessInfo> metadataInfo)
         {
             // Create new node
             var providerInfoNode = doc.CreateElement(nodeName, _elementNamespace);
@@ -114,6 +105,13 @@ namespace SOS.Export.IO.DwcArchive
             var processStatusAttribute = doc.CreateAttribute("process-end");
             processStatusAttribute.Value = providerInfo.ProcessStatus.ToString();
             providerInfoNode.Attributes.Append(processStatusAttribute);
+
+            if (metadataInfo?.Any() ?? false)
+            {
+                var processMetadataInfoAttribute = doc.CreateAttribute("metadata");
+                processStatusAttribute.Value = string.Join(';', metadataInfo.Select(md => $"{md.Id}, start: {md.Start}, end: {md.End}, count: {md.Count}"));
+                providerInfoNode.Attributes.Append(processMetadataInfoAttribute);
+            }
 
             return providerInfoNode;
         }

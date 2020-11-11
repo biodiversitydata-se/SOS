@@ -13,14 +13,9 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
     public class ProviderInfo
     {
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
-        /// <param name="dataProviderType"></param>
-        public ProviderInfo(DataProviderType dataProviderType)
-        {
-            DataProviderType = dataProviderType;
-        }
-
+        /// <param name="dataProvider"></param>
         public ProviderInfo(DataProvider dataProvider)
         {
             DataProviderId = dataProvider.Id;
@@ -53,6 +48,26 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         public RunStatus? HarvestStatus { get; set; }
 
         /// <summary>
+        /// Last incremental process count 
+        /// </summary>
+        public int? LatestIncrementalCount { get; set; }
+
+        /// <summary>
+        /// Last incremental process end 
+        /// </summary>
+        public DateTime? LatestIncrementalEnd { get; set; }
+
+        /// <summary>
+        /// Last incremental process status 
+        /// </summary>
+        public RunStatus? LatestIncrementalStatus { get; set; }
+
+        /// <summary>
+        /// Last incremental process start 
+        /// </summary>
+        public DateTime? LatestIncrementalStart { get; set; }
+
+        /// <summary>
         ///     Number of items processed
         /// </summary>
         public int? ProcessCount { get; set; }
@@ -79,9 +94,5 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         [BsonRepresentation(BsonType.String)]
         public DataProviderType DataProviderType { get; private set; }
 
-        /// <summary>
-        ///     Provider information about meta data
-        /// </summary>
-        public IEnumerable<ProviderInfo> MetadataInfo { get; set; }
     }
 }
