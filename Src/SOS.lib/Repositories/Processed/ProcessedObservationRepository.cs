@@ -36,6 +36,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Settings(s => s
                     .NumberOfShards(_numberOfShards)
                     .NumberOfReplicas(_numberOfReplicas)
+                    .Setting("max_terms_count", 110000)
                 )
                 .Map<Observation>(p => p
                     .AutoMap()
