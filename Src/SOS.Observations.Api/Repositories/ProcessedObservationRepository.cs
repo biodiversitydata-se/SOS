@@ -56,13 +56,33 @@ namespace SOS.Observations.Api.Repositories
             {
                 sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
             }
-            
-            queryList.Add(q => q
-                .Terms(t => t
-                    .Field("artportalenInternal.sightingTypeSearchGroupId")
-                    .Terms(sightingTypeSearchGroupFilter)
-                )
-            );
+
+            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
+            {
+                // Only Artportalen has merged observations
+                queryList.Add(q => q
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeSearchGroupId")
+                        .Terms(sightingTypeSearchGroupFilter)
+
+                    )
+                );
+            }
+            else
+            {
+                // Get observations from other than Artportalen too
+                queryList.Add(q => q
+                    .Bool(b => b
+                        .Should(s => s
+                                         .Terms(t => t
+                                             .Field("artportalenInternal.sightingTypeSearchGroupId")
+                                             .Terms(sightingTypeSearchGroupFilter)
+                                         ) ||
+                                     !s.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
+                        )
+                    )
+                );
+            }
 
             query = queryList;
             return query;
