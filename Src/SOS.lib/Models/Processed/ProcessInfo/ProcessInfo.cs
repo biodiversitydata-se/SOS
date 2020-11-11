@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Lib.Models.Processed.ProcessInfo
 {
@@ -32,6 +33,11 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         ///     Harvest end date and time
         /// </summary>
         public DateTime End { get; set; }
+
+        /// <summary>
+        ///     Provider information about meta data
+        /// </summary>
+        public IEnumerable<ProcessInfo> MetadataInfo { get; set; }
 
         /// <summary>
         ///     Information about providers

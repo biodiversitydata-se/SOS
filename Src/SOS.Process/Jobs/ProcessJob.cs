@@ -157,17 +157,9 @@ namespace SOS.Process.Jobs
                 await _validationManager.VerifyCollectionAsync(mode);
 
                 cancellationToken?.ThrowIfCancellationRequested();
-                //--------------------------------------
-                // 7. Get ProviderInfo
-                //--------------------------------------
-                var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataProviderType>
-                {
-                    {nameof(Lib.Models.Processed.Observation.Area), DataProviderType.Areas},
-                    {nameof(Taxon), DataProviderType.Taxa}
-                });
-
+                
                 //------------------------------------------------------------------------
-                // 8. Create observation processing tasks, and wait for them to complete
+                // 7. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
                 if (mode == JobRunModes.Full)
                 {
@@ -175,7 +167,6 @@ namespace SOS.Process.Jobs
                 }
 
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
-                var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
                     if (!dataProvider.IsActive || (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
@@ -186,43 +177,15 @@ namespace SOS.Process.Jobs
                     var processor = _processorByType[dataProvider.Type];
                     processTaskByDataProvider.Add(dataProvider,
                         processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
-
-                    // Get harvest info and create a provider info object that we can add processing info to later
-                    var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
-                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId); 
-                    var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
-                    providerInfo.MetadataInfo = metaDataProviderInfo
-                        .Where(mdp => new[] { DataProviderType.Taxa }.Contains(mdp.DataProviderType)).ToArray();
-                    providerInfoByDataProvider.Add(dataProvider, providerInfo);
                 }
 
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processingResult.All(t => t.Status == RunStatus.Success);
 
+                await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
+
                 if (mode == JobRunModes.Full)
                 {
-                    //----------------------------------------------
-                    // 9. Update provider info 
-                    //----------------------------------------------
-                    foreach (var task in processTaskByDataProvider)
-                    {
-                        var vi = providerInfoByDataProvider[task.Key];
-                        vi.ProcessCount = task.Value.Result.Count;
-                        vi.ProcessEnd = task.Value.Result.End;
-                        vi.ProcessStart = task.Value.Result.Start;
-                        vi.ProcessStatus = task.Value.Result.Status;
-                    }
-
-                    //-----------------------------------------
-                    // 10. Save process info
-                    //-----------------------------------------
-                    _logger.LogInformation("Start updating process info for observations");
-                    await SaveProcessInfo(
-                        mode == JobRunModes.IncrementalActiveInstance ? _processedObservationRepository.ActiveInstanceName : _processedObservationRepository.InactiveInstanceName,
-                        processStart,
-                        providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
-                        success ? RunStatus.Success : RunStatus.Failed,
-                        providerInfoByDataProvider.Values);
                     _logger.LogInformation("Finish updating process info for observations");
 
                     //----------------------------------------------------------------------------
@@ -323,6 +286,98 @@ namespace SOS.Process.Jobs
                     _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
                 }
             }
+        }
+
+        /// <summary>
+        /// Update process info
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="processStart"></param>
+        /// <param name="processTaskByDataProvider"></param>
+        /// <param name="success"></param>
+        /// <returns></returns>
+        private async Task UpdateProcessInfoAsync(JobRunModes mode, 
+            DateTime processStart, 
+            Dictionary<DataProvider, 
+                Task<ProcessingStatus>> processTaskByDataProvider, bool success)
+        {
+
+            if (!processTaskByDataProvider?.Any() ?? true)
+            {
+                return;
+            }
+
+            // Try to get process info for current instance
+            var processInfo = (await GetProcessInfoAsync(new[]
+            {
+                   _processedObservationRepository.CurrentInstanceName
+                })).FirstOrDefault();
+
+            if (processInfo == null || mode == JobRunModes.Full)
+            {
+                var providersInfo = new List<ProviderInfo>();
+
+                foreach (var taskProvider in processTaskByDataProvider)
+                {
+                    var provider = taskProvider.Key;
+                    var processResult = taskProvider.Value.Result;
+
+                    // Get harvest info and create a provider info object 
+                    var harvestInfoId = HarvestInfo.GetIdFromDataProvider(provider);
+                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId);
+                    var providerInfo = new ProviderInfo(provider)
+                    {
+                        HarvestCount = harvestInfo?.Count,
+                        HarvestEnd = harvestInfo?.End,
+                        HarvestStart = harvestInfo?.Start,
+                        HarvestStatus = harvestInfo?.Status,
+                        ProcessCount = processResult.Count,
+                        ProcessEnd = processResult.End,
+                        ProcessStart = processResult.Start,
+                        ProcessStatus = processResult.Status
+                    };
+
+                    providersInfo.Add(providerInfo);
+                }
+
+                var metaDataProcessInfo = await GetProcessInfoAsync(new[]
+                {
+                        nameof(Lib.Models.Processed.Observation.Area),
+                        nameof(Taxon)
+                    });
+
+                processInfo = new ProcessInfo(_processedObservationRepository.CurrentInstanceName, processStart)
+                {
+                    Count = processTaskByDataProvider.Sum(pi => pi.Value.Result.Count),
+                    End = DateTime.Now,
+                    MetadataInfo = metaDataProcessInfo,
+                    ProvidersInfo = providersInfo,
+                    Status = success ? RunStatus.Success : RunStatus.Failed
+                };
+            }
+            else
+            {
+                foreach (var taskProvider in processTaskByDataProvider)
+                {
+                    var provider = taskProvider.Key;
+                    var processResult = taskProvider.Value.Result;
+
+                    // Get provider info and update incremental values
+
+                    var providerInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId == provider.Id);
+                    if (providerInfo != null)
+                    {
+                        providerInfo.LatestIncrementalCount = processResult.Count;
+                        providerInfo.LatestIncrementalEnd = processResult.End;
+                        providerInfo.LatestIncrementalStart = processResult.Start;
+                        providerInfo.LatestIncrementalStatus = processResult.Status;
+                    }
+                }
+            }
+
+            _logger.LogInformation("Start updating process info for observations");
+            await SaveProcessInfo(processInfo);
+            _logger.LogInformation("Finish updating process info for observations");
         }
 
         /// <summary>

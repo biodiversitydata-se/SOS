@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Taxon.Interfaces;
@@ -43,11 +44,14 @@ namespace SOS.Process.Jobs
             var taxaCount = await _taxonProcessor.ProcessTaxaAsync();
             var success = taxaCount >= 0;
             _logger.LogDebug("Start updating process info for taxa");
+
+            await SaveProcessInfo(new ProcessInfo(nameof(Taxon), start)
+            {
+                Count = taxaCount,
+                End = DateTime.Now,
+                Status = success ? RunStatus.Success : RunStatus.Failed
+            });
            
-            var providerInfo = CreateProviderInfo(DataProviderType.Taxa, null, start, DateTime.Now,
-                success ? RunStatus.Success : RunStatus.Failed, taxaCount);
-            await SaveProcessInfo(nameof(Taxon), start, taxaCount,
-                success ? RunStatus.Success : RunStatus.Failed, new[] {providerInfo});
             _logger.LogDebug("Finish updating process info for taxa");
 
             return success ? true : throw new Exception("Process taxa job failed");

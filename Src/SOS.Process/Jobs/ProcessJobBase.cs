@@ -45,95 +45,35 @@ namespace SOS.Process.Jobs
             return await _processInfoRepository.GetAsync(id);
         }
 
-        /// <inheritdoc />
-        public async Task SaveProcessInfo(string processInfoId, DateTime start, int count, RunStatus status,
-            IEnumerable<ProviderInfo> providersInfo)
+
+        protected async Task SaveProcessInfo(ProcessInfo processInfo)
         {
             // Make sure collection exists
             await _processInfoRepository.VerifyCollectionAsync();
 
-            var processInfo = new ProcessInfo(processInfoId, start)
-            {
-                Count = count,
-                End = DateTime.Now,
-                ProvidersInfo = providersInfo,
-                Status = status
-            };
-
             await _processInfoRepository.AddOrUpdateAsync(processInfo);
         }
 
-        /// <summary>
-        ///     Create a provider info object
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="harvestInfo"></param>
-        /// <param name="processStart"></param>
-        /// <param name="processEnd"></param>
-        /// <param name="processStatus"></param>
-        /// <param name="processCount"></param>
-        /// <returns></returns>
-        protected ProviderInfo CreateProviderInfo(
-            DataProviderType type,
-            HarvestInfo harvestInfo,
-            DateTime processStart,
-            DateTime? processEnd = null,
-            RunStatus? processStatus = null,
-            int? processCount = null)
-        {
-            return new ProviderInfo(type)
-            {
-                HarvestCount = harvestInfo?.Count,
-                HarvestEnd = harvestInfo?.End,
-                HarvestStart = harvestInfo?.Start,
-                HarvestStatus = harvestInfo?.Status,
-                ProcessCount = processCount,
-                ProcessEnd = processEnd,
-                ProcessStart = processStart,
-                ProcessStatus = processStatus
-            };
-        }
-
-        protected ProviderInfo CreateProviderInfo(
-            DataProvider dataProvider,
-            HarvestInfo harvestInfo,
-            DateTime processStart,
-            DateTime? processEnd = null,
-            RunStatus? processStatus = null,
-            int? processCount = null)
-        {
-            return new ProviderInfo(dataProvider)
-            {
-                HarvestCount = harvestInfo?.Count,
-                HarvestEnd = harvestInfo?.End,
-                HarvestStart = harvestInfo?.Start,
-                HarvestStatus = harvestInfo?.Status,
-                ProcessCount = processCount,
-                ProcessEnd = processEnd,
-                ProcessStart = processStart,
-                ProcessStatus = processStatus
-            };
-        }
 
         /// <summary>
         ///     Get provider info
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProviderInfo>> GetProviderInfoAsync(IDictionary<string, DataProviderType> ids)
+        protected async Task<IEnumerable<ProcessInfo>> GetProcessInfoAsync(IEnumerable<string> ids)
         {
-            var providerInfo = new List<ProviderInfo>();
+            var processInfos = new List<ProcessInfo>();
             foreach (var id in ids)
             {
-                var processInfo = await GetProcessInfoAsync(id.Key);
+                var processInfo = await GetProcessInfoAsync(id);
 
-                if (processInfo?.ProvidersInfo != null)
+                if (processInfo != null)
                 {
-                    providerInfo.Add(processInfo.ProvidersInfo?.FirstOrDefault(p => p.DataProviderType == id.Value));
+                    processInfos.Add(processInfo);
                 }
             }
 
-            return providerInfo;
+            return processInfos;
         }
     }
 }
