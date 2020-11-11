@@ -208,7 +208,7 @@ namespace SOS.Import.Harvesters.Observations
                     $"No sightings found ({batchIndex})");
                     return 0;
                 }
-
+                
                 if (_artportalenConfiguration.AddTestSightings && !incremenatlMode && !_hasAddedTestSightings)
                 {
                     _hasAddedTestSightings = true;
