@@ -63,27 +63,5 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Occurrence.Gender.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
             result.Occurrence.Gender.Value.Should().Be("Malle");
         }
-
-        [Fact]
-        public void Value_that_exist_in_vocabulary_is_mapped()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithSex("Male")
-                .Build();
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Id.Should().Be((int) GenderId.Male);
-        }
     }
 }

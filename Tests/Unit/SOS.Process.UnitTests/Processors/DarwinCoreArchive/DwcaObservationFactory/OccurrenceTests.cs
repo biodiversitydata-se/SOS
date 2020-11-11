@@ -18,7 +18,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
-        public void Behavior_value_foraging_is_field_mapped_to_Activity()
+        public void Behavior_field_with_value_foraging_is_mapped_to_Activity_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -40,40 +40,17 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Foraging);
         }
 
-        /// <summary>
+        /// <remarks>
         ///     Life Stage GBIF Vocabulary
         ///     http://rs.gbif.org/vocabulary/gbif/life_stage.xml
-        ///     zygote
-        ///     embryo
-        ///     larva
-        ///     juvenile
-        ///     adult
-        ///     sporophyte
-        ///     spore
-        ///     gametophyte
-        ///     gamete
-        ///     pupa
-        /// </summary>
-        /// <remarks>
-        ///     There exist multiple synonyms for several values. For example synonyms to 'larva' are:
-        ///     larvae, tadpole, polliwog, polliwig, polewig, polwig, planula, nauplius, zoea, nymph, caterpillar, grub
-        ///     maggot, wriggler, trochophore, veliger, glochidium, ammocoete, leptocephalus, bipinnaria
-        /// </remarks>
-        [Fact]
-        public void GBIF_LifeStage_vocabulary()
-        {
-        }
-
-        /// <remarks>
-        /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
         /// </remarks>
         [Theory]
         [InlineData("adult", LifeStageId.Adult)]
         [InlineData("egg", LifeStageId.Egg)]
         [InlineData("eggs", LifeStageId.Egg)]
         [InlineData("juvenile", LifeStageId.Juvenile)]
-        public void Succeeds_to_parse_LifeStage_from_the_dwc_lifeStage_field(
-            string dwcLifeStage,
+        public void LifeStage_field_with_valid_value_is_mapped_to_LifeStage_vocabulary(
+            string lifeStageValue,
             LifeStageId expectedLifeStageId)
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -82,7 +59,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithLifeStage(dwcLifeStage)
+                .WithLifeStage(lifeStageValue)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -97,7 +74,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void OccurrenceStatus_value_absent_is_field_mapped_to_OccurrenceStatus()
+        public void OccurrenceStatus_field_with_value_absent_is_mapped_to_OccurrenceStatus_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -124,7 +101,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void OccurrenceStatus_value_present_is_field_mapped_to_OccurrenceStatus()
+        public void OccurrenceStatus_field_with_value_present_is_mapped_to_OccurrenceStatus_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -151,7 +128,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ReproductiveCondition_value_in_bloom_is_field_mapped_to_LifeStage()
+        public void ReproductiveCondition_field_with_value_fruitbearing_is_mapped_to_LifeStage_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -174,7 +151,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ReproductiveCondition_value_pregnant_is_field_mapped_to_Activity()
+        public void ReproductiveCondition_field_with_value_pregnant_is_mapped_to_Activity_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -182,7 +159,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithReproductiveCondition("non-reproductive")
+                .WithReproductiveCondition("pregnant")
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -196,8 +173,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Occurrence.Activity.Id.Should().Be((int) ActivityId.PregnantFemale);
         }
 
-        [Fact]
-        public void Sex_with_female_value_is_field_mapped()
+        [Theory]
+        [InlineData("female", GenderId.Female)]
+        [InlineData("Male", GenderId.Male)]
+        public void Sex_field_with_valid_value_is_mapped_to_gender_vocabulary(
+            string sexFieldValue,
+            GenderId expectedGenderId)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -205,7 +186,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithSex("female")
+                .WithSex(sexFieldValue)
                 .Build();
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -215,33 +196,11 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Id.Should().Be((int) GenderId.Female);
+            result.Occurrence.Gender.Id.Should().Be((int)expectedGenderId);
         }
 
         [Fact]
-        public void Sex_with_Male_value_is_field_mapped()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithSex("Male")
-                .Build();
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Id.Should().Be((int) GenderId.Male);
-        }
-
-        [Fact]
-        public void Sex_with_Misspelled_value_is_mapped_to_custom_value()
+        public void Sex_field_with_misspelled_value_is_mapped_to_custom_value()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -265,7 +224,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Sex_with_null_value_is_not_field_mapped()
+        public void Sex_field_with_null_value_is_not_mapped_to_gender_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
