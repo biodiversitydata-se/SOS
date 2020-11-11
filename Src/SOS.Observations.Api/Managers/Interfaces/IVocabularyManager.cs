@@ -35,5 +35,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="translatedValue"></param>
         /// <returns></returns>
         bool TryGetValue(VocabularyId fieldId, int sosId, out string translatedValue);
+
+        Task<byte[]> GetVocabulariesZipFileAsync(IEnumerable<VocabularyId> vocabularyIds);
     }
 }

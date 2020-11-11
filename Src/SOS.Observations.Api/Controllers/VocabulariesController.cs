@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Dtos.Vocabulary;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -35,17 +37,19 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get all term vocabularies.
+        /// Get all vocabularies.
         /// </summary>
         /// <returns></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(IEnumerable<Vocabulary>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<VocabularyDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabulariesAsync()
         {
             try
             {
-                return new OkObjectResult(await _vocabularyManager.GetVocabulariesAsync());
+                var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                var dtos = vocabularies.ToVocabularyDtos();
+                return new OkObjectResult(dtos);
             }
             catch (Exception e)
             {
@@ -55,24 +59,48 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get specific vocabulary.
+        /// Get all vocabularies as zip file.
         /// </summary>
-        /// <param name="termId"></param>
         /// <returns></returns>
-        [HttpGet("{termId}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [HttpGet("ZipFile")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabularyAsync([FromRoute] VocabularyId termId)
+        public async Task<IActionResult> GetVocabulariesAsZipFileAsync()
         {
             try
             {
-                var processedVocabularies = await _vocabularyManager.GetVocabulariesAsync();
-                var vocabularity = processedVocabularies.Single(f => f.Id == termId);
-                return new OkObjectResult(vocabularity);
+                var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
+                var zipBytes = await _vocabularyManager.GetVocabulariesZipFileAsync(vocabularyIds);
+                return File(zipBytes, "application/zip", "Vocabularies.zip");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting term vocabulary");
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get a specific vocabulary.
+        /// </summary>
+        /// <param name="vocabularyId"></param>
+        /// <returns></returns>
+        [HttpGet("{vocabularyId}")]
+        [ProducesResponseType(typeof(VocabularyDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetVocabularyAsync(
+            [FromRoute] VocabularyIdDto vocabularyId)
+        {
+            try
+            {
+                var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+                var vocabulary = vocabularies.Single(f => f.Id == (VocabularyId)vocabularyId);
+                var dto = vocabulary.ToVocabularyDto();
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting vocabulary");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
