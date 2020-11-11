@@ -463,7 +463,7 @@ namespace SOS.Observations.Api.Controllers
 
 
         [HttpGet("Provider/{providerId}/lastmodified")]
-        [ProducesResponseType(typeof(IEnumerable<Vocabulary>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute] int providerId)
         {
