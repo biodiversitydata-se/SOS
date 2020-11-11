@@ -160,7 +160,6 @@ namespace SOS.Process.Jobs
                 //--------------------------------------
                 // 7. Get ProviderInfo
                 //--------------------------------------
-                var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataProviderType>
                 {
                     {nameof(Lib.Models.Processed.Observation.Area), DataProviderType.Areas},
@@ -176,6 +175,7 @@ namespace SOS.Process.Jobs
                 }
 
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
+                var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
                     if (!dataProvider.IsActive || (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
@@ -198,33 +198,33 @@ namespace SOS.Process.Jobs
 
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processingResult.All(t => t.Status == RunStatus.Success);
-                
-                //----------------------------------------------
-                // 9. Update provider info 
-                //----------------------------------------------
-                foreach (var task in processTaskByDataProvider)
-                {
-                    var vi = providerInfoByDataProvider[task.Key];
-                    vi.ProcessCount = mode == JobRunModes.Full ? task.Value.Result.Count : vi.ProcessCount + task.Value.Result.Count;
-                    vi.ProcessEnd = task.Value.Result.End;
-                    vi.ProcessStart = task.Value.Result.Start;
-                    vi.ProcessStatus = task.Value.Result.Status;
-                }
-
-                //-----------------------------------------
-                // 10. Save process info
-                //-----------------------------------------
-                _logger.LogInformation("Start updating process info for observations");
-               await SaveProcessInfo(
-                   mode == JobRunModes.IncrementalActiveInstance ? _processedObservationRepository.ActiveInstanceName : _processedObservationRepository.InactiveInstanceName,
-                    processStart,
-                    providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
-                    success ? RunStatus.Success : RunStatus.Failed,
-                    providerInfoByDataProvider.Values);
-                _logger.LogInformation("Finish updating process info for observations");
 
                 if (mode == JobRunModes.Full)
                 {
+                    //----------------------------------------------
+                    // 9. Update provider info 
+                    //----------------------------------------------
+                    foreach (var task in processTaskByDataProvider)
+                    {
+                        var vi = providerInfoByDataProvider[task.Key];
+                        vi.ProcessCount = task.Value.Result.Count;
+                        vi.ProcessEnd = task.Value.Result.End;
+                        vi.ProcessStart = task.Value.Result.Start;
+                        vi.ProcessStatus = task.Value.Result.Status;
+                    }
+
+                    //-----------------------------------------
+                    // 10. Save process info
+                    //-----------------------------------------
+                    _logger.LogInformation("Start updating process info for observations");
+                    await SaveProcessInfo(
+                        mode == JobRunModes.IncrementalActiveInstance ? _processedObservationRepository.ActiveInstanceName : _processedObservationRepository.InactiveInstanceName,
+                        processStart,
+                        providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
+                        success ? RunStatus.Success : RunStatus.Failed,
+                        providerInfoByDataProvider.Values);
+                    _logger.LogInformation("Finish updating process info for observations");
+
                     //----------------------------------------------------------------------------
                     // 11. If a data provider failed to process and it was not Artportalen,
                     //     then try to copy that data from the active instance.
@@ -253,7 +253,15 @@ namespace SOS.Process.Jobs
                     _logger.LogInformation("Start enable indexing");
                     await _processedObservationRepository.EnableIndexingAsync();
                     _logger.LogInformation("Finish enable indexing");
-                   
+
+                    // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
+                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
+                    {
+                        _logger.LogInformation("Toggle instance");
+                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                            .InActiveInstance);
+                    }
+
                     if (mode == JobRunModes.Full)
                     {
                         if (_runIncrementalAfterFull)
@@ -282,14 +290,6 @@ namespace SOS.Process.Jobs
                                 _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
                             }
                         }
-                    }
-
-                    // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
-                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
-                    {
-                        _logger.LogInformation("Toggle instance");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
-                            .InActiveInstance);
                     }
                 }
 

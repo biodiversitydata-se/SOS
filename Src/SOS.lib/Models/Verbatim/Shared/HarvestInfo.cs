@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Nors;
@@ -79,16 +80,18 @@ namespace SOS.Lib.Models.Verbatim.Shared
                     return nameof(ArtportalenObservationVerbatim);
                 case DataProviderType.ClamPortalObservations:
                     return nameof(ClamObservationVerbatim);
-                case DataProviderType.SharkObservations:
-                    return nameof(SharkObservationVerbatim);
+                case DataProviderType.FishDataObservations:
+                    return nameof(FishDataObservationVerbatim);
                 case DataProviderType.KULObservations:
                     return nameof(KulObservationVerbatim);
+                case DataProviderType.MvmObservations:
+                    return nameof(MvmObservationVerbatim);
                 case DataProviderType.NorsObservations:
                     return nameof(NorsObservationVerbatim);
                 case DataProviderType.SersObservations:
                     return nameof(SersObservationVerbatim);
-                case DataProviderType.MvmObservations:
-                    return nameof(MvmObservationVerbatim);
+                case DataProviderType.SharkObservations:
+                    return nameof(SharkObservationVerbatim);
                 case DataProviderType.VirtualHerbariumObservations:
                     return nameof(VirtualHerbariumObservationVerbatim);
                 default:

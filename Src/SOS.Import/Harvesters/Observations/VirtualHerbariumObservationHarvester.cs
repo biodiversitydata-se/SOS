@@ -99,7 +99,7 @@ namespace SOS.Import.Harvesters.Observations
                     pageIndex++;
                     _logger.LogDebug($"Start getting observations page: {pageIndex}");
                     observations =
-                        await _virtualHerbariumObservationService.GetAsync(new DateTime(1900, 1, 1), pageIndex, 10000);
+                        await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
                     _logger.LogDebug($"Finish getting observations page: {pageIndex}");
                 }
 
