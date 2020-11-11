@@ -64,8 +64,13 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Identification.DateIdentified.Should().Be(date);
         }
 
-        [Fact]
-        public void IdentificationVerificationStatus_with_unverified_value_is_fieldmapped_to_Unvalidated_statusId()
+        [Theory]
+        [InlineData("verified", ValidationStatusId.Verified, true)]
+        [InlineData("unverified", ValidationStatusId.Unvalidated, false)]
+        public void IdentificationVerificationStatus_field_with_valid_value_is_mapped_to_ValidationStatus_vocabulary(
+            string identificationVerificationStatusValue,
+            ValidationStatusId expectedValidationStatusId,
+            bool expectedValidatedValue)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -73,7 +78,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithIdentificationVerificationStatus("unverified")
+                .WithIdentificationVerificationStatus(identificationVerificationStatusValue)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -84,33 +89,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Identification.ValidationStatus.Id.Should().Be((int) ValidationStatusId.Unvalidated);
-            result.Identification.Validated.Should().BeFalse();
+            result.Identification.ValidationStatus.Id.Should().Be((int)expectedValidationStatusId);
+            result.Identification.Validated.Should().Be(expectedValidatedValue);
         }
-
-        [Fact]
-        public void IdentificationVerificationStatus_with_verified_value_is_fieldmapped_to_Verified_statusId()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithIdentificationVerificationStatus("verified")
-                .Build();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Identification.ValidationStatus.Id.Should().Be((int)ValidationStatusId.Verified);
-            result.Identification.Validated.Should().BeTrue();
-        }
-
     }
 }
