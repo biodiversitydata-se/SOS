@@ -36,6 +36,9 @@ namespace SOS.Process.Helpers
         {
             var jsonFilesVocabularies = GetJsonFilesVocabularies();
             var processedVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            generatedVocabularies = SortVocabularies(generatedVocabularies);
+            jsonFilesVocabularies = SortVocabularies(jsonFilesVocabularies);
+            processedVocabularies = SortVocabularies(processedVocabularies);
             var generatedVocabulariesJtoken = JToken.FromObject(generatedVocabularies);
             var jsonFilesVocabulariesJtoken = JToken.FromObject(jsonFilesVocabularies);
             var processedVocabulariesJtoken = JToken.FromObject(processedVocabularies);
@@ -63,6 +66,19 @@ namespace SOS.Process.Helpers
             });
 
             return zipFile;
+        }
+
+        private List<Vocabulary> SortVocabularies(IEnumerable<Vocabulary> vocabularies)
+        {
+            var sortedVocabularies = new List<Vocabulary>();
+            foreach (var vocabulary in vocabularies.OrderBy(vocabulary => vocabulary.Id))
+            {
+                vocabulary.Values = vocabulary.Values.OrderBy(m => m.Id).ToList();
+                vocabulary.ExternalSystemsMapping = vocabulary.ExternalSystemsMapping?.OrderBy(m => m.Id).ToList();
+                sortedVocabularies.Add(vocabulary);
+            }
+
+            return sortedVocabularies;
         }
 
         private List<Vocabulary> GetJsonFilesVocabularies()
