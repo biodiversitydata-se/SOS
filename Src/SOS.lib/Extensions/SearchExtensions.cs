@@ -191,12 +191,13 @@ namespace SOS.Lib.Extensions
 
             if (filter.GeometryFilter?.IsValid ?? false)
             {
+                var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
                 foreach (var geom in filter.GeometryFilter.Geometries)
                 {
                     switch (geom.Type.ToLower())
                     {
                         case "point":
-                            queryContainers.Add(q => q
+                            geometryContainers.Add(q => q
                                 .GeoDistance(gd => gd
                                     .Field("location.pointLocation")
                                     .DistanceType(GeoDistanceType.Arc)
@@ -211,7 +212,7 @@ namespace SOS.Lib.Extensions
                         case "multipolygon":
                             if (filter.GeometryFilter.UsePointAccuracy)
                             {
-                                queryContainers.Add(q => q
+                                geometryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.pointWithBuffer")
                                         .Shape(s => geom)
@@ -221,7 +222,7 @@ namespace SOS.Lib.Extensions
                             }
                             else
                             {
-                                queryContainers.Add(q => q
+                                geometryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.point")
                                         .Shape(s => geom)
@@ -233,6 +234,12 @@ namespace SOS.Lib.Extensions
                             break;
                     }
                 }
+
+                queryContainers.Add(q => q
+                    .Bool(b => b
+                        .Should(geometryContainers)
+                    )
+                );
             }
 
             if (filter.GenderIds?.Any() ?? false)
