@@ -34,6 +34,7 @@ namespace SOS.Hangfire.JobServer
     public class Program
     {
         private static string _env;
+        private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
         private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -93,15 +94,15 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                    _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
                     services.AddHangfire(configuration =>
                         configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings()
-                            .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),
-                                hangfireDbConfiguration.DatabaseName,
+                            .UseMongoStorage(new MongoClient(_hangfireDbConfiguration.GetMongoDbSettings()),
+                                _hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
                                     MigrationOptions = new MongoMigrationOptions
@@ -113,9 +114,8 @@ namespace SOS.Hangfire.JobServer
                                     CheckConnection = true
                                 })
                     );
-
                     GlobalJobFilters.Filters.Add(
-                        new HangfireJobExpirationTimeAttribute(hangfireDbConfiguration.JobExpirationDays));
+                        new HangfireJobExpirationTimeAttribute(_hangfireDbConfiguration.JobExpirationDays));
 
                     // Add the processing server as IHostedService
                     services.AddHangfireServer();
@@ -167,6 +167,14 @@ namespace SOS.Hangfire.JobServer
         {
             var sb = new StringBuilder();
             sb.AppendLine("Hangfire JobServer Started with the following settings:");
+
+            sb.AppendLine("Hangfire settings:");
+            sb.AppendLine("================");
+            sb.AppendLine(
+                $"[MongoDb].[Servers]: {string.Join(", ", _hangfireDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: {_hangfireDbConfiguration.DatabaseName}");
+            sb.AppendLine("");
+
             sb.AppendLine("Import settings:");
             sb.AppendLine("================");
             sb.AppendLine(
