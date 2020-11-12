@@ -36,15 +36,11 @@ namespace SOS.Observations.Api.Repositories
 
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(FilterBase filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
-            var queryList = query.ToList();
-
+            var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            
             int[] sightingTypeSearchGroupFilter = null;
 
-            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
-            {
-                sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
-            }
-            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
+            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
             {
                 sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
             }
@@ -56,35 +52,33 @@ namespace SOS.Observations.Api.Repositories
             {
                 sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
             }
-
-            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
+            else 
             {
-                // Only Artportalen has merged observations
-                queryList.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.sightingTypeSearchGroupId")
-                        .Terms(sightingTypeSearchGroupFilter)
-
-                    )
-                );
+                 sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
             }
-            else
+
+            sightingTypeQuery.Add(q => q
+                .Terms(t => t
+                    .Field("artportalenInternal.sightingTypeSearchGroupId")
+                    .Terms(sightingTypeSearchGroupFilter)
+
+                )
+            );
+
+            if (filter.TypeFilter != SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
             {
                 // Get observations from other than Artportalen too
-                queryList.Add(q => q
-                    .Bool(b => b
-                        .Should(s => s
-                                         .Terms(t => t
-                                             .Field("artportalenInternal.sightingTypeSearchGroupId")
-                                             .Terms(sightingTypeSearchGroupFilter)
-                                         ) ||
-                                     !s.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
-                        )
-                    )
+                sightingTypeQuery.Add(q => q
+                        !.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
                 );
             }
+            
+            query.ToList().Add(q => q
+                .Bool(b => b
+                    .Should(sightingTypeQuery)
+                )
+            );
 
-            query = queryList;
             return query;
         }
 
