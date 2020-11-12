@@ -12,6 +12,12 @@
         Verified = 0,
 
         /// <summary>
+        ///     Reported by expert.
+        ///     (Rapporterad av expert)
+        /// </summary>
+        ReportedByExpert = 1,
+
+        /// <summary>
         ///     Unvalidated.
         ///     (Ovaliderad)
         /// </summary>

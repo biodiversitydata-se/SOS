@@ -19,6 +19,21 @@
       ]
     },
     {
+      "Id": 1,
+      "Value": "Reported by expert",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Rapporterad av expert"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Reported by expert"
+        }
+      ]
+    },
+    {
       "Id": 10,
       "Value": "Unvalidated",
       "Localized": true,
@@ -409,6 +424,14 @@
             {
               "Value": "Verified",
               "SosId": 0
+            },
+            {
+              "Value": "Rapporterad av expert",
+              "SosId": 1
+            },
+            {
+              "Value": "Reported by expert",
+              "SosId": 1
             },
             {
               "Value": "Ovaliderad",

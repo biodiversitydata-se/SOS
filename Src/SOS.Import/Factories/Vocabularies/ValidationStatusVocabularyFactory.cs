@@ -35,6 +35,7 @@ namespace SOS.Import.Factories.Vocabularies
             var vocabularyValues = base.ConvertToLocalizedVocabularyValues(validationStatusList.ToArray());
             //int id = vocabularyValues.Max(f => f.Id);
             vocabularyValues.Add(CreateVocabularyValue(0, "Verified", "Validerad"));
+            vocabularyValues.Add(CreateVocabularyValue(1, "Reported by expert", "Rapporterad av expert"));
             vocabularyValues = vocabularyValues.OrderBy(f => f.Id).ToList();
             return vocabularyValues;
         }

@@ -28,7 +28,6 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <param name="vocabularyHarvester"></param>
         /// <param name="vocabulariesDiffHelper"></param>
-        /// <param name="areaDiffHelper"></param>
         /// <param name="logger"></param>
         /// <param name="areaHarvester"></param>
         public DiagnosticsController(
