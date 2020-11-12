@@ -14,7 +14,6 @@ using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;

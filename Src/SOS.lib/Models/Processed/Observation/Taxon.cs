@@ -13,18 +13,6 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Taxon : IEntity<int>, IBasicTaxon
     {
         /// <summary>
-        ///     Vernacular names.
-        /// </summary>
-        [Nested]
-        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
-
-        /// <summary>
-        ///     Synonyme names.
-        /// </summary>
-        [Nested]
-        public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: acceptedNameUsage.
         ///     The full name, with authorship and date information
         ///     if known, of the currently valid (zoological) or
@@ -67,6 +55,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DisturbanceRadius { get; set; }
 
         /// <summary>
+        ///     Dyntaxa taxon id.
+        /// </summary>
+        public int DyntaxaTaxonId { get; set; }
+
+        /// <summary>
         ///     Darwin Core term name: family.
         ///     The full scientific name of the family in which
         ///     the taxon is classified.
@@ -93,6 +86,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This property is currently not used.
         /// </summary>
         public string HigherClassification { get; set; }
+
+        /// <summary>
+        ///     Object id
+        /// </summary>
+        public int Id { get; set; }
 
         /// <summary>
         ///     Individual id
@@ -238,6 +236,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OriginalNameUsageId { get; set; }
 
         /// <summary>
+        ///     Main parent Dyntaxa taxon id.
+        /// </summary>
+        public int? ParentDyntaxaTaxonId { get; set; }
+
+        /// <summary>
         ///     Darwin Core term name: parentNameUsage.
         ///     The full name, with authorship and date information
         ///     if known, of the direct, most proximate higher-rank
@@ -283,6 +286,20 @@ namespace SOS.Lib.Models.Processed.Observation
         public string RedlistCategory { get; set; }
 
         /// <summary>
+        ///     Darwin Core term name: scientificName.
+        ///     The full scientific name, with authorship and date
+        ///     information if known. When forming part of an
+        ///     Identification, this should be the name in lowest level
+        ///     taxonomic rank that can be determined.
+        ///     This term should not contain identification qualifications,
+        ///     which should instead be supplied in the
+        ///     IdentificationQualifier term.
+        ///     Currently scientific name without author is provided.
+        /// </summary>
+        [Keyword]
+        public string ScientificName { get; set; }
+
+        /// <summary>
         ///     Darwin Core term name: scientificNameAuthorship.
         ///     The authorship information for the scientificName
         ///     formatted according to the conventions of the applicable
@@ -299,6 +316,16 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string ScientificNameId { get; set; }
+
+        /// <summary>
+        ///     Secondary parents dyntaxa taxon ids.
+        /// </summary>
+        public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+
+        /// <summary>
+        ///     Systematic sort order
+        /// </summary>
+        public int SortOrder { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: specificEpithet.
@@ -326,6 +353,12 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Do taxon occur in sweden
         /// </summary>
         public string SwedishHistory { get; set; }
+
+        /// <summary>
+        ///     Synonyme names.
+        /// </summary>
+        [Nested]
+        public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: taxonConceptID.
@@ -394,42 +427,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VernacularName { get; set; }
 
         /// <summary>
-        ///     Systematic sort order
+        ///     Vernacular names.
         /// </summary>
-        public int SortOrder { get; set; }
-
-        /// <summary>
-        ///     Dyntaxa taxon id.
-        /// </summary>
-        public int DyntaxaTaxonId { get; set; }
-
-        /// <summary>
-        ///     Main parent Dyntaxa taxon id.
-        /// </summary>
-        public int? ParentDyntaxaTaxonId { get; set; }
-
-        /// <summary>
-        ///     Secondary parents dyntaxa taxon ids.
-        /// </summary>
-        public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
-
-        /// <summary>
-        ///     Darwin Core term name: scientificName.
-        ///     The full scientific name, with authorship and date
-        ///     information if known. When forming part of an
-        ///     Identification, this should be the name in lowest level
-        ///     taxonomic rank that can be determined.
-        ///     This term should not contain identification qualifications,
-        ///     which should instead be supplied in the
-        ///     IdentificationQualifier term.
-        ///     Currently scientific name without author is provided.
-        /// </summary>
-        [Keyword]
-        public string ScientificName { get; set; }
-
-        /// <summary>
-        ///     Object id
-        /// </summary>
-        public int Id { get; set; }
+        [Nested]
+        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
     }
 }
