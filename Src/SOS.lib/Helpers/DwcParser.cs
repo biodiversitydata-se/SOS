@@ -36,6 +36,8 @@ namespace SOS.Lib.Helpers
                     "yyyy-MM-dd H:mm",
                     "yyyy-MM-dd h:mm tt",
                     "yyyy-MM-dd HH:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss.f",
+                    "yyyy-MM-dd HH:mm:ss.fffffff",
                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
                     "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
