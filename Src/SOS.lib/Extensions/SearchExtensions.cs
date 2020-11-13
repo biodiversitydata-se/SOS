@@ -468,7 +468,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields,
+        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> properties,
             bool isInternal)
         {
             var projection = new SourceFilterDescriptor<dynamic>();
@@ -497,11 +497,22 @@ namespace SOS.Lib.Extensions
                 );
             }
 
-            if (fields?.Any() ?? false)
+            if (properties?.Any() ?? false)
             {
-                projection.Includes(i => i
-                    .Fields(fields.Select(f => new Field(f)))
-                );
+                var fields = new List<Field>();
+                foreach (var property in properties)
+                {
+                    var propertyHierarchy = property.Split('.');
+                    var camelCaseProperty = string.Empty;
+
+                    for (var i = 0; i < propertyHierarchy.Length; i++)
+                    {
+                        camelCaseProperty += $"{(i == 0 ? "" : ".")}{propertyHierarchy[i].ToCamelCase()}";
+                    }
+                    fields.Add(new Field(camelCaseProperty));
+                }
+                
+                projection.Includes(i => i.Fields(fields));
             }
 
             return p => projection;
