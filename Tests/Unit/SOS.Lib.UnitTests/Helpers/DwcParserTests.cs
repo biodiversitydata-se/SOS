@@ -205,6 +205,9 @@ namespace SOS.Lib.UnitTests.Helpers
             DwcParser.ParseDate("1963-03-08T14:07-0600").Should()
                 .Be(DateTime.SpecifyKind(new DateTime(1963, 3, 8, 14, 7, 0), DateTimeKind.Utc)
                     .Add(TimeSpan.FromHours(6)).ToLocalTime());
+            DwcParser.ParseDate("1995-09-13 00:00:00.0").Should().Be(new DateTime(1995, 9, 13));
+            DwcParser.ParseDate("1900-01-01 00:00:00.0").Should().Be(new DateTime(1900, 1, 1));
+            DwcParser.ParseDate("2009-08-06 18:25:01.0000000").Should().Be(new DateTime(2009, 8, 6,18,25,1));
         }
     }
 }

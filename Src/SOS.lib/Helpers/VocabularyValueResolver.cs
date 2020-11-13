@@ -33,15 +33,16 @@ namespace SOS.Lib.Helpers
 
         public VocabularyConfiguration Configuration => _vocabularyConfiguration;
 
-        public void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations)
+        public void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, bool forceResolve = false)
         {
-            ResolveVocabularyMappedValues(processedObservations, _vocabularyConfiguration.LocalizationCultureCode);
+            ResolveVocabularyMappedValues(processedObservations, _vocabularyConfiguration.LocalizationCultureCode, forceResolve);
         }
 
         public void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations,
-            string cultureCode)
+            string cultureCode,
+            bool forceResolve = false)
         {
-            if (!_vocabularyConfiguration.ResolveValues) return;
+            if (!forceResolve && !_vocabularyConfiguration.ResolveValues) return;
             var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
 
             foreach (var observation in processedObservations)

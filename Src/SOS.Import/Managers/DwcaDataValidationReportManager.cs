@@ -116,7 +116,7 @@ namespace SOS.Import.Managers
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
-                        {processedObservation});
+                        {processedObservation}, true);
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
                     var observationValidation = _validationManager.ValidateObservation(processedObservation);
