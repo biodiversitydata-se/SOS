@@ -41,9 +41,7 @@ namespace SOS.Lib.UnitTests.Helpers
                 FieldDescriptionId.DecimalLongitude,
                 FieldDescriptionId.DecimalLatitude,
                 FieldDescriptionId.CoordinateUncertaintyInMeters,
-                FieldDescriptionId.Year,
-                FieldDescriptionId.Month,
-                FieldDescriptionId.Day,
+                FieldDescriptionId.EventDate,
                 FieldDescriptionId.Continent,
                 FieldDescriptionId.AccessRights
             };
