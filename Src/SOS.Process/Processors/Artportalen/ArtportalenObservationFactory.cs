@@ -268,7 +268,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityUnit = GetSosIdFromMetadata(
                     verbatimObservation?.Unit, 
                     _vocabularyById[VocabularyId.Unit],
-                    (int) UnitId.Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
+                    (int) UnitId.Individuals);
                 obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, _vocabularyById[VocabularyId.DiscoveryMethod]);
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, _vocabularyById[VocabularyId.DeterminationMethod]);
                 CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
