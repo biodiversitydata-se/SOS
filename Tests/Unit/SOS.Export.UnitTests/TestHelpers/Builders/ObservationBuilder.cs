@@ -2,24 +2,33 @@
 
 namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
-    public class ProcessedObservationBuilder : BuilderBase<ProcessedObservationBuilder, Observation>
+    public class ObservationBuilder : BuilderBase<ObservationBuilder, Observation>
     {
-        public ProcessedObservationBuilder WithDecimalLatitude(double decimalLatitude)
+        public ObservationBuilder WithOccurrenceId(string occurrenceId)
+        {
+            return With(entity => entity.Occurrence.OccurrenceId = occurrenceId);
+        }
+        public ObservationBuilder WithScientificName(string scientificName)
+        {
+            return With(entity => entity.Taxon.ScientificName = scientificName);
+        }
+
+        public ObservationBuilder WithDecimalLatitude(double decimalLatitude)
         {
             return With(entity => entity.Location.DecimalLatitude = decimalLatitude);
         }
 
-        public ProcessedObservationBuilder WithDecimalLongitude(double decimalLongitude)
+        public ObservationBuilder WithDecimalLongitude(double decimalLongitude)
         {
             return With(entity => entity.Location.DecimalLongitude = decimalLongitude);
         }
 
-        public ProcessedObservationBuilder WithCoordinateUncertaintyInMeters(int? coordinateUncertaintyInMeters)
+        public ObservationBuilder WithCoordinateUncertaintyInMeters(int? coordinateUncertaintyInMeters)
         {
             return With(entity => entity.Location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters);
         }
 
-        public ProcessedObservationBuilder WithOccurrenceRemarks(string occurrenceRemarks)
+        public ObservationBuilder WithOccurrenceRemarks(string occurrenceRemarks)
         {
             return With(entity => entity.Occurrence.OccurrenceRemarks = occurrenceRemarks);
         }
