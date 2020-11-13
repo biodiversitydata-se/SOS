@@ -36,6 +36,27 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Check if property exist in object
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static bool HasProperty(this Type objectType, string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                return false;
+            }
+
+            var objectHierarchy = propertyName.Split('.');
+            var levels = objectHierarchy?.Length ?? 0;
+
+            var property = objectType.GetProperties().FirstOrDefault(p => p.Name.Equals(objectHierarchy[0], StringComparison.CurrentCultureIgnoreCase));
+
+            return levels == 1 ? property != null : property?.PropertyType.HasProperty(string.Join('.', objectHierarchy.Skip(1))) ?? false;
+        }
+
+        /// <summary>
         ///     Set object property by reflection
         /// </summary>
         /// <typeparam name="T"></typeparam>
