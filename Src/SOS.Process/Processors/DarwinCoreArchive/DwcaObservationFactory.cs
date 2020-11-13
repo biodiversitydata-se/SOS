@@ -516,11 +516,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Gender]);
             processedOccurrence.IsNaturalOccurrence = true;
-            processedOccurrence.IsNeverFoundObservation =
-                false; // todo - Add the following logic? dyntaxaTaxonId == 0; // Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
+            processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
-            processedOccurrence.IsPositiveObservation =
-                true; // todo - Add the following logic? dyntaxaTaxonId != 0; // Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
+            processedOccurrence.IsPositiveObservation = true; 
             if (processedOccurrence.OccurrenceStatus?.Id == (int) OccurrenceStatusId.Absent)
             {
                 processedOccurrence.IsPositiveObservation = false;
