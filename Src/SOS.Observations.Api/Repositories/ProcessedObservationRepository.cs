@@ -37,31 +37,27 @@ namespace SOS.Observations.Api.Repositories
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(FilterBase filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-            
-            int[] sightingTypeSearchGroupFilter = null;
+
+            // Default DoNotShowMerged
+            var sightingTypeSearchGroupFilter = new[] { 0, 1, 4, 16, 32, 128 };
 
             if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
             {
-                sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
+                sightingTypeSearchGroupFilter = new [] { 0, 1, 2, 4, 16, 32, 128 };
             }
             else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
             {
-                sightingTypeSearchGroupFilter = new int[] { 0, 2 };
+                sightingTypeSearchGroupFilter = new [] { 0, 2 };
             }
             else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
             {
-                sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
-            }
-            else 
-            {
-                 sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
+                sightingTypeSearchGroupFilter = new [] { 0, 1, 2, 4, 32, 128 };
             }
 
             sightingTypeQuery.Add(q => q
                 .Terms(t => t
                     .Field("artportalenInternal.sightingTypeSearchGroupId")
                     .Terms(sightingTypeSearchGroupFilter)
-
                 )
             );
 

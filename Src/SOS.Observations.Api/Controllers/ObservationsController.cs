@@ -8,10 +8,10 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -64,9 +64,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var pagingArgumentsValidation = ValidateSearchPagingArguments(skip, take);
-                var searchFilterValidation = ValidateSearchFilter(filter);
-                var validationResult = Result.Combine(pagingArgumentsValidation, searchFilterValidation);
+                var validationResult = Result.Combine(
+                    ValidateSearchPagingArguments(skip, take), 
+                    ValidateSearchFilter(filter),
+                    ValidatePropertyExists(nameof(sortBy), sortBy));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 SearchFilter searchFilter = filter.ToSearchFilter();
@@ -96,9 +97,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var pagingArgumentsValidation = ValidateSearchPagingArgumentsInternal(skip, take);
-                var searchFilterValidation = ValidateSearchFilterInternal(filter);
-                var validationResult = Result.Combine(pagingArgumentsValidation, searchFilterValidation);
+                var validationResult = Result.Combine(
+                    ValidateSearchPagingArgumentsInternal(skip, take),
+                    ValidateSearchFilterInternal(filter),
+                    ValidatePropertyExists(nameof(sortBy), sortBy));
+
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var result = await _observationManager.GetChunkAsync(filter.ToSearchFilterInternal(), skip, take, sortBy, sortOrder);
@@ -129,9 +132,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var filterValidation = ValidateSearchFilterInternal(filter);
-                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation);
+                var paramsValidationResult = Result.Combine(
+                    ValidatePagingArguments(skip, take),
+                    ValidateSearchFilterInternal(filter),
+                    ValidatePropertyExists(nameof(sortBy), sortBy));
+
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
@@ -547,6 +552,21 @@ namespace SOS.Observations.Api.Controllers
             return new Tuple<bool, IEnumerable<string>>(!errors.Any(), errors);
         }
 
+        private Result ValidatePropertyExists(string name, string property, bool mandatory = false)
+        {
+            if (string.IsNullOrEmpty(property))
+            {
+                return mandatory ? Result.Failure($"You must state { name }") : Result.Success();
+            }
+
+            if (typeof(Observation).HasProperty(property))
+            {
+                return Result.Success();
+            }
+
+            return Result.Failure($"Missing property ({ property }) used for { name }");
+        }
+
         private Result ValidateSearchFilter(SearchFilterDto filter)
         {
             var errors = new List<string>();
@@ -561,6 +581,13 @@ namespace SOS.Observations.Api.Controllers
                 StringComparer.CurrentCultureIgnoreCase))
             {
                 errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+            }
+
+            if (filter.OutputFields?.Any() ?? false)
+            {
+                var observationType = typeof(Observation);
+
+                errors.AddRange(filter.OutputFields.Where(of => !observationType.HasProperty(of)).Select(of => $"Output field doesn't exist ({of})"));
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
@@ -582,6 +609,14 @@ namespace SOS.Observations.Api.Controllers
             {
                 errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
             }
+
+            if (filter.OutputFields?.Any() ?? false)
+            {
+                var observationType = typeof(Observation);
+
+                errors.AddRange(filter.OutputFields.Where(of => !observationType.HasProperty(of)).Select(of => $"Output field doesn't exist ({of})"));
+            }
+
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
             return Result.Success();
