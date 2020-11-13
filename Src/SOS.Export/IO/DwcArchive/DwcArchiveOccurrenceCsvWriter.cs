@@ -53,7 +53,7 @@ namespace SOS.Export.IO.DwcArchive
                 elasticRetrievalStopwatch.Stop();
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter,"\t");
-
+                
                 // Write header row
                 WriteHeaderRow(csvWriter, fieldDescriptions);
 
