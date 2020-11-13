@@ -15,13 +15,15 @@ namespace SOS.Lib.Helpers.Interfaces
         ///     Resolve field mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
-        void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations);
+        /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
+        void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, bool forceResolve = false);
 
         /// <summary>
         ///     Resolve field mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="cultureCode"></param>
-        void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, string cultureCode);
+        /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
+        void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, string cultureCode, bool forceResolve = false);
     }
 }
