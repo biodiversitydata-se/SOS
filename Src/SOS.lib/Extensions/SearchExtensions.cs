@@ -374,6 +374,13 @@ namespace SOS.Lib.Extensions
             return queryContainers;
         }
 
+        private static Field ToField(this string property)
+        {
+            return new Field(string.Join('.', property.Split('.').Select(p => p
+                .ToCamelCase()
+            )));
+        }
+
 
         /// <summary>
         ///     Create project parameter filter.
@@ -499,20 +506,7 @@ namespace SOS.Lib.Extensions
 
             if (properties?.Any() ?? false)
             {
-                var fields = new List<Field>();
-                foreach (var property in properties)
-                {
-                    var propertyHierarchy = property.Split('.');
-                    var camelCaseProperty = string.Empty;
-
-                    for (var i = 0; i < propertyHierarchy.Length; i++)
-                    {
-                        camelCaseProperty += $"{(i == 0 ? "" : ".")}{propertyHierarchy[i].ToCamelCase()}";
-                    }
-                    fields.Add(new Field(camelCaseProperty));
-                }
-                
-                projection.Includes(i => i.Fields(fields));
+                projection.Includes(i => i.Fields(properties.Select(p => p.ToField())));
             }
 
             return p => projection;
