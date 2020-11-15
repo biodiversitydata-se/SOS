@@ -146,7 +146,6 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
             var observationBuilder = new ObservationBuilder();
