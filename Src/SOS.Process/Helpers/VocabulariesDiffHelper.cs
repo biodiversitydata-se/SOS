@@ -74,6 +74,14 @@ namespace SOS.Process.Helpers
             foreach (var vocabulary in vocabularies.OrderBy(vocabulary => vocabulary.Id))
             {
                 vocabulary.Values = vocabulary.Values.OrderBy(m => m.Id).ToList();
+                foreach (var externalSystemMapping in vocabulary.ExternalSystemsMapping ?? Enumerable.Empty<ExternalSystemMapping>())
+                {
+                    foreach (var mapping in externalSystemMapping?.Mappings ?? Enumerable.Empty<ExternalSystemMappingField>())
+                    {
+                        mapping.Values = mapping.Values.OrderBy(m => m.SosId).ToList();
+                    }
+                }
+
                 vocabulary.ExternalSystemsMapping = vocabulary.ExternalSystemsMapping?.OrderBy(m => m.Id).ToList();
                 sortedVocabularies.Add(vocabulary);
             }
