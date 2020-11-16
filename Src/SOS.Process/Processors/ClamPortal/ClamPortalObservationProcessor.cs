@@ -30,7 +30,7 @@ namespace SOS.Process.Processors.ClamPortal
             DataProvider dataProvider,
             ICollection<Observation> observations)
         {
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
             return await CommitBatchAsync(dataProvider, observations);
         }

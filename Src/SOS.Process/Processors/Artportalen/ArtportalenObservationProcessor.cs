@@ -159,7 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                 Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
 
                 Logger.LogDebug($"Start validating Artportalen batch ({startId}-{endId})");
-                var invalidObservations = ValidationManager.ValidateObservations(ref processedObservationsBatch);
+                var invalidObservations = ValidationManager.ValidateObservations(ref processedObservationsBatch, dataProvider);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 Logger.LogDebug($"End validating Artportalen batch ({startId}-{endId})");
 
@@ -241,7 +241,7 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             cancellationToken?.ThrowIfCancellationRequested();
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
 
             if (mode != JobRunModes.Full)

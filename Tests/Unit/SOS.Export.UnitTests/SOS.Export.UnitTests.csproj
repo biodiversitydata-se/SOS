@@ -50,6 +50,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
