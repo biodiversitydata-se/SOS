@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Jobs
@@ -52,9 +53,16 @@ namespace SOS.Import.Jobs
             var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(mode, cancellationToken);
             _logger.LogInformation($"End Artportalen Harvest Job. Status: {harvestInfoResult.Status}");
 
+            // Incremental harvest, add harvest count
+            if (mode != JobRunModes.Full)
+            {
+                var harvestInfo = await _harvestInfoRepository.GetAsync(nameof(ArtportalenObservationVerbatim));
+                harvestInfoResult.Count += harvestInfo?.Count ?? 0;
+            }
+           
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
-
+           
             return harvestInfoResult.Status.Equals(RunStatus.Failed)
                 ? throw new Exception("Artportalen Harvest Job failed")
                 : harvestInfoResult.Status.Equals(RunStatus.Success);
