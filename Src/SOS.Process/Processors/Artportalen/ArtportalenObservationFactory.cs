@@ -113,7 +113,6 @@ namespace SOS.Process.Processors.Artportalen
                 var obs = new Observation();
 
                 // Record level
-                obs.VerbatimId = verbatimObservation.SightingId;
                 obs.DataProviderId = _dataProvider.Id;
                 obs.AccessRights = !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                                    verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
@@ -237,6 +236,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
                 obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
                 obs.ArtportalenInternal.NoteOfInterest = verbatimObservation.NoteOfInterest;
+                obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;
                 obs.ArtportalenInternal.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
