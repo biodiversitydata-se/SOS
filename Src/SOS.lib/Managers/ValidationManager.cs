@@ -7,13 +7,14 @@ using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Managers
 {
     public class ValidationManager : IValidationManager
     {
-        private readonly IInvalidObservationRepository _invalidObservationRepository;
+        private readonly IInvalidObservationRepository _invalidObservationRepository;        
         private readonly ILogger<ValidationManager> _logger;
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace SOS.Lib.Managers
         public ValidationManager(IInvalidObservationRepository invalidObservationRepository, ILogger<ValidationManager> logger)
         {
             _invalidObservationRepository = invalidObservationRepository ??
-                                            throw new ArgumentNullException(nameof(invalidObservationRepository));
+                                            throw new ArgumentNullException(nameof(invalidObservationRepository));       
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -46,14 +47,13 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<Observation> observations)
+        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<Observation> observations, DataProvider dataProvider)
         {
             var validItems = new List<Observation>();
-            var invalidItems = new List<InvalidObservation>();
-
+            var invalidItems = new List<InvalidObservation>();            
             foreach (var observation in observations)
             {
-                var observationValidation = ValidateObservation(observation);
+                var observationValidation = ValidateObservation(observation, dataProvider);
 
                 if (observationValidation.IsInvalid)
                 {
@@ -74,9 +74,9 @@ namespace SOS.Lib.Managers
         /// </summary>
         /// <param name="observation"></param>
         /// <returns></returns>
-        public InvalidObservation ValidateObservation(Observation observation)
+        public InvalidObservation ValidateObservation(Observation observation, DataProvider dataProvider)
         {
-            var observationValidation = new InvalidObservation(observation.DatasetId, observation.DatasetName, observation.Occurrence.OccurrenceId);
+            var observationValidation = new InvalidObservation(observation.DataProviderId.ToString(), dataProvider.Name, observation.Occurrence.OccurrenceId);
 
             if (observation.Taxon == null)
             {

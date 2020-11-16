@@ -163,7 +163,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
+                    var invalidObservations = ValidationManager.ValidateObservations(ref sightings, dataProvider);
                     await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                     await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter++.ToString());
@@ -176,7 +176,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             if (sightings.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
+                var invalidObservations = ValidationManager.ValidateObservations(ref sightings, dataProvider);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                 await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter.ToString());
