@@ -6,7 +6,6 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -105,7 +104,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ProcessConfiguration processConfiguration,
             ILogger<VirtualHerbariumObservationProcessor> logger) : 
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
