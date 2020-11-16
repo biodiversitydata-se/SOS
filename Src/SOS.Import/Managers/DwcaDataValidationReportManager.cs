@@ -119,7 +119,7 @@ namespace SOS.Import.Managers
                         {processedObservation}, true);
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
-                    var observationValidation = _validationManager.ValidateObservation(processedObservation);
+                    var observationValidation = _validationManager.ValidateObservation(processedObservation, dataProvider);
                     if (observationValidation.IsValid)
                     {
                         nrValidObservations++;

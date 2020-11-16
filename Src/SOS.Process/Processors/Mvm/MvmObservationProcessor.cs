@@ -73,7 +73,7 @@ namespace SOS.Process.Processors.Mvm
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                    var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
                     await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
                     await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
@@ -86,7 +86,7 @@ namespace SOS.Process.Processors.Mvm
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
