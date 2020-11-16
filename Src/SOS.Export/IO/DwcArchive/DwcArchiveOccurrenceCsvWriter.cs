@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -53,7 +54,7 @@ namespace SOS.Export.IO.DwcArchive
                 elasticRetrievalStopwatch.Stop();
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter,"\t");
-
+                
                 // Write header row
                 WriteHeaderRow(csvWriter, fieldDescriptions);
 
@@ -127,7 +128,7 @@ namespace SOS.Export.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.InstitutionID]) WriteField(csvWriter, dwcObservation.InstitutionID);
             if (writeField[(int)FieldDescriptionId.Language]) WriteField(csvWriter, dwcObservation.Language);
             if (writeField[(int)FieldDescriptionId.License]) WriteField(csvWriter, dwcObservation.License);
-            if (writeField[(int)FieldDescriptionId.Modified]) WriteField(csvWriter, dwcObservation.Modified?.ToString("s"));
+            if (writeField[(int)FieldDescriptionId.Modified]) WriteField(csvWriter, dwcObservation.Modified?.ToString("s", CultureInfo.InvariantCulture));
             if (writeField[(int)FieldDescriptionId.OwnerInstitutionCode]) WriteField(csvWriter, dwcObservation.OwnerInstitutionCode);
             if (writeField[(int)FieldDescriptionId.References]) WriteField(csvWriter, dwcObservation.References);
             if (writeField[(int)FieldDescriptionId.RightsHolder]) WriteField(csvWriter, dwcObservation.RightsHolder);
@@ -164,8 +165,8 @@ namespace SOS.Export.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.Country]) WriteField(csvWriter, dwcObservation.Location.Country);
             if (writeField[(int)FieldDescriptionId.CountryCode]) WriteField(csvWriter, dwcObservation.Location.CountryCode);
             if (writeField[(int)FieldDescriptionId.County]) WriteField(csvWriter, dwcObservation.Location.County);
-            if (writeField[(int)FieldDescriptionId.DecimalLatitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLatitude?.ToString("F5"));
-            if (writeField[(int)FieldDescriptionId.DecimalLongitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLongitude?.ToString("F5"));
+            if (writeField[(int)FieldDescriptionId.DecimalLatitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLatitude?.ToString("F5", CultureInfo.InvariantCulture));
+            if (writeField[(int)FieldDescriptionId.DecimalLongitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLongitude?.ToString("F5", CultureInfo.InvariantCulture));
             if (writeField[(int)FieldDescriptionId.FootprintSpatialFit]) WriteField(csvWriter, dwcObservation.Location.FootprintSpatialFit);
             if (writeField[(int)FieldDescriptionId.FootprintSRS]) WriteField(csvWriter, dwcObservation.Location.FootprintSRS);
             if (writeField[(int)FieldDescriptionId.FootprintWKT]) WriteField(csvWriter, dwcObservation.Location.FootprintWKT);

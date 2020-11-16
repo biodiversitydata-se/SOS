@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Moq;
@@ -32,11 +33,25 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
         public static Mock<IProcessedObservationRepository> Create(Observation observation)
         {
             var stub = new Mock<IProcessedObservationRepository>();
-            stub
-                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
+
+            stub.SetupSequence(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<Observation>
                 {
-                    Records = new[] {observation}
+                    Records = new[] { observation } // return the observation the first call.
+                })
+                .ReturnsAsync(new ScrollResult<Observation>
+                {
+                    Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
+                });
+
+            stub.SetupSequence(pdcr => pdcr.TypedScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
+                .ReturnsAsync(new ScrollResult<Observation>
+                {
+                    Records = new[] {observation} // return the observation the first call.
+                })
+                .ReturnsAsync(new ScrollResult<Observation>
+                    {
+                        Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
 
             return stub;

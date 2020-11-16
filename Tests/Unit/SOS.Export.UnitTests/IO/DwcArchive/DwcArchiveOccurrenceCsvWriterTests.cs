@@ -63,7 +63,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observationBuilder = new ProcessedObservationBuilder();
+            var observationBuilder = new ObservationBuilder();
             var observation = observationBuilder
                 .WithCoordinateUncertaintyInMeters(0)
                 .Build();
@@ -92,37 +92,6 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task Create_a_DwC_occurrence_csv_file_with_ten_observations()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
-            var processedDarwinCoreRepositoryStub =
-                ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
-            var memoryStream = new MemoryStream();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new SearchFilter(),
-                memoryStream,
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryStub.Object,
-                JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            var records = ReadCsvFile(memoryStream).ToList();
-            result.Should().BeTrue();
-            records.Count.Should().Be(10);
-        }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        [Trait("Category", "DwcArchiveUnit")]
         public async Task
             Creating_Occurrence_csv_file_with_subset_of_field_descriptions_is_using_exactly_the_provided_fields()
         {
@@ -131,8 +100,15 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
+            var observationBuilder = new ObservationBuilder();
+            var observation = observationBuilder
+                .WithOccurrenceId("urn:lsid:artportalen.se:Sighting:48823")
+                .WithScientificName("Triturus cristatus")
+                .WithDecimalLatitude(13.823392373018132)
+                .WithDecimalLongitude(55.51071440795833)
+                .Build();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+
             var fieldDescriptionIds = new List<FieldDescriptionId>
             {
                 FieldDescriptionId.OccurrenceID,
@@ -172,7 +148,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observationBuilder = new ProcessedObservationBuilder();
+            var observationBuilder = new ObservationBuilder();
             var observation = observationBuilder
                 .WithDecimalLatitude(13.823392373018132)
                 .WithDecimalLongitude(55.51071440795833)
@@ -208,7 +184,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observationBuilder = new ProcessedObservationBuilder();
+            var observationBuilder = new ObservationBuilder();
             var observation = observationBuilder
                 .WithOccurrenceRemarks("Sighting found in\r\nUppsala")
                 .Build();
