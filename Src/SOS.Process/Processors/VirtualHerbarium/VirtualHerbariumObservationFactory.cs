@@ -19,9 +19,9 @@ namespace SOS.Process.Processors.VirtualHerbarium
 {
     public class VirtualHerbariumObservationFactory
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
+       
 
         public VirtualHerbariumObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
@@ -47,6 +47,11 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <returns></returns>
         public Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
         {
+            if (verbatim == null)
+            {
+                return null;
+            }
+
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
             {
