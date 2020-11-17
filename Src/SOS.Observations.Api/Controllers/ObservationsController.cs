@@ -585,13 +585,16 @@ namespace SOS.Observations.Api.Controllers
 
             if (filter.OutputFields?.Any() ?? false)
             {
-
-                errors.AddRange(filter.OutputFields.Where(of => !typeof(Observation).HasProperty(of)).Select(of => $"Output field doesn't exist ({of})"));
+                errors.AddRange(filter.OutputFields
+                    .Where(of => !typeof(Observation).HasProperty(of))
+                    .Select(of => $"Output field doesn't exist ({of})"));
             }
 
-            if (filter.Taxon?.RedListCategories.Any() ?? false)
+            if (filter.Taxon?.RedListCategories?.Any() ?? false)
             {
-                errors.AddRange(filter.Taxon.RedListCategories.Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase)).Select(rc => $"Red list category doesn't exist ({rc})"));
+                errors.AddRange(filter.Taxon.RedListCategories
+                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
+                    .Select(rc => $"Red list category doesn't exist ({rc})"));
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
@@ -616,11 +619,17 @@ namespace SOS.Observations.Api.Controllers
 
             if (filter.OutputFields?.Any() ?? false)
             {
-                var observationType = typeof(Observation);
-
-                errors.AddRange(filter.OutputFields.Where(of => !observationType.HasProperty(of)).Select(of => $"Output field doesn't exist ({of})"));
+                errors.AddRange(filter.OutputFields
+                    .Where(of => !typeof(Observation).HasProperty(of))
+                    .Select(of => $"Output field doesn't exist ({of})"));
             }
 
+            if (filter.Taxon?.RedListCategories?.Any() ?? false)
+            {
+                errors.AddRange(filter.Taxon.RedListCategories
+                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
+                    .Select(rc => $"Red list category doesn't exist ({rc})"));
+            }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
             return Result.Success();
