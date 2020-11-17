@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [InlineData("adult", LifeStageId.Adult)]
         [InlineData("egg", LifeStageId.Egg)]
         [InlineData("eggs", LifeStageId.Egg)]
-        [InlineData("juvenile", LifeStageId.Anamorph)]
+        [InlineData("juvenile", LifeStageId.Juvenile)]
         public void LifeStage_field_with_valid_value_is_mapped_to_LifeStage_vocabulary(
             string lifeStageValue,
             LifeStageId expectedLifeStageId)
