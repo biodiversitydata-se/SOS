@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Destination\Interfaces\**" />
+    <EmbeddedResource Remove="Repositories\Destination\Interfaces\**" />
+    <None Remove="Repositories\Destination\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="xunit.runner.json" />
   </ItemGroup>
@@ -48,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Destination\Interfaces\" />
+    <Folder Include="Repositories\Destination\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

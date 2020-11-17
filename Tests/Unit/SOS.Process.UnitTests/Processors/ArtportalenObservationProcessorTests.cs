@@ -117,56 +117,6 @@ namespace SOS.Process.UnitTests.Processors
             result.Status.Should().Be(RunStatus.Failed);
         }
 
-        // todo - delete test?
-        // This test doesn't add any value to the unit test suite due to the following reasons:
-        // 1) The constructor is always invoked by dependency injection, which means that this test adds no protection against regressions (bugs).
-        // 2) This test, tests the code implementation details and not the behavior of the system.
-        //
-        ///// <summary>
-        ///// Test constructor
-        ///// </summary>
-        //[Fact]
-        //public void ConstructorTest()
-        //{
-        //    TestObject.Should().NotBeNull();
-
-        //    Action create = () => new ArtportalenObservationProcessor(
-        //        null,
-        //        _processedObservationRepositoryMock.Object,
-        //        _processedFieldMappingRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object,
-        //        _processConfiguration,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenVerbatimRepository");
-
-        //    create = () => new ArtportalenObservationProcessor(
-        //        _artportalenVerbatimRepository.Object,
-        //        null,
-        //        _processedFieldMappingRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object,
-        //        _processConfiguration,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
-
-        //    create = () => new ArtportalenObservationProcessor(
-        //        _artportalenVerbatimRepository.Object,
-        //        _processedObservationRepositoryMock.Object,
-        //        _processedFieldMappingRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object,
-        //        null,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processConfiguration");
-
-        //    create = () => new ArtportalenObservationProcessor(
-        //        _artportalenVerbatimRepository.Object,
-        //        _processedObservationRepositoryMock.Object,
-        //        _processedFieldMappingRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object,
-        //        _processConfiguration,
-        //        null);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        //}
-
         /// <summary>
         ///     Make a successful test of processing
         /// </summary>

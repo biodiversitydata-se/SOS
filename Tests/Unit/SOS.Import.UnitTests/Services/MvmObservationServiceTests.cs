@@ -32,34 +32,6 @@ namespace SOS.Import.UnitTests.Services
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new MvmObservationService(
-                null,
-                _mvmServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("speciesObservationChangeServiceClient");
-
-            create = () => new MvmObservationService(
-                _speciesObservationChangeServiceMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("mvmServiceConfiguration");
-
-            create = () => new MvmObservationService(
-                _speciesObservationChangeServiceMock.Object,
-                _mvmServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Get clams observations fail
         /// </summary>
         /// <returns></returns>

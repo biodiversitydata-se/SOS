@@ -41,44 +41,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new KulObservationHarvester(
-                null,
-                _kulObservationVerbatimRepositoryMock.Object,
-                _kulServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationService");
-
-            create = () => new KulObservationHarvester(
-                _kulObservationServiceMock.Object,
-                null,
-                _kulServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("kulObservationVerbatimRepository");
-
-            create = () => new KulObservationHarvester(
-                _kulObservationServiceMock.Object,
-                _kulObservationVerbatimRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulServiceConfiguration");
-
-            create = () => new KulObservationHarvester(
-                _kulObservationServiceMock.Object,
-                _kulObservationVerbatimRepositoryMock.Object,
-                _kulServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>

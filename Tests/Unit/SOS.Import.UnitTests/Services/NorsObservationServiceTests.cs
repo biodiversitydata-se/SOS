@@ -35,34 +35,6 @@ namespace SOS.Import.UnitTests.Services
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new NorsObservationService(
-                null,
-                _norsServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("httpClientService");
-
-            create = () => new NorsObservationService(
-                _httpClientService.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsServiceConfiguration");
-
-            create = () => new NorsObservationService(
-                _httpClientService.Object,
-                _norsServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Get clams observations fail
         /// </summary>
         /// <returns></returns>

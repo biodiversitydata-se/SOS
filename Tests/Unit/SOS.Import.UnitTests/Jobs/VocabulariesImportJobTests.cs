@@ -82,33 +82,6 @@ namespace SOS.Import.UnitTests.Jobs
         }
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new VocabulariesImportJob(
-                null,
-                _harvestInfoRepositoryMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fieldMappingHarvester");
-
-            create = () => new VocabulariesImportJob(
-                _vocabularyHarvesterMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new VocabulariesImportJob(
-                _vocabularyHarvesterMock.Object,
-                _harvestInfoRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Run harvest job successfully
         /// </summary>
         /// <returns></returns>

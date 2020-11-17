@@ -42,44 +42,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new NorsObservationHarvester(
-                null,
-                _norsObservationVerbatimRepositoryMock.Object,
-                _norsServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsObservationService");
-
-            create = () => new NorsObservationHarvester(
-                _norsObservationServiceMock.Object,
-                null,
-                _norsServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("norsObservationVerbatimRepository");
-
-            create = () => new NorsObservationHarvester(
-                _norsObservationServiceMock.Object,
-                _norsObservationVerbatimRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsServiceConfiguration");
-
-            create = () => new NorsObservationHarvester(
-                _norsObservationServiceMock.Object,
-                _norsObservationVerbatimRepositoryMock.Object,
-                _norsServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
