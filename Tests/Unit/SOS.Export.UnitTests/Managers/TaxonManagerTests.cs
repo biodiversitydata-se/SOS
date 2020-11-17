@@ -34,26 +34,6 @@ namespace SOS.Export.UnitTests.Managers
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new TaxonManager(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
-
-            create = () => new TaxonManager(
-                _processedTaxonRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test taxon tree fail
         /// </summary>
         /// <returns></returns>

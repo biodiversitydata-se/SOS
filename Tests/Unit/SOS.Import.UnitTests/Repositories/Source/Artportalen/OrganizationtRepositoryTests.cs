@@ -33,25 +33,6 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test the constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new OrganizationRepository(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
-
-            create = () => new OrganizationRepository(
-                _artportalenDataServiceMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test get projects fail
         /// </summary>
         /// <returns></returns>
