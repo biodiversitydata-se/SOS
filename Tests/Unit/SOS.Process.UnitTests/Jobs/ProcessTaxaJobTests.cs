@@ -42,43 +42,6 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new ProcessTaxaJob(
-                null,
-                _harvestInfoRepository.Object,
-                _processInfoRepository.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonProcessor");
-
-            create = () => new ProcessTaxaJob(
-                _taxonProcessorMock.Object,
-                null,
-                _processInfoRepository.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new ProcessTaxaJob(
-                _taxonProcessorMock.Object,
-                _harvestInfoRepository.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
-
-            create = () => new ProcessTaxaJob(
-                _taxonProcessorMock.Object,
-                _harvestInfoRepository.Object,
-                _processInfoRepository.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test processing exception
         /// </summary>
         /// <returns></returns>
@@ -111,23 +74,20 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
             _taxonProcessorMock.Setup(r => r.ProcessTaxaAsync())
-                .ReturnsAsync(0);
+                .ReturnsAsync(-1);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync();
+            Func<Task> run =
+                () => TestObject.RunAsync();
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
+            run.Should().Throw<Exception>()
+                .WithMessage("Process taxa job failed");
         }
 
         /// <summary>

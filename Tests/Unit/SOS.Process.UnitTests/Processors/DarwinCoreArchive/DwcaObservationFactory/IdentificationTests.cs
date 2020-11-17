@@ -37,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Identification.DateIdentified.Should().Be(new DateTime(2019, 5, 29));
+            result.Identification.DateIdentified.Should().Be(new DateTime(2019, 5, 29).ToUniversalTime());
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var builder = new DwcObservationVerbatimBuilder();
-            var date = new DateTime(2019, 5, 29);
+            var date = new DateTime(2019, 5, 29,0,0,0, DateTimeKind.Utc);
             var dwcaObservation = builder
                 .WithDefaultValues()
                 .WithDateIdentified(date)
