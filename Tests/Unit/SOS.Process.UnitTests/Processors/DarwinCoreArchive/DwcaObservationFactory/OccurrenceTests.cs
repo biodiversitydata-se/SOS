@@ -37,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Cocoon);
+            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Foraging);
         }
 
         /// <remarks>
@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [InlineData("adult", LifeStageId.Adult)]
         [InlineData("egg", LifeStageId.Egg)]
         [InlineData("eggs", LifeStageId.Egg)]
-        [InlineData("juvenile", LifeStageId.Juvenile)]
+        [InlineData("juvenile", LifeStageId.Anamorph)]
         public void LifeStage_field_with_valid_value_is_mapped_to_LifeStage_vocabulary(
             string lifeStageValue,
             LifeStageId expectedLifeStageId)
