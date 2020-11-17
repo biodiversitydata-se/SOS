@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -167,7 +166,11 @@ namespace SOS.Process.Processors.Taxon
                 var parentNames = treeNode.AsParentsNodeIterator().Select(m => m.ScientificName);
                 var reversedParentNames = parentNames.Reverse();
                 var higherClassification = string.Join(" | ", reversedParentNames);
-                taxonById[treeNode.TaxonId].HigherClassification = higherClassification;
+
+                if (taxonById.TryGetValue(treeNode.TaxonId, out var taxon))
+                {
+                    taxon.HigherClassification = higherClassification;
+                }
             }
         }
 

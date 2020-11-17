@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 
 namespace SOS.Lib.Factories
@@ -29,6 +30,11 @@ namespace SOS.Lib.Factories
         public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(
             Dictionary<int, IBasicTaxon> taxonById)
         {
+            if (!taxonById?.Any() ?? true)
+            {
+                return null;
+            }
+
             var treeNodeById = new Dictionary<int, TaxonTreeNode<IBasicTaxon>>();
 
             foreach (var taxon in taxonById.Values)
@@ -44,10 +50,18 @@ namespace SOS.Lib.Factories
                 {
                     if (!treeNodeById.TryGetValue(taxon.ParentDyntaxaTaxonId.Value, out var parentNode))
                     {
+                        if (!taxonById.TryGetValue(taxon.ParentDyntaxaTaxonId.Value, out var parentTaxon))
+                        {
+                            parentTaxon = new BasicTaxon
+                            {
+                                Id = taxon.ParentDyntaxaTaxonId.Value
+                            };
+                        }
+
                         parentNode = new TaxonTreeNode<IBasicTaxon>(
                             taxon.ParentDyntaxaTaxonId.Value,
-                            taxonById[taxon.ParentDyntaxaTaxonId.Value].ScientificName,
-                            taxonById[taxon.ParentDyntaxaTaxonId.Value]);
+                            parentTaxon.ScientificName,
+                            parentTaxon);
                         treeNodeById.Add(taxon.ParentDyntaxaTaxonId.Value, parentNode);
                     }
 
@@ -63,10 +77,18 @@ namespace SOS.Lib.Factories
                     {
                         if (!treeNodeById.TryGetValue(secondaryParentTaxonId, out var secondaryParentNode))
                         {
+                            if (!taxonById.TryGetValue(secondaryParentTaxonId, out var secondaryParentTaxon))
+                            {
+                                secondaryParentTaxon = new BasicTaxon
+                                {
+                                    Id = secondaryParentTaxonId
+                                };
+                            }
+
                             secondaryParentNode = new TaxonTreeNode<IBasicTaxon>(
                                 secondaryParentTaxonId,
-                                taxonById[secondaryParentTaxonId].ScientificName,
-                                taxonById[secondaryParentTaxonId]);
+                                secondaryParentTaxon.ScientificName,
+                                secondaryParentTaxon);
                             treeNodeById.Add(secondaryParentTaxonId, secondaryParentNode);
                         }
 
