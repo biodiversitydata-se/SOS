@@ -98,25 +98,6 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new DataProviderManager(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataProviderRepository");
-
-            create = () => new DataProviderManager(
-                _dataProviderRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Exception occur when a provider is deleted
         /// </summary>
         /// <returns></returns>

@@ -36,27 +36,6 @@ namespace SOS.Export.UnitTests.Jobs
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new ExportAndSendJob(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("observationManager");
-
-            create = () => new ExportAndSendJob(
-                _observationManager.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-
-        /// <summary>
         ///     Test run fail
         /// </summary>
         /// <returns></returns>

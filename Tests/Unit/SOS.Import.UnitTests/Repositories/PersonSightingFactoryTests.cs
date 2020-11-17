@@ -57,39 +57,5 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             verifiedBy.Should().Be(expected);
         }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void TestGetVerifiedByDataDictionary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-         /*   var sightingRelationEntities = SightingRelationEntityTestData.CreateItems().ToVerbatims().ToList();
-            var speciesCollectionItemEntities = SpeciesCollectionItemEntityTestData.CreateItems();
-            var personByUserId = PersonTestData.CreatePersonDictionary();
-            var sightingIds = new HashSet<int>(sightingRelationEntities
-                .Select(x => x.SightingId)
-                .Concat(speciesCollectionItemEntities.Select(x => x.SightingId))
-                .Distinct());
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = PersonSightingFactory.CreatePersonSightingDictionary(
-                sightingIds,
-                personByUserId,
-                null,
-                speciesCollectionItemEntities.ToVerbatims().ToList(),
-                sightingRelationEntities);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().ContainKeys(sightingIds);
-            result[1].Observers.Should().Be("Via Tord Yvel", "because Observer is not specified, but ReportedBy is");
-            result[1].ReportedBy.Should().Be("Tord Yvel", "because ReportedBy is specified");
-            result[1].SpeciesCollection.Should().BeNull("because SpeciesCollection is not specified");*/
-        }
     }
 }

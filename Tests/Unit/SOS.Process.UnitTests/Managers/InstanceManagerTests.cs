@@ -31,37 +31,6 @@ namespace SOS.Process.UnitTests.Managers
         private readonly Mock<ILogger<InstanceManager>> _loggerMock;
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                _processInfoRepositoryMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
-
-            Action create = () => new InstanceManager(
-                null,
-                _processInfoRepositoryMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
-
-
-            create = () => new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
-
-            create = () => new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                _processInfoRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test processing exception
         /// </summary>
         /// <returns></returns>

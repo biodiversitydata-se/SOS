@@ -43,43 +43,6 @@ namespace SOS.Import.UnitTests.Harvesters
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new AreaHarvester(
-                null,
-                _areaProcessedRepository.Object,
-                _areaHelperMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaRepository");
-
-            create = () => new AreaHarvester(
-                _areaRepositoryMock.Object,
-                null,
-                _areaHelperMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaProcessedRepository");
-
-            create = () => new AreaHarvester(
-                _areaRepositoryMock.Object,
-                _areaProcessedRepository.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
-
-            create = () => new AreaHarvester(
-                _areaRepositoryMock.Object,
-                _areaProcessedRepository.Object,
-                _areaHelperMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
