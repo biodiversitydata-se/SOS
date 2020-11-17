@@ -27,28 +27,6 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            new ActivateInstanceJob(
-                _instanceManagerMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
-
-            Action create = () => new ActivateInstanceJob(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
-
-
-            create = () => new ActivateInstanceJob(
-                _instanceManagerMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test processing exception
         /// </summary>
         /// <returns></returns>
