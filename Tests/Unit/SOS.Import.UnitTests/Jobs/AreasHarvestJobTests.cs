@@ -82,33 +82,6 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new AreasHarvestJob(
-                null,
-                _harvestInfoRepositoryMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHarvester");
-
-            create = () => new AreasHarvestJob(
-                _areaHarvesterMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new AreasHarvestJob(
-                _areaHarvesterMock.Object,
-                _harvestInfoRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Run harvest job successfully
         /// </summary>
         /// <returns></returns>

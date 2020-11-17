@@ -43,46 +43,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new VirtualHerbariumObservationHarvester(
-                null,
-                _virtualHerbariumObservationVerbatimRepositoryMock.Object,
-                _virtualHerbariumServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("virtualHerbariumObservationService");
-
-            create = () => new VirtualHerbariumObservationHarvester(
-                _virtualHerbariumObservationServiceMock.Object,
-                null,
-                _virtualHerbariumServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("virtualHerbariumObservationVerbatimRepository");
-
-            create = () => new VirtualHerbariumObservationHarvester(
-                _virtualHerbariumObservationServiceMock.Object,
-                _virtualHerbariumObservationVerbatimRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("virtualHerbariumServiceConfiguration");
-
-            create = () => new VirtualHerbariumObservationHarvester(
-                _virtualHerbariumObservationServiceMock.Object,
-                _virtualHerbariumObservationVerbatimRepositoryMock.Object,
-                _virtualHerbariumServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>

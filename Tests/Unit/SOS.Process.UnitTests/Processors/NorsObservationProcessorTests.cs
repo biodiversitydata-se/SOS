@@ -89,54 +89,6 @@ namespace SOS.Process.UnitTests.Processors
             result.Status.Should().Be(RunStatus.Failed);
         }
 
-        // todo - delete test?
-        // This test doesn't add any value to the unit test suite due to the following reasons:
-        // 1) The constructor is always invoked by dependency injection, which means that this test adds no protection against regressions (bugs).
-        // 2) This test, tests the code implementation details and not the behavior of the system.
-        //
-        ///// <summary>
-        /////     Test constructor
-        ///// </summary>
-        //[Fact]
-        //public void ConstructorTest()
-        //{
-        //    TestObject.Should().NotBeNull();
-
-        //    Action create = () => new NorsObservationProcessor(
-        //        null,
-        //        _areaHelper.Object,
-        //        _processedObservationRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object, TODO,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-        //        .Be("norsObservationVerbatimRepository");
-
-
-        //    create = () => new NorsObservationProcessor(
-        //        _norsObservationVerbatimRepositoryMock.Object,
-        //        null,
-        //        _processedObservationRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object, TODO,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
-
-        //    create = () => new NorsObservationProcessor(
-        //        _norsObservationVerbatimRepositoryMock.Object,
-        //        _areaHelper.Object,
-        //        null,
-        //        _fieldMappingResolverHelperMock.Object, TODO,
-        //        _loggerMock.Object);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
-
-        //    create = () => new NorsObservationProcessor(
-        //        _norsObservationVerbatimRepositoryMock.Object,
-        //        _areaHelper.Object,
-        //        _processedObservationRepositoryMock.Object,
-        //        _fieldMappingResolverHelperMock.Object, TODO,
-        //        null);
-        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        //}
-
         /// <summary>
         ///     Test processing exception
         /// </summary>

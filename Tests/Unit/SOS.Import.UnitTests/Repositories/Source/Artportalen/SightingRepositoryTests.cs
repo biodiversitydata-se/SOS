@@ -33,25 +33,6 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test the constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new SightingRepository(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
-
-            create = () => new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test get chunk of sightings exception
         /// </summary>
         /// <returns></returns>
@@ -146,56 +127,6 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().Be(span[0]);
-        }
-
-        /// <summary>
-        ///     Test get sightings project id's fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetProjectIdsAsyncException()
-        {
-            _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null, false))
-                .Throws<Exception>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetSightingProjectIdsAsync(It.IsAny<IEnumerable<int>>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
-        }
-
-        /// <summary>
-        ///     Test get sighting project id's success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetProjectIdsAsyncSuccess()
-        {
-            var projectIds = new List<(int SightingId, int ProjectId)>
-            {
-                (1, 1),
-                (1, 2)
-            };
-
-            _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null, false))
-                .ReturnsAsync(projectIds);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetSightingProjectIdsAsync(It.IsAny<IEnumerable<int>>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
         }
     }
 }

@@ -42,44 +42,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new SersObservationHarvester(
-                null,
-                _sersObservationVerbatimRepositoryMock.Object,
-                _sersServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersObservationService");
-
-            create = () => new SersObservationHarvester(
-                _sersObservationServiceMock.Object,
-                null,
-                _sersServiceConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("sersObservationVerbatimRepository");
-
-            create = () => new SersObservationHarvester(
-                _sersObservationServiceMock.Object,
-                _sersObservationVerbatimRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersServiceConfiguration");
-
-            create = () => new SersObservationHarvester(
-                _sersObservationServiceMock.Object,
-                _sersObservationVerbatimRepositoryMock.Object,
-                _sersServiceConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>

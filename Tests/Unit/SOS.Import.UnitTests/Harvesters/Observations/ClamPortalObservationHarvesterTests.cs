@@ -36,34 +36,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        ///     Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new ClamPortalObservationHarvester(
-                null,
-                _clamObservationServiceMock.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("clamObservationVerbatimRepository");
-
-            create = () => new ClamPortalObservationHarvester(
-                _clamObservationVerbatimRepositoryMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationService");
-
-            create = () => new ClamPortalObservationHarvester(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _clamObservationServiceMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
