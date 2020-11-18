@@ -222,7 +222,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest and process observations from active providers")]
+        [DisplayName("Harvest Observations - [Mode = {0}]")]
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
