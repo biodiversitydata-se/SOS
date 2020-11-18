@@ -1,0 +1,23 @@
+<div class="form-group" *ngIf="dataSets.length > 0">
+  <label for="contactMethod">
+    Data source filter
+  </label>
+  <select name="contactMethod"
+          id="contactMethod"
+          class="form-control"
+          (change)="onChange($event.target.value)"
+          [(ngModel)]="selectedDataSetId">
+    <option *ngFor="let dataSet of dataSets" [value]="dataSet.id">{{ dataSet.name }}</option>
+  </select>
+</div>
+<div *ngIf="loadingData" class="spinner-border" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div *ngIf="!loadingData">{{markerClusterData.length}} invalid location observations shown</div>
+<div style="height: 600px;"
+     leaflet
+     [leafletOptions]="options"
+     [leafletMarkerCluster]="markerClusterData"
+     [leafletMarkerClusterOptions]="markerClusterOptions">
+</div>
+<app-invalid-grid [dataSetId]="selectedDataSet.id"></app-invalid-grid>
