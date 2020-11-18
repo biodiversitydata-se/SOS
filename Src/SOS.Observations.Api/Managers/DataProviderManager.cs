@@ -57,7 +57,9 @@ namespace SOS.Observations.Api.Managers
                         dataProvider,
                         providerInfo.ProcessCount.GetValueOrDefault(0),
                         0,
-                        providerInfo.HarvestEnd));
+                        providerInfo.HarvestEnd,
+                        providerInfo.ProcessEnd,
+                        providerInfo.LatestIncrementalEnd));
                 }
                 else
                 {
