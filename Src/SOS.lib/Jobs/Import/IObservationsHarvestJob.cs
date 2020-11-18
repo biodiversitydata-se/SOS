@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
@@ -10,10 +11,12 @@ namespace SOS.Lib.Jobs.Import
         /// <summary>
         ///     Harvest multiple sources and start processing when done
         /// </summary>
+        /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(10)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [DisplayName("Harvest Observations - [Mode = {0}]")]
         Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
 
         /// <summary>

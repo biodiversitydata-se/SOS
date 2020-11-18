@@ -37,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Cocoon);
+            result.Occurrence.Activity.Id.Should().Be((int) ActivityId.Foraging);
         }
 
         /// <remarks>
