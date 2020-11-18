@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -31,8 +32,14 @@ namespace SOS.Observations.Api.Dtos.Filter
         public TaxonFilterDto Taxon { get; set; }
 
         /// <summary>
+        /// Area filter
+        /// </summary>
+        public IEnumerable<AreaFilterDto> Areas { get; set; }
+
+        /// <summary>
         /// Area filter.
         /// </summary>
+        [Obsolete("To be removed. Use Areas instead")]
         public IEnumerable<int> AreaIds { get; set; }
 
         /// <summary>

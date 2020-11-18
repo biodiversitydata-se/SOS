@@ -18,6 +18,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<byte[]> GetZipppedAreaAsync(int areaId);
 
         /// <summary>
+        ///     Get zipped json bytes with an area json file
+        /// </summary>
+        /// <returns></returns>
+        Task<byte[]> GetZipppedAreaAsync(AreaType areaType, string feature);
+
+        /// <summary>
         ///     Get areas matching provided filter
         /// </summary>
         /// <param name="areaTypes"></param>

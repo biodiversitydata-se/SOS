@@ -46,6 +46,14 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         Task<List<Area>> GetAsync(AreaType[] areaTypes);
 
         /// <summary>
+        /// Get Area by type and feature
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        Task<Area> GetAsync(AreaType areaType, string feature);
+
+        /// <summary>
         ///     Save geometries to Gridfs
         /// </summary>
         /// <param name="areaGeometries"></param>

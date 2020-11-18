@@ -34,6 +34,156 @@ namespace SOS.Observations.Api.Controllers
         private readonly ILogger<ObservationsController> _logger;
         private readonly IObservationManager _observationManager;
 
+
+        private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
+        {
+            if (zoom < minLimit || zoom > maxLimit)
+            {
+                return Result.Failure<int>($"Zoom must be between {minLimit} and {maxLimit}");
+            }
+
+            return Result.Success(zoom);
+        }
+
+        private Result ValidatePagingArguments(int skip, int take)
+        {
+            if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
+            if (take <= 0) return Result.Failure("Take must be greater than 0");
+            if (skip + take > _observationManager.MaxNrElasticSearchAggregationBuckets)
+                return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
+
+            return Result.Success();
+        }
+
+        /// <summary>
+        /// Basic validation of search filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        private Tuple<bool, IEnumerable<string>> ValidateFilter(SearchFilter filter, int skip, int take)
+        {
+            var errors = new List<string>();
+
+            if (!filter.IsFilterActive)
+            {
+                errors.Add("You must provide a filter."); ;
+            }
+            else
+            {
+
+                // No culture code, set default
+                if (string.IsNullOrEmpty(filter?.FieldTranslationCultureCode))
+                {
+                    filter.FieldTranslationCultureCode = "sv-SE";
+                }
+
+                if (!new[] { "sv-SE", "en-GB" }.Contains(filter.FieldTranslationCultureCode,
+                    StringComparer.CurrentCultureIgnoreCase))
+                {
+                    errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+                }
+
+                //Remove the limitations if we use the internal functions
+                if (!(filter is SearchFilterInternal))
+                {
+                    if (skip < 0 || take <= 0 || take > MaxBatchSize)
+                    {
+                        errors.Add($"You can't take more than {MaxBatchSize} at a time.");
+                    }
+                }
+
+                if (skip + take > ElasticSearchMaxRecords)
+                {
+                    errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+                }
+            }
+
+
+            return new Tuple<bool, IEnumerable<string>>(!errors.Any(), errors);
+        }
+
+        private Result ValidatePropertyExists(string name, string property, bool mandatory = false)
+        {
+            if (string.IsNullOrEmpty(property))
+            {
+                return mandatory ? Result.Failure($"You must state { name }") : Result.Success();
+            }
+
+            if (typeof(Observation).HasProperty(property))
+            {
+                return Result.Success();
+            }
+
+            return Result.Failure($"Missing property ({ property }) used for { name }");
+        }
+
+        private Result ValidateSearchFilter(SearchFilterDto filter)
+        {
+            var errors = new List<string>();
+
+            // No culture code, set default
+            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
+            {
+                filter.TranslationCultureCode = "sv-SE";
+            }
+
+            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
+                StringComparer.CurrentCultureIgnoreCase))
+            {
+                errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+            }
+
+            if (filter.OutputFields?.Any() ?? false)
+            {
+                errors.AddRange(filter.OutputFields
+                    .Where(of => !typeof(Observation).HasProperty(of))
+                    .Select(of => $"Output field doesn't exist ({of})"));
+            }
+
+            if (filter.Taxon?.RedListCategories?.Any() ?? false)
+            {
+                errors.AddRange(filter.Taxon.RedListCategories
+                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
+                    .Select(rc => $"Red list category doesn't exist ({rc})"));
+            }
+
+            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
+            return Result.Success();
+        }
+
+        private Result ValidateSearchPagingArguments(int skip, int take)
+        {
+            var errors = new List<string>();
+
+            if (skip < 0 || take <= 0 || take > MaxBatchSize)
+            {
+                errors.Add($"You can't take more than {MaxBatchSize} at a time.");
+            }
+
+            if (skip + take > ElasticSearchMaxRecords)
+            {
+                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+            }
+
+            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
+            return Result.Success();
+        }
+
+        private Result ValidateSearchPagingArgumentsInternal(int skip, int take)
+        {
+            var errors = new List<string>();
+
+            if (skip + take > ElasticSearchMaxRecords)
+            {
+                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+            }
+
+            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
+            return Result.Success();
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -99,7 +249,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArgumentsInternal(skip, take),
-                    ValidateSearchFilterInternal(filter),
+                    ValidateSearchFilter(filter),
                     ValidatePropertyExists(nameof(sortBy), sortBy));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
@@ -134,7 +284,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var paramsValidationResult = Result.Combine(
                     ValidatePagingArguments(skip, take),
-                    ValidateSearchFilterInternal(filter),
+                    ValidateSearchFilter(filter),
                     ValidatePropertyExists(nameof(sortBy), sortBy));
 
                 if (paramsValidationResult.IsFailure)
@@ -287,7 +437,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var filterValidation = ValidateSearchFilterInternal(filter);
+                var filterValidation = ValidateSearchFilter(filter);
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
@@ -441,7 +591,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var filterValidation = ValidateSearchFilterInternal(filter);
+                var filterValidation = ValidateSearchFilter(filter);
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
@@ -481,189 +631,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, $"Error getting last modified date for provider {providerId}");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
-
-        private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
-        {
-            if (zoom < minLimit || zoom > maxLimit)
-            {
-                return Result.Failure<int>($"Zoom must be between {minLimit} and {maxLimit}");
-            }
-
-            return Result.Success(zoom);
-        }
-
-        private Result ValidatePagingArguments(int skip, int take)
-        {
-            if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
-            if (take <= 0) return Result.Failure("Take must be greater than 0");
-            if (skip + take > _observationManager.MaxNrElasticSearchAggregationBuckets)
-                return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
-
-            return Result.Success();
-        }
-
-        /// <summary>
-        /// Basic validation of search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        private Tuple<bool, IEnumerable<string>> ValidateFilter(SearchFilter filter, int skip, int take)
-        {
-            var errors = new List<string>();
-
-            if (!filter.IsFilterActive)
-            {
-                errors.Add("You must provide a filter."); ;
-            }
-            else
-            {
-
-                // No culture code, set default
-                if (string.IsNullOrEmpty(filter?.FieldTranslationCultureCode))
-                {
-                    filter.FieldTranslationCultureCode = "sv-SE";
-                }
-
-                if (!new[] { "sv-SE", "en-GB" }.Contains(filter.FieldTranslationCultureCode,
-                    StringComparer.CurrentCultureIgnoreCase))
-                {
-                    errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
-                }
-
-                //Remove the limitations if we use the internal functions
-                if (!(filter is SearchFilterInternal))
-                {
-                    if (skip < 0 || take <= 0 || take > MaxBatchSize)
-                    {
-                        errors.Add($"You can't take more than {MaxBatchSize} at a time.");
-                    }
-                }
-
-                if (skip + take > ElasticSearchMaxRecords)
-                {
-                    errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
-                }
-            }
-
-
-            return new Tuple<bool, IEnumerable<string>>(!errors.Any(), errors);
-        }
-
-        private Result ValidatePropertyExists(string name, string property, bool mandatory = false)
-        {
-            if (string.IsNullOrEmpty(property))
-            {
-                return mandatory ? Result.Failure($"You must state { name }") : Result.Success();
-            }
-
-            if (typeof(Observation).HasProperty(property))
-            {
-                return Result.Success();
-            }
-
-            return Result.Failure($"Missing property ({ property }) used for { name }");
-        }
-
-        private Result ValidateSearchFilter(SearchFilterDto filter)
-        {
-            var errors = new List<string>();
-
-            // No culture code, set default
-            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
-            {
-                filter.TranslationCultureCode = "sv-SE";
-            }
-
-            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
-                StringComparer.CurrentCultureIgnoreCase))
-            {
-                errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
-            }
-
-            if (filter.OutputFields?.Any() ?? false)
-            {
-                errors.AddRange(filter.OutputFields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
-            }
-
-            if (filter.Taxon?.RedListCategories?.Any() ?? false)
-            {
-                errors.AddRange(filter.Taxon.RedListCategories
-                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
-                    .Select(rc => $"Red list category doesn't exist ({rc})"));
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateSearchFilterInternal(SearchFilterInternalDto filter)
-        {
-            var errors = new List<string>();
-
-            // No culture code, set default
-            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
-            {
-                filter.TranslationCultureCode = "sv-SE";
-            }
-
-            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
-                StringComparer.CurrentCultureIgnoreCase))
-            {
-                errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
-            }
-
-            if (filter.OutputFields?.Any() ?? false)
-            {
-                errors.AddRange(filter.OutputFields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
-            }
-
-            if (filter.Taxon?.RedListCategories?.Any() ?? false)
-            {
-                errors.AddRange(filter.Taxon.RedListCategories
-                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
-                    .Select(rc => $"Red list category doesn't exist ({rc})"));
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateSearchPagingArguments(int skip, int take)
-        {
-            var errors = new List<string>();
-
-            if (skip < 0 || take <= 0 || take > MaxBatchSize)
-            {
-                errors.Add($"You can't take more than {MaxBatchSize} at a time.");
-            }
-
-            if (skip + take > ElasticSearchMaxRecords)
-            {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateSearchPagingArgumentsInternal(int skip, int take)
-        {
-            var errors = new List<string>();
-
-            if (skip + take > ElasticSearchMaxRecords)
-            {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
         }
     }
 }

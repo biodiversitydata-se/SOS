@@ -18,6 +18,11 @@ namespace SOS.Lib.Models.Search
             DoNotShowSightingsInMerged
         }
 
+        /// <summary>
+        /// Geographical areas to filter by
+        /// </summary>
+        public IEnumerable<AreaFilter> Areas { get; set; }
+
         public IEnumerable<int> AreaIds { get; set; }
 
         public IEnumerable<int> CountyIds { get; set; }

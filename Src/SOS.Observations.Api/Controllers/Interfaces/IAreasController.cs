@@ -26,6 +26,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="areaId">Id of area to export</param>
         /// <returns>Area as a zipped json</returns>
-        Task<IActionResult> ExportArea(int areaId);
+        Task<IActionResult> ExportAreaAsync(int areaId);
+
+        /// <summary>
+        /// Exports an area including its polygon
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        Task<IActionResult> ExportAreaAsync(AreaType areaType, string feature);
     }
 }
