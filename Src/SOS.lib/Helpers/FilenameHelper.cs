@@ -8,7 +8,7 @@ namespace SOS.Lib.Helpers
     public static class FilenameHelper
     {
         /// <summary>
-        ///     Creates a filename by joining: name, file extension and current date & time.
+        ///     Creates a filename by joining: name, file extension and current date and time.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
         /// <param name="fileExtension">The file extension.</param>
@@ -19,7 +19,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        ///     Creates a filename by joining: name and current date & time. File extension is excluded.
+        ///     Creates a filename by joining: name and current date and time. File extension is excluded.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
         /// <param name="preserveFileExtension">If true, the file extension will be preserved.</param>

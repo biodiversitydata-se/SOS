@@ -7,7 +7,7 @@ namespace SOS.Lib.Database.Interfaces
     /// </summary>
     public interface IMongoDbClient : IMongoClient
     {
-        // <summary>
+        /// <summary>
         /// Read batch size
         /// </summary>
         public int ReadBatchSize { get; }

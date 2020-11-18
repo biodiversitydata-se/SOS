@@ -35,6 +35,7 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
         Task<bool> AddCollectionAsync();
 
+        /// <summary>
         ///     Add collection if not exists
         /// </summary>
         /// <returns></returns>
