@@ -16,7 +16,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(10)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Harvest Observations - [Mode = {0}]")]
+        [DisplayName("Harvest Observations [Mode={0}]")]
         Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
 
         /// <summary>
