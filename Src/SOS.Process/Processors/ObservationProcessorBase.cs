@@ -136,22 +136,6 @@ namespace SOS.Process.Processors
             return await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
         }
 
-        protected async Task<bool> DeleteProviderBatchAsync(
-            DataProvider dataProvider,
-            ICollection<int> verbatimIds)
-        {
-            try
-            {
-                return await ProcessRepository.DeleteProviderBatchAsync(dataProvider, verbatimIds);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Failed to commit batch for {dataProvider}");
-                return false;
-            }
-
-        }
-
         protected bool IsBatchFilledToLimit(int count)
         {
             return count % ProcessRepository.BatchSize == 0;

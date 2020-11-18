@@ -323,11 +323,17 @@ namespace SOS.Lib.Extensions
 
                     if (filter.EndDate.HasValue)
                     {
+                        var endDate = filter.EndDate.Value;
+                        if (endDate.Hour == 0 && endDate.Minute == 0 && endDate.Second == 0)
+                        { 
+                            //Assume whole day search if time is 00:00:00
+                           endDate = endDate.AddDays(1).AddSeconds(-1);
+                        }
                         queryContainers.Add(q => q
                             .DateRange(r => r
                                     .Field("event.endDate")
                                     .LessThanOrEquals(
-                                        DateMath.Anchored(filter.EndDate.Value
+                                        DateMath.Anchored(endDate
                                             .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
                             )
                         );
