@@ -13,6 +13,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Observation : IEntity<string>
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Observation()
+        {
+            Created = DateTime.Now;
+        }
+
+        /// <summary>
         ///     List of defects found in harvest
         /// </summary>
         [Object]
@@ -25,8 +33,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public Event Event { get; set; }
-
-        
 
         /// <summary>
         ///     Geological information, such as stratigraphy, that qualifies a region or place.
@@ -275,11 +281,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Type { get; set; }
 
         /// <summary>
-        /// Verbatim numeric id if applicable
-        /// </summary>
-        public int VerbatimId { get; set; }
-
-        /// <summary>
         ///     Properties only used by Artportalen
         /// </summary>
         public ArtportalenInternal ArtportalenInternal { get; set; }
@@ -298,6 +299,10 @@ namespace SOS.Lib.Models.Processed.Observation
         [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
+        /// <summary>
+        /// Date this observation was created
+        /// </summary>
+        public DateTime Created { get; set; }
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }
 }

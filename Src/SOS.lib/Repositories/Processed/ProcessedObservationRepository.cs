@@ -181,9 +181,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteProviderBatchAsync(
-            DataProvider dataProvider,
-            ICollection<int> verbatimIds)
+        public async Task<bool> DeleteArtportalenBatchAsync(ICollection<int> sightingIds)
         {
             try
             {
@@ -191,15 +189,9 @@ namespace SOS.Lib.Repositories.Processed
                 var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
-                        .Term(t => t
-                            .Field(f => f.DataProviderId)
-                            .Value(dataProvider.Id)
-                         )
-                    )
-                    .Query(q => q
                         .Terms(t => t
-                            .Field(f => f.VerbatimId)
-                            .Terms(verbatimIds)
+                            .Field(f => f.ArtportalenInternal.SightingId)
+                            .Terms(sightingIds)
                         )
                     )
                 );
