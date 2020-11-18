@@ -1,0 +1,12 @@
+<div>
+  <div *ngIf="loadingData" class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+  <div *ngIf="!loadingData">{{rowData.length}} total invalid observations</div>
+  <ag-grid-angular style="height: 500px;"
+                   class="ag-theme-alpine"
+                   [pagination]="true"
+                   [rowData]="rowData"
+                   [columnDefs]="columnDefs">
+  </ag-grid-angular>
+</div>
