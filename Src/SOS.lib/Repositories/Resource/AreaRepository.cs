@@ -46,16 +46,21 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<Area>>
+            var indexModels = new[]
             {
                 new CreateIndexModel<Area>(
                     Builders<Area>.IndexKeys.Ascending(a => a.Name)),
                 new CreateIndexModel<Area>(
-                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType))
+                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
+                new CreateIndexModel<Area>(
+                    Builders<Area>.IndexKeys.Ascending(a => a.FeatureId)),
+                new CreateIndexModel<Area>(
+                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType).Ascending(a => a.FeatureId))
             };
 
-            Logger.LogDebug("Creating Area indexes");
+            Logger.LogDebug("Start creating Area indexes");
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
+            Logger.LogDebug("Finish creating Area indexes");
         }
 
         /// <inheritdoc />
@@ -80,6 +85,19 @@ namespace SOS.Lib.Repositories.Resource
             return res;
         }
 
+        /// <inheritdoc />
+        public async Task<Area> GetAsync(AreaType areaType, string feature)
+        {
+            var filters = new [] {
+                Builders<Area>.Filter.Eq(a => a.AreaType, areaType),
+                Builders<Area>.Filter.Eq(a => a.FeatureId, feature)
+            };
+
+            var res = await (await MongoCollection.FindAsync(Builders<Area>.Filter.And(filters))).FirstOrDefaultAsync();
+            return res;
+        }
+
+       
         /// <inheritdoc />
         public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
             int skip, int take)

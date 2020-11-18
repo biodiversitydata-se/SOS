@@ -85,6 +85,8 @@ namespace SOS.Import.Harvesters
                             {
                                 _logger.LogDebug("Finish storing geometries");
 
+                                await _areaProcessedRepository.CreateIndexAsync();
+
                                 _logger.LogDebug("Start clearing cache");
                                 _areaHelper.ClearCache();
                                 _logger.LogDebug("Finish clearing cache");

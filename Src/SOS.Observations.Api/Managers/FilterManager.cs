@@ -47,6 +47,22 @@ namespace SOS.Observations.Api.Managers
                 }
             }
 
+            // Map areas to area ids
+            if (preparedFilter.Areas?.Any() ?? false)
+            {
+                var areaIds = preparedFilter.AreaIds?.ToList() ?? new List<int>();
+                foreach (var feature in preparedFilter.Areas)
+                {
+                    var area = await _areaRepository.GetAsync(feature.Type, feature.Feature);
+                    if (area != null)
+                    {
+                        areaIds.Add(area.Id);
+                    }
+                }
+
+                preparedFilter.AreaIds = areaIds;
+            }
+
             // handle the area ids search
             if (preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
             {

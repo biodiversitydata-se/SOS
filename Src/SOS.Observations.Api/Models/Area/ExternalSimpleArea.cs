@@ -8,6 +8,11 @@
         public string AreaType { get; set; }
 
         /// <summary>
+        /// Feature id
+        /// </summary>
+        public string Feature { get; set; }
+
+        /// <summary>
         ///     Area Id
         /// </summary>
         public int Id { get; set; }

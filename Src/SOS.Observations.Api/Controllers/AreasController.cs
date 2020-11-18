@@ -58,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        public async Task<IActionResult> ExportArea(int areaId)
+        public async Task<IActionResult> ExportAreaAsync(int areaId)
         {
             try
             {
@@ -75,6 +75,31 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error getting areas");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpGet("{areaType}/{feature}/export")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public async Task<IActionResult> ExportAreaAsync([FromRoute] AreaType areaType, [FromRoute] string feature)
+        {
+            try
+            {
+                var zipBytes = await _areaManager.GetZipppedAreaAsync(areaType, feature);
+
+                if (zipBytes == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return File(zipBytes, "application/zip", $"Area{areaType:G}:{feature}.zip");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting areas");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }
