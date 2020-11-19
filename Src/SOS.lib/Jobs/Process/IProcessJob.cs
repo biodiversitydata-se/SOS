@@ -15,7 +15,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisplayName("Process Observations - [Mode = {1}]")]
+        [DisplayName("Process Observations [Mode={1}]")]
         Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             JobRunModes mode,

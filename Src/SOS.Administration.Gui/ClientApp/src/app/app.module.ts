@@ -13,6 +13,7 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { InvalidObservationsComponent } from './invalid-observations/invalid-observations.component';
 import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
+import { StatusComponent } from './status/status.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
     HomeComponent,
     CounterComponent,
     InvalidObservationsComponent,
-    InvalidGridComponent
+    InvalidGridComponent,
+    StatusComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -29,8 +31,8 @@ import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: InvalidObservationsComponent, pathMatch: 'full' },
-      { path: 'list', component: CounterComponent },
-      { path: 'fetch-data', component: InvalidObservationsComponent },
+      { path: 'invalid-observations', component: InvalidObservationsComponent },
+      { path: 'status', component: StatusComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,

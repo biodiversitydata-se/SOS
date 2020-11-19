@@ -2995,7 +2995,7 @@
 
         /// <summary>
         ///     Ponds.
-        ///     (Småvatten (<1 ha))
+        ///     (Småvatten (less than 1 ha))
         /// </summary>
         Ponds = 499,
 

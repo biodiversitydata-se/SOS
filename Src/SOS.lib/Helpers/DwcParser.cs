@@ -13,7 +13,7 @@ namespace SOS.Lib.Helpers
     {
         /// <summary>
         ///     Default date formats used by ParseDate().
-        ///     At least Year, Month & Day must be specified.
+        ///     At least Year, Month and Day must be specified.
         /// </summary>
         private static IEnumerable<string> DatePatterns
         {

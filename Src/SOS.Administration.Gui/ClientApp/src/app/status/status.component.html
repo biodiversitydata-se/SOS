@@ -1,0 +1,28 @@
+<div>  
+  <div *ngIf="processInfo">
+    <h1>Status info</h1>
+    <div *ngFor="let provider of processInfo">
+      <h3>{{provider.id}}</h3>
+      <ul>
+        <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
+        <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>
+        <li>Time taken: <b>{{getTimeTaken(provider.start, provider.end)}}</b></li>
+        <li>
+          Status:
+          <span *ngIf="provider.status == 'Success'">
+            <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+          </span>
+          <span *ngIf="provider.status != 'Success'">
+            <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
+          </span>
+          {{provider.status}}
+        </li>
+      </ul>
+      <ag-grid-angular *ngIf="provider.providersInfo" style="height: 300px;"
+                       class="ag-theme-alpine"
+                       [rowData]="provider.providersInfo"
+                       [columnDefs]="processColumnDefs">
+      </ag-grid-angular>
+    </div>
+  </div>
+</div>

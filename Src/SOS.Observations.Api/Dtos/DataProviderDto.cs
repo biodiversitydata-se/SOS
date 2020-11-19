@@ -69,6 +69,16 @@ namespace SOS.Observations.Api.Dtos
         public DateTime? LatestHarvestDate { get; set; }
 
         /// <summary>
+        ///     Latest process date.
+        /// </summary>
+        public DateTime? LatestProcessDate { get; set; }
+
+        /// <summary>
+        ///     Latest incremental harvest and process date. Used for data providers supporting incremental harvest.
+        /// </summary>
+        public DateTime? LatestIncrementalHarvestDate { get; set; }
+
+        /// <summary>
         ///     Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
@@ -96,12 +106,16 @@ namespace SOS.Observations.Api.Dtos
         /// <param name="publicObservations"></param>
         /// <param name="protectedObservations"></param>
         /// <param name="latestHarvestDate"></param>
+        /// <param name="latestProcessDate"></param>
+        /// <param name="latestIncrementalHarvestDate"></param>
         /// <returns></returns>
         public static DataProviderDto Create(
             DataProvider dataProvider,
             int publicObservations,
             int protectedObservations,
-            DateTime? latestHarvestDate)
+            DateTime? latestHarvestDate,
+            DateTime? latestProcessDate,
+            DateTime? latestIncrementalHarvestDate)
         {
             return new DataProviderDto
             {
@@ -116,7 +130,9 @@ namespace SOS.Observations.Api.Dtos
                 Url = dataProvider.Url,
                 PublicObservations = publicObservations,
                 ProtectedObservations = protectedObservations,
-                LatestHarvestDate = latestHarvestDate
+                LatestHarvestDate = latestHarvestDate,
+                LatestProcessDate = latestProcessDate,
+                LatestIncrementalHarvestDate = latestIncrementalHarvestDate
             };
         }
     }
