@@ -92,7 +92,9 @@ namespace SOS.Observations.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter()); });
+                .AddJsonOptions(options => { options
+                    .JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+                });
 
             // MongoDB conventions.
             ConventionRegistry.Register(

@@ -15,6 +15,6 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///    Feature
         /// </summary>
-        public string Feature { get; set; }
+        public string FeatureId { get; set; }
     }
 }

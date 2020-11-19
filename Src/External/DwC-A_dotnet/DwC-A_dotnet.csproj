@@ -18,7 +18,7 @@
     <PackageTags>DwC-A darwin-core Biodiversity</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Linq.Async" Version="4.1.1" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
