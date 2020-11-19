@@ -35,28 +35,10 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet]
-        [ProducesResponseType(typeof(List<DataProviderDto>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersAsync()
-        {
-            try
-            {
-                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(true);
-                return Ok(dataProviders);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting data providers");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpGet("Active")]
+        [HttpGet("")]
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetActiveDataProvidersAsync()
+        public async Task<IActionResult> GetDataProvidersAsync()
         {
             try
             {
