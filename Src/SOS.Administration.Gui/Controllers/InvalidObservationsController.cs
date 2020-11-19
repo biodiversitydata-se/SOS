@@ -60,16 +60,15 @@ namespace SOS.Administration.Gui.Controllers
             _client = new MongoClient(invalidObservationsDatabaseSettings.ConnectionString);
         }
 
-        [HttpGet]
-        [Route("{dataSetId}")]
-        public IEnumerable<InvalidLocation> Get(string dataSetId)
+        [HttpGet]        
+        public IEnumerable<InvalidLocation> Get(string dataSetId, int instanceId)
         {
             var database = _client.GetDatabase("sos");
             var names = _client.ListDatabaseNames();
             var collection = database.GetCollection<InstanceInfo>("ProcessedConfiguration");
             var info = collection.Find(new BsonDocument()).FirstOrDefault();
             
-            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-0");
+            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
             
             var filter = Builders<InvalidObservation>.Filter.Eq(p=>p.DatasetID, dataSetId);
             if(dataSetId == "0")
@@ -111,15 +110,15 @@ namespace SOS.Administration.Gui.Controllers
             return invalidLocations;          
         }
         [HttpGet]
-        [Route("list/{dataSetId}")]
-        public IEnumerable<InvalidObservation> GetList(string dataSetId)
+        [Route("list")]
+        public IEnumerable<InvalidObservation> GetList(string dataSetId, int instanceId)
         {
             var database = _client.GetDatabase("sos");
             var names = _client.ListDatabaseNames();
             var collection = database.GetCollection<InstanceInfo>("ProcessedConfiguration");
             var info = collection.Find(new BsonDocument()).FirstOrDefault();
 
-            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-0");// + info.ActiveInstance);
+            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
 
             var filter = Builders<InvalidObservation>.Filter.Eq(p => p.DatasetID, dataSetId);
             if (dataSetId == "0")

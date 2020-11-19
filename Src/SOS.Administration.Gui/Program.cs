@@ -21,7 +21,6 @@ namespace SOS.Administration.Gui
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureAppConfiguration(configurationBuilder => { configurationBuilder.AddEnvironmentVariables(); });
+                });                
     }
 }

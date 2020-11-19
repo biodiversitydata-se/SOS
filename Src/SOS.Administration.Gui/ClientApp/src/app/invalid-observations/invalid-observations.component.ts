@@ -17,8 +17,15 @@ export class InvalidObservationsComponent {
     zoom: 5,
     center: latLng(46.879966, -121.726909)
   };
-  public markerClusterOptions = {};
-  public markerClusterData = [];
+  get selectedInstance(): string { return this._selectedInstance }
+  set selectedInstance(id: string) {
+    this._selectedInstance = id;
+    this.updateMap();
+  }
+  private _selectedInstance: string = "0";
+  activeInstance: string = "0";
+  markerClusterOptions = {};
+  markerClusterData = [];
   http: HttpClient;
   baseUrl: string;
   loadingData: boolean = false;
@@ -27,18 +34,24 @@ export class InvalidObservationsComponent {
     this.baseUrl = baseUrl;
     this.selectedDataSet.id = 0;
     this.selectedDataSet.name = "All";
+    this.updateActiveInstance();
     this.updateProviders();
-    this.updateMap();
   }
   onChange(event) {        
     this.selectedDataSet = this.dataSets.find(p => p.id == event);
-    this.selectedDataSetId = this.selectedDataSet.id;
+    this.selectedDataSetId = this.selectedDataSet.id;    
     this.updateMap();
+  }
+  updateActiveInstance() {
+    this.http.get<ActiveInstanceInfo>(this.baseUrl + 'statusinfo/activeinstance').subscribe(result => {
+      this.selectedInstance = result.activeInstance.toString();
+      this.activeInstance = this.selectedInstance;
+    }, error => console.error(error));
   }
   updateMap() {
     this.markerClusterData = [];
     this.loadingData = true;
-    this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations/' + this.selectedDataSet.id).subscribe(result => {      
+    this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations?dataSetId=' + this.selectedDataSet.id + "&instance=" + this.selectedInstance).subscribe(result => {      
       this.markerClusterData = result.map(function (val, index) {
         var description = '<span>Id:' + val.occurrenceId + '</span><br/><span>DatasetName:' + val.dataSetName + '</span><br/><span>DatasetId:' + val.dataSetId + '</span>'
         var m = marker([val.lat, val.lon], {
@@ -81,4 +94,9 @@ interface InvalidLocation {
 class DataProvider{
   id: number;
   name: string;
+}
+
+class ActiveInstanceInfo {
+  id: number;
+  activeInstance: number;
 }

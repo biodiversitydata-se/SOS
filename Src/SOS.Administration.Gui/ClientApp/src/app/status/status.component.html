@@ -7,8 +7,8 @@
     <div *ngFor="let provider of processInfo">
       <h3>{{provider.id}}</h3>
       <ul>
-        <li>Start: {{formatDate(provider.start)}}</li>
-        <li>End: {{formatDate(provider.end)}}</li>
+        <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
+        <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>
         <li>Time taken: <b>{{getTimeTaken(provider.start, provider.end)}}</b></li>
         <li>
           Status:

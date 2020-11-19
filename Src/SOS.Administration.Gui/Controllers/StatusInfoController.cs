@@ -15,8 +15,8 @@ namespace SOS.Administration.Gui.Controllers
     public class HarvestInfo
     {
         public string Id { get; set; }
-        
-        public int Count{ get; set; }
+
+        public int Count { get; set; }
 
         public DateTime? DataLastModified { get; set; }
         public DateTime End { get; set; }
@@ -39,6 +39,10 @@ namespace SOS.Administration.Gui.Controllers
             public DateTime? HarvestStart { get; set; }
             public string HarvestStatus { get; set; }
             public int? HarvestCount { get; set; }
+            public DateTime? LatestIncrementalEnd { get; set; }
+            public DateTime? LatestIncrementalStart { get; set; }
+            public int? LatestIncrementalStatus { get; set; }
+            public int? LatestIncrementalCount { get; set; }
         }
         public string Id { get; set; }
 
@@ -46,7 +50,12 @@ namespace SOS.Administration.Gui.Controllers
         public DateTime End { get; set; }
         public DateTime Start { get; set; }
         public string Status { get; set; }
-        public IEnumerable<Provider> ProvidersInfo{ get; set; }
+        public IEnumerable<Provider> ProvidersInfo { get; set; }
+    }
+    public class ActiveInstanceInfo
+    {
+        public int Id { get; set; }
+        public int ActiveInstance { get; set; }
     }
     [ApiController]
     [Route("[controller]")]
@@ -78,6 +87,15 @@ namespace SOS.Administration.Gui.Controllers
             var collection = database.GetCollection<ProcessInfo>("ProcessInfo");
             var providers = collection.Find(new BsonDocument());
             return providers.SortByDescending(p=>p.End).ToList();
+        }
+        [HttpGet]
+        [Route("activeinstance")]
+        public ActiveInstanceInfo GetActiveInstance()
+        {
+            var database = _client.GetDatabase("sos");
+            var collection = database.GetCollection<ActiveInstanceInfo>("ProcessedConfiguration");
+            var instance = collection.Find(new BsonDocument()).ToList();
+            return instance.FirstOrDefault();
         }
     }
 }
