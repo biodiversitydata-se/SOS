@@ -51,7 +51,7 @@ export class InvalidObservationsComponent {
   updateMap() {
     this.markerClusterData = [];
     this.loadingData = true;
-    this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations?dataSetId=' + this.selectedDataSet.id + "&instance=" + this.selectedInstance).subscribe(result => {      
+    this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations?dataSetId=' + this.selectedDataSet.id + "&instanceId=" + this.selectedInstance).subscribe(result => {      
       this.markerClusterData = result.map(function (val, index) {
         var description = '<span>Id:' + val.occurrenceId + '</span><br/><span>DatasetName:' + val.dataSetName + '</span><br/><span>DatasetId:' + val.dataSetId + '</span>'
         var m = marker([val.lat, val.lon], {
