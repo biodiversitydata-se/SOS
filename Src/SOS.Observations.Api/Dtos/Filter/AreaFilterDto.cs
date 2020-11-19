@@ -15,6 +15,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         ///    Feature
         /// </summary>
-        public string Feature { get; set; }
+        public string FeatureId { get; set; }
     }
 }

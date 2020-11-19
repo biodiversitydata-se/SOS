@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.Managers
                 var areaIds = preparedFilter.AreaIds?.ToList() ?? new List<int>();
                 foreach (var feature in preparedFilter.Areas)
                 {
-                    var area = await _areaRepository.GetAsync(feature.Type, feature.Feature);
+                    var area = await _areaRepository.GetAsync(feature.Type, feature.FeatureId);
                     if (area != null)
                     {
                         areaIds.Add(area.Id);
