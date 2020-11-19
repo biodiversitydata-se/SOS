@@ -9,15 +9,9 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IDataProviderController
     {
         /// <summary>
-        ///     Gets all data providers.
+        ///     Get all data providers.
         /// </summary>
-        /// <returns>List of data providers</returns>
+        /// <returns>List of data providers.</returns>
         Task<IActionResult> GetDataProvidersAsync();
-
-        /// <summary>
-        ///    Gets all active data providers.
-        /// </summary>
-        /// <returns></returns>
-        Task<IActionResult> GetActiveDataProvidersAsync();
     }
 }

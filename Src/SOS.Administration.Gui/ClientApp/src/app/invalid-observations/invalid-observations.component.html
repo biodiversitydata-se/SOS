@@ -1,3 +1,14 @@
+
+<div class="form-group">
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="instance-radios" id="instance0" value="0" [(ngModel)]="selectedInstance" />
+    <label class="form-check-label" for="instance0">InvalidObservations-0 <span *ngIf="activeInstance=='0'">(active)</span></label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="instance-radios" id="instance1" value="1"  [(ngModel)]="selectedInstance"/>
+    <label class="form-check-label" for="instance1">InvalidObservations-1 <span *ngIf="activeInstance=='1'">(active)</span></label>
+  </div>
+</div>
 <div class="form-group" *ngIf="dataSets.length > 0">
   <label for="contactMethod">
     Data source filter
@@ -20,4 +31,4 @@
      [leafletMarkerCluster]="markerClusterData"
      [leafletMarkerClusterOptions]="markerClusterOptions">
 </div>
-<app-invalid-grid [dataSetId]="selectedDataSet.id"></app-invalid-grid>
+<app-invalid-grid [dataSetId]="selectedDataSet.id" [instance]="selectedInstance"></app-invalid-grid>
