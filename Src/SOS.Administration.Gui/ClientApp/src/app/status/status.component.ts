@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
-import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration } from 'date-fns'
+import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow } from 'date-fns'
 
 
 function dateFormatter(params) {
@@ -42,7 +42,16 @@ export class StatusComponent implements OnInit {
     { field: 'processEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },   
     { field: 'harvestCount', sortable: true, filter: true, resizable: true },
     { field: 'harvestStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
-    { field: 'harvestEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },    
+    { field: 'harvestEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
+    {
+      field: 'latestIncrementalStatus', sortable: true, filter: true, resizable: true, cellRenderer: function (params) {
+        return params.value == "2" ? '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="green" /></svg><span>' + params.value + '</span>' :
+          '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="red" /></svg><span>' + params.value + '</span>'
+      }
+    },    
+    { field: 'latestIncrementalCount', sortable: true, filter: true, resizable: true },
+    { field: 'latestIncrementalStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
+    { field: 'latestIncrementalEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },    
   ];
 
   processRowData = [
@@ -60,6 +69,9 @@ export class StatusComponent implements OnInit {
   }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
+  }
+  formatFrom(param) {
+    return formatDistanceToNow(parseISO(param))
   }
   getTimeTaken(start, end) {
     var startDate = parseISO(start);
@@ -82,6 +94,10 @@ class Provider {
   harvestStart: Date;
   harvestEnd: Date;
   harvestStatus: string;
+  latestIncrementalCount: number;
+  latestIncrementalStart: Date;
+  latestIncrementalEnd: Date;
+  latestIncrementalStatus: string;
 }
 class ProcessInfo {
   id: string;

@@ -14,6 +14,13 @@ export class InvalidGridComponent implements OnInit {
     this.updateGrid();
   }
   private _dataSetId: string;
+  @Input()
+  get instance(): string { return this._instance }
+  set instance(id: string) {
+    this._instance = id;
+    this.updateGrid();
+  }
+  private _instance: string;
   columnDefs = [
     { field: 'occurrenceID', sortable: true, filter: true, resizable: true },
     { field: 'datasetID', sortable: true, filter: true, resizable: true },
@@ -40,7 +47,7 @@ export class InvalidGridComponent implements OnInit {
   private updateGrid() {
       this.rowData = [];
     this.loadingData = true;
-    this.http.get<InvalidObservation[]>(this.baseUrl + 'invalidobservations/list/' + this._dataSetId).subscribe(result => {
+    this.http.get<InvalidObservation[]>(this.baseUrl + 'invalidobservations/list?dataSetId=' + this._dataSetId + "&instance=" + this._instance).subscribe(result => {
           this.rowData = result.map(function(val, index) {
               return val;
           });
