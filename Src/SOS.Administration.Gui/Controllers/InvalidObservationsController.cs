@@ -126,8 +126,8 @@ namespace SOS.Administration.Gui.Controllers
                 filter = new BsonDocument();
             }           
             var documents = observationCollection.Find(filter).ToList();
-            var ids = documents.Where(p=>p.DatasetID == "1").Select(p => p.OccurrenceID.Substring(p.OccurrenceID.LastIndexOf(":") + 1,p.OccurrenceID.Length - p.OccurrenceID.LastIndexOf(":") - 1) + ",");
-            System.IO.File.WriteAllLines("test_ids.txt", ids.ToArray());
+            //var ids = documents.Where(p=>p.DatasetID == "1").Select(p => p.OccurrenceID.Substring(p.OccurrenceID.LastIndexOf(":") + 1,p.OccurrenceID.Length - p.OccurrenceID.LastIndexOf(":") - 1) + ",");
+            //System.IO.File.WriteAllLines("test_ids.txt", ids.ToArray());
             return documents;
         }
     }
