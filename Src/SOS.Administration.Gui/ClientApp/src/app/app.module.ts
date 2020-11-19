@@ -30,7 +30,7 @@ import { StatusComponent } from './status/status.component';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: InvalidObservationsComponent, pathMatch: 'full' },
+      { path: '', component: StatusComponent, pathMatch: 'full' },
       { path: 'invalid-observations', component: InvalidObservationsComponent },
       { path: 'status', component: StatusComponent },
     ]),
