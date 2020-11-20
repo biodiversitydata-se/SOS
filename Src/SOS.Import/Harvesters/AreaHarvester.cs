@@ -78,7 +78,7 @@ namespace SOS.Import.Harvesters
                                 .PolygonWKT?
                                 .ToGeometry()
                                 .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
-                            _logger.LogDebug("Finsih casting geometries");
+                            _logger.LogDebug("Finish casting geometries");
 
                             _logger.LogDebug("Start storing geometries");
                             if (await _areaProcessedRepository.StoreGeometriesAsync(geometries))

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SOS.Administration.Gui.Models;
+using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -29,10 +31,10 @@ namespace SOS.Administration.Gui.Controllers
         private readonly ILogger<DataProviderController> _logger;
         private MongoClient _client;
 
-        public DataProviderController(ILogger<DataProviderController> logger, IInvalidObservationsDatabaseSettings invalidObservationsDatabaseSettings)
+        public DataProviderController(ILogger<DataProviderController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
         {
             _logger = logger;
-            _client = new MongoClient(invalidObservationsDatabaseSettings.ConnectionString);
+            _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
         }
 
         [HttpGet]

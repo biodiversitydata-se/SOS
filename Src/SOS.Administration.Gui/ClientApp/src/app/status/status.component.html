@@ -1,6 +1,13 @@
-<div>  
+<div>
   <div *ngIf="processInfo">
     <h1>Status info</h1>
+    <h2>Disk usage</h2>
+    <ag-grid-angular *ngIf="searchindexinfo" style="height: 200px;"
+                     class="ag-theme-alpine"
+                     [rowData]="searchindexinfo.allocations"
+                     [columnDefs]="searchIndexColumnDefs">
+    </ag-grid-angular>
+    <h2>Index status</h2>
     <div *ngFor="let provider of processInfo">
       <h3>{{provider.id}}</h3>
       <ul>
@@ -24,5 +31,6 @@
                        [columnDefs]="processColumnDefs">
       </ag-grid-angular>
     </div>
+
   </div>
 </div>

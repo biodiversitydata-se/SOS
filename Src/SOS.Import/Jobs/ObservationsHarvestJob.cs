@@ -95,7 +95,7 @@ namespace SOS.Import.Jobs
                 }
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
-                _logger.LogInformation("Finish observasions harvest jobs");
+                _logger.LogInformation("Finish observations harvest jobs");
 
                 //---------------------------------------------------------------------------------------------------------
                 // 3. Make sure mandatory providers where successful
@@ -143,7 +143,7 @@ namespace SOS.Import.Jobs
                 //------------------------------------------------------------------------
                 // 2. Harvest observations directly without enqueuing to Hangfire
                 //------------------------------------------------------------------------
-                _logger.LogInformation("Start incremental observasions harvest jobs");
+                _logger.LogInformation("Start incremental observations harvest jobs");
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
                 foreach (var dataProvider in dataProviders)
                 {
@@ -154,7 +154,7 @@ namespace SOS.Import.Jobs
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
                 var success = harvestTaskByDataProvider.All(p => p.Value.Result);
-                _logger.LogInformation($"Finish observasions incremental harvest jobs. Success: { success }");
+                _logger.LogInformation($"Finish observations incremental harvest jobs. Success: { success }");
 
                 return success;
             }

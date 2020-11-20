@@ -20,6 +20,7 @@ function dateFormatter(params) {
 export class StatusComponent implements OnInit {
   http: HttpClient;
   baseUrl: string;
+  searchindexinfo: SearchIndexInfo;
   statuses = [];
   processInfo: ProcessInfo;
 
@@ -56,6 +57,14 @@ export class StatusComponent implements OnInit {
 
   processRowData = [
   ];
+
+  searchIndexColumnDefs = [      
+    { field: 'node', sortable: true, filter: true, resizable: true },
+    { field: 'percentage', sortable: true, filter: true, resizable: true },
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },
+    { field: 'diskAvailable', sortable: true, filter: true, resizable: true },
+    { field: 'diskTotal', sortable: true, filter: true, resizable: true },
+  ];
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
     this.baseUrl = baseUrl
@@ -65,6 +74,9 @@ export class StatusComponent implements OnInit {
     this.statuses = [];
     this.http.get<ProcessInfo>(this.baseUrl + 'statusinfo/process').subscribe(result => {
       this.processInfo = result;          
+    }, error => console.error(error));
+    this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
+      this.searchindexinfo = result;
     }, error => console.error(error));
   }
   formatDate(param) {
@@ -82,6 +94,16 @@ export class StatusComponent implements OnInit {
     })
     return formatDuration(duration);
   }
+}
+class AllocationInfo {
+  node: string;
+  diskAvailable: string;
+  diskUsed: string;
+  diskTotal: string;
+  percentage: number;
+}
+class SearchIndexInfo {
+  allocations: AllocationInfo[];
 }
 class Provider {
   dataProviderId: number;
@@ -106,12 +128,4 @@ class ProcessInfo {
   end: Date;  
   status: string;
   providersInfo: Provider[];
-}
-class HarvestInfo {
-  id: string;
-  count: string;
-  start: Date;
-  end: Date;
-  dataLastModified: Date;
-  status: string;
 }
