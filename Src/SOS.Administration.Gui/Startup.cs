@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui

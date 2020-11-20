@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
