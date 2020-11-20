@@ -7,6 +7,12 @@
                      [rowData]="searchindexinfo.allocations"
                      [columnDefs]="searchIndexColumnDefs">
     </ag-grid-angular>
+    <h2>Processing</h2>
+    <ag-grid-angular *ngIf="processingJobsRowData.length>0" style="height: 200px;"
+                     class="ag-theme-alpine"
+                     [rowData]="processingJobsRowData"
+                     [columnDefs]="processingJobsColumnDefs">
+    </ag-grid-angular>
     <h2>Index status</h2>
     <div *ngFor="let provider of processInfo">
       <h3>{{provider.id}} {{getActiveInfo(provider.id)}}</h3>
