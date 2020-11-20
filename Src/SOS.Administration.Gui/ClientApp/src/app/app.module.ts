@@ -13,6 +13,7 @@ import { HomeComponent } from './home/home.component';
 import { InvalidObservationsComponent } from './invalid-observations/invalid-observations.component';
 import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
 import { StatusComponent } from './status/status.component';
+import { InvalidMapComponent } from './invalid-map/invalid-map.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { StatusComponent } from './status/status.component';
     HomeComponent,
     InvalidObservationsComponent,
     InvalidGridComponent,
-    StatusComponent
+    StatusComponent,
+    InvalidMapComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
