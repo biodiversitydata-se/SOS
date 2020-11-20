@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SOS.Administration.Gui.Models;
+using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -54,20 +56,16 @@ namespace SOS.Administration.Gui.Controllers
         private readonly ILogger<InvalidObservationsController> _logger;
         private MongoClient _client;
 
-        public InvalidObservationsController(ILogger<InvalidObservationsController> logger, IInvalidObservationsDatabaseSettings invalidObservationsDatabaseSettings)
+        public InvalidObservationsController(ILogger<InvalidObservationsController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
         {
             _logger = logger;
-            _client = new MongoClient(invalidObservationsDatabaseSettings.ConnectionString);
+            _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
         }
 
         [HttpGet]        
         public IEnumerable<InvalidLocation> Get(string dataSetId, int instanceId)
         {
-            var database = _client.GetDatabase("sos");
-            var names = _client.ListDatabaseNames();
-            var collection = database.GetCollection<InstanceInfo>("ProcessedConfiguration");
-            var info = collection.Find(new BsonDocument()).FirstOrDefault();
-            
+            var database = _client.GetDatabase("sos");            
             var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
             
             var filter = Builders<InvalidObservation>.Filter.Eq(p=>p.DatasetID, dataSetId);
@@ -113,11 +111,7 @@ namespace SOS.Administration.Gui.Controllers
         [Route("list")]
         public IEnumerable<InvalidObservation> GetList(string dataSetId, int instanceId)
         {
-            var database = _client.GetDatabase("sos");
-            var names = _client.ListDatabaseNames();
-            var collection = database.GetCollection<InstanceInfo>("ProcessedConfiguration");
-            var info = collection.Find(new BsonDocument()).FirstOrDefault();
-
+            var database = _client.GetDatabase("sos");          
             var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
 
             var filter = Builders<InvalidObservation>.Filter.Eq(p => p.DatasetID, dataSetId);
