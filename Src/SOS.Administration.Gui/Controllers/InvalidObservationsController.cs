@@ -8,46 +8,11 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
-{
-    public class InvalidObservation
-    {
-        public string DatasetID { get; set; }
-
-        /// <summary>
-        ///     Name of data set
-        /// </summary>
-        public string DatasetName { get; set; }
-
-        /// <summary>
-        ///     List of defects
-        /// </summary>
-        public ICollection<string> Defects { get; set; }
-
-        public string OccurrenceID { get; set; }
-
-        public DateTime ModifiedDate { get; set; }
-
-        /// <summary>
-        ///     Object id
-        /// </summary>
-        public ObjectId Id { get; set; }
-    }
-    public class InvalidLocation
-    {
-        public string DataSetName { get; set; }
-        public string DataSetId { get; set; }
-        public string OccurrenceId { get; set; }
-        public float Lat { get; set; }
-        public float Lon { get; set; }
-    }
-    [BsonIgnoreExtraElements]
-    public class InstanceInfo
-    {        
-        public int ActiveInstance { get; set; }        
-    }
+{    
     [ApiController]
     [Route("[controller]")]
     public class InvalidObservationsController : ControllerBase
@@ -62,19 +27,19 @@ namespace SOS.Administration.Gui.Controllers
         }
 
         [HttpGet]        
-        public IEnumerable<InvalidLocation> Get(string dataSetId, int instanceId)
+        public IEnumerable<InvalidLocationDto> Get(string dataSetId, int instanceId)
         {
             var database = _client.GetDatabase("sos");            
-            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
+            var observationCollection = database.GetCollection<InvalidObservationDto>("InvalidObservation-" + instanceId.ToString());
             
-            var filter = Builders<InvalidObservation>.Filter.Eq(p=>p.DatasetID, dataSetId);
+            var filter = Builders<InvalidObservationDto>.Filter.Eq(p=>p.DatasetID, dataSetId);
             if(dataSetId == "0")
             {
                 filter = new BsonDocument();
             }
            
             var documents = observationCollection.Find(filter).ToList();
-            var invalidLocations = new List<InvalidLocation>();
+            var invalidLocations = new List<InvalidLocationDto>();
             foreach(var document in documents)
             {                
                 foreach (var defect in document.Defects)
@@ -88,7 +53,7 @@ namespace SOS.Administration.Gui.Controllers
                             var latstring = latlonstring.Substring(latlonstring.IndexOf("lat:") + 4);
                             var lon = float.Parse(lonstring.Substring(0,lonstring.Length -2));
                             var lat = float.Parse(latstring);
-                            invalidLocations.Add(new InvalidLocation()
+                            invalidLocations.Add(new InvalidLocationDto()
                             {
                                 DataSetId = document.DatasetID,
                                 DataSetName = document.DatasetName,
@@ -108,12 +73,12 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("list")]
-        public IEnumerable<InvalidObservation> GetList(string dataSetId, int instanceId)
+        public IEnumerable<InvalidObservationDto> GetList(string dataSetId, int instanceId)
         {
             var database = _client.GetDatabase("sos");          
-            var observationCollection = database.GetCollection<InvalidObservation>("InvalidObservation-" + instanceId.ToString());
+            var observationCollection = database.GetCollection<InvalidObservationDto>("InvalidObservation-" + instanceId.ToString());
 
-            var filter = Builders<InvalidObservation>.Filter.Eq(p => p.DatasetID, dataSetId);
+            var filter = Builders<InvalidObservationDto>.Filter.Eq(p => p.DatasetID, dataSetId);
             if (dataSetId == "0")
             {
                 filter = new BsonDocument();

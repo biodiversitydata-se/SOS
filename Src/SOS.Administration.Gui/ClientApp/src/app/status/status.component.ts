@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow } from 'date-fns'
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
+import { HangfireJob } from '../models/hangfirejob';
 import { ProcessInfo } from '../models/providerinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
 
@@ -9,6 +10,15 @@ import { SearchIndexInfo } from '../models/searchindexinfo';
 function dateFormatter(params) {
   if (params.value) {
     return format(parseISO(params.value), 'yyyy-MM-dd HH:mm:ss');
+  }
+  else {
+    return '';
+  }
+}
+
+function dateSinceFormatter(params) {
+  if (params.value) {
+    return 'Running for ' + formatDistanceToNow(parseISO(params.value));
   }
   else {
     return '';
@@ -68,6 +78,12 @@ export class StatusComponent implements OnInit {
     { field: 'diskAvailable', sortable: true, filter: true, resizable: true },
     { field: 'diskTotal', sortable: true, filter: true, resizable: true },
   ];
+  processingJobsRowData = [];
+  processingJobsColumnDefs = [
+    { field: 'invocationData', width: 600, sortable: true, filter: true, resizable: true },
+    { field: 'createdAt', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
+    { field: 'createdAt', headerName:'Runtime', sortable: true, filter: true, resizable: true, valueFormatter: dateSinceFormatter } 
+  ];
   activeInstance: string;
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
@@ -86,6 +102,9 @@ export class StatusComponent implements OnInit {
     this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
       this.searchindexinfo = result;
     }, error => console.error(error));
+    this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
+      this.processingJobsRowData = result;
+    }, error => console.error(error));   
   }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
