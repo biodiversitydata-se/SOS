@@ -9,7 +9,7 @@
     </ag-grid-angular>
     <h2>Index status</h2>
     <div *ngFor="let provider of processInfo">
-      <h3>{{provider.id}}</h3>
+      <h3>{{provider.id}} {{getActiveInfo(provider.id)}}</h3>
       <ul>
         <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
         <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>

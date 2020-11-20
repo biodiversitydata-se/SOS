@@ -1,6 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tileLayer, latLng, circle, polygon, marker, icon } from 'leaflet';
+import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
+import { DataProvider } from '../models/dataprovider';
+import { InvalidLocation } from '../models/invalidlocation';
 
 @Component({
   selector: 'app-fetch-data',
@@ -80,23 +83,4 @@ export class InvalidObservationsComponent {
       });
     }, error => console.error(error));
   }
-}
-
-interface InvalidLocation {
-  occurrenceId: string;
-  dataSetId: string;
-  dataSetName: string;
-  lat: number;
-  lon: number
-}
-
-
-class DataProvider{
-  id: number;
-  name: string;
-}
-
-class ActiveInstanceInfo {
-  id: number;
-  activeInstance: number;
 }
