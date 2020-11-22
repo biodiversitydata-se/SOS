@@ -30,7 +30,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Upload file to blob storage")]
+        [DisplayName("Upload file to Azure Blob Storage [Src=\"{0}\"]")]
         public async Task<bool> RunAsync(string sourcePath, string blobStorageContainer,
             bool deleteSourceOnSuccess, IJobCancellationToken cancellationToken)
         {
