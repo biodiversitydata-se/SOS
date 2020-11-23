@@ -76,11 +76,10 @@ namespace SOS.Lib.Helpers
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
                 processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = Models.Processed.Observation.VocabularyValue.Create(positionLocation.County?.Id);
-            processedObservation.Location.Municipality =
-                Models.Processed.Observation.VocabularyValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.Parish = Models.Processed.Observation.VocabularyValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.Province = Models.Processed.Observation.VocabularyValue.Create(positionLocation.Province?.Id);
+            processedObservation.Location.County = VocabularyValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.Municipality = VocabularyValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.Parish = VocabularyValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.Province = VocabularyValue.Create(positionLocation.Province?.Id);
             processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
@@ -190,7 +189,7 @@ namespace SOS.Lib.Helpers
                         Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
                             out var areaType);
 
-                        var area = new Lib.Models.Processed.Observation.Area
+                        var area = new Models.Processed.Observation.Area
                         {
                             Id = id,
                             FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),

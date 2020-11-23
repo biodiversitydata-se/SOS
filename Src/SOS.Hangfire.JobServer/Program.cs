@@ -116,6 +116,7 @@ namespace SOS.Hangfire.JobServer
                     );
                     GlobalJobFilters.Filters.Add(
                         new HangfireJobExpirationTimeAttribute(_hangfireDbConfiguration.JobExpirationDays));
+                    GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
 
                     // Add the processing server as IHostedService
                     services.AddHangfireServer();
