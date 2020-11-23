@@ -85,7 +85,57 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                ) AS sapa ON s.Id = sapa.SiteId AND sapa.ParishIndex = 1
 	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
+
+
         /// <summary>
+        /// Add bird validation areas
+        /// </summary>
+        /// <param name="sites"></param>
+        /// <returns></returns>
+        private async Task<IDictionary<int, ICollection<string>>> AddBirdValidationAreas(int[] siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            try
+            {
+                const string query = @"
+                SELECT 
+		            sa.SiteId, a.FeatureId
+	            FROM 
+		            SiteAreas sa
+		            INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 18
+                    INNER JOIN @sid s ON sa.SiteId = s.Id";
+
+                var siteBirdValidationAreas = (await QueryAsync<(int siteId, string featureId)>(query,
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
+
+                var siteAreas = new Dictionary<int, ICollection<string>>();
+                if (siteBirdValidationAreas?.Any() ?? false)
+                {
+                   
+                    foreach (var siteBirdValidationArea in siteBirdValidationAreas)
+                    {
+                        if (!siteAreas.TryGetValue(siteBirdValidationArea.siteId, out var areas))
+                        {
+                            areas = new List<string>();
+                            siteAreas.Add(siteBirdValidationArea.siteId, areas);
+                        }
+                        areas.Add(siteBirdValidationArea.featureId);
+                    }
+                }
+                return siteAreas;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting bird validation areas");
+                return null;
+            }
+        }
+
+		/// <summary>
 		///     Constructor
 		/// </summary>
 		/// <param name="artportalenDataService"></param>
