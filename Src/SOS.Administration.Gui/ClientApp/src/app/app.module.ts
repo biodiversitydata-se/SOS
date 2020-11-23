@@ -14,6 +14,7 @@ import { InvalidObservationsComponent } from './invalid-observations/invalid-obs
 import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
 import { StatusComponent } from './status/status.component';
 import { InvalidMapComponent } from './invalid-map/invalid-map.component';
+import { FunctionalTestsComponent } from './functional-tests/functional-tests.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { InvalidMapComponent } from './invalid-map/invalid-map.component';
     InvalidObservationsComponent,
     InvalidGridComponent,
     StatusComponent,
-    InvalidMapComponent
+    InvalidMapComponent,
+    FunctionalTestsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -33,6 +35,7 @@ import { InvalidMapComponent } from './invalid-map/invalid-map.component';
       { path: '', component: StatusComponent, pathMatch: 'full' },
       { path: 'invalid-observations', component: InvalidObservationsComponent },
       { path: 'status', component: StatusComponent },
+      { path: 'tests', component: FunctionalTestsComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,

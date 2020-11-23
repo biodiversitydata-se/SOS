@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-nav-menu',
@@ -7,7 +8,13 @@ import { Component } from '@angular/core';
 })
 export class NavMenuComponent {
   isExpanded = false;
-
+  http: HttpClient;
+  baseUrl: string;
+  environment: string;
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    this.http = http;
+    this.baseUrl = baseUrl;
+  }
   collapse() {
     this.isExpanded = false;
   }
@@ -15,4 +22,12 @@ export class NavMenuComponent {
   toggle() {
     this.isExpanded = !this.isExpanded;
   }
+  ngOnInit() {
+    this.http.get<Environment>(this.baseUrl + 'environment').subscribe(result => {
+      this.environment = result.environment;
+    }, error => console.error(error));  
+  }
+}
+class Environment {
+  environment: string;
 }
