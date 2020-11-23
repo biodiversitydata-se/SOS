@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -8,6 +9,7 @@ namespace SOS.Lib.Jobs.Import
         ///     Run geo harvest
         /// </summary>
         /// <returns></returns>
+        [DisplayName("Harvest areas from Artportalen db")]
         Task<bool> RunAsync();
     }
 }

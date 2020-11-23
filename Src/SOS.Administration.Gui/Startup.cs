@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using SOS.Administration.Gui.Models;
+using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui
 {
@@ -28,11 +28,11 @@ namespace SOS.Administration.Gui
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-            services.Configure<InvalidObservationsDatabaseSettings>(
-                Configuration.GetSection(nameof(InvalidObservationsDatabaseSettings)));
+            services.Configure<MongoDbConfiguration>(
+                Configuration.GetSection(nameof(MongoDbConfiguration)));
 
-            services.AddSingleton<IInvalidObservationsDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<InvalidObservationsDatabaseSettings>>().Value);
+            services.Configure<ElasticSearchConfiguration>(
+              Configuration.GetSection(nameof(ElasticSearchConfiguration)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

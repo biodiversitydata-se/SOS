@@ -35,7 +35,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest areas from Artportalen")]
+        [DisplayName("Harvest areas from Artportalen db")]
         public async Task<bool> RunAsync()
         {
             _logger.LogInformation("Start Geo Harvest Job");

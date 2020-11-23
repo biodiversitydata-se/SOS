@@ -21,14 +21,6 @@
     <option *ngFor="let dataSet of dataSets" [value]="dataSet.id">{{ dataSet.name }}</option>
   </select>
 </div>
-<div *ngIf="loadingData" class="spinner-border" role="status">
-  <span class="sr-only">Loading...</span>
-</div>
-<div *ngIf="!loadingData">{{markerClusterData.length}} invalid location observations shown</div>
-<div style="height: 600px;"
-     leaflet
-     [leafletOptions]="options"
-     [leafletMarkerCluster]="markerClusterData"
-     [leafletMarkerClusterOptions]="markerClusterOptions">
-</div>
+
+<app-invalid-map [dataSetId]="selectedDataSet.id" [instance]="selectedInstance"></app-invalid-map>
 <app-invalid-grid [dataSetId]="selectedDataSet.id" [instance]="selectedInstance"></app-invalid-grid>

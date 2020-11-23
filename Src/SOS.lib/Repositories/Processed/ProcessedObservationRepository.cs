@@ -425,6 +425,26 @@ namespace SOS.Lib.Repositories.Processed
                 return null;
             }
 
+            //check
+            var currentAllocation = _elasticClient.Cat.Allocation();
+            if (currentAllocation != null && currentAllocation.IsValid)
+            {
+                string diskUsageDescription = "Current diskusage in cluster:";
+                foreach (var record in currentAllocation.Records)
+                {
+                    if (int.TryParse(record.DiskPercent, out int percentageUsed)) 
+                    {
+                        diskUsageDescription += percentageUsed + "% ";
+                        if (percentageUsed > 90)
+                        {
+                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
+                            return null;
+                        }
+                    }
+                }
+                Logger.LogDebug(diskUsageDescription);
+            }
+
             var count = 0;
             return _elasticClient.BulkAll(items, b => b
                     .Index(IndexName)
