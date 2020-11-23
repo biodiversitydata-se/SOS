@@ -1,42 +1,77 @@
 <div>
   <div *ngIf="processInfo">
     <h1>Status info</h1>
-    <h2>Disk usage</h2>
-    <ag-grid-angular *ngIf="searchindexinfo" style="height: 200px;"
-                     class="ag-theme-alpine"
-                     [rowData]="searchindexinfo.allocations"
-                     [columnDefs]="searchIndexColumnDefs">
-    </ag-grid-angular>
-    <h2>Processing</h2>
-    <ag-grid-angular *ngIf="processingJobsRowData.length>0" style="height: 200px;"
-                     class="ag-theme-alpine"
-                     [rowData]="processingJobsRowData"
-                     [columnDefs]="processingJobsColumnDefs">
-    </ag-grid-angular>
-    <h2>Index status</h2>
-    <div *ngFor="let provider of processInfo">
-      <h3>{{provider.id}} {{getActiveInfo(provider.id)}}</h3>
-      <ul>
-        <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
-        <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>
-        <li>Time taken: <b>{{getTimeTaken(provider.start, provider.end)}}</b></li>
-        <li>
-          Status:
-          <span *ngIf="provider.status == 'Success'">
-            <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
-          </span>
-          <span *ngIf="provider.status != 'Success'">
-            <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
-          </span>
-          {{provider.status}}
-        </li>
-      </ul>
-      <ag-grid-angular *ngIf="provider.providersInfo" style="height: 300px;"
-                       class="ag-theme-alpine"
-                       [rowData]="provider.providersInfo"
-                       [columnDefs]="processColumnDefs">
-      </ag-grid-angular>
+    <hr />
+    <div class="row">
+      <div class="col-sm">
+        <h2>Disk usage</h2>
+        <ag-grid-angular *ngIf="searchindexinfo" style="height: 200px;"
+                         class="ag-theme-alpine"
+                         [rowData]="searchindexinfo.allocations"
+                         [columnDefs]="searchIndexColumnDefs">
+        </ag-grid-angular>
+      </div>
+      <div class="col-sm">
+        <h2>Current processing</h2>
+        <ag-grid-angular *ngIf="processingJobsRowData.length>0" style="height: 200px;"
+                         class="ag-theme-alpine"
+                         [rowData]="processingJobsRowData"
+                         [columnDefs]="processingJobsColumnDefs">
+        </ag-grid-angular>
+      </div>
     </div>
-
+    <hr />
+    <h2>Index status</h2>
+    <div class="row">
+      <div class="col" *ngFor="let provider of processInfo.slice(0,2)">
+        <h3>{{provider.id}} {{getActiveInfo(provider.id)}}</h3>
+        <ul>
+          <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
+          <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>
+          <li>Time taken: <b>{{getTimeTaken(provider.start, provider.end)}}</b></li>
+          <li>
+            Status:
+            <span *ngIf="provider.status == 'Success'">
+              <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+            </span>
+            <span *ngIf="provider.status != 'Success'">
+              <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
+            </span>
+            {{provider.status}}
+          </li>
+        </ul>
+        <ag-grid-angular *ngIf="provider.providersInfo" style="height: 300px;"
+                         class="ag-theme-alpine"
+                         [rowData]="provider.providersInfo"
+                         [columnDefs]="processColumnDefs">
+        </ag-grid-angular>
+      </div>
+    </div>
+    <div style="height:30px;"></div>
+    <div class="row">
+      <div class="col" *ngFor="let provider of processInfo.slice(2,4)">
+        <h3>{{provider.id}} {{getActiveInfo(provider.id)}}</h3>
+        <ul>
+          <li>Start: {{formatDate(provider.start)}} ({{formatFrom(provider.start)}} ago)</li>
+          <li>End: {{formatDate(provider.end)}} ({{formatFrom(provider.start)}} ago)</li>
+          <li>Time taken: <b>{{getTimeTaken(provider.start, provider.end)}}</b></li>
+          <li>
+            Status:
+            <span *ngIf="provider.status == 'Success'">
+              <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+            </span>
+            <span *ngIf="provider.status != 'Success'">
+              <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
+            </span>
+            {{provider.status}}
+          </li>
+        </ul>
+        <ag-grid-angular *ngIf="provider.providersInfo" style="height: 300px;"
+                         class="ag-theme-alpine"
+                         [rowData]="provider.providersInfo"
+                         [columnDefs]="processColumnDefs">
+        </ag-grid-angular>
+      </div>
+    </div>
   </div>
 </div>
