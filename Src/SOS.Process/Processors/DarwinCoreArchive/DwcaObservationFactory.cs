@@ -30,7 +30,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// </summary>
     public class DwcaObservationFactory
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 10000;
+        private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
