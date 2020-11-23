@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
@@ -31,42 +32,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
+                var areaTypes = ((int[]) Enum.GetValues(typeof(AreaType))).Where(at => at != 25);
 
                 var query = @"
-                SELECT 
-	                a.AreaDatasetId,
+                SELECT -- Break out feature 100 (Sweden) from AreaDataSetId = 18
+	                CASE WHEN a.AreaDatasetId = 18 AND a.FeatureId = 100 THEN 25 ELSE a.AreaDatasetId END AS AreaDatasetId,
                     a.Id,
                     a.FeatureId,
                     a.Polygon.STAsText() AS PolygonWKT,
-	                a.Name,
-                    a.ParentId
-                FROM 
-	                Area a
-                    INNER JOIN @tvp t ON a.AreaDatasetId = t.Id";
-
-                return await QueryAsync<AreaEntity>(query,
-                    new { tvp = areaTypes.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting areas");
-                return null;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<AreaEntity>> GetAreasExceptGeometryFieldAsync()
-        {
-            try
-            {
-                var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
-
-                var query = @"
-                SELECT 
-	                a.AreaDatasetId,
-                    a.Id,
-                    a.FeatureId,                    
 	                a.Name,
                     a.ParentId
                 FROM 

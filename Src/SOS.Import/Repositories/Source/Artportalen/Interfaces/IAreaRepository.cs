@@ -14,11 +14,5 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<AreaEntity>> GetAsync();
-
-        /// <summary>
-        ///     Get all areas, but exclude Geometry property.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<AreaEntity>> GetAreasExceptGeometryFieldAsync();
     }
 }

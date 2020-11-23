@@ -85,7 +85,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                ) AS sapa ON s.Id = sapa.SiteId AND sapa.ParishIndex = 1
 	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
-		/// <summary>
+        /// <summary>
 		///     Constructor
 		/// </summary>
 		/// <param name="artportalenDataService"></param>
