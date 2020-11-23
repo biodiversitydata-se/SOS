@@ -222,7 +222,7 @@ namespace SOS.Import.Harvesters.Observations
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
 
-                _logger.LogDebug($"Finsih casting entities to verbatim ({batchIndex})");
+                _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
@@ -396,7 +396,7 @@ namespace SOS.Import.Harvesters.Observations
                     var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
 
                     var projectEntities = await _projectRepository.GetProjectsAsync();
-                    _logger.LogDebug("Finsih getting sighting metadata");
+                    _logger.LogDebug("Finish getting sighting metadata");
 
                     _logger.LogDebug("Start Initialize metadata");
                     _artportalenMetadataContainer.Initialize(
@@ -429,7 +429,7 @@ namespace SOS.Import.Harvesters.Observations
                 {
                     IncrementalMode = mode != JobRunModes.Full
                 };
-                _logger.LogDebug("Finsih creating factory");
+                _logger.LogDebug("Finish creating factory");
 
                 _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 

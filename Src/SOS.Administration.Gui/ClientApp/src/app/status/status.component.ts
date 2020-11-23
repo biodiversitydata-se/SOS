@@ -1,11 +1,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow } from 'date-fns'
+import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
+import { HangfireJob } from '../models/hangfirejob';
+import { ProcessInfo } from '../models/providerinfo';
+import { SearchIndexInfo } from '../models/searchindexinfo';
 
 
 function dateFormatter(params) {
   if (params.value) {
     return format(parseISO(params.value), 'yyyy-MM-dd HH:mm:ss');
+  }
+  else {
+    return '';
+  }
+}
+
+function dateSinceFormatter(params) {
+  if (params.value) {
+    return 'Running for ' + formatDistanceToNow(parseISO(params.value));
   }
   else {
     return '';
@@ -20,6 +33,7 @@ function dateFormatter(params) {
 export class StatusComponent implements OnInit {
   http: HttpClient;
   baseUrl: string;
+  searchindexinfo: SearchIndexInfo;
   statuses = [];
   processInfo: ProcessInfo;
 
@@ -56,6 +70,21 @@ export class StatusComponent implements OnInit {
 
   processRowData = [
   ];
+
+  searchIndexColumnDefs = [      
+    { field: 'node', sortable: true, filter: true, resizable: true },
+    { field: 'percentage', sortable: true, filter: true, resizable: true },
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },
+    { field: 'diskAvailable', sortable: true, filter: true, resizable: true },
+    { field: 'diskTotal', sortable: true, filter: true, resizable: true },
+  ];
+  processingJobsRowData = [];
+  processingJobsColumnDefs = [
+    { field: 'invocationData', width: 600, sortable: true, filter: true, resizable: true },
+    { field: 'createdAt', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
+    { field: 'createdAt', headerName:'Runtime', sortable: true, filter: true, resizable: true, valueFormatter: dateSinceFormatter } 
+  ];
+  activeInstance: string;
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
     this.baseUrl = baseUrl
@@ -63,9 +92,19 @@ export class StatusComponent implements OnInit {
 
   ngOnInit() {
     this.statuses = [];
-    this.http.get<ProcessInfo>(this.baseUrl + 'statusinfo/process').subscribe(result => {
-      this.processInfo = result;          
+    this.http.get<ActiveInstanceInfo>(this.baseUrl + 'statusinfo/activeinstance').subscribe(result => {      
+      this.activeInstance = result.activeInstance.toString();
+      this.http.get<ProcessInfo>(this.baseUrl + 'statusinfo/process').subscribe(result => {
+        this.processInfo = result;
+      }, error => console.error(error));
     }, error => console.error(error));
+    
+    this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
+      this.searchindexinfo = result;
+    }, error => console.error(error));
+    this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
+      this.processingJobsRowData = result;
+    }, error => console.error(error));   
   }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
@@ -82,36 +121,13 @@ export class StatusComponent implements OnInit {
     })
     return formatDuration(duration);
   }
-}
-class Provider {
-  dataProviderId: number;
-  dataProviderIdentifier: string
-  processCount: number;
-  processStart: Date;
-  processEnd: Date;
-  rocessStatus: string;
-  harvestCount: number;
-  harvestStart: Date;
-  harvestEnd: Date;
-  harvestStatus: string;
-  latestIncrementalCount: number;
-  latestIncrementalStart: Date;
-  latestIncrementalEnd: Date;
-  latestIncrementalStatus: string;
-}
-class ProcessInfo {
-  id: string;
-  count: string;
-  start: Date;
-  end: Date;  
-  status: string;
-  providersInfo: Provider[];
-}
-class HarvestInfo {
-  id: string;
-  count: string;
-  start: Date;
-  end: Date;
-  dataLastModified: Date;
-  status: string;
+  getActiveInfo(providerId: string) {
+    if (this.activeInstance == "0" && providerId == "Observation-0") {
+      return "(active)";
+    }
+    if (this.activeInstance == "1" && providerId == "Observation-1") {
+      return "(active)";
+    }
+    return '';
+  }
 }
