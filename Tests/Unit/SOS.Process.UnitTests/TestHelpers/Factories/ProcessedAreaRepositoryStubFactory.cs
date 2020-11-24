@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -24,8 +25,8 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
                 .ReturnsAsync(areas);
 
             processedAreaRepositoryStub
-                .Setup(avm => avm.GetGeometryAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) =>
+                .Setup(avm => avm.GetGeometryAsync(It.IsAny<AreaType>(), It.IsAny<string>()))
+                .ReturnsAsync((ObjectId id) =>
                 {
                     if (areaById.TryGetValue(id, out AreaWithGeometry area))
                     {
@@ -49,10 +50,8 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
             List<Area> areas = new List<Area>();
             foreach (var areaWithGeometry in areasWithGeometry)
             {
-                areas.Add(new Area(areaWithGeometry.AreaType)
+                areas.Add(new Area(areaWithGeometry.AreaType, areaWithGeometry.FeatureId)
                 {
-                    FeatureId = areaWithGeometry.FeatureId,
-                    Id = areaWithGeometry.Id,
                     Name = areaWithGeometry.Name
                 });
             }

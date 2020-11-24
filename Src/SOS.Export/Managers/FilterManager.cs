@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
@@ -44,56 +45,68 @@ namespace SOS.Export.Managers
             }
 
             // handle the area ids search
-            if (preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
+            if (preparedFilter?.Areas?.Any() ?? false)
             {
-                foreach (var areaId in preparedFilter.AreaIds)
+                foreach (var areaId in preparedFilter.Areas)
                 {
-                    var area = await _areaRepository.GetAsync(areaId);
+                    var area = await _areaRepository.GetAsync(areaId.Type, areaId.FeatureId);
 
                     if (area != null)
                     {
                         //if we already have the info needed for the search we skip polygon searches
                         if (area.AreaType == AreaType.County ||
                             area.AreaType == AreaType.Municipality ||
-                            area.AreaType == AreaType.Province)
+                            area.AreaType == AreaType.Province ||
+                            area.AreaType == AreaType.Parish)
                         {
                             if (area.AreaType == AreaType.County)
                             {
                                 if (preparedFilter.CountyIds == null)
                                 {
-                                    preparedFilter.CountyIds = new List<int>();
+                                    preparedFilter.CountyIds = new List<string>();
                                 }
 
                                 var list = preparedFilter.CountyIds.ToList();
-                                list.Add(area.Id);
+                                list.Add(area.FeatureId);
                                 preparedFilter.CountyIds = list;
                             }
                             else if (area.AreaType == AreaType.Municipality)
                             {
                                 if (preparedFilter.MunicipalityIds == null)
                                 {
-                                    preparedFilter.MunicipalityIds = new List<int>();
+                                    preparedFilter.MunicipalityIds = new List<string>();
                                 }
 
                                 var list = preparedFilter.MunicipalityIds.ToList();
-                                list.Add(area.Id);
+                                list.Add(area.FeatureId);
                                 preparedFilter.MunicipalityIds = list;
                             }
                             else if (area.AreaType == AreaType.Province)
                             {
                                 if (preparedFilter.ProvinceIds == null)
                                 {
-                                    preparedFilter.ProvinceIds = new List<int>();
+                                    preparedFilter.ProvinceIds = new List<string>();
                                 }
 
                                 var list = preparedFilter.ProvinceIds.ToList();
-                                list.Add(area.Id);
+                                list.Add(area.FeatureId);
                                 preparedFilter.ProvinceIds = list;
+                            }
+                            else if (area.AreaType == AreaType.Parish)
+                            {
+                                if (preparedFilter.ParishIds == null)
+                                {
+                                    preparedFilter.ParishIds = new List<string>();
+                                }
+
+                                var list = preparedFilter.ParishIds.ToList();
+                                list.Add(area.FeatureId);
+                                preparedFilter.ParishIds = list;
                             }
                         }
                         else // we need to use the geometry filter
                         {
-                            var geometry = await _areaRepository.GetGeometryAsync(areaId);
+                            var geometry = await _areaRepository.GetGeometryAsync(areaId.Type, areaId.FeatureId);
 
                             if (preparedFilter.GeometryFilter == null)
                             {

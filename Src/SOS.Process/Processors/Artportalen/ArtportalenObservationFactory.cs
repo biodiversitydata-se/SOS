@@ -16,6 +16,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
@@ -171,7 +172,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
                 obs.Location.Country = new VocabularyValue {Id = (int) CountryId.Sweden};
                 obs.Location.CountryCode = CountryCode.Sweden;
-                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _vocabularyById[VocabularyId.County], null, verbatimObservation.Site?.County?.Name);
+                obs.Location.County = CastToArea(verbatimObservation.Site?.County);
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
                 obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
                 obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
@@ -181,14 +182,14 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id, _vocabularyById[VocabularyId.Municipality], null, verbatimObservation.Site?.Municipality?.Name);
+                obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
                 obs.Location.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
-                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id, _vocabularyById[VocabularyId.Parish], null, verbatimObservation.Site?.Parish?.Name);
+                obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Point = point;
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
-                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _vocabularyById[VocabularyId.Province], null, verbatimObservation.Site?.Province?.Name);
+                obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord.ToString() : null;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
@@ -279,6 +280,20 @@ namespace SOS.Process.Processors.Artportalen
             {
                 throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}, SightingId={verbatimObservation.SightingId}", e);
             }
+        }
+
+        private static Area CastToArea(GeographicalArea area)
+        {
+            if (area == null)
+            {
+                return null;
+            }
+
+            return new Area
+            {
+                FeatureId = area.FeatureId,
+                Name = area.Name
+            };
         }
 
         private List<ExtendedMeasurementOrFact> CreateMeasurementOrFactsFromProjects(string occurrenceId, IEnumerable<Project> projects)

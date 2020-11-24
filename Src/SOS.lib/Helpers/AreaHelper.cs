@@ -30,23 +30,17 @@ namespace SOS.Lib.Helpers
 
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
-        private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly STRtree<IFeature> _strTree;
-        private IDictionary<VocabularyId, Dictionary<int, VocabularyValueInfo>> _vocabularyValueById;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="processedAreaRepository"></param>
-        /// <param name="processedVocabularyRepository"></param>
         public AreaHelper(
-            IAreaRepository processedAreaRepository,
-            IVocabularyRepository processedVocabularyRepository)
+            IAreaRepository processedAreaRepository)
         {
             _processedAreaRepository = processedAreaRepository ??
                                        throw new ArgumentNullException(nameof(processedAreaRepository));
-            _processedVocabularyRepository = processedVocabularyRepository ??
-                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _strTree = new STRtree<IFeature>();
 
             // Try to get saved cache
@@ -76,10 +70,6 @@ namespace SOS.Lib.Helpers
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
                 processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = VocabularyValue.Create(positionLocation.County?.Id);
-            processedObservation.Location.Municipality = VocabularyValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.Parish = VocabularyValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.Province = VocabularyValue.Create(positionLocation.Province?.Id);
             processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
@@ -117,12 +107,6 @@ namespace SOS.Lib.Helpers
 
         private async Task InitializeAsync()
         {
-            // Get field mappings
-            var processedVocabularies = (await _processedVocabularyRepository.GetAllAsync()).ToArray();
-
-            _vocabularyValueById = processedVocabularies.ToDictionary(m => m.Id,
-                m => m.Values.ToDictionary(v => v.Id, v => v));
-
             // If tree already initialized, return
             if (_strTree.Count != 0)
             {
@@ -132,9 +116,8 @@ namespace SOS.Lib.Helpers
             var areas = await _processedAreaRepository.GetAsync(_areaTypes);
             foreach (var area in areas)
             {
-                var geometry = await _processedAreaRepository.GetGeometryAsync(area.Id);
+                var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
                 var attributes = new Dictionary<string, object>();
-                attributes.Add("id", area.Id);
                 attributes.Add("name", area.Name);
                 attributes.Add("areaType", area.AreaType);
                 attributes.Add("featureId", area.FeatureId);
@@ -185,13 +168,11 @@ namespace SOS.Lib.Helpers
                 {
                     foreach (var feature in features)
                     {
-                        int.TryParse(feature.Attributes.GetOptionalValue("id").ToString(), out var id);
                         Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
                             out var areaType);
 
                         var area = new Models.Processed.Observation.Area
                         {
-                            Id = id,
                             FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
                             Name = feature.Attributes.GetOptionalValue("name")?.ToString()
                         };
@@ -228,70 +209,34 @@ namespace SOS.Lib.Helpers
         private static void SetProvincePartIdByCoordinate(Observation processedObservation)
         {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.Province?.Id;
+            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.Province?.FeatureId;
             if (new[]
             {
-                (int) ProvinceId.LuleLappmark,
-                (int) ProvinceId.LyckseleLappmark,
-                (int) ProvinceId.PiteLappmark,
-                (int) ProvinceId.TorneLappmark,
-                (int) ProvinceId.AseleLappmark
-            }.Contains(processedObservation.Location.Province?.Id ?? 0))
+                ProvinceIds.LuleLappmark,
+                ProvinceIds.LyckseleLappmark,
+                ProvinceIds.PiteLappmark,
+                ProvinceIds.TorneLappmark,
+                ProvinceIds.ÅseleLappmark
+            }.Contains(processedObservation.Location.Province?.FeatureId))
             {
-                processedObservation.Location.ProvincePartIdByCoordinate = (int) SpecialProvincePartId.Lappland;
+                processedObservation.Location.ProvincePartIdByCoordinate = SpecialProvincePartId.Lappland;
             }
         }
 
         private static void SetCountyPartIdByCoordinate(Observation processedObservation)
         {
             // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.County?.Id;
-            if (processedObservation.Location.County?.Id == (int) CountyId.Kalmar)
+            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.County?.FeatureId;
+            if (processedObservation.Location.County?.FeatureId == CountyId.Kalmar)
             {
-                if (processedObservation.Location.Province?.Id == (int) ProvinceId.Oland)
+                if (processedObservation.Location.Province?.FeatureId == ProvinceIds.Öland)
                 {
-                    processedObservation.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.Oland;
+                    processedObservation.Location.CountyPartIdByCoordinate = SpecialCountyPartId.Öland;
                 }
                 else
                 {
-                    processedObservation.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.KalmarFastland;
+                    processedObservation.Location.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
                 }
-            }
-        }
-
-        private IDictionary<VocabularyId, IDictionary<object, int>> GetGeoRegionVocabularyDictionaries(
-            ICollection<Vocabulary> verbatimFieldMappings)
-        {
-            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
-            foreach (var vocabularity in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
-            {
-                var processedVocabularies =
-                    vocabularity.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
-                if (processedVocabularies != null)
-                {
-                    var mapping = processedVocabularies.Mappings.Single(m => m.Key == VocabularyMappingKeyFields.FeatureId);
-                    var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(vocabularity.Id, sosIdByValue);
-                }
-            }
-
-            return dic;
-        }
-
-        public void AddValueDataToGeographicalFields(Observation observation)
-        {
-            SetValue(observation?.Location?.County, _vocabularyValueById[VocabularyId.County]);
-            SetValue(observation?.Location?.Municipality, _vocabularyValueById[VocabularyId.Municipality]);
-            SetValue(observation?.Location?.Province, _vocabularyValueById[VocabularyId.Province]);
-            SetValue(observation?.Location?.Parish, _vocabularyValueById[VocabularyId.Parish]);
-        }
-
-        private void SetValue(Models.Processed.Observation.VocabularyValue val, IDictionary<int, VocabularyValueInfo> fieldMappingValueById)
-        {
-            if (val == null) return;
-            if (fieldMappingValueById.TryGetValue(val.Id, out var fieldMappingValue))
-            {
-                val.Value = fieldMappingValue.Value;
             }
         }
     }

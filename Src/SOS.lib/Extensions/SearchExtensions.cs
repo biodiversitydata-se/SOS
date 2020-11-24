@@ -19,7 +19,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.County.Id)
+                        .Field(f => f.Location.County.FeatureId)
                         .Terms(filter.CountyIds)
                     )
                 );
@@ -97,7 +97,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.Municipality.Id)
+                        .Field(f => f.Location.Municipality.FeatureId)
                         .Terms(filter.MunicipalityIds)
                     )
                 );
@@ -133,7 +133,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.Province.Id)
+                        .Field(f => f.Location.Province.FeatureId)
                         .Terms(filter.ProvinceIds)
                     )
                 );
@@ -183,7 +183,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field("location.county.id")
+                        .Field("location.county.featureId")
                         .Terms(filter.CountyIds)
                     )
                 );
@@ -256,7 +256,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field("location.municipality.id")
+                        .Field("location.municipality.featureId")
                         .Terms(filter.MunicipalityIds)
                     )
                 );
@@ -284,11 +284,21 @@ namespace SOS.Lib.Extensions
                 );
             }
 
+            if (filter.ParishIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("location.parish.featureId")
+                        .Terms(filter.ParishIds)
+                    )
+                );
+            }
+
             if (filter.ProvinceIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field("location.province.id")
+                        .Field("location.province.featureId")
                         .Terms(filter.ProvinceIds)
                     )
                 );

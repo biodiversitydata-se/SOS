@@ -84,7 +84,7 @@ namespace SOS.Import.UnitTests.Harvesters
                 .ReturnsAsync(true);
             _areaProcessedRepository.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<Area>>()))
                 .ReturnsAsync(true);
-            _areaProcessedRepository.Setup(tr => tr.StoreGeometriesAsync(It.IsAny<IDictionary<int, Geometry>>()))
+            _areaProcessedRepository.Setup(tr => tr.StoreGeometriesAsync(It.IsAny<IDictionary<string, Geometry>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------

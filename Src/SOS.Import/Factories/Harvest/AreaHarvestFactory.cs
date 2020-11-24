@@ -15,13 +15,11 @@ namespace SOS.Import.Factories.Harvest
         {
             return await Task.Run(() =>
             {
-                return from e in entities
-                    select new Area((AreaType)e.AreaDatasetId)
+                return entities
+                    .Select(e => new Area((AreaType) e.AreaDatasetId, e.FeatureId)
                     {
-                        Id = e.Id,
-                        FeatureId = e.FeatureId,
                         Name = e.Name
-                    };
+                    });
             });
         }
     }

@@ -19,21 +19,21 @@ namespace SOS.Import.Repositories.Source.Artportalen
         private string GetSiteQuery(string join) =>
             $@"
                 SELECT 
-	                s.Id,
+	               s.Id,
 	                ISNULL(s.PresentationName, s.Name) AS Name,
 	                s.XCoord,
 	                s.YCoord,
                     s.Accuracy,
 					s.ExternalId,
-	                am.Id AS MunicipalityId,
+	                am.FeatureId AS MunicipalityFeatureId,
 	                am.Name AS MunicipalityName,
-	                am.ParentId AS CountyId,
-	                am.ParentAreaName AS CountyName,
-	                ap.Id AS ProvinceId,
+	                amp.FeatureId AS CountyFeatureId,
+	                amp.Name AS CountyName,
+	                ap.FeatureId AS ProvinceFeatureId,
 	                ap.Name AS ProvinceName,
-	                acp.Id AS CountryPartId,
+	                acp.FeatureId AS CountryPartFeatureId,
 	                acp.Name AS CountryPartName,
-	                apa.Id AS ParishId,
+	                apa.FeatureId AS ParishId,
 	                apa.Name AS ParishName,
 					s.ParentId AS ParentSiteId,
 					s.PresentationNameParishRegion
@@ -45,17 +45,20 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                 SELECT
 			                sa.SiteId,
 			                sa.AreasId,
+							a.FeatureId,
 							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS MunicipalityIndex
 		                FROM
 			                SiteAreas sa
 			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 1 
 	                ) AS sam ON s.Id = sam.SiteId AND sam.MunicipalityIndex = 1
 	                LEFT JOIN Area am ON sam.AreasId = am.Id
+					LEFT JOIN Area amp ON am.ParentId = amp.Id
 	                LEFT JOIN -- Bad data exists, some sites are connected to more than one province
 	                (
 		                SELECT
 			                sa.SiteId,
 			                sa.AreasId,
+							a.FeatureId,
 							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS ProvinceIndex
 		                FROM
 			                SiteAreas sa
@@ -67,6 +70,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                SELECT
 			                sa.SiteId,
 			                sa.AreasId,
+							a.FeatureId,
 							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS CountyIndex
 		                FROM
 			                SiteAreas sa
@@ -78,6 +82,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                SELECT
 			                sa.SiteId,
 			                sa.AreasId,
+							a.FeatureId,
 							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS ParishIndex
 						FROM
 			                SiteAreas sa
@@ -85,55 +90,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                ) AS sapa ON s.Id = sapa.SiteId AND sapa.ParishIndex = 1
 	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
-
-
-        /// <summary>
-        /// Add bird validation areas
-        /// </summary>
-        /// <param name="sites"></param>
-        /// <returns></returns>
-        private async Task<IDictionary<int, ICollection<string>>> AddBirdValidationAreas(int[] siteIds)
-        {
-            if (!siteIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            try
-            {
-                const string query = @"
-                SELECT 
-		            sa.SiteId, a.FeatureId
-	            FROM 
-		            SiteAreas sa
-		            INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 18
-                    INNER JOIN @sid s ON sa.SiteId = s.Id";
-
-                var siteBirdValidationAreas = (await QueryAsync<(int siteId, string featureId)>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
-
-                var siteAreas = new Dictionary<int, ICollection<string>>();
-                if (siteBirdValidationAreas?.Any() ?? false)
-                {
-                   
-                    foreach (var siteBirdValidationArea in siteBirdValidationAreas)
-                    {
-                        if (!siteAreas.TryGetValue(siteBirdValidationArea.siteId, out var areas))
-                        {
-                            areas = new List<string>();
-                            siteAreas.Add(siteBirdValidationArea.siteId, areas);
-                        }
-                        areas.Add(siteBirdValidationArea.featureId);
-                    }
-                }
-                return siteAreas;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting bird validation areas");
-                return null;
-            }
-        }
 
 		/// <summary>
 		///     Constructor
@@ -181,5 +137,49 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
-	}
+
+        /// <inheritdoc />
+        public async Task<IDictionary<int, ICollection<string>>> GetSiteBirdValidationAreaIds(int[] siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            try
+            {
+                const string query = @"
+                SELECT 
+		            sa.SiteId, a.FeatureId
+	            FROM 
+		            SiteAreas sa
+		            INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 18
+                    INNER JOIN @sid s ON sa.SiteId = s.Id";
+
+                var siteBirdValidationAreas = (await QueryAsync<(int siteId, string featureId)>(query,
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
+
+                var siteAreas = new Dictionary<int, ICollection<string>>();
+                if (siteBirdValidationAreas?.Any() ?? false)
+                {
+
+                    foreach (var siteBirdValidationArea in siteBirdValidationAreas)
+                    {
+                        if (!siteAreas.TryGetValue(siteBirdValidationArea.siteId, out var areas))
+                        {
+                            areas = new List<string>();
+                            siteAreas.Add(siteBirdValidationArea.siteId, areas);
+                        }
+                        areas.Add(siteBirdValidationArea.featureId);
+                    }
+                }
+                return siteAreas;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting bird validation areas");
+                return null;
+            }
+        }
+    }
 }

@@ -10,12 +10,7 @@
         /// <summary>
         /// Feature id
         /// </summary>
-        public string Feature { get; set; }
-
-        /// <summary>
-        ///     Area Id
-        /// </summary>
-        public int Id { get; set; }
+        public string FeatureId { get; set; }
 
         /// <summary>
         ///     Name of area

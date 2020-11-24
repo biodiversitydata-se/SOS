@@ -9,7 +9,7 @@
         /// <summary>
         ///     Id
         /// </summary>
-        TKey Id { get; set; }
+        TKey Id { get; }
     }
 
     /// <summary>

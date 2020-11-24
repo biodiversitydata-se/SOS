@@ -88,7 +88,6 @@ namespace SOS.Observations.Api.Extensions
             filter.EndDate = searchFilterDto.Date?.EndDate;
             filter.SearchOnlyBetweenDates = (searchFilterDto.Date?.SearchOnlyBetweenDates).GetValueOrDefault();
             filter.Areas = searchFilterDto.Areas?.Select(a => new AreaFilter {FeatureId = a.FeatureId, Type = a.Type});
-            filter.AreaIds = searchFilterDto.AreaIds;
             filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
@@ -130,7 +129,7 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterDto.Date?.StartDate;
             filter.EndDate = searchFilterDto.Date?.EndDate;
             filter.SearchOnlyBetweenDates = (searchFilterDto.Date?.SearchOnlyBetweenDates).GetValueOrDefault();
-            filter.AreaIds = searchFilterDto.AreaIds;
+            filter.Areas = searchFilterDto.Areas?.Select(a => new AreaFilter {Type = a.Type, FeatureId = a.FeatureId});
             filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;

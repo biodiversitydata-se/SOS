@@ -13,7 +13,7 @@
         /// <summary>
         ///     Id of county
         /// </summary>
-        public int? CountyId { get; set; }
+        public string CountyFeatureId { get; set; }
 
         /// <summary>
         ///     Id of county
@@ -23,7 +23,7 @@
         /// <summary>
         ///     Country part id
         /// </summary>
-        public int? CountryPartId { get; set; }
+        public string CountryPartFeatureId { get; set; }
 
         /// <summary>
         ///     Name of country part
@@ -43,7 +43,7 @@
         /// <summary>
         ///     Id of municipality
         /// </summary>
-        public int? MunicipalityId { get; set; }
+        public string MunicipalityFeatureId { get; set; }
 
         /// <summary>
         ///     Name of municipality
@@ -53,7 +53,7 @@
         /// <summary>
         ///     Id of Parish
         /// </summary>
-        public int? ParishId { get; set; }
+        public string ParishFeatureId { get; set; }
 
         /// <summary>
         ///     Name of Parish
@@ -68,7 +68,7 @@
         /// <summary>
         ///     Id of province
         /// </summary>
-        public int? ProvinceId { get; set; }
+        public string ProvinceFeatureId { get; set; }
 
         /// <summary>
         ///     Name of province

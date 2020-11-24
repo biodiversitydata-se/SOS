@@ -74,7 +74,7 @@ namespace SOS.Import.Harvesters
                             _logger.LogDebug("Finish adding areas");
 
                             _logger.LogDebug("Start casting geometries");
-                            var geometries = areas.ToDictionary(a => a.Id, a => a
+                            var geometries = areas.ToDictionary(a => ((AreaType)a.AreaDatasetId).ToAreaId(a.FeatureId), a => a
                                 .PolygonWKT?
                                 .ToGeometry()
                                 .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));

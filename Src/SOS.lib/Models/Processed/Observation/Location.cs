@@ -52,7 +52,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Special handling of Kalmar/Öland
         /// </summary>
-        public int? CountyPartIdByCoordinate { get; set; }
+        public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
         ///     The standard code for the country in which the
@@ -72,7 +72,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public VocabularyValue County { get; set; }
+        public Area County { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: municipality.
@@ -84,7 +84,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public VocabularyValue Municipality { get; set; }
+        public Area Municipality { get; set; }
 
         /// <summary>
         ///     The original municipality value from data provider.
@@ -98,7 +98,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public VocabularyValue Parish { get; set; }
+        public Area Parish { get; set; }
  
         /// <summary>
         ///     Darwin Core term name: stateProvince.
@@ -111,7 +111,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public VocabularyValue Province { get; set; }
+        public Area Province { get; set; }
 
         /// <summary>
         ///     The original StateProvince value from data provider.
@@ -426,7 +426,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Spacial handling of Lappland
         /// </summary>
-        public int? ProvincePartIdByCoordinate { get; set; }
+        public string ProvincePartIdByCoordinate { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: verbatimCoordinates.

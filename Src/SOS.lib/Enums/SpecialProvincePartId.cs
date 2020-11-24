@@ -1,10 +1,10 @@
 ﻿namespace SOS.Lib.Enums
 {
-    public enum SpecialProvincePartId
+    public static class SpecialProvincePartId
     {
         /// <summary>
         ///     Special province Lappland that have province parts.
         /// </summary>
-        Lappland = -100
+        public static string Lappland => "-100";
     }
 }

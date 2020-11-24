@@ -173,10 +173,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<UnitVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<BasisOfRecordVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ContinentVocabularyFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<CountyVocabularyFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<MunicipalityVocabularyFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ParishVocabularyFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ProvinceVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TypeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<CountryVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<AccessRightsVocabularyFactory>().InstancePerLifetimeScope();

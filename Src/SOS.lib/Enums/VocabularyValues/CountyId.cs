@@ -1,113 +1,34 @@
 ﻿namespace SOS.Lib.Enums.VocabularyValues
 {
+
     /// <summary>
     ///     Enumeration of County.
     /// </summary>
-    public enum CountyId
+    public static class CountyId
     {
-        /// <summary>
-        ///     Blekinge.
-        /// </summary>
-        Blekinge = 1,
+        public static string Blekinge => "10";
+        public static string Dalarna => "20";
+        public static string Gotland => "9";
+        public static string Gävleborg => "21";
+        public static string Halland => "13";
+        public static string Jämtland => "23";
+        public static string Jönköping => "6";
+        public static string Kalmar => "8";
+        public static string Kronoberg => "7";
+        public static string Norrbotten => "25";
+        public static string Skåne => "12";
+        public static string Stockholm => "1";
+        public static string Södermanland => "4";
+        public static string Uppsala => "3";
+        public static string Värmland => "17";
+        public static string Västerbotten => "24";
+        public static string Västernorrland => "22";
+        public static string Västmanland => "19";
 
-        /// <summary>
-        ///     Dalarna.
-        /// </summary>
-        Dalarna = 2,
+        public static string VästraGötaland	 => "14";
 
-        /// <summary>
-        ///     Gotland.
-        /// </summary>
-        Gotland = 3,
-
-        /// <summary>
-        ///     Gävleborg.
-        /// </summary>
-        Gavleborg = 4,
-
-        /// <summary>
-        ///     Halland.
-        /// </summary>
-        Halland = 5,
-
-        /// <summary>
-        ///     Jämtland.
-        /// </summary>
-        Jamtland = 6,
-
-        /// <summary>
-        ///     Jönköping.
-        /// </summary>
-        Jonkoping = 7,
-
-        /// <summary>
-        ///     Kalmar.
-        /// </summary>
-        Kalmar = 8,
-
-        /// <summary>
-        ///     Kronoberg.
-        /// </summary>
-        Kronoberg = 9,
-
-        /// <summary>
-        ///     Norrbotten.
-        /// </summary>
-        Norrbotten = 10,
-
-        /// <summary>
-        ///     Skåne.
-        /// </summary>
-        Skane = 11,
-
-        /// <summary>
-        ///     Stockholm.
-        /// </summary>
-        Stockholm = 12,
-
-        /// <summary>
-        ///     Södermanland.
-        /// </summary>
-        Sodermanland = 13,
-
-        /// <summary>
-        ///     Uppsala.
-        /// </summary>
-        Uppsala = 14,
-
-        /// <summary>
-        ///     Värmland.
-        /// </summary>
-        Varmland = 15,
-
-        /// <summary>
-        ///     Västerbotten.
-        /// </summary>
-        Vasterbotten = 16,
-
-        /// <summary>
-        ///     Östergötland.
-        /// </summary>
-        Ostergotland = 17,
-
-        /// <summary>
-        ///     Västernorrland.
-        /// </summary>
-        Vasternorrland = 18,
-
-        /// <summary>
-        ///     Västmanland.
-        /// </summary>
-        Vastmanland = 19,
-
-        /// <summary>
-        ///     Västra Götaland.
-        /// </summary>
-        VastraGotaland = 20,
-
-        /// <summary>
-        ///     Örebro.
-        /// </summary>
-        Orebro = 21
+        public static string Örebro => "18";
+        public static string Östergötland => "5";
+        	
     }
 }

@@ -65,10 +65,8 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private static AreaWithGeometry ConvertToArea(IFeature feature, AreaType areaType)
         {
-            return new AreaWithGeometry(areaType)
+            return new AreaWithGeometry(areaType, feature.Attributes["nativeId"].ToString())
             {
-                Id = int.Parse(feature.Attributes["id"].ToString()),
-                FeatureId = feature.Attributes["nativeId"].ToString(),
                 Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoShape(),
                 Name = feature.Attributes["name"].ToString()
             };

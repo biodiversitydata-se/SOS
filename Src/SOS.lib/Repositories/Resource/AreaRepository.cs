@@ -4,12 +4,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
@@ -20,7 +22,7 @@ namespace SOS.Lib.Repositories.Resource
     /// <summary>
     ///     Area repository
     /// </summary>
-    public class AreaRepository : RepositoryBase<Area, int>, IAreaRepository
+    public class AreaRepository : RepositoryBase<Area, ObjectId>, IAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -70,9 +72,9 @@ namespace SOS.Lib.Repositories.Resource
         }
 
         /// <inheritdoc />
-        public async Task<IGeoShape> GetGeometryAsync(int areaId)
+        public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
         {
-            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{areaId}");
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaType.ToAreaId(featureId));
             var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
@@ -139,14 +141,14 @@ namespace SOS.Lib.Repositories.Resource
         }
 
         /// <inheritdoc />
-        public async Task<bool> StoreGeometriesAsync(IDictionary<int, Geometry> areaGeometries)
+        public async Task<bool> StoreGeometriesAsync(IDictionary<string, Geometry> areaGeometries)
         {
             var serializeOptions = new JsonSerializerOptions();
             serializeOptions.Converters.Add(new GeometryConverter());
 
             foreach (var geometry in areaGeometries)
             {
-                var fileName = $"geometry-{geometry.Key}";
+                var fileName = geometry.Key;
                 var geometryString = JsonSerializer.Serialize(geometry.Value, serializeOptions);
                 var byteArray = Encoding.UTF8.GetBytes(geometryString);
 

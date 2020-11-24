@@ -72,9 +72,6 @@
     <Compile Update="Factories\Vocabularies\CountryVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\Vocabularies\CountyVocabularyFactory.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
     <Compile Update="Factories\Vocabularies\DwcVocabularyFactoryBase.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
@@ -90,19 +87,10 @@
     <Compile Update="Factories\Vocabularies\LifeStageVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\Vocabularies\MunicipalityVocabularyFactory.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
     <Compile Update="Factories\Vocabularies\OccurrenceStatusVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
     <Compile Update="Factories\Vocabularies\InstitutionVocabularyFactory.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Factories\Vocabularies\ParishVocabularyFactory.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Factories\Vocabularies\ProvinceVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
     <Compile Update="Factories\Vocabularies\SubstrateVocabularyFactory.cs">

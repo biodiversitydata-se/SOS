@@ -1,178 +1,51 @@
-﻿namespace SOS.Lib.Enums.VocabularyValues
+﻿using Hangfire.Annotations;
+
+namespace SOS.Lib.Enums.VocabularyValues
 {
-    /// <summary>
-    ///     Enumeration of Province.
-    /// </summary>
-    public enum ProvinceId
+    public static class ProvinceIds
     {
-        /// <summary>
-        ///     Skåne.
-        /// </summary>
-        Skane = 8058,
+        public static string Blekinge => "2";
 
-        /// <summary>
-        ///     Blekinge.
-        /// </summary>
-        Blekinge = 8059,
+        public static string Bohuslän => "7";
 
-        /// <summary>
-        ///     Småland.
-        /// </summary>
-        Smaland = 8060,
+        public static string Bottenhavet => "31";
 
-        /// <summary>
-        ///     Öland.
-        /// </summary>
-        Oland = 8061,
+        public static string Bottenviken => "31";
 
-        /// <summary>
-        ///     Gotland.
-        /// </summary>
-        Gotland = 8062,
+        public static string Dalarna => "16";
 
-        /// <summary>
-        ///     Halland.
-        /// </summary>
-        Halland = 8063,
+        public static string Dalsland => "8";
+        public static string Gotland => "5";
+        public static string Gästrikland => "17";
+        public static string Halland => "6";
+        public static string Hälsingland => "18";
+        public static string Härjedalen => "23";
+        public static string Jämtland => "24";
+        public static string Kattegatt => "33"; 
+        public static string LuleLappmark => "28"; 
+        public static string LyckseleLappmark => "26";
+        public static string Medelpad => "19";
+        public static string Norrbotten => "22"; 
+        public static string Närke => "10"; 
+        public static string PiteLappmark => "27"; 
+        public static string Skagerrak => "34"; 
+        public static string Skane => "1";
 
-        /// <summary>
-        ///     Bohuslän.
-        /// </summary>
-        Bohuslan = 8064,
+        public static string Småland => "3";
+        public static string Södermanland => "12";
+        public static string TorneLappmark => "29";
+        public static string Uppland => "13";
 
-        /// <summary>
-        ///     Dalsland.
-        /// </summary>
-        Dalsland = 8065,
-
-        /// <summary>
-        ///     Västergötland.
-        /// </summary>
-        Vastergotland = 8066,
-
-        /// <summary>
-        ///     Närke.
-        /// </summary>
-        Narke = 8067,
-
-        /// <summary>
-        ///     Östergötland.
-        /// </summary>
-        Ostergotland = 8068,
-
-        /// <summary>
-        ///     Södermanland.
-        /// </summary>
-        Sodermanland = 8069,
-
-        /// <summary>
-        ///     Uppland.
-        /// </summary>
-        Uppland = 8070,
-
-        /// <summary>
-        ///     Västmanland.
-        /// </summary>
-        Vastmanland = 8071,
-
-        /// <summary>
-        ///     Värmland.
-        /// </summary>
-        Varmland = 8072,
-
-        /// <summary>
-        ///     Dalarna.
-        /// </summary>
-        Dalarna = 8073,
-
-        /// <summary>
-        ///     Gästrikland.
-        /// </summary>
-        Gastrikland = 8074,
-
-        /// <summary>
-        ///     Hälsingland.
-        /// </summary>
-        Halsingland = 8075,
-
-        /// <summary>
-        ///     Medelpad.
-        /// </summary>
-        Medelpad = 8076,
-
-        /// <summary>
-        ///     Ångermanland.
-        /// </summary>
-        Angermanland = 8077,
-
-        /// <summary>
-        ///     Västerbotten.
-        /// </summary>
-        Vasterbotten = 8078,
-
-        /// <summary>
-        ///     Norrbotten.
-        /// </summary>
-        Norrbotten = 8079,
-
-        /// <summary>
-        ///     Härjedalen.
-        /// </summary>
-        Harjedalen = 8080,
-
-        /// <summary>
-        ///     Jämtland.
-        /// </summary>
-        Jamtland = 8081,
-
-        /// <summary>
-        ///     Åsele lappmark.
-        /// </summary>
-        AseleLappmark = 8082,
-
-        /// <summary>
-        ///     Lycksele lappmark.
-        /// </summary>
-        LyckseleLappmark = 8083,
-
-        /// <summary>
-        ///     Pite lappmark.
-        /// </summary>
-        PiteLappmark = 8084,
-
-        /// <summary>
-        ///     Lule lappmark.
-        /// </summary>
-        LuleLappmark = 8085,
-
-        /// <summary>
-        ///     Torne lappmark.
-        /// </summary>
-        TorneLappmark = 8086,
-
-        /// <summary>
-        ///     Bottenviken.
-        /// </summary>
-        Bottenviken = 55235,
-
-        /// <summary>
-        ///     Bottenhavet.
-        /// </summary>
-        Bottenhavet = 55236,
-
-        /// <summary>
-        ///     Östersjön.
-        /// </summary>
-        Ostersjon = 55237,
-
-        /// <summary>
-        ///     Kattegatt.
-        /// </summary>
-        Kattegatt = 55238,
-
-        /// <summary>
-        ///     Skagerrak.
-        /// </summary>
-        Skagerrak = 55239
+        public static string Värmland => "15";
+        public static string Västerbotten => "21";
+        public static string Västergötland => "9";
+        public static string Västmanland => "14";
+        public static string Ångermanland => "20";
+        public static string ÅseleLappmark => "25";
+        public static string Öland => "4";
+        public static string Östergötland => "11";
+        public static string Östersjön => "32";
     }
+
+    
 }

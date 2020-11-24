@@ -66,8 +66,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processDbConfiguration.WriteBatchSize);
             
             var areaHelper = new AreaHelper(
-                new AreaRepository(processClient, new NullLogger<AreaRepository>()),
-                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>()));
+                new AreaRepository(processClient, new NullLogger<AreaRepository>()));
            
             var taxonProcessedRepository =
                 new TaxonRepository(processClient, new NullLogger<TaxonRepository>());

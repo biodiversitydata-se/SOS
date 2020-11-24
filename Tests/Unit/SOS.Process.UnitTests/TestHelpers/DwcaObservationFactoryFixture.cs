@@ -42,7 +42,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var processedAreaRepositoryStub =
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
-            var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object, vocabularyRepository.Object);
+            var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object);
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
