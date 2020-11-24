@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Resource;
@@ -21,7 +22,7 @@ namespace SOS.Observations.Api.IntegrationTests.Managers
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());
-            var taxonManager = new TaxonManager(processedTaxonRepository, new NullLogger<TaxonManager>());
+            var taxonManager = new TaxonManager(processedTaxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonManager>());
             return taxonManager;
         }
 

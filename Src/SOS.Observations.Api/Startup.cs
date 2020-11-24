@@ -282,7 +282,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
-            services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddScoped<ITaxonManager, TaxonManager>();
             services.AddScoped<IFilterManager, FilterManager>();
 
             // Add repositories
@@ -290,7 +290,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddSingleton<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
             // Add services

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -34,8 +35,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var taxonManager = new TaxonManager(
-                new TaxonRepository(exportClient,
+            var taxonManager = new TaxonManager(new MemoryCache(new MemoryCacheOptions()), new TaxonRepository(exportClient,
                     new Mock<ILogger<TaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
             var vocabularyRepository =
