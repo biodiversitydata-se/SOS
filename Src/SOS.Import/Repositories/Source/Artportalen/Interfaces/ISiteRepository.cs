@@ -22,5 +22,12 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// <param name="live"></param>
         /// <returns></returns>
         Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live = false);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <returns></returns>
+        Task<IDictionary<int, ICollection<string>>> GetSiteBirdValidationAreaIds(int[] siteIds);
     }
 }

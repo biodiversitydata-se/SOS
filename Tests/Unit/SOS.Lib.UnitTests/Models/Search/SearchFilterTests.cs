@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
+using MongoDB.Bson;
 using Nest;
 using SOS.Lib.Models.Search;
 using Xunit;
@@ -19,7 +20,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                CountyIds = new[] {1, 2, 3},
+                CountyIds = new [] { "5", "24" , "14"},
                 GeometryFilter = new GeometryFilter
                 {
                     MaxDistanceFromPoint = 50,
@@ -60,7 +61,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                CountyIds = new[] {1, 2, 3},
+                CountyIds = new[] { "14", "5", "24" },
                 GeometryFilter = new GeometryFilter
                 {
                     MaxDistanceFromPoint = 50,

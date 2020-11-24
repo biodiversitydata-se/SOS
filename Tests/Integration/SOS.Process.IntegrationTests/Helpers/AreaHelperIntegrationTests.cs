@@ -43,8 +43,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.CountyPartIdByCoordinate.Should().Be((int) SpecialCountyPartId.Oland);
-            observation.Location.County.Id.Should().Be((int) CountyId.Kalmar);
+            observation.Location.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.Öland);
+            observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
         }
 
         [Fact]
@@ -73,43 +73,11 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.CountyPartIdByCoordinate.Should().Be((int) SpecialCountyPartId.KalmarFastland);
-            observation.Location.County.Id.Should().Be((int) CountyId.Kalmar);
+            observation.Location.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.KalmarFastland);
+            observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
         }
 
-        [Fact]
-        [Trait("Category", "Integration")]
-        public void GetRegionBelongingsForLocationInTranasMunicipality()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<Observation>();
-            var observation = new Observation
-            {
-                Location = new Location
-                {
-                    DecimalLatitude = Coordinates.TranasMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.TranasMunicipality.Longitude
-                }
-            };
-            observations.Add(observation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddValueDataToGeographicalFields(observation);
-            observation.Location.County.Value.Should().Be("Jönköping");
-            observation.Location.Municipality.Value.Should().Be("Tranås");
-            observation.Location.Province.Value.Should().Be("Småland");
-            observation.Location.Parish.Value.Should().Be("Tranås");
-        }
-
+       
         [Fact]
         [Trait("Category", "Integration")]
         public void ProvincePartIdByCoordinateShouldBeSetToLappland_When_ObservationIsInLappmark()
@@ -134,8 +102,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.ProvincePartIdByCoordinate.Should().Be((int) SpecialProvincePartId.Lappland);
-            observation.Location.Province.Id.Should().Be((int) ProvinceId.TorneLappmark);
+            observation.Location.ProvincePartIdByCoordinate.Should().Be((string) SpecialProvincePartId.Lappland);
+            observation.Location.Province.FeatureId.Should().Be((string) ProvinceIds.TorneLappmark);
         }
     }
 }

@@ -8,7 +8,7 @@
         /// <summary>
         ///     Id of area
         /// </summary>
-        public int Id { get; set; }
+        public string FeatureId { get; set; }
 
         /// <summary>
         ///     Name of area

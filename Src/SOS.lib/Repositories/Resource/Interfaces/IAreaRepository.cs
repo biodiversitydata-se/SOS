@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -11,7 +12,7 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IAreaRepository : IRepositoryBase<Area, int>
+    public interface IAreaRepository : IRepositoryBase<Area, ObjectId>
     {
         /// <summary>
         ///     Create indexes
@@ -26,11 +27,12 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         Task DropGeometriesAsync();
 
         /// <summary>
-        ///     Get the geometry for a area
+        ///  Get the geometry for a area
         /// </summary>
-        /// <param name="areaId"></param>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<IGeoShape> GetGeometryAsync(int areaId);
+        Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
 
         /// <summary>
         ///     Get all the areas, paged
@@ -49,15 +51,15 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         /// Get Area by type and feature
         /// </summary>
         /// <param name="areaType"></param>
-        /// <param name="feature"></param>
+        /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<Area> GetAsync(AreaType areaType, string feature);
+        Task<Area> GetAsync(AreaType areaType, string featureId);
 
         /// <summary>
         ///     Save geometries to Gridfs
         /// </summary>
         /// <param name="areaGeometries"></param>
         /// <returns></returns>
-        Task<bool> StoreGeometriesAsync(IDictionary<int, Geometry> areaGeometries);
+        Task<bool> StoreGeometriesAsync(IDictionary<string, Geometry> areaGeometries);
     }
 }

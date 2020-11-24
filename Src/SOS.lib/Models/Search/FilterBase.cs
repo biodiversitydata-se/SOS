@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using MongoDB.Bson;
 
 namespace SOS.Lib.Models.Search
 {
@@ -23,9 +24,7 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<AreaFilter> Areas { get; set; }
 
-        public IEnumerable<int> AreaIds { get; set; }
-
-        public IEnumerable<int> CountyIds { get; set; }
+        public IEnumerable<string> CountyIds { get; set; }
 
         /// <summary>
         ///     Only get data from these providers
@@ -66,7 +65,7 @@ namespace SOS.Lib.Models.Search
         ///     True if any filter property is set.
         /// </summary>
         public bool IsFilterActive =>
-            (AreaIds?.Any() ?? false) ||
+            (Areas?.Any() ?? false) ||
             (CountyIds?.Any() ?? false) ||
             (DataProviderIds?.Any() ?? false) ||
             EndDate != null ||
@@ -74,6 +73,7 @@ namespace SOS.Lib.Models.Search
             (GenderIds?.Any() ?? false) ||
             (MunicipalityIds?.Any() ?? false) ||
             OnlyValidated.HasValue ||
+            (ParishIds?.Any() ?? false) || 
             PositiveSightings.HasValue ||
             (ProvinceIds?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
@@ -83,12 +83,17 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public IEnumerable<int> MunicipalityIds { get; set; }
+        public IEnumerable<string> MunicipalityIds { get; set; }
 
         /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
+
+        /// <summary>
+        ///     Parish to match. Queryable values are available in Field Mappings.
+        /// </summary>
+        public IEnumerable<string> ParishIds { get; set; }
 
         /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
@@ -100,7 +105,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Provinces to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public IEnumerable<int> ProvinceIds { get; set; }
+        public IEnumerable<string> ProvinceIds { get; set; }
 
         /// <summary>
         ///     Redlist categories to match. Queryable values are available in Field Mappings.

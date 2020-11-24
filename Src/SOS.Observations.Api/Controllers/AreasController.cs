@@ -53,30 +53,6 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
-        [HttpGet("{areaId}/Export")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        public async Task<IActionResult> ExportAreaAsync(int areaId)
-        {
-            try
-            {
-                var zipBytes = await _areaManager.GetZipppedAreaAsync(areaId);
-
-                if (zipBytes == null)
-                {
-                    return new StatusCodeResult((int) HttpStatusCode.NoContent);
-                }
-
-                return File(zipBytes, "application/zip", $"Area{areaId}.zip");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
 
         /// <inheritdoc />
         [HttpGet("{areaType}/{feature}/Export")]

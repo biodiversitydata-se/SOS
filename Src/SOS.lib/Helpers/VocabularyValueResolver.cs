@@ -54,14 +54,6 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.AccessRights]);
                 ResolveVocabularyMappedValue(observation.InstitutionCode,
                     valueMappingDictionaries[VocabularyId.Institution]);
-                ResolveVocabularyMappedValue(observation.Location?.County,
-                    valueMappingDictionaries[VocabularyId.County]);
-                ResolveVocabularyMappedValue(observation.Location?.Municipality,
-                    valueMappingDictionaries[VocabularyId.Municipality]);
-                ResolveVocabularyMappedValue(observation.Location?.Parish,
-                    valueMappingDictionaries[VocabularyId.Parish]);
-                ResolveVocabularyMappedValue(observation.Location?.Province,
-                    valueMappingDictionaries[VocabularyId.Province]);
                 ResolveVocabularyMappedValue(observation.Location?.Country,
                     valueMappingDictionaries[VocabularyId.Country]);
                 ResolveVocabularyMappedValue(observation.Location?.Continent,

@@ -6,11 +6,6 @@
     public class Area
     {
         /// <summary>
-        ///     Id of area
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
         ///     Feature Id of area
         /// </summary>
         public string FeatureId { get; set; }

@@ -369,23 +369,18 @@ namespace SOS.Import.Factories.Harvest
             return new Site
             {
                 Accuracy = accuracy,
-                County = entity.CountyId.HasValue
-                    ? new GeographicalArea { Id = entity.CountyId.Value, Name = entity.CountyName }
-                    : null,
-                CountryPart = entity.CountryPartId.HasValue
-                    ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName }
-                    : null,
+                County = string.IsNullOrEmpty(entity.CountyFeatureId)
+                    ? null : new GeographicalArea { FeatureId = entity.CountyFeatureId, Name = entity.CountyName },
+                CountryPart = string.IsNullOrEmpty(entity.CountryPartFeatureId)
+                    ? null : new GeographicalArea { FeatureId = entity.CountryPartFeatureId, Name = entity.CountryPartName },
                 ExternalId = entity.ExternalId,
                 Id = entity.Id,
-                Municipality = entity.MunicipalityId.HasValue
-                    ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName }
-                    : null,
-                Province = entity.ProvinceId.HasValue
-                    ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName }
-                    : null,
-                Parish = entity.ParishId.HasValue
-                    ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName }
-                    : null,
+                Municipality = string.IsNullOrEmpty(entity.MunicipalityFeatureId)
+                    ? null : new GeographicalArea { FeatureId = entity.MunicipalityFeatureId, Name = entity.MunicipalityName },
+                Province = string.IsNullOrEmpty(entity.ProvinceFeatureId)
+                    ? null : new GeographicalArea { FeatureId = entity.ProvinceFeatureId, Name = entity.ProvinceName },
+                Parish = string.IsNullOrEmpty(entity.ParishFeatureId)
+                    ? null : new GeographicalArea { FeatureId = entity.ParishFeatureId, Name = entity.ParishName },
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),

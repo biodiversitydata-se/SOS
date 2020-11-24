@@ -1,17 +1,17 @@
 ﻿namespace SOS.Lib.Enums
 {
-    public enum SpecialCountyPartId
+    public static class SpecialCountyPartId
     {
         /// <summary>
         ///     Kalmar fastland
         ///     Special county that represents a part of the County Kalmar
         /// </summary>
-        KalmarFastland = -100,
+        public static string KalmarFastland => "-100";
 
         /// <summary>
         ///     Oland
         ///     Special county that represents a part of the county Kalmar (Öland)
         /// </summary>
-        Oland = -101
+        public static string Öland => "-101";
     }
 }

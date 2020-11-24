@@ -47,13 +47,12 @@ namespace SOS.Observations.Api.Managers
                     return null;
                 }
 
-                var geometry = await _areaRepository.GetGeometryAsync(area.Id);
+                var geometry = await _areaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
                 var externalArea = new ExternalArea
                 {
                     AreaType = area.AreaType.ToString(),
-                    Feature = area.FeatureId,
+                    FeatureId = area.FeatureId,
                     Geometry = geometry.ToGeoJson(),
-                    Id = area.Id,
                     Name = area.Name
                 };
                 var result = JsonConvert.SerializeObject(externalArea, Formatting.Indented,
@@ -82,13 +81,7 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<byte[]> GetZipppedAreaAsync(int areaId)
-        {
-            var area = await _areaRepository.GetAsync(areaId);
-            return await GetZipppedAreaAsync(area);
-        }
-
-        public async Task<byte[]> GetZipppedAreaAsync(AreaType areaType, string feature)
+    public async Task<byte[]> GetZipppedAreaAsync(AreaType areaType, string feature)
         {
             var area = await _areaRepository.GetAsync(areaType, feature);
             return await GetZipppedAreaAsync(area);
@@ -107,8 +100,7 @@ namespace SOS.Observations.Api.Managers
                     Records = result.Records.Select(r => new ExternalSimpleArea
                     {
                         AreaType = r.AreaType.ToString(),
-                        Feature = r.FeatureId,
-                        Id = r.Id,
+                        FeatureId = r.FeatureId,
                         Name = r.Name
                     }),
                     Skip = result.Skip,

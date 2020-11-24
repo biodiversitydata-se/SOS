@@ -52,8 +52,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper =
-                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
-                    vocabularyRepository);
+                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
