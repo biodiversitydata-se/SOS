@@ -276,22 +276,22 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
 
             // Add managers
-            services.AddSingleton<IAreaManager, AreaManager>();
-            services.AddSingleton<IDataProviderManager, DataProviderManager>();
+            services.AddScoped<IAreaManager, AreaManager>();
+            services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
-            services.AddSingleton<IVocabularyManager, VocabularyManager>();
+            services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
-            services.AddScoped<ITaxonManager, TaxonManager>();
-            services.AddSingleton<IFilterManager, FilterManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddScoped<IFilterManager, FilterManager>();
 
             // Add repositories
-            services.AddSingleton<IAreaRepository, AreaRepository>();
-            services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddScoped<ITaxonRepository, TaxonRepository>();
-            services.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+            services.AddSingleton<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
