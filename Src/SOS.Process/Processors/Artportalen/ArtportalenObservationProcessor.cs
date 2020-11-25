@@ -240,10 +240,7 @@ namespace SOS.Process.Processors.Artportalen
         {
             cancellationToken?.ThrowIfCancellationRequested();
 
-            Logger.LogDebug($"Start validating Artportalen batch ({batchId})");
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-            Logger.LogDebug($"End validating Artportalen batch ({batchId})");
+            observations = await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
 
             if (mode != JobRunModes.Full)
             {
@@ -252,15 +249,11 @@ namespace SOS.Process.Processors.Artportalen
                 Logger.LogDebug($"Finish deleteing live data ({batchId}) {success}");
             }
 
-            Logger.LogDebug($"Start storing Artportalen batch ({batchId})");
-            var verbatimCount = await CommitBatchAsync(dataProvider, observations);
-            Logger.LogDebug($"Finish storing Artportalen batch ({batchId})");
+            var verbatimCount = await CommitBatchAsync(dataProvider, observations, batchId);
 
             if (mode == JobRunModes.Full)
             {
-                Logger.LogDebug($"Start writing Artportalen CSV ({batchId})");
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
-                Logger.LogDebug($"Finish writing Artportalen CSV ({batchId})");
             }
 
             observations.Clear();

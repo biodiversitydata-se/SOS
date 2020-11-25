@@ -98,7 +98,8 @@ namespace SOS.Process.Processors
 
         protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
-            ICollection<Observation> processedObservations)
+            ICollection<Observation> processedObservations,
+            string batchId)
         {
             try
             {
@@ -110,7 +111,11 @@ namespace SOS.Process.Processors
                             processedObservations); 
                 }
 
-                return await ProcessRepository.AddManyAsync(processedObservations);
+                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
+                var processedCount = await ProcessRepository.AddManyAsync(processedObservations);
+                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+
+                return processedCount;
             }
             catch (Exception e)
             {
@@ -118,6 +123,31 @@ namespace SOS.Process.Processors
                 return 0;
             }
            
+        }
+
+        protected async Task<int> ValidateAndStoreObservation(DataProvider dataProvider, ICollection<Observation> observations, string batchId)
+        {
+            observations =
+                await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
+
+            var processedCount = await CommitBatchAsync(dataProvider, observations, batchId);
+
+            await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+
+            return processedCount;
+        }
+
+        protected async Task<ICollection<Observation>> ValidateAndRemoveInvalidObservations(
+            DataProvider dataProvider,
+            ICollection<Observation> observations,
+            string batchId)
+        {
+            Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
+            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+            Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
+
+            return observations;
         }
 
         /// <summary>
@@ -132,8 +162,14 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             string batchId = "")
         {
+
+            Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
             vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB);
-            return await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
+            var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
+
+            Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
+
+            return success;
         }
 
         protected bool IsBatchFilledToLimit(int count)

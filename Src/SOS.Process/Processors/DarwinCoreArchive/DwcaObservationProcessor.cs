@@ -83,7 +83,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
+            Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
@@ -94,22 +94,22 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
                 }
 
-                Logger.LogDebug($"Start deleting {dataProvider} data");
+                Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
                 if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
                 {
-                    Logger.LogError($"Failed to delete {dataProvider} data");
+                    Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
                     return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
                 }
 
-                Logger.LogDebug($"Finish deleting {dataProvider} data");
+                Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
 
-                Logger.LogDebug($"Start processing {dataProvider} data");
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
                 var verbatimCount = await ProcessObservationsSequential(
                     dataProvider,
                     taxa,
                     cancellationToken);
                 
-                Logger.LogInformation($"Finish processing {dataProvider} data.");
+                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
                 return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
@@ -145,13 +145,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var verbatimCount = 0;
+            var batchId = 0;
+            var processedCount = 0;
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
                 taxa,
                 _processedVocabularyRepository,
                 _areaHelper);
-            ICollection<Observation> sightings = new List<Observation>();
+            ICollection<Observation> observations = new List<Observation>();
             using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
             int counter = 0;
             // Process and commit in batches.
@@ -159,31 +160,32 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 processedObservation.DataProviderId = dataProvider.Id;
-                sightings.Add(processedObservation);
-                if (IsBatchFilledToLimit(sightings.Count))
+                observations.Add(processedObservation);
+                if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref sightings, dataProvider);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                    await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter++.ToString());
-                    sightings.Clear();
-                    Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
+
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    observations.Clear();
+                    Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
                 }
             });
 
             // Commit remaining batch (not filled to limit).
-            if (sightings.Any())
+            if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref sightings, dataProvider);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter.ToString());
-                Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
+
+                batchId++;
+
+                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                observations.Clear();
+                Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
             }
 
-            return verbatimCount;
+            return processedCount;
         }
     }
 }
