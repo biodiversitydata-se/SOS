@@ -3,6 +3,8 @@ import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 import { Component, Inject, OnInit } from '@angular/core';
 import { format, parseISO } from 'date-fns';
 import { Observable } from 'rxjs';
+import { FunctionalTest } from '../models/functionaltest';
+import { TestResults } from '../models/testresults';
 
 @Component({
   selector: 'app-functional-tests',
@@ -29,6 +31,7 @@ export class FunctionalTestsComponent implements OnInit {
         test.currentStatus = "Unknown";
       }
       this.loadingData = false;
+      this.runTests();
     }, error => console.error(error));  
   }
   public runTests() {
@@ -113,20 +116,4 @@ class TestMessage {
   type: string;
   message: string;
   timestamp: Date;
-}
-class TestResult {
-  result: string;
-  status: string;
-}
-class TestResults {
-  testId: number;
-  timeTakenMs: number;
-  results: TestResult[];
-}
-interface FunctionalTest {
-  group: string;
-  description: string;
-  route: string;
-  timeTakenMs: number;
-  currentStatus: string;
 }
