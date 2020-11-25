@@ -38,6 +38,7 @@ export class FunctionalTestsComponent implements OnInit {
     this.messageList = [];
     for (let test of this.functionalTests) {
       test.currentStatus = "Unknown";
+      test.errorMessages = "";
     }
     this.testResults = [];
     for (let test of this.functionalTests) {
@@ -55,13 +56,26 @@ export class FunctionalTestsComponent implements OnInit {
   }
   setTestStatus(test: FunctionalTest, result: TestResults) {
     test.timeTakenMs = result.timeTakenMs;
+    let failed: boolean = false;
     for (let res of result.results) {
       if (res.status != "Succeeded") {
-        test.currentStatus = "Failed";
-        return;
+        failed = true;
+        test.errorMessages += res.result + ", ";       
       }
     }
-    test.currentStatus = "Succeeded";
+    if (failed) {
+      test.currentStatus = "Failed";
+    }
+    else {
+      test.currentStatus = "Succeeded";
+    }
+  }
+  getTotalTime() {
+    let totalTime: number = 0;
+    for (let result of this.testResults) {
+      totalTime += result.timeTakenMs;
+    }
+    return totalTime;
   }
   getGroups() {
     let groups = [];

@@ -4,4 +4,5 @@ export interface FunctionalTest {
   route: string;
   timeTakenMs: number;
   currentStatus: string;
+  errorMessages: string;
 }
