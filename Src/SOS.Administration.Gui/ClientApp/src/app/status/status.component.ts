@@ -149,7 +149,8 @@ export class StatusComponent implements OnInit {
     this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(result => {      
       for (let test of result) {
         test.currentStatus = "Unknown";
-      }           
+      }
+      let testsRemaining = result.length;
       for (let test of result) {        
         this.http.get<TestResults>('tests/' + test.route).subscribe(result => {          
           if (result) {
@@ -157,10 +158,20 @@ export class StatusComponent implements OnInit {
             for (let message of result.results) {
               if (message.status == "Succeeded") { this.completedTests++; }
               if (message.status == "Failed") { this.failedTests++; }
-            }
+            }           
           }
-          this.runningTests = false;      
-        }, error => this.completedTests++);
+          testsRemaining--;
+          if (testsRemaining == 0) {
+            this.runningTests = false;
+          }
+        }, error => {
+          testsRemaining--;
+          if (testsRemaining == 0) {
+            this.runningTests = false;
+          }
+          this.failedTests++;
+        });
+       
       }
       
     }, error => console.error(error));
