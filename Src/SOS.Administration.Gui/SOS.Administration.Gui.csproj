@@ -19,6 +19,7 @@
     <PackageReference Include="NEST" Version="7.10.0" />
     <PackageReference Include="NLog" Version="4.7.5" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.3" />
+    <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +57,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
+    <ProjectReference Include="..\SOS.Observations.Api\SOS.Observations.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\services\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -35,7 +35,7 @@ import { FunctionalTestsComponent } from './functional-tests/functional-tests.co
       { path: '', component: StatusComponent, pathMatch: 'full' },
       { path: 'invalid-observations', component: InvalidObservationsComponent },
       { path: 'status', component: StatusComponent },
-      { path: 'tests', component: FunctionalTestsComponent },
+      { path: 'test', component: FunctionalTestsComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,

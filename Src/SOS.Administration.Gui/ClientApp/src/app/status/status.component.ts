@@ -2,9 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow } from 'date-fns'
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
+import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
 import { ProcessInfo } from '../models/providerinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
+import { TestResults } from '../models/testresults';
 
 
 function dateFormatter(params) {
@@ -85,6 +87,11 @@ export class StatusComponent implements OnInit {
     { field: 'createdAt', headerName:'Runtime', sortable: true, filter: true, resizable: true, valueFormatter: dateSinceFormatter } 
   ];
   activeInstance: string;
+  runningTests: boolean = false;
+  completedTests: number = 0;
+  failedTests: number = 0;
+  totalRuntimeMs: number = 0;
+  hostingenvironment: Environment;
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
     this.baseUrl = baseUrl
@@ -104,7 +111,11 @@ export class StatusComponent implements OnInit {
     }, error => console.error(error));
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
-    }, error => console.error(error));   
+    }, error => console.error(error));
+    this.http.get<Environment>(this.baseUrl + 'hostingenvironment').subscribe(result => {
+      this.hostingenvironment = result;
+    }, error => console.error(error));
+    this.runTests();
   }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
@@ -129,5 +140,29 @@ export class StatusComponent implements OnInit {
       return "(active)";
     }
     return '';
+  }
+  private runTests() {
+    this.runningTests = true;
+    this.completedTests = 0;
+    this.failedTests = 0;
+    this.totalRuntimeMs = 0;
+    this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(result => {      
+      for (let test of result) {
+        test.currentStatus = "Unknown";
+      }           
+      for (let test of result) {        
+        this.http.get<TestResults>('tests/' + test.route).subscribe(result => {          
+          if (result) {
+            this.totalRuntimeMs += result.timeTakenMs;
+            for (let message of result.results) {
+              if (message.status == "Succeeded") { this.completedTests++; }
+              if (message.status == "Failed") { this.failedTests++; }
+            }
+          }
+          this.runningTests = false;      
+        }, error => this.completedTests++);
+      }
+      
+    }, error => console.error(error));
   }
 }
