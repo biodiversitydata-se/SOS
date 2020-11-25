@@ -182,14 +182,6 @@ namespace SOS.Observations.Api.Managers
                             nameof(Observation.Location.Continent));
                         ResolveFieldMappedValue(locationDictionary, VocabularyId.Country,
                             nameof(Observation.Location.Country));
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.County,
-                            nameof(Observation.Location.County));
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.Municipality,
-                            nameof(Observation.Location.Municipality));
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.Parish,
-                            nameof(Observation.Location.Parish));
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.Province,
-                            nameof(Observation.Location.Province));
                     }
 
                     if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject))
