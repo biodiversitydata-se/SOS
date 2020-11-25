@@ -59,7 +59,8 @@ namespace SOS.Process.Processors.Sers
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var verbatimCount = 0;
+            var batchId = 0;
+            var processedCount = 0;
             ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new SersObservationFactory(dataProvider, taxa);
 
@@ -74,12 +75,12 @@ namespace SOS.Process.Processors.Sers
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
                     observations.Clear();
-                    Logger.LogDebug($"SERS Sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"SERS observations processed: {processedCount}");
                 }
             });
 
@@ -87,14 +88,15 @@ namespace SOS.Process.Processors.Sers
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-                Logger.LogDebug($"SERS Sightings processed: {verbatimCount}");
+
+                batchId++;
+
+                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                observations.Clear();
+                Logger.LogDebug($"SERS observations processed: {processedCount}");
             }
 
-            return verbatimCount;
+            return processedCount;
         }
     }
 }

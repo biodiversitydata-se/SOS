@@ -26,19 +26,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
         private readonly IAreaHelper _areaHelper;
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
 
-        private async Task<int> AddBatch(DataProvider dataProvider, ICollection<Observation> observations)
-        {
-           
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-            var processedCount = await CommitBatchAsync(dataProvider, observations);
-            await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-
-            Logger.LogDebug($"Virtual Herbarium Sightings processed: {processedCount}");
-
-            return processedCount;
-        }
-
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
@@ -48,6 +35,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         {
             try
             {
+                var batchId = 0;
                 var processedCount = 0;
                 var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
                 ICollection<Observation> observations = new List<Observation>();
@@ -61,13 +49,26 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
                     if (processedObservation != null)
                     {
+                        if (processedObservation.Location.DecimalLatitude > 70 ||
+                            processedObservation.Location.DecimalLatitude < 55 ||
+                            processedObservation.Location.DecimalLongitude < 10 ||
+                            processedObservation.Location.DecimalLongitude > 25)
+                        {
+                            var st = true;
+                        }
+
                         _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
 
                         observations.Add(processedObservation);
                         if (IsBatchFilledToLimit(observations.Count))
                         {
-                            processedCount += await AddBatch(dataProvider, observations);
-                            observations = new List<Observation>();
+                            cancellationToken?.ThrowIfCancellationRequested();
+
+                            batchId++;
+
+                            processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                            observations.Clear();
+                            Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                         }
                     }
                 });
@@ -75,7 +76,13 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 // Commit remaining batch (not filled to limit).
                 if (observations.Any())
                 {
-                    processedCount += await AddBatch(dataProvider, observations);
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    observations.Clear();
+                    Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                 }
 
                 return processedCount;
