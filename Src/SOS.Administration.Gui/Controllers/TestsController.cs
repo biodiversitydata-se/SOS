@@ -20,8 +20,7 @@ using Xunit;
 namespace SOS.Administration.Gui.Controllers
 {
     public class Test
-    {
-        public int Id { get; set; }
+    {     
         public string Description { get; set; }
         public string Group { get; set; }
         public string Route { get; set; }
@@ -40,10 +39,22 @@ namespace SOS.Administration.Gui.Controllers
     public class ObservationTaxon
     {
         public int Id { get; set; }
+        public string VernacularName { get; set; }
+    }
+    public class ObservationLocation
+    {
+        public int Id { get; set; }
+        public ObservationPlace Municipality { get; set; }
+    }
+    public class ObservationPlace
+    {
+        public int Id { get; set; }
+        public string Value { get; set; }
     }
     public class Observation
     {     
         public ObservationTaxon Taxon { get; set; }
+        public ObservationLocation Location { get; set; }
     }
     [Route("[controller]")]
     [ApiController]
@@ -59,47 +70,53 @@ namespace SOS.Administration.Gui.Controllers
             _apiUrl = optionsMonitor.CurrentValue.ApiUrl;
             _tests = new List<Test>() { 
                 new Test() 
-                { 
-                    Id = 0,
+                {                    
                     Description = "Search for Otters",
                     Group = "Search",
                     Route = "test_searchotter"
                 },
-                new Test()
+                 new Test()
                 {
-                    Id = 1,
+                    Description = "Search for Otters in Tranås",
+                    Group = "Search",
+                    Route = "test_searchotteratlocation"
+                },
+                new Test()
+                {                   
                     Description = "Search for Wolfs",
                     Group = "Search",
                     Route = "test_searchwolf"
                 },
                 new Test()
-                {
-                    Id = 2,
+                {                    
                     Description = "Get DataProviders",
                     Group = "DataProviders",
                     Route = "test_dataproviders"
                 }
                 ,
                 new Test()
-                {
-                    Id = 3,
+                {                    
                     Description = "Get Vocabulary",
                     Group = "Vocabularies",
                     Route = "test_vocabularies"
                 },
                 new Test()
-                {
-                    Id = 4,
+                {                  
                     Description = "GeoAggregation of all mammals",
                     Group = "Aggregations",
                     Route = "test_geogridaggregation"
                 },
                 new Test()
-                {
-                    Id = 5,
+                {                   
                     Description = "TaxonAggregation of all taxon",
                     Group = "Aggregations",
                     Route = "test_taxonaggregation"
+                },
+                 new Test()
+                {                   
+                    Description = "TaxonAggregation of all taxon with boundingbox",
+                    Group = "Aggregations",
+                    Route = "test_taxonaggregationbbox"
                 }
             };
 
@@ -122,9 +139,14 @@ namespace SOS.Administration.Gui.Controllers
                 throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
             }
         }
-        private async Task<PagedResult<TaxonAggregationItemDto>> SearchSOSTaxonAggregation(SearchFilterDto searchFilter, int take, int skip)
+        private async Task<PagedResult<TaxonAggregationItemDto>> SearchSOSTaxonAggregation(SearchFilterDto searchFilter, int take, int skip, double? bboxleft=null, double? bboxtop = null, double? bboxright = null, double? bboxbottom = null)
         {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/TaxonAggregation?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
+            var bboxstring = "";
+            if(bboxleft.HasValue && bboxtop.HasValue && bboxright.HasValue && bboxbottom.HasValue)
+            {
+                bboxstring = $"&bboxLeft={bboxleft}&bboxTop={bboxtop}&bboxRight={bboxright}&bboxBottom={bboxbottom}".Replace(',','.');
+            }
+            var response = await _client.PostAsync($"{_apiUrl}Observations/TaxonAggregation?take={take}&skip={skip}" + bboxstring, new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
@@ -196,6 +218,55 @@ namespace SOS.Administration.Gui.Controllers
             try { Assert.Equal(100077, result.Records.First().Taxon.Id); results.Add(new TestResult() { Result = "TaxonId equals 100077", Status = "Succeeded" }); }
             catch (Exception e) { results.Add(new TestResult() { Result = "TaxonId equals 100077:" + e.Message, Status = "Failed" }); }
                         
+            return testResults;
+        }
+
+        [HttpGet]
+        [Route("Test_SearchOtterAtLocation")]
+        public async Task<TestResults> Test_SearchOtterAtLocation()
+        {
+            TestResults testResults = new TestResults();
+            var results = new List<TestResult>();
+            testResults.Results = results;
+            testResults.TestId = 0;
+            SearchFilterDto searchFilter = new SearchFilterDto();
+            searchFilter.Taxon = new TaxonFilterDto()
+            {
+                TaxonIds = new List<int>() { 100077 },
+                IncludeUnderlyingTaxa = true
+            };
+            searchFilter.AreaIds = new List<int>() { 7,283 };
+            searchFilter.Date = new DateFilterDto()
+            {
+                StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
+                EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+            };
+            searchFilter.OnlyValidated = false;
+            searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
+            PagedResult<Observation> result;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+                result = await SearchSOS(searchFilter, 2, 0);
+                sw.Stop();
+                testResults.TimeTakenMs = sw.ElapsedMilliseconds;
+                results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
+            }
+            catch (Exception e)
+            {
+                sw.Stop();
+                testResults.TimeTakenMs = sw.ElapsedMilliseconds;
+                results.Add(new TestResult() { Result = "Call api:" + e.Message, Status = "Failed" });
+                return testResults;
+            }
+
+            try { Assert.Equal("Tranås", result.Records.First().Location.Municipality.Value); results.Add(new TestResult() { Result = "Location Municipality equals Tranås", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Location Municipality equals Tranås:" + e.Message, Status = "Failed" }); }
+
+            try { Assert.Equal("utter", result.Records.First().Taxon.VernacularName); results.Add(new TestResult() { Result = "Vernacular name equals utter", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Vernacular name equals utter:" + e.Message, Status = "Failed" }); }
+
             return testResults;
         }
         [HttpGet]
@@ -324,11 +395,55 @@ namespace SOS.Administration.Gui.Controllers
                 return testResults;
             }
 
-            try { Assert.True(result.TotalCount > 3000); results.Add(new TestResult() { Result = "Returns >30000 results", Status = "Succeeded" }); }
+            try { Assert.True(result.TotalCount > 30000); results.Add(new TestResult() { Result = "Returns >30000 results", Status = "Succeeded" }); }
             catch (Exception e) { results.Add(new TestResult() { Result = "Returns >30000 results:" + e.Message, Status = "Failed" }); }
 
             try { Assert.True(result.Records.First().ObservationCount > 100000); results.Add(new TestResult() { Result = "Returns >100 000 results from first taxon", Status = "Succeeded" }); }
             catch (Exception e) { results.Add(new TestResult() { Result = "Returns >100 000 results from first taxon" + e.Message, Status = "Failed" }); }            
+
+            return testResults;
+        }
+        [HttpGet]
+        [Route("Test_TaxonAggregationBBox")]
+        public async Task<TestResults> Test_TaxonAggregationBBox()
+        {
+            TestResults testResults = new TestResults();
+            var results = new List<TestResult>();
+            testResults.Results = results;
+            testResults.TestId = 1;
+            SearchFilterDto searchFilter = new SearchFilterDto();
+            searchFilter.Date = new DateFilterDto()
+            {
+                StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
+                EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+            };
+            searchFilter.OnlyValidated = false;
+            searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
+
+            PagedResult<TaxonAggregationItemDto> result;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+
+                result = await SearchSOSTaxonAggregation(searchFilter, 500, 0, 17.9296875, 59.355596110016315, 18.28125, 59.17592824927137);
+                sw.Stop();
+                testResults.TimeTakenMs = sw.ElapsedMilliseconds;
+                results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
+            }
+            catch (Exception e)
+            {
+                sw.Stop();
+                testResults.TimeTakenMs = sw.ElapsedMilliseconds;
+                results.Add(new TestResult() { Result = "Call api:" + e.Message, Status = "Failed" });
+                return testResults;
+            }
+
+            try { Assert.True(result.TotalCount > 8000); results.Add(new TestResult() { Result = "Returns >8000 results", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Returns >8000 results:" + e.Message, Status = "Failed" }); }
+
+            try { Assert.True(result.Records.First().ObservationCount > 2500); results.Add(new TestResult() { Result = "Returns >2500 results from first taxon", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Returns >2500 results from first taxon" + e.Message, Status = "Failed" }); }
 
             return testResults;
         }
