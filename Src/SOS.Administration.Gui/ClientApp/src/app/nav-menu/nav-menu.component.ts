@@ -23,11 +23,8 @@ export class NavMenuComponent {
     this.isExpanded = !this.isExpanded;
   }
   ngOnInit() {
-    this.http.get<Environment>(this.baseUrl + 'environment').subscribe(result => {
+    this.http.get<Environment>(this.baseUrl + 'hostingenvironment').subscribe(result => {
       this.environment = result.environment;
     }, error => console.error(error));  
   }
-}
-class Environment {
-  environment: string;
 }

@@ -91,6 +91,7 @@ export class StatusComponent implements OnInit {
   completedTests: number = 0;
   failedTests: number = 0;
   totalRuntimeMs: number = 0;
+  hostingenvironment: Environment;
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
     this.baseUrl = baseUrl
@@ -110,6 +111,9 @@ export class StatusComponent implements OnInit {
     }, error => console.error(error));
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
+    }, error => console.error(error));
+    this.http.get<Environment>(this.baseUrl + 'hostingenvironment').subscribe(result => {
+      this.hostingenvironment = result;
     }, error => console.error(error));
     this.runTests();
   }
@@ -155,9 +159,10 @@ export class StatusComponent implements OnInit {
               if (message.status == "Failed") { this.failedTests++; }
             }
           }
+          this.runningTests = false;      
         }, error => this.completedTests++);
       }
-      this.runningTests = false;
+      
     }, error => console.error(error));
   }
 }
