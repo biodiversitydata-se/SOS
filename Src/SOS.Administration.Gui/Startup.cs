@@ -33,6 +33,9 @@ namespace SOS.Administration.Gui
 
             services.Configure<ElasticSearchConfiguration>(
               Configuration.GetSection(nameof(ElasticSearchConfiguration)));
+
+            services.Configure<ApiTestConfiguration>(
+              Configuration.GetSection(nameof(ApiTestConfiguration)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
