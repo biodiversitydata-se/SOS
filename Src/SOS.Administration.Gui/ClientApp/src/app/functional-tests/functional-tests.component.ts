@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class FunctionalTestsComponent implements OnInit {
   functionalTests: FunctionalTest[] = [];
+  testResults: TestResults[] = [];
   messageList: TestMessage[] = [];
   http: HttpClient;
   loadingData: boolean = false;
@@ -35,9 +36,11 @@ export class FunctionalTestsComponent implements OnInit {
     for (let test of this.functionalTests) {
       test.currentStatus = "Unknown";
     }
+    this.testResults = [];
     for (let test of this.functionalTests) {
       this.messageList.push({ timestamp: new Date(), message: "Running test:'" + test.description + "'", type: "Info" });
       this.http.get<TestResults>('tests/' + test.route).subscribe(result => {
+        this.testResults.push(result);
         if (result) {
           this.setTestStatus(test, result);
           for (let message of result.results) {
@@ -79,7 +82,24 @@ export class FunctionalTestsComponent implements OnInit {
     if (type == "Failed") { return "list-group-item-danger"; }
     return "";
   }
-  
+  getCompletedTestCount() {
+    let count:number = 0;
+    for (let result of this.testResults) {
+      for (let res of result.results) {
+        if (res.status == "Succeeded") { count++;}
+      }
+    }
+    return count;
+  }
+  getFailedTestCount() {
+    let count: number = 0;
+    for (let result of this.testResults) {
+      for (let res of result.results) {
+        if (res.status == "Failed") { count++; }
+      }
+    }
+    return count;
+  }
   formatDate(params) {
   if (params) {
     return format(parseISO(params), 'HH:mm:ss');
