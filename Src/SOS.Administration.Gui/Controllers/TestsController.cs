@@ -6,8 +6,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
@@ -48,11 +50,13 @@ namespace SOS.Administration.Gui.Controllers
     public class TestsController : ControllerBase
     {
         private readonly HttpClient _client;
+        private readonly string _apiUrl;
         private readonly List<Test> _tests;
 
-        public TestsController()
+        public TestsController(IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
         {
             _client = new HttpClient();
+            _apiUrl = optionsMonitor.CurrentValue.ApiUrl;
             _tests = new List<Test>() { 
                 new Test() 
                 { 
@@ -107,7 +111,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         private async Task<PagedResult<Observation>> SearchSOS(SearchFilterDto searchFilter, int take, int skip)
         {
-            var response = await _client.PostAsync($"https://sos-search.artdata.slu.se/Observations/Search?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync($"{_apiUrl}Observations/Search?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
@@ -120,7 +124,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         private async Task<PagedResult<TaxonAggregationItemDto>> SearchSOSTaxonAggregation(SearchFilterDto searchFilter, int take, int skip)
         {
-            var response = await _client.PostAsync($"https://sos-search.artdata.slu.se/Observations/TaxonAggregation?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync($"{_apiUrl}Observations/TaxonAggregation?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
@@ -133,7 +137,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         private async Task<GeoGridResultDto> SearchSOSGeoAggregation(SearchFilterDto searchFilter)
         {
-            var response = await _client.PostAsync($"https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=10", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync($"{_apiUrl}Observations/geogridaggregation?zoom=10", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
@@ -320,7 +324,7 @@ namespace SOS.Administration.Gui.Controllers
                 return testResults;
             }
 
-            try { Assert.True(result.TotalCount > 30000); results.Add(new TestResult() { Result = "Returns >30000 results", Status = "Succeeded" }); }
+            try { Assert.True(result.TotalCount > 3000); results.Add(new TestResult() { Result = "Returns >30000 results", Status = "Succeeded" }); }
             catch (Exception e) { results.Add(new TestResult() { Result = "Returns >30000 results:" + e.Message, Status = "Failed" }); }
 
             try { Assert.True(result.Records.First().ObservationCount > 100000); results.Add(new TestResult() { Result = "Returns >100 000 results from first taxon", Status = "Succeeded" }); }
@@ -341,7 +345,7 @@ namespace SOS.Administration.Gui.Controllers
             sw.Start();
             try
             {
-                var response = await _client.GetAsync($"https://sos-search.artdata.slu.se/DataProviders");
+                var response = await _client.GetAsync($"{_apiUrl}DataProviders");
                 if (response.IsSuccessStatusCode)
                 {
                     var resultString = response.Content.ReadAsStringAsync().Result;
@@ -382,7 +386,7 @@ namespace SOS.Administration.Gui.Controllers
             sw.Start();
             try
             {
-                var response = await _client.GetAsync($"https://sos-search.artdata.slu.se/Vocabularies/LifeStage");
+                var response = await _client.GetAsync($"{_apiUrl}Vocabularies/LifeStage");
                 if (response.IsSuccessStatusCode)
                 {
                     var resultString = response.Content.ReadAsStringAsync().Result;
