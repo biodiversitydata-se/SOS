@@ -37,8 +37,8 @@ namespace SOS.Lib.Models.TaxonTree
         /// <returns></returns>
         public IEnumerable<int> GetUnderlyingTaxonIds(IEnumerable<int> taxonIds, bool returnSelfs)
         {
-            if (taxonIds == null) return null;
-            var treeNodes = GetTreeNodes(taxonIds);
+            if (!taxonIds?.Any() ?? true) return null;
+            var treeNodes = taxonIds.Where(t => TreeNodeById.ContainsKey(t)).Select(t => TreeNodeById[t]);
             var underlyingTaxonIds = new List<int>();
             foreach (var treeNode in treeNodes.AsDepthFirstNodeIterator(returnSelfs))
             {
@@ -56,19 +56,7 @@ namespace SOS.Lib.Models.TaxonTree
         /// <returns></returns>
         public IEnumerable<int> GetUnderlyingTaxonIds(int taxonId, bool returnSelfs)
         {
-            var treeNode = TreeNodeById[taxonId];
-            var underlyingTaxonIds = new List<int>();
-            foreach (var node in treeNode.AsDepthFirstNodeIterator(returnSelfs))
-            {
-                underlyingTaxonIds.Add(node.TaxonId);
-            }
-
-            return underlyingTaxonIds;
-        }
-
-        private IEnumerable<TaxonTreeNode<T>> GetTreeNodes(IEnumerable<int> taxonIds)
-        {
-            return taxonIds.Select(t => TreeNodeById[t]);
+            return GetUnderlyingTaxonIds(new[] {taxonId}, returnSelfs);
         }
     }
 }

@@ -12,7 +12,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -94,13 +93,13 @@ namespace SOS.Observations.Api.Controllers
                     .Where(of => !typeof(Observation).HasProperty(of))
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
-
+            /*
             if ((filter.Taxon?.TaxonIds?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
             {
                 errors.AddRange(filter.Taxon.TaxonIds
                     .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
                     .Select(tid => $"TaxonId doesn't exist ({tid})"));
-            }
+            }*/
 
             if (filter.Taxon?.RedListCategories?.Any() ?? false)
             {
