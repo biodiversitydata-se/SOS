@@ -31,7 +31,7 @@ export class FunctionalTestsComponent implements OnInit {
       this.loadingData = false;
     }, error => console.error(error));  
   }
-  private runTests() {
+  public runTests() {
     this.messageList = [];
     for (let test of this.functionalTests) {
       test.currentStatus = "Unknown";
