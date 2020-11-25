@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Factories;
@@ -20,17 +21,19 @@ namespace SOS.Export.Managers
         private static readonly object InitLock = new object();
         private readonly ILogger<TaxonManager> _logger;
         private readonly ITaxonRepository _processedTaxonRepository;
-        private TaxonTree<IBasicTaxon> _taxonTree;
+        private readonly IMemoryCache _memoryCache;
+        private const string TaxonTreeCacheKey = "TaxonTree";
 
         /// <summary>
         ///     Constructor
         /// </summary>
+        /// <param name="memoryCache"></param>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="logger"></param>
-        public TaxonManager(
-            ITaxonRepository processedTaxonRepository,
+        public TaxonManager(IMemoryCache memoryCache, ITaxonRepository processedTaxonRepository,
             ILogger<TaxonManager> logger)
         {
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _processedTaxonRepository = processedTaxonRepository ??
                                         throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -41,18 +44,22 @@ namespace SOS.Export.Managers
         {
             get
             {
-                if (_taxonTree == null)
+                TaxonTree<IBasicTaxon> taxonTree;
+                if (!_memoryCache.TryGetValue(TaxonTreeCacheKey, out taxonTree))
                 {
                     lock (InitLock)
                     {
-                        if (_taxonTree == null)
+                        if (!_memoryCache.TryGetValue(TaxonTreeCacheKey, out taxonTree))
                         {
-                            _taxonTree = GetTaxonTreeAsync().Result;
+                            taxonTree = GetTaxonTreeAsync().Result;
+                            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                            _memoryCache.Set(TaxonTreeCacheKey, taxonTree, cacheEntryOptions);
                         }
                     }
                 }
 
-                return _taxonTree;
+                return taxonTree;
             }
         }
 
