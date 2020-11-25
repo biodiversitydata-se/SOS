@@ -30,10 +30,9 @@ namespace SOS.Observations.Api.Controllers
     {
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
-        private readonly IVocabularyManager _vocabularyManager;
-        private readonly ILogger<ObservationsController> _logger;
-        private readonly ITaxonManager _taxonManager;
         private readonly IObservationManager _observationManager;
+        private readonly ITaxonManager _taxonManager;
+        private readonly ILogger<ObservationsController> _logger;
 
 
         private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
@@ -93,13 +92,13 @@ namespace SOS.Observations.Api.Controllers
                     .Where(of => !typeof(Observation).HasProperty(of))
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
-            /*
+            
             if ((filter.Taxon?.TaxonIds?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
             {
                 errors.AddRange(filter.Taxon.TaxonIds
                     .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
                     .Select(tid => $"TaxonId doesn't exist ({tid})"));
-            }*/
+            }
 
             if (filter.Taxon?.RedListCategories?.Any() ?? false)
             {
@@ -147,21 +146,42 @@ namespace SOS.Observations.Api.Controllers
         ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
-        /// <param name="vocabularyManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager,
-            IVocabularyManager vocabularyManager,
             ITaxonManager taxonManager,
             ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
+        ///     object
+        ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
+        ///     the substring "Id" (but not exclusively) are mapped in the Field Mappings object.
+        /// </summary>
+        /// <param name="filter">Filter used to limit the search</param>
+        /// <param name="skip">Start index of returned observations</param>
+        /// <param name="take">End index of returned observations</param>
+        /// <param name="sortBy">Field to sort by</param>
+        /// <param name="sortOrder">Sort order (ASC, DESC)</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <returns>List of matching observations</returns>
+        /// <example>
+        ///     Get all observations within 100m of provided point
+        ///     "geometryFilter": {
+        ///     "maxDistanceFromPoint": 100,
+        ///     "geometry": {
+        ///     "coordinates": [ 12.3456(lon), 78.9101112(lat) ],
+        ///     "type": "Point"
+        ///     },
+        ///     "usePointAccuracy": false
+        ///     }
+        /// </example>
         [HttpPost("Search")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -171,13 +191,14 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
-            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
+            [FromQuery] bool validateSearchFilter = true)
         {
             try
             {
                 var validationResult = Result.Combine(
-                    ValidateSearchPagingArguments(skip, take), 
-                    ValidateSearchFilter(filter),
+                    ValidateSearchPagingArguments(skip, take),
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -193,7 +214,30 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
+        ///     object
+        ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
+        ///     the substring "Id" (but not exclusively) are mapped in the Field Mappings object.
+        /// </summary>
+        /// <param name="filter">Filter used to limit the search</param>
+        /// <param name="skip">Start index of returned observations</param>
+        /// <param name="take">End index of returned observations</param>
+        /// <param name="sortBy">Field to sort by</param>
+        /// <param name="sortOrder">Sort order (ASC, DESC)</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <returns>List of matching observations</returns>
+        /// <example>
+        ///     Get all observations within 100m of provided point
+        ///     "geometryFilter": {
+        ///     "maxDistanceFromPoint": 100,
+        ///     "geometry": {
+        ///     "coordinates": [ 12.3456(lon), 78.9101112(lat) ],
+        ///     "type": "Point"
+        ///     },
+        ///     "usePointAccuracy": false
+        ///     }
+        /// </example>
         [HttpPost("SearchInternal")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -204,13 +248,14 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
-            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArgumentsInternal(skip, take),
-                    ValidateSearchFilter(filter),
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
@@ -238,14 +283,14 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
-            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc
-            )
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
                 var paramsValidationResult = Result.Combine(
                     ValidatePagingArguments(skip, take),
-                    ValidateSearchFilter(filter),
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy));
 
                 if (paramsValidationResult.IsFailure)
@@ -303,6 +348,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -314,11 +360,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null)
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = true)
         {
             try
             {
-                var filterValidation = ValidateSearchFilter(filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
@@ -382,6 +429,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationInternal")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -394,11 +442,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null)
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
-                var filterValidation = ValidateSearchFilter(filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
@@ -432,6 +481,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
@@ -444,11 +494,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null)
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
-                var filterValidation = ValidateSearchFilter(filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
@@ -484,6 +535,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -496,11 +548,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null)
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = true)
         {
             try
             {
-                var filterValidation = ValidateSearchFilter(filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
@@ -535,6 +588,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregationInternal")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -548,11 +602,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null)
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
-                var filterValidation = ValidateSearchFilter(filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
                 var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);

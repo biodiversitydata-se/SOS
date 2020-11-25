@@ -82,6 +82,11 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public async Task<Area> GetAsync(AreaType areaType, string featureId)
+        {
+            return await _areaRepository.GetAsync(areaType, featureId);
+        }
+
         public async Task<byte[]> GetZipppedAreaAsync(int areaId)
         {
             var area = await _areaRepository.GetAsync(areaId);
