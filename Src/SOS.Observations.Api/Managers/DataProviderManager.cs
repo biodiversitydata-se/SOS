@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -14,23 +16,23 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class DataProviderManager : IDataProviderManager
     {
-        private readonly IDataProviderRepository _dataProviderRepository;
+        private readonly ICache<int, DataProvider> _dataProviderCache;
         private readonly ILogger<DataProviderManager> _logger;
         private readonly IProcessInfoManager _processInfoManager;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="dataProviderRepository"></param>
+        /// <param name="dataProviderCache"></param>
         /// <param name="processInfoManager"></param>
         /// <param name="logger"></param>
         public DataProviderManager(
-            IDataProviderRepository dataProviderRepository,
+            ICache<int, DataProvider> dataProviderCache,
             IProcessInfoManager processInfoManager,
             ILogger<DataProviderManager> logger)
         {
-            _dataProviderRepository =
-                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+            _dataProviderCache =
+                dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -40,7 +42,7 @@ namespace SOS.Observations.Api.Managers
         {
             var dataProviderDtos = new List<DataProviderDto>();
             var processInfos = await _processInfoManager.GetProcessInfoAsync(true);
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
+            var allDataProviders = await _dataProviderCache.GetAllAsync();
             var selectedDataProviders = includeInactive
                 ? allDataProviders
                 : allDataProviders.Where(provider => provider.IsActive).ToList();

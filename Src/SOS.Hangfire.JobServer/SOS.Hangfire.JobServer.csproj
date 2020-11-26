@@ -54,6 +54,7 @@
     <PackageReference Include="HangFire.Autofac" Version="2.3.1" />
     <PackageReference Include="HangFire.Mongo" Version="0.7.12" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.9" />
