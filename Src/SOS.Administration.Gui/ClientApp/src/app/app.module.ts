@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 import { AgGridModule } from 'ag-grid-angular';
+import { ChartsModule, ThemeService } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -15,6 +16,7 @@ import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
 import { StatusComponent } from './status/status.component';
 import { InvalidMapComponent } from './invalid-map/invalid-map.component';
 import { FunctionalTestsComponent } from './functional-tests/functional-tests.component';
+import { PerformanceChartComponent } from './performance-chart/performance-chart.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,8 @@ import { FunctionalTestsComponent } from './functional-tests/functional-tests.co
     InvalidGridComponent,
     StatusComponent,
     InvalidMapComponent,
-    FunctionalTestsComponent
+    FunctionalTestsComponent,
+    PerformanceChartComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -36,12 +39,14 @@ import { FunctionalTestsComponent } from './functional-tests/functional-tests.co
       { path: 'invalid-observations', component: InvalidObservationsComponent },
       { path: 'status', component: StatusComponent },
       { path: 'test', component: FunctionalTestsComponent },
+      { path: 'stats', component: PerformanceChartComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,
+    ChartsModule,
     AgGridModule.withComponents([])
   ],
-  providers: [],
+  providers: [ThemeService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
