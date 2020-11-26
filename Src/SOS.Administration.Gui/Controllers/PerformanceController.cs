@@ -33,21 +33,26 @@ namespace SOS.Administration.Gui.Controllers
         [Route("{testId}")]
         public async Task<IEnumerable<PerformanceData>> GetPerformanceData(int testId)
         {
+            var startDateTime = DateTime.Now.AddMinutes(-120);
+            var endDateTime = DateTime.Now;
             var result = await _elasticClient.SearchAsync<PerformanceResult>(p => p.
                 Index(_indexName).
-                Query(q =>q.Term(t=>t.Field("testId").Value(testId))).
+                Query(q =>q
+                        .Bool(b=>b.Filter(
+                            bs=>bs.Term(t=>t.Field("testId").Value(testId)), 
+                            bs=> bs.DateRange(range => range.Field("timestamp").GreaterThanOrEquals(startDateTime).LessThanOrEquals(endDateTime))))).
                 Aggregations(agg => agg.
                                 DateHistogram("date_histo",
                                     e=>e.
                                         Field("timestamp").
-                                        FixedInterval(new Time(TimeSpan.FromMinutes(5))).
+                                        FixedInterval(new Time(TimeSpan.FromMinutes(1))).
                                         Aggregations(agg2=>agg2.
                                             Sum("the_sum", su=>su.
                                                 Field("timeTakenMs"))
                                             .MovingFunction("the_movavg",mf => mf
-                                                .Window(100)
+                                                .Window(10)
                                                 .BucketsPath("the_sum")
-                                                .Script("MovingFunctions.unweightedAvg(values)")
+                                                .Script("MovingFunctions.linearWeightedAvg(values)")
                                                 )))));
             var histogram = result.Aggregations.DateHistogram("date_histo");
             var data = new List<PerformanceData>();
