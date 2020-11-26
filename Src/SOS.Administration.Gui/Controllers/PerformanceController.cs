@@ -65,7 +65,7 @@ namespace SOS.Administration.Gui.Controllers
                 };
                 if (item.ContainsKey("the_movavg"))
                 {
-                    var nested = (ValueAggregate)item["the_movavg"];
+                    var nested = (ValueAggregate)item["the_avg"];
                     performanceData.TimeTakenMs = nested.Value;
                 }
                 data.Add(performanceData);
