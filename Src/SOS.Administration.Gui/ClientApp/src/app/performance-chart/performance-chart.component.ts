@@ -4,6 +4,7 @@ import { Color, BaseChartDirective, Label } from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import { HttpClient } from '@angular/common/http';
 import { FunctionalTest } from '../models/functionaltest';
+import { add, formatISO, sub } from 'date-fns';
 
 @Component({
   selector: 'app-performance-chart',
@@ -85,21 +86,52 @@ export class PerformanceChartComponent implements OnInit {
   }
 
   ngOnInit(): void {    
-    this.updateData();    
+    this.updateData(null, null);    
   }
-  private updateData() {
+  private updateData(startDate, endDate) {
+    this.lineChartData = [];
       this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(tests => {
           this.lineChartData = [];
-          for (let test of tests) {
-              this.http.get<PerformanceData[]>(this.baseUrl + 'performance/' + test.id).subscribe(result => {
-                  this.lineChartData.push({ data: result.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: test.description, backgroundColor: this.idxToColor(test.id) });
-              });
+        for (let test of tests) {
+          if (startDate && endDate) {            
+            this.http.get<PerformanceData[]>(this.baseUrl + 'performance/' + test.id + "?startTime=" + startDate + "&endTime=" + endDate).subscribe(result => {
+              this.lineChartData.push({ data: result.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: test.description, backgroundColor: this.idxToColor(test.id) });
+            });
           }
+          else {
+            this.http.get<PerformanceData[]>(this.baseUrl + 'performance/' + test.id).subscribe(result => {
+              this.lineChartData.push({ data: result.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: test.description, backgroundColor: this.idxToColor(test.id) });
+            });
+          }
+        }
       });
   }
-
   idxToColor(idx) {         
     return this.veryDifferentColors[idx] + "77";
+  }
+  filter30Minutes() {
+    this.updateData(sub(new Date(), { minutes: 30 }).toUTCString(), new Date().toUTCString());
+  }
+  filter1Hour() {
+    this.updateData(sub(new Date(), { minutes: 60 }).toUTCString(), new Date().toUTCString());
+  }
+  filter3Hours() {
+    this.updateData(sub(new Date(), { hours: 3 }).toUTCString(), new Date().toUTCString());
+  }
+  filter6Hours() {
+    this.updateData(sub(new Date(), { hours: 6 }).toUTCString(), new Date().toUTCString());
+  }
+  filter12Hours() {
+    this.updateData(sub(new Date(), { hours: 12 }).toUTCString(), new Date().toUTCString());
+  }
+  filter24Hours() {
+    this.updateData(sub(new Date(), { hours: 24 }).toUTCString(), new Date().toUTCString());
+  }
+  filter3Days() {
+    this.updateData(sub(new Date(), { days: 3 }).toUTCString(), new Date().toUTCString());
+  }
+  filter1Week() {
+    this.updateData(sub(new Date(), { weeks: 1 }).toUTCString(), new Date().toUTCString());
   }
 }
 class PerformanceData {

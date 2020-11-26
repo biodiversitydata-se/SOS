@@ -31,10 +31,24 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("{testId}")]
-        public async Task<IEnumerable<PerformanceData>> GetPerformanceData(int testId)
+        public async Task<IEnumerable<PerformanceData>> GetPerformanceData(int testId, DateTime? startTime, DateTime? endTime)
         {
-            var startDateTime = DateTime.Now.AddHours(-6);
-            var endDateTime = DateTime.Now;
+            DateTime startDateTime = DateTime.Now.AddHours(-6);
+            DateTime endDateTime = DateTime.Now;
+            if (startTime.HasValue)
+            {
+                startDateTime = startTime.Value;
+            }
+            if (endTime.HasValue)
+            {
+                endDateTime = endTime.Value;
+            }
+            var interval = TimeSpan.FromMinutes(5);
+            var timespan = endDateTime.Subtract(startDateTime);
+            if (timespan.Days > 0)
+            {
+                interval = TimeSpan.FromMinutes(60);
+            }           
             var result = await _elasticClient.SearchAsync<PerformanceResult>(p => p.
                 Index(_indexName).
                 Query(q =>q
@@ -45,15 +59,11 @@ namespace SOS.Administration.Gui.Controllers
                                 DateHistogram("date_histo",
                                     e=>e.
                                         Field("timestamp").
-                                        FixedInterval(new Time(TimeSpan.FromMinutes(5))).
+                                        FixedInterval(new Time(interval)).
                                         Aggregations(agg2=>agg2.
                                             Average("the_avg", su=>su.
                                                 Field("timeTakenMs"))
-                                            .MovingFunction("the_movavg",mf => mf
-                                                .Window(10)
-                                                .BucketsPath("the_avg")
-                                                .Script("MovingFunctions.linearWeightedAvg(values)")
-                                                )))));
+                                            ))));
             var histogram = result.Aggregations.DateHistogram("date_histo");
             var data = new List<PerformanceData>();
             foreach(var item in histogram.Buckets)
@@ -63,7 +73,7 @@ namespace SOS.Administration.Gui.Controllers
                     Timestamp = item.Date,
                     EventCount = item.DocCount
                 };
-                if (item.ContainsKey("the_movavg"))
+                if (item.ContainsKey("the_avg"))
                 {
                     var nested = (ValueAggregate)item["the_avg"];
                     performanceData.TimeTakenMs = nested.Value;

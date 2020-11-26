@@ -60,7 +60,7 @@ namespace SOS.Administration.Gui
             _logger.LogInformation("Timed Hosted Service running.");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromMinutes(1));
+                TimeSpan.FromMinutes(2));
 
             return Task.CompletedTask;
         }
