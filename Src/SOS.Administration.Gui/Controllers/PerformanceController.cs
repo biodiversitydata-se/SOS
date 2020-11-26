@@ -33,7 +33,7 @@ namespace SOS.Administration.Gui.Controllers
         [Route("{testId}")]
         public async Task<IEnumerable<PerformanceData>> GetPerformanceData(int testId)
         {
-            var startDateTime = DateTime.Now.AddMinutes(-120);
+            var startDateTime = DateTime.Now.AddHours(-6);
             var endDateTime = DateTime.Now;
             var result = await _elasticClient.SearchAsync<PerformanceResult>(p => p.
                 Index(_indexName).
@@ -45,13 +45,13 @@ namespace SOS.Administration.Gui.Controllers
                                 DateHistogram("date_histo",
                                     e=>e.
                                         Field("timestamp").
-                                        FixedInterval(new Time(TimeSpan.FromMinutes(1))).
+                                        FixedInterval(new Time(TimeSpan.FromMinutes(5))).
                                         Aggregations(agg2=>agg2.
-                                            Sum("the_sum", su=>su.
+                                            Average("the_avg", su=>su.
                                                 Field("timeTakenMs"))
                                             .MovingFunction("the_movavg",mf => mf
                                                 .Window(10)
-                                                .BucketsPath("the_sum")
+                                                .BucketsPath("the_avg")
                                                 .Script("MovingFunctions.linearWeightedAvg(values)")
                                                 )))));
             var histogram = result.Aggregations.DateHistogram("date_histo");
