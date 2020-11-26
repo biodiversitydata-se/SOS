@@ -76,8 +76,7 @@ namespace SOS.Administration.Gui
                     TestId = test.Id,
                     Timestamp = DateTime.Now
                 };
-                var testResult = await test.RunTest();
-                _logger.LogInformation($"Ran test '{test.Description}', took {testResult.TimeTakenMs}ms");
+                var testResult = await test.RunTest();                
                 result.TimeTakenMs = testResult.TimeTakenMs;
                 totalTimeTakenMs += result.TimeTakenMs;
                 var indexResult = await _elasticClient.IndexAsync<PerformanceResult>(result, p=>p.Index(_indexName));
@@ -89,8 +88,6 @@ namespace SOS.Administration.Gui
                 TimeTakenMs = totalTimeTakenMs
             };
             var indexResult2 = await _elasticClient.IndexAsync<PerformanceResult>(totalResult, p=>p.Index(_indexName));
-            _logger.LogInformation(
-                $"Timed Hosted Service is working. Count:{count}, Time taken {totalTimeTakenMs}");
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
