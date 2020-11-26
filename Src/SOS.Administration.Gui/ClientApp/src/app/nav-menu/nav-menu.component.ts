@@ -7,13 +7,9 @@ import { Component, Inject } from '@angular/core';
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent {
-  isExpanded = false;
-  http: HttpClient;
-  baseUrl: string;
+  isExpanded = false;  
   environment: string;
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    this.http = http;
-    this.baseUrl = baseUrl;
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
   }
   collapse() {
     this.isExpanded = false;
