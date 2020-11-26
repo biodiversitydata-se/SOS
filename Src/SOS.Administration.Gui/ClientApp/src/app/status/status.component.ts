@@ -32,9 +32,7 @@ function dateSinceFormatter(params) {
   templateUrl: './status.component.html',
   styleUrls: ['./status.component.scss']
 })
-export class StatusComponent implements OnInit {
-  http: HttpClient;
-  baseUrl: string;
+export class StatusComponent implements OnInit {  
   searchindexinfo: SearchIndexInfo;
   statuses = [];
   processInfo: ProcessInfo;
@@ -92,9 +90,8 @@ export class StatusComponent implements OnInit {
   failedTests: number = 0;
   totalRuntimeMs: number = 0;
   hostingenvironment: Environment;
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    this.http = http;
-    this.baseUrl = baseUrl
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
+
   }
 
   ngOnInit() {

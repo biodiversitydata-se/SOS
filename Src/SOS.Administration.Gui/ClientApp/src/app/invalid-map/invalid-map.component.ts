@@ -29,15 +29,11 @@ export class InvalidMapComponent implements OnInit {
     ],
     zoom: 5,
     center: latLng(46.879966, -121.726909)
-  };
-  http: HttpClient;
-  baseUrl: string;
+  };  
   loadingData: boolean = false;
   markerClusterOptions = {};
   markerClusterData = [];
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    this.http = http;
-    this.baseUrl = baseUrl;
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
   }
 
   ngOnInit() {
