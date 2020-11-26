@@ -23,11 +23,15 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -91,6 +95,8 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+
             services.AddControllers()
                 .AddJsonOptions(options => { options
                     .JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
@@ -274,6 +280,12 @@ namespace SOS.Observations.Api
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
+
+            // Add Caches
+            services.AddSingleton<ICache<int, Area>, AreaCache>();
+            services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
+            services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
+
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

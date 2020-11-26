@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.Managers
     public class VocabularyManager : IVocabularyManager
     {
         private readonly ILogger<VocabularyManager> _logger;
-        private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private Dictionary<VocabularyId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         
         /// <summary>
@@ -32,14 +32,14 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="processedVocabularyRepository"></param>
+        /// <param name="vocabularyCache"></param>
         /// <param name="logger"></param>
         public VocabularyManager(
-            IVocabularyRepository processedVocabularyRepository,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILogger<VocabularyManager> logger)
         {
-            _processedVocabularyRepository = processedVocabularyRepository ??
-                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
+            _vocabularyCache = vocabularyCache ??
+                               throw new ArgumentNullException(nameof(vocabularyCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<IEnumerable<Vocabulary>> GetVocabulariesAsync()
         {
-            return await _processedVocabularyRepository.GetAllAsync();
+            return await _vocabularyCache.GetAllAsync();
         }
 
         /// <inheritdoc />
@@ -81,7 +81,7 @@ namespace SOS.Observations.Api.Managers
             CreateLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<VocabularyId, Dictionary<int, Dictionary<string, string>>>();
-            var processedVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            var processedVocabularies = await _vocabularyCache.GetAllAsync();
             foreach (var vocabularity in processedVocabularies.Where(m => m.Localized))
             {
                 var fieldMappingFieldId = vocabularity.Id;
@@ -104,7 +104,7 @@ namespace SOS.Observations.Api.Managers
             CreateNonLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<VocabularyId, Dictionary<int, string>>();
-            var processedVocabularies = await _processedVocabularyRepository.GetAllAsync();
+            var processedVocabularies = await _vocabularyCache.GetAllAsync();
             foreach (var vocabularity in processedVocabularies.Where(m => !m.Localized))
             {
                 var fieldMappingFieldId = vocabularity.Id;

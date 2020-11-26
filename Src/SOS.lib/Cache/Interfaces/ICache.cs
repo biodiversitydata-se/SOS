@@ -1,13 +1,29 @@
-﻿namespace SOS.Lib.Cache.Interfaces
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace SOS.Lib.Cache.Interfaces
 {
     /// <summary>
     /// Cache interface
     /// </summary>
-    public interface ICache
+    public interface ICache<TKey, TEntity>
     {
         /// <summary>
-        /// Release current cache
+        /// Clear current cache
         /// </summary>
-        void Release();
+        void Clear();
+
+        /// <summary>
+        /// Try to get cached entity
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        Task<TEntity> GetAsync(TKey key);
+
+        /// <summary>
+        /// Get all entities
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetAllAsync();
     }
 }

@@ -6,14 +6,14 @@ namespace SOS.Lib.Cache
     /// <summary>
     /// Area cache
     /// </summary>
-    public class AreaCache : CacheBase<int, Area>
+    public class DataProviderCache : CacheBase<int, DataProvider>
     {
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="areaRepository"></param>
-        public AreaCache(IAreaRepository areaRepository) : base(areaRepository)
+        /// <param name="dataProviderRepository"></param>
+        public DataProviderCache(IDataProviderRepository dataProviderRepository) : base(dataProviderRepository)
         {
 
         }
