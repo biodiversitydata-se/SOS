@@ -45,6 +45,7 @@ namespace SOS.Lib.Cache
         public void Clear()
         {
             Cache.Clear();
+            _initialized = false;
         }
 
         /// <inheritdoc />
@@ -68,7 +69,7 @@ namespace SOS.Lib.Cache
         /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            if (!_initialized)
+            if (!_initialized || Cache.IsEmpty)
             {
                 var entities = await Repository.GetAllAsync();
 
