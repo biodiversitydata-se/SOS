@@ -326,7 +326,7 @@ namespace SOS.Export.IO.DwcArchive
             {
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+                var csvWriter = new CsvWriter(streamWriter, "\t");
 
                 // Write occurrence rows to CSV file.
                 foreach (var dwcObservation in dwcObservations)

@@ -60,7 +60,8 @@ namespace SOS.Process.Processors.Nors
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var verbatimCount = 0;
+            var batchId = 0;
+            var processedCount = 0;
             ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new NorsObservationFactory(dataProvider, taxa);
 
@@ -75,12 +76,12 @@ namespace SOS.Process.Processors.Nors
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
                     observations.Clear();
-                    Logger.LogDebug($"NORS Sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"NORS observations processed: {processedCount}");
                 }
             });
 
@@ -88,14 +89,15 @@ namespace SOS.Process.Processors.Nors
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-                Logger.LogDebug($"NORS Sightings processed: {verbatimCount}");
+
+                batchId++;
+
+                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                observations.Clear();
+                Logger.LogDebug($"NORS observations processed: {processedCount}");
             }
 
-            return verbatimCount;
+            return processedCount;
         }
     }
 }

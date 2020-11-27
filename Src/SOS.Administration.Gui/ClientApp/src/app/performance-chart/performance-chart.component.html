@@ -1,0 +1,47 @@
+<div class="flex">
+  <div class="flex-item">
+    <div class="row">
+      <div class="col-sm-2">
+        <a class="filterlink" (click)="filter30Minutes()">30 minutes ago</a>
+      </div>
+      <div class="col">
+        <a class="filterlink" (click)="filter12Hours()">12 hours ago</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <a class="filterlink" (click)="filter1Hour()">1 hours ago</a>
+      </div>
+      <div class="col">
+        <a class="filterlink"  (click)="filter24Hours()">24 hours ago</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <a class="filterlink"  (click)="filter3Hours()">3 hours ago</a>
+      </div>
+      <div class="col">
+        <a class="filterlink"  (click)="filter3Days()">3 days ago</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <a  class="filterlink" (click)="filter3Hours()">6 hours ago</a>
+      </div>
+      <div class="col">
+        <a class="filterlink" (click)="filter1Week()">1 week ago</a>
+      </div>
+    </div>
+  </div>
+  <div class="flex-item">
+    <div style="display: block;">
+      <canvas baseChart width="400" height="200"
+              [datasets]="lineChartData"
+              [options]="lineChartOptions"
+              [colors]="lineChartColors"
+              [legend]="lineChartLegend"
+              [chartType]="lineChartType"
+              [plugins]="lineChartPlugins"></canvas>
+    </div>
+  </div>
+</div>

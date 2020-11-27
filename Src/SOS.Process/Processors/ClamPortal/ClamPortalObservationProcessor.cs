@@ -26,15 +26,6 @@ namespace SOS.Process.Processors.ClamPortal
         private readonly IAreaHelper _areaHelper;
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
 
-        private async Task<int> ValidateAndSaveObservationsAsync(
-            DataProvider dataProvider,
-            ICollection<Observation> observations)
-        {
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-            return await CommitBatchAsync(dataProvider, observations);
-        }
-
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -68,7 +59,8 @@ namespace SOS.Process.Processors.ClamPortal
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var verbatimCount = 0;
+            var batchId = 0;
+            var processedCount = 0;
             ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new ClamPortalObservationFactory(dataProvider, taxa);
 
@@ -83,11 +75,11 @@ namespace SOS.Process.Processors.ClamPortal
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    verbatimCount += await ValidateAndSaveObservationsAsync(dataProvider, observations);
-                   
-                    await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
                     observations.Clear();
-                    Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
                 }
             });
 
@@ -95,12 +87,14 @@ namespace SOS.Process.Processors.ClamPortal
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await ValidateAndSaveObservationsAsync(dataProvider, observations);
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-                Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
+
+                batchId++;
+                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+
+                Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
             }
 
-            return verbatimCount;
+            return processedCount;
         }
     }
 }

@@ -55,9 +55,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
             {
-                var sweRef99Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude)
-                    {SRID = (int) CoordinateSys.SWEREF99_TM};
-                wgs84Point = (Point) sweRef99Point.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude)
+                    { SRID = (int)CoordinateSys.WGS84 };
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);

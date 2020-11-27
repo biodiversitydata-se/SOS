@@ -20,18 +20,20 @@ namespace SOS.Administration.Gui.Controllers
     {       
         private readonly ILogger<DataProviderController> _logger;
         private MongoClient _client;
+        private MongoDbConfiguration _configuration;
 
         public DataProviderController(ILogger<DataProviderController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
         {
             _logger = logger;
             _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
+            _configuration = mongoDbSettings.CurrentValue;
         }
 
         [HttpGet]
         [Route("")]
         public IEnumerable<DataProviderDto> Get()
         {
-            var database = _client.GetDatabase("sos");            
+            var database = _client.GetDatabase(_configuration.DatabaseName);            
             var collection = database.GetCollection<DataProviderDto>("DataProvider");
             var providers = collection.Find(new BsonDocument());
             return providers.ToList();          

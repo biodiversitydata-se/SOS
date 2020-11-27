@@ -1,0 +1,954 @@
+{
+	"info": {
+		"_postman_id": "116b30ad-dbb2-4a4b-82df-6cb257bd5820",
+		"name": "SOS Health Check - Prod",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Observations/Search",
+			"item": [
+				{
+					"name": "Sök efter Utter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "613c19a5-a1c5-409f-868c-5a869c8e4075",
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Returns 2 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(2);",
+									"});",
+									"",
+									"pm.test(\"total count > 5000\", function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(5000);",
+									"});",
+									"",
+									"pm.test(\"TaxonId is 100077\", function () {    ",
+									"    pm.expect(observation.taxon.id).to.eql(100077);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"taxonIds\":[100077],\n        \"includeUnderlyingTaxa\" : false        \n    },    \n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter Utter i Tranås kommun",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ecf97e7f-71f8-4023-87a6-3424d4befa10",
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"Municipality is Tranås\", function () {    ",
+									"    pm.expect(observation.location.municipality.value).to.eql('Tranås');",
+									"});",
+									"",
+									"pm.test(\"Taxon vernacular name is 'utter'\", function () {    ",
+									"    pm.expect(observation.taxon.vernacularName).to.eql('utter');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\",\n        \"searchOnlyBetweenDates\": true\n    },\n    \"taxon\" : {\n        \"taxonIds\" : [100077]        \n    },\n    \"areaIds\" : [7, 283],\n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=2",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter skyddade fynd som aldrig ska visas (Varg)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "abe459b4-63c4-41fe-9d91-33e513836818",
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									" ",
+									"pm.test(\"Returns 0 records\", function () {    ",
+									"    pm.expect(result.records.length).to.eql(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"outputFields\" : [\"taxon.id\", \"taxon.vernacularName\", \"taxon.protectionLevel\", \"accessRights\", \"protectionLevel\"],\n    \"taxon\" : {\n        \"taxonIds\":[100024],\n        \"includeUnderlyingTaxa\" : true        \n    }\n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=10",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter skyddade fynd som kan vara publikt tillgängliga",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8d9e4058-3404-49a1-953a-3c3f6615005d",
+								"exec": [
+									"const result = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									" ",
+									"pm.test(\"Protection level is 1\", function () {",
+									"    pm.expect(result.records.every(o => o.protectionLevel === 1)).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"occurrenceStatus\": \"present\",\n    \"outputFields\" : [\"protectionLevel\"],\n    \"taxon\" : {\n        \"taxonIds\":[100055, 267302, 267303, 267320, 100024, 100093],\n        \"includeUnderlyingTaxa\" : true        \n    }\n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1000",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter alla observationer med occurrenceStatus=\"present\"",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3f00ba0e-ee6a-48ae-b4ab-f390a105a8a9",
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"total count > 70 000 000\", function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(70000000);",
+									"});",
+									"",
+									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('present');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fieldTranslationCultureCode\":\"sv-SE\",\n    \"outputFields\" : [\"rightsHolder\", \"datasetName\", \"occurrence.recordedBy\", \"occurrence.catalogNumber\", \"occurrence.occurrenceStatus\", \"taxon.id\", \"taxon.vernacularName\", \"taxon.redlistCategory\"],\n    \"occurrenceStatus\": \"present\" \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sök efter observationer med occurrenceStatus=\"absent\" i Riksskogstaxeringen",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "114a43f3-3860-447f-bcd5-4c29e8218ef1",
+								"exec": [
+									"const result = pm.response.json();",
+									"const observation = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"total count > 400 000\", function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(400000);",
+									"});",
+									"",
+									"pm.test(\"Occurrence status has value 'present'\", function () {    ",
+									"    pm.expect(observation.occurrence.occurrenceStatus.value).to.eql('absent');",
+									"    pm.expect(observation.occurrence.isPositiveObservation).to.be.false;",
+									"});",
+									"",
+									"pm.test(\"DataProvider is Riksskogstaxeringen\", function () {    ",
+									"    pm.expect(observation.dataProviderId).to.eql(16);",
+									"    pm.expect(observation.datasetName).to.eql('Riksskogstaxeringen');",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"dataProviderIds\": [16],\n    \"onlyValidated\":true,\n    \"occurrenceStatus\":\"absent\",\n    \"translationCultureCode\":\"sv-SE\"\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/search?skip=0&take=1",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Observations/GeoGridAggregation",
+			"item": [
+				{
+					"name": "Geogridaggregering med alla däggdjur",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0285efb1-35c1-4886-b417-787f41627b0d",
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"grid cell count > 1000\", function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(1000);",
+									"});",
+									"",
+									"pm.test(\"Observation count > 1000 for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(1000);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"taxonIds\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },    \n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}\n"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=10",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Geogridaggregering med alla däggdjur & bbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d5248c0e-baa0-48b1-b5dd-1bb8a92bfa99",
+								"exec": [
+									"const result = pm.response.json();",
+									"const gridCell = result.gridCells[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"grid cell count > 100\", function () {    ",
+									"    pm.expect(result.gridCellCount).to.greaterThan(100);",
+									"});",
+									"",
+									"pm.test(\"Observation count > 100 for the grid cell with most observations\", function () {    ",
+									"    pm.expect(gridCell.observationsCount).to.greaterThan(100);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },\n    \"taxon\" : {\n        \"taxonIds\":[4000107],\n        \"includeUnderlyingTaxa\" : true\n    },    \n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/geogridaggregation?zoom=15&bboxLeft=17.9296875&bboxTop=59.355596110016315&bboxRight=18.28125&bboxBottom=59.17592824927137",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"geogridaggregation"
+							],
+							"query": [
+								{
+									"key": "zoom",
+									"value": "15"
+								},
+								{
+									"key": "bboxLeft",
+									"value": "17.9296875"
+								},
+								{
+									"key": "bboxTop",
+									"value": "59.355596110016315"
+								},
+								{
+									"key": "bboxRight",
+									"value": "18.28125"
+								},
+								{
+									"key": "bboxBottom",
+									"value": "59.17592824927137"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Observations/TaxonAggregation",
+			"item": [
+				{
+					"name": "Taxonaggregering med alla taxa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9950b516-413d-403f-9b47-0b5f4d7053f0",
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"total count > 30000\", function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(30000);",
+									"});",
+									"",
+									"pm.test(\"The taxon with most observations has more than 100 000\", function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(100000);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },    \n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/TaxonAggregation?skip=0&take=100",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Taxonaggregering med alla taxa & bbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9dc90c9e-a2fe-445e-aa44-c7fc1f9b93e5",
+								"exec": [
+									"const result = pm.response.json();",
+									"const taxonRecord = result.records[0];",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"total count > 8000\", function () {    ",
+									"    pm.expect(result.totalCount).to.greaterThan(8000);",
+									"});",
+									"",
+									"pm.test(\"The taxon with most observations has more than 2500\", function () {    ",
+									"    pm.expect(taxonRecord.observationCount).to.greaterThan(2500);    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"date\": {\n        \"startDate\":\"1990-01-31T07:59:46.862Z\",\n\t    \"endDate\":\"2020-01-31T07:59:46.862Z\"\n    },    \n    \"onlyValidated\":false,\n    \"occurrenceStatus\":\"present\",\n    \"translationCultureCode\":\"sv-SE\"    \n}"
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Observations/TaxonAggregation?skip=0&take=500&bboxLeft=17.9296875&bboxTop=59.355596110016315&bboxRight=18.28125&bboxBottom=59.17592824927137",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Observations",
+								"TaxonAggregation"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "take",
+									"value": "500"
+								},
+								{
+									"key": "bboxLeft",
+									"value": "17.9296875"
+								},
+								{
+									"key": "bboxTop",
+									"value": "59.355596110016315"
+								},
+								{
+									"key": "bboxRight",
+									"value": "18.28125"
+								},
+								{
+									"key": "bboxBottom",
+									"value": "59.17592824927137"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "DataProviders",
+			"item": [
+				{
+					"name": "Hämta alla data providers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "44877460-fd95-4ba6-829c-e7a1cd2ef3f2",
+								"exec": [
+									"// Init variables",
+									"const dataProviders = pm.response.json();",
+									"const artportalenDataProvider = dataProviders.find(d => d.id == 1);",
+									"var yesterday = new Date();",
+									"yesterday.setDate(yesterday.getDate() - 1);",
+									"",
+									"// Tests",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});   ",
+									"",
+									"pm.test(\"Every dataprovider has Id and Identifier property\", function () {",
+									"    pm.expect(dataProviders.every(d => d.id !== undefined && d.identifier !== undefined)).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Artportalen observations is more than 70 millions\", function () {",
+									"    pm.expect(artportalenDataProvider.publicObservations).to.be.greaterThan(70000000);",
+									"});",
+									"",
+									"pm.test(\"Artportalen is harvested yesterday or today\", function () {",
+									"    var artportalenHarvestDate = Date.parse(artportalenDataProvider.latestHarvestDate);    ",
+									"    pm.expect(artportalenHarvestDate >= yesterday).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Artportalen incremental harvest is done within the last 30 minutes\", function () {",
+									"    var artportalenIncrementalHarvestDate = Date.parse(artportalenDataProvider.latestIncrementalHarvestDate);      ",
+									"    var date30MinutesAgo = new Date();",
+									"    date30MinutesAgo.setMinutes(date30MinutesAgo.getMinutes() - 30);",
+									"    pm.expect(artportalenIncrementalHarvestDate >= date30MinutesAgo).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"The number of data providers is more than 10\", function () {       ",
+									"    pm.expect(dataProviders.length).to.be.greaterThan(10);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/DataProviders",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"DataProviders"
+							]
+						},
+						"description": "Hämta alla aktiva dataset"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "ProcessInformation",
+			"item": [
+				{
+					"name": "Hämta ProcessInformation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0f969029-f4a3-40df-b3b3-d322c94f31c2",
+								"exec": [
+									"const processInformation = pm.response.json();",
+									"var yesterday = new Date();",
+									"yesterday.setDate(yesterday.getDate() - 1);",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});   ",
+									"",
+									"pm.test(\"Latest Process was successful\", function () {",
+									"    pm.expect(processInformation.status === 'Success').to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Systems/ProcessInformation?active=true",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Systems",
+								"ProcessInformation"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Hämta alla aktiva dataset"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Vocabularies",
+			"item": [
+				{
+					"name": "Hämta ordlistan för fältet lifeStage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a819f963-2cfa-4963-9c4e-829530a0f80b",
+								"exec": [
+									"const lifeStageVocabulary = pm.response.json();",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,201,202]);",
+									"});    ",
+									"",
+									"pm.test(\"LifeStage vocabulary is returned\", function () {",
+									"    pm.expect(lifeStageVocabulary.name).to.eql('LifeStage');",
+									"    pm.expect(lifeStageVocabulary.enumId).to.eql('LifeStage');    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "https://sos-search.artdata.slu.se/Vocabularies/lifeStage",
+							"protocol": "https",
+							"host": [
+								"sos-search",
+								"artdata",
+								"slu",
+								"se"
+							],
+							"path": [
+								"Vocabularies",
+								"lifeStage"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

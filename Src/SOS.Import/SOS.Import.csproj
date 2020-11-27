@@ -33,12 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Destination\Area\" />
-    <Folder Include="Repositories\Destination\Area\Interfaces\" />
-    <Folder Include="Repositories\Destination\FieldMappings\" />
-    <Folder Include="Repositories\Destination\FieldMappings\Interfaces\" />
-    <Folder Include="Repositories\Resource\" />
-    <Folder Include="Repositories\Resource\Interfaces\" />
     <Folder Include="Resources\EmlMetadata\" />
   </ItemGroup>
 

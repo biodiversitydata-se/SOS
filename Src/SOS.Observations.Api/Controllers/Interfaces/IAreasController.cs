@@ -6,7 +6,7 @@ using SOS.Lib.Enums;
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
     /// <summary>
-    ///     Sighting controller interface
+    ///     Area controller interface
     /// </summary>
     public interface IAreasController
     {
@@ -29,4 +29,5 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> ExportAreaAsync(AreaType areaType, string feature);
     }
+   
 }

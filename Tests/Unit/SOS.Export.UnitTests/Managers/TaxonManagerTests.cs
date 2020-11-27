@@ -1,5 +1,6 @@
 using System;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Managers;
@@ -29,8 +30,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <summary>
         ///     Return object to be tested
         /// </summary>
-        private TaxonManager TestObject => new TaxonManager(
-            _processedTaxonRepositoryMock.Object,
+        private TaxonManager TestObject => new TaxonManager(new MemoryCache(new MemoryCacheOptions()), _processedTaxonRepositoryMock.Object,
             _loggerMock.Object);
 
         /// <summary>
