@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
@@ -22,8 +23,7 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class AreaManager : IAreaManager
     {
-        private readonly IAreaRepository _areaRepository;
-
+        private readonly IAreaCache _areaCache;
         private readonly ILogger<AreaManager> _logger;
 
         private byte[] CreateZipFile(string filename, byte[] bytes)
@@ -39,6 +39,7 @@ namespace SOS.Observations.Api.Managers
             return ms.ToArray();
         }
 
+        /// <inheritdoc />
         private async Task<byte[]> GetZipppedAreaAsync(Area area){
             try
             {
@@ -47,7 +48,7 @@ namespace SOS.Observations.Api.Managers
                     return null;
                 }
 
-                var geometry = await _areaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
                 var externalArea = new ExternalArea
                 {
                     AreaType = area.AreaType.ToString(),
@@ -66,24 +67,23 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-    /// <summary>
-    ///     Constructor
-    /// </summary>
-    /// <param name="areaRepository"></param>
-    /// <param name="logger"></param>
-    public AreaManager(
-            IAreaRepository areaRepository,
-            ILogger<AreaManager> logger)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="areaCache"></param>
+        /// <param name="logger"></param>
+        public AreaManager(
+        IAreaCache areaCache,
+        ILogger<AreaManager> logger)
         {
-            _areaRepository = areaRepository ??
-                              throw new ArgumentNullException(nameof(_areaRepository));
+            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+    }
 
-    public async Task<byte[]> GetZipppedAreaAsync(AreaType areaType, string feature)
+    public async Task<byte[]> GetZipppedAreaAsync(AreaType areaType, string featureId)
         {
-            var area = await _areaRepository.GetAsync(areaType, feature);
+            var area = await _areaCache.GetAsync(areaType.ToAreaId(featureId));
             return await GetZipppedAreaAsync(area);
         }
 
@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var result = await _areaRepository.GetAreasAsync(areaTypes, searchString, skip, take);
+                var result = await _areaCache.GetAreasAsync(areaTypes, searchString, skip, take);
 
                 return new PagedResult<ExternalSimpleArea>
                 {

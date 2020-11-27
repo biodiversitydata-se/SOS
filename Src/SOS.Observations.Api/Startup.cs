@@ -282,10 +282,9 @@ namespace SOS.Observations.Api
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
 
             // Add Caches
-            services.AddSingleton<ICache<int, Area>, AreaCache>();
+            services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
-
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

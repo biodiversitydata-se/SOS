@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
@@ -17,12 +16,12 @@ namespace SOS.Observations.Api.Managers
     {
         private const int BiotaTaxonId = 0;
         private readonly ITaxonManager _taxonManager;
-        private readonly IAreaRepository _areaRepository;
+        private readonly IAreaCache _areaCache;
 
-        public FilterManager(ITaxonManager taxonManager, IAreaRepository areaRepository)
+        public FilterManager(ITaxonManager taxonManager, IAreaCache areaCache)
         {
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
+            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
         }
 
         /// <summary>
@@ -53,7 +52,7 @@ namespace SOS.Observations.Api.Managers
             {
                 foreach (var areaFilter in preparedFilter.Areas)
                 {
-                    var area = await _areaRepository.GetAsync(areaFilter.Type, areaFilter.FeatureId);
+                    var area = await _areaCache.GetAsync(areaFilter.Type, areaFilter.FeatureId);
 
                     if (area != null)
                     {
@@ -110,7 +109,7 @@ namespace SOS.Observations.Api.Managers
                         }
                         else // we need to use the geometry filter
                         {
-                            var geometry = await _areaRepository.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
+                            var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
 
                             if (preparedFilter.GeometryFilter == null)
                             {

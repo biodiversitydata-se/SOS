@@ -51,12 +51,12 @@ namespace SOS.Lib.Cache
         /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey key)
         {
-            if (Cache.TryGetValue(key, out var value))
+            if (Cache.TryGetValue(key, out var entity))
             {
-                return value;
+                return entity;
             }
 
-            var entity = await Repository.GetAsync(key);
+            entity = await Repository.GetAsync(key);
 
             if (entity != null)
             {

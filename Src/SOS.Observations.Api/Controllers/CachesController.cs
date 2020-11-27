@@ -17,21 +17,25 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class CachesController : BaseController, ICachesController
     {
+        private readonly IAreaCache _areaCache;
         private readonly ICache<int, DataProvider> _dataProvidersCache;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private readonly ILogger<CachesController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
+        /// <param name="areaCache"></param>
         /// <param name="dataProvidersCache"></param>
         /// <param name="vocabularyCache"></param>
         /// <param name="logger"></param>
         public CachesController(
+            IAreaCache areaCache,
             ICache<int, DataProvider> dataProvidersCache,
             ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILogger<CachesController> logger)
         {
+            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _dataProvidersCache = dataProvidersCache ?? throw new ArgumentNullException(nameof(dataProvidersCache));
             _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -48,6 +52,9 @@ namespace SOS.Observations.Api.Controllers
             {
                 switch (cache)
                 {
+                    case Cache.Area:
+                        _areaCache.Clear();
+                        break;
                     case Cache.DataProviders:
                         _dataProvidersCache.Clear();
                         break;

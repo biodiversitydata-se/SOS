@@ -1,10 +1,10 @@
-﻿using MongoDB.Bson;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
 {
-    public class Area : IEntity<ObjectId>
+    public class Area : IEntity<string>
     {
         /// <summary>
         ///  Constructor
@@ -15,6 +15,7 @@ namespace SOS.Lib.Models.Shared
         {
             AreaType = areaType;
             FeatureId = featureId;
+            Id = AreaType.ToAreaId(featureId);
         }
 
         /// <summary>
@@ -35,6 +36,6 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Area Id
         /// </summary>
-        public ObjectId Id { get; set; }
+        public string Id { get; set; }
     }
 }

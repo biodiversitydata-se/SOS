@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Nest;
@@ -22,7 +21,7 @@ namespace SOS.Lib.Repositories.Resource
     /// <summary>
     ///     Area repository
     /// </summary>
-    public class AreaRepository : RepositoryBase<Area, ObjectId>, IAreaRepository
+    public class AreaRepository : RepositoryBase<Area, string>, IAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
