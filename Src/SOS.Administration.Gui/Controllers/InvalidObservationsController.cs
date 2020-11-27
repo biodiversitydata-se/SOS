@@ -19,17 +19,19 @@ namespace SOS.Administration.Gui.Controllers
     {       
         private readonly ILogger<InvalidObservationsController> _logger;
         private MongoClient _client;
+        private MongoDbConfiguration _configuration;
 
         public InvalidObservationsController(ILogger<InvalidObservationsController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
         {
             _logger = logger;
             _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
+            _configuration = mongoDbSettings.CurrentValue;
         }
 
         [HttpGet]        
         public IEnumerable<InvalidLocationDto> Get(string dataSetId, int instanceId)
         {
-            var database = _client.GetDatabase("sos");            
+            var database = _client.GetDatabase(_configuration.DatabaseName);            
             var observationCollection = database.GetCollection<InvalidObservationDto>("InvalidObservation-" + instanceId.ToString());
             
             var filter = Builders<InvalidObservationDto>.Filter.Eq(p=>p.DatasetID, dataSetId);
@@ -75,7 +77,7 @@ namespace SOS.Administration.Gui.Controllers
         [Route("list")]
         public IEnumerable<InvalidObservationDto> GetList(string dataSetId, int instanceId)
         {
-            var database = _client.GetDatabase("sos");          
+            var database = _client.GetDatabase(_configuration.DatabaseName);          
             var observationCollection = database.GetCollection<InvalidObservationDto>("InvalidObservation-" + instanceId.ToString());
 
             var filter = Builders<InvalidObservationDto>.Filter.Eq(p => p.DatasetID, dataSetId);

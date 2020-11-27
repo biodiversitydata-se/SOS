@@ -58,7 +58,8 @@ namespace SOS.Process.Processors.Mvm
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var verbatimCount = 0;
+            var batchId = 0;
+            var processedCount = 0;
             ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new MvmObservationFactory(dataProvider, taxa);
 
@@ -73,12 +74,12 @@ namespace SOS.Process.Processors.Mvm
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+
+                    batchId++;
+
+                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
                     observations.Clear();
-                    Logger.LogDebug($"MVM Sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"MVM observations processed: {processedCount}");
                 }
             });
 
@@ -86,14 +87,15 @@ namespace SOS.Process.Processors.Mvm
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-                Logger.LogDebug($"MVM Sightings processed: {verbatimCount}");
+
+                batchId++;
+
+                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                observations.Clear();
+                Logger.LogDebug($"MVM observations processed: {processedCount}");
             }
 
-            return verbatimCount;
+            return processedCount;
         }
     }
 }

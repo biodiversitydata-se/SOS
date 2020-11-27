@@ -272,7 +272,7 @@ namespace SOS.Process.Processors.Artportalen
                     (int) UnitId.Individuals);
                 obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, _vocabularyById[VocabularyId.DiscoveryMethod]);
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, _vocabularyById[VocabularyId.DeterminationMethod]);
-                CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
+                obs.MeasurementOrFacts = CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
 
                 return obs;
             }

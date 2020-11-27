@@ -23,11 +23,15 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -91,6 +95,8 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+
             services.AddControllers()
                 .AddJsonOptions(options => { options
                     .JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
@@ -275,23 +281,29 @@ namespace SOS.Observations.Api
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
 
+            // Add Caches
+            services.AddSingleton<ICache<int, Area>, AreaCache>();
+            services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
+            services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
+
+
             // Add managers
-            services.AddSingleton<IAreaManager, AreaManager>();
-            services.AddSingleton<IDataProviderManager, DataProviderManager>();
+            services.AddScoped<IAreaManager, AreaManager>();
+            services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
-            services.AddSingleton<IVocabularyManager, VocabularyManager>();
+            services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
-            services.AddSingleton<IFilterManager, FilterManager>();
+            services.AddScoped<IFilterManager, FilterManager>();
 
             // Add repositories
-            services.AddSingleton<IAreaRepository, AreaRepository>();
-            services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
-            services.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+            services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
