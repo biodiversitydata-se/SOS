@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -26,7 +25,7 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
 
             processedAreaRepositoryStub
                 .Setup(avm => avm.GetGeometryAsync(It.IsAny<AreaType>(), It.IsAny<string>()))
-                .ReturnsAsync((ObjectId id) =>
+                .ReturnsAsync((string id) =>
                 {
                     if (areaById.TryGetValue(id, out AreaWithGeometry area))
                     {

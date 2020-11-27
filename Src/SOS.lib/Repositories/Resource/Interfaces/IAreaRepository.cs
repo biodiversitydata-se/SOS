@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -12,7 +11,7 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IAreaRepository : IRepositoryBase<Area, ObjectId>
+    public interface IAreaRepository : IRepositoryBase<Area, string>
     {
         /// <summary>
         ///     Create indexes
@@ -42,7 +41,7 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         /// <param name="skip">Skip this many</param>
         /// <param name="take">Take this many areas</param>
         /// <returns></returns>
-        public Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip,
+        Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip,
             int take);
 
         Task<List<Area>> GetAsync(AreaType[] areaTypes);
