@@ -35,7 +35,7 @@ function dateSinceFormatter(params) {
 export class StatusComponent implements OnInit {  
   searchindexinfo: SearchIndexInfo;
   statuses = [];
-  processInfo: ProcessInfo;
+  processInfo: ProcessInfo[];
 
   processColumnDefs = [
     {
@@ -90,6 +90,8 @@ export class StatusComponent implements OnInit {
   failedTests: number = 0;
   totalRuntimeMs: number = 0;
   hostingenvironment: Environment;
+  dataComparison: DataCompare[] = [];
+  totalDataDifference: number = 0;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -98,8 +100,20 @@ export class StatusComponent implements OnInit {
     this.statuses = [];
     this.http.get<ActiveInstanceInfo>(this.baseUrl + 'statusinfo/activeinstance').subscribe(result => {      
       this.activeInstance = result.activeInstance.toString();
-      this.http.get<ProcessInfo>(this.baseUrl + 'statusinfo/process').subscribe(result => {
+      this.http.get<ProcessInfo[]>(this.baseUrl + 'statusinfo/process').subscribe(result => {
         this.processInfo = result;
+        this.totalDataDifference = 0;
+        let active = this.processInfo.find(p => p.id == "Observation-" + this.activeInstance);
+        let inactive = this.processInfo.find(p => p.id != "Observation-" + this.activeInstance && p.id.includes("Observation"));
+        for (let provider of active.providersInfo) {
+          let compare = new DataCompare();
+          compare.source = provider.dataProviderIdentifier;
+          compare.today = provider.processCount;
+          let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
+          compare.yesterday = inactiveprovider.processCount;
+          this.totalDataDifference += compare.today - compare.yesterday;
+          this.dataComparison.push(compare);
+        }
       }, error => console.error(error));
     }, error => console.error(error));
     
@@ -173,4 +187,9 @@ export class StatusComponent implements OnInit {
       
     }, error => console.error(error));
   }
+}
+class DataCompare {
+  source: string;
+  today: number;
+  yesterday: number;
 }
