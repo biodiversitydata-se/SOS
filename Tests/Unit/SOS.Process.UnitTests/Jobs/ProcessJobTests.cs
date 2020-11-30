@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -21,7 +22,6 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
@@ -54,7 +54,7 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _instanceManager = new Mock<IInstanceManager>();
             _validationManager = new Mock<IValidationManager>();
-            _taxonProcessedRepository = new Mock<ITaxonRepository>();
+            _taxonCache =new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
             _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
@@ -65,12 +65,11 @@ namespace SOS.Process.UnitTests.Jobs
             _sharkProcessor = new Mock<ISharkObservationProcessor>();
             _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
-            _taxonProcessedRepository = new Mock<ITaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
-            _dataProviderManager = new Mock<IDataProviderManager>();
+            _dataProviderCache = new Mock<ICache<int, DataProvider>>();
             _processConfigurationMock = new Mock<ProcessConfiguration>();
         }
 
@@ -87,10 +86,10 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<ISharkObservationProcessor> _sharkProcessor;
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
-        private readonly Mock<ITaxonRepository> _taxonProcessedRepository;
+        private readonly Mock<ICache<int, Taxon>> _taxonCache;
         private readonly Mock<IValidationManager> _validationManager;
         private readonly Mock<IInstanceManager> _instanceManager;
-        private readonly Mock<IDataProviderManager> _dataProviderManager;
+        private readonly Mock<ICache<int, DataProvider>> _dataProviderCache;
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
@@ -111,8 +110,8 @@ namespace SOS.Process.UnitTests.Jobs
             _sharkProcessor.Object,
             _virtualHerbariumProcessor.Object,
             _dwcaObservationProcessor.Object,
-            _taxonProcessedRepository.Object,
-            _dataProviderManager.Object,
+            _taxonCache.Object,
+            _dataProviderCache.Object,
             _instanceManager.Object,
             _validationManager.Object,
             _processTaxaJob.Object,
@@ -131,7 +130,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
+            _taxonCache.Setup(r => r.GetAllAsync())
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -178,12 +177,12 @@ namespace SOS.Process.UnitTests.Jobs
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
 
-            _dataProviderManager.Setup(dpm => dpm.GetAllDataProvidersAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Name = "Artportalen", Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
+            _dataProviderCache.Setup(dpm => dpm.GetAllAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Name = "Artportalen", Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
             
             _processTaxaJob.Setup(r => r.RunAsync())
                 .ReturnsAsync(true);
 
-            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
+            _taxonCache.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new List<Taxon>
                 {
                     new Taxon {Id = 100024, ScientificName = "Canus Lupus"}
