@@ -31,6 +31,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -285,6 +286,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
+            services.AddSingleton<IEntityCache<ProcessedConfiguration>, EntityCache<ProcessedConfiguration>>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

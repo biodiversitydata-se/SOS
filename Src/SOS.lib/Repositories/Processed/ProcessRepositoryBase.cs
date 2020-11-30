@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
@@ -17,6 +18,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IProcessClient _client;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
+        private IEntityCache<ProcessedConfiguration> _processedConfigurationCache;
         private readonly bool _toggleable;
 
         /// <summary>
@@ -37,6 +39,23 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
+                // Cache is only used in public API
+                if (_processedConfigurationCache != null)
+                {
+                    var processedConfig = _processedConfigurationCache.Get();
+
+                    if (processedConfig == null)
+                    {
+                        processedConfig = MongoCollectionConfiguration
+                            .Find(Builders<ProcessedConfiguration>.Filter.Empty)
+                            .FirstOrDefault();
+
+                        _processedConfigurationCache.Set(processedConfig);
+                    }
+
+                    return processedConfig;
+                }
+
                 return MongoCollectionConfiguration
                     .Find(Builders<ProcessedConfiguration>.Filter.Empty)
                     .FirstOrDefault();
@@ -118,22 +137,25 @@ namespace SOS.Lib.Repositories.Processed
         protected string GetInstanceName(byte instance) =>  _toggleable
                 ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}"
                 : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
-        
+
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
+        /// <param name="processedConfigurationCache"></param>
         public ProcessRepositoryBase(
             IProcessClient client,
             bool toggleable,
-            ILogger<ProcessRepositoryBase<TEntity>> logger
+            ILogger<ProcessRepositoryBase<TEntity>> logger,
+            IEntityCache<ProcessedConfiguration> processedConfigurationCache = null
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _toggleable = toggleable;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _processedConfigurationCache = processedConfigurationCache;
 
             _database = _client.GetDatabase();
             BatchSize = _client.WriteBatchSize;
