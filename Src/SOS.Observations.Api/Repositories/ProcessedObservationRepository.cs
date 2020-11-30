@@ -7,11 +7,13 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
@@ -122,19 +124,21 @@ namespace SOS.Observations.Api.Repositories
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="elasticClient"></param>
         /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="telemetry"></param>
         /// <param name="logger"></param>
+        /// <param name="processedConfigurationCache"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             TelemetryClient telemetry,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
+            ILogger<ProcessedObservationRepository> logger,
+            IEntityCache<ProcessedConfiguration> processedConfigurationCache) : base(client, true, logger, processedConfigurationCache)
         {
             LiveMode = true;
 
