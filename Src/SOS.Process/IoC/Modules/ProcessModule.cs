@@ -1,13 +1,18 @@
 ﻿using Autofac;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -76,6 +81,12 @@ namespace SOS.Process.IoC.Modules
             var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
             builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
                 Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
+
+            // Caches
+            builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
+            builder.RegisterType<DataProviderCache>().As<ICache<int, DataProvider>>().SingleInstance();
+            builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
+            builder.RegisterType<TaxonCache>().As<ICache<int, Taxon>>().SingleInstance();
 
             // Helpers, single instance since static data
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();

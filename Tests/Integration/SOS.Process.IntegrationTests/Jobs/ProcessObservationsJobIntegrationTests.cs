@@ -9,6 +9,7 @@ using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Services;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -70,6 +71,8 @@ namespace SOS.Process.IntegrationTests.Jobs
            
             var taxonProcessedRepository =
                 new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
+
+            var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
@@ -201,9 +204,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 validationManager,
                 new NullLogger<DwcaObservationProcessor>());
 
-            var dataProviderManager = new DataProviderManager(
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
-                new NullLogger<DataProviderManager>());
+            var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
+            
 
             var processJob = new ProcessJob(
                 processedObservationRepository,
@@ -219,8 +221,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 sharkProcessor,
                 virtualHrbariumProcessor,
                 dwcaProcessor,
-                taxonProcessedRepository,
-                dataProviderManager,
+                taxonCache,
+                dataProviderCache,
                 instanceManager,
                 validationManager,
                 processTaxaJob,

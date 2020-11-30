@@ -96,30 +96,5 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
-
-        private async Task<IEnumerable<Taxon>> GetTaxaAsync()
-        {
-            try
-            {
-                const int batchSize = 200000;
-                var skip = 0;
-                var tmpTaxa = await _processedTaxonRepository.GetChunkAsync(skip, batchSize);
-                var taxa = new List<Taxon>();
-
-                while (tmpTaxa?.Any() ?? false)
-                {
-                    taxa.AddRange(tmpTaxa);
-                    skip += tmpTaxa.Count();
-                    tmpTaxa = await _processedTaxonRepository.GetChunkAsync(skip, batchSize);
-                }
-
-                return taxa;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get chunk of taxa");
-                return null;
-            }
-        }
     }
 }
