@@ -5,6 +5,9 @@ import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import { HttpClient } from '@angular/common/http';
 import { FunctionalTest } from '../models/functionaltest';
 import { add, formatISO, sub } from 'date-fns';
+import  stc from 'string-to-color'
+import { PerformanceData } from '../models/performancedata';
+
 
 @Component({
   selector: 'app-performance-chart',
@@ -47,6 +50,10 @@ export class PerformanceChartComponent implements OnInit {
       ],
     },
   };
+  public lineChartLegend = true;
+  public lineChartType: ChartType = 'line';
+  public lineChartPlugins = [pluginAnnotations];
+  
   public lineChartColors: Color[] = [
     { // grey
       backgroundColor: 'rgba(148,159,177,0.2)',
@@ -73,69 +80,30 @@ export class PerformanceChartComponent implements OnInit {
       pointHoverBorderColor: 'rgba(148,159,177,0.8)'
     }
   ];
-  public lineChartLegend = true;
-  public lineChartType: ChartType = 'line';
-  public lineChartPlugins = [pluginAnnotations];
-
-  @ViewChild(BaseChartDirective, { static: true }) chart: BaseChartDirective;
-  veryDifferentColors: string[];
-   
-
-  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {    
-    this.veryDifferentColors = ["#000000", "#00FF00", "#0000FF", "#FF0000", "#01FFFE", "#FFA6FE", "#FFDB66", "#006401", "#010067", "#95003A", "#007DB5", "#FF00F6", "#FFEEE8", "#774D00", "#90FB92", "#0076FF", "#D5FF00", "#FF937E", "#6A826C", "#FF029D", "#FE8900", "#7A4782", "#7E2DD2", "#85A900", "#FF0056", "#A42400", "#00AE7E", "#683D3B", "#BDC6FF", "#263400", "#BDD393", "#00B917", "#9E008E", "#001544", "#C28C9F", "#FF74A3", "#01D0FF", "#004754", "#E56FFE", "#788231", "#0E4CA1", "#91D0CB", "#BE9970", "#968AE8", "#BB8800", "#43002C", "#DEFF74", "#00FFC6", "#FFE502", "#620E00", "#008F9C", "#98FF52", "#7544B1", "#B500FF", "#00FF78", "#FF6E41", "#005F39", "#6B6882", "#5FAD4E", "#A75740", "#A5FFD2", "#FFB167", "#009BFF", "#E85EBE"];
+  @ViewChild(BaseChartDirective, { static: true }) chart: BaseChartDirective;  
+  filterId = "30m";
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {        
   }
 
   ngOnInit(): void {    
-    this.updateData(null, null);    
+    this.updateData("PT30M", "PT1M");    
   }
-  private updateData(startDate, endDate) {
-    this.lineChartData = [];
-      this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(tests => {
-          this.lineChartData = [];
-        for (let test of tests) {
-          if (startDate && endDate) {            
-            this.http.get<PerformanceData[]>(this.baseUrl + 'performance/' + test.id + "?startTime=" + startDate + "&endTime=" + endDate).subscribe(result => {
-              this.lineChartData.push({ data: result.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: test.description, backgroundColor: this.idxToColor(test.id) });
-            });
-          }
-          else {
-            this.http.get<PerformanceData[]>(this.baseUrl + 'performance/' + test.id).subscribe(result => {
-              this.lineChartData.push({ data: result.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: test.description, backgroundColor: this.idxToColor(test.id) });
-            });
-          }
-        }
-      });
+  private updateData(timespan: string, interval:string) {        
+    this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=' + timespan + "&interval=" + interval).subscribe(result => {
+      this.lineChartData = [];        
+      for (let dat of result.requests)
+        this.lineChartData.push({ data: dat.map(p => { return { x: Date.parse(p.timestamp), y: Math.floor(p.timeTakenMs) }; }), label: dat[0].requestName, backgroundColor: stc(dat[0].requestName) +'77' });
+    });
   }
-  idxToColor(idx) {         
-    return this.veryDifferentColors[idx] + "77";
+  onChange(value) {
+    console.log(value);
+    if (value == "30m") { this.updateData("PT30M", "PT5M"); }
+    if (value == "1h") { this.updateData("PT1H", "PT5M"); }
+    if (value == "3h") { this.updateData("PT3H", "PT5M"); }
+    if (value == "6h") { this.updateData("PT6H", "PT10M"); }
+    if (value == "12h") { this.updateData("PT12H", "PT15M"); }
+    if (value == "24h") { this.updateData("PT24H", "PT30M"); }
+    if (value == "3d") { this.updateData("PT3D", "PT2H"); }
+    if (value == "7d") { this.updateData("PT7D", "PT2H"); }
   }
-  filter30Minutes() {
-    this.updateData(sub(new Date(), { minutes: 30 }).toUTCString(), new Date().toUTCString());
-  }
-  filter1Hour() {
-    this.updateData(sub(new Date(), { minutes: 60 }).toUTCString(), new Date().toUTCString());
-  }
-  filter3Hours() {
-    this.updateData(sub(new Date(), { hours: 3 }).toUTCString(), new Date().toUTCString());
-  }
-  filter6Hours() {
-    this.updateData(sub(new Date(), { hours: 6 }).toUTCString(), new Date().toUTCString());
-  }
-  filter12Hours() {
-    this.updateData(sub(new Date(), { hours: 12 }).toUTCString(), new Date().toUTCString());
-  }
-  filter24Hours() {
-    this.updateData(sub(new Date(), { hours: 24 }).toUTCString(), new Date().toUTCString());
-  }
-  filter3Days() {
-    this.updateData(sub(new Date(), { days: 3 }).toUTCString(), new Date().toUTCString());
-  }
-  filter1Week() {
-    this.updateData(sub(new Date(), { weeks: 1 }).toUTCString(), new Date().toUTCString());
-  }
-}
-class PerformanceData {
-  timestamp: string;
-  timeTakenMs: number;
-  eventCount: number;
 }
