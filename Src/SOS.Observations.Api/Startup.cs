@@ -286,7 +286,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
-            services.AddSingleton<IEntityCache<ProcessedConfiguration>, EntityCache<ProcessedConfiguration>>();
+            services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();
