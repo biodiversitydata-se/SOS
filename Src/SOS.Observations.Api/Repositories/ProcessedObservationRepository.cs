@@ -138,7 +138,7 @@ namespace SOS.Observations.Api.Repositories
             ElasticSearchConfiguration elasticConfiguration,
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger,
-            IEntityCache<ProcessedConfiguration> processedConfigurationCache) : base(client, true, logger, processedConfigurationCache)
+            IClassCache<ProcessedConfiguration> processedConfigurationCache) : base(client, true, logger, processedConfigurationCache)
         {
             LiveMode = true;
 

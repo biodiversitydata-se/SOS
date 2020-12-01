@@ -57,13 +57,5 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// If no value is set, this will be set to include only present observations.
         /// </summary>
         public OccurrenceStatusFilterValuesDto? OccurrenceStatus { get; set; }
-
-        /// <summary>
-        ///  Translation culture code for fields that are using a vocabulary.
-        ///  Available values.
-        ///  sv-SE (Swedish)
-        ///  en-GB (English)
-        /// </summary>
-        public string TranslationCultureCode { get; set; }
     }
 }

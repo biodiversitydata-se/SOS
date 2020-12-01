@@ -74,18 +74,6 @@ namespace SOS.Observations.Api.Controllers
         {
             var errors = new List<string>();
 
-            // No culture code, set default
-            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
-            {
-                filter.TranslationCultureCode = "sv-SE";
-            }
-
-            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
-                StringComparer.CurrentCultureIgnoreCase))
-            {
-                errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
-            }
-
             if (filter.OutputFields?.Any() ?? false)
             {
                 errors.AddRange(filter.OutputFields
@@ -142,6 +130,23 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        private Result ValidateTranslationCultureCode(string translationCultureCode)
+        {
+            // No culture code, set default
+            if (string.IsNullOrEmpty(translationCultureCode))
+            {
+                translationCultureCode = "sv-SE";
+            }
+
+            if (!new[] { "sv-SE", "en-GB" }.Contains(translationCultureCode,
+                StringComparer.CurrentCultureIgnoreCase))
+            {
+               return Result.Failure("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+            }
+
+            return Result.Success();
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -170,6 +175,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -192,17 +198,19 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
-            [FromQuery] bool validateSearchFilter = true)
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidatePropertyExists(nameof(sortBy), sortBy));
+                    ValidatePropertyExists(nameof(sortBy), sortBy),
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter();
+                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode);
                 var result = await _observationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
@@ -226,6 +234,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -249,18 +258,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
-            [FromQuery] bool validateSearchFilter = false)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArgumentsInternal(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidatePropertyExists(nameof(sortBy), sortBy));
+                    ValidatePropertyExists(nameof(sortBy), sortBy),
+                    ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var result = await _observationManager.GetChunkAsync(filter.ToSearchFilterInternal(), skip, take, sortBy, sortOrder);
+                var result = await _observationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -284,21 +295,23 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
-            [FromQuery] bool validateSearchFilter = false)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var paramsValidationResult = Result.Combine(
                     ValidatePagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidatePropertyExists(nameof(sortBy), sortBy));
+                    ValidatePropertyExists(nameof(sortBy), sortBy),
+                    ValidateTranslationCultureCode(translationCultureCode));
 
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(), aggregationType, skip, take, sortBy, sortOrder);
+                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -349,6 +362,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -361,20 +375,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = true)
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(), zoom, bboxOrError.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -430,6 +446,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationInternal")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -443,20 +460,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = false)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(), zoom, bboxOrError.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -482,6 +501,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
@@ -495,20 +515,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = false)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(), zoomOrError.Value, bboxOrError.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -536,6 +558,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -549,20 +572,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = true)
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(), bboxOrError.Value, skip, take);
+                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bboxOrError.Value, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -589,6 +614,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregationInternal")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -603,20 +629,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = false)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(), bboxOrError.Value, skip, take);
+                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bboxOrError.Value, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);

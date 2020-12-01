@@ -3,19 +3,19 @@
     /// <summary>
     /// Class holding a entity 
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public interface IEntityCache<TEntity>
+    /// <typeparam name="TClass"></typeparam>
+    public interface IClassCache<TClass>
     {
         /// <summary>
         /// Get cached entity
         /// </summary>
         /// <returns></returns>
-        TEntity Get();
+        TClass Get();
 
         /// <summary>
         /// Set entity cache
         /// </summary>
         /// <param name="entity"></param>
-        void Set(TEntity entity);
+        void Set(TClass entity);
     }
 }

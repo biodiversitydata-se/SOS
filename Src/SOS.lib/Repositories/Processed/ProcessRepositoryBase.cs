@@ -18,7 +18,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IProcessClient _client;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-        private IEntityCache<ProcessedConfiguration> _processedConfigurationCache;
+        private IClassCache<ProcessedConfiguration> _processedConfigurationCache;
         private readonly bool _toggleable;
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             bool toggleable,
             ILogger<ProcessRepositoryBase<TEntity>> logger,
-            IEntityCache<ProcessedConfiguration> processedConfigurationCache = null
+            IClassCache<ProcessedConfiguration> processedConfigurationCache = null
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));

@@ -78,7 +78,7 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto)
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode)
         {
             if (searchFilterDto == null) return null;
 
@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.Extensions
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
             filter.DataProviderIds = searchFilterDto.DataProviderIds;
-            filter.FieldTranslationCultureCode = searchFilterDto.TranslationCultureCode;
+            filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterDto.OnlyValidated;
             filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
             {
@@ -120,7 +120,7 @@ namespace SOS.Observations.Api.Extensions
             return filter;
         }
 
-        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto)
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto, string translationCultureCode)
         {
             if (searchFilterDto == null) return null;
 
@@ -134,7 +134,7 @@ namespace SOS.Observations.Api.Extensions
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
             filter.DataProviderIds = searchFilterDto.DataProviderIds;
-            filter.FieldTranslationCultureCode = searchFilterDto.TranslationCultureCode;
+            filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterDto.OnlyValidated;
             filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
             {
