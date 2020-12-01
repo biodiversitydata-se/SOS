@@ -17,6 +17,31 @@ namespace SOS.Lib.Models.Search
             ShowBoth,
             DoNotShowSightingsInMerged
         }
+        /// <summary>
+        /// OnlyStartDate, Only StartDate of the observation must be within the specified interval            
+        /// OnlyEndDate, Only EndDate of the observation must be within the specified interval    
+        /// BetweenStartDateAndEndDate, Start and EndDate of the observation must be within the specified interval    
+        /// OverlappingStartDateAndEndDate, Start or EndDate of the observation must be within the specified interval    
+        /// </summary>
+        public enum DateRangeFilterType
+        {
+            /// <summary>
+            /// Only StartDate of the observation must be within the specified interval
+            /// </summary>
+            OnlyStartDate,
+            /// <summary>
+            /// Only EndDate of the observation must be within the specified interval
+            /// </summary>
+            OnlyEndDate,
+            /// <summary>
+            /// Start and EndDate of the observation must be within the specified interval
+            /// </summary>
+            BetweenStartDateAndEndDate,
+            /// <summary>
+            /// Start or EndDate of the observation must be within the specified interval
+            /// </summary>
+            OverlappingStartDateAndEndDate
+        }
 
         /// <summary>
         /// Geographical areas to filter by
@@ -108,9 +133,9 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     If true the whole event timespan must be between StartDate and EndDate
+        ///     Which type of date filtering that should be used
         /// </summary>
-        public bool SearchOnlyBetweenDates { get; set; }
+        public DateRangeFilterType DateFilterType { get; set; } = DateRangeFilterType.OverlappingStartDateAndEndDate;
 
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
 
