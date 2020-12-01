@@ -25,7 +25,21 @@ namespace SOS.Administration.Gui.Controllers
         }
         public List<Request[]> Requests { get; set; }
     }
-    public class ApplicationsInsightsReturn
+    public class FailedData
+    {
+        public string Name { get; set; }
+        public long Count { get; set; }
+    }
+    public class ApplicationInsightsQueryReturn
+    {
+        public class Table
+        {
+            public string Name { get; set; }
+            public IList<IList<object>> Rows { get; set; }
+        }
+        public Table[] Tables { get; set; }
+    }
+    public class ApplicationsInsightsTelemetryReturn
     {
         public class AiValue
         {
@@ -53,13 +67,15 @@ namespace SOS.Administration.Gui.Controllers
         }
         public AiValue Value { get; set; }
     }
+    
     [Route("[controller]")]
     [ApiController]
     public class PerformanceController : ControllerBase
     {
         private readonly ElasticClient _elasticClient;
         private readonly string _indexName;
-        private const string aiURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
+        private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
+        private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
         private ApplicationInsightsConfiguration _aiConfig;
 
 
@@ -71,13 +87,13 @@ namespace SOS.Administration.Gui.Controllers
         }
      
         public static string GetTelemetry(string appid, string apikey,
-                string queryType, string queryPath, string parameterString)
+                string queryType, string parameterString)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("x-api-key", apikey);
-            var req = string.Format(aiURL, appid, queryType, queryPath, parameterString);
+            var req = string.Format(aiQueryURL, appid, queryType, parameterString);
             HttpResponseMessage response = client.GetAsync(req).Result;
             if (response.IsSuccessStatusCode)
             {
@@ -88,7 +104,28 @@ namespace SOS.Administration.Gui.Controllers
                 return response.ReasonPhrase;
             }
         }
-        
+        [HttpGet]
+        [Route("failed")]
+        public async Task<IEnumerable<FailedData>> GetFailedRequests()
+        {
+            var query = @"requests
+                            | where success == false and resultCode != 404
+                            | summarize failedCount = sum(itemCount) by name
+                            | top 10 by failedCount desc";
+            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "query", "timespan=P1D&query=" + query );
+            var result = JsonConvert.DeserializeObject<ApplicationInsightsQueryReturn>(json);
+            var failedRequests = new List<FailedData>();
+            foreach(var row in result.Tables[0].Rows)
+            {
+                var failedRequest = new FailedData()
+                {
+                    Name = (string)row[0],
+                    Count = (long)row[1]
+                };
+                failedRequests.Add(failedRequest);
+            }
+            return failedRequests;
+        }
         [HttpGet]
         [Route("")]
         public async Task<PerformanceData> GetPerformanceData(string interval, string timespan)
@@ -102,8 +139,8 @@ namespace SOS.Administration.Gui.Controllers
                 interval = "PT12H";
             }
 
-            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey,"metrics", "requests/duration", $"interval={interval}&timespan={timespan}&segment=request/name&top={1000}");
-            var ret = JsonConvert.DeserializeObject<ApplicationsInsightsReturn>(json);
+            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey,"metrics/requests/duration", $"interval={interval}&timespan={timespan}&segment=request/name&top={1000}");
+            var ret = JsonConvert.DeserializeObject<ApplicationsInsightsTelemetryReturn>(json);
             Dictionary<string, List<PerformanceData.Request>> requestDictionary = new Dictionary<string, List<PerformanceData.Request>>();
             foreach(var segment in ret.Value.Segments)
             {
