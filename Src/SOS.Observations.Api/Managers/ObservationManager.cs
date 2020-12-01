@@ -213,6 +213,7 @@ namespace SOS.Observations.Api.Managers
             foreach (var observation in processedObservations)
             {
                 TranslateLocalizedValue(observation.Occurrence?.Activity, VocabularyId.Activity, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.DiscoveryMethod, VocabularyId.DiscoveryMethod, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.Gender, VocabularyId.Gender, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.LifeStage, VocabularyId.LifeStage, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnit, VocabularyId.Unit,
@@ -250,6 +251,8 @@ namespace SOS.Observations.Api.Managers
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Activity,
                                 nameof(Observation.Occurrence.Activity), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.DiscoveryMethod,
+                                nameof(Observation.Occurrence.DiscoveryMethod), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Gender,
                                 nameof(Observation.Occurrence.Gender), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.LifeStage,
