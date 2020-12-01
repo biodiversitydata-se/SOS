@@ -24,6 +24,7 @@
     "@asymmetrik/ngx-leaflet": "^6.0.1",
     "@asymmetrik/ngx-leaflet-markercluster": "^3.0.0",
     "@nguniversal/module-map-ngfactory-loader": "8.1.1",
+    "@popperjs/core": "^2.5.4",
     "@types/leaflet.markercluster": "^1.4.3",
     "ag-grid-angular": "^24.1.0",
     "ag-grid-community": "^24.1.0",
@@ -41,6 +42,7 @@
     "oidc-client": "^1.9.1",
     "popper.js": "^1.16.0",
     "rxjs": "^6.5.3",
+    "string-to-color": "^2.2.2",
     "zone.js": "0.9.1"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDurat
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
+import { PerformanceData } from '../models/performancedata';
 import { ProcessInfo } from '../models/providerinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
 import { TestResults } from '../models/testresults';
@@ -92,6 +93,7 @@ export class StatusComponent implements OnInit {
   hostingenvironment: Environment;
   dataComparison: DataCompare[] = [];
   totalDataDifference: number = 0;
+  performanceComparison: DataCompare[] = [];
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -127,6 +129,19 @@ export class StatusComponent implements OnInit {
       this.hostingenvironment = result;
     }, error => console.error(error));
     this.runTests();
+    this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=P2D&interval=P1D').subscribe(result => {
+      this.performanceComparison = [];
+      for (var request of result.requests) {
+        if (request.length == 3) {
+          console.log(request);
+          let compare = new DataCompare();
+          compare.source = request[0].requestName;
+          compare.today = request[2].timeTakenMs;
+          compare.yesterday = request[1].timeTakenMs;
+          this.performanceComparison.push(compare);
+        }
+    }
+    });
   }
   formatDate(param) {
     return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
