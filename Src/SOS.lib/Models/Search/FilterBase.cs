@@ -27,9 +27,12 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Bird validation area id's
         /// </summary>
-        public IEnumerable<string> BirdValidationAreaIds { get; set; }
+        public ICollection<string> BirdValidationAreaIds { get; set; }
 
-        public IEnumerable<string> CountyIds { get; set; }
+        /// <summary>
+        /// County id's
+        /// </summary>
+        public ICollection<string> CountyIds { get; set; }
 
         /// <summary>
         ///     Only get data from these providers
@@ -88,7 +91,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public IEnumerable<string> MunicipalityIds { get; set; }
+        public ICollection<string> MunicipalityIds { get; set; }
 
         /// <summary>
         ///     True to return only validated sightings.
@@ -98,7 +101,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Parish to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public IEnumerable<string> ParishIds { get; set; }
+        public ICollection<string> ParishIds { get; set; }
 
         /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
@@ -110,7 +113,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Provinces to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public IEnumerable<string> ProvinceIds { get; set; }
+        public ICollection<string> ProvinceIds { get; set; }
 
         /// <summary>
         ///     Redlist categories to match. Queryable values are available in Field Mappings.

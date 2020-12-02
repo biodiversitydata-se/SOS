@@ -55,121 +55,33 @@ namespace SOS.Observations.Api.Managers
                     switch (areaFilter.Type)
                     {
                         case AreaType.County:
-                            var countyIds = (preparedFilter.CountyIds ??= new List<string>()).ToList();
-                            countyIds.Add(areaFilter.FeatureId);
-                            preparedFilter.CountyIds = countyIds;
+                            (preparedFilter.CountyIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Municipality:
-                            var municipalityIds = (preparedFilter.MunicipalityIds ??= new List<string>()).ToList();
-                            municipalityIds.Add(areaFilter.FeatureId);
-                            preparedFilter.MunicipalityIds = municipalityIds;
+                            (preparedFilter.MunicipalityIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Province:
-                            var provinceIds = (preparedFilter.ProvinceIds ??= new List<string>()).ToList();
-                            provinceIds.Add(areaFilter.FeatureId);
-                            preparedFilter.ProvinceIds = provinceIds;
+                            (preparedFilter.ProvinceIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Parish:
-                            var parishIds = (preparedFilter.ParishIds ??= new List<string>()).ToList();
-                            parishIds.Add(areaFilter.FeatureId);
-                            preparedFilter.ParishIds = parishIds;
+                            (preparedFilter.ParishIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.BirdValidationArea:
-                            var birdValidationAreaIds = (preparedFilter.BirdValidationAreaIds ??= new List<string>()).ToList();
-                            birdValidationAreaIds.Add(areaFilter.FeatureId);
-                            preparedFilter.BirdValidationAreaIds = birdValidationAreaIds;
+                            (preparedFilter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         default:
                             var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
 
                             if (geometry != null)
                             {
-                               var geometries = (preparedFilter.GeometryFilter ??= new GeometryFilter
+                                (preparedFilter.GeometryFilter ??= new GeometryFilter
                                 {
                                     MaxDistanceFromPoint = 0
-                                }).Geometries;
-
-                               geometries.Add(geometry);
-                               preparedFilter.GeometryFilter.Geometries = geometries;
+                                }).Geometries.Add(geometry);
                             }
 
                             break;
                     }
-
-                   
-                    /*
-                    var area = await _areaCache.GetAsync(areaFilter.Type, areaFilter.FeatureId);
-
-                    if (area != null)
-                    {
-                        //if we already have the info needed for the search we skip polygon searches
-                        if (area.AreaType == AreaType.County ||
-                            area.AreaType == AreaType.Municipality ||
-                            area.AreaType == AreaType.Province ||
-                            area.AreaType == AreaType.Parish)
-                        {
-                            if (area.AreaType == AreaType.County)
-                            {
-                                if (preparedFilter.CountyIds == null)
-                                {
-                                    preparedFilter.CountyIds = new List<string>();
-                                }
-
-                                var list = preparedFilter.CountyIds.ToList();
-                                list.Add(area.FeatureId);
-                                preparedFilter.CountyIds = list;
-                            }
-                            else if (area.AreaType == AreaType.Municipality)
-                            {
-                                if (preparedFilter.MunicipalityIds == null)
-                                {
-                                    preparedFilter.MunicipalityIds = new List<string>();
-                                }
-
-                                var list = preparedFilter.MunicipalityIds.ToList();
-                                list.Add(area.FeatureId);
-                                preparedFilter.MunicipalityIds = list;
-                            }
-                            else if (area.AreaType == AreaType.Province)
-                            {
-                                if (preparedFilter.ProvinceIds == null)
-                                {
-                                    preparedFilter.ProvinceIds = new List<string>();
-                                }
-
-                                var list = preparedFilter.ProvinceIds.ToList();
-                                list.Add(area.FeatureId);
-                                preparedFilter.ProvinceIds = list;
-                            }
-                            else if (area.AreaType == AreaType.Parish)
-                            {
-                                if (preparedFilter.ParishIds == null)
-                                {
-                                    preparedFilter.ParishIds = new List<string>();
-                                }
-
-                                var list = preparedFilter.ParishIds.ToList();
-                                list.Add(area.FeatureId);
-                                preparedFilter.ParishIds = list;
-                            }
-                        }
-                        else if (area.AreaType == AreaType.BirdValidationArea)
-                        {
-
-                        }
-                        else // we need to use the geometry filter
-                        {
-                            var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
-
-                            if (preparedFilter.GeometryFilter == null)
-                            {
-                                preparedFilter.GeometryFilter = new GeometryFilter();
-                                preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
-                            }
-
-                            preparedFilter.GeometryFilter.Geometries.Add(geometry);
-                        }
-                    }*/
                 }
             }
 
