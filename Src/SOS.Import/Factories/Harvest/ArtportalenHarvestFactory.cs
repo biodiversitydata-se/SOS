@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -306,7 +307,10 @@ namespace SOS.Import.Factories.Harvest
 
             while (idBatch?.Any() ?? false)
             {
-                var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsAsync(idBatch, IncrementalMode))?.ToList());
+                var siteEntities = await _siteRepository.GetByIdsAsync(idBatch, IncrementalMode);
+                var siteBirdValidationAreaIds = await _siteRepository.GetSiteBirdValidationAreaIds(idBatch);
+
+                var sites = CastSiteEntitiesToVerbatim(siteEntities?.ToList(), siteBirdValidationAreaIds);
 
                 if (sites?.Any() ?? false)
                 {
@@ -322,12 +326,13 @@ namespace SOS.Import.Factories.Harvest
         }
 
         /// <summary>
-        ///     Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
+        ///  Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
         ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
         /// </summary>
         /// <param name="siteEntities"></param>
+        /// <param name="siteBirdValidationAreaIds"></param>
         /// <returns></returns>
-        private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
+        private IEnumerable<Site> CastSiteEntitiesToVerbatim(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<string>> siteBirdValidationAreaIds)
         {
             var sites = new List<Site>();
 
@@ -336,23 +341,26 @@ namespace SOS.Import.Factories.Harvest
                 return sites;
             }
 
-            var batchSize = 100000;
             while (siteEntities.Count > 0)
             {
-                var sitesBatch = siteEntities.Take(batchSize).ToArray();
-                sites.AddRange(from s in sitesBatch
-                               select CastSiteEntityToVerbatim(s));
-                siteEntities.RemoveRange(0, sitesBatch?.Count() ?? 0);
+                var siteEntity = siteEntities.First();
+
+                var site = CastSiteEntityToVerbatim(siteEntity, siteBirdValidationAreaIds);
+
+                sites.Add(site);
+                siteEntities.Remove(siteEntity);
             }
+
             return sites;
         }
 
         /// <summary>
-        ///     Cast site itemEntity to aggregate
+        /// Cast site itemEntity to aggregate
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="siteBirdValidationAreaIds"></param>
         /// <returns></returns>
-        private Site CastSiteEntityToVerbatim(SiteEntity entity)
+        private Site CastSiteEntityToVerbatim(SiteEntity entity, IDictionary<int, ICollection<string>> siteBirdValidationAreaIds)
         {
             Point wgs84Point = null;
             const int defaultAccuracy = 100;
@@ -366,7 +374,7 @@ namespace SOS.Import.Factories.Harvest
             }
 
             var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
-            return new Site
+            var site = new Site
             {
                 Accuracy = accuracy,
                 County = string.IsNullOrEmpty(entity.CountyFeatureId)
@@ -390,6 +398,13 @@ namespace SOS.Import.Factories.Harvest
                 VerbatimCoordinateSystem = CoordinateSys.WebMercator,
                 ParentSiteId = entity.ParentSiteId
             };
+
+            if (siteBirdValidationAreaIds != null && siteBirdValidationAreaIds.TryGetValue(site.Id, out var birdValidationAreaIds))
+            {
+                site.BirdValidationAreaIds = birdValidationAreaIds;
+            }
+
+            return site;
         }
         #endregion Site
 

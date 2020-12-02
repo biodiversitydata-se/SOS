@@ -150,13 +150,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 const string query = @"
                 SELECT 
-		            sa.SiteId, a.FeatureId
+                    sa.SiteId,
+		            a.FeatureId
 	            FROM 
 		            SiteAreas sa
 		            INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 18
                     INNER JOIN @sid s ON sa.SiteId = s.Id";
 
-                var siteBirdValidationAreas = (await QueryAsync<(int siteId, string featureId)>(query,
+                var siteBirdValidationAreas = (await QueryAsync<(int SiteId, string FeatureId)>(query,
                     new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
 
                 var siteAreas = new Dictionary<int, ICollection<string>>();
@@ -165,12 +166,12 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                     foreach (var siteBirdValidationArea in siteBirdValidationAreas)
                     {
-                        if (!siteAreas.TryGetValue(siteBirdValidationArea.siteId, out var areas))
+                        if (!siteAreas.TryGetValue(siteBirdValidationArea.SiteId, out var areas))
                         {
                             areas = new List<string>();
-                            siteAreas.Add(siteBirdValidationArea.siteId, areas);
+                            siteAreas.Add(siteBirdValidationArea.SiteId, areas);
                         }
-                        areas.Add(siteBirdValidationArea.featureId);
+                        areas.Add(siteBirdValidationArea.FeatureId);
                     }
                 }
                 return siteAreas;

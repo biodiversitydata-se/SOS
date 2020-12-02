@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using System.Collections.Generic;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
@@ -32,6 +33,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Country Region
         /// </summary>
         public GeographicalArea CountryRegion { get; set; }
+
+        /// <summary>
+        /// Bird validation areas
+        /// </summary>
+        public IEnumerable<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
         ///     External Id of site

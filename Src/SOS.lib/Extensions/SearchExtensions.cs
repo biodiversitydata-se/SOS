@@ -15,6 +15,16 @@ namespace SOS.Lib.Extensions
         {
             var queryContainers = new List<Func<QueryContainerDescriptor<Observation>, QueryContainer>>();
 
+            if (filter.BirdValidationAreaIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.ArtportalenInternal.BirdValidationAreaIds)
+                        .Terms(filter.BirdValidationAreaIds)
+                    )
+                );
+            }
+
             if (filter.CountyIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
@@ -178,6 +188,16 @@ namespace SOS.Lib.Extensions
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
         {
             var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            if (filter.BirdValidationAreaIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("artportalenInternal.birdValidationAreaIds")
+                        .Terms(filter.BirdValidationAreaIds)
+                    )
+                );
+            }
 
             if (filter.CountyIds?.Any() ?? false)
             {
