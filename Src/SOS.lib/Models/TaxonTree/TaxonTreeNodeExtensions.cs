@@ -88,7 +88,10 @@ namespace SOS.Lib.Models.TaxonTree
 
                 foreach (var childNode in currentNode.Children)
                 {
-                    stack.Push(childNode);
+                    if (!visitedNodes.Contains(childNode))
+                    {
+                        stack.Push(childNode);
+                    }
                 }
             }
 
