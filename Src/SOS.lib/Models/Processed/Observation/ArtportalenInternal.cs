@@ -11,6 +11,11 @@ namespace SOS.Lib.Models.Processed.Observation
     public class ArtportalenInternal
     {
         /// <summary>
+        /// Bird validation areas
+        /// </summary>
+        public IEnumerable<string> BirdValidationAreaIds { get; set; }
+
+        /// <summary>
         ///     Ids of Species Facts connected to Taxon
         /// </summary>
         public IEnumerable<int> SpeciesFactsIds { get; set; }

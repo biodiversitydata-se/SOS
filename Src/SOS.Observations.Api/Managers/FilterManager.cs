@@ -52,6 +52,52 @@ namespace SOS.Observations.Api.Managers
             {
                 foreach (var areaFilter in preparedFilter.Areas)
                 {
+                    switch (areaFilter.Type)
+                    {
+                        case AreaType.County:
+                            var countyIds = (preparedFilter.CountyIds ??= new List<string>()).ToList();
+                            countyIds.Add(areaFilter.FeatureId);
+                            preparedFilter.CountyIds = countyIds;
+                            break;
+                        case AreaType.Municipality:
+                            var municipalityIds = (preparedFilter.MunicipalityIds ??= new List<string>()).ToList();
+                            municipalityIds.Add(areaFilter.FeatureId);
+                            preparedFilter.MunicipalityIds = municipalityIds;
+                            break;
+                        case AreaType.Province:
+                            var provinceIds = (preparedFilter.ProvinceIds ??= new List<string>()).ToList();
+                            provinceIds.Add(areaFilter.FeatureId);
+                            preparedFilter.ProvinceIds = provinceIds;
+                            break;
+                        case AreaType.Parish:
+                            var parishIds = (preparedFilter.ParishIds ??= new List<string>()).ToList();
+                            parishIds.Add(areaFilter.FeatureId);
+                            preparedFilter.ParishIds = parishIds;
+                            break;
+                        case AreaType.BirdValidationArea:
+                            var birdValidationAreaIds = (preparedFilter.BirdValidationAreaIds ??= new List<string>()).ToList();
+                            birdValidationAreaIds.Add(areaFilter.FeatureId);
+                            preparedFilter.BirdValidationAreaIds = birdValidationAreaIds;
+                            break;
+                        default:
+                            var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
+
+                            if (geometry != null)
+                            {
+                               var geometries = (preparedFilter.GeometryFilter ??= new GeometryFilter
+                                {
+                                    MaxDistanceFromPoint = 0
+                                }).Geometries;
+
+                               geometries.Add(geometry);
+                               preparedFilter.GeometryFilter.Geometries = geometries;
+                            }
+
+                            break;
+                    }
+
+                   
+                    /*
                     var area = await _areaCache.GetAsync(areaFilter.Type, areaFilter.FeatureId);
 
                     if (area != null)
@@ -107,6 +153,10 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.ParishIds = list;
                             }
                         }
+                        else if (area.AreaType == AreaType.BirdValidationArea)
+                        {
+
+                        }
                         else // we need to use the geometry filter
                         {
                             var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
@@ -119,7 +169,7 @@ namespace SOS.Observations.Api.Managers
 
                             preparedFilter.GeometryFilter.Geometries.Add(geometry);
                         }
-                    }
+                    }*/
                 }
             }
 

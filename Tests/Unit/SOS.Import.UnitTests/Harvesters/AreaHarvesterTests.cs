@@ -76,7 +76,7 @@ namespace SOS.Import.UnitTests.Harvesters
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _areaRepositoryMock.Setup(mdr => mdr.GetAsync())
-                .ReturnsAsync(new[] {new AreaEntity {Id = 1, Name = "Sverige"}});
+                .ReturnsAsync(new[] {new AreaEntity {FeatureId = "1", Name = "Sverige"}});
 
             _areaProcessedRepository.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);

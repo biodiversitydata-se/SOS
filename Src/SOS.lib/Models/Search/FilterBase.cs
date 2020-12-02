@@ -24,6 +24,11 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<AreaFilter> Areas { get; set; }
 
+        /// <summary>
+        /// Bird validation area id's
+        /// </summary>
+        public IEnumerable<string> BirdValidationAreaIds { get; set; }
+
         public IEnumerable<string> CountyIds { get; set; }
 
         /// <summary>

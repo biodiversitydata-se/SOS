@@ -8,11 +8,6 @@
         public int AreaDatasetId { get; set; }
 
         /// <summary>
-        ///     Area Id
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
         ///     Area geometry
         /// </summary>
         public string PolygonWKT { get; set; }
