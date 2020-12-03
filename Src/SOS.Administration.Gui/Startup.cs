@@ -36,6 +36,9 @@ namespace SOS.Administration.Gui
 
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));
+
+            services.Configure<ApplicationInsightsConfiguration>(
+              Configuration.GetSection(nameof(ApplicationInsightsConfiguration)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
