@@ -87,7 +87,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 },
                 Identification = new Identification
                 {
-                    Validated = true,
+                    Validated = false,
                     UncertainDetermination = false
                 },
                 Location = new Lib.Models.Processed.Observation.Location

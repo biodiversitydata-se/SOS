@@ -70,7 +70,7 @@ namespace SOS.Process.Processors.FishData
                 },
                 Identification = new Identification
                 {
-                    Validated = true,
+                    Validated = false,
                     UncertainDetermination = false
                 },
                 Location = new Lib.Models.Processed.Observation.Location
