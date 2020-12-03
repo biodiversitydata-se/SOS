@@ -71,8 +71,9 @@ namespace SOS.Process.Processors.Shark
                 Identification = new Identification
                 {
                     IdentifiedBy = verbatim.AnalysedBy,
+                    UncertainDetermination = false,
                     Validated = false,
-                    UncertainDetermination = false
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Lib.Models.Processed.Observation.Location
                 {
