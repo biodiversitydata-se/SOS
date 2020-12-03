@@ -40,7 +40,7 @@ export class InvalidMapComponent implements OnInit {
   }
 
   updateMap() {
-    if (this.loadingData || this.dataSetId == -1) { return; } else { this.loadingData = true; }
+    if (this.loadingData || this.dataSetId == "-1") { return; } else { this.loadingData = true; }
     this.markerClusterData = [];
     this.loadingData = true;
     this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations?dataSetId=' + this._dataSetId + "&instanceId=" + this._instance).subscribe(result => {
