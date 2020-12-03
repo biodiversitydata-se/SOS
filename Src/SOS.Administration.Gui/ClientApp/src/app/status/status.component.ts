@@ -94,6 +94,8 @@ export class StatusComponent implements OnInit {
   dataComparison: DataCompare[] = [];
   totalDataDifference: number = 0;
   performanceComparison: DataCompare[] = [];
+  failedCalls: FailedCalls[] = [];
+  sumFailedCalls: number = 0;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -124,6 +126,13 @@ export class StatusComponent implements OnInit {
     }, error => console.error(error));
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
+    }, error => console.error(error));
+    this.http.get<FailedCalls[]>(this.baseUrl + 'performance/failed').subscribe(result => {
+      this.failedCalls = result;
+      this.sumFailedCalls = 0;
+      for (var call of this.failedCalls) {
+        this.sumFailedCalls += call.count;
+      }
     }, error => console.error(error));
     this.http.get<Environment>(this.baseUrl + 'hostingenvironment').subscribe(result => {
       this.hostingenvironment = result;
@@ -207,4 +216,8 @@ class DataCompare {
   source: string;
   today: number;
   yesterday: number;
+}
+class FailedCalls {
+  name: string;
+  count: number;
 }
