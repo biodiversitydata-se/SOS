@@ -28,9 +28,7 @@ export class InvalidGridComponent implements OnInit {
     { field: 'defects', sortable: true, filter: true, resizable: true }
   ];
 
-  rowData = [
-    { occurrenceID: '', datasetID: '', datasetName: '', defects:[] },
-  
+  rowData = [   
   ];
   http: HttpClient;
   baseUrl: string;
@@ -40,13 +38,12 @@ export class InvalidGridComponent implements OnInit {
     this.baseUrl = baseUrl;
   }
 
-  ngOnInit() {
-    this.updateGrid();     
+  ngOnInit() {    
   }
 
-  private updateGrid() {    
-    this.rowData = [];
-    this.loadingData = true;
+  private updateGrid() {
+    if (this.loadingData || this.dataSetId == "-1") { return; } else { this.loadingData = true; }
+    this.rowData = [];    
     this.http.get<InvalidObservation[]>(this.baseUrl + 'invalidobservations/list?dataSetId=' + this._dataSetId + "&instanceId=" + this._instance).subscribe(result => {
           this.rowData = result.map(function(val, index) {
               return val;
