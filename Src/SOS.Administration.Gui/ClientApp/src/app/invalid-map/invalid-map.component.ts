@@ -36,11 +36,11 @@ export class InvalidMapComponent implements OnInit {
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
   }
 
-  ngOnInit() {
-    this.updateMap();   
+  ngOnInit() {    
   }
 
   updateMap() {
+    if (this.loadingData || this.dataSetId == "-1") { return; } else { this.loadingData = true; }
     this.markerClusterData = [];
     this.loadingData = true;
     this.http.get<InvalidLocation[]>(this.baseUrl + 'invalidobservations?dataSetId=' + this._dataSetId + "&instanceId=" + this._instance).subscribe(result => {

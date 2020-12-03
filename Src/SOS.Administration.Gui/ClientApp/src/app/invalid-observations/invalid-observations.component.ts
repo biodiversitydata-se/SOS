@@ -12,7 +12,7 @@ import { InvalidLocation } from '../models/invalidlocation';
 export class InvalidObservationsComponent {  
   dataSets = [];
   selectedDataSet = new DataProvider();
-  selectedDataSetId = 0;
+  selectedDataSetId = -1;
   
   get selectedInstance(): string { return this._selectedInstance }
   set selectedInstance(id: string) {
@@ -26,8 +26,8 @@ export class InvalidObservationsComponent {
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this.http = http;
     this.baseUrl = baseUrl;
-    this.selectedDataSet.id = 0;
-    this.selectedDataSet.name = "All";
+    this.selectedDataSet.id = -1;
+    this.selectedDataSet.name = "";
     this.updateActiveInstance();
     this.updateProviders();
   }
@@ -47,8 +47,12 @@ export class InvalidObservationsComponent {
       this.dataSets = result;
       var all = new DataProvider();
       all.id = 0;
-      all.name = "All";
+      all.name = "All (warning, slow!)";
       this.dataSets.push(all);
+      var none = new DataProvider();
+      none.id = -1;
+      none.name = "";
+      this.dataSets.push(none);
       this.dataSets = this.dataSets.sort((a, b) => {
         return a.id - b.id;
       });
