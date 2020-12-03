@@ -1,37 +1,21 @@
 <div class="flex">
   <div class="flex-item">
-    <div class="row">
-      <div class="col-sm-2">
-        <a class="filterlink" (click)="filter30Minutes()">30 minutes ago</a>
-      </div>
-      <div class="col">
-        <a class="filterlink" (click)="filter12Hours()">12 hours ago</a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">
-        <a class="filterlink" (click)="filter1Hour()">1 hours ago</a>
-      </div>
-      <div class="col">
-        <a class="filterlink"  (click)="filter24Hours()">24 hours ago</a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">
-        <a class="filterlink"  (click)="filter3Hours()">3 hours ago</a>
-      </div>
-      <div class="col">
-        <a class="filterlink"  (click)="filter3Days()">3 days ago</a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-2">
-        <a  class="filterlink" (click)="filter3Hours()">6 hours ago</a>
-      </div>
-      <div class="col">
-        <a class="filterlink" (click)="filter1Week()">1 week ago</a>
-      </div>
-    </div>
+    <div class="form-group">
+      <select name="filter"
+              id="filter"
+              class="form-control"
+              (change)="onChange($event.target.value)"
+              [(ngModel)]="filterId">
+        <option value="30m">30 minutes ago</option>
+        <option value="1h">1 hour ago</option>
+        <option value="3h">3 hours ago</option>
+        <option value="6h">6 hours ago</option>
+        <option value="12h">12 hours ago</option>
+        <option value="24h">24 hours ago</option>
+        <option value="3d">3 days ago</option>
+        <option value="7d">7 days ago</option>
+      </select>
+    </div>   
   </div>
   <div class="flex-item">
     <div style="display: block;">
