@@ -106,7 +106,14 @@ namespace SOS.Observations.Api.Controllers
                     .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
                     .Select(rc => $"Red list category doesn't exist ({rc})"));
             }
-
+            if(filter.Date?.DateFilterType == DateFilterTypeDto.OnlyStartDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
+            {
+                errors.Add("When using OnlyStartDate as filter both StartDate and EndDate need to be specified");
+            }
+            if (filter.Date?.DateFilterType == DateFilterTypeDto.OnlyEndDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
+            {
+                errors.Add("When using OnlyEndDate as filter both StartDate and EndDate need to be specified");
+            }
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
             return Result.Success();
         }

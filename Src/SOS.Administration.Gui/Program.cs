@@ -43,11 +43,7 @@ namespace SOS.Administration.Gui
                 {
                     logging.ClearProviders();
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddHostedService<PerformanceLoggerHostedService>();
-                })
+                })                
                 .UseNLog();  // NLog: Setup NLog for Dependency injection                
     }
 }

@@ -307,64 +307,7 @@ namespace SOS.Lib.Extensions
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
             {
-                if (filter.SearchOnlyBetweenDates)
-                {
-                    if (filter.StartDate.HasValue)
-                    {
-                        queryContainers.Add(q => q
-                            .DateRange(r => r
-                                    .Field("event.startDate")
-                                    .GreaterThanOrEquals(
-                                        DateMath.Anchored(filter.StartDate.Value
-                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                            )
-                        );
-                    }
-
-                    if (filter.EndDate.HasValue)
-                    {
-                        var endDate = filter.EndDate.Value;
-                        if (endDate.Hour == 0 && endDate.Minute == 0 && endDate.Second == 0)
-                        { 
-                            //Assume whole day search if time is 00:00:00
-                           endDate = endDate.AddDays(1).AddSeconds(-1);
-                        }
-                        queryContainers.Add(q => q
-                            .DateRange(r => r
-                                    .Field("event.endDate")
-                                    .LessThanOrEquals(
-                                        DateMath.Anchored(endDate
-                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                            )
-                        );
-                    }
-                }
-                else
-                {
-                    if (filter.EndDate.HasValue)
-                    {
-                        queryContainers.Add(q => q
-                            .DateRange(r => r
-                                    .Field("event.startDate")
-                                    .LessThanOrEquals(
-                                        DateMath.Anchored(filter.EndDate.Value
-                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                            )
-                        );
-                    }
-
-                    if (filter.StartDate.HasValue)
-                    {
-                        queryContainers.Add(q => q
-                            .DateRange(r => r
-                                    .Field("event.endDate")
-                                    .GreaterThanOrEquals(
-                                        DateMath.Anchored(filter.StartDate.Value
-                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                            )
-                        );
-                    }
-                }
+                AddDateRangeFilters(filter, queryContainers);
             }
 
             if (filter.TaxonIds?.Any() ?? false)
@@ -378,6 +321,112 @@ namespace SOS.Lib.Extensions
             }
 
             return queryContainers;
+        }
+
+        private static void AddDateRangeFilters(FilterBase filter, List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryContainers)
+        {
+            if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+            {
+                if (filter.StartDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.startDate")
+                                .GreaterThanOrEquals(
+                                    DateMath.Anchored(filter.StartDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+
+                if (filter.EndDate.HasValue)
+                {
+                    var endDate = filter.EndDate.Value;
+                    if (endDate.Hour == 0 && endDate.Minute == 0 && endDate.Second == 0)
+                    {
+                        //Assume whole day search if time is 00:00:00
+                        endDate = endDate.AddDays(1).AddSeconds(-1);
+                    }
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.endDate")
+                                .LessThanOrEquals(
+                                    DateMath.Anchored(endDate
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+            }
+            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+            {
+                if (filter.EndDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.startDate")
+                                .LessThanOrEquals(
+                                    DateMath.Anchored(filter.EndDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+
+                if (filter.StartDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.endDate")
+                                .GreaterThanOrEquals(
+                                    DateMath.Anchored(filter.StartDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+            }
+            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+            {
+                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                       .DateRange(r => r
+                               .Field("event.startDate")
+                               .GreaterThanOrEquals(
+                                   DateMath.Anchored(filter.StartDate.Value
+                                       .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                       )
+                   );
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.startDate")
+                                .LessThanOrEquals(
+                                    DateMath.Anchored(filter.EndDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+            }
+            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+            {
+                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                       .DateRange(r => r
+                               .Field("event.endDate")
+                               .GreaterThanOrEquals(
+                                   DateMath.Anchored(filter.StartDate.Value
+                                       .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                       )
+                   );
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.endDate")
+                                .LessThanOrEquals(
+                                    DateMath.Anchored(filter.EndDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+            }
         }
 
         private static Field ToField(this string property)

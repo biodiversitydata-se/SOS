@@ -2,8 +2,14 @@
   <div *ngIf="processInfo">
     <h1>Status info</h1>
     <span *ngFor="let provider of processInfo">
-      <span *ngIf="provider.status == 'Success'">
+      <span *ngIf="provider.status == 'Success' && !isActiveProvider(provider.id)">
         <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+      </span>
+      <span *ngIf="provider.status == 'Success' && !activeInstanceHarvestIsOlderThanOneDay && isActiveProvider(provider.id)">
+        <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+      </span>
+      <span *ngIf="provider.status == 'Success' && activeInstanceHarvestIsOlderThanOneDay && isActiveProvider(provider.id)">
+        <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="gold" /></svg>
       </span>
       <span *ngIf="provider.status != 'Success'">
         <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
@@ -21,7 +27,7 @@
           <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z" />
         </svg>{{completedTests}}
       </a>
-      <a [routerLink]="['/test']">
+      <a [routerLink]="['/test']" *ngIf="failedTests > 0">
         <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="red" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
         </svg>{{failedTests}} |
@@ -33,7 +39,14 @@
     <span *ngIf="totalDataDifference >= 0">
       <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
     </span>
-    Data status
+    Data status |
+    <span *ngIf="failedCalls.length > 0">
+      <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="gold" /></svg>
+    </span>
+    <span *ngIf="failedCalls.length <= 0">
+      <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+    </span>
+    Failed search calls: {{sumFailedCalls}}
     <hr />
     <div class="row">
       <div class="col">
@@ -69,6 +82,53 @@
       </div>
       <div class="col">
         <h2>Performance status</h2>
+        <table class="table-small">
+          <thead>
+            <tr>
+              <th scope="col">URL</th>
+              <th scope="col">Today</th>
+              <th scope="col">Yesterday</th>
+              <th scope="col">Difference</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let data of performanceComparison">
+              <td scope="row">{{data.source}}</td>
+              <td scope="row">{{data.today}}ms</td>
+              <td scope="row">{{data.yesterday}}ms</td>
+              <td scope="row" [class.red]="(data.today - data.yesterday) >= 0" [class.green]="(data.today - data.yesterday) < 0">{{data.today - data.yesterday | number}}ms</td>
+              <td>
+                <span *ngIf="(data.today - data.yesterday) > 0">
+                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
+                </span>
+                <span *ngIf="(data.today - data.yesterday) <= 0">
+                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SpeciesObservationSystem/overview">Details in Application insights</a>
+      </div>
+      <div>
+        <h2>Failed searches</h2>
+        <table class="table-small">
+          <thead>
+            <tr>
+              <th scope="col">URL</th>
+              <th scope="col">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of failedCalls">
+              <td scope="row">{{data.name}}</td>
+              <td scope="row">{{data.count}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SpeciesObservationSystem/failures">Details in Application insights</a>
       </div>
     </div>
     <hr />
@@ -88,7 +148,7 @@
                          [rowData]="processingJobsRowData"
                          [columnDefs]="processingJobsColumnDefs">
         </ag-grid-angular>
-        <a [href]="hostingenvironment.hangfireUrl">Hangfire</a>
+        <a target="_blank" [href]="hostingenvironment.hangfireUrl">Hangfire</a>
       </div>
       <div class="col-sm">
         <h2>Tests</h2>
