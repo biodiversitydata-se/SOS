@@ -36,90 +36,7 @@ namespace SOS.Observations.Api.Repositories
         private readonly TelemetryClient _telemetry;
         private readonly string _indexName;
 
-        private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(FilterBase filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
-        {
-            var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-
-            // Default DoNotShowMerged
-            var sightingTypeSearchGroupFilter = new[] { 0, 1, 4, 16, 32, 128 };
-
-            if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
-            {
-                sightingTypeSearchGroupFilter = new [] { 0, 1, 2, 4, 16, 32, 128 };
-            }
-            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
-            {
-                sightingTypeSearchGroupFilter = new [] { 0, 2 };
-            }
-            else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
-            {
-                sightingTypeSearchGroupFilter = new [] { 0, 1, 2, 4, 32, 128 };
-            }
-
-            sightingTypeQuery.Add(q => q
-                .Terms(t => t
-                    .Field("artportalenInternal.sightingTypeSearchGroupId")
-                    .Terms(sightingTypeSearchGroupFilter)
-                )
-            );
-
-            if (filter.TypeFilter != SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
-            {
-                // Get observations from other than Artportalen too
-                sightingTypeQuery.Add(q => q
-                        !.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
-                );
-            }
-            
-            query.ToList().Add(q => q
-                .Bool(b => b
-                    .Should(sightingTypeQuery)
-                )
-            );
-
-            return query;
-        }
-
-        private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(
-            FilterBase filter)
-        {
-            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-
-            if (filter.GeometryFilter?.IsValid ?? false)
-            {
-                foreach (var geom in filter.GeometryFilter.Geometries)
-                {
-                    switch (geom.Type.ToLower())
-                    {
-                        case "holepolygon":
-                            if (filter.GeometryFilter.UsePointAccuracy)
-                            {
-                                queryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.pointWithBuffer")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Intersects)
-                                    )
-                                );
-                            }
-                            else
-                            {
-                                queryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.point")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Within)
-                                    )
-                                );
-                            }
-
-                            break;
-                    }
-                }
-            }
-
-            return queryContainers;
-        }
+       
 
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
 
@@ -152,16 +69,12 @@ namespace SOS.Observations.Api.Repositories
 
         }
 
-        private Tuple<IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, List<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
+        private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
         {
             var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
+            var excludeQuery = filter.ToExcludeQuery();
 
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
-
-            return new Tuple<IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, List<Func<QueryContainerDescriptor<object>, QueryContainer>>>(query, excludeQuery);
+            return new Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>>(query, excludeQuery);
         }
 
         /// <inheritdoc />
@@ -249,8 +162,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
-
-            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
+            query.AddAggregationFilter(aggregationType);
             
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg) => agg
@@ -321,8 +233,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
-
-            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
+            query.AddAggregationFilter(aggregationType);
 
             // Aggregation for distinct count
             static IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
