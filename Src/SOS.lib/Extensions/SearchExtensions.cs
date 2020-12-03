@@ -9,9 +9,17 @@ using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
 {
+    /// <summary>
+    /// ElasticSearch query extensions
+    /// </summary>
     public static class SearchExtensions
     {
-        private static void AddDateRangeFilters(FilterBase filter, List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryContainers)
+        /// <summary>
+        /// Add date range query to filter
+        /// </summary>
+        /// <param name="queryContainers"></param>
+        /// <param name="filter"></param>
+        private static void AddDateRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryContainers, FilterBase filter)
         {
             if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
             {
@@ -118,21 +126,82 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add geometry filter to query
+        /// </summary>
+        /// <param name="queryContainers"></param>
+        /// <param name="filter"></param>
+        private static void AddGeometryFilters(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryContainers,
+            FilterBase filter)
+        {
+            if (filter.GeometryFilter?.IsValid ?? false)
+            {
+                var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                foreach (var geom in filter.GeometryFilter.Geometries)
+                {
+                    switch (geom.Type.ToLower())
+                    {
+                        case "point":
+                            geometryContainers.Add(q => q
+                                .GeoDistance(gd => gd
+                                    .Field("location.pointLocation")
+                                    .DistanceType(GeoDistanceType.Arc)
+                                    .Location(geom.ToGeoLocation())
+                                    .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                                )
+                            );
+
+                            break;
+                        case "polygon":
+                        case "multipolygon":
+                            if (filter.GeometryFilter.UsePointAccuracy)
+                            {
+                                geometryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.pointWithBuffer")
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Intersects)
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                geometryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.point")
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Within)
+                                    )
+                                );
+                            }
+
+                            break;
+                    }
+                }
+
+                queryContainers.Add(q => q
+                    .Bool(b => b
+                        .Should(geometryContainers)
+                    )
+                );
+            }
+        }
+
+        /// <summary>
         /// Add internal filters to query
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        private static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddInternalFilters(
-            FilterBase filter, ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+        private static void AddInternalFilters(this
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
         {
-            var queryInternal = query.ToList();
-
             var internalFilter = filter as SearchFilterInternal;
 
             if (internalFilter.ProjectIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Nested(n => n
                         .Path("artportalenInternal.projects")
                         .Query(q => q
@@ -145,7 +214,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.ReportedByUserId.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field(new Field("artportalenInternal.reportedByUserId"))
                         .Terms(internalFilter.ReportedByUserId)
@@ -155,7 +224,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.ObservedByUserId.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field(new Field("artportalenInternal.occurrenceRecordedByInternal.id"))
                         .Terms(internalFilter.ObservedByUserId)
@@ -165,7 +234,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.BoundingBox != null)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .GeoBoundingBox(g => g
                         .Field(new Field("location.pointLocation"))
                         .BoundingBox(internalFilter.BoundingBox[1],
@@ -175,7 +244,7 @@ namespace SOS.Lib.Extensions
             }
             if (internalFilter.OnlyWithMedia)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Wildcard(w => w
                         .Field("occurrence.associatedMedia")
                         .Value("?*")));
@@ -183,7 +252,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlyWithNotes)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Wildcard(w => w
                         .Field("occurrence.occurrenceRemarks")
                         .Value("?*")));
@@ -191,7 +260,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlyWithNotesOfInterest)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("artportalenInternal.noteOfInterest")
                         .Value(true)));
@@ -199,7 +268,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.ReportedDateFrom.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .DateRange(r => r
                         .Field("reportedDate")
                         .GreaterThanOrEquals(
@@ -213,7 +282,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.ReportedDateTo.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .DateRange(r => r
                         .Field("reportedDate")
                         .LessThanOrEquals(
@@ -227,7 +296,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.MaxAccuracy.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Range(r => r
                         .Field("location.coordinateUncertaintyInMeters")
                         .LessThanOrEquals(internalFilter.MaxAccuracy)
@@ -237,7 +306,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.Months?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Script(s => s
                         .Script(sc => sc
                             .Source($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());")
@@ -248,7 +317,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.DiscoveryMethodIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("occurrence.discoveryMethod.id")
                         .Terms(internalFilter.DiscoveryMethodIds)
@@ -258,7 +327,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.LifeStageIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("occurrence.lifeStage.id")
                         .Terms(internalFilter.LifeStageIds)
@@ -268,7 +337,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.ActivityIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("occurrence.activity.id")
                         .Terms(internalFilter.ActivityIds)
@@ -278,7 +347,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.HasTriggerdValidationRule)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("artportalenInternal.hasTriggeredValidationRules")
                         .Value(true)));
@@ -286,7 +355,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.HasTriggerdValidationRuleWithWarning)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning")
                         .Value(true)));
@@ -294,22 +363,22 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
             {
-                AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
+                AddNumericFilterWithRelationalOperator(query, "occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
             }
 
             if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
             {
-                AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
+                AddNumericFilterWithRelationalOperator(query, "occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
             }
 
             if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
             {
-                AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
+                AddNumericFilterWithRelationalOperator(query, "occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
             }
 
             if (internalFilter.ValidationStatusIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("identification.validationStatus.id")
                         .Terms(internalFilter.ValidationStatusIds)
@@ -319,7 +388,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlyWithBarcode)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Wildcard(w => w
                         .Field("taxon.individualId")
                         .Value("?*")
@@ -330,13 +399,13 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.DeterminationFilter)
             {
                 case SearchFilterInternal.SightingDeterminationFilter.NotUnsureDetermination:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("identification.uncertainDetermination")
                             .Value(false)));
                     break;
                 case SearchFilterInternal.SightingDeterminationFilter.OnlyUnsureDetermination:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("identification.uncertainDetermination")
                             .Value(true)));
@@ -346,13 +415,13 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.UnspontaneousFilter)
             {
                 case SearchFilterInternal.SightingUnspontaneousFilter.NotUnspontaneous:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNaturalOccurrence")
                             .Value(true)));
                     break;
                 case SearchFilterInternal.SightingUnspontaneousFilter.Unspontaneous:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNaturalOccurrence")
                             .Value(false)));
@@ -362,13 +431,13 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.NotRecoveredFilter)
             {
                 case SearchFilterInternal.SightingNotRecoveredFilter.DontIncludeNotRecovered:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNotRediscoveredObservation")
                             .Value(false)));
                     break;
                 case SearchFilterInternal.SightingNotRecoveredFilter.OnlyNotRecovered:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNotRediscoveredObservation")
                             .Value(true)));
@@ -377,7 +446,7 @@ namespace SOS.Lib.Extensions
 
             if (!string.IsNullOrEmpty(internalFilter.SpeciesCollectionLabel))
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("collectionId.keyword")
                         .Value(internalFilter.SpeciesCollectionLabel)));
@@ -385,7 +454,7 @@ namespace SOS.Lib.Extensions
 
             if (!string.IsNullOrEmpty(internalFilter.PublicCollection))
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("occurrence.publicCollection.keyword")
                         .Value(internalFilter.PublicCollection)));
@@ -393,7 +462,7 @@ namespace SOS.Lib.Extensions
 
             if (!string.IsNullOrEmpty(internalFilter.PrivateCollection))
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("artportalenInternal.privateCollection.keyword")
                         .Value(internalFilter.PrivateCollection)));
@@ -401,7 +470,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.SubstrateSpeciesId.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("event.substrateSpeciesId")
                         .Value(internalFilter.SubstrateSpeciesId.Value)));
@@ -409,7 +478,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.SubstrateId.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("event.substrate.id")
                         .Value(internalFilter.SubstrateId.Value)));
@@ -417,7 +486,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.BiotopeId.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Term(m => m
                         .Field("event.biotope.id")
                         .Value(internalFilter.BiotopeId.Value)));
@@ -426,13 +495,13 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.NotPresentFilter)
             {
                 case SearchFilterInternal.SightingNotPresentFilter.DontIncludeNotPresent:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNeverFoundObservation")
                             .Value(false)));
                     break;
                 case SearchFilterInternal.SightingNotPresentFilter.OnlyNotPresent:
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(m => m
                             .Field("occurrence.isNeverFoundObservation")
                             .Value(true)));
@@ -441,12 +510,12 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlySecondHandInformation)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Wildcard(w => w
                         .Field("occurrence.recordedBy")
                         .Value("Via*")));
 
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Script(s => s
                         .Script(sc => sc
                             .Source("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value")
@@ -457,7 +526,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.RegionalSightingStateIdsFilter?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("artportalenInternal.regionalSightingStateId")
                         .Terms(internalFilter.RegionalSightingStateIdsFilter)
@@ -467,7 +536,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.PublishTypeIdsFilter?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("artportalenInternal.sightingPublishTypeIds")
                         .Terms(internalFilter.PublishTypeIdsFilter)
@@ -477,7 +546,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.SiteIds?.Any() ?? false)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Terms(t => t
                         .Field("location.locationId")
                         .Terms(internalFilter.SiteIds.Select(s => $"urn:lsid:artportalen.se:site:{s}"))
@@ -489,7 +558,7 @@ namespace SOS.Lib.Extensions
             {
                 foreach (var factsId in internalFilter.SpeciesFactsIds)
                 {
-                    queryInternal.Add(q => q
+                    query.Add(q => q
                         .Term(t => t
                             .Field("artportalenInternal.speciesFactsIds")
                             .Value(factsId)
@@ -500,7 +569,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
             {
-                queryInternal.Add(q => q
+                query.Add(q => q
                     .Script(s => s
                         .Script(sc => sc
                             .Source($@"
@@ -530,8 +599,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-
-            return queryInternal;
         }
 
         /// <summary>
@@ -540,24 +607,20 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         /// <param name="excludeQuery"></param>
         /// <returns></returns>
-        private static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddInternalExcludeFilters(
-            FilterBase filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+        private static void AddInternalExcludeFilters(this
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery, FilterBase filter)
         {
-            var excludeQueryInternal = excludeQuery.ToList();
             var internalFilter = filter as SearchFilterInternal;
 
             if (internalFilter.ExcludeValidationStatusIds?.Any() ?? false)
             {
-                excludeQueryInternal.Add(q => q
+                excludeQuery.Add(q => q
                     .Terms(t => t
                         .Field("identification.validationStatus.id")
                         .Terms(internalFilter.ExcludeValidationStatusIds)
                     )
                 );
             }
-       
-
-            return excludeQueryInternal;
         }
 
         /// <summary>
@@ -567,7 +630,7 @@ namespace SOS.Lib.Extensions
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="relationalOperator"></param>
-        private static void AddNumericFilterWithRelationalOperator(
+        private static void AddNumericFilterWithRelationalOperator(this 
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryInternal, string fieldName,
             int value, string relationalOperator)
         {
@@ -600,7 +663,7 @@ namespace SOS.Lib.Extensions
             }
         }
 
-        private static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(FilterBase filter, ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+        private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -640,8 +703,6 @@ namespace SOS.Lib.Extensions
                     .Should(sightingTypeQuery)
                 )
             );
-
-            return query;
         }
 
         private static ICollection<Func<QueryContainerDescriptor<Observation>, QueryContainer>> CreateTypedQuery(FilterBase filter)
@@ -818,174 +879,6 @@ namespace SOS.Lib.Extensions
         }
 
 
-        private static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
-        {
-            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-
-            if (filter.BirdValidationAreaIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.birdValidationAreaIds")
-                        .Terms(filter.BirdValidationAreaIds)
-                    )
-                );
-            }
-
-            if (filter.CountyIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("location.county.featureId")
-                        .Terms(filter.CountyIds)
-                    )
-                );
-            }
-
-            if (filter.GeometryFilter?.IsValid ?? false)
-            {
-                var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                foreach (var geom in filter.GeometryFilter.Geometries)
-                {
-                    switch (geom.Type.ToLower())
-                    {
-                        case "point":
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.pointLocation")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-
-                            break;
-                        case "polygon":
-                        case "multipolygon":
-                            if (filter.GeometryFilter.UsePointAccuracy)
-                            {
-                                geometryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.pointWithBuffer")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Intersects)
-                                    )
-                                );
-                            }
-                            else
-                            {
-                                geometryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.point")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Within)
-                                    )
-                                );
-                            }
-
-                            break;
-                    }
-                }
-
-                queryContainers.Add(q => q
-                    .Bool(b => b
-                        .Should(geometryContainers)
-                    )
-                );
-            }
-
-            if (filter.GenderIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("occurrence.gender.id")
-                        .Terms(filter.GenderIds)
-                    )
-                );
-            }
-
-            if (filter.MunicipalityIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("location.municipality.featureId")
-                        .Terms(filter.MunicipalityIds)
-                    )
-                );
-            }
-
-            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
-            {
-                queryContainers.Add(q => q
-                    .Term(m => m.Field("identification.validated").Value(true)));
-            }
-
-            if (filter.PositiveSightings.HasValue)
-            {
-                queryContainers.Add(q => q
-                    .Term(m => m.Field("occurrence.isPositiveObservation").Value(filter.PositiveSightings.Value)));
-            }
-
-            if (filter.DataProviderIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("dataProviderId")
-                        .Terms(filter.DataProviderIds)
-                    )
-                );
-            }
-
-            if (filter.ParishIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("location.parish.featureId")
-                        .Terms(filter.ParishIds)
-                    )
-                );
-            }
-
-            if (filter.ProvinceIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("location.province.featureId")
-                        .Terms(filter.ProvinceIds)
-                    )
-                );
-            }
-
-            if (filter.RedListCategories?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("taxon.redlistCategory")
-                        .Terms(filter.RedListCategories.Select(m => m.ToLower()))
-                    )
-                );
-            }
-
-            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
-            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
-            {
-                AddDateRangeFilters(filter, queryContainers);
-            }
-
-            if (filter.TaxonIds?.Any() ?? false)
-            {
-                queryContainers.Add(q => q
-                    .Terms(t => t
-                        .Field("taxon.id")
-                        .Terms(filter.TaxonIds)
-                    )
-                );
-            }
-
-            return queryContainers;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -1073,20 +966,125 @@ namespace SOS.Lib.Extensions
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
             this FilterBase filter)
         {
-            if (!filter.IsFilterActive)
+            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            if (filter.BirdValidationAreaIds?.Any() ?? false)
             {
-                return new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("artportalenInternal.birdValidationAreaIds")
+                        .Terms(filter.BirdValidationAreaIds)
+                    )
+                );
             }
 
-            var query = CreateQuery(filter);
-            query = AddSightingTypeFilters(filter, query);
+            if (filter.CountyIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("location.county.featureId")
+                        .Terms(filter.CountyIds)
+                    )
+                );
+            }
+
+            if (filter.DataProviderIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("dataProviderId")
+                        .Terms(filter.DataProviderIds)
+                    )
+                );
+            }
+
+            if (filter.GenderIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("occurrence.gender.id")
+                        .Terms(filter.GenderIds)
+                    )
+                );
+            }
+
+            if (filter.MunicipalityIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("location.municipality.featureId")
+                        .Terms(filter.MunicipalityIds)
+                    )
+                );
+            }
+
+            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
+            {
+                queryContainers.Add(q => q
+                    .Term(m => m.Field("identification.validated").Value(true)));
+            }
+
+            if (filter.PositiveSightings.HasValue)
+            {
+                queryContainers.Add(q => q
+                    .Term(m => m.Field("occurrence.isPositiveObservation").Value(filter.PositiveSightings.Value)));
+            }
+
+            if (filter.ParishIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("location.parish.featureId")
+                        .Terms(filter.ParishIds)
+                    )
+                );
+            }
+
+            if (filter.ProvinceIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("location.province.featureId")
+                        .Terms(filter.ProvinceIds)
+                    )
+                );
+            }
+
+            if (filter.RedListCategories?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("taxon.redlistCategory")
+                        .Terms(filter.RedListCategories.Select(m => m.ToLower()))
+                    )
+                );
+            }
+
+            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
+            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
+            {
+                queryContainers.AddDateRangeFilters(filter);
+            }
+
+            if (filter.TaxonIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("taxon.id")
+                        .Terms(filter.TaxonIds)
+                    )
+                );
+            }
+
+            queryContainers.AddGeometryFilters(filter);
+            queryContainers.AddSightingTypeFilters(filter);
 
             if (filter is SearchFilterInternal)
             {
-                query = AddInternalFilters(filter, query);
+                queryContainers.AddInternalFilters(filter);
             }
 
-            return query;
+            return queryContainers;
         }
 
         /// <summary>
@@ -1133,7 +1131,7 @@ namespace SOS.Lib.Extensions
 
             if (filter is SearchFilterInternal)
             {
-                queryContainers = AddInternalExcludeFilters(filter, queryContainers);
+                queryContainers.AddInternalExcludeFilters(filter);
             }
 
             return queryContainers;
