@@ -87,8 +87,9 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 },
                 Identification = new Identification
                 {
+                    UncertainDetermination = false,
                     Validated = false,
-                    UncertainDetermination = false
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Lib.Models.Processed.Observation.Location
                 {
