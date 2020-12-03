@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
-import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow } from 'date-fns'
+import { format, parseISO, formatDistanceStrict, formatDuration, intervalToDuration, formatDistance, formatDistanceToNow, sub, subHours } from 'date-fns'
+import { compareAsc } from 'date-fns/esm';
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
@@ -96,6 +97,7 @@ export class StatusComponent implements OnInit {
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
+  activeInstanceHarvestIsOlderThanOneDay = false;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -108,6 +110,14 @@ export class StatusComponent implements OnInit {
         this.processInfo = result;
         this.totalDataDifference = 0;
         let active = this.processInfo.find(p => p.id == "Observation-" + this.activeInstance);
+        var activeEndDate = parseISO(active.end);       
+        var oneDayAgo = subHours(new Date(), 24);
+        if (compareAsc(activeEndDate, oneDayAgo) == -1) {
+          this.activeInstanceHarvestIsOlderThanOneDay = true;
+        }
+        else {
+          this.activeInstanceHarvestIsOlderThanOneDay = false;
+        }
         let inactive = this.processInfo.find(p => p.id != "Observation-" + this.activeInstance && p.id.includes("Observation"));
         for (let provider of active.providersInfo) {
           let compare = new DataCompare();
@@ -142,7 +152,6 @@ export class StatusComponent implements OnInit {
       this.performanceComparison = [];
       for (var request of result.requests) {
         if (request.length == 3) {
-          console.log(request);
           let compare = new DataCompare();
           compare.source = request[0].requestName;
           compare.today = request[2].timeTakenMs;
@@ -168,13 +177,22 @@ export class StatusComponent implements OnInit {
     return formatDuration(duration);
   }
   getActiveInfo(providerId: string) {
-    if (this.activeInstance == "0" && providerId == "Observation-0") {
+    if (this.isActiveProvider(providerId)) {
       return "(active)";
     }
-    if (this.activeInstance == "1" && providerId == "Observation-1") {
+    if (this.isActiveProvider(providerId)) {
       return "(active)";
     }
     return '';
+  }
+  isActiveProvider(providerId: string) {
+    if (this.activeInstance == "0" && providerId == "Observation-0") {
+      return true;
+    }
+    if (this.activeInstance == "1" && providerId == "Observation-1") {
+      return true;
+    }
+    return false;
   }
   private runTests() {
     this.runningTests = true;
