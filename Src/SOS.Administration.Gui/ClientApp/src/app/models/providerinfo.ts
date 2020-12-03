@@ -3,8 +3,8 @@ import { Provider } from "./provider";
 export class ProcessInfo {
   id: string;
   count: string;
-  start: Date;
-  end: Date;
+  start: string;
+  end: string;
   status: string;
   providersInfo: Provider[];
 }
