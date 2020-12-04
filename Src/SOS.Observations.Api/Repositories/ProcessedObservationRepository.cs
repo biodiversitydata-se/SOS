@@ -245,7 +245,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
-
+            
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
             
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
@@ -491,6 +491,10 @@ namespace SOS.Observations.Api.Repositories
         {
             var (query, excludeQuery) = GetCoreQueries(filter);
 
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_TaxonAggregation");
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
             // Get number of taxa
             var searchResponseCount = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(_indexName)
@@ -553,6 +557,8 @@ namespace SOS.Observations.Api.Repositories
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            _telemetry.StopOperation(operation);
 
             IEnumerable<TaxonAggregationItem> observationCountByTaxon = searchResponse
                 .Aggregations
