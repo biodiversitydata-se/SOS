@@ -330,6 +330,8 @@ namespace SOS.Observations.Api
                 app.UseHsts();
             }
 
+            app.UseHangfireDashboard();
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 

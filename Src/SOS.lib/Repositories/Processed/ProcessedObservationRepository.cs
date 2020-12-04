@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -13,6 +14,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -49,6 +51,12 @@ namespace SOS.Lib.Repositories.Processed
                             .Name(nn => nn.Location.PointWithBuffer)))));
 
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid;
+        }
+
+        private Observation CastDynamicToObservation(dynamic dynamicObject)
+        {
+            return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject),
+                new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
         }
 
         /// <summary>
@@ -238,15 +246,15 @@ namespace SOS.Lib.Repositories.Processed
             FilterBase filter,
             string scrollId)
         {
-            ISearchResponse<Observation> searchResponse;
+            ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                     .Index(IndexName)
                     .Source(source => source
                         .Includes(fieldsDescriptor => fieldsDescriptor
-                            .Field(observation => observation.Occurrence.OccurrenceId)
-                            .Field(observation => observation.Media)))
+                            .Field("occurrence.occurrenceId")
+                            .Field("media")))
                     .Query(query => query
                         .Bool(boolQueryDescriptor => boolQueryDescriptor
                             .Filter(filter.ToMultimediaQuery())
@@ -259,14 +267,15 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
+
             return new ScrollResult<SimpleMultimediaRow>
             {
-                Records = searchResponse.Documents.ToSimpleMultimediaRows(),
+                Records = searchResponse.Documents.Select(d => (Observation)d).ToSimpleMultimediaRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
@@ -277,15 +286,15 @@ namespace SOS.Lib.Repositories.Processed
             FilterBase filter,
             string scrollId)
         {
-            ISearchResponse<Observation> searchResponse;
+            ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                     .Index(IndexName)
                     .Source(source => source
                         .Includes(fieldsDescriptor => fieldsDescriptor
-                            .Field(observation => observation.Occurrence.OccurrenceId)
-                            .Field(observation => observation.MeasurementOrFacts)))
+                            .Field("occurrence.occurrenceId")
+                            .Field("measurementOrFacts")))
                     .Query(query => query
                         .Bool(boolQueryDescriptor => boolQueryDescriptor
                             .Filter(filter.ToMeasurementOrFactsQuery())
@@ -305,7 +314,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
-                Records = searchResponse.Documents.ToExtendedMeasurementOrFactRows(),
+                Records = searchResponse.Documents.Select(d => (Observation)d).ToExtendedMeasurementOrFactRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
@@ -316,19 +325,20 @@ namespace SOS.Lib.Repositories.Processed
             FilterBase filter,
             string scrollId)
         {
-            ISearchResponse<Observation> searchResponse;
+            ISearchResponse<dynamic> searchResponse;
 
             if (string.IsNullOrEmpty(scrollId))
             {
-                var query = filter.ToTypedObservationQuery();
-                var projection = new SourceFilterDescriptor<Observation>()
-                    .Excludes(e => e.Fields(
-                        f => f.Location.Point,
-                        f => f.Location.PointLocation,
-                        f => f.Location.PointWithBuffer));
-
+                var query = filter.ToQuery();
+                var projection = new SourceFilterDescriptor<dynamic>()
+                    .Excludes(e => e
+                        .Field("location.point")
+                        .Field("location.pointLocation")
+                        .Field("location.pointWithBuffer")
+                    );
+               
                 searchResponse = await _elasticClient
-                    .SearchAsync<Observation>(s => s
+                    .SearchAsync<dynamic>(s => s
                         .Index(IndexName)
                         .Source(p => projection)
                         .Query(q => q
@@ -349,7 +359,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<Observation>
             {
-                Records = searchResponse.Documents,
+                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d)),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
