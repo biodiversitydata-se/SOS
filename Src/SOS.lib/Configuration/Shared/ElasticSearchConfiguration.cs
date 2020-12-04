@@ -93,7 +93,7 @@ namespace SOS.Lib.Configuration.Shared
             }
 
             //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
-            //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
+            //settings.DisableDirectStreaming().EnableDebugMode().PrettyJson(); // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
 
             return new ElasticClient(settings);
         }
