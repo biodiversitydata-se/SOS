@@ -94,6 +94,8 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddMemoryCache();
+
                     _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
                     services.AddHangfire(configuration =>

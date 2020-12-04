@@ -191,7 +191,6 @@ namespace SOS.Administration.Api
                 IgnoreAntiforgeryToken = true
             });
 
-
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
