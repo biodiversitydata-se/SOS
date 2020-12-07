@@ -4,13 +4,14 @@ using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Taxon
 {
-    public class TaxonManagerIntegrationTests : IClassFixture<ObservationApiIntegrationTestFixture>
+    [Collection(Collections.ApiIntegrationTestsCollection)]
+    public class TaxonManagerIntegrationTests
     {
-        private readonly ObservationApiIntegrationTestFixture _fixture;
+        private readonly ApiIntegrationTestFixture _fixture;
 
-        public TaxonManagerIntegrationTests(ObservationApiIntegrationTestFixture apiTestFixture)
+        public TaxonManagerIntegrationTests(ApiIntegrationTestFixture fixture)
         {
-            _fixture = apiTestFixture;
+            _fixture = fixture;
         }
 
         [Fact]

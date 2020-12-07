@@ -5,12 +5,12 @@ using SOS.TestHelpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
-    public class ObservationApiEndToEndTestFixture : FixtureBase, IDisposable
+    public class ApiEndToEndTestFixture : FixtureBase, IDisposable
     {
         public SosApiClient SosApiClient { get; private set; }
         public InstallationEnvironment InstallationEnvironment { get; private set; }
 
-        public ObservationApiEndToEndTestFixture()
+        public ApiEndToEndTestFixture()
         {
             InstallationEnvironment = GetEnvironmentFromAppSettings();
             var apiUrl = GetApiUrl();

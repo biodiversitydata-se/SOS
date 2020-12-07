@@ -15,13 +15,14 @@ using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
 {
-    public class ObservationsSearchApiIntegrationTests : IClassFixture<ObservationApiIntegrationTestFixture>
+    [Collection(Collections.ApiIntegrationTestsCollection)]
+    public class ObservationsSearchApiIntegrationTests
     {
-        private readonly ObservationApiIntegrationTestFixture _fixture;
+        private readonly ApiIntegrationTestFixture _fixture;
 
-        public ObservationsSearchApiIntegrationTests(ObservationApiIntegrationTestFixture apiTestFixture)
+        public ObservationsSearchApiIntegrationTests(ApiIntegrationTestFixture fixture)
         {
-            _fixture = apiTestFixture;
+            _fixture = fixture;
         }
 
         [Fact]

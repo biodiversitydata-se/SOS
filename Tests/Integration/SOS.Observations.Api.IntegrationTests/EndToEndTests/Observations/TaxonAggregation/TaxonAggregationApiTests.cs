@@ -8,11 +8,11 @@ using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.TaxonAggregation
 {
-    public class TaxonAggregationApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
+    public class TaxonAggregationApiTests : IClassFixture<ApiEndToEndTestFixture>
     {
-        private readonly ObservationApiEndToEndTestFixture _fixture;
+        private readonly ApiEndToEndTestFixture _fixture;
 
-        public TaxonAggregationApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
+        public TaxonAggregationApiTests(ApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }
