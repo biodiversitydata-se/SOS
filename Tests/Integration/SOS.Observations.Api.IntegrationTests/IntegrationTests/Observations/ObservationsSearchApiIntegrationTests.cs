@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using SOS.TestHelpers;
 using Xunit;
@@ -25,7 +26,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_Otter()
+        public async Task Search_for_Otter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -46,7 +47,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 2);
-            var result = GetSearchResult(response);
+            var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -58,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_Otter_At_Location()
+        public async Task Search_for_Otter_At_Location()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -80,7 +81,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 2);
-            var result = GetSearchResult(response);
+            var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -107,20 +108,12 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 10);
-            var result = GetSearchResult(response);
+            var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.Should().BeEmpty("because Wolf is protected");
-        }
-
-        private PagedResultDto<Observation> GetSearchResult(IActionResult response)
-        {
-            var result = (OkObjectResult)response;
-            var strJson = JsonConvert.SerializeObject(result.Value);
-            var pagedResult = JsonConvert.DeserializeObject<PagedResultDto<Observation>>(strJson);
-            return pagedResult;
         }
     }
 }

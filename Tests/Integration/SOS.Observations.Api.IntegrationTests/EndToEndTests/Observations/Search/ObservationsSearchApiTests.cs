@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
 
         [Fact]
         [Trait("Category", "ApiEndToEndTest")]
-        public async Task Search_Otter()
+        public async Task Search_for_Otter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
 
         [Fact]
         [Trait("Category", "ApiEndToEndTest")]
-        public async Task Search_Otter_At_Location()
+        public async Task Search_for_Otter_At_Location()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
