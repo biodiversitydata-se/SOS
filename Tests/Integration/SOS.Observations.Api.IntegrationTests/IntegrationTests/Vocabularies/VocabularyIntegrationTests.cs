@@ -1,23 +1,20 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Taxon
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Vocabularies
 {
-    public class VocabularyIntegrationTests : IClassFixture<ObservationApiIntegrationTestFixture>
+    [Collection(Collections.ApiIntegrationTestsCollection)]
+    public class VocabularyIntegrationTests
     {
-        private readonly ObservationApiIntegrationTestFixture _fixture;
+        private readonly ApiIntegrationTestFixture _fixture;
 
-        public VocabularyIntegrationTests(ObservationApiIntegrationTestFixture apiTestFixture)
+        public VocabularyIntegrationTests(ApiIntegrationTestFixture fixture)
         {
-            _fixture = apiTestFixture;
+            _fixture = fixture;
         }
 
         [Fact]

@@ -10,11 +10,11 @@ using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.GeoGridAggregation
 {
-    public class GeoGridAggregationApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
+    public class GeoGridAggregationApiTests : IClassFixture<ApiEndToEndTestFixture>
     {
-        private readonly ObservationApiEndToEndTestFixture _fixture;
+        private readonly ApiEndToEndTestFixture _fixture;
 
-        public GeoGridAggregationApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
+        public GeoGridAggregationApiTests(ApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }

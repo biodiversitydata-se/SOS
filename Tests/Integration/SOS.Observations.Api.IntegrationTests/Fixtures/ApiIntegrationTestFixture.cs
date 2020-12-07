@@ -15,14 +15,14 @@ using SOS.TestHelpers;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
-    public class ObservationApiIntegrationTestFixture : FixtureBase, IDisposable
+    public class ApiIntegrationTestFixture : FixtureBase, IDisposable
     {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
         public TaxonManager TaxonManager { get; private set; }
 
-        public ObservationApiIntegrationTestFixture()
+        public ApiIntegrationTestFixture()
         {
             InstallationEnvironment = GetEnvironmentFromAppSettings();
             Initialize();

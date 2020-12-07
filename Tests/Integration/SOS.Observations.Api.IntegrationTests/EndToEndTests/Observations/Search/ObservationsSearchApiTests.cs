@@ -9,11 +9,11 @@ using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Search
 {
-    public class ObservationsSearchApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
+    public class ObservationsSearchApiTests : IClassFixture<ApiEndToEndTestFixture>
     {
-        private readonly ObservationApiEndToEndTestFixture _fixture;
+        private readonly ApiEndToEndTestFixture _fixture;
 
-        public ObservationsSearchApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
+        public ObservationsSearchApiTests(ApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }
