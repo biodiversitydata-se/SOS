@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.GeoGr
         }
 
         [Fact]
-        [Trait("Catgory", "ApiEndToEndTest")]
+        [Trait("Category", "ApiEndToEndTest")]
         public async Task GeoGridAggregation_Mammalia()
         {
             //-----------------------------------------------------------------------------------------------------------

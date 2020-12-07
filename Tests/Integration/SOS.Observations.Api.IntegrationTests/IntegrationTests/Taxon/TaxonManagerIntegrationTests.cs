@@ -14,6 +14,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Taxon
         }
 
         [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public void Taxon_tree_root_is_biota()
         {
             //-----------------------------------------------------------------------------------------------------------

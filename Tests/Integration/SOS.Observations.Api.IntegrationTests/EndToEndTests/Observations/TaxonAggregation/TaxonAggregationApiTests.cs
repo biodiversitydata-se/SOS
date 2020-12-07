@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Taxon
         }
 
         [Fact]
-        [Trait("Catgory", "ApiEndToEndTest")]
+        [Trait("Category", "ApiEndToEndTest")]
         public async Task TaxonAggregation()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Taxon
         }
 
         [Fact]
-        [Trait("Catgory", "ApiEndToEndTest")]
+        [Trait("Category", "ApiEndToEndTest")]
         public async Task TaxonAggregation_with_boundingbox()
         {
             //-----------------------------------------------------------------------------------------------------------
