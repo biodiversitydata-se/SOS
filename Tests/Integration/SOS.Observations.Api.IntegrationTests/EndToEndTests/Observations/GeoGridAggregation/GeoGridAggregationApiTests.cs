@@ -5,23 +5,22 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.TestHelpers;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.GeoGridAggregation
+namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.GeoGridAggregation
 {
-
-    [Collection("Api test collection")]
-    public class GeoGridAggregationApiTests : TestBase
+    public class GeoGridAggregationApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
     {
-        private readonly ApiTestFixture _fixture;
+        private readonly ObservationApiEndToEndTestFixture _fixture;
 
-        public GeoGridAggregationApiTests(ApiTestFixture apiTestFixture)
+        public GeoGridAggregationApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task GeoGridAggregation_Mammalia()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -29,8 +28,8 @@ namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.GeoGridAgg
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto() {TaxonIds = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true},
-                Date = new DateFilterDto()
+                Taxon = new TaxonFilterDto {TaxonIds = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true},
+                Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
