@@ -19,13 +19,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
     {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
+        public VocabulariesController VocabulariesController { get; private set; }
         public TaxonManager TaxonManager { get; private set; }
 
         public ObservationApiIntegrationTestFixture()
         {
             InstallationEnvironment = GetEnvironmentFromAppSettings();
-            ObservationsController = CreateObservationsController(out var taxonManger);
-            TaxonManager = taxonManger;
+            Initialize();
         }
 
         public void Dispose() { }
@@ -46,7 +46,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return elasticConfiguration;
         }
 
-        private ObservationsController CreateObservationsController(out TaxonManager taxonManager)
+        private void Initialize()
         {
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var elasticClient = elasticConfiguration.GetClient(true);
@@ -54,12 +54,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
-            taxonManager = CreateTaxonManager(processClient);
+            var taxonManager = CreateTaxonManager(processClient);
 
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient);
-            var observationManager = CreateObservationManager(processedObservationRepository, processClient, taxonManager);
-            var observationsController = new ObservationsController(observationManager, taxonManager, new NullLogger<ObservationsController>());
-            return observationsController;
+            var vocabularyManger = CreateVocabularyManager(processClient);
+            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, taxonManager);
+            ObservationsController = new ObservationsController(observationManager, taxonManager, new NullLogger<ObservationsController>());
+            VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
+            TaxonManager = taxonManager;
         }
 
         private TaxonManager CreateTaxonManager(ProcessClient processClient)
@@ -71,18 +73,24 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         private ObservationManager CreateObservationManager(
             Repositories.ProcessedObservationRepository processedObservationRepository, 
+            VocabularyManager vocabularyManager,
             ProcessClient processClient,
             TaxonManager taxonManager)
         {
-            var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
-            var vocabularyCache = new VocabularyCache(vocabularyRepository);
-            var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var filterManager = new FilterManager(taxonManager, areaRepository);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
                 filterManager, new NullLogger<ObservationManager>());
 
             return observationsManager;
+        }
+
+        private VocabularyManager CreateVocabularyManager(ProcessClient processClient)
+        {
+            var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            var vocabularyCache = new VocabularyCache(vocabularyRepository);
+            var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
+            return vocabularyManager;
         }
 
         private Repositories.ProcessedObservationRepository CreateProcessedObservationRepository(
