@@ -7,21 +7,19 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.Search
+namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Search
 {
-
-    [Collection("Api test collection")]
-    public class ObservationsSearchApiTests : TestBase
+    public class ObservationsSearchApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
     {
-        private readonly ApiTestFixture _fixture;
+        private readonly ObservationApiEndToEndTestFixture _fixture;
 
-        public ObservationsSearchApiTests(ApiTestFixture apiTestFixture)
+        public ObservationsSearchApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task Search_Otter()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.Search
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task Search_Otter_At_Location()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -85,7 +83,7 @@ namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.Search
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task Search_for_Wolf_should_return_0_observations()
         {
             //-----------------------------------------------------------------------------------------------------------

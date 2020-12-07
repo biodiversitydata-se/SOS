@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -7,21 +6,19 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.TaxonAggregation
+namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.TaxonAggregation
 {
-
-    [Collection("Api test collection")]
-    public class TaxonAggregationApiTests : TestBase
+    public class TaxonAggregationApiTests : IClassFixture<ObservationApiEndToEndTestFixture>
     {
-        private readonly ApiTestFixture _fixture;
+        private readonly ObservationApiEndToEndTestFixture _fixture;
 
-        public TaxonAggregationApiTests(ApiTestFixture apiTestFixture)
+        public TaxonAggregationApiTests(ObservationApiEndToEndTestFixture apiTestFixture)
         {
             _fixture = apiTestFixture;
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task TaxonAggregation()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -52,7 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.ApiTests.Observations.TaxonAggre
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Catgory", "ApiEndToEndTest")]
         public async Task TaxonAggregation_with_boundingbox()
         {
             //-----------------------------------------------------------------------------------------------------------

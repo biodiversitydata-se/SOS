@@ -8,17 +8,17 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Configuration;
 
-namespace SOS.Observations.Api.IntegrationTests.ApiClients
+namespace SOS.Observations.Api.IntegrationTests.EndToEndTests
 {
     public class SosApiClient
     {
         private readonly HttpClient _client;
         private readonly string _apiUrl;
 
-        public SosApiClient(ApiTestConfiguration apiTestConfiguration)
+        public SosApiClient(string apiUrl)
         {
             _client = new HttpClient();
-            _apiUrl = apiTestConfiguration.ApiUrl;
+            _apiUrl = apiUrl;
         }
 
         public async Task<PagedResultDto<Observation>> SearchSos(SearchFilterDto searchFilter, int take, int skip)
