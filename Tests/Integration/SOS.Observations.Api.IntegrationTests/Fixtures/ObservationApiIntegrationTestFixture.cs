@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         private ObservationsController CreateObservationsController(out TaxonManager taxonManager)
         {
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
-            var elasticClient = elasticConfiguration.GetClient();
+            var elasticClient = elasticConfiguration.GetClient(true);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
