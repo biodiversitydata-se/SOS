@@ -291,30 +291,30 @@ namespace SOS.Lib.Extensions
 
             switch (internalFilter.DeterminationFilter)
             {
-                case SearchFilterInternal.SightingDeterminationFilter.NotUnsureDetermination:
+                case SightingDeterminationFilter.NotUnsureDetermination:
                     query.TryAddTermCriteria("identification.uncertainDetermination", false);
                     break;
-                case SearchFilterInternal.SightingDeterminationFilter.OnlyUnsureDetermination:
+                case SightingDeterminationFilter.OnlyUnsureDetermination:
                     query.TryAddTermCriteria("identification.uncertainDetermination", true);
                     break;
             }
 
             switch (internalFilter.UnspontaneousFilter)
             {
-                case SearchFilterInternal.SightingUnspontaneousFilter.NotUnspontaneous:
+                case SightingUnspontaneousFilter.NotUnspontaneous:
                     query.TryAddTermCriteria("occurrence.isNaturalOccurrence", true);
                     break;
-                case SearchFilterInternal.SightingUnspontaneousFilter.Unspontaneous:
+                case SightingUnspontaneousFilter.Unspontaneous:
                     query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
                     break;
             }
 
             switch (internalFilter.NotRecoveredFilter)
             {
-                case SearchFilterInternal.SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
                     query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
                     break;
-                case SearchFilterInternal.SightingNotRecoveredFilter.OnlyNotRecovered:
+                case SightingNotRecoveredFilter.OnlyNotRecovered:
                     query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
                     break;
             }
@@ -329,10 +329,10 @@ namespace SOS.Lib.Extensions
 
             switch (internalFilter.NotPresentFilter)
             {
-                case SearchFilterInternal.SightingNotPresentFilter.DontIncludeNotPresent:
+                case SightingNotPresentFilter.DontIncludeNotPresent:
                     query.TryAddTermCriteria("occurrence.isNeverFoundObservation", false);
                     break;
-                case SearchFilterInternal.SightingNotPresentFilter.OnlyNotPresent:
+                case SightingNotPresentFilter.OnlyNotPresent:
                     query.TryAddTermCriteria("occurrence.isNeverFoundObservation", true);
                     break;
             }

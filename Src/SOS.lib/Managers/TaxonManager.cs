@@ -9,9 +9,9 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Lib.Managers
 {
     /// <summary>
     ///     Taxon manager

@@ -10,12 +10,14 @@ using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using Xunit;
@@ -35,8 +37,9 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var taxonManager = new TaxonManager(new MemoryCache(new MemoryCacheOptions()), new TaxonRepository(exportClient,
+            var taxonManager = new TaxonManager(new TaxonRepository(exportClient,
                     new Mock<ILogger<TaxonRepository>>().Object),
+                new MemoryCache(new MemoryCacheOptions()),
                 new Mock<ILogger<TaxonManager>>().Object);
             var vocabularyRepository =
                 new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
@@ -62,7 +65,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path}, 
-                new FilterManager(taxonManager, new AreaRepository(exportClient, new NullLogger<AreaRepository>())), 
+                new FilterManager(taxonManager, new AreaCache(new AreaRepository(exportClient, new NullLogger<AreaRepository>()))), 
                 new Mock<ILogger<ObservationManager>>().Object);
 
             return observationManager;

@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
+using SOS.Lib.Managers;
 using SOS.Lib.Repositories.Resource;
-using SOS.Observations.Api.Managers;
 using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.Managers

@@ -11,6 +11,7 @@ using SOS.Export.Managers.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -76,8 +77,8 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                var preparedFilter = await _filterManager.PrepareFilter(filter);
-                zipFilePath = await CreateDWCExportAsync(preparedFilter, Guid.NewGuid().ToString(), cancellationToken);
+                await _filterManager.PrepareFilter(filter);
+                zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
 
                 // zend file to user
                 return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
@@ -107,8 +108,8 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                var preparedFilter = await _filterManager.PrepareFilter(filter);
-                zipFilePath = await CreateDWCExportAsync(preparedFilter, fileName, cancellationToken);
+                await _filterManager.PrepareFilter(filter);
+                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer?.ToLower();

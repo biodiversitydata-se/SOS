@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search
 {
@@ -8,32 +9,37 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class SearchFilterInternal : SearchFilter
     {
-        public enum SightingDeterminationFilter
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SearchFilterInternal()
         {
-            NoFilter,
-            NotUnsureDetermination,
-            OnlyUnsureDetermination
+
         }
 
-        public enum SightingUnspontaneousFilter
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="searchFilter"></param>
+        public SearchFilterInternal(SearchFilter searchFilter)
         {
-            NoFilter,
-            NotUnspontaneous,
-            Unspontaneous
-        }
+            if (searchFilter == null)
+            {
+                return;
+            }
 
-        public enum SightingNotRecoveredFilter
-        {
-            NoFilter,
-            OnlyNotRecovered,
-            DontIncludeNotRecovered
-        }
-
-        public enum SightingNotPresentFilter
-        {
-            DontIncludeNotPresent,
-            OnlyNotPresent,
-            IncludeNotPresent
+            StartDate = searchFilter.StartDate;
+            EndDate = searchFilter.EndDate;
+            DateFilterType = searchFilter.DateFilterType;
+            Areas = searchFilter.Areas;
+            TaxonIds = searchFilter.TaxonIds;
+            IncludeUnderlyingTaxa = searchFilter.IncludeUnderlyingTaxa;
+            RedListCategories = searchFilter.RedListCategories;
+            DataProviderIds = searchFilter.DataProviderIds;
+            FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
+            OnlyValidated = searchFilter.OnlyValidated;
+            GeometryFilter = searchFilter.GeometryFilter;
+            PositiveSightings = searchFilter.PositiveSightings;
         }
 
         public int? ReportedByUserId { get; set; }

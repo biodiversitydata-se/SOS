@@ -19,4 +19,32 @@ namespace SOS.Lib.Enums
         /// </summary>
         Desc = 1
     }
+
+    public enum SightingDeterminationFilter
+    {
+        NoFilter,
+        NotUnsureDetermination,
+        OnlyUnsureDetermination
+    }
+
+    public enum SightingUnspontaneousFilter
+    {
+        NoFilter,
+        NotUnspontaneous,
+        Unspontaneous
+    }
+
+    public enum SightingNotRecoveredFilter
+    {
+        NoFilter,
+        OnlyNotRecovered,
+        DontIncludeNotRecovered
+    }
+
+    public enum SightingNotPresentFilter
+    {
+        DontIncludeNotPresent,
+        OnlyNotPresent,
+        IncludeNotPresent
+    }
 }

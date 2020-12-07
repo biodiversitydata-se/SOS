@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -70,13 +71,22 @@ namespace SOS.Observations.Api.Controllers
             return Result.Failure($"Missing property ({ property }) used for { name }");
         }
 
-        private Result ValidateSearchFilter(SearchFilterDto filter)
+        private Result ValidateSearchFilter(SearchFilterBaseDto filter)
         {
             var errors = new List<string>();
 
-            if (filter.OutputFields?.Any() ?? false)
+            var searchFilter = filter as SearchFilterDto;
+            if (searchFilter?.OutputFields?.Any() ?? false)
             {
-                errors.AddRange(filter.OutputFields
+                errors.AddRange(searchFilter.OutputFields
+                    .Where(of => !typeof(Observation).HasProperty(of))
+                    .Select(of => $"Output field doesn't exist ({of})"));
+            }
+            
+            var searchFilterInternal = filter as SearchFilterInternalDto;
+            if (searchFilterInternal?.OutputFields?.Any() ?? false)
+            {
+                errors.AddRange(searchFilterInternal.OutputFields
                     .Where(of => !typeof(Observation).HasProperty(of))
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
@@ -296,7 +306,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchAggregatedInternalAsync(
-            [FromBody] SearchFilterInternalDto filter,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -376,7 +386,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
-            [FromBody] SearchFilterDto filter,
+            [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
@@ -461,7 +471,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
-            [FromBody] SearchFilterInternalDto filter,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
@@ -516,7 +526,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
-            [FromBody] SearchFilterDto filter,
+            [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
@@ -572,7 +582,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregationAsync(
-            [FromBody] SearchFilterDto filter,
+            [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] double? bboxLeft = null,
@@ -629,7 +639,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternalAsync(
-            [FromBody] SearchFilterInternalDto filter,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] double? bboxLeft = null,

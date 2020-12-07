@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Lib.Managers
 {
     /// <summary>
     /// Filter manager.
@@ -29,52 +29,50 @@ namespace SOS.Observations.Api.Managers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>A cloned filter with additional information.</returns>
-        public async Task<SearchFilter> PrepareFilter(SearchFilter filter)
+        public async Task PrepareFilter(FilterBase filter)
         {
-            var preparedFilter = filter.Clone();
-
-            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null &&
-                preparedFilter.TaxonIds.Any())
+            if (filter.IncludeUnderlyingTaxa && filter.TaxonIds != null &&
+                filter.TaxonIds.Any())
             {
-                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                if (filter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
                 {
-                    preparedFilter.TaxonIds = new List<int>();
+                    filter.TaxonIds = new List<int>();
                 }
                 else
                 {
-                    preparedFilter.TaxonIds =
-                        _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                    filter.TaxonIds =
+                        _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
                 }
             }
 
             // handle the area ids search
-            if (preparedFilter.Areas?.Any() ?? false)
+            if (filter.Areas?.Any() ?? false)
             {
-                foreach (var areaFilter in preparedFilter.Areas)
+                foreach (var areaFilter in filter.Areas)
                 {
                     switch (areaFilter.Type)
                     {
                         case AreaType.County:
-                            (preparedFilter.CountyIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                            (filter.CountyIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Municipality:
-                            (preparedFilter.MunicipalityIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                            (filter.MunicipalityIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Province:
-                            (preparedFilter.ProvinceIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                            (filter.ProvinceIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.Parish:
-                            (preparedFilter.ParishIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                            (filter.ParishIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         case AreaType.BirdValidationArea:
-                            (preparedFilter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
+                            (filter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         default:
                             var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
 
                             if (geometry != null)
                             {
-                                (preparedFilter.GeometryFilter ??= new GeometryFilter
+                                (filter.GeometryFilter ??= new GeometryFilter
                                 {
                                     MaxDistanceFromPoint = 0
                                 }).Geometries.Add(geometry);
@@ -84,8 +82,6 @@ namespace SOS.Observations.Api.Managers
                     }
                 }
             }
-
-            return preparedFilter;
         }
     }
 }

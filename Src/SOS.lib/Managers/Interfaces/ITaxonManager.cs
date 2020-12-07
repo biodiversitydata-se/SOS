@@ -1,10 +1,10 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 
-namespace SOS.Export.Managers.Interfaces
+namespace SOS.Lib.Managers.Interfaces
 {
     /// <summary>
-    ///     Taxon manager interface.
+    ///     Taxon manager
     /// </summary>
     public interface ITaxonManager
     {

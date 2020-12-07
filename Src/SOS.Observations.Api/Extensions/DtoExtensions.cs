@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
@@ -78,16 +79,15 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, string translationCultureCode)
         {
             if (searchFilterDto == null) return null;
 
             var filter = new SearchFilter();
-            filter.OutputFields = searchFilterDto.OutputFields;
             filter.StartDate = searchFilterDto.Date?.StartDate;
             filter.EndDate = searchFilterDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.Areas = searchFilterDto.Areas?.Select(a => new AreaFilter {FeatureId = a.FeatureId, Type = a.Type});
+            filter.Areas = searchFilterDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, Type = a.Type });
             filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
@@ -120,46 +120,12 @@ namespace SOS.Observations.Api.Extensions
             return filter;
         }
 
-        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto, string translationCultureCode)
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto, string translationCultureCode)
         {
             if (searchFilterDto == null) return null;
 
-            var filter = new SearchFilterInternal();
-            filter.OutputFields = searchFilterDto.OutputFields;
-            filter.StartDate = searchFilterDto.Date?.StartDate;
-            filter.EndDate = searchFilterDto.Date?.EndDate;
-            filter.Areas = searchFilterDto.Areas?.Select(a => new AreaFilter {Type = a.Type, FeatureId = a.FeatureId});
-            filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
-            filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
-            filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
-            filter.DataProviderIds = searchFilterDto.DataProviderIds;
-            filter.FieldTranslationCultureCode = translationCultureCode;
-            filter.OnlyValidated = searchFilterDto.OnlyValidated;
-            filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
-            {
-                Geometries = searchFilterDto.Geometry.Geometries,
-                MaxDistanceFromPoint = searchFilterDto.Geometry.MaxDistanceFromPoint,
-                UsePointAccuracy = searchFilterDto.Geometry.UsePointAccuracy
-            };
+            var filter = new SearchFilterInternal(searchFilterDto.ToSearchFilter(translationCultureCode));
 
-            if (searchFilterDto.OccurrenceStatus != null)
-            {
-                switch (searchFilterDto.OccurrenceStatus)
-                {
-                    case OccurrenceStatusFilterValuesDto.Present:
-                        filter.PositiveSightings = true;
-                        break;
-                    case OccurrenceStatusFilterValuesDto.Absent:
-                        filter.PositiveSightings = false;
-                        break;
-                    case OccurrenceStatusFilterValuesDto.BothPresentAndAbsent:
-                        filter.PositiveSightings = null;
-                        break;
-                }
-            }
-
-            filter.IncludeRealCount = searchFilterDto.IncludeRealCount;
             if (searchFilterDto.ArtportalenFilter != null)
             {
                 filter.ReportedByUserId = searchFilterDto.ArtportalenFilter.ReportedByUserId;
@@ -172,8 +138,7 @@ namespace SOS.Observations.Api.Extensions
                 filter.OnlyWithBarcode = searchFilterDto.ArtportalenFilter.OnlyWithBarcode;
                 filter.ReportedDateFrom = searchFilterDto.ArtportalenFilter.ReportedDateFrom;
                 filter.ReportedDateTo = searchFilterDto.ArtportalenFilter.ReportedDateTo;
-                filter.TypeFilter =
-                    (SearchFilterInternal.SightingTypeFilter) searchFilterDto.ArtportalenFilter.TypeFilter;
+                filter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterDto.ArtportalenFilter.TypeFilter;
                 filter.MaxAccuracy = searchFilterDto.ArtportalenFilter.MaxAccuracy;
                 filter.UsePeriodForAllYears = searchFilterDto.ArtportalenFilter.UsePeriodForAllYears;
                 filter.Months = searchFilterDto.ArtportalenFilter.Months;
@@ -192,13 +157,13 @@ namespace SOS.Observations.Api.Extensions
                 filter.ValidationStatusIds = searchFilterDto.ArtportalenFilter.ValidationStatusIds;
                 filter.ExcludeValidationStatusIds = searchFilterDto.ArtportalenFilter.ExcludeValidationStatusIds;
                 filter.DeterminationFilter =
-                    (SearchFilterInternal.SightingDeterminationFilter) searchFilterDto.ArtportalenFilter
+                    (SightingDeterminationFilter)searchFilterDto.ArtportalenFilter
                         .DeterminationFilter;
                 filter.UnspontaneousFilter =
-                    (SearchFilterInternal.SightingUnspontaneousFilter) searchFilterDto.ArtportalenFilter
+                    (SightingUnspontaneousFilter)searchFilterDto.ArtportalenFilter
                         .UnspontaneousFilter;
                 filter.NotRecoveredFilter =
-                    (SearchFilterInternal.SightingNotRecoveredFilter) searchFilterDto.ArtportalenFilter
+                    (SightingNotRecoveredFilter)searchFilterDto.ArtportalenFilter
                         .NotRecoveredFilter;
                 filter.SpeciesCollectionLabel = searchFilterDto.ArtportalenFilter.SpeciesCollectionLabel;
                 filter.PublicCollection = searchFilterDto.ArtportalenFilter.PublicCollection;
@@ -207,7 +172,7 @@ namespace SOS.Observations.Api.Extensions
                 filter.SubstrateId = searchFilterDto.ArtportalenFilter.SubstrateId;
                 filter.BiotopeId = searchFilterDto.ArtportalenFilter.BiotopeId;
                 filter.NotPresentFilter =
-                    (SearchFilterInternal.SightingNotPresentFilter) searchFilterDto.ArtportalenFilter.NotPresentFilter;
+                    (SightingNotPresentFilter)searchFilterDto.ArtportalenFilter.NotPresentFilter;
                 filter.OnlySecondHandInformation = searchFilterDto.ArtportalenFilter.OnlySecondHandInformation;
                 filter.PublishTypeIdsFilter = searchFilterDto.ArtportalenFilter.PublishTypeIdsFilter;
                 filter.RegionalSightingStateIdsFilter =
@@ -217,6 +182,38 @@ namespace SOS.Observations.Api.Extensions
             }
 
             return filter;
+        }
+
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode)
+        {
+            if (searchFilterDto == null) return null;
+
+            var filter = (searchFilterDto as SearchFilterBaseDto).ToSearchFilter(translationCultureCode);
+            filter.OutputFields = searchFilterDto.OutputFields;
+
+            return filter;
+        }
+
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
+            string translationCultureCode)
+        {
+            if (searchFilterDto == null) return null;
+
+            var filter = (searchFilterDto as SearchFilterInternalBaseDto).ToSearchFilterInternal(translationCultureCode);
+            filter.OutputFields = searchFilterDto.OutputFields;
+            filter.IncludeRealCount = searchFilterDto.IncludeRealCount;
+           
+            return filter;
+        }
+
+        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode)
+        {
+            return (searchFilterDto as SearchFilterBaseDto)?.ToSearchFilter(translationCultureCode);
+        }
+
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode)
+        {
+            return (searchFilterDto as SearchFilterInternalBaseDto)?.ToSearchFilterInternal(translationCultureCode);
         }
 
         public static IEnumerable<VocabularyDto> ToVocabularyDtos(this IEnumerable<Vocabulary> vocabularies, bool includeSystemMappings = true)

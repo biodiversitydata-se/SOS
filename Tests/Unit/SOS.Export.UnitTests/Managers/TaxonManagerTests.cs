@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.Managers;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
@@ -30,7 +30,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <summary>
         ///     Return object to be tested
         /// </summary>
-        private TaxonManager TestObject => new TaxonManager(new MemoryCache(new MemoryCacheOptions()), _processedTaxonRepositoryMock.Object,
+        private TaxonManager TestObject => new TaxonManager(_processedTaxonRepositoryMock.Object, new MemoryCache(new MemoryCacheOptions()),
             _loggerMock.Object);
 
         /// <summary>
