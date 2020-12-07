@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
         }
 
         [Fact]
-        [Trait("Catgory", "ApiIntegrationTest")]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Search_Otter()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Search_Otter_At_Location()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations
         }
 
         [Fact]
-        [Trait("Catgory", "ApiTest")]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Search_for_Wolf_should_return_0_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
