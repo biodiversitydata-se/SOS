@@ -31,6 +31,8 @@ using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
@@ -45,6 +47,8 @@ using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
+using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
 using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
 using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
 

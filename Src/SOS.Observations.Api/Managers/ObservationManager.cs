@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -52,7 +53,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
                 ResolveLocalizedVocabularyFields(filter.FieldTranslationCultureCode, processedObservations.Records);
@@ -71,7 +72,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter);
 
                 if(aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
@@ -100,7 +101,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter);
                 return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision, bbox);
             }
             catch (Exception e)
@@ -121,7 +122,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, bbox);
             }
             catch (Exception e)
@@ -151,7 +152,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter);
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, bbox, skip, take);
             }
             catch (Exception e)

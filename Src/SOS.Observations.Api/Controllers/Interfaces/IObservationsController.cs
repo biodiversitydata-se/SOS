@@ -76,7 +76,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
 
 
         Task<IActionResult> SearchAggregatedInternalAsync(
-            SearchFilterInternalDto filter,
+            SearchFilterAggregationInternalDto filter,
             AggregationType aggregationType,
             int skip,
             int take,
@@ -128,7 +128,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
-            SearchFilterDto filter,
+            SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
             double? bboxTop,
@@ -180,7 +180,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
-            SearchFilterInternalDto filter,
+            SearchFilterAggregationInternalDto filter,
             int zoom,
             double? bboxLeft,
             double? bboxTop,
@@ -202,7 +202,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
-            SearchFilterDto filter,
+            SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
             double? bboxTop,
@@ -225,7 +225,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         Task<IActionResult> TaxonAggregationAsync(
-            SearchFilterDto filter,
+            SearchFilterAggregationDto filter,
             int skip,
             int take,
             double? bboxLeft,
@@ -249,7 +249,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         Task<IActionResult> TaxonAggregationInternalAsync(
-            SearchFilterInternalDto filter,
+            SearchFilterAggregationInternalDto filter,
             int skip,
             int take,
             double? bboxLeft,
