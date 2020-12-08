@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="areaTypes">Filter used to limit number of areas returned</param>
         /// <param name="searchString">Filter used to limit number of areas returned</param>
         /// <param name="skip">Start index of returned areas</param>
-        /// <param name="take">End index of returned areas</param>
+        /// <param name="take">Number of areas to return</param>
         /// <returns>List of Areas</returns>
         Task<IActionResult> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip = 0,
             int take = 100);
