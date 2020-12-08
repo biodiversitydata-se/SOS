@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using SOS.Lib.Enums;
 
 namespace SOS.Administration.Gui.Services
 {
@@ -249,7 +250,7 @@ namespace SOS.Administration.Gui.Services
                 TaxonIds = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
-            searchFilter.AreaIds = new List<int>() { 7, 283 };
+            searchFilter.Areas = new [] { new AreaFilterDto{ Type = AreaType.Parish, FeatureId = "7" }, new AreaFilterDto{ Type = AreaType.Parish, FeatureId = "283"} };
             searchFilter.Date = new DateFilterDto()
             {
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),

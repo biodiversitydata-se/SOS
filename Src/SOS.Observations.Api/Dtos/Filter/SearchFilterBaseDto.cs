@@ -29,12 +29,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<AreaFilterDto> Areas { get; set; }
 
         /// <summary>
-        /// Area filter.
-        /// </summary>
-        [Obsolete("To be removed. Use Areas instead")]
-        public IEnumerable<int> AreaIds { get; set; }
-
-        /// <summary>
         /// Geometry filter 
         /// </summary>
         public GeometryFilterDto Geometry { get; set; }

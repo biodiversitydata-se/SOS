@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">Filter used to limit the search</param>
         /// <param name="skip">Start index of returned observations</param>
-        /// <param name="take">End index of returned observations</param>
+        /// <param name="take">Max number of observations to return</param>
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
@@ -247,7 +247,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">Filter used to limit the search</param>
         /// <param name="skip">Start index of returned observations</param>
-        /// <param name="take">End index of returned observations</param>
+        /// <param name="take">Max number of observations to return</param>
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
@@ -568,8 +568,8 @@ namespace SOS.Observations.Api.Controllers
         /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
-        /// <param name="take">End index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="skip">Start index of returned records. Skip + Take must be less than or equal to 65535.</param>
+        /// <param name="take">Max number of taxa to return. Skip + Take must be less than or equal to 65535.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -625,7 +625,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
-        /// <param name="take">End index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="take">Max number of taxa to return. Skip+Take must be less than or equal to 65535.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>

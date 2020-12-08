@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text.Json.Serialization;
+using SOS.Lib.JsonConverters;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -40,6 +42,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.
         /// </summary>
+        [JsonConverter(typeof(EndDayConverter))]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
