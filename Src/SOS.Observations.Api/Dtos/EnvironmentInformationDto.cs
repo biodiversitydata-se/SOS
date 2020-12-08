@@ -21,8 +21,13 @@
         public string OsPlatform { get; set; }
 
         /// <summary>
-        ///     .Net version
+        ///     .Net version.
         /// </summary>
         public string AspDotnetVersion { get; set; }
+
+        /// <summary>
+        ///     Current Culture.
+        /// </summary>
+        public string CurrentCulture { get; set; }
     }
 }
