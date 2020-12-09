@@ -8,6 +8,8 @@ using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Managers;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.Managers;
@@ -54,9 +56,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
-            var taxonManager = CreateTaxonManager(processClient);
-
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient);
+            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+            var taxonManager = CreateTaxonManager(processClient, memoryCache);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient, memoryCache);
             var vocabularyManger = CreateVocabularyManager(processClient);
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, taxonManager);
             ObservationsController = new ObservationsController(observationManager, taxonManager, new NullLogger<ObservationsController>());
@@ -64,10 +66,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager = taxonManager;
         }
 
-        private TaxonManager CreateTaxonManager(ProcessClient processClient)
+        private TaxonManager CreateTaxonManager(ProcessClient processClient, IMemoryCache memoryCache)
         {
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
-            var taxonManager = new TaxonManager(taxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonManager>());
+            var taxonManager = new TaxonManager(taxonRepository, memoryCache, new NullLogger<TaxonManager>());
             return taxonManager;
         }
 
@@ -78,7 +80,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager taxonManager)
         {
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-            var filterManager = new FilterManager(taxonManager, areaRepository);
+            var areaCache = new AreaCache(areaRepository);
+            var filterManager = new FilterManager(taxonManager, areaCache);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
                 filterManager, new NullLogger<ObservationManager>());
 
@@ -96,14 +99,17 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         private Repositories.ProcessedObservationRepository CreateProcessedObservationRepository(
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClient elasticClient,
-            IProcessClient processClient)
+            IProcessClient processClient,
+            IMemoryCache memoryCache)
         {
+            var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new Repositories.ProcessedObservationRepository(
                 elasticClient, 
                 processClient,
                 elasticConfiguration, 
                 new TelemetryClient(), 
-                new NullLogger<Repositories.ProcessedObservationRepository>());
+                new NullLogger<Repositories.ProcessedObservationRepository>(),
+                processedConfigurationCache);
             return processedObservationRepository;
         }
     }
