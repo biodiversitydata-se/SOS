@@ -30,105 +30,24 @@ namespace SOS.Lib.Extensions
         {
             if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
             {
-                if (filter.StartDate.HasValue)
-                {
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.startDate")
-                                .GreaterThanOrEquals(
-                                    DateMath.Anchored(filter.StartDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
-
-                if (filter.EndDate.HasValue)
-                {
-                    var endDate = filter.EndDate.Value;
-                    if (endDate.Hour == 0 && endDate.Minute == 0 && endDate.Second == 0)
-                    {
-                        //Assume whole day search if time is 00:00:00
-                        endDate = endDate.AddDays(1).AddSeconds(-1);
-                    }
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.endDate")
-                                .LessThanOrEquals(
-                                    DateMath.Anchored(endDate
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
+                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
             {
-                if (filter.EndDate.HasValue)
-                {
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.startDate")
-                                .LessThanOrEquals(
-                                    DateMath.Anchored(filter.EndDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
+                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.LessThanOrEquals);
+                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.GreaterThanOrEquals);
 
-                if (filter.StartDate.HasValue)
-                {
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.endDate")
-                                .GreaterThanOrEquals(
-                                    DateMath.Anchored(filter.StartDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
             {
-                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
-                {
-                    query.Add(q => q
-                       .DateRange(r => r
-                               .Field("event.startDate")
-                               .GreaterThanOrEquals(
-                                   DateMath.Anchored(filter.StartDate.Value
-                                       .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                       )
-                   );
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.startDate")
-                                .LessThanOrEquals(
-                                    DateMath.Anchored(filter.EndDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
+                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.LessThanOrEquals);
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
             {
-                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
-                {
-                    query.Add(q => q
-                       .DateRange(r => r
-                               .Field("event.endDate")
-                               .GreaterThanOrEquals(
-                                   DateMath.Anchored(filter.StartDate.Value
-                                       .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                       )
-                   );
-                    query.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.endDate")
-                                .LessThanOrEquals(
-                                    DateMath.Anchored(filter.EndDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
+                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.GreaterThanOrEquals);
+                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
             }
         }
 
@@ -139,7 +58,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="geometry"></param>
         /// <param name="relation"></param>
-        private static void AddGeoShapeCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field,  IGeoShape geometry, GeoShapeRelation relation)
+        private static void AddGeoShapeCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoShapeRelation relation)
         {
             query.Add(q => q
                 .GeoShape(gd => gd
@@ -241,19 +160,21 @@ namespace SOS.Lib.Extensions
             }
             if (internalFilter.OnlyWithMedia)
             {
-                query.AddWildcardCriteria("occurrence.associatedMedia", "?*");
+                query.AddMustExistsCriteria("occurrence.associatedMedia");
+            //    query.AddWildcardCriteria("occurrence.associatedMedia", "http*");
             }
 
             if (internalFilter.OnlyWithNotes)
             {
-                query.AddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
+                query.AddMustExistsCriteria("occurrence.occurrenceRemarks");
+              //  query.AddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
             }
 
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
             query.TryAddDateRangeCriteria("reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", internalFilter.MaxAccuracy, RangeTypes.LessThanOrEquals);
-            
+
             if (internalFilter.Months?.Any() ?? false)
             {
                 query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
@@ -286,7 +207,8 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlyWithBarcode)
             {
-                query.AddWildcardCriteria("taxon.individualId", "?*");
+                query.AddMustExistsCriteria("taxon.individualId");
+               // query.AddWildcardCriteria("taxon.individualId", "?*");
             }
 
             switch (internalFilter.DeterminationFilter)
@@ -346,7 +268,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
             query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
             query.TryAddTermsCriteria("location.locationId", internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}"));
-            
+
 
 
             if (internalFilter.SpeciesFactsIds?.Any() ?? false)
@@ -399,6 +321,14 @@ namespace SOS.Lib.Extensions
             excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeValidationStatusIds);
         }
 
+        private static void AddMustExistsCriteria(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
+        {
+            query.Add(q => q
+                .Regexp(re => re.Field(field).Value(".+"))
+            );
+        }
+
         /// <summary>
         /// Add numeric filter with relation operator
         /// </summary>
@@ -406,7 +336,7 @@ namespace SOS.Lib.Extensions
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="relationalOperator"></param>
-        private static void AddNumericFilterWithRelationalOperator(this 
+        private static void AddNumericFilterWithRelationalOperator(this
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryInternal, string fieldName,
             int value, string relationalOperator)
         {
@@ -630,14 +560,14 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-    /// Try to add query criteria
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="query"></param>
-    /// <param name="field"></param>
-    /// <param name="terms"></param>
-    private static void TryAddTermsCriteria<T>(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
+        /// Try to add query criteria
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
+        /// <param name="terms"></param>
+        private static void TryAddTermsCriteria<T>(
+                this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
         {
             if (terms?.Any() ?? false)
             {
@@ -681,7 +611,7 @@ namespace SOS.Lib.Extensions
             if (!string.IsNullOrEmpty(value?.ToString()) && matchValue.Equals(value))
             {
                 query.Add(q => q
-                    .Term(m => m.Field(field).Value(value))); 
+                    .Term(m => m.Field(field).Value(value)));
             }
         }
 
@@ -710,7 +640,7 @@ namespace SOS.Lib.Extensions
 
             if (aggregationType.IsSpeciesSightingsList())
             {
-                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new [] { 0, 1, 3, 8, 10 });
+                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new[] { 0, 1, 3, 8, 10 });
             }
         }
 
