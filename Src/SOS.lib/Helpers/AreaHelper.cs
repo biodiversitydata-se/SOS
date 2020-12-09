@@ -36,7 +36,7 @@ namespace SOS.Lib.Helpers
             _processedAreaRepository = processedAreaRepository ??
                                        throw new ArgumentNullException(nameof(processedAreaRepository));
 
-            _initialized = false;
+            ClearCache();
         }
 
 
