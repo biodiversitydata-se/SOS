@@ -2,6 +2,7 @@
 using System.Linq;
 using Moq;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -25,13 +26,13 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
 
             processedAreaRepositoryStub
                 .Setup(avm => avm.GetGeometryAsync(It.IsAny<AreaType>(), It.IsAny<string>()))
-                .ReturnsAsync((string id) =>
+                .ReturnsAsync((AreaType type, string featureId) =>
                 {
-                    if (areaById.TryGetValue(id, out AreaWithGeometry area))
+                  if (areaById.TryGetValue(type.ToAreaId(featureId), out AreaWithGeometry area))
                     {
                         return area.Geometry;
                     }
-
+                 
                     return null;
                 });
 
