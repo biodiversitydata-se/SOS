@@ -9,6 +9,7 @@ using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -139,7 +140,7 @@ namespace SOS.Observations.Api
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
-            
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddApiVersioning(o =>
@@ -322,7 +323,7 @@ namespace SOS.Observations.Api
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="apiVersionDescriptionProvider"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration)
         {
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (_isDevelopment)
@@ -333,6 +334,9 @@ namespace SOS.Observations.Api
             {
                 app.UseHsts();
             }
+#if DEBUG
+            configuration.DisableTelemetry = true;
+#endif
 
             app.UseHangfireDashboard();
 
