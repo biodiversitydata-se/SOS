@@ -77,7 +77,7 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with cuurent configuration
         /// </summary>
         /// <returns></returns>
-        public ElasticClient GetClient()
+        public ElasticClient GetClient(bool enableDebugMode = false)
         {
             var uris = Hosts.Select(u => new Uri(u));
 
@@ -93,7 +93,10 @@ namespace SOS.Lib.Configuration.Shared
             }
 
             //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
-            //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
+            if (enableDebugMode)
+            {
+                settings.DisableDirectStreaming().EnableDebugMode().PrettyJson();
+            }
 
             return new ElasticClient(settings);
         }

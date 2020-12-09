@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -58,7 +59,8 @@ namespace SOS.Administration.Api.Controllers
                     AspDotnetVersion = Assembly
                         .GetEntryAssembly()?
                         .GetCustomAttribute<TargetFrameworkAttribute>()?
-                        .FrameworkName
+                        .FrameworkName,
+                    CurrentCulture = CultureInfo.CurrentCulture.Name
                 };
 
                 return new OkObjectResult(environmentInformationDto);
