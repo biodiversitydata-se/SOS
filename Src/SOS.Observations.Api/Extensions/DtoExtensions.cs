@@ -16,9 +16,7 @@ namespace SOS.Observations.Api.Extensions
         {
             if (searchFilterBaseDto == null) return default;
 
-            var isInternalFilter = searchFilterBaseDto is SearchFilterInternalBaseDto;
-
-            var filter = isInternalFilter ? new SearchFilterInternal() : new SearchFilter();
+            var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? new SearchFilterInternal() : new SearchFilter();
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
@@ -52,22 +50,23 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
-            if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
-            {
-                PopulateInternalBase(searchFilterInternalBaseDto, filter as SearchFilterInternal);
-
-                if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
-                {
-                    (filter as SearchFilterInternal).IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filter.OutputFields = searchFilterInternalDto.OutputFields;
-                }
-            } 
-            
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
                 filter.OutputFields = searchFilterDto.OutputFields;
             }
 
+            if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
+            {
+                var filterInternal = (SearchFilterInternal)filter;
+                PopulateInternalBase(searchFilterInternalBaseDto, filterInternal);
+
+                if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
+                {
+                    filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
+                    filter.OutputFields = searchFilterInternalDto.OutputFields;
+                }
+            } 
+            
             return filter;
         }
 
@@ -197,7 +196,6 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-       
         public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode)
         {
             return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode);
