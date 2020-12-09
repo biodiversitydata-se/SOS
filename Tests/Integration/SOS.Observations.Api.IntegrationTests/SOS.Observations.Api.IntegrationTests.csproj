@@ -49,6 +49,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="IntegrationTests\Observations\GeoGridAggregation\" />
+    <Folder Include="IntegrationTests\Observations\TaxonAggregation\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 
