@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
@@ -61,7 +60,11 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto() { TaxonIds = new List<int>() { 100077 }, IncludeUnderlyingTaxa = true },
-                Areas = new [] { new AreaFilterDto{ Type = AreaType.Municipality, FeatureId = "687" } },
+                Areas = new[]
+                {
+                    TestData.Areas.TranasMunicipality, // Tranås Municipality
+                    TestData.Areas.JonkopingCounty // Jönköping County
+                },
                 Date = new DateFilterDto()
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
