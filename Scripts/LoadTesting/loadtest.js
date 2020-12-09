@@ -3,9 +3,9 @@ import http from "k6/http";
 
 export let options = {
   stages: [
-    { duration: '2m', target: 200 }, // simulate ramp-up of traffic from 1 to 100 users over 1 minute.
-    { duration: '10m', target: 200 }, // stay at 100 users for 10 minutes
-    { duration: '2m', target: 0 }, // ramp-down to 0 users
+    { duration: '1m', target: 200 }, // simulate ramp-up of traffic from 1 to 100 users over 1 minute.
+    { duration: '12m', target: 200 }, // stay at 100 users for 10 minutes
+    { duration: '1m', target: 0 }, // ramp-down to 0 users
   ],
   thresholds: {
     RTT: ['p(99)<3000', 'p(70)<2500', 'avg<2000', 'med<1500', 'min<1000'],
@@ -47,11 +47,82 @@ export default function main() {
         areaIds: [7, 283],
         onlyValidated: false,
         occurrenceStatus: "present",
-        translationCultureCode: "sv-SE",
+        fieldTranslationCultureCode: "sv-SE",
       };
 
       response = http.post(
         environmentUrl + "/Observations/Search?take=100&validateSearchFilter=true",
+        JSON.stringify(body),
+        {
+          headers: headers,
+          timeout:180000
+        }
+      );
+      check(response, {
+        'is status 200': (r) => r.status === 200,
+      });
+
+      // Automatically added sleep
+      sleep(1);
+    });
+    group("All observations with occurrenceStatus == present", function () {
+      let response;
+      let body = {
+        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.redlistCategory"],
+        occurrenceStatus: "present",
+        fieldTranslationCultureCode: "sv-SE",
+      };
+
+      response = http.post(
+        environmentUrl + "/Observations/Search?skip=0&take=1&validateSearchFilter=true",
+        JSON.stringify(body),
+        {
+          headers: headers,
+          timeout:180000
+        }
+      );
+      check(response, {
+        'is status 200': (r) => r.status === 200,
+      });
+
+      // Automatically added sleep
+      sleep(1);
+    });
+    group("All observations with occurrenceStatus == absent in Riksskogstaxeringen", function () {
+      let response;
+      let body = {        
+        occurrenceStatus: "absent",
+        dataProviderIds: [16],
+        onlyValidated:true,
+        fieldTranslationCultureCode: "sv-SE",
+      };
+
+      response = http.post(
+        environmentUrl + "/Observations/Search?skip=0&take=1&validateSearchFilter=true",
+        JSON.stringify(body),
+        {
+          headers: headers,
+          timeout:180000
+        }
+      );
+      check(response, {
+        'is status 200': (r) => r.status === 200,
+      });
+
+      // Automatically added sleep
+      sleep(1);
+    });
+    group("Wolves", function () {
+      let response;
+      let body = {
+        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.redlistCategory"],
+        occurrenceStatus: "present",
+        fieldTranslationCultureCode: "sv-SE",
+        taxon: { taxonIds: [100024], includeUnderlyingTaxa: true }
+      };
+
+      response = http.post(
+        environmentUrl + "/Observations/Search?skip=0&take=1&validateSearchFilter=true",
         JSON.stringify(body),
         {
           headers: headers,
@@ -76,7 +147,7 @@ export default function main() {
         areaIds: [164],
         onlyValidated: false,
         occurrenceStatus: "present",
-        translationCultureCode: "sv-SE",
+        fieldTranslationCultureCode: "sv-SE",
       };
 
       response = http.post(
@@ -161,7 +232,7 @@ export default function main() {
             "usePointAccuracy": false
         },
         "onlyValidated": false,
-        "translationCultureCode": "sv-SE"
+        "fieldTranslationCultureCode": "sv-SE"
     }
 
       response = http.post(
@@ -193,7 +264,7 @@ export default function main() {
         areaIds: [208],
         onlyValidated: false,
         occurrenceStatus: "present",
-        translationCultureCode: "sv-SE",
+        fieldTranslationCultureCode: "sv-SE",
       };
 
       response = http.post(
@@ -222,7 +293,7 @@ export default function main() {
         },
         onlyValidated: false,
         occurrenceStatus: "present",
-        translationCultureCode: "sv-SE",
+        fieldTranslationCultureCode: "sv-SE",
       };
 
       response = http.post(
@@ -254,7 +325,7 @@ export default function main() {
         },    
         onlyValidated:false,
         occurrenceStatus:"present",
-        translationCultureCode:"sv-SE"    
+        fieldTranslationCultureCode:"sv-SE"    
     };
 
       response = http.post(
@@ -279,7 +350,7 @@ export default function main() {
         "CountyIds":null,
         "DataProviderIds":null,
         "EndDate":"2020-01-31T07:59:46",
-        "FieldTranslationCultureCode":"sv-SE",
+        "FieldfieldTranslationCultureCode":"sv-SE",
         "GeometryFilter":null,
         "GenderIds":null,
         "IncludeUnderlyingTaxa":true,
@@ -382,6 +453,42 @@ export default function main() {
 
       response = http.get(
         environmentUrl + "/DataProviders",        
+        {
+          headers: headers,
+          timeout:180000
+        }
+      );
+      check(response, {
+        'is status 200': (r) => r.status === 200,
+      });
+      // Automatically added sleep
+      sleep(1);
+    })   
+  })
+  group("Vocabularies", function(){
+    group("Get lifeStage Vocabulary", function(){
+      let response;      
+
+      response = http.get(
+        environmentUrl + "/Vocabularies/lifeStage",        
+        {
+          headers: headers,
+          timeout:180000
+        }
+      );
+      check(response, {
+        'is status 200': (r) => r.status === 200,
+      });
+      // Automatically added sleep
+      sleep(1);
+    })   
+  })
+  group("ProcessInformation", function(){
+    group("Get Process Information", function(){
+      let response;      
+
+      response = http.get(
+        environmentUrl + "/Systems/ProcessInformation?active=true",        
         {
           headers: headers,
           timeout:180000

@@ -1,1 +1,1 @@
-k6 run .\loadtest.js --out csv=test.csv --out json=test.json --summary-export=summary-export.json
+& "C:\Program Files\k6\k6.exe" run .\loadtest.js --out csv=test.csv --out json=test.json --summary-export=summary-export.json
