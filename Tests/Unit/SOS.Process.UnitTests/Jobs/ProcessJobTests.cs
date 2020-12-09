@@ -225,7 +225,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processInfoRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()))
                 .ReturnsAsync(true);
 
-            _areaHelper.Setup(r => r.PersistCache());
+            _areaHelper.Setup(r => r.InitializeAsync());
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
-using Newtonsoft.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -21,14 +18,13 @@ namespace SOS.Lib.Helpers
 {
     public class AreaHelper : IAreaHelper
     {
-        private const string CacheFileName = "positionAreas.json";
-
         private readonly AreaType[] _areaTypes =
             {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
-        private readonly STRtree<IFeature> _strTree;
+        private STRtree<IFeature> _strTree;
+        private bool _initialized;
 
         /// <summary>
         ///     Constructor
@@ -39,12 +35,8 @@ namespace SOS.Lib.Helpers
         {
             _processedAreaRepository = processedAreaRepository ??
                                        throw new ArgumentNullException(nameof(processedAreaRepository));
-            _strTree = new STRtree<IFeature>();
 
-            // Try to get saved cache
-            InitializeCache();
-
-            Task.Run(InitializeAsync).Wait();
+            _initialized = false;
         }
 
 
@@ -75,41 +67,21 @@ namespace SOS.Lib.Helpers
 
         public void ClearCache()
         {
-            if (File.Exists(CacheFileName))
-            {
-                File.Delete(CacheFileName);
-            }
-            InitializeCache();
+            _initialized = false;
+            _featureCache = new ConcurrentDictionary<string, PositionLocation>();
+            _strTree = new STRtree<IFeature>();
         }
 
         /// <inheritdoc />
-        public void PersistCache()
-        {
-            // Update saved cache
-            using var file = new StreamWriter(File.Create(CacheFileName), Encoding.UTF8);
-            file.Write(JsonConvert.SerializeObject(_featureCache));
-        }
-
-        /// <summary>
-        ///     Get save cache if it exists
-        /// </summary>
-        /// <returns></returns>
-        private void InitializeCache()
-        {
-            // Try to get saved cache
-            _featureCache = File.Exists(CacheFileName)
-                ? JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
-                    File.ReadAllText(CacheFileName, Encoding.UTF8))
-                : new ConcurrentDictionary<string, PositionLocation>();
-        }
-
-        private async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
             // If tree already initialized, return
-            if (_strTree.Count != 0)
+            if (_initialized)
             {
                 return;
             }
+            
+            ClearCache();
 
             var areas = await _processedAreaRepository.GetAsync(_areaTypes);
             foreach (var area in areas)
@@ -125,6 +97,7 @@ namespace SOS.Lib.Helpers
             }
 
             _strTree.Build();
+            _initialized = true;
         }
 
         /// <summary>
@@ -166,31 +139,32 @@ namespace SOS.Lib.Helpers
                 {
                     foreach (var feature in features)
                     {
-                        Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
-                            out var areaType);
-
-                        var area = new Models.Processed.Observation.Area
+                        if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
+                            out var areaType))
                         {
-                            FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
-                            Name = feature.Attributes.GetOptionalValue("name")?.ToString()
-                        };
-                        switch ((AreaType) areaType)
-                        {
-                            case AreaType.County:
-                                positionLocation.County = area;
-                                break;
-                            case AreaType.Municipality:
-                                positionLocation.Municipality = area;
-                                break;
-                            case AreaType.Parish:
-                                positionLocation.Parish = area;
-                                break;
-                            case AreaType.Province:
-                                positionLocation.Province = area;
-                                break;
-                            case AreaType.EconomicZoneOfSweden:
-                                positionLocation.EconomicZoneOfSweden = true;
-                                break;
+                            var area = new Area
+                            {
+                                FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
+                                Name = feature.Attributes.GetOptionalValue("name")?.ToString()
+                            };
+                            switch ((AreaType)areaType)
+                            {
+                                case AreaType.County:
+                                    positionLocation.County = area;
+                                    break;
+                                case AreaType.Municipality:
+                                    positionLocation.Municipality = area;
+                                    break;
+                                case AreaType.Parish:
+                                    positionLocation.Parish = area;
+                                    break;
+                                case AreaType.Province:
+                                    positionLocation.Province = area;
+                                    break;
+                                case AreaType.EconomicZoneOfSweden:
+                                    positionLocation.EconomicZoneOfSweden = true;
+                                    break;
+                            }
                         }
                     }
                 }

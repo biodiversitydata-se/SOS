@@ -163,7 +163,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 var siteAreas = new Dictionary<int, ICollection<string>>();
                 if (siteBirdValidationAreas?.Any() ?? false)
                 {
-
                     foreach (var siteBirdValidationArea in siteBirdValidationAreas)
                     {
                         if (!siteAreas.TryGetValue(siteBirdValidationArea.SiteId, out var areas))
