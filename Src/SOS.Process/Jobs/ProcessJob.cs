@@ -54,7 +54,76 @@ namespace SOS.Process.Jobs
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
 
-       
+        private async Task<IDictionary<int, Taxon>> GetTaxa(JobRunModes mode)
+        {
+            // Use current taxa if we are in incremental mode, to speed things up
+            if (mode == JobRunModes.Full)
+            {
+                //----------------------------------------------------------------------
+                // Process taxa
+                //----------------------------------------------------------------------
+                _logger.LogInformation("Start processing taxonomy");
+
+                if (!await _processTaxaJob.RunAsync())
+                {
+                    _logger.LogError("Failed to process taxonomy");
+                    return null;
+                }
+                _taxonCache.Clear();
+                _logger.LogInformation("Finish processing taxonomy");
+            }
+
+            //--------------------------------------
+            // Get taxonomy
+            //--------------------------------------
+            _logger.LogInformation("Start getting processed taxa");
+
+            var taxa = await _taxonCache.GetAllAsync();
+            if (!taxa?.Any() ?? true)
+            {
+                _logger.LogWarning("Failed to get processed taxa");
+                return null;
+            }
+
+            var taxonById = taxa.ToDictionary(m => m.Id, m => m);
+            _logger.LogInformation("Finish getting processed taxa");
+
+            return taxonById;
+        }
+
+        private async Task InitializeAreaHelperAsync(JobRunModes mode)
+        {
+            _logger.LogDebug("Start initialize area cache");
+            await _areaHelper.InitializeAsync();
+            _logger.LogDebug("Finish initialize area cache");
+        }
+
+        private async Task InitializeMongoDbCollections(JobRunModes mode, bool cleanStart)
+        {
+            if (cleanStart && mode == JobRunModes.Full)
+            {
+                _logger.LogInformation(
+                    $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                await _processedObservationRepository.ClearCollectionAsync();
+               
+                _logger.LogInformation(
+                    $"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+            }
+            else
+            {
+                _logger.LogInformation("Start ensure collection exists");
+                // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
+                await _processedObservationRepository.VerifyCollectionAsync();
+                _logger.LogInformation("Finish ensure collection exists");
+            }
+
+            _logger.LogInformation("Start disable indexing");
+            await _processedObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation("Finish disable indexing");
+
+            await _validationManager.VerifyCollectionAsync(mode);
+        }
+
         /// <summary>
         ///  Run process job
         /// </summary>
@@ -88,79 +157,23 @@ namespace SOS.Process.Jobs
                     return false;
                 }
 
-                // Use current taxa if we are in incremental mode, to speed things up
-                if (mode == JobRunModes.Full)
-                {
-                    //----------------------------------------------------------------------
-                    // 3. Process taxa
-                    //----------------------------------------------------------------------
-                    _logger.LogInformation("Start processing taxonomy");
+                //----------------------------------------------------------------------
+                // 3. Initialization of meta data etc
+                //----------------------------------------------------------------------
+                var getTaxaTask = GetTaxa(mode);
+                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(mode), InitializeMongoDbCollections(mode, cleanStart));
 
-                    if (!await _processTaxaJob.RunAsync())
-                    {
-                        _logger.LogError("Failed to process taxonomy");
-                        return false;
-                    }
-                    _taxonCache.Clear();
-                    _logger.LogInformation("Finish processing taxonomy");
-                }
+                var taxonById = await getTaxaTask;
 
-                //--------------------------------------
-                // 4. Get taxonomy
-                //--------------------------------------
-                 _logger.LogInformation("Start getting processed taxa");
-                
-                var taxa = await _taxonCache.GetAllAsync();
-                if (!taxa?.Any() ?? true)
+                if ((taxonById?.Count ?? 0) == 0)
                 {
-                    _logger.LogWarning("Failed to get processed taxa");
                     return false;
                 }
 
-                var taxonById = taxa.ToDictionary(m => m.Id, m => m);
-                cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogInformation("Finish getting processed taxa");
-
-                //------------------------------------------------------------------------
-                // 5. Ensure ElasticSearch (ES) index ProcessedObservation-{0/1} exists
-                //    Also empty the MongoDb collection InvalidObservation-{0/1}
-                //
-                // If cleanStart == true => Always clear the ES index.
-                // If cleanStart == false => Keep existing data. Just create ES index if it doesn't exist.
-                //------------------------------------------------------------------------
-                bool newCollection;
-                if (cleanStart && mode == JobRunModes.Full)
-                {
-                    _logger.LogInformation(
-                        $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
-                    await _processedObservationRepository.ClearCollectionAsync();
-                    newCollection = true;
-                    _logger.LogInformation(
-                        $"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
-                }
-                else
-                {
-                    _logger.LogInformation("Start ensure collection exists");
-                    // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
-                    newCollection = await _processedObservationRepository.VerifyCollectionAsync();
-                    _logger.LogInformation("Finish ensure collection exists");
-                }
-
-                _logger.LogInformation("Start disable indexing");
-                await _processedObservationRepository.DisableIndexingAsync();
-                _logger.LogInformation("Finish disable indexing");
-
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                //--------------------------------------
-                // 6.  Verify MongoDB InvalidObservation-{0/1} collection.
-                //--------------------------------------
-                await _validationManager.VerifyCollectionAsync(mode);
-
-                cancellationToken?.ThrowIfCancellationRequested();
-                
                 //------------------------------------------------------------------------
-                // 7. Create observation processing tasks, and wait for them to complete
+                // 4. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
                 if (mode == JobRunModes.Full)
                 {
@@ -187,10 +200,8 @@ namespace SOS.Process.Jobs
 
                 if (mode == JobRunModes.Full)
                 {
-                    _logger.LogInformation("Finish updating process info for observations");
-
                     //----------------------------------------------------------------------------
-                    // 11. If a data provider failed to process and it was not Artportalen,
+                    // 5. If a data provider failed to process and it was not Artportalen,
                     //     then try to copy that data from the active instance.
                     //----------------------------------------------------------------------------
 
@@ -210,7 +221,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //---------------------------------
-                // 12. Create ElasticSearch index
+                // 6. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
@@ -239,7 +250,7 @@ namespace SOS.Process.Jobs
                         }
                         
                         //----------------------------------------------------------------------------
-                        // 13. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
                         var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
 
@@ -259,14 +270,8 @@ namespace SOS.Process.Jobs
 
                 _logger.LogInformation($"Processing done: {success}");
 
-                //------------------------
-                // 14. Store area cache
-                //------------------------
-                _logger.LogDebug("Persist area cache");
-                _areaHelper.PersistCache();
-
                 //-------------------------------
-                // 15. Return processing result
+                // 8. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception("Failed to process observations.");
             }

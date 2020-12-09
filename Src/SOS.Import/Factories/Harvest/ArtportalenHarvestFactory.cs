@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -50,7 +48,7 @@ namespace SOS.Import.Factories.Harvest
             if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
             {
                 // Try to set parent site name if empty
-                if (site.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
+                if (site?.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
                 {
                     if (_sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
                     {
@@ -197,6 +195,11 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
         {
+            if (entity == null)
+            {
+                return null;
+            }
+
             return new ProjectParameter
             {
                 Id = entity.ProjectParameterId,
@@ -346,8 +349,12 @@ namespace SOS.Import.Factories.Harvest
                 var siteEntity = siteEntities.First();
 
                 var site = CastSiteEntityToVerbatim(siteEntity, siteBirdValidationAreaIds);
-
-                sites.Add(site);
+                
+                if (site != null)
+                {
+                    sites.Add(site);
+                }
+               
                 siteEntities.Remove(siteEntity);
             }
 
@@ -362,6 +369,11 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private Site CastSiteEntityToVerbatim(SiteEntity entity, IDictionary<int, ICollection<string>> siteBirdValidationAreaIds)
         {
+            if (entity == null)
+            {
+                return null;
+            }
+
             Point wgs84Point = null;
             const int defaultAccuracy = 100;
 
@@ -416,6 +428,11 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private static IEnumerable<SightingRelation> CastSightingRelationsToVerbatim(IEnumerable<SightingRelationEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
             return from e in entities
                    select new SightingRelation
                    {

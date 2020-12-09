@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Helpers.Interfaces
@@ -24,8 +25,9 @@ namespace SOS.Lib.Helpers.Interfaces
         void ClearCache();
 
         /// <summary>
-        ///     Save cache so we can use it after restart
+        /// Make sure cache is initialized
         /// </summary>
-        void PersistCache();
+        /// <returns></returns>
+        Task InitializeAsync();
     }
 }
