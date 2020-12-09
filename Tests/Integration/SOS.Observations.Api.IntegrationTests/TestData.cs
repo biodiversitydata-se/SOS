@@ -8,6 +8,13 @@ namespace SOS.Observations.Api.IntegrationTests
 {
     public static class TestData
     {
+        public static class TaxonIds
+        {
+            public static readonly int Otter = 100077;
+            public static readonly int Mammalia = 4000107;
+            public static readonly int Wolf = 100024;
+        }
+
         public static class Areas
         {
             /// <summary>

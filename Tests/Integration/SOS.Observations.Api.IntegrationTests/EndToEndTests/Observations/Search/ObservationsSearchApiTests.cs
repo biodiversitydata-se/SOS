@@ -27,8 +27,8 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto() {TaxonIds = new List<int>() {100077}, IncludeUnderlyingTaxa = true},
-                Date = new DateFilterDto()
+                Taxon = new TaxonFilterDto {TaxonIds = new List<int> {TestData.TaxonIds.Otter}, IncludeUnderlyingTaxa = true},
+                Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto() { TaxonIds = new List<int>() { 100077 }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Areas = new[]
                 {
                     TestData.Areas.TranasMunicipality, // Tranås Municipality
@@ -95,7 +95,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto() { TaxonIds = new List<int>() { 100024 }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
                 OnlyValidated = false,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
