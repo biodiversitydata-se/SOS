@@ -11,6 +11,8 @@ using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -87,7 +89,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunExportAndSendJob([FromBody] ExportFilter filter)
+        public async Task<IActionResult> RunExportAndSendJob([FromBody] ExportFilterDto filter)
         {
             try
             {
@@ -105,7 +107,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest("Not a valid e-mail");
                 }
 
-                var matchCount = await _observationManager.GetMatchCountAsync(filter);
+                var exportFilter = filter.ToExportFilter("en-GB");
+                var matchCount = await _observationManager.GetMatchCountAsync(exportFilter);
 
                 if (matchCount == 0)
                 {
@@ -118,7 +121,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(filter, email, JobCancellationToken.Null)));
+                    job.RunAsync(null, email, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
