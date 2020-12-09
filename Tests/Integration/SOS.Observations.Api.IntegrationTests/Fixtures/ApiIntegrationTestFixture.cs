@@ -8,6 +8,8 @@ using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Managers;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.Managers;
@@ -78,7 +80,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager taxonManager)
         {
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-            var filterManager = new FilterManager(taxonManager, areaRepository);
+            var areaCache = new AreaCache(areaRepository);
+            var filterManager = new FilterManager(taxonManager, areaCache);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
                 filterManager, new NullLogger<ObservationManager>());
 
@@ -103,7 +106,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processClient,
                 elasticConfiguration, 
                 new TelemetryClient(), 
-                new NullLogger<Repositories.ProcessedObservationRepository>());
+                new NullLogger<Repositories.ProcessedObservationRepository>(),
+                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())));
             return processedObservationRepository;
         }
     }

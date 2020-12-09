@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
@@ -60,7 +61,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto() { TaxonIds = new List<int>() { 100077 }, IncludeUnderlyingTaxa = true },
-                AreaIds = new List<int>() { 7, 283 },
+                Areas = new [] { new AreaFilterDto{ Type = AreaType.Municipality, FeatureId = "687" } },
                 Date = new DateFilterDto()
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
@@ -79,7 +80,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Searc
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.First().Taxon.VernacularName.Should().Be("utter", "because otter has the swedish vernacular name 'utter'");
-            result.Records.First().Location.Municipality.Value.Should().Be("Tranås", "because the Area search is limited to Tranås municipality");
+            result.Records.First().Location.Municipality.Name.Should().Be("Tranås", "because the Area search is limited to Tranås municipality");
         }
 
         [Fact]
