@@ -37,29 +37,23 @@ namespace SOS.Process.Processors.VirtualHerbarium
             {
                 var batchId = 0;
                 var processedCount = 0;
-                var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
                 ICollection<Observation> observations = new List<Observation>();
+                var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
+                
                 using var cursor = await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
 
                 // Process and commit in batches.
                 await cursor.ForEachAsync(async verbatimObservation =>
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    
                     var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
 
                     if (processedObservation != null)
                     {
-                        if (processedObservation.Location.DecimalLatitude > 70 ||
-                            processedObservation.Location.DecimalLatitude < 55 ||
-                            processedObservation.Location.DecimalLongitude < 10 ||
-                            processedObservation.Location.DecimalLongitude > 25)
-                        {
-                            var st = true;
-                        }
-
                         _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
-
                         observations.Add(processedObservation);
+
                         if (IsBatchFilledToLimit(observations.Count))
                         {
                             cancellationToken?.ThrowIfCancellationRequested();

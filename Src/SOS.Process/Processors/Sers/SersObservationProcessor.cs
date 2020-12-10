@@ -69,9 +69,12 @@ namespace SOS.Process.Processors.Sers
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
+                cancellationToken?.ThrowIfCancellationRequested();
+
                 var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
+
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
