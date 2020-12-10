@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take);
 
         /// <summary>
         /// Get aggregated grid cells data.

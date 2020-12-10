@@ -68,7 +68,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace SOS.Observations.Api.Managers
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
 
                 if(aggregationType.IsSpeciesSightingsList())
-                    return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take, sortBy, sortOrder);
+                    return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
                 return null;
             }

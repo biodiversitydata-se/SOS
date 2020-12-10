@@ -80,8 +80,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             AggregationType aggregationType,
             int skip,
             int take,
-            string sortBy,
-            SearchSortOrder sortOrder, 
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE");
 

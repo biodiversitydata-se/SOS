@@ -310,8 +310,6 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
-            [FromQuery] string sortBy = "",
-            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
@@ -320,7 +318,6 @@ namespace SOS.Observations.Api.Controllers
                 var paramsValidationResult = Result.Combine(
                     ValidatePagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
 
                 if (paramsValidationResult.IsFailure)
@@ -328,7 +325,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take, sortBy, sortOrder);
+                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
