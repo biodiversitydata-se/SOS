@@ -33,7 +33,7 @@ export default function main() {
     "Content-Type": "application/json",
   };
   //let environmentUrl = "https://localhost:44380";
-  let environmentUrl = "https://sos-search-st.artdata.slu.se";
+  let environmentUrl = "https://sos-search.artdata.slu.se";
   group("Searches", function () {
     group("Otters in Tranaes", function () {
       let response;
