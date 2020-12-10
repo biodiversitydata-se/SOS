@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.ApplicationInsights;
@@ -157,11 +156,6 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return null;
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
             
@@ -226,13 +220,8 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return null;
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
 
@@ -378,11 +367,6 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return 0;
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
@@ -531,7 +515,6 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query)
                     )
                 )
-            
             );
             if (!searchResponse.IsValid)
             {
