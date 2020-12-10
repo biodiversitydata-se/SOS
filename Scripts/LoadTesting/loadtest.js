@@ -3,7 +3,8 @@ import http from "k6/http";
 
 export let options = {
   stages: [
-    { duration: '3m', target: 60 }, // ramp-down to 60 users over 3 minutes (peak hour ends)
+ 
+    { duration: '3m', target: 100 }, // ramp-up to 100 users over 3 minutes (peak hour starts)
 
   ],
   thresholds: {

@@ -28,4 +28,4 @@ add-type @"
 $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
 [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
 
-Invoke-WebRequest -Uri 'https://artsearch2-1-test.artdata.slu.se:9200/sos-st-loadtests-summaries/_doc?pretty&refresh' -Headers $headers -ContentType "application/json" -Method Post -Body $jsonString
+Invoke-WebRequest -UseBasicParsing -Uri 'https://artsearch2-1-test.artdata.slu.se:9200/sos-st-loadtests-summaries/_doc?pretty&refresh' -Headers $headers -ContentType "application/json" -Method Post -Body $jsonString
