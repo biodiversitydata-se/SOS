@@ -269,14 +269,13 @@ namespace SOS.Observations.Api
 
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-            services.AddSingleton<IElasticClient>(elasticConfiguration.GetClient());
+            services.AddScoped<IElasticClient, ElasticClient>(p=>elasticConfiguration.GetClient());
             
             // Processed Mongo Db
             var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
-            services.AddSingleton<IProcessClient>(processClient);
+            services.AddScoped<IProcessClient, ProcessClient>(p=> new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
+                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
             var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
                 .Get<BlobStorageConfiguration>();
