@@ -17,6 +17,7 @@ import { StatusComponent } from './status/status.component';
 import { InvalidMapComponent } from './invalid-map/invalid-map.component';
 import { FunctionalTestsComponent } from './functional-tests/functional-tests.component';
 import { PerformanceChartComponent } from './performance-chart/performance-chart.component';
+import { LoadTestComponent } from './load-test/load-test.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { PerformanceChartComponent } from './performance-chart/performance-chart
     StatusComponent,
     InvalidMapComponent,
     FunctionalTestsComponent,
-    PerformanceChartComponent
+    PerformanceChartComponent,
+    LoadTestComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -40,6 +42,7 @@ import { PerformanceChartComponent } from './performance-chart/performance-chart
       { path: 'status', component: StatusComponent },
       { path: 'test', component: FunctionalTestsComponent },
       { path: 'stats', component: PerformanceChartComponent },
+      { path: 'loadtest', component: LoadTestComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,
