@@ -27,6 +27,6 @@ Write-Host "Total number of metrics ${lineCount}"
 $index = 0;
 foreach($line in $lines){    
     Write-Host "Posting metric: ${index}/${lineCount}"    
-    Invoke-WebRequest -Uri 'https://artsearch2-1-test.artdata.slu.se:9200/sos-st-loadtests-metrics/_doc?pretty&refresh' -Headers $headers -ContentType "application/json" -Method Post -Body $line
+    Invoke-WebRequest -UseBasicParsing -Uri 'https://artsearch2-1-test.artdata.slu.se:9200/sos-st-loadtests-metrics/_doc?pretty&refresh' -Headers $headers -ContentType "application/json" -Method Post -Body $line
     $index++;
 }
