@@ -4,7 +4,7 @@ import http from "k6/http";
 export let options = {
   stages: [
     { duration: '1m', target: 200 }, // simulate ramp-up of traffic from 1 to 100 users over 1 minute.
-    { duration: '12m', target: 200 }, // stay at 100 users for 10 minutes
+    { duration: '1m', target: 200 }, // stay at 100 users for 10 minutes
     { duration: '1m', target: 0 }, // ramp-down to 0 users
   ],
   thresholds: {
@@ -33,7 +33,7 @@ export default function main() {
     "Content-Type": "application/json",
   };
   //let environmentUrl = "https://localhost:44380";
-  let environmentUrl = "https://sos-search-st.artdata.slu.se";
+  let environmentUrl = "https://sos-search.artdata.slu.se";
   group("Searches", function () {
     group("Otters in Tranaes", function () {
       let response;
