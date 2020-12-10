@@ -21,8 +21,12 @@ add-type @"
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 $AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
 [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
-
-foreach($line in Get-Content -Path .\test.json){    
-    Write-Host $line
+$lines = Get-Content -Path .\test.json
+$lineCount = $lines.Length
+Write-Host "Total number of metrics ${lineCount}"
+$index = 0;
+foreach($line in $lines){    
+    Write-Host "Posting metric: ${index}/${lineCount}"    
     Invoke-WebRequest -Uri 'https://artsearch2-1-test.artdata.slu.se:9200/sos-st-loadtests-metrics/_doc?pretty&refresh' -Headers $headers -ContentType "application/json" -Method Post -Body $line
+    $index++;
 }

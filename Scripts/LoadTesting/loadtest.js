@@ -3,13 +3,8 @@ import http from "k6/http";
 
 export let options = {
   stages: [
-    { duration: '5m', target: 60 }, // simulate ramp-up of traffic from 1 to 60 users over 5 minutes.
-    { duration: '10m', target: 60 }, // stay at 60 users for 10 minutes
-    { duration: '3m', target: 100 }, // ramp-up to 100 users over 3 minutes (peak hour starts)
-    { duration: '2m', target: 100 }, // stay at 100 users for short amount of time (peak hour)
     { duration: '3m', target: 60 }, // ramp-down to 60 users over 3 minutes (peak hour ends)
-    { duration: '10m', target: 60 }, // continue at 60 for additional 10 minutes
-    { duration: '5m', target: 0 }, // ramp-down to 0 users
+
   ],
   thresholds: {
     RTT: ['p(99)<3000', 'p(70)<2500', 'avg<2000', 'med<1500', 'min<1000'],
