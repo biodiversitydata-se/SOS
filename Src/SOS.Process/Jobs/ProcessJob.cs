@@ -111,15 +111,15 @@ namespace SOS.Process.Jobs
             }
             else
             {
-                _logger.LogInformation("Start ensure collection exists");
+                _logger.LogInformation($"Start ensure collection exists ({_processedObservationRepository.IndexName})");
                 // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
                 await _processedObservationRepository.VerifyCollectionAsync();
-                _logger.LogInformation("Finish ensure collection exists");
+                _logger.LogInformation($"Finish ensure collection exists ({_processedObservationRepository.IndexName})");
             }
 
-            _logger.LogInformation("Start disable indexing");
+            _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.IndexName})");
             await _processedObservationRepository.DisableIndexingAsync();
-            _logger.LogInformation("Finish disable indexing");
+            _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.IndexName})");
 
             await _validationManager.VerifyCollectionAsync(mode);
         }
@@ -225,14 +225,14 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    _logger.LogInformation("Start enable indexing");
+                    _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.IndexName})");
                     await _processedObservationRepository.EnableIndexingAsync();
-                    _logger.LogInformation("Finish enable indexing");
+                    _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.IndexName})");
 
                     // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
-                        _logger.LogInformation("Toggle instance");
+                        _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstanceName} => {_processedObservationRepository.InactiveInstanceName}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
                     }
@@ -268,7 +268,7 @@ namespace SOS.Process.Jobs
                     }
                 }
 
-                _logger.LogInformation($"Processing done: {success}");
+                _logger.LogInformation($"Processing done: {success} {mode}");
 
                 //-------------------------------
                 // 8. Return processing result

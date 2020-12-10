@@ -55,36 +55,43 @@ namespace SOS.Process.Processors
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
+            Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
                 if (mode == JobRunModes.Full)
                 {
-                    Logger.LogDebug($"Start deleting {dataProvider} data");
+                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
                     if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
                     {
-                        Logger.LogError($"Failed to delete {dataProvider} data");
+                        Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
                         return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
                     }
 
-                    Logger.LogDebug($"Finish deleting {dataProvider} data");
+                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
                 }
-                
-                Logger.LogDebug($"Start processing {dataProvider} data");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to delete {dataProvider.Identifier} sightings");
+            }
+
+            try
+            {
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
                 var verbatimCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
-                Logger.LogInformation($"Finish processing {dataProvider} data.");
+                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
             {
-                Logger.LogInformation($"{dataProvider} observation processing was canceled.");
+                Logger.LogInformation($"{dataProvider.Identifier} observation processing was canceled.");
                 return ProcessingStatus.Cancelled(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to process {dataProvider} sightings");
+                Logger.LogError(e, $"Failed to process {dataProvider.Identifier} sightings");
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
         }
