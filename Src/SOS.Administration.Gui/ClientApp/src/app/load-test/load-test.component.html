@@ -1,0 +1,9 @@
+<div *ngIf="loadtestresults">
+  <h2>Checks:</h2>
+  <h5>Passed:{{loadtestresults.metrics.checks.passes}}</h5>
+  <h5>Failed:{{loadtestresults.metrics.checks.fails}}</h5>
+  <h2>Iterations:</h2>
+  <h5>Count:{{loadtestresults.metrics.iterations.count}}</h5>
+  <h5>Rate:{{loadtestresults.metrics.iterations.rate}}</h5>
+  <h5>Average duration:{{loadtestresults.metrics.iteration_duration.avg}}ms</h5>
+</div>

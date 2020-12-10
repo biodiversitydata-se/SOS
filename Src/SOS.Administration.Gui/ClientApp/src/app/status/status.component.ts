@@ -97,7 +97,7 @@ export class StatusComponent implements OnInit {
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
-  activeInstanceHarvestIsOlderThanOneDay = false;
+  activeInstanceHarvestIsOlderThanOneDay = false;    
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -133,7 +133,7 @@ export class StatusComponent implements OnInit {
     
     this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
       this.searchindexinfo = result;
-    }, error => console.error(error));
+    }, error => console.error(error)); 
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
     }, error => console.error(error));
