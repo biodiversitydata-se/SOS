@@ -73,6 +73,7 @@ namespace SOS.Lib.Managers
         /// Checks if an observation is valid or not.
         /// </summary>
         /// <param name="observation"></param>
+        /// <param name="dataProvider"></param>
         /// <returns></returns>
         public InvalidObservation ValidateObservation(Observation observation, DataProvider dataProvider)
         {

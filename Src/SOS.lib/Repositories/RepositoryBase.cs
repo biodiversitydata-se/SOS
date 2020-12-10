@@ -433,7 +433,7 @@ namespace SOS.Lib.Repositories
             bool noCursorTimeout = false)
         {
             return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
-                new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true,  });
+                new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable });
         }
 
         /// <inheritdoc />

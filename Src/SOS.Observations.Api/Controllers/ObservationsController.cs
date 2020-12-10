@@ -191,7 +191,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Max number of observations to return</param>
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns>List of matching observations</returns>
         /// <example>
@@ -250,7 +250,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Max number of observations to return</param>
         /// <param name="sortBy">Field to sort by</param>
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns>List of matching observations</returns>
         /// <example>
@@ -375,7 +375,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
@@ -459,7 +459,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationInternal")]
@@ -514,7 +514,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationGeoJson")]
@@ -571,7 +571,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
@@ -627,7 +627,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">No validation of filter properties will be made if this is set to true</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregationInternal")]
