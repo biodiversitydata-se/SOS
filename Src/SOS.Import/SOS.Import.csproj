@@ -129,9 +129,6 @@
     <None Update="Resources\Vocabularies\CountryVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Vocabularies\CountyVocabulary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Vocabularies\DeterminationMethodVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -150,16 +147,7 @@
     <None Update="Resources\Vocabularies\LifeStageVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Vocabularies\MunicipalityVocabulary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Vocabularies\OccurrenceStatusVocabulary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Vocabularies\ParishVocabulary.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Vocabularies\ProvinceVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vocabularies\SubstrateVocabulary.json">
