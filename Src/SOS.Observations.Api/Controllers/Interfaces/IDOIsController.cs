@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
@@ -14,6 +14,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>Object with these properties: fileName, jobId</returns>
-        Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilter filter);
+        Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilterDto filter);
     }
 }

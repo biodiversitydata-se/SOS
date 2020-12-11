@@ -2,14 +2,17 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -20,9 +23,8 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     [Route("[controller]")]
     [Authorize/*(Roles = "Privat")*/]
-    public class DOIsController : ControllerBase, IDOIsController
+    public class DOIsController : ObservationBaseController, IDOIsController
     {
-        private readonly IObservationManager _observationManager;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
 
@@ -32,11 +34,11 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationManager"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
-        public DOIsController(IObservationManager observationManager, 
+        public DOIsController(IObservationManager observationManager,
+            ITaxonManager taxonManager,
             ObservationApiConfiguration observationApiConfiguration,
-            ILogger<ExportsController> logger)
+            ILogger<ExportsController> logger) : base(observationManager, taxonManager)
         {
-            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _exportObservationsLimit = observationApiConfiguration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -46,12 +48,21 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilter filter)
+        public async Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilterDto filter)
         {
             try
             {
+                var validationResults = Result.Combine(
+                    ValidateSearchFilter(filter));
+
+                if (validationResults.IsFailure)
+                {
+                    return BadRequest(validationResults.Error);
+                }
+
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-                var matchCount = await _observationManager.GetMatchCountAsync(filter);
+                var exportFilter = filter.ToExportFilter("en-GB");
+                var matchCount = await ObservationManager.GetMatchCountAsync(exportFilter);
 
                 if (matchCount == 0)
                 {
@@ -63,10 +74,8 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
                 }
 
-                // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
-
                 var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
-                    job.RunAsync(filter, creatorEmail, JobCancellationToken.Null));
+                    job.RunAsync(exportFilter, creatorEmail, JobCancellationToken.Null));
 
                 return new OkObjectResult(new { jobId });
             }

@@ -911,11 +911,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 case VocabularyId.Gender:
                     return "sex";
-                case VocabularyId.County:
-                    return "county";
-                case VocabularyId.Municipality:
-                    return "municipality";
-                case VocabularyId.Province:
                     return "stateProvince";
                 case VocabularyId.BasisOfRecord:
                     return "basisOfRecord";

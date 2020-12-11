@@ -22,9 +22,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var sb = new StringBuilder();
             foreach (var vocabularity in processedVocabularies)
             {
-                if (vocabularity.Id == VocabularyId.Municipality ||
-                    vocabularity.Id == VocabularyId.Parish)
-                    continue;
                 sb.Append(CreateEnum(vocabularity));
                 sb.AppendLine();
             }
