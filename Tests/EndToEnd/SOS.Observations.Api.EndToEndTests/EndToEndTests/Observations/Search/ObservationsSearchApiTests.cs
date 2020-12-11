@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.Search
+namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
 {
     public class ObservationsSearchApiTests : IClassFixture<ApiEndToEndTestFixture>
     {

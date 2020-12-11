@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using SOS.Observations.Api.IntegrationTests.EndToEndTests;
+using SOS.Observations.Api.EndToEndTests.EndToEndTests;
 using SOS.TestHelpers;
 
-namespace SOS.Observations.Api.IntegrationTests.Fixtures
+namespace SOS.Observations.Api.EndToEndTests.Fixtures
 {
     public class ApiEndToEndTestFixture : FixtureBase, IDisposable
     {
