@@ -16,3 +16,6 @@ html {
 .box-shadow {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
+.header-image{
+    background-image:url("../../assets/head.png")
+}
