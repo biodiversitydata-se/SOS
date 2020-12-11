@@ -133,21 +133,38 @@
     </div>
     <hr />
     <div class="row">
-      <div class="col-sm">
+      <div class="col-sm" *ngIf="searchindexinfo">
         <h2>Disk usage Elasticsearch</h2>
-        <ag-grid-angular *ngIf="searchindexinfo" style="height: 200px;"
-                         class="ag-theme-alpine"
-                         [rowData]="searchindexinfo.allocations"
-                         [columnDefs]="searchIndexColumnDefs">
-        </ag-grid-angular>
+        <div *ngFor="let disk of searchindexinfo.allocations">
+          <h5>{{disk.node}}</h5>
+          <mwl-gauge [max]="100"
+                     [min]="0"
+                     [dialStartAngle]="180"
+                     [dialEndAngle]="0"
+                     [value]="disk.percentage"
+                     [animated]="true"
+                     [label]="gaugeLabelFunction"
+                     [color]="gaugeColorFunction"
+                     [animationDuration]="1">
+          </mwl-gauge>
+          Used: {{disk.diskUsed }}
+          Total: {{disk.diskTotal }}
+        </div>       
       </div>
-      <div class="col-sm">
+      <div class="col-sm" *ngIf="mongodbinfo">
         <h2>Disk usage MongoDb</h2>
-        <ag-grid-angular *ngIf="mongodbinfo" style="height: 200px;"
-                         class="ag-theme-alpine"
-                         [rowData]="mongodbinfo"
-                         [columnDefs]="mongodbInfoColumnDefs">
-        </ag-grid-angular>        
+        <mwl-gauge [max]="100"
+                   [min]="0"
+                   [dialStartAngle]="180"
+                   [dialEndAngle]="0"
+                   [value]="mongodbinfo[0].percentage"
+                   [animated]="true"
+                   [label]="gaugeLabelFunction"
+                   [color]="gaugeColorFunction"
+                   [animationDuration]="1">
+        </mwl-gauge>
+        Used: {{mongodbinfo[0].diskUsed / 1000000 | number}}GB
+        Total: {{mongodbinfo[0].diskTotal / 1000000 | number}}GB
       </div>
       <div class="col-sm">
         <h2>Tests</h2>

@@ -12,7 +12,7 @@ export class LoadTestComponent implements OnInit {
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) { }
 
   ngOnInit() {
-    this.http.get<LoadTestResult>(this.baseUrl + 'assets/summary-export.json').subscribe(result => {
+    this.http.get<LoadTestResult>(this.baseUrl + 'performance/loadtestsummary').subscribe(result => {
       this.loadtestresults = result;
     }, error => console.error(error));
   }
