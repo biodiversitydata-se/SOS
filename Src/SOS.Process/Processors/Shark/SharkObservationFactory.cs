@@ -96,7 +96,7 @@ namespace SOS.Process.Processors.Shark
                 Occurrence = new Occurrence
                 {
                     CatalogNumber = verbatim.SharkSampleId,
-                    OccurrenceId = verbatim.SharkSampleId,
+                    OccurrenceId = $"urn:lsid:shark:Sighting:{verbatim.SharkSampleId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
