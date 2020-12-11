@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.TaxonAggregation
+namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAggregation
 {
     public class TaxonAggregationApiTests : IClassFixture<ApiEndToEndTestFixture>
     {
