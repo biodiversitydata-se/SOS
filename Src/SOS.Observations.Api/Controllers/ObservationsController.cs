@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -27,142 +25,9 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ObservationsController : ControllerBase, IObservationsController
+    public class ObservationsController : ObservationBaseController, IObservationsController
     {
-        private const int MaxBatchSize = 1000;
-        private const int ElasticSearchMaxRecords = 10000;
-        private readonly IObservationManager _observationManager;
-        private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ObservationsController> _logger;
-
-
-        private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
-        {
-            if (zoom < minLimit || zoom > maxLimit)
-            {
-                return Result.Failure<int>($"Zoom must be between {minLimit} and {maxLimit}");
-            }
-
-            return Result.Success(zoom);
-        }
-
-        private Result ValidatePagingArguments(int skip, int take)
-        {
-            if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
-            if (take <= 0) return Result.Failure("Take must be greater than 0");
-            if (skip + take > _observationManager.MaxNrElasticSearchAggregationBuckets)
-                return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
-
-            return Result.Success();
-        }
-
-        private Result ValidatePropertyExists(string name, string property, bool mandatory = false)
-        {
-            if (string.IsNullOrEmpty(property))
-            {
-                return mandatory ? Result.Failure($"You must state { name }") : Result.Success();
-            }
-
-            if (typeof(Observation).HasProperty(property))
-            {
-                return Result.Success();
-            }
-
-            return Result.Failure($"Missing property ({ property }) used for { name }");
-        }
-
-        private Result ValidateSearchFilter(SearchFilterBaseDto filter)
-        {
-            var errors = new List<string>();
-
-            var searchFilter = filter as SearchFilterDto;
-            if (searchFilter?.OutputFields?.Any() ?? false)
-            {
-                errors.AddRange(searchFilter.OutputFields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
-            }
-            
-            var searchFilterInternal = filter as SearchFilterInternalDto;
-            if (searchFilterInternal?.OutputFields?.Any() ?? false)
-            {
-                errors.AddRange(searchFilterInternal.OutputFields
-                    .Where(of => !typeof(Observation).HasProperty(of))
-                    .Select(of => $"Output field doesn't exist ({of})"));
-            }
-            
-            if ((filter.Taxon?.TaxonIds?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
-            {
-                errors.AddRange(filter.Taxon.TaxonIds
-                    .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
-                    .Select(tid => $"TaxonId doesn't exist ({tid})"));
-            }
-
-            if (filter.Taxon?.RedListCategories?.Any() ?? false)
-            {
-                errors.AddRange(filter.Taxon.RedListCategories
-                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
-                    .Select(rc => $"Red list category doesn't exist ({rc})"));
-            }
-            if(filter.Date?.DateFilterType == DateFilterTypeDto.OnlyStartDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
-            {
-                errors.Add("When using OnlyStartDate as filter both StartDate and EndDate need to be specified");
-            }
-            if (filter.Date?.DateFilterType == DateFilterTypeDto.OnlyEndDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
-            {
-                errors.Add("When using OnlyEndDate as filter both StartDate and EndDate need to be specified");
-            }
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateSearchPagingArguments(int skip, int take)
-        {
-            var errors = new List<string>();
-
-            if (skip < 0 || take <= 0 || take > MaxBatchSize)
-            {
-                errors.Add($"You can't take more than {MaxBatchSize} at a time.");
-            }
-
-            if (skip + take > ElasticSearchMaxRecords)
-            {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateSearchPagingArgumentsInternal(int skip, int take)
-        {
-            var errors = new List<string>();
-
-            if (skip + take > ElasticSearchMaxRecords)
-            {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
-            }
-
-            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
-            return Result.Success();
-        }
-
-        private Result ValidateTranslationCultureCode(string translationCultureCode)
-        {
-            // No culture code, set default
-            if (string.IsNullOrEmpty(translationCultureCode))
-            {
-                translationCultureCode = "sv-SE";
-            }
-
-            if (!new[] { "sv-SE", "en-GB" }.Contains(translationCultureCode,
-                StringComparer.CurrentCultureIgnoreCase))
-            {
-               return Result.Failure("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
-            }
-
-            return Result.Success();
-        }
 
         /// <summary>
         ///     Constructor
@@ -173,10 +38,8 @@ namespace SOS.Observations.Api.Controllers
         public ObservationsController(
             IObservationManager observationManager,
             ITaxonManager taxonManager,
-            ILogger<ObservationsController> logger)
+            ILogger<ObservationsController> logger) : base(observationManager, taxonManager)
         {
-            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -228,7 +91,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode);
-                var result = await _observationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -288,7 +151,7 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var result = await _observationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -325,7 +188,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take);
+                var result = await ObservationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -404,7 +267,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bboxOrError.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -489,7 +352,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bboxOrError.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -544,7 +407,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bboxOrError.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -601,7 +464,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bboxOrError.Value, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bboxOrError.Value, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -658,7 +521,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bboxOrError.Value, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bboxOrError.Value, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -682,7 +545,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                return new OkObjectResult(await _observationManager.GetLatestModifiedDateForProviderAsync(providerId));
+                return new OkObjectResult(await ObservationManager.GetLatestModifiedDateForProviderAsync(providerId));
             }
             catch (Exception e)
             {

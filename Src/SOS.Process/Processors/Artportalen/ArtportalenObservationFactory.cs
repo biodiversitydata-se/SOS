@@ -861,10 +861,6 @@ namespace SOS.Process.Processors.Artportalen
             {
                 case VocabularyId.Activity:
                 case VocabularyId.Gender:
-                case VocabularyId.County:
-                case VocabularyId.Municipality:
-                case VocabularyId.Parish:
-                case VocabularyId.Province:
                 case VocabularyId.LifeStage:
                 case VocabularyId.Substrate:
                 case VocabularyId.ValidationStatus:

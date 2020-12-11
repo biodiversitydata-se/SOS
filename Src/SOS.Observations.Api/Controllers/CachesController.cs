@@ -15,7 +15,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CachesController : BaseController, ICachesController
+    public class CachesController : ControllerBase, ICachesController
     {
         private readonly IAreaCache _areaCache;
         private readonly ICache<int, DataProvider> _dataProvidersCache;

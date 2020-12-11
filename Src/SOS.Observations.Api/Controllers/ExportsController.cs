@@ -3,13 +3,14 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
@@ -22,9 +23,8 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ExportsController : ControllerBase, IExportsController
+    public class ExportsController : ObservationBaseController, IExportsController
     {
-        private readonly IObservationManager _observationManager;
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
@@ -34,11 +34,15 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="blobStorageManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public ExportsController(IObservationManager observationManager, IBlobStorageManager blobStorageManager, ObservationApiConfiguration configuration, ILogger<ExportsController> logger)
+        public ExportsController(IObservationManager observationManager, 
+            IBlobStorageManager blobStorageManager, 
+            ITaxonManager taxonManager, 
+            ObservationApiConfiguration configuration, 
+            ILogger<ExportsController> logger) :base(observationManager, taxonManager)
         {
-            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportObservationsLimit = configuration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -94,21 +98,18 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-                if (string.IsNullOrEmpty(email))
+
+                var validationResults = Result.Combine(
+                    ValidateSearchFilter(filter),
+                    ValidateEmail(email));
+
+                if (validationResults.IsFailure)
                 {
-                    return BadRequest("Could not find a e-mail address");
-                }
-                
-                var emailRegex =
-                    new Regex(
-                        @"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
-                if (!emailRegex.IsMatch(email))
-                {
-                    return BadRequest("Not a valid e-mail");
+                    return BadRequest(validationResults.Error);
                 }
 
                 var exportFilter = filter.ToExportFilter("en-GB");
-                var matchCount = await _observationManager.GetMatchCountAsync(exportFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(exportFilter);
 
                 if (matchCount == 0)
                 {
