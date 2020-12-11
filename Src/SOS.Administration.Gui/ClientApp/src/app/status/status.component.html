@@ -134,7 +134,7 @@
     <hr />
     <div class="row">
       <div class="col-sm">
-        <h2>Disk usage</h2>
+        <h2>Disk usage Elasticsearch</h2>
         <ag-grid-angular *ngIf="searchindexinfo" style="height: 200px;"
                          class="ag-theme-alpine"
                          [rowData]="searchindexinfo.allocations"
@@ -142,13 +142,12 @@
         </ag-grid-angular>
       </div>
       <div class="col-sm">
-        <h2>Current processing</h2>
-        <ag-grid-angular *ngIf="processingJobsRowData.length>0" style="height: 200px;"
+        <h2>Disk usage MongoDb</h2>
+        <ag-grid-angular *ngIf="mongodbinfo" style="height: 200px;"
                          class="ag-theme-alpine"
-                         [rowData]="processingJobsRowData"
-                         [columnDefs]="processingJobsColumnDefs">
-        </ag-grid-angular>
-        <a target="_blank" [href]="hostingenvironment.hangfireUrl">Hangfire</a>
+                         [rowData]="mongodbinfo"
+                         [columnDefs]="mongodbInfoColumnDefs">
+        </ag-grid-angular>        
       </div>
       <div class="col-sm">
         <h2>Tests</h2>
@@ -170,6 +169,15 @@
         <div>
           <button type="button" class="btn btn-primary" (click)="runTests()">Rerun tests</button>
         </div>
+      </div>
+      <div class="col-sm">
+        <h2>Current processing</h2>
+        <ag-grid-angular *ngIf="processingJobsRowData.length>0" style="height: 200px;"
+                         class="ag-theme-alpine"
+                         [rowData]="processingJobsRowData"
+                         [columnDefs]="processingJobsColumnDefs">
+        </ag-grid-angular>
+        <a target="_blank" [href]="hostingenvironment.hangfireUrl">Hangfire</a>
       </div>
     </div>
     <hr />

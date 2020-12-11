@@ -103,5 +103,21 @@ namespace SOS.Administration.Gui.Controllers
             }
             return info;
         }
+        [HttpGet]
+        [Route("mongoinfo")]
+        public MongoDbInfoDto GetMongoDatabaseInfo()
+        {
+            var db = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
+            var command = new BsonDocument { { "dbStats", 1 }, { "scale", 1000 } };
+            var result = db.RunCommand<BsonDocument>(command);
+            var usedSize = result.GetValue("fsUsedSize");
+            var totalSize = result.GetValue("fsTotalSize");
+            var info = new MongoDbInfoDto()
+            {
+                DiskTotal = totalSize.ToString(),
+                DiskUsed = usedSize.ToString()
+            };
+            return info;
+        }
     }
 }
