@@ -109,8 +109,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 },
                 Occurrence = new Occurrence
                 {
-                    CatalogNumber = verbatim.AccessionNo,
-                    OccurrenceId = verbatim.AccessionNo,
+                    CatalogNumber = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}",
+                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:Sighting:{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
