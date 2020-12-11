@@ -6,9 +6,8 @@ using Newtonsoft.Json;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Configuration;
 
-namespace SOS.Observations.Api.IntegrationTests.EndToEndTests
+namespace SOS.Observations.Api.EndToEndTests.EndToEndTests
 {
     public class SosApiClient
     {
@@ -54,9 +53,9 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests
             }
         }
 
-        public async Task<GeoGridResultDto> SearchSosGeoAggregation(SearchFilterDto searchFilter)
+        public async Task<GeoGridResultDto> SearchSosGeoAggregation(SearchFilterDto searchFilter, int zoom)
         {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/geogridaggregation?zoom=10", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
+            var response = await _client.PostAsync($"{_apiUrl}Observations/geogridaggregation?zoom={zoom}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var resultString = response.Content.ReadAsStringAsync().Result;
