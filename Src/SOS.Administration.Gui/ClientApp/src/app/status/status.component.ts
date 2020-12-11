@@ -5,6 +5,7 @@ import { compareAsc } from 'date-fns/esm';
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
+import { MongoDbInfo } from '../models/mongodbinfo';
 import { PerformanceData } from '../models/performancedata';
 import { ProcessInfo } from '../models/providerinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
@@ -36,6 +37,7 @@ function dateSinceFormatter(params) {
 })
 export class StatusComponent implements OnInit {  
   searchindexinfo: SearchIndexInfo;
+  mongodbinfo: MongoDbInfo[];
   statuses = [];
   processInfo: ProcessInfo[];
 
@@ -76,8 +78,13 @@ export class StatusComponent implements OnInit {
   searchIndexColumnDefs = [      
     { field: 'node', sortable: true, filter: true, resizable: true },
     { field: 'percentage', sortable: true, filter: true, resizable: true },
-    { field: 'diskUsed', sortable: true, filter: true, resizable: true },
-    { field: 'diskAvailable', sortable: true, filter: true, resizable: true },
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },    
+    { field: 'diskTotal', sortable: true, filter: true, resizable: true },
+  ];
+  mongodbInfoColumnDefs = [
+    { field: 'node', sortable: true, filter: true, resizable: true },
+    { field: 'percentage', sortable: true, filter: true, resizable: true },
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },    
     { field: 'diskTotal', sortable: true, filter: true, resizable: true },
   ];
   processingJobsRowData = [];
@@ -133,6 +140,16 @@ export class StatusComponent implements OnInit {
     
     this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
       this.searchindexinfo = result;
+    }, error => console.error(error));
+    this.http.get<MongoDbInfo>(this.baseUrl + 'statusinfo/mongoinfo').subscribe(result => {
+      this.mongodbinfo = []
+      let info = new MongoDbInfo();
+      info.diskUsed = result.diskUsed;
+      info.diskTotal = result.diskTotal;
+      info.node = "Mongo";
+      info.percentage = (result.diskUsed / result.diskTotal) * 100;
+      info.percentage = Math.floor(info.percentage);
+      this.mongodbinfo.push(info);
     }, error => console.error(error)); 
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
