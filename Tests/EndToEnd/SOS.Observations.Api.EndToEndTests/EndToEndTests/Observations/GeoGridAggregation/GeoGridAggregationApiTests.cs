@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.IntegrationTests.Fixtures;
-using SOS.TestHelpers;
+using SOS.Observations.Api.EndToEndTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.GeoGridAggregation
+namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.GeoGridAggregation
 {
     public class GeoGridAggregationApiTests : IClassFixture<ApiEndToEndTestFixture>
     {
@@ -41,7 +40,7 @@ namespace SOS.Observations.Api.IntegrationTests.EndToEndTests.Observations.GeoGr
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await _fixture.SosApiClient.SearchSosGeoAggregation(searchFilter);
+            var result = await _fixture.SosApiClient.SearchSosGeoAggregation(searchFilter, 10);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
