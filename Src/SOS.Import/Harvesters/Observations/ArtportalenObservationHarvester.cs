@@ -138,7 +138,7 @@ namespace SOS.Import.Harvesters.Observations
 
             if (!idsToHarvest?.Any() ?? true)
             {
-                return -1;
+                return 0;
             }
 
             var harvestBatchTasks = new List<Task<int>>();
