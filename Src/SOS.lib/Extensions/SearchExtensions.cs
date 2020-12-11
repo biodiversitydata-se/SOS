@@ -35,19 +35,25 @@ namespace SOS.Lib.Extensions
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
             {
-                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.LessThanOrEquals);
-                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.GreaterThanOrEquals);
+                query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
 
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
             {
-                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.LessThanOrEquals);
+                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                {
+                    query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                    query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                }
             }
             else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
             {
-                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.GreaterThanOrEquals);
-                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                {
+                    query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                    query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                }
             }
         }
 
