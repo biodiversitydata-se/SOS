@@ -10,28 +10,33 @@ using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations.GeoGridAggregation
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
-    public class GeoGridAggregationIntegrationTests
+    public class AreasFilterIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;
 
-        public GeoGridAggregationIntegrationTests(ApiIntegrationTestFixture fixture)
+        public AreasFilterIntegrationTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task GeoGridAggregation_Mammalia()
+        public async Task Search_for_Otter_at_Location()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var searchFilter = new SearchFilterAggregationDto
+            SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { TaxonIds = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
+                Areas = new[]
+                {
+                    TestData.Areas.TranasMunicipality, // Tranås Municipality
+                    TestData.Areas.JonkopingCounty // Jönköping County
+                },
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
@@ -44,14 +49,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations.Ge
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.GeogridSearchTileBasedAggregationAsync(searchFilter, 10);
-            var result = response.GetResult<GeoGridResultDto>();
+            var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 2);
+            var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.GridCellCount.Should().BeGreaterThan(1000);
-            result.GridCells.First().ObservationsCount.Should().BeGreaterThan(1000);
+            result.Records.First().Taxon.VernacularName.Should().Be("utter", "because otter has the swedish vernacular name 'utter'");
+            result.Records.First().Location.Municipality.Name.Should().Be("Tranås", "because the Area search is limited to Tranås municipality");
         }
     }
 }

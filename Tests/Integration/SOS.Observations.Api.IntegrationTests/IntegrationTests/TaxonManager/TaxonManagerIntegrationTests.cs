@@ -2,7 +2,7 @@
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Taxon
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonManagerIntegrationTests
