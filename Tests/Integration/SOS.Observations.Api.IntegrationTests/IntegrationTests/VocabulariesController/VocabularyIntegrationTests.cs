@@ -5,7 +5,7 @@ using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Vocabularies
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.VocabulariesController
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class VocabularyIntegrationTests
