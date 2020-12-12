@@ -127,6 +127,13 @@ namespace SOS.Administration.Gui.Controllers
             return failedRequests;
         }
         [HttpGet]
+        [Route("loadtestsummary")]
+        public async Task<IEnumerable<FailedData>> GetLoadTestSummary()
+        {           
+            var failedRequests = new List<FailedData>();           
+            return failedRequests;
+        }
+        [HttpGet]
         [Route("")]
         public async Task<PerformanceData> GetPerformanceData(string interval, string timespan)
         {
