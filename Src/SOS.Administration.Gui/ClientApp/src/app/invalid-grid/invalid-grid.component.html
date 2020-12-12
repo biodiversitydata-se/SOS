@@ -1,12 +1,19 @@
 <div>
   <div *ngIf="loadingData" class="spinner-border" role="status">
     <span class="sr-only">Loading...</span>
-  </div>
-  <div *ngIf="!loadingData">{{rowData.length}} total invalid observations</div>
-  <ag-grid-angular style="height: 500px;"
-                   class="ag-theme-alpine"
-                   [pagination]="true"
-                   [rowData]="rowData"
-                   [columnDefs]="columnDefs">
-  </ag-grid-angular>
+  </div>  
+  <ngx-datatable class="bootstrap"
+                 [rows]="rowData"
+                 [columns]="columnDefs"
+                 [columnMode]="ColumnMode.force"
+                 [headerHeight]="50"
+                 [footerHeight]="50"
+                 rowHeight="auto"
+                 [externalPaging]="true"
+                 [count]="page.totalElements"
+                 [offset]="page.pageNumber"                 
+                 [limit]="page.size"
+                 (sort)="onSort($event)"
+                 (page)="setPage($event)">
+  </ngx-datatable>
 </div>
