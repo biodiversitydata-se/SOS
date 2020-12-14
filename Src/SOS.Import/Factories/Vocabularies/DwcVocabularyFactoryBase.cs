@@ -123,5 +123,47 @@ namespace SOS.Import.Factories.Vocabularies
                 .Select(m => m.Value)
                 .ToArray();
         }
+
+        protected VocabularyValueInfo CreateVocabularyValue(int id, string value)
+        {
+            return new VocabularyValueInfo
+            {
+                Id = id,
+                Value = value,
+                Localized = true,
+                Translations = CreateTranslation(value),
+                IsCustomValue = true
+            };
+        }
+
+        protected VocabularyValueInfo CreateVocabularyValue(int id, string english, string swedish)
+        {
+            return new VocabularyValueInfo
+            {
+                Id = id,
+                Value = english,
+                Localized = true,
+                Translations = CreateTranslation(english, swedish),
+                IsCustomValue = true
+            };
+        }
+
+        protected List<VocabularyValueTranslation> CreateTranslation(string english, string swedish)
+        {
+            return new List<VocabularyValueTranslation>
+            {
+                new VocabularyValueTranslation {CultureCode = "sv-SE", Value = swedish},
+                new VocabularyValueTranslation {CultureCode = "en-GB", Value = english}
+            };
+        }
+
+        protected List<VocabularyValueTranslation> CreateTranslation(string value)
+        {
+            return new List<VocabularyValueTranslation>
+            {
+                new VocabularyValueTranslation {CultureCode = "sv-SE", Value = value},
+                new VocabularyValueTranslation {CultureCode = "en-GB", Value = value}
+            };
+        }
     }
 }
