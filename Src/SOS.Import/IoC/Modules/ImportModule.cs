@@ -166,6 +166,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ActivityVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<LifeStageVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ReproductiveConditionVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BehaviorVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<BiotopeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SubstrateVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationStatusVocabularyFactory>().InstancePerLifetimeScope();
