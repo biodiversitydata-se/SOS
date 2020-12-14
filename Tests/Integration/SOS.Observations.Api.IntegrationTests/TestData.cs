@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Enums;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests
@@ -17,12 +18,12 @@ namespace SOS.Observations.Api.IntegrationTests
             /// <summary>
             /// Tranås municipality.
             /// </summary>
-            public static AreaFilterDto TranasMunicipality => new AreaFilterDto { AreaType = AreaType.Municipality, FeatureId = "687" };
+            public static AreaFilterDto TranasMunicipality => new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" };
             
             /// <summary>
             /// Jönköping county.
             /// </summary>
-            public static AreaFilterDto JonkopingCounty => new AreaFilterDto { AreaType = AreaType.County, FeatureId = "6" };
+            public static AreaFilterDto JonkopingCounty => new AreaFilterDto { AreaType = AreaTypeDto.County, FeatureId = "6" };
         }
     }
 

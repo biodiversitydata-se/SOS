@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.Areas = searchFilterBaseDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = a.AreaType });
+            filter.Areas = searchFilterBaseDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
             filter.TaxonIds = searchFilterBaseDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;

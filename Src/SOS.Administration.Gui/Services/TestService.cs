@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using SOS.Lib.Models.Search;
+﻿using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -8,13 +7,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
-using SOS.Lib.Enums;
+using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Administration.Gui.Services
 {
@@ -250,7 +247,7 @@ namespace SOS.Administration.Gui.Services
                 TaxonIds = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
-            searchFilter.Areas = new [] { new AreaFilterDto{ AreaType = AreaType.County, FeatureId = "6" }, new AreaFilterDto{ AreaType = AreaType.Municipality, FeatureId = "687"} };
+            searchFilter.Areas = new [] { new AreaFilterDto{ AreaType = AreaTypeDto.County, FeatureId = "6" }, new AreaFilterDto{ AreaType = AreaTypeDto.Municipality, FeatureId = "687"} };
             searchFilter.Date = new DateFilterDto()
             {
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
