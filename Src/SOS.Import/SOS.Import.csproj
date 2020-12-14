@@ -120,6 +120,9 @@
     <None Update="Resources\Vocabularies\BasisOfRecordVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Vocabularies\BehaviorVocabulary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Vocabularies\BiotopeVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -148,6 +151,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vocabularies\OccurrenceStatusVocabulary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Vocabularies\ReproductiveCondition.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vocabularies\SubstrateVocabulary.json">

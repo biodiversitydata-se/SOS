@@ -1,0 +1,1164 @@
+{
+  "Id": 23,
+  "Name": "Behavior",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 3,
+      "Value": "breeding failed",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "misslyckad häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "breeding failed"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "incubating",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "incubating"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "carrying food for young",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "föda åt ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying food for young"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "carrying faecal sac",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bär exkrementsäck"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying faecal sac"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "visiting occupied nest",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "besöker bebott bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visiting occupied nest"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "distraction display",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "avledningsbeteende"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "distraction display"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "nest building",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobygge"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest building"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Value": "agitated behaviour",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "upprörd, varnande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "agitated behaviour"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Value": "visit possible nest?",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobesök?"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visit possible nest?"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Value": "mating/mating ceremonies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "parning/parningsceremonier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mating/mating ceremonies"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Value": "permanent territory",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "permanent revir"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "permanent territory"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Value": "pair in suitable habitat",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "par i lämplig häckbiotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pair in suitable habitat"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Value": "display/song",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel/sång"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display/song"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Value": "in nesting habitat",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "obs i häcktid, lämplig biotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in nesting habitat"
+        }
+      ]
+    },
+    {
+      "Id": 24,
+      "Value": "flying overhead",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "förbiflygande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "flying overhead"
+        }
+      ]
+    },
+    {
+      "Id": 25,
+      "Value": "foraging",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "födosökande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "foraging"
+        }
+      ]
+    },
+    {
+      "Id": 26,
+      "Value": "display / song outside breeding",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel/sång, ej häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display / song outside breeding"
+        }
+      ]
+    },
+    {
+      "Id": 28,
+      "Value": "territory outside breeding",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "revir, ej häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "territory outside breeding"
+        }
+      ]
+    },
+    {
+      "Id": 31,
+      "Value": "migration attempt",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckförsök"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migration attempt"
+        }
+      ]
+    },
+    {
+      "Id": 32,
+      "Value": "migrating",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating"
+        }
+      ]
+    },
+    {
+      "Id": 33,
+      "Value": "migrating N",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande N"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating N"
+        }
+      ]
+    },
+    {
+      "Id": 34,
+      "Value": "migrating NE",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande NO"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating NE"
+        }
+      ]
+    },
+    {
+      "Id": 35,
+      "Value": "migrating E",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande O"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating E"
+        }
+      ]
+    },
+    {
+      "Id": 36,
+      "Value": "migrating SE",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande SO"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating SE"
+        }
+      ]
+    },
+    {
+      "Id": 37,
+      "Value": "migrating S",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande S"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating S"
+        }
+      ]
+    },
+    {
+      "Id": 38,
+      "Value": "migrating SW",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande SV"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating SW"
+        }
+      ]
+    },
+    {
+      "Id": 39,
+      "Value": "migrating W",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande V"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating W"
+        }
+      ]
+    },
+    {
+      "Id": 40,
+      "Value": "migrating NW",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sträckande NV"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating NW"
+        }
+      ]
+    },
+    {
+      "Id": 49,
+      "Value": "mine",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "mina"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mine"
+        }
+      ]
+    },
+    {
+      "Id": 55,
+      "Value": "running/crawling",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "frispringande/krypande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "running/crawling"
+        }
+      ]
+    },
+    {
+      "Id": 56,
+      "Value": "free-flying",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "friflygande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "free-flying"
+        }
+      ]
+    },
+    {
+      "Id": 57,
+      "Value": "in water/swimming",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i vatten/simmande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in water/swimming"
+        }
+      ]
+    },
+    {
+      "Id": 60,
+      "Value": "hibernating",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dvala"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "hibernating"
+        }
+      ]
+    },
+    {
+      "Id": 66,
+      "Value": "play",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "lek"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "play"
+        }
+      ]
+    },
+    {
+      "Id": 67,
+      "Value": "migrating fish",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "vandrande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "migrating fish"
+        }
+      ]
+    },
+    {
+      "Id": 84,
+      "Value": "jump",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "hopp över vattenytan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "jump"
+        }
+      ]
+    },
+    {
+      "Id": 89,
+      "Value": "in water",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i vatten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in water"
+        }
+      ]
+    },
+    {
+      "Id": 90,
+      "Value": "dispute between males",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "kamp mellan handjur"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dispute between males"
+        }
+      ]
+    },
+    {
+      "Id": 91,
+      "Value": "steady course, regular diving",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "konstant kurs, regelbunden dykning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "steady course, regular diving"
+        }
+      ]
+    },
+    {
+      "Id": 92,
+      "Value": "slow movement, long periods on the surface",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "långsam rörelse, lång tid vid ytan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "slow movement, long periods on the surface"
+        }
+      ]
+    },
+    {
+      "Id": 93,
+      "Value": "approaching boat",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "närmanden mot båt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "approaching boat"
+        }
+      ]
+    },
+    {
+      "Id": 104,
+      "Value": "roosting",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "roosting"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "roosting"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            },
+            {
+              "Value": 24,
+              "SosId": 24
+            },
+            {
+              "Value": 25,
+              "SosId": 25
+            },
+            {
+              "Value": 26,
+              "SosId": 26
+            },
+            {
+              "Value": 28,
+              "SosId": 28
+            },
+            {
+              "Value": 31,
+              "SosId": 31
+            },
+            {
+              "Value": 32,
+              "SosId": 32
+            },
+            {
+              "Value": 33,
+              "SosId": 33
+            },
+            {
+              "Value": 34,
+              "SosId": 34
+            },
+            {
+              "Value": 35,
+              "SosId": 35
+            },
+            {
+              "Value": 36,
+              "SosId": 36
+            },
+            {
+              "Value": 37,
+              "SosId": 37
+            },
+            {
+              "Value": 38,
+              "SosId": 38
+            },
+            {
+              "Value": 39,
+              "SosId": 39
+            },
+            {
+              "Value": 40,
+              "SosId": 40
+            },
+            {
+              "Value": 49,
+              "SosId": 49
+            },
+            {
+              "Value": 55,
+              "SosId": 55
+            },
+            {
+              "Value": 56,
+              "SosId": 56
+            },
+            {
+              "Value": 57,
+              "SosId": 57
+            },
+            {
+              "Value": 60,
+              "SosId": 60
+            },
+            {
+              "Value": 66,
+              "SosId": 66
+            },
+            {
+              "Value": 67,
+              "SosId": 67
+            },
+            {
+              "Value": 84,
+              "SosId": 84
+            },
+            {
+              "Value": 89,
+              "SosId": 89
+            },
+            {
+              "Value": 90,
+              "SosId": 90
+            },
+            {
+              "Value": 91,
+              "SosId": 91
+            },
+            {
+              "Value": 92,
+              "SosId": 92
+            },
+            {
+              "Value": 93,
+              "SosId": 93
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Name": "DarwinCore",
+      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+      "Mappings": [
+        {
+          "Key": "behavior",
+          "Description": "The behavior term (http://rs.tdwg.org/dwc/terms/behavior)",
+          "Values": [
+            {
+              "Value": "misslyckad häckning",
+              "SosId": 3
+            },
+            {
+              "Value": "breeding failed",
+              "SosId": 3
+            },
+            {
+              "Value": "ruvande",
+              "SosId": 4
+            },
+            {
+              "Value": "incubating",
+              "SosId": 4
+            },
+            {
+              "Value": "föda åt ungar",
+              "SosId": 6
+            },
+            {
+              "Value": "carrying food for young",
+              "SosId": 6
+            },
+            {
+              "Value": "bär exkrementsäck",
+              "SosId": 7
+            },
+            {
+              "Value": "carrying faecal sac",
+              "SosId": 7
+            },
+            {
+              "Value": "besöker bebott bo",
+              "SosId": 8
+            },
+            {
+              "Value": "visiting occupied nest",
+              "SosId": 8
+            },
+            {
+              "Value": "avledningsbeteende",
+              "SosId": 11
+            },
+            {
+              "Value": "distraction display",
+              "SosId": 11
+            },
+            {
+              "Value": "bobygge",
+              "SosId": 12
+            },
+            {
+              "Value": "nest building",
+              "SosId": 12
+            },
+            {
+              "Value": "upprörd, varnande",
+              "SosId": 14
+            },
+            {
+              "Value": "agitated behaviour",
+              "SosId": 14
+            },
+            {
+              "Value": "bobesök?",
+              "SosId": 15
+            },
+            {
+              "Value": "visit possible nest?",
+              "SosId": 15
+            },
+            {
+              "Value": "parning/parningsceremonier",
+              "SosId": 16
+            },
+            {
+              "Value": "mating/mating ceremonies",
+              "SosId": 16
+            },
+            {
+              "Value": "permanent revir",
+              "SosId": 17
+            },
+            {
+              "Value": "permanent territory",
+              "SosId": 17
+            },
+            {
+              "Value": "par i lämplig häckbiotop",
+              "SosId": 18
+            },
+            {
+              "Value": "pair in suitable habitat",
+              "SosId": 18
+            },
+            {
+              "Value": "spel/sång",
+              "SosId": 19
+            },
+            {
+              "Value": "display/song",
+              "SosId": 19
+            },
+            {
+              "Value": "obs i häcktid, lämplig biotop",
+              "SosId": 20
+            },
+            {
+              "Value": "in nesting habitat",
+              "SosId": 20
+            },
+            {
+              "Value": "förbiflygande",
+              "SosId": 24
+            },
+            {
+              "Value": "flying overhead",
+              "SosId": 24
+            },
+            {
+              "Value": "födosökande",
+              "SosId": 25
+            },
+            {
+              "Value": "foraging",
+              "SosId": 25
+            },
+            {
+              "Value": "spel/sång, ej häckning",
+              "SosId": 26
+            },
+            {
+              "Value": "display / song outside breeding",
+              "SosId": 26
+            },
+            {
+              "Value": "revir, ej häckning",
+              "SosId": 28
+            },
+            {
+              "Value": "territory outside breeding",
+              "SosId": 28
+            },
+            {
+              "Value": "sträckförsök",
+              "SosId": 31
+            },
+            {
+              "Value": "migration attempt",
+              "SosId": 31
+            },
+            {
+              "Value": "sträckande",
+              "SosId": 32
+            },
+            {
+              "Value": "migrating",
+              "SosId": 32
+            },
+            {
+              "Value": "sträckande N",
+              "SosId": 33
+            },
+            {
+              "Value": "migrating N",
+              "SosId": 33
+            },
+            {
+              "Value": "sträckande NO",
+              "SosId": 34
+            },
+            {
+              "Value": "migrating NE",
+              "SosId": 34
+            },
+            {
+              "Value": "sträckande O",
+              "SosId": 35
+            },
+            {
+              "Value": "migrating E",
+              "SosId": 35
+            },
+            {
+              "Value": "sträckande SO",
+              "SosId": 36
+            },
+            {
+              "Value": "migrating SE",
+              "SosId": 36
+            },
+            {
+              "Value": "sträckande S",
+              "SosId": 37
+            },
+            {
+              "Value": "migrating S",
+              "SosId": 37
+            },
+            {
+              "Value": "sträckande SV",
+              "SosId": 38
+            },
+            {
+              "Value": "migrating SW",
+              "SosId": 38
+            },
+            {
+              "Value": "sträckande V",
+              "SosId": 39
+            },
+            {
+              "Value": "migrating W",
+              "SosId": 39
+            },
+            {
+              "Value": "sträckande NV",
+              "SosId": 40
+            },
+            {
+              "Value": "migrating NW",
+              "SosId": 40
+            },
+            {
+              "Value": "mina",
+              "SosId": 49
+            },
+            {
+              "Value": "mine",
+              "SosId": 49
+            },
+            {
+              "Value": "frispringande/krypande",
+              "SosId": 55
+            },
+            {
+              "Value": "running/crawling",
+              "SosId": 55
+            },
+            {
+              "Value": "running",
+              "SosId": 55
+            },
+            {
+              "Value": "friflygande",
+              "SosId": 56
+            },
+            {
+              "Value": "free-flying",
+              "SosId": 56
+            },
+            {
+              "Value": "i vatten/simmande",
+              "SosId": 57
+            },
+            {
+              "Value": "in water/swimming",
+              "SosId": 57
+            },
+            {
+              "Value": "dvala",
+              "SosId": 60
+            },
+            {
+              "Value": "hibernating",
+              "SosId": 60
+            },
+            {
+              "Value": "lek",
+              "SosId": 66
+            },
+            {
+              "Value": "play",
+              "SosId": 66
+            },
+            {
+              "Value": "vandrande",
+              "SosId": 67
+            },
+            {
+              "Value": "migrating fish",
+              "SosId": 67
+            },
+            {
+              "Value": "hopp över vattenytan",
+              "SosId": 84
+            },
+            {
+              "Value": "jump",
+              "SosId": 84
+            },
+            {
+              "Value": "i vatten",
+              "SosId": 89
+            },
+            {
+              "Value": "in water",
+              "SosId": 89
+            },
+            {
+              "Value": "kamp mellan handjur",
+              "SosId": 90
+            },
+            {
+              "Value": "dispute between males",
+              "SosId": 90
+            },
+            {
+              "Value": "konstant kurs, regelbunden dykning",
+              "SosId": 91
+            },
+            {
+              "Value": "steady course, regular diving",
+              "SosId": 91
+            },
+            {
+              "Value": "långsam rörelse, lång tid vid ytan",
+              "SosId": 92
+            },
+            {
+              "Value": "slow movement, long periods on the surface",
+              "SosId": 92
+            },
+            {
+              "Value": "närmanden mot båt",
+              "SosId": 93
+            },
+            {
+              "Value": "approaching boat",
+              "SosId": 93
+            },
+            {
+              "Value": "roosting",
+              "SosId": 104
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

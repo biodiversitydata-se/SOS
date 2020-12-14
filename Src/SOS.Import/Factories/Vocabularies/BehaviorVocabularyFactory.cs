@@ -10,41 +10,34 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating verification status field mapping.
+    ///     Class for creating EstablishmentMeans field mapping.
     /// </summary>
-    public class ValidationStatusVocabularyFactory : ArtportalenVocabularyFactoryBase
+    public class BehaviorVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
-        private readonly IMetadataRepository _artportalenMetadataRepository;
+        private readonly IMetadataRepository _metadataRepository;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="artportalenMetadataRepository"></param>
-        public ValidationStatusVocabularyFactory(IMetadataRepository artportalenMetadataRepository)
+        /// <param name="metadataRepository"></param>
+        public BehaviorVocabularyFactory(
+            IMetadataRepository metadataRepository)
         {
-            _artportalenMetadataRepository = artportalenMetadataRepository ??
-                                             throw new ArgumentNullException(nameof(artportalenMetadataRepository));
+            _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
         }
 
-        protected override VocabularyId FieldId => VocabularyId.ValidationStatus;
+        protected override VocabularyId FieldId => VocabularyId.Behavior;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
         {
-            var validationStatusList = await _artportalenMetadataRepository.GetValidationStatusAsync();
-            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(validationStatusList.ToArray());
-            vocabularyValues = vocabularyValues.Where(v => !_excludeArtportalenIds.Contains(v.Id)).ToList();
-            //int id = vocabularyValues.Max(f => f.Id);
-            vocabularyValues.Add(CreateVocabularyValue(0, "Verified", "Validerad"));
-            vocabularyValues.Add(CreateVocabularyValue(1, "Reported by expert", "Rapporterad av expert"));
-            vocabularyValues = vocabularyValues.OrderBy(f => f.Id).ToList();
+            var activities = await _metadataRepository.GetActivitiesAsync();
+            var selectedActivities = activities.Where(a => _artportalenIds.Contains(a.Id));
+            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(selectedActivities.ToArray());
+            int id = activities.Max(f => f.Id);
+            vocabularyValues.Add(CreateVocabularyValue(++id, "roosting"));
             return vocabularyValues;
         }
-
-        private readonly int[] _excludeArtportalenIds =
-        {
-            50 // Rejected (Underkänd)
-        };
 
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
             ICollection<VocabularyValueInfo> vocabularyValues)
@@ -71,8 +64,8 @@ namespace SOS.Import.Factories.Vocabularies
             var dwcMappings = CreateDwcMappings(vocabularyValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
-                Key = VocabularyMappingKeyFields.DwcIdentificationVerificationStatus,
-                Description = "The identificationVerificationStatus term (http://rs.tdwg.org/dwc/terms/identificationVerificationStatus)",
+                Key = VocabularyMappingKeyFields.DwcBehavior,
+                Description = "The behavior term (http://rs.tdwg.org/dwc/terms/behavior)",
                 Values = dwcMappings.Select(pair => new ExternalSystemMappingValue { Value = pair.Key, SosId = pair.Value }).ToList()
             };
 
@@ -80,11 +73,56 @@ namespace SOS.Import.Factories.Vocabularies
             return externalSystemMapping;
         }
 
+        private readonly int[] _artportalenIds =
+        {
+            3,
+            4,
+            6,
+            7,
+            8,
+            11,
+            12,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            24,
+            25,
+            26,
+            28,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            49,
+            55,
+            56,
+            57,
+            60,
+            66,
+            67,
+            84,
+            89,
+            90,
+            91,
+            92,
+            93
+        };
+
         private Dictionary<string, string> GetDwcMappingSynonyms()
         {
             return new Dictionary<string, string>
             {
-                {"unverified", "Unvalidated"}
+                {"running", "running/crawling"}
             };
         }
     }

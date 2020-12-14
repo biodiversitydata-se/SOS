@@ -40,20 +40,20 @@ namespace SOS.Import.Harvesters
         /// <param name="unitVocabularyFactory"></param>
         /// <param name="basisOfRecordVocabularyFactory"></param>
         /// <param name="continentVocabularyFactory"></param>
-        /// <param name="parishVocabularyFactory"></param>
         /// <param name="establishmentMeansVocabularyFactory"></param>
+        /// <param name="discoveryMethodVocabularyFactory"></param>
         /// <param name="determinationMethodVocabularyFactory"></param>
+        /// <param name="reproductiveConditionVocabularyFactory"></param>
+        /// <param name="behaviorVocabularyFactory"></param>
         /// <param name="logger"></param>
         /// <param name="activityVocabularyFactory"></param>
         /// <param name="biotopeVocabularyFactory"></param>
         /// <param name="substrateVocabularyFactory"></param>
-        /// <param name="countyVocabularyFactory"></param>
-        /// <param name="municipalityVocabularyFactory"></param>
-        /// <param name="provinceVocabularyFactory"></param>
         /// <param name="typeVocabularyFactory"></param>
         /// <param name="countryVocabularyFactory"></param>
         /// <param name="accessRightsVocabularyFactory"></param>
         /// <param name="occurrenceStatusVocabularyFactory"></param>
+        /// <param name="areaTypeVocabularyFactory"></param>
         public VocabularyHarvester(
             IVocabularyRepository vocabularyRepository,
             ActivityVocabularyFactory activityVocabularyFactory,
@@ -74,6 +74,8 @@ namespace SOS.Import.Harvesters
             AreaTypeVocabularyFactory areaTypeVocabularyFactory,
             DiscoveryMethodVocabularyFactory discoveryMethodVocabularyFactory,
             DeterminationMethodVocabularyFactory determinationMethodVocabularyFactory,
+            ReproductiveConditionVocabularyFactory reproductiveConditionVocabularyFactory,
+            BehaviorVocabularyFactory behaviorVocabularyFactory,
             ILogger<VocabularyHarvester> logger)
         {
             _vocabularyRepository =
@@ -98,7 +100,9 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.EstablishmentMeans, establishmentMeansVocabularyFactory},
                 {VocabularyId.AreaType, areaTypeVocabularyFactory},
                 {VocabularyId.DiscoveryMethod, discoveryMethodVocabularyFactory},
-                {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory}
+                {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory},
+                {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
+                {VocabularyId.Behavior, behaviorVocabularyFactory}
             };
         }
 
