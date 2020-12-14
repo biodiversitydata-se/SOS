@@ -4,11 +4,11 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Models.Area;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -37,9 +37,9 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet]
-        [ProducesResponseType(typeof(PagedResult<ExternalSimpleArea>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaType> areaTypes = null,
+        public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
             [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
         {
             try
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<IActionResult> ExportAreaAsync([FromRoute] AreaType areaType, [FromRoute] string feature)
+        public async Task<IActionResult> ExportAreaAsync([FromRoute] AreaTypeDto areaType, [FromRoute] string feature)
         {
             try
             {

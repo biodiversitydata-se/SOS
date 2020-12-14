@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Enums;
+using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="skip">Start index of returned areas</param>
         /// <param name="take">Number of areas to return</param>
         /// <returns>List of Areas</returns>
-        Task<IActionResult> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip = 0,
+        Task<IActionResult> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString, int skip = 0,
             int take = 100);
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="areaType"></param>
         /// <param name="feature"></param>
         /// <returns></returns>
-        Task<IActionResult> ExportAreaAsync(AreaType areaType, string feature);
+        Task<IActionResult> ExportAreaAsync(AreaTypeDto areaType, string feature);
     }
    
 }

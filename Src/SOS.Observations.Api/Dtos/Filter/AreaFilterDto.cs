@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         ///     Type of area
         /// </summary>
-        public AreaType AreaType { get; set; }
+        public AreaTypeDto AreaType { get; set; }
        
         /// <summary>
         ///    Feature

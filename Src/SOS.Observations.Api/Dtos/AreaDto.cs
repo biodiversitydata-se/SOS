@@ -1,11 +1,11 @@
 ﻿using SOS.Lib.Models.Shared;
 
-namespace SOS.Observations.Api.Models.Area
+namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
     ///     Area used external
     /// </summary>
-    public class ExternalArea : ExternalSimpleArea
+    public class AreaDto : AreaBaseDto
     {
         /// <summary>
         ///     Area geometry
