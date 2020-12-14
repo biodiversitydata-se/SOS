@@ -96,7 +96,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     or other policies.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue AccessRights { get; set; }
@@ -109,7 +109,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (http://rs.tdwg.org/dwc/terms/type-vocabulary/index.htm).
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue BasisOfRecord { get; set; }
@@ -191,7 +191,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     the object(s) or information referred to in the record.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue InstitutionCode { get; set; }
@@ -275,7 +275,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     root of the record.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Type { get; set; }

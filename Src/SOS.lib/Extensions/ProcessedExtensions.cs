@@ -161,7 +161,7 @@ namespace SOS.Lib.Extensions
                 OrganismQuantityType = source.OrganismQuantityUnit?.Value,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
-                ReproductiveCondition = source.Activity?.Value,
+                ReproductiveCondition = source.ReproductiveCondition?.Value,
                 Sex = source.Gender?.Value
             };
         }

@@ -51,8 +51,8 @@ namespace SOS.Process.Processors.Artportalen
             IVocabularyRepository processedVocabularyRepository,
             bool incrementalMode)
         {
-            var allFieldMappings = await processedVocabularyRepository.GetAllAsync();
-            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
+            var allVocabularies = await processedVocabularyRepository.GetAllAsync();
+            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
             return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
         }
 
@@ -141,7 +141,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 // Event
                 obs.Event = new Event();
-                obs.Event.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, _vocabularyById[VocabularyId.Biotope]);
+                obs.Event.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
                 obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate;
@@ -158,7 +158,7 @@ namespace SOS.Process.Processors.Artportalen
                     obs.Event.SubstrateSpeciesScientificName = substratTaxon.ScientificName;
                 }
 
-                obs.Event.Substrate = GetSosIdFromMetadata(verbatimObservation?.Substrate, _vocabularyById[VocabularyId.Substrate]);
+                obs.Event.Substrate = GetSosIdFromMetadata(verbatimObservation?.Substrate, VocabularyId.Substrate);
 
                 // Identification
                 obs.Identification = new Identification();
@@ -258,21 +258,22 @@ namespace SOS.Process.Processors.Artportalen
                     : obs.Event.BiotopeDescription).WithMaxLength(255);
 
                 // Get field mapping values
-                obs.Occurrence.Gender = GetSosIdFromMetadata(verbatimObservation?.Gender, _vocabularyById[VocabularyId.Gender]);
-                obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, _vocabularyById[VocabularyId.Activity]);
+                obs.Occurrence.Gender = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Gender);
+                obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Activity);
                 
-                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, _vocabularyById[VocabularyId.ValidationStatus]);
-                obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, _vocabularyById[VocabularyId.LifeStage]);
-                obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, _vocabularyById[VocabularyId.Institution]);
+                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.ValidationStatus);
+                obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.LifeStage);
+                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.ReproductiveCondition, null, true);
+                obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, VocabularyId.Institution);
                 obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
                     ? null
                     : $"urn:lsid:artdata.slu.se:organization:{verbatimObservation.OwnerOrganization.Id}";
                 obs.Occurrence.OrganismQuantityUnit = GetSosIdFromMetadata(
                     verbatimObservation?.Unit, 
-                    _vocabularyById[VocabularyId.Unit],
+                    VocabularyId.Unit,
                     (int) UnitId.Individuals);
-                obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, _vocabularyById[VocabularyId.DiscoveryMethod]);
-                obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, _vocabularyById[VocabularyId.DeterminationMethod]);
+                obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
+                obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
 
                 return obs;
@@ -547,16 +548,18 @@ namespace SOS.Process.Processors.Artportalen
         ///     Get SOS internal Id for the id specific for the data provider.
         /// </summary>
         /// <param name="val"></param>
-        /// <param name="sosIdByProviderValue"></param>
+        /// <param name="vocabularyId"></param>
         /// <param name="defaultId"></param>
         /// <param name="valueIfValNotFound"></param>
         /// <returns></returns>
-        private static VocabularyValue GetSosId(
+        private VocabularyValue GetSosId(
             int? val, 
-            IDictionary<object, int> sosIdByProviderValue,
+            VocabularyId vocabularyId,
             int? defaultId = null,
             string valueIfValNotFound = null)
         {
+            IDictionary<object, int> sosIdByProviderValue = _vocabularyById.GetValue(vocabularyId);
+
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
@@ -583,20 +586,28 @@ namespace SOS.Process.Processors.Artportalen
         ///     Get SOS internal Id for the id specific for the data provider.
         /// </summary>
         /// <param name="metadata"></param>
-        /// <param name="sosIdByProviderValue"></param>
+        /// <param name="vocabularyId"></param>
         /// <param name="defaultId"></param>
+        /// <param name="setValueToNullIfNoMappingFound"></param>
         /// <returns></returns>
-        private static VocabularyValue GetSosIdFromMetadata(
+        public VocabularyValue GetSosIdFromMetadata(
             Metadata metadata,
-            IDictionary<object, int> sosIdByProviderValue,
-            int? defaultId = null)
+            VocabularyId vocabularyId,
+            int? defaultId = null,
+            bool setValueToNullIfNoMappingFound = false)
         {
+            IDictionary<object, int> sosIdByProviderValue = _vocabularyById.GetValue(vocabularyId);
             int? val = metadata?.Id;
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
             {
                 return new VocabularyValue { Id = sosId };
+            }
+
+            if (setValueToNullIfNoMappingFound)
+            {
+                return null;
             }
 
             var metadataValue = metadata?.Translate(Cultures.en_GB, Cultures.sv_SE);
@@ -832,48 +843,27 @@ namespace SOS.Process.Processors.Artportalen
         ///     Get field mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
-        /// <param name="allFieldMappings"></param>
+        /// <param name="allVocabularies"></param>
         /// <returns></returns>
         private static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
             ExternalSystemId externalSystemId,
-            ICollection<Vocabulary> allFieldMappings)
+            ICollection<Vocabulary> allVocabularies)
         {
             var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
 
-            foreach (var vocabularity in allFieldMappings)
+            foreach (var vocabulary in allVocabularies)
             {
-                var processedVocabularies = vocabularity.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                var processedVocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
                 if (processedVocabularies != null)
                 {
-                    var mappingKey = GetMappingKey(vocabularity.Id);
+                    var mappingKey = "Id";
                     var mapping = processedVocabularies.Mappings.Single(m => m.Key == mappingKey);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(vocabularity.Id, sosIdByValue);
+                    dic.Add(vocabulary.Id, sosIdByValue);
                 }
             }
 
             return dic;
-        }
-
-        private static string GetMappingKey(VocabularyId vocabularyId)
-        {
-            switch (vocabularyId)
-            {
-                case VocabularyId.Activity:
-                case VocabularyId.Gender:
-                case VocabularyId.LifeStage:
-                case VocabularyId.Substrate:
-                case VocabularyId.ValidationStatus:
-                case VocabularyId.Biotope:
-                case VocabularyId.Institution:
-                case VocabularyId.AreaType:
-                case VocabularyId.Unit:
-                case VocabularyId.DiscoveryMethod:
-                case VocabularyId.DeterminationMethod:
-                    return "Id";
-                default:
-                    throw new ArgumentException($"No mapping exist for the field: {vocabularyId}");
-            }
         }
     }
 }
