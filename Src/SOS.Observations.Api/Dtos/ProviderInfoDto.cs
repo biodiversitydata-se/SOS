@@ -1,26 +1,9 @@
 ﻿using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
 
-namespace SOS.Lib.Models.Processed.ProcessInfo
+namespace SOS.Observations.Api.Dtos
 {
-    /// <summary>
-    ///     Information about verbatim
-    /// </summary>
-    public class ProviderInfo
+    public class ProviderInfoDto
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        public ProviderInfo(DataProvider dataProvider)
-        {
-            DataProviderId = dataProvider.Id;
-            DataProviderIdentifier = dataProvider.Identifier;
-        }
-
         public int? DataProviderId { get; set; }
 
         public string DataProviderIdentifier { get; set; }
@@ -43,8 +26,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         ///     Status of harvest
         /// </summary>
-        [BsonRepresentation(BsonType.String)]
-        public RunStatus? HarvestStatus { get; set; }
+        public string HarvestStatus { get; set; }
 
         /// <summary>
         /// Last incremental process count 
@@ -59,7 +41,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         /// Last incremental process status 
         /// </summary>
-        public RunStatus? LatestIncrementalStatus { get; set; }
+        public string LatestIncrementalStatus { get; set; }
 
         /// <summary>
         /// Last incremental process start 
@@ -84,14 +66,11 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         ///     Status of processing
         /// </summary>
-        [BsonRepresentation(BsonType.String)]
-        public RunStatus? ProcessStatus { get; set; }
+        public string ProcessStatus { get; set; }
 
         /// <summary>
         ///     Id of data provider
         /// </summary>
-        [BsonRepresentation(BsonType.String)]
-        public DataProviderType DataProviderType { get; private set; }
-
+        public string DataProviderType { get; private set; }
     }
 }

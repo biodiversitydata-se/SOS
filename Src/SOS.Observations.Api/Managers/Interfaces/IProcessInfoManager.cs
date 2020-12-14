@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -12,6 +12,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         ///     Get process information
         /// </summary>
         /// <returns></returns>
-        Task<ProcessInfo> GetProcessInfoAsync(bool active);
+        Task<ProcessInfoDto> GetProcessInfoAsync(bool active);
     }
 }

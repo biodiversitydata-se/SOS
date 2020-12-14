@@ -1,11 +1,13 @@
-﻿namespace SOS.Observations.Api.Models.Area
+﻿using SOS.Observations.Api.Dtos.Enum;
+
+namespace SOS.Observations.Api.Dtos
 {
-    public class ExternalSimpleArea
+    public class AreaBaseDto
     {
         /// <summary>
         ///     Type of area
         /// </summary>
-        public string AreaType { get; set; }
+        public AreaTypeDto AreaType { get; set; }
 
         /// <summary>
         /// Feature id

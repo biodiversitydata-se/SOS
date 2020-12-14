@@ -3,8 +3,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet("ProcessInformation")]
-        [ProducesResponseType(typeof(ProcessInfo), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetProcessInfoAsync([FromQuery] bool active)
         {
