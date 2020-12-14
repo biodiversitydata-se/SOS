@@ -211,6 +211,20 @@ export class StatusComponent implements OnInit {
     }
     return false;
   }
+  gaugeColorFunction(value: number): string {
+    if (value < 75) {
+      return "green"
+    }
+    else if (value > 75 && value < 90) {
+      return "gold"
+    }
+    else {
+      return "red";
+    }
+  }
+  gaugeLabelFunction(value: number): string {
+    return value + '%';
+  }
   private runTests() {
     this.runningTests = true;
     this.completedTests = 0;

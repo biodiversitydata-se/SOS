@@ -7,6 +7,8 @@ import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { LeafletMarkerClusterModule } from '@asymmetrik/ngx-leaflet-markercluster';
 import { AgGridModule } from 'ag-grid-angular';
 import { ChartsModule, ThemeService } from 'ng2-charts';
+import { GaugeModule } from 'angular-gauge';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -47,7 +49,9 @@ import { LoadTestComponent } from './load-test/load-test.component';
     LeafletModule,
     LeafletMarkerClusterModule,
     ChartsModule,
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([]),
+    GaugeModule.forRoot(),
+    NgxDatatableModule
   ],
   providers: [ThemeService],
   bootstrap: [AppComponent]
