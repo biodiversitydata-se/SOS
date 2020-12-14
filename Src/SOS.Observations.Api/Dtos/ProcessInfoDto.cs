@@ -1,28 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Processed.ProcessInfo
+namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
-    ///     Process configuration
+    /// Dto
     /// </summary>
-    public class ProcessInfo : IEntity<string>
+    public class ProcessInfoDto
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="start"></param>
-        public ProcessInfo(string id, DateTime start)
-        {
-            Id = id;
-            Start = start;
-        }
-
         /// <summary>
         ///     Item processed
         /// </summary>
@@ -36,12 +21,12 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         ///     Provider information about meta data
         /// </summary>
-        public IEnumerable<ProcessInfo> MetadataInfo { get; set; }
+        public IEnumerable<ProcessInfoDto> MetadataInfo { get; set; }
 
         /// <summary>
         ///     Information about providers
         /// </summary>
-        public IEnumerable<ProviderInfo> ProvidersInfo { get; set; }
+        public IEnumerable<ProviderInfoDto> ProvidersInfo { get; set; }
 
         /// <summary>
         ///     Harvest start date and time
@@ -51,8 +36,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         ///     Running status
         /// </summary>
-        [BsonRepresentation(BsonType.String)]
-        public RunStatus Status { get; set; }
+        public string Status { get; set; }
 
         /// <summary>
         ///     Id, equals updated instance (0 or 1)
