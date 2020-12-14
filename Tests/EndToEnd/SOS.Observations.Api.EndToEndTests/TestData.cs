@@ -17,12 +17,12 @@ namespace SOS.Observations.Api.EndToEndTests
             /// <summary>
             /// Tranås municipality.
             /// </summary>
-            public static AreaFilterDto TranasMunicipality => new AreaFilterDto { Type = AreaType.Municipality, FeatureId = "687" };
+            public static AreaFilterDto TranasMunicipality => new AreaFilterDto { AreaType = AreaType.Municipality, FeatureId = "687" };
             
             /// <summary>
             /// Jönköping county.
             /// </summary>
-            public static AreaFilterDto JonkopingCounty => new AreaFilterDto { Type = AreaType.County, FeatureId = "6" };
+            public static AreaFilterDto JonkopingCounty => new AreaFilterDto { AreaType = AreaType.County, FeatureId = "6" };
         }
     }
 
