@@ -61,7 +61,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     such as that used in HISPID/ABCD.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue ValidationStatus { get; set; }

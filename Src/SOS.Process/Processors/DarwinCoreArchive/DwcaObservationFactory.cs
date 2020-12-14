@@ -514,6 +514,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 _vocabularyById[VocabularyId.Activity]); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
 
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Gender]);
+            processedOccurrence.ReproductiveCondition = GetSosId(verbatimObservation.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;

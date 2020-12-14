@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     ('län' in swedish).
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Continent { get; set; }
@@ -44,7 +44,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     vocabulary such as the Getty Thesaurus of Geographic Names.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Country { get; set; }
@@ -68,9 +68,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     department, etc.) in which the Location occurs
         ///     ('län' in swedish).
         /// </summary>
-        /// <remarks>
-        ///     This value is field mapped.
-        /// </remarks>
         [Object]
         public Area County { get; set; }
 
@@ -80,9 +77,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     administrative region than county (city, municipality, etc.)
         ///     in which the Location occurs.
         /// </summary>
-        /// <remarks>
-        ///     This value is field mapped.
-        /// </remarks>
         [Object]
         public Area Municipality { get; set; }
 
@@ -94,9 +88,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Parish ('socken' in swedish).
         /// </summary>
-        /// <remarks>
-        ///     This value is field mapped.
-        /// </remarks>
         [Object]
         public Area Parish { get; set; }
  
@@ -107,9 +98,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     in which the Location occurs.
         ///     ('landskap' in swedish).
         /// </summary>
-        /// <remarks>
-        ///     This value is field mapped.
-        /// </remarks>
         [Object]
         public Area Province { get; set; }
 
