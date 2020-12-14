@@ -8,7 +8,7 @@ using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.Observations.TaxonAggregation
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class TaxonAggregationIntegrationTests

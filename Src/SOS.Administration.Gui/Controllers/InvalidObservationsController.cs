@@ -75,7 +75,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("list")]
-        public IEnumerable<InvalidObservationDto> GetList(string dataSetId, int instanceId)
+        public PagedInvalidObservationsDto GetList(string dataSetId, int instanceId, int pageNr = 0, int pageSize = 20, string sortField = "occurrenceId", string sortOrder = "desc")
         {
             var database = _client.GetDatabase(_configuration.DatabaseName);          
             var observationCollection = database.GetCollection<InvalidObservationDto>("InvalidObservation-" + instanceId.ToString());
@@ -84,11 +84,28 @@ namespace SOS.Administration.Gui.Controllers
             if (dataSetId == "0")
             {
                 filter = new BsonDocument();
-            }           
-            var documents = observationCollection.Find(filter).ToList();
-            //var ids = documents.Where(p=>p.DatasetID == "1").Select(p => p.OccurrenceID.Substring(p.OccurrenceID.LastIndexOf(":") + 1,p.OccurrenceID.Length - p.OccurrenceID.LastIndexOf(":") - 1) + ",");
-            //System.IO.File.WriteAllLines("test_ids.txt", ids.ToArray());
-            return documents;
+            }
+            var docs = observationCollection.Find(filter).Skip(pageNr * pageSize).Limit(pageSize);
+            if(sortOrder == "desc")
+            {
+                if(sortField == "occurrenceId") { docs = docs.SortByDescending(p => p.OccurrenceID); }
+                if (sortField == "datasetID") { docs = docs.SortByDescending(p => p.DatasetID); }
+                if (sortField == "datasetName") { docs = docs.SortByDescending(p => p.DatasetName); }
+                if (sortField == "defects") { docs = docs.SortByDescending(p => p.Defects); }
+            }
+            else
+            {
+                docs = docs.SortBy(p => p.OccurrenceID);
+            }
+            var documents = docs.ToList();
+            var totalCount = observationCollection.CountDocuments(filter);
+            var pagedResult = new PagedInvalidObservationsDto();
+            pagedResult.Observations = documents;
+            pagedResult.PageNumber = pageNr;
+            pagedResult.Size = pageSize;
+            pagedResult.TotalElements = totalCount;
+            pagedResult.TotalPages = pagedResult.TotalElements / pageSize;
+            return pagedResult;
         }
     }
 }
