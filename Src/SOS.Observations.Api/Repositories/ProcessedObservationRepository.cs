@@ -36,8 +36,6 @@ namespace SOS.Observations.Api.Repositories
         private readonly TelemetryClient _telemetry;
         private readonly string _indexName;
 
-       
-
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
 
         /// <summary>

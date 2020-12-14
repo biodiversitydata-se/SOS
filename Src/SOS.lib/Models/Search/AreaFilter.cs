@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Type of area
         /// </summary>
-        public AreaType Type { get; set; }
+        public AreaType AreaType { get; set; }
        
         /// <summary>
         ///    Feature

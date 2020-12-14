@@ -50,7 +50,7 @@ namespace SOS.Lib.Managers
             {
                 foreach (var areaFilter in filter.Areas)
                 {
-                    switch (areaFilter.Type)
+                    switch (areaFilter.AreaType)
                     {
                         case AreaType.County:
                             (filter.CountyIds ??= new List<string>()).Add(areaFilter.FeatureId);
@@ -68,7 +68,7 @@ namespace SOS.Lib.Managers
                             (filter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                             break;
                         default:
-                            var geometry = await _areaCache.GetGeometryAsync(areaFilter.Type, areaFilter.FeatureId);
+                            var geometry = await _areaCache.GetGeometryAsync(areaFilter.AreaType, areaFilter.FeatureId);
 
                             if (geometry != null)
                             {
