@@ -14,7 +14,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Activity property.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue
@@ -93,7 +93,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue EstablishmentMeans { get; set; }
@@ -150,7 +150,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue LifeStage { get; set; }
@@ -216,7 +216,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         public VocabularyValue OrganismQuantityUnit { get; set; }
 
@@ -249,12 +249,21 @@ namespace SOS.Lib.Models.Processed.Observation
         public string RecordNumber { get; set; }
 
         /// <summary>
+        ///     The reproductive condition of the biological individual(s) represented in the Occurrence.
+        /// </summary>
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        [Object]
+        public VocabularyValue ReproductiveCondition { get; set; }
+
+        /// <summary>
         ///     The sex of the biological individual(s) represented in
         ///     the Occurrence.
         ///     Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Gender { get; set; }
@@ -265,7 +274,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue OccurrenceStatus { get; set; }

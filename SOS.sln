@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export", "Src\SOS.Expor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
 	ProjectSection(SolutionItems) = preProject
+		CHANGELOG.md = CHANGELOG.md
 		Docs\FieldMapping.md = Docs\FieldMapping.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{A173A436-C08B-4D4C-8245-09C0A037B6A7}"
@@ -71,7 +73,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Administration.Gui", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndToEnd", "EndToEnd", "{D64F2BE7-6B3C-4393-97FE-B8046FE449BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Observations.Api.EndToEndTests", "Tests\EndToEnd\SOS.Observations.Api.EndToEndTests\SOS.Observations.Api.EndToEndTests.csproj", "{32244B4B-C247-47A9-8865-A22BC62B6AAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.EndToEndTests", "Tests\EndToEnd\SOS.Observations.Api.EndToEndTests\SOS.Observations.Api.EndToEndTests.csproj", "{32244B4B-C247-47A9-8865-A22BC62B6AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

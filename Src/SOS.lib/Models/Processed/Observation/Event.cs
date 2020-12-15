@@ -13,7 +13,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Biotope.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Biotope { get; set; }
@@ -114,7 +114,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Substrate.
         /// </summary>
         /// <remarks>
-        ///     This value is field mapped.
+        ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
         public VocabularyValue Substrate { get; set; }
