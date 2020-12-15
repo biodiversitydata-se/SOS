@@ -34,6 +34,9 @@ namespace SOS.Administration.Gui
             services.Configure<ElasticSearchConfiguration>(
               Configuration.GetSection(nameof(ElasticSearchConfiguration)));
 
+            services.Configure<TestElasticSearchConfiguration>(
+                Configuration.GetSection(nameof(TestElasticSearchConfiguration)));
+
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));
 
