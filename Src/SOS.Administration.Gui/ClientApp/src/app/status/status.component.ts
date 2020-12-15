@@ -5,6 +5,7 @@ import { compareAsc } from 'date-fns/esm';
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
+import { LoadTestMetrics, LoadTestResult } from '../models/loadtestmetrics';
 import { MongoDbInfo } from '../models/mongodbinfo';
 import { PerformanceData } from '../models/performancedata';
 import { ProcessInfo } from '../models/providerinfo';
@@ -40,6 +41,7 @@ export class StatusComponent implements OnInit {
   mongodbinfo: MongoDbInfo[];
   statuses = [];
   processInfo: ProcessInfo[];
+  loadTestSummary: LoadTestResult[];
 
   processColumnDefs = [
     {
@@ -140,6 +142,9 @@ export class StatusComponent implements OnInit {
     
     this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
       this.searchindexinfo = result;
+    }, error => console.error(error));
+    this.http.get<LoadTestResult[]>(this.baseUrl + 'performance/loadtestsummary').subscribe(result => {
+      this.loadTestSummary = result;
     }, error => console.error(error));
     this.http.get<MongoDbInfo>(this.baseUrl + 'statusinfo/mongoinfo').subscribe(result => {
       this.mongodbinfo = []

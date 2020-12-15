@@ -113,22 +113,45 @@
         <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SpeciesObservationSystem/overview">Details in Application insights</a>
       </div>
       <div>
-        <h2>Failed searches</h2>
-        <table class="table-small">
-          <thead>
-            <tr>
-              <th scope="col">URL</th>
-              <th scope="col">Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of failedCalls">
-              <td scope="row">{{data.name}}</td>
-              <td scope="row">{{data.count}}</td>
-            </tr>
-          </tbody>
-        </table>
-        <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SpeciesObservationSystem/failures">Details in Application insights</a>
+        <div>
+          <h2>Failed searches</h2>
+          <table class="table-small">
+            <thead>
+              <tr>
+                <th scope="col">URL</th>
+                <th scope="col">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of failedCalls">
+                <td scope="row">{{data.name}}</td>
+                <td scope="row">{{data.count}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SpeciesObservationSystem/failures">Details in Application insights</a>
+        </div>
+        <div>
+          <h2>Latest load tests</h2>
+          <table class="table-small">
+            <thead>
+              <tr>
+                <th width="100px" scope="col">Date</th>
+                <th width="140px" scope="col">Iteration Count</th>
+                <th width="80px" scope="col">Rate</th>
+                <th scope="col">Avg time(ms)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of loadTestSummary.slice(0,5).reverse()">
+                <td scope="row">{{data.timestamp | date}}</td>
+                <td scope="row">{{data.metrics.iterations.count}}</td>
+                <td scope="row">{{data.metrics.iterations.rate | number}}</td>
+                <td scope="row">{{data.metrics.iteration_duration.avg | number}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>           
       </div>
     </div>
     <hr />

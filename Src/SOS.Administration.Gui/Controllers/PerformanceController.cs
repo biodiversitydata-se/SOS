@@ -41,7 +41,7 @@ namespace SOS.Administration.Gui.Controllers
     }
     public class ApplicationsInsightsTelemetryReturn
     {
-        public class AiValue
+        public class ApplicationInsightsValue
         {
             public DateTime Start { get; set; }
             public DateTime End { get; set; }
@@ -65,24 +65,53 @@ namespace SOS.Administration.Gui.Controllers
             }
             public IEnumerable<Segment> Segments { get; set; }
         }
-        public AiValue Value { get; set; }
+        public ApplicationInsightsValue Value { get; set; }
+    }
+    public class LoadTestSummary
+    {
+        public class LoadTestMetrics
+        {
+            public class LoadTestChecks
+            {
+                public int Fails { get; set; }
+                public int Passes { get; set; }
+                public int Value { get; set; }
+            }
+            public class LoadTestIterations
+            {
+                public int Count { get; set; }
+                public double Rate { get; set; }
+            }
+            public class LoadTestIterationDuration
+            {
+                public double Avg { get; set; }
+                public double Med { get; set; }
+                public double Max { get; set; }
+                public double Min { get; set; }
+            }
+            public LoadTestChecks Checks { get; set; }
+            public LoadTestIterations Iterations { get; set; }
+            public LoadTestIterationDuration Iteration_duration { get; set; }
+        }
+        public LoadTestMetrics Metrics { get; set; }
+        public DateTime Timestamp { get; set; }
     }
     
     [Route("[controller]")]
     [ApiController]
     public class PerformanceController : ControllerBase
     {
-        private readonly ElasticClient _elasticClient;
+
+        private readonly ElasticClient _testElasticClient;
         private readonly string _indexName;
         private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
         private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
         private ApplicationInsightsConfiguration _aiConfig;
 
 
-        public PerformanceController(IOptionsMonitor<ElasticSearchConfiguration> elasticConfiguration, IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig)
-        {
-            _elasticClient = elasticConfiguration.CurrentValue.GetClient();
-            _indexName = elasticConfiguration.CurrentValue.IndexPrefix + "-performance-data";
+        public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<TestElasticSearchConfiguration> testElasticConfiguration)
+        {          
+            _testElasticClient = testElasticConfiguration.CurrentValue.GetClient();
             _aiConfig = aiConfig.CurrentValue;
         }
      
@@ -128,10 +157,17 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("loadtestsummary")]
-        public async Task<IEnumerable<FailedData>> GetLoadTestSummary()
-        {           
-            var failedRequests = new List<FailedData>();           
-            return failedRequests;
+        public async Task<IEnumerable<LoadTestSummary>> GetLoadTestSummary()
+        {                       
+            var result = await _testElasticClient.SearchAsync<LoadTestSummary>(p => p.Index("sos-st-loadtests-summaries"));
+            if (result.IsValid) 
+            { 
+                return result.Documents;
+            }
+            else
+            {
+                return new List<LoadTestSummary>();
+            }
         }
         [HttpGet]
         [Route("")]
