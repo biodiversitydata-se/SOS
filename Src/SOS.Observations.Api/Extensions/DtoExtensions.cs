@@ -217,9 +217,9 @@ namespace SOS.Observations.Api.Extensions
             return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode);
         }
 
-        public static ExportFilter ToExportFilter(this ExportFilterDto searchFilterDto, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode)
         {
-            return (ExportFilter)PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode);
         }
 
         public static IEnumerable<VocabularyDto> ToVocabularyDtos(this IEnumerable<Vocabulary> vocabularies, bool includeSystemMappings = true)

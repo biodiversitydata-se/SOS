@@ -1,0 +1,15 @@
+<h4>DOI-er</h4>
+<app-doi-list [visible]="true" [data]="_doiList"></app-doi-list>
+
+<div class="float-left">
+  <select [ngModel]="_pageSize" (ngModelChange)="onPageSizeChange($event)" class="form-control-sm">
+    <option>10</option>
+    <option>25</option>
+    <option>50</option>
+    <option>100</option>
+  </select>
+</div>
+<app-pagination [pageSize]="_pageSize" [itemCount]="_total" maxPages="5" [pageIndex]="_pageIndex" (paging)="onPaging($event)"></app-pagination>
+
+
+

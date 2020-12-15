@@ -10,6 +10,19 @@ import { IMetadata, IResponse } from '../models/datacite';
 export class DoiService {
   constructor(private readonly _httpClientService: HttpClientService) { }
 
+  /**
+   * Get batch of DOI's
+   * @param take
+   * @param page
+   * @param orderBy
+   * @param sortOrder
+   */
+  getBatchAsync(take: number, page: number, orderBy: string, sortOrder: string) : Observable<IResponse<Array<IMetadata>>> {
+    return this._httpClientService.getAsync<IResponse<Array<IMetadata>>>(
+      `doi?take=${take}&page=${page}&orderBy=${orderBy}&sortOrder=${sortOrder}`
+    );
+  }
+
  /**
   * Get DOI meta data
   * @param prefix
@@ -32,8 +45,8 @@ export class DoiService {
    * Search for a DOI
    * @param searchFor
    */
-  search(searchFor: string): Observable<Array<IMetadata>> {
-    return this._httpClientService.getAsync<Array<IMetadata>>(
+  search(searchFor: string): Observable<IResponse<Array<IMetadata>>> {
+    return this._httpClientService.getAsync<IResponse<Array<IMetadata>>>(
       `doi/search?searchFor=${ searchFor.replace(/\s/, '+') }`
     );
   }

@@ -71,7 +71,7 @@ namespace SOS.Export.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<bool> ExportAndSendAsync(ExportFilter filter, string emailAddress,
+        public async Task<bool> ExportAndSendAsync(SearchFilter filter, string emailAddress,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -95,14 +95,14 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
+        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
             IJobCancellationToken cancellationToken)
         {
             return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, cancellationToken);
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, string emailAddress,
+        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName, string emailAddress,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -154,7 +154,7 @@ namespace SOS.Export.Managers
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>Path to created file</returns>
-        private async Task<string> CreateDWCExportAsync(ExportFilter filter, string fileName,
+        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try

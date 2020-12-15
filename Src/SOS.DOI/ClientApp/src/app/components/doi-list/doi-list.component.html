@@ -1,0 +1,16 @@
+<table *ngIf="visible" class="table bg-transparent">
+  <thead>
+  <tr>
+    <th scope="col">DOI</th>
+    <th scope="col">Titles</th>
+    <th scope="col">Created</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let metadata of data">
+    <th scope="row"><a [routerLink]="['/' + metadata.id]">{{metadata.id}}</a></th>
+    <td><span *ngFor="let title of metadata.attributes.titles" class="mr-1">{{title.title}}</span></td>
+    <td>{{metadata.attributes.created}}</td>
+  </tr>
+  </tbody>
+</table>

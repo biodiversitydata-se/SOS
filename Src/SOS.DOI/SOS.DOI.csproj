@@ -34,11 +34,19 @@
     <None Remove="ClientApp\src\models\datacite\doi-creator.ts" />
     <None Remove="ClientApp\src\models\datacite\doi-metadata.ts" />
     <None Remove="ClientApp\src\models\datacite\doi-response.ts" />
+    <None Remove="ClientApp\src\models\datacite\doi-responsemeta.ts" />
     <None Remove="ClientApp\src\models\datacite\doi-title.ts" />
     <None Remove="ClientApp\src\models\datacite\index.ts" />
     <None Remove="ClientApp\src\services\doi.service.ts" />
     <None Remove="ClientApp\src\services\httpclient.service.ts" />
     <None Remove="ClientApp\src\services\index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Remove="ClientApp\src\app\about\about.component.ts" />
+    <TypeScriptCompile Remove="ClientApp\src\app\components\doi-list\doi-list.component.ts" />
+    <TypeScriptCompile Remove="ClientApp\src\app\components\pagination\pagination.component.ts" />
+    <TypeScriptCompile Remove="ClientApp\src\app\list\list.component.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +70,9 @@
     </None>
     <None Update="ClientApp\src\models\datacite\doi-description.js.map">
       <DependentUpon>doi-description.js</DependentUpon>
+    </None>
+    <None Update="ClientApp\src\models\datacite\doi-metadata - Copy.js">
+      <DependentUpon>doi-metadata.ts</DependentUpon>
     </None>
     <None Update="ClientApp\src\models\datacite\doi-metadata.js">
       <DependentUpon>doi-metadata.ts</DependentUpon>

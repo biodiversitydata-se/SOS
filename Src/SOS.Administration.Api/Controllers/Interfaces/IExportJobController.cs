@@ -15,7 +15,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="blobStorageContainer"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        IActionResult RunExportAndStoreJob([FromBody] ExportFilter filter, [FromQuery] string blobStorageContainer,
+        IActionResult RunExportAndStoreJob([FromBody] SearchFilter filter, [FromQuery] string blobStorageContainer,
             [FromQuery] string fileName);
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyExportAndStoreJob(ExportFilter filter, string blobStorageContainer, string fileName,
+        IActionResult ScheduleDailyExportAndStoreJob(SearchFilter filter, string blobStorageContainer, string fileName,
             int hour, int minute);
 
         /// <summary>

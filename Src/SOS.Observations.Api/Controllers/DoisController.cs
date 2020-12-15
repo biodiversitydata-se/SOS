@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-                var exportFilter = filter.ToExportFilter("en-GB");
+                var exportFilter = filter.ToSearchFilter("en-GB");
                 var matchCount = await ObservationManager.GetMatchCountAsync(exportFilter);
 
                 if (matchCount == 0)
@@ -74,6 +74,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
                 }
 
+                creatorEmail = "mats.lindgren@slu.se";
                 var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
                     job.RunAsync(exportFilter, creatorEmail, JobCancellationToken.Null));
 

@@ -32,7 +32,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunExportAndStoreJob([FromBody] ExportFilter filter,
+        public IActionResult RunExportAndStoreJob([FromBody] SearchFilter filter,
             [FromQuery] string blobStorageContainer, [FromQuery] string fileName)
         {
             try
@@ -61,7 +61,7 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("DarwinCore/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyExportAndStoreJob([FromBody] ExportFilter filter,
+        public IActionResult ScheduleDailyExportAndStoreJob([FromBody] SearchFilter filter,
             [FromQuery] string blobStorageContainer, [FromQuery] string fileName, [FromQuery] int hour,
             [FromQuery] int minute)
         {

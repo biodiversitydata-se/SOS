@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 import { DoiService } from '../../services';
-import { IMetadata, IResponse } from '../../models/datacite';
+import { IMetadata } from '../../models/datacite';
 
 @Component({
   templateUrl: './search.component.html',
@@ -10,19 +10,39 @@ import { IMetadata, IResponse } from '../../models/datacite';
 export class SearchComponent {
   _searchTerm: string;
   _notFound: boolean;
-  _data: Array<IMetadata>;
+  _doiSearch: Array<IMetadata>;
+  _doiList: Array<IMetadata>;
+
+  private resetSearch(): void {
+    this._searchTerm = '';
+  }
+
+  private getLatest10Async(): void {
+    this._doiService.getBatchAsync(10, 1, 'created', 'desc')
+      .subscribe(
+        response => {
+          this._doiList = response.data;
+        },
+        err => {
+          console.error(err);
+        }
+      );
+  }
 
   constructor(private readonly _doiService: DoiService) {
     this._notFound = false;
+
+    this.getLatest10Async();
   }
 
   onSearchClick(): void {
     this._doiService.search(this._searchTerm)
       .subscribe(
-        data => {
-          this._data = data;
+        response => {
+          this._doiSearch = response.data;
 
-          this._notFound = this._data.length === 0;
+          this._notFound = this._doiSearch.length === 0;
+
         },
         err => {
           console.error(err);
@@ -32,7 +52,5 @@ export class SearchComponent {
     this.resetSearch();
   }
 
-  private resetSearch(): void {
-    this._searchTerm = '';
-  }
+  
 }
