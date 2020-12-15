@@ -1,0 +1,22 @@
+@import "../../../styles/_variables.scss";
+
+.adb-pagination {
+  .page-item.disabled .page-link {
+    background-color: $adb-bgcolor-whiteblue;
+  }
+
+  .page-item.active .page-link {
+    color: $adb-text-black71;
+    background-color: #fff;
+    font-weight: bold;
+  }
+
+  .page-link {
+    background-color: $adb-bgcolor-whiteblue;
+    border: none;
+  }
+
+  &.pagination-sm .page-link {
+    padding: 0.5rem 0.75rem !important;
+  }
+}

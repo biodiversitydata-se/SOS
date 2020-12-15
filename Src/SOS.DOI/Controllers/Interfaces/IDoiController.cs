@@ -1,10 +1,21 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Enums;
 
 namespace SOS.DOI.Controllers.Interfaces
 {
     public interface IDoiController
     {
+        /// <summary>
+        /// Get batch of DOI's
+        /// </summary>
+        /// <param name="take"></param>
+        /// <param name="page"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetBatchAsync(int take, int page, string orderBy, SearchSortOrder sortOrder);
+
         /// <summary>
         ///  Get DOI meta data
         /// </summary>

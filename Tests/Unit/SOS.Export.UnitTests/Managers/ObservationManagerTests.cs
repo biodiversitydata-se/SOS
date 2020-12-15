@@ -93,7 +93,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(),
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -133,7 +133,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(),
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -159,7 +159,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(),
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(),
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

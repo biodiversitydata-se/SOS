@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.DOI.Controllers.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.DOI.Controllers
@@ -30,6 +31,24 @@ namespace SOS.DOI.Controllers
             _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
             _blobStorageService = blobStorageService ?? throw new ArgumentException(nameof(blobStorageService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetBatchAsync([FromQuery]int take = 10, [FromQuery]int page = 1, [FromQuery]string orderBy = "created", [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Desc)
+        {
+            try
+            {
+                var metadata = await _dataCiteService.GetBatchAsync(take, page, orderBy, sortOrder);
+
+                return new OkObjectResult(metadata);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Getting DOI metadata failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <inheritdoc />

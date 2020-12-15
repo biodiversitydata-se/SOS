@@ -13,19 +13,7 @@
 <div *ngIf="_notFound" class="alert alert-warning" role="alert">
   Kunde inte hitta någon DOI.
 </div>
-<table *ngIf="_data" class="table bg-transparent">
-  <thead>
-  <tr>
-    <th scope="col">DOI</th>
-    <th scope="col">Titles</th>
-    <th scope="col">Created</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let metadata of _data">
-    <th scope="row"><a [routerLink]="metadata.id">{{metadata.id}}</a></th>
-    <td><span *ngFor="let title of metadata.attributes.titles" class="mr-1">{{title.title}}</span></td>
-    <td>{{metadata.attributes.created}}</td>
-  </tr>
-  </tbody>
-</table>
+<app-doi-list [visible]="!_notFound && _doiSearch" [data]="_doiSearch"></app-doi-list>
+
+<h4>Senast skapade DOI-er</h4>
+<app-doi-list [visible]="true" [data]="_doiList"></app-doi-list>

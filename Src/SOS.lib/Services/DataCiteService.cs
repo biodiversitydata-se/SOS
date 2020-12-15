@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Services.Interfaces;
 
@@ -72,6 +73,24 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
+        public async Task<DOI<IEnumerable<DOIMetadata>>> GetBatchAsync(int take, int page, string orderBy, SearchSortOrder sortOrder)
+        {
+            try
+            {
+                var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
+                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&page[size]={take}&page[number]={page}&sort={orderBy}:{(sortOrder == SearchSortOrder.Asc ? "asc" : "desc")}"));
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to get DOI batch", e);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc />
         public async Task<DOIMetadata> GetMetadataAsync(string prefix, string suffix)
         {
             try
@@ -113,14 +132,14 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DOIMetadata>> SearchMetadataAsync(string searchFor)
+        public async Task<DOI<IEnumerable<DOIMetadata>>> SearchMetadataAsync(string searchFor)
         {
             try
             {
                var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
+                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
 
-               return response?.Data;
+               return response;
             }
             catch (Exception e)
             {

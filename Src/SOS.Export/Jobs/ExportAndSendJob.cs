@@ -31,7 +31,7 @@ namespace SOS.Export.Jobs
 
         /// <inheritdoc />
         [DisplayName("Create a DwC-A file using passed filter and send an email when file is ready to download")]
-        public async Task<bool> RunAsync(ExportFilter filter, string email, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(SearchFilter filter, string email, IJobCancellationToken cancellationToken)
         {
             try
             {

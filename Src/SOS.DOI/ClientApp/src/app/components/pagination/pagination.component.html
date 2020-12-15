@@ -1,0 +1,29 @@
+<nav *ngIf="visible" class="clearfix" aria-label="Page navigation">
+  <ul class="pagination pagination-sm justify-content-center adb-plate adb-pagination m-0">
+    <li [class.disabled]="pageIndex === 1" class="page-item">
+      <a (click)="onPageNavigationClick(1)" class="page-link" [routerLink]="" attr.aria-label="Första">
+        <i class="fa fa-angle-double-left" aria-hidden="true"><<</i>
+      </a>
+    </li>
+    <li [class.disabled]="pageIndex === 1" class="page-item">
+      <a (click)="onPageNavigationClick(pageIndex-1)" class="page-link" [routerLink]="" attr.aria-label="Föregående">
+        <i class="fa fa-angle-left" aria-hidden="true"><</i>
+      </a>
+    </li>
+    <li [class.active]="pageIndex === page" *ngFor="let page of pages" class="page-item">
+      <a (click)="onPageNavigationClick(page)" class="page-link" [routerLink]="" attr.aria-label="" [attr.aria-current]="pageIndex === page ? 'page' : null">
+        {{ page }}
+      </a>
+    </li>
+    <li [class.disabled]="pageIndex === pageCount" class="page-item">
+      <a (click)="onPageNavigationClick(pageIndex+1)" class="page-link" [routerLink]="" attr.aria-label="Nästa">
+        <i class="fa fa-angle-right" aria-hidden="true">></i>
+      </a>
+    </li>
+    <li [class.disabled]="pageIndex === pageCount" class="page-item">
+      <a (click)="onPageNavigationClick(pageCount)" class="page-link" [routerLink]="" attr.aria-label="Sista">
+        <i class="fa fa-angle-double-right" aria-hidden="true">>></i>
+      </a>
+    </li>
+  </ul>
+</nav>

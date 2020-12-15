@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.DataCite;
 
 namespace SOS.Lib.Services.Interfaces
@@ -15,6 +16,16 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="data"></param>
         /// <returns></returns>
         Task<DOIMetadata> CreateDoiDraftAsync(DOIMetadata data);
+
+        /// <summary>
+        /// Get batch of DOI's
+        /// </summary>
+        /// <param name="take"></param>
+        /// <param name="page"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Task<DOI<IEnumerable<DOIMetadata>>> GetBatchAsync(int take, int page, string orderBy, SearchSortOrder sortOrder);
 
         /// <summary>
         /// Get a metadata for a doi
@@ -36,6 +47,6 @@ namespace SOS.Lib.Services.Interfaces
         /// </summary>
         /// <param name="searchFor"></param>
         /// <returns></returns>
-        Task<IEnumerable<DOIMetadata>> SearchMetadataAsync(string searchFor);
+        Task<DOI<IEnumerable<DOIMetadata>>> SearchMetadataAsync(string searchFor);
     }
 }

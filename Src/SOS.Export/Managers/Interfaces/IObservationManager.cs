@@ -16,7 +16,7 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="emailAddress"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ExportAndSendAsync(ExportFilter filter, string emailAddress,
+        Task<bool> ExportAndSendAsync(SearchFilter filter, string emailAddress,
             IJobCancellationToken cancellationToken);
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
+        Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
             IJobCancellationToken cancellationToken);
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="emailAddress"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
+        Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
             string emailAddress, IJobCancellationToken cancellationToken);
     }
 }

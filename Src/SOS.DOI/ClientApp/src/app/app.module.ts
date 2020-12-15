@@ -4,9 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
+import { DoiListComponent } from './components/doi-list/doi-list.component';
+import { PaginationComponent } from './components/pagination/pagination.component';
+import { TopMenuComponent } from './components/top-menu/top-menu.component';
+
+import { AboutComponent } from './about/about.component';
 import { AppComponent } from './app.component';
+import { ListComponent } from './list/list.component';
 import { SearchComponent } from './search/search.component';
-import { TopMenuComponent } from './top-menu/top-menu.component';
 import { ViewComponent } from './view/view.component';
 
 // Services
@@ -17,7 +22,11 @@ import {
 
 @NgModule({
   declarations: [
+    AboutComponent,
     AppComponent,
+    DoiListComponent,
+    ListComponent,
+    PaginationComponent,
     SearchComponent,
     TopMenuComponent,
     ViewComponent
@@ -28,7 +37,9 @@ import {
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: SearchComponent, pathMatch: 'full' },
-      { path: ':prefix/:suffix', component: ViewComponent, pathMatch: 'prefix' } 
+      { path: ':prefix/:suffix', component: ViewComponent, pathMatch: 'prefix' },
+      { path: 'list', component: ListComponent, pathMatch: 'full' },
+      { path: 'about', component: AboutComponent, pathMatch: 'full' },
     ])
   ],
   providers: [

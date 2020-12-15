@@ -9,5 +9,8 @@ namespace SOS.Lib.Models.DataCite
         /// </summary>
         [JsonPropertyName("data")]
         public T Data { get; set; }
+
+        [JsonPropertyName("meta")]
+        public DOIResponseMeta Meta { get; set; }
     }
 }
