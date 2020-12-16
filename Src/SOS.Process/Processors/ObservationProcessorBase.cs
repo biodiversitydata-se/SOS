@@ -57,6 +57,7 @@ namespace SOS.Process.Processors
         {
             Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
             var startTime = DateTime.Now;
+            
             try
             {
                 if (mode == JobRunModes.Full)
@@ -65,19 +66,11 @@ namespace SOS.Process.Processors
                     if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
                     {
                         Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
-                        return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
                     }
 
                     Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Failed to delete {dataProvider.Identifier} sightings");
-            }
 
-            try
-            {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
                 var verbatimCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");

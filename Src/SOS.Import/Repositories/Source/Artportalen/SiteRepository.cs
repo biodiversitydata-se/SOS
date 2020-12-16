@@ -91,12 +91,40 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
 
-		/// <summary>
-		///     Constructor
-		/// </summary>
-		/// <param name="artportalenDataService"></param>
-		/// <param name="logger"></param>
-		public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
+        /// <summary>
+        /// Get sites by id's, Up to 3 attempts will be made if call fails
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="attempt"></param>
+        /// <param name="live"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live, int attempt)
+        {
+            try
+            {
+                return await QueryAsync<SiteEntity>(GetSiteQuery(
+                        $"INNER JOIN @tvp t ON s.Id = t.Id"),
+                    new { tvp = ids.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting sites by id");
+
+                if (attempt < 2)
+                {
+                    return await GetByIdsAsync(ids, live, ++attempt);
+                }
+                
+                return null;
+            }
+        }
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="artportalenDataService"></param>
+        /// <param name="logger"></param>
+        public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
             artportalenDataService, logger)
         {
         }
@@ -106,9 +134,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-               
-
-				return await QueryAsync<SiteEntity>(GetSiteQuery("INNER JOIN SearchableSightings ss ON s.Id = ss.SiteId"));
+                return await QueryAsync<SiteEntity>(GetSiteQuery("INNER JOIN SearchableSightings ss ON s.Id = ss.SiteId"));
             }
             catch (Exception e)
             {
@@ -125,17 +151,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
 
-            try
-            {
-                return await QueryAsync<SiteEntity>(GetSiteQuery(      
-                        $"INNER JOIN @tvp t ON s.Id = t.Id"), 
-                    new { tvp = ids.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sites by id");
-                return null;
-            }
+            return await GetByIdsAsync(ids, live, 0);
         }
 
         /// <inheritdoc />

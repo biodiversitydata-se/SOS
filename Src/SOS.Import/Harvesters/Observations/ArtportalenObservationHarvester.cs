@@ -202,19 +202,25 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug(
                     $"Finish getting Artportalen sightings ({batchIndex})");
 
-                if (!sightings?.Any() ?? true)
-                {
-                    _logger.LogDebug(
-                    $"No sightings found ({batchIndex})");
-                    return 0;
-                }
-                
-                if (_artportalenConfiguration.AddTestSightings && !incremenatlMode && !_hasAddedTestSightings)
+                if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false) && !incremenatlMode && !_hasAddedTestSightings)
                 {
                     _hasAddedTestSightings = true;
                     _logger.LogDebug("Start adding test sightings");
                     AddTestSightings(_sightingRepository, ref sightings, _artportalenConfiguration.AddTestSightingIds);
                     _logger.LogDebug("Finish adding test sightings");
+                }
+
+                if (_artportalenConfiguration.HarvestStartDate.HasValue && (sightings?.Any() ?? false))
+                {
+                    sightings = sightings.Where(s => s.StartDate >= _artportalenConfiguration.HarvestStartDate.Value)
+                        ?.ToArray();
+                }
+
+                if (!sightings?.Any() ?? true)
+                {
+                    _logger.LogDebug(
+                    $"No sightings found ({batchIndex})");
+                    return 0;
                 }
 
                 _logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
