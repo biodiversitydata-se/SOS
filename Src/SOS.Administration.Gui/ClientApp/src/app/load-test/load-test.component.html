@@ -1,13 +1,13 @@
-<div *ngIf="loadtestresults">
-  <div *ngFor="let result of loadtestresults">
-    <h1>{{result.timestamp}}</h1>
-    <h2>Checks:</h2>
-    <h5>Passed:{{result.metrics.checks.passes}}</h5>
-    <h5>Failed:{{result.metrics.checks.fails}}</h5>
-    <h2>Iterations:</h2>
-    <h5>Count:{{result.metrics.iterations.count}}</h5>
-    <h5>Rate:{{result.metrics.iterations.rate}}</h5>
-    <h5>Average duration:{{result.metrics.iteration_duration.avg}}ms</h5>
-    <hr/>
+<div class="flex">  
+  <div class="flex-item">
+    <div style="display: block;">
+      <canvas baseChart width="400" height="200"
+              [datasets]="lineChartData"
+              [options]="lineChartOptions"
+              [colors]="lineChartColors"
+              [legend]="lineChartLegend"
+              [chartType]="lineChartType"
+              [plugins]="lineChartPlugins"></canvas>
+    </div>
   </div>
 </div>
