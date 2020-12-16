@@ -47,6 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilterDto filter)
         {

@@ -188,6 +188,8 @@ namespace SOS.Hangfire.JobServer
                 $"[ArtportalenSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested}");
             sb.AppendLine(
                 $"[ArtportalenSettings].[ChunkSize]: {_importConfiguration.ArtportalenConfiguration.ChunkSize}");
+            sb.AppendLine(
+                $"[ArtportalenSettings].[HarvestStartDate]: {_importConfiguration.ArtportalenConfiguration.HarvestStartDate}");
             sb.AppendLine("");
 
             sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
