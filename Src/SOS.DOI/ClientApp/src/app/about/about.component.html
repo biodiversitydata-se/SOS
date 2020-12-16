@@ -1,8 +1,43 @@
-<div class="d-flex align-items-center justify-content-center py-5">
-  <h1>
-    Om SOS DOI
-  </h1>
-  <h2>
-
-  </h2>
-</div>
+<h1>
+  Om SOS DOI
+</h1>
+<p>
+  På den här sajten kan du hitta alla DOI-er som skapats av SOS-systemet. All data kring DOI-erna tillhandahålls av <a href="https://datacite.org/" target="_blank" title="Datacite">Datacite</a>, där kan du också läsa mer om DOI-er.
+</p>
+<p>
+  DOI-er i SOS kan skapas på två olika sätt. Dels skapar systemet regelbundet DOI-er för dataset som innehåller all observationsdata och dels kan en användare själv filtrera ut ett dataset och skapa en DOI för det.
+  Skapa egna DOI gör man via SOS-sök API. Antingen programmatiskt eller via det visuella Swaggergränssnittet som du finner <a href="https://sos-search.artdata.slu.se/swagger/index.html" target="_blank" title="SOS-sök">här</a>.
+</p>
+<h2>
+  SOS-Sök
+</h2>
+<h3>
+  Swagger
+</h3>
+<p>
+  Om man väljer att använda det visuella <a href="https://sos-search.artdata.slu.se/swagger/index.html" title="SOS-sök" target="_blank">Swagger-gränssnittet</a> går man tillväga så här för att använda en metod:
+</p>
+<ul>
+  <li>Klicka på rubriken till den funktion du vill använda. T.ex. "Observations" för att söka observationer.</li>
+  <li>Därefter klickar du på vilken metod du vill använda. T.ex. "Observations/Search".</li>
+  <li>När sektionen expanderar visas en knapp med texten "Try it out" till höger. Klicka på den.</li>
+  <li>Nu kan du använda metoden genom att ange de parametrar metoden kräver. Mer information om parametrarna finner du på sidan.</li>
+</ul>
+<h3>Skapa DOI</h3>
+<p>
+  För att få skapa en DOI måste man vara inloggad och ha rätt behörighet. Vänd dig till systemansvarig om du anser dig ha behov av att skapa DOI-er.
+</p>
+<p>
+  Det finns en begränsning i hur många observationer en egenskapad DOI kan ha. Den gränsen är 2 000 000 observationer. Har man behov av dataset med fler observationer hänvisar vi till de dataset som innehåller samtliga observationer.
+  Du kan via den här sajten söka fram och ladda ner lämpligt dataset och sen själv filtrera ut de observationer du behöver.
+</p>
+<p>
+  En DOI skapas genom att man filtrerar ut de observationer man är intresserad av. Innan man tar ut en DOI, rekommenderar vi att man försäkrar sig om att datasetet innehåller det data man vill ha.
+  Detta gör man genom att använda sök och/eller export-funktionen som också återfinns på <a href="https://sos-search.artdata.slu.se/swagger/index.html" target="_blank" title="SOS-sök">SOS-sök</a> sidan.
+  Sök, export och DOI använder sig av samma filter för att begränsa antalet observationer. När du försäkrat dig om att du får fram de observationer du önskar genom sök och/eller export, är det
+  bara att kopiera filtret till DOI-anropet.
+</p>
+<p>
+  När du valt att skapa en DOI, kommer du bli notifierad via e-post när din fil och tillhörande DOI är klara. Via länken i e-postmeddelandet kan du ladda ner flen som skapats. Filen man kommer åt via länken sparas bara en begränsad tid.
+  Vill man hämta filen efter att den tiden har passerat måste man göra det via länken som man får om man söker fram DOI-n på den här sajten.
+</p>
