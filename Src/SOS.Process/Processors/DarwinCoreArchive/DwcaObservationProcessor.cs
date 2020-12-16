@@ -98,9 +98,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
                 {
                     Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
-                    return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
                 }
-
                 Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");

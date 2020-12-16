@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Configuration.Import
 {
@@ -41,5 +42,10 @@ namespace SOS.Lib.Configuration.Import
         ///     Sighting ids that should be added when AddTestSightings is set to true.
         /// </summary>
         public List<int> AddTestSightingIds { get; set; }
+
+        /// <summary>
+        /// Harvest sightings from this start date
+        /// </summary>
+        public DateTime? HarvestStartDate { get; set; }
     }
 }
