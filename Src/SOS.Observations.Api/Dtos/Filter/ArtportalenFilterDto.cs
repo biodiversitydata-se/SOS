@@ -44,12 +44,18 @@ namespace SOS.Observations.Api.Dtos.Filter
         public int? ReportedByUserId { get; set; }
         public int? ObservedByUserId { get; set; }
         public List<int> ProjectIds { get; set; }
+        /// <summary>
+        /// Limit the search by a bounding box.
+        /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
+        /// </summary>
         public List<double> BoundingBox { get; set; }
         /// <summary>
         /// Only include hits with media associated
         /// </summary>
         public bool OnlyWithMedia { get; set; }
-
+        /// <summary>
+        /// Only include hits with notes attached to them
+        /// </summary>
         public bool OnlyWithNotes { get; set; }
 
         public bool OnlyWithNotesOfInterest { get; set; }
