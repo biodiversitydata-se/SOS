@@ -70,29 +70,6 @@ namespace SOS.Process.UnitTests.Processors
         }
 
         /// <summary>
-        ///     Test processing fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AggregateAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var dataprovider = CreateDataProvider();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataprovider, null, JobRunModes.Full, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(RunStatus.Failed);
-        }
-
-        /// <summary>
         ///     Test processing exception
         /// </summary>
         /// <returns></returns>
@@ -103,7 +80,7 @@ namespace SOS.Process.UnitTests.Processors
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataprovider = CreateDataProvider();
-            _virtualHerbariumObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
