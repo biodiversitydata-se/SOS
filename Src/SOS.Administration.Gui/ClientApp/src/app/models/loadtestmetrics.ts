@@ -20,4 +20,5 @@ export class LoadTestMetrics {
 
 export class LoadTestResult {
   metrics: LoadTestMetrics;
+  timestamp: string;
 }
