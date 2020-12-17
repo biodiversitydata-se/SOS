@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
+using NLog;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
@@ -56,6 +57,7 @@ namespace SOS.Hangfire.JobServer
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
 
             Console.WriteLine("Starting up in environment:"  + _env);
+           
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
@@ -91,6 +93,9 @@ namespace SOS.Hangfire.JobServer
                         .ClearProviders()
                         .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
                         .AddNLog($"NLog.{_env}.config");
+                    var config = hostingContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+                    LogManager.Configuration.Variables["logUserName"] = config.UserName;
+                    LogManager.Configuration.Variables["logPassword"] = config.Password;
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
