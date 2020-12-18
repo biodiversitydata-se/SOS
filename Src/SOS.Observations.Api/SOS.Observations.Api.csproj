@@ -12,6 +12,8 @@
         <DocumentationFile>bin\Release\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Elastic.Apm.NLog" Version="1.5.1" />
+        <PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.1" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
         <PackageReference Include="CSharpFunctionalExtensions" Version="2.12.2" />
         <PackageReference Include="HangFire" Version="1.7.17" />
@@ -26,6 +28,7 @@
         <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
         <PackageReference Include="MongoDB.Driver.GridFS" Version="2.11.4" />
         <PackageReference Include="NGeoHash" Version="1.2.0" />
+        <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.5.0" />
         <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.3" />
         <PackageReference Include="SauceControl.InheritDoc" Version="1.1.1">
           <PrivateAssets>all</PrivateAssets>

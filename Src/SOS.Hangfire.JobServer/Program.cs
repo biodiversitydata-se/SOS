@@ -93,9 +93,7 @@ namespace SOS.Hangfire.JobServer
                         .ClearProviders()
                         .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
                         .AddNLog($"NLog.{_env}.config");
-                    var config = hostingContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-                    LogManager.Configuration.Variables["logUserName"] = config.UserName;
-                    LogManager.Configuration.Variables["logPassword"] = config.Password;
+
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
