@@ -1,6 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to Observation API will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+
+
 
 ##### Types of changes
 - `Added` for new features.
@@ -15,9 +17,19 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - New field: `Observation.Occurrence.ReproductiveCondition`
+- New search field: `Areas`. This relaces the `AreaIds` field.
+
+### Changed
+- Remove the `translationCultureCode` field from search filter, and add it as a query parameter.
+
 
 ### Fixed
-- Fix sort order in `/Observations/TaxonAggregation` endpoint.
+- Sort order in `/Observations/TaxonAggregation` endpoint. Now the paging will work.
 
-## [0.9.1] - 2020-12-02
+### Removed
+- `OutputFields` field from search filter for aggregation endpoints. Affected endpoints:  
+- `SortBy` and `SortOrder` query parameters from the `Observations/SearchAggregatedInternal` endpoint.
+- `AreaIds` field in search filter. Replaced by `Areas`
+
+## [0.9.1] - 2020-11-30
 Initial release
