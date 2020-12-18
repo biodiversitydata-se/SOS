@@ -1,5 +1,5 @@
 
-$user = "elastic"
+$user = "***REMOVED***"
 $password = "***REMOVED***"
 $credential = "${user}:${password}"
 $credentialBytes = [System.Text.Encoding]::ASCII.GetBytes($credential)
