@@ -263,7 +263,8 @@ namespace SOS.Process.Processors.Artportalen
                 
                 obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.ValidationStatus);
                 obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.LifeStage);
-                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.ReproductiveCondition, null, true);
+                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.ReproductiveCondition, null, true);
+                obs.Occurrence.Behavior = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Behavior, null, true);
                 obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, VocabularyId.Institution);
                 obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
                     ? null

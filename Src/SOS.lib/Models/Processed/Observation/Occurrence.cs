@@ -58,9 +58,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     A description of the behavior shown by the subject at
         ///     the time the Occurrence was recorded.
-        ///     Recommended best practice is to use a controlled vocabulary.
         /// </summary>
-        public string Behavior { get; set; }
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        [Object]
+        public VocabularyValue Behavior { get; set; }
 
         /// <summary>
         ///     Bird nest activity property

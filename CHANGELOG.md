@@ -17,11 +17,12 @@ All notable changes to Observation API will be documented in this file. The form
 ## [Unreleased]
 ### Added
 - New field: `Observation.Occurrence.ReproductiveCondition`
+- New vocabularies: `ReproductiveCondition` and `Behavior`
 - New search field: `Areas`. This relaces the `AreaIds` field.
 
 ### Changed
 - Remove the `translationCultureCode` field from search filter, and add it as a query parameter.
-
+- Change data type for the `Observation.Occurrence.Behavior` field from string to VocabularyValue.
 
 ### Fixed
 - Sort order in `/Observations/TaxonAggregation` endpoint. Now the paging will work.
