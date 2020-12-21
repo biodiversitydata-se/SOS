@@ -13,6 +13,13 @@ namespace SOS.Lib.Cache.Interfaces
     public interface IAreaCache : ICache<string, Area>
     {
         /// <summary>
+        /// Get list of areas
+        /// </summary>
+        /// <param name="areaKeys"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Area>> GetAreasAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+
+        /// <summary>
         ///     Get all the areas, paged
         /// </summary>
         /// <param name="areaTypes">Skip this many</param>
@@ -39,6 +46,10 @@ namespace SOS.Lib.Cache.Interfaces
         /// <returns></returns>
         Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
 
-       
+        /// Get multiple geometries
+        /// </summary>
+        /// <param name="areaKeys"></param>
+        /// <returns></returns>
+        Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
     }
 }

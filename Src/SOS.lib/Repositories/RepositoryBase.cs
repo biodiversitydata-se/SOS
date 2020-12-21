@@ -381,6 +381,21 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids)
+        {
+            try
+            {
+               return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
         {
             return await GetBatchAsync(skip, MongoCollection);

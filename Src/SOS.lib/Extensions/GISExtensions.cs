@@ -170,16 +170,6 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///     Convert angle to radians
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        private static double ToRadians(this double val)
-        {
-            return Math.PI / 180 * val;
-        }
-
-        /// <summary>
         ///     Make polygon valid
         /// </summary>
         /// <param name="polygon"></param>
@@ -272,49 +262,14 @@ namespace SOS.Lib.Extensions
             return circle;
         }
 
-        public static IFeature ToFeature(this IGeoShape geometry, IDictionary<string, object> attributes = null)
+        public static IFeature ToFeature(this IGeoShape geoShape, IDictionary<string, object> attributes = null)
         {
-            if (geometry == null)
+            if (geoShape == null)
             {
                 return null;
             }
 
-            Geometry featureGeometry = null;
-
-            switch (geometry.Type?.ToLower())
-            {
-                case "point":
-                    var point = (PointGeoShape) geometry;
-                    featureGeometry = new Point(point.Coordinates.Longitude, point.Coordinates.Latitude);
-                    break;
-                case "polygon":
-                    var polygon = (PolygonGeoShape) geometry;
-                    var linearRings = polygon.Coordinates.Select(lr =>
-                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
-                        .ToArray();
-
-                    featureGeometry = new Polygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
-                    break;
-                case "multipolygon":
-                    var multiPolygons = (MultiPolygonGeoShape) geometry;
-                    var polygons = new List<Polygon>();
-
-                    foreach (var poly in multiPolygons.Coordinates)
-                    {
-                        var lr = poly.Select(lr =>
-                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
-                            .ToArray();
-
-                        polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
-                    }
-
-                    featureGeometry = new MultiPolygon(polygons.ToArray());
-                    break;
-                default:
-                    return null;
-            }
-
-            return new Feature {Geometry = featureGeometry, Attributes = new AttributesTable(attributes)};
+            return new Feature {Geometry = geoShape.ToGeometry(), Attributes = attributes == null ? null : new AttributesTable(attributes)};
         }
 
         /// <summary>
@@ -364,33 +319,83 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///     Cast geo shape to geo json geometry
         /// </summary>
+        /// <param name="geoShape"></param>
+        /// <returns></returns>
+        public static Geometry ToGeometry(this IGeoShape geoShape)
+        {
+            if (geoShape == null)
+            {
+                return null;
+            }
+
+            switch (geoShape.Type?.ToLower())
+            {
+                case "point":
+                    var point = (PointGeoShape)geoShape;
+                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(point.Coordinates.Longitude,
+                        point.Coordinates.Latitude));
+                case "linestring":
+                    var linestring = (LineString)geoShape;
+                    return Geometry.DefaultFactory.CreateLineString(linestring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                case "linearring":
+                    var linearring = (LinearRing)geoShape;
+                    return Geometry.DefaultFactory.CreateLinearRing(linearring.Coordinates.Select(c => new Coordinate(c.X, c.Y))?.ToArray());
+                case "polygon":
+                    var polygon = (PolygonGeoShape)geoShape;
+                    var linearRings = polygon.Coordinates.Select(lr =>
+                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
+                        .ToArray();
+
+                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
+                case "multipolygon":
+                    var multiPolygons = (MultiPolygonGeoShape)geoShape;
+                    var polygons = new List<Polygon>();
+
+                    foreach (var poly in multiPolygons.Coordinates)
+                    {
+                        var lr = poly.Select(lr =>
+                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
+                            .ToArray();
+
+                        polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
+                    }
+
+                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        ///     Cast geo shape to geo json geometry
+        /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static GeoJsonGeometry ToGeoJson(this IGeoShape geometry)
+        public static GeoJsonGeometry ToGeoJson(this IGeoShape geoShape)
         {
-            if (geometry == null)
+            if (geoShape == null)
             {
                 return null;
             }
 
             var coordinates = new ArrayList();
             var type = "";
-            switch (geometry.Type?.ToLower())
+            switch (geoShape.Type?.ToLower())
             {
                 case "point":
-                    var point = (PointGeoShape) geometry;
+                    var point = (PointGeoShape)geoShape;
                     coordinates.Add(point.Coordinates.Longitude);
                     coordinates.Add(point.Coordinates.Latitude);
                     type = "Point"; // Type in correct case
                     break;
                 case "polygon":
-                    var polygon = (PolygonGeoShape) geometry;
+                    var polygon = (PolygonGeoShape)geoShape;
                     coordinates.AddRange(polygon.Coordinates
                         .Select(ls => ls.Select(pnt => new[] {pnt.Longitude, pnt.Latitude})).ToArray());
                     type = "Polygon"; // Type in correct case
                     break;
                 case "multipolygon":
-                    var multiPolygons = (MultiPolygonGeoShape) geometry;
+                    var multiPolygons = (MultiPolygonGeoShape)geoShape;
                     coordinates.AddRange(multiPolygons.Coordinates
                         .Select(p => p.Select(ls => ls.Select(pnt => new[] {pnt.Longitude, pnt.Latitude}))).ToArray());
                     type = "MultiPolygon"; // Type in correct case
@@ -571,6 +576,16 @@ namespace SOS.Lib.Extensions
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int) toCoordinateSystem;
             return transformedGeometry;
+        }
+
+        /// <summary>
+        ///     Convert angle to radians
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double ToRadians(this double val)
+        {
+            return Math.PI / 180 * val;
         }
 
         /// <summary>

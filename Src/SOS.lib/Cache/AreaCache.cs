@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
@@ -43,11 +44,39 @@ namespace SOS.Lib.Cache
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<Area>> GetAreasAsync(
+            IEnumerable<(AreaType areaType, string featureId)> areaKeys)
+        {
+            if (!areaKeys?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var missingInCache = areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Except(Cache.Keys);
+
+            if (missingInCache?.Any() ?? false)
+            {
+                var areas = await _areaRepository.GetAsync(missingInCache);
+
+                if (areas != null)
+                {
+                    foreach (var area in areas)
+                    {
+                        Cache.TryAdd(area.Id, area);
+                    }
+                }
+            }
+
+            return Cache.Where(gc => areaKeys.Select(k => k.areaType.ToAreaId(k.featureId)).Contains(gc.Key)).Select(gc => gc.Value);
+        }
+
+        /// <inheritdoc />
         public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
             int skip,
             int take)
         {
             return await _areaRepository.GetAreasAsync(areaTypes, searchString, skip, take);
+
         }
 
         /// <inheritdoc />
@@ -66,6 +95,25 @@ namespace SOS.Lib.Cache
             }
 
             return geometry;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<IGeoShape>> GetGeometriesAsync(
+            IEnumerable<(AreaType areaType, string featureId)> areaKeys)
+        {
+            if (!areaKeys?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var missingInCache = areaKeys.Except(_geometryCache.Keys);
+
+            if (missingInCache?.Any() ?? false)
+            {
+                await Task.WhenAll(missingInCache.Select(mic => GetGeometryAsync(mic.Item1, mic.Item2)));
+            }
+
+            return _geometryCache.Where(gc => areaKeys.Contains(gc.Key)).Select(gc => gc.Value);
         }
     }
 }

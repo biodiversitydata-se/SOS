@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -42,7 +43,8 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        private async Task<byte[]> GetZipppedAreaAsync(Area area){
+        private async Task<byte[]> GetZipppedAreaAsync(Area area)
+        {
             try
             {
                 if (area?.AreaType == AreaType.EconomicZoneOfSweden)
@@ -59,7 +61,7 @@ namespace SOS.Observations.Api.Managers
                     Name = area.Name
                 };
 
-                var serializeOptions = new JsonSerializerOptions{ IgnoreNullValues = true };
+                var serializeOptions = new JsonSerializerOptions { IgnoreNullValues = true };
                 serializeOptions.Converters.Add(new GeometryConverter());
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
@@ -85,12 +87,24 @@ namespace SOS.Observations.Api.Managers
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+        }
 
-    public async Task<byte[]> GetZipppedAreaAsync(AreaTypeDto areaType, string featureId)
+        public async Task<byte[]> GetZipppedAreaAsync(AreaTypeDto areaType, string featureId)
         {
             var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
             return await GetZipppedAreaAsync(area);
+        }
+
+        /// <inheritdoc />
+        public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
+        {
+            return await _areaCache.GetGeometryAsync(areaType, featureId);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys)
+        {
+            return await _areaCache.GetGeometriesAsync(areaKeys);
         }
 
         /// <inheritdoc />
@@ -99,13 +113,13 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var result = await _areaCache.GetAreasAsync(areaTypes.Select(at => (AreaType) at), searchString, skip, take);
+                var result = await _areaCache.GetAreasAsync(areaTypes.Select(at => (AreaType)at), searchString, skip, take);
 
                 return new PagedResult<AreaBaseDto>
                 {
                     Records = result.Records.Select(r => new AreaBaseDto
                     {
-                        AreaType = (AreaTypeDto) r.AreaType,
+                        AreaType = (AreaTypeDto)r.AreaType,
                         FeatureId = r.FeatureId,
                         Name = r.Name
                     }),

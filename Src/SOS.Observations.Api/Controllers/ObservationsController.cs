@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Nest;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -17,6 +22,7 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Swagger;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -27,19 +33,155 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class ObservationsController : ObservationBaseController, IObservationsController
     {
+        private readonly IAreaManager _areaManager;
+        private readonly int _tilesLimit;
         private readonly ILogger<ObservationsController> _logger;
 
+        private void AdjustEnvelopeByShape(IGeoShape geoShape, ref double? bboxLeft,
+            ref double? bboxTop,
+            ref double? bboxRight,
+            ref double? bboxBottom)
+        {
+            if (geoShape != null)
+            {
+                var envelope = geoShape.ToGeometry().EnvelopeInternal;
+
+                if (!envelope.IsNull)
+                {
+                    if (!bboxLeft.HasValue || envelope.MinX < bboxLeft)
+                    {
+                        bboxLeft = envelope.MinX;
+                    }
+                    if (!bboxRight.HasValue || envelope.MaxX > bboxRight)
+                    {
+                        bboxRight = envelope.MaxX;
+                    }
+                    if (!bboxBottom.HasValue || envelope.MinY < bboxBottom)
+                    {
+                        bboxBottom = envelope.MinY;
+                    }
+                    if (!bboxTop.HasValue || envelope.MaxY > bboxTop)
+                    {
+                        bboxTop = envelope.MaxY;
+                    }
+                }
+            }
+        }
+
         /// <summary>
-        ///     Constructor
+        /// Get bounding box
+        /// </summary>
+        /// <param name="bboxLeft"></param>
+        /// <param name="bboxTop"></param>
+        /// <param name="bboxRight"></param>
+        /// <param name="bboxBottom"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        private async Task<Envelope> GetBoundingBox(double? bboxLeft = null,
+            double? bboxTop = null,
+            double? bboxRight = null,
+            double? bboxBottom = null,
+            SearchFilterBaseDto filter = null)
+        {
+            // If areas passed, adjust bounding box to them
+            if (filter.Areas?.Any() ?? false)
+            {
+               var areaGeometries = await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
+                foreach (var areaGeometry in areaGeometries)
+                {
+                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
+                }
+            }
+
+            // If geometries passed, adjust bounding box to them
+            if (filter.Geometry?.Geometries?.Any() ?? false)
+            {
+                foreach (var areaGeometry in filter.Geometry.Geometries)
+                {
+                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
+                }
+            }
+
+            // Create a bound box using user passed values
+            var boundingBox = Geometry.DefaultFactory.CreatePolygon(new LinearRing(new[]
+            {
+                new Coordinate(bboxLeft ?? 0, bboxTop ?? 0),
+                new Coordinate(bboxLeft ?? 0, bboxBottom ?? 0),
+                new Coordinate(bboxRight ?? 0, bboxBottom ?? 0),
+                new Coordinate(bboxRight ?? 0, bboxTop ?? 0),
+                new Coordinate(bboxLeft ?? 0, bboxTop ?? 0),
+            })).EnvelopeInternal;
+
+
+            // Get geometry of sweden economic zone
+            var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "100");
+            // Get bounding box of swedish economic zone
+            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
+
+            // Try to intersect sweden and user defined bb
+            boundingBox = swedenBoundingBox.Intersection(boundingBox);
+            
+            // If user bb outside of sweden, use sweden
+            if (boundingBox.IsNull)
+            {
+                boundingBox = swedenBoundingBox;
+            }
+            
+            return boundingBox;
+        }
+
+        private async Task<Result<Envelope>> ValidateBoundingBoxAsync(double? left, double? top, double? right, double? bottom, int zoom, SearchFilterBaseDto filter)
+        {
+            if (left.HasValue && top.HasValue && right.HasValue && bottom.HasValue)
+            {
+                if (left >= right)
+                {
+                    return Result.Failure<Envelope>("Bbox left value is >= right value.");
+                }
+
+                if (bottom >= top)
+                {
+                    return Result.Failure<Envelope>("Bbox bottom value is >= top value.");
+                }
+            }
+
+            var boundingBox = await GetBoundingBox(left, top, right, bottom, filter);
+
+            var tileWidthInDegrees = 360 / Math.Pow(2, zoom);
+            var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(boundingBox.Centre.Y.ToRadians());
+
+            var lonDiff = Math.Abs(boundingBox.MaxX - boundingBox.MinX);
+            var latDiff = Math.Abs(boundingBox.MaxY - boundingBox.MinY);
+            var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
+            var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
+            var maxTilesTot = maxLonTiles * maxLatTiles;
+
+            if (maxTilesTot > _tilesLimit)
+            {
+                return Result.Failure<Envelope>($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using lower zoom or a smaller bounding box.");
+            }
+
+            return Result.Success(boundingBox);
+        }
+
+        /// <summary>
+        /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="taxonManager"></param>
+        /// <param name="areaManager"></param>
+        /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager,
             ITaxonManager taxonManager,
+            IAreaManager areaManager,
+            ObservationApiConfiguration observationApiConfiguration,
             ILogger<ObservationsController> logger) : base(observationManager, taxonManager)
         {
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
+            _tilesLimit = observationApiConfiguration?.TilesLimit ??
+                          throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -81,6 +223,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = true,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
+
             try
             {
                 var validationResult = Result.Combine(
@@ -257,17 +400,20 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
-                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bboxOrError.Value);
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bbox);
+
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -342,17 +488,19 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
-                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bboxOrError.Value);
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -397,17 +545,19 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
-                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError,
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bboxOrError.Value);
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -454,17 +604,20 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError,
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bboxOrError.Value, skip, take);
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bbox, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -511,17 +664,21 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError,
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bboxOrError.Value, skip, take);
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bbox, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);

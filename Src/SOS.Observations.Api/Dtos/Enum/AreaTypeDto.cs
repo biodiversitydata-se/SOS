@@ -16,7 +16,6 @@
         Spa = 20,
         County = 21,
         ProtectedNature = 22,
-        EconomicZoneOfSweden = 25,
         Sci = 26,
         WaterArea = 27
     }

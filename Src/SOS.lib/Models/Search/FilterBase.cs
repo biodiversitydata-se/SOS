@@ -95,25 +95,6 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     True if any filter property is set.
-        /// </summary>
-        public bool IsFilterActive =>
-            (Areas?.Any() ?? false) ||
-            (CountyIds?.Any() ?? false) ||
-            (DataProviderIds?.Any() ?? false) ||
-            EndDate != null ||
-            (GeometryFilter?.IsValid ?? false) ||
-            (GenderIds?.Any() ?? false) ||
-            (MunicipalityIds?.Any() ?? false) ||
-            OnlyValidated.HasValue ||
-            (ParishIds?.Any() ?? false) || 
-            PositiveSightings.HasValue ||
-            (ProvinceIds?.Any() ?? false) ||
-            (RedListCategories?.Any() ?? false) ||
-            StartDate != null ||
-            (TaxonIds?.Any() ?? false);
-
-        /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.
         /// </summary>
         public ICollection<string> MunicipalityIds { get; set; }

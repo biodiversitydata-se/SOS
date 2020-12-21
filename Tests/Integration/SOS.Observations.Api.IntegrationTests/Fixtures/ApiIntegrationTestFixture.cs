@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.Lib.Cache;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
@@ -58,12 +59,21 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var taxonManager = CreateTaxonManager(processClient, memoryCache);
+            var areaManager = CreateAreaManager(processClient);
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient, memoryCache);
             var vocabularyManger = CreateVocabularyManager(processClient);
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, taxonManager);
-            ObservationsController = new ObservationsController(observationManager, taxonManager, new NullLogger<ObservationsController>());
+            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, new ObservationApiConfiguration() { TilesLimit = 100000 }, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             TaxonManager = taxonManager;
+        }
+
+        private AreaManager CreateAreaManager(ProcessClient processClient)
+        {
+            var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
+            var areaCache = new AreaCache(areaRepository);
+            var areaManager = new AreaManager(areaCache, new NullLogger<AreaManager>());
+            return areaManager;
         }
 
         private TaxonManager CreateTaxonManager(ProcessClient processClient, IMemoryCache memoryCache)

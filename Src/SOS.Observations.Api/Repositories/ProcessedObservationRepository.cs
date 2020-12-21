@@ -573,8 +573,8 @@ namespace SOS.Observations.Api.Repositories
                 .Aggregations(a => a.Filter("geotile_filter", g => g
                     .Filter(f => f.GeoBoundingBox(bb => bb
                         .Field("location.pointLocation")
-                        .BoundingBox(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
-                        )))
+                        .BoundingBox(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))
+                   ))
                     .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
                         .Field("location.pointLocation")
                         .Size(maxNrReturnedBuckets + 1)
