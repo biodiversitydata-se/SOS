@@ -217,6 +217,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();
         }
     }
 }
