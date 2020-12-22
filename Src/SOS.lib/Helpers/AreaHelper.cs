@@ -60,7 +60,11 @@ namespace SOS.Lib.Helpers
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
                 processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+            processedObservation.Location.County = positionLocation?.County;
+            processedObservation.Location.Municipality = positionLocation?.Municipality;
+            processedObservation.Location.Parish = positionLocation?.Parish;
+            processedObservation.Location.Province = positionLocation?.Province;
+            processedObservation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
         }

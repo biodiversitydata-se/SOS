@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Configuration.Shared;
+﻿using System.Collections.Generic;
+using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Lib.Configuration.Import
 {
@@ -9,5 +10,10 @@ namespace SOS.Lib.Configuration.Import
         /// If set to null all sightings will be fetched.
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
+
+        /// <summary>
+        /// Data types to handle
+        /// </summary>
+        public IEnumerable<string> ValidDataTypes { get; set; }
     }
 }

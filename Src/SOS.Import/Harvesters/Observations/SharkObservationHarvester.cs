@@ -90,6 +90,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 var verbatimFactory = new SharkHarvestFactory();
 
+
                 foreach (var row in dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray()))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -100,6 +101,12 @@ namespace SOS.Import.Harvesters.Observations
                     }
 
                     var dataSetName = row[datasetNameIndex];
+
+                    if (_sharkServiceConfiguration.ValidDataTypes.Count(vt =>
+                        dataSetName.IndexOf(vt, StringComparison.CurrentCultureIgnoreCase) != -1) == 0)
+                    {
+                       continue;
+                    }
 
                     _logger.LogDebug($"Start getting file: {dataSetName}");
 

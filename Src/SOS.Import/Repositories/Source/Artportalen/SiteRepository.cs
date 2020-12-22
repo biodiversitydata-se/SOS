@@ -33,7 +33,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                ap.Name AS ProvinceName,
 	                acp.FeatureId AS CountryPartFeatureId,
 	                acp.Name AS CountryPartName,
-	                apa.FeatureId AS ParishId,
+	                apa.FeatureId AS ParishFeatureId,
 	                apa.Name AS ParishName,
 					s.ParentId AS ParentSiteId,
 					s.PresentationNameParishRegion

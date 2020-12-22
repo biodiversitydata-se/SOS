@@ -55,7 +55,7 @@ namespace SOS.Process.Processors.Shark
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
-
+            var sharkSampleId = verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId;
             var obs = new Observation
             {
                 DataProviderId = _dataProvider.Id,
@@ -95,8 +95,8 @@ namespace SOS.Process.Processors.Shark
                 },
                 Occurrence = new Occurrence
                 {
-                    CatalogNumber = verbatim.SharkSampleId,
-                    OccurrenceId = $"urn:lsid:shark:Sighting:{verbatim.SharkSampleId}",
+                    CatalogNumber = sharkSampleId,
+                    OccurrenceId = $"urn:lsid:shark:Sighting:{sharkSampleId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,

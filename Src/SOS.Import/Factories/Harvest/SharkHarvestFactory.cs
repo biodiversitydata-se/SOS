@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Lib.Extensions;
@@ -32,8 +36,10 @@ namespace SOS.Import.Factories.Harvest
                     return null;
                 }
 
-                return from r in fileData.Rows
+                var verbatims = from r in fileData.Rows
                     select CastEntityToVerbatim(r.ToArray(), propertyMapping);
+
+                return from v in verbatims where v != null select v;
             });
         }
 
@@ -45,18 +51,28 @@ namespace SOS.Import.Factories.Harvest
         private SharkObservationVerbatim CastEntityToVerbatim(IReadOnlyList<string> rowData,
             IDictionary<string, int> propertyMapping)
         {
-            var observation = new SharkObservationVerbatim();
-            foreach (var propertyName in propertyMapping)
+            if (propertyMapping.TryGetValue("value", out var valueIndex))
             {
-                if (string.IsNullOrEmpty(rowData[propertyName.Value]))
+                if (!double.TryParse(rowData[valueIndex], NumberStyles.Number, CultureInfo.InvariantCulture, out var value) || value == 0)
                 {
-                    continue;
+                    return null;
                 }
 
-                observation.SetProperty(propertyName.Key, rowData[propertyName.Value]);
+                var observation = new SharkObservationVerbatim();
+                foreach (var propertyName in propertyMapping)
+                {
+                    if (string.IsNullOrEmpty(rowData[propertyName.Value]))
+                    {
+                        continue;
+                    }
+
+                    observation.SetProperty(propertyName.Key, rowData[propertyName.Value]);
+                }
+
+                return observation;
             }
 
-            return observation;
+            return null;
         }
     }
 }
