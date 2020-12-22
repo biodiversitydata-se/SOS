@@ -58,6 +58,7 @@ namespace SOS.Import.Factories.Validation
         }
 
         protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync();
+        protected abstract Task<long> GetTotalObservationsCountAsync();
         protected abstract Observation CreateProcessedObservation(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
         protected abstract void ValidateVerbatimData(TVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder);
         protected abstract void UpdateTermDictionaryValueSummary(
@@ -70,7 +71,7 @@ namespace SOS.Import.Factories.Validation
             HashSet<int> nonMatchingTaxonIds, 
             HashSet<string> nonMatchingScientificNames);
 
-        public async Task<DwcaDataValidationReport<object, Observation>> CreateDataValidationSummary(
+        public async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
             DataProvider dataProvider,
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 100,
@@ -92,6 +93,7 @@ namespace SOS.Import.Factories.Validation
             }
             HashSet<int> nonMatchingTaxonIds = new HashSet<int>();
             HashSet<string> nonMatchingScientificNames = new HashSet<string>();
+            var totalCount = await GetTotalObservationsCountAsync();
             using var cursor = await GetAllObservationsByCursorAsync();
             while (await cursor.MoveNextAsync())
             {
@@ -182,13 +184,13 @@ namespace SOS.Import.Factories.Validation
             {
                 remarks.Add("No remarks.");
             }
-            return new DwcaDataValidationReport<object, Observation>
+            return new DataValidationReport<object, Observation>
             {
                 Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport },
-                Summary = new DwcaDataValidationReportSummary
+                Summary = new DataValidationReportSummary
                 {
                     ReportCreatedDate = DateTime.Now.ToString("yyyy-MM-dd"),
-                    TotalNumberOfObservationsInFile = 0, // todo
+                    TotalNumberOfObservationsInDb = totalCount,
                     NrObservationsProcessed = nrProcessedObservations,
                     NrValidObservations = nrValidObservations,
                     NrInvalidObservations = nrInvalidObservations,

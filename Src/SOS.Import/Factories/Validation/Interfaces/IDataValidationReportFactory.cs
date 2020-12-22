@@ -7,7 +7,7 @@ namespace SOS.Import.Factories.Validation.Interfaces
 {
     public interface IDataValidationReportFactory
     {
-        public Task<DwcaDataValidationReport<object, Observation>> CreateDataValidationSummary(
+        public Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
             DataProvider dataProvider,
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 10,

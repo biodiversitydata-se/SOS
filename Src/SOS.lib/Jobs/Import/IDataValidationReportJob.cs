@@ -10,7 +10,7 @@ namespace SOS.Lib.Jobs.Import
     public interface IDataValidationReportJob
     {
         /// <summary>
-        ///     Run create DwC-A validation report job.
+        ///     Run create a data validation report job for a specific data provider.
         /// </summary>
         /// <returns></returns>
         [DisplayName("Data Validation Report, Data provider: \"{0}\"")]

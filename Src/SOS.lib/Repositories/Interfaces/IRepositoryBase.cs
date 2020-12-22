@@ -98,6 +98,19 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<bool> CheckIfCollectionExistsAsync(string collectionName);
 
         /// <summary>
+        /// Count the number of documents in the collection.
+        /// </summary>
+        /// <returns></returns>
+        Task<long> CountAllDocumentsAsync();
+
+        /// <summary>
+        /// Count the number of documents in the collection.
+        /// </summary>
+        /// <param name="mongoCollection"></param>
+        /// <returns></returns>
+        Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
         ///     Remove
         /// </summary>
         /// <param name="id"></param>

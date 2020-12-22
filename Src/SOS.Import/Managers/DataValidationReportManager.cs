@@ -27,7 +27,7 @@ namespace SOS.Import.Managers
             };
         }
 
-        public async Task<DwcaDataValidationReport<object, Observation>> CreateDataValidationReport(
+        public async Task<DataValidationReport<object, Observation>> CreateDataValidationReport(
             DataProvider dataProvider, 
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 10, 

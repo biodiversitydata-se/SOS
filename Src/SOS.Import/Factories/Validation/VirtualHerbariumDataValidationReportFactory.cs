@@ -39,6 +39,12 @@ namespace SOS.Import.Factories.Validation
         {
             return await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
         }
+
+        protected override async Task<long> GetTotalObservationsCountAsync()
+        {
+            return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
+        }
+
         protected override Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
             var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);

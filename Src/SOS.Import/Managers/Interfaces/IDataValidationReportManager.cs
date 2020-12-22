@@ -8,7 +8,7 @@ namespace SOS.Import.Managers.Interfaces
 {
     public interface IDataValidationReportManager
     {
-        public Task<DwcaDataValidationReport<object, Observation>> CreateDataValidationReport(
+        public Task<DataValidationReport<object, Observation>> CreateDataValidationReport(
             DataProvider dataProvider,
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 10,
