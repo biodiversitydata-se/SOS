@@ -72,6 +72,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.Gender]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.ReproductiveCondition,
                     valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
+                ResolveVocabularyMappedValue(observation.Occurrence?.Behavior,
+                    valueMappingDictionaries[VocabularyId.Behavior]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.OrganismQuantityUnit,
                     valueMappingDictionaries[VocabularyId.Unit]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.EstablishmentMeans,

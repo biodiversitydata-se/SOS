@@ -78,6 +78,34 @@ namespace SOS.Lib.Models.Search
         public string FieldTranslationCultureCode { get; set; }
 
         /// <summary>
+        /// Bird validation area id's
+        /// </summary>
+        public ICollection<string> BirdValidationAreaIds { get; set; }
+
+        /// <summary>
+        /// County id's
+        /// </summary>
+        public ICollection<string> CountyIds { get; set; }
+
+        /// <summary>
+        ///     Only get data from these providers
+        /// </summary>
+        public IEnumerable<int> DataProviderIds { get; set; }
+
+        /// <summary>
+        ///     Observation end date specified in the ISO 8601 standard.
+        /// </summary>
+        public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        ///     Field mapping translation culture code.
+        ///     Available values.
+        ///     sv-SE (Swedish)
+        ///     en-GB (English)
+        /// </summary>
+        public string FieldTranslationCultureCode { get; set; }
+
+        /// <summary>
         ///     Geometry filter 
         /// </summary>
         public GeometryFilter GeometryFilter { get; set; }
@@ -93,6 +121,11 @@ namespace SOS.Lib.Models.Search
         ///     for the hierarchical underlying taxa.
         /// </summary>
         public bool IncludeUnderlyingTaxa { get; set; }
+
+        /// <summary>
+        ///     Decides whether to search for the exact taxa or
+        ///     for the hierarchical underlying taxa.
+        /// </summary>
 
         /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.

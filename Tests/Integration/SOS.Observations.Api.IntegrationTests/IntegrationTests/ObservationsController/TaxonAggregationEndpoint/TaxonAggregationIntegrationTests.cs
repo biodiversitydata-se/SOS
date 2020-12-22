@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().BeGreaterThan(8000, "There are observations on more than 8 000 taxa inside the bounding box");
+            result.TotalCount.Should().BeGreaterThan(7500, "There are observations on more than 7 500 taxa inside the bounding box");
             result.Records.First().ObservationCount.Should().BeGreaterThan(2500,
                 "The taxon with most observations inside the bounding box has more than 2 500 observations");
         }

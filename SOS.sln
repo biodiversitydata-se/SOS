@@ -22,8 +22,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
-		Docs\FieldMapping.md = Docs\FieldMapping.md
 		README.md = README.md
+		Docs\Vocabularies.md = Docs\Vocabularies.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{A173A436-C08B-4D4C-8245-09C0A037B6A7}"

@@ -170,10 +170,10 @@ export class StatusComponent implements OnInit {
       this.hostingenvironment = result;
     }, error => console.error(error));
     this.runTests();
-    this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=P2D&interval=P1D').subscribe(result => {
+    this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=P3D&interval=P1D').subscribe(result => {
       this.performanceComparison = [];
       for (var request of result.requests) {
-        if (request.length == 3) {
+        if (request.length == 4) {
           let compare = new DataCompare();
           compare.source = request[0].requestName;
           compare.today = request[2].timeTakenMs;
@@ -215,6 +215,36 @@ export class StatusComponent implements OnInit {
       return true;
     }
     return false;
+  }
+  isPerformanceRed(today: number, yesterday: number): boolean {
+    let percentage = yesterday / today;
+    if (percentage <= 0.5) {
+      return true;
+    }
+    return false;
+  }
+  isPerformanceYellow(today: number, yesterday: number): boolean {
+    let percentage = yesterday / today;
+    if (percentage < 1.0 && percentage > 0.5) {
+      return true;
+    }
+    else {
+      return false;
+    }    
+  }
+  isPerformanceGreen(today: number, yesterday: number): boolean {
+    if (today <= yesterday) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  getYesterdayDate() {    
+      return format(subHours(new Date(), 24), 'MMM dd')    
+  }
+  getYesterYesterdayDate() {
+    return format(subHours(new Date(), 48), 'MMM dd')
   }
   gaugeColorFunction(value: number): string {
     if (value < 75) {

@@ -19,6 +19,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
+using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.Artportalen
@@ -263,7 +264,8 @@ namespace SOS.Process.Processors.Artportalen
                 
                 obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.ValidationStatus);
                 obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.LifeStage);
-                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.ReproductiveCondition, null, true);
+                obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.ReproductiveCondition, null, true);
+                obs.Occurrence.Behavior = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Behavior, null, true);
                 obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, VocabularyId.Institution);
                 obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
                     ? null
@@ -274,7 +276,7 @@ namespace SOS.Process.Processors.Artportalen
                     (int) UnitId.Individuals);
                 obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
-                obs.MeasurementOrFacts = CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
+                obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
                 return obs;
             }
@@ -298,8 +300,9 @@ namespace SOS.Process.Processors.Artportalen
             };
         }
 
-        private List<ExtendedMeasurementOrFact> CreateMeasurementOrFactsFromProjects(string occurrenceId, IEnumerable<Project> projects)
+        private List<ExtendedMeasurementOrFact> CreateMeasurementOrFacts(string occurrenceId, ArtportalenObservationVerbatim verbatimObservation)
         {
+            IEnumerable<Project> projects = verbatimObservation.Projects;
             if (projects == null || !projects.Any()) return null;
             var emofCollection = new List<ExtendedMeasurementOrFact>();
 
@@ -312,22 +315,48 @@ namespace SOS.Process.Processors.Artportalen
 
                 foreach (var projectParameter in project.ProjectParameters)
                 {
-                    var emof = new ExtendedMeasurementOrFact();
-                    emof.OccurrenceID = occurrenceId;
-                    emof.MeasurementID = $"{project.Id}-{projectParameter.Id}";
-                    emof.MeasurementType = projectParameter.Name;
-                    emof.MeasurementValue = projectParameter.Value;
-                    emof.MeasurementUnit = projectParameter.Unit;
-                    emof.MeasurementDeterminedDate = DwcFormatter.CreateDateIntervalString(project.StartDate, project.EndDate);
-                    emof.MeasurementMethod = GetMeasurementMethodDescription(project);
-                    emof.MeasurementRemarks = GetMeasurementRemarks(projectParameter, project);
-
-                    emofCollection.Add(emof);
+                    var emofRecord = CreateEmofRecordFromProjectParameter(occurrenceId, project, projectParameter);
+                    emofCollection.Add(emofRecord);
                 }
+            }
+
+            if (verbatimObservation.Length.HasValue)
+            {
+                var emof = new ExtendedMeasurementOrFact();
+                emof.OccurrenceID = occurrenceId;
+                emof.MeasurementType = "Length";
+                emof.MeasurementValue = verbatimObservation.Length.ToString();
+                emof.MeasurementUnit = "cm";
+                emofCollection.Add(emof);
+            }
+
+            if (verbatimObservation.Weight.HasValue)
+            {
+                var emof = new ExtendedMeasurementOrFact();
+                emof.OccurrenceID = occurrenceId;
+                emof.MeasurementType = "Weight";
+                emof.MeasurementValue = verbatimObservation.Weight.ToString();
+                emof.MeasurementUnit = "gram";
+                emofCollection.Add(emof);
             }
 
             if (!emofCollection.Any()) return null;
             return emofCollection;
+        }
+
+        private ExtendedMeasurementOrFact CreateEmofRecordFromProjectParameter(string occurrenceId, Project project,
+            ProjectParameter projectParameter)
+        {
+            var emof = new ExtendedMeasurementOrFact();
+            emof.OccurrenceID = occurrenceId;
+            emof.MeasurementID = $"{project.Id}-{projectParameter.Id}";
+            emof.MeasurementType = projectParameter.Name;
+            emof.MeasurementValue = projectParameter.Value;
+            emof.MeasurementUnit = projectParameter.Unit;
+            emof.MeasurementDeterminedDate = DwcFormatter.CreateDateIntervalString(project.StartDate, project.EndDate);
+            emof.MeasurementMethod = GetMeasurementMethodDescription(project);
+            emof.MeasurementRemarks = GetMeasurementRemarks(projectParameter, project);
+            return emof;
         }
 
         private string GetMeasurementMethodDescription(Project project)

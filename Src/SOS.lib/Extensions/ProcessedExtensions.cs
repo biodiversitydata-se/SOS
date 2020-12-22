@@ -147,7 +147,7 @@ namespace SOS.Lib.Extensions
                 AssociatedReferences = source.AssociatedReferences,
                 AssociatedSequences = source.AssociatedSequences,
                 AssociatedTaxa = source.AssociatedTaxa,
-                Behavior = source.Activity?.Value,
+                Behavior = source.Behavior?.Value,
                 CatalogNumber = source.CatalogNumber,
                 Disposition = source.Disposition,
                 EstablishmentMeans = source.EstablishmentMeans?.Value,

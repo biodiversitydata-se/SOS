@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -77,6 +78,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         {
             try
             {
+                if (input == "") return "";
                 return input.First().ToString().ToUpper() + input.Substring(1);
             }
             catch (Exception e)

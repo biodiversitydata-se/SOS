@@ -6,7 +6,7 @@ $jsonString = ConvertTo-Json $jsonObject -Compress -Depth 2
 Write-Host $jsonString
 
 $user = "elastic"
-$password = "artdataroot"
+$password = "***REMOVED***"
 $credential = "${user}:${password}"
 $credentialBytes = [System.Text.Encoding]::ASCII.GetBytes($credential)
 $base64Credential = [System.Convert]::ToBase64String($credentialBytes)

@@ -86,8 +86,8 @@
           <thead>
             <tr>
               <th scope="col">URL</th>
-              <th scope="col">Today</th>
-              <th scope="col">Yesterday</th>
+              <th scope="col">{{getYesterdayDate()}}</th>
+              <th scope="col">{{getYesterYesterdayDate()}}</th>
               <th scope="col">Difference</th>
               <th></th>
             </tr>
@@ -98,12 +98,15 @@
               <td scope="row">{{data.source}}</td>
               <td scope="row">{{data.today}}ms</td>
               <td scope="row">{{data.yesterday}}ms</td>
-              <td scope="row" [class.red]="(data.today - data.yesterday) >= 0" [class.green]="(data.today - data.yesterday) < 0">{{data.today - data.yesterday | number}}ms</td>
+              <td scope="row" [class.red]="isPerformanceRed(data.today,data.yesterday)" [class.yellow]="isPerformanceYellow(data.today,data.yesterday)" [class.green]="isPerformanceGreen(data.today,data.yesterday)">{{data.today - data.yesterday | number}}ms</td>
               <td>
-                <span *ngIf="(data.today - data.yesterday) > 0">
+                <span *ngIf="isPerformanceRed(data.today,data.yesterday)">
                   <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
                 </span>
-                <span *ngIf="(data.today - data.yesterday) <= 0">
+                <span *ngIf="isPerformanceYellow(data.today,data.yesterday)">
+                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="gold" /></svg>
+                </span>
+                <span *ngIf="isPerformanceGreen(data.today,data.yesterday)">
                   <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
                 </span>
               </td>

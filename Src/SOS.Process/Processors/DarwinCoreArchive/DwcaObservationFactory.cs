@@ -489,7 +489,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.AssociatedReferences = verbatimObservation.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatimObservation.AssociatedSequences;
             processedOccurrence.AssociatedTaxa = verbatimObservation.AssociatedTaxa;
-            processedOccurrence.Behavior = verbatimObservation.Behavior;
             processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber ?? verbatimObservation.OccurrenceID;
             processedOccurrence.Disposition = verbatimObservation.Disposition;
             processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans,
@@ -515,6 +514,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Gender]);
             processedOccurrence.ReproductiveCondition = GetSosId(verbatimObservation.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
+            processedOccurrence.Behavior = GetSosId(verbatimObservation.Behavior, _vocabularyById.GetValue(VocabularyId.Behavior));
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;

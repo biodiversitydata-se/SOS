@@ -73,6 +73,7 @@ namespace SOS.Administration.Api
                 {
                     logging.ClearProviders();
                     logging.SetMinimumLevel(LogLevel.Trace);
+                    LogManager.ReconfigExistingLoggers();
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {

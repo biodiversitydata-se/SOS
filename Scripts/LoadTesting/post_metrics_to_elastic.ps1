@@ -1,6 +1,6 @@
 
-$user = "elastic"
-$password = "artdataroot"
+$user = "***REMOVED***"
+$password = "***REMOVED***"
 $credential = "${user}:${password}"
 $credentialBytes = [System.Text.Encoding]::ASCII.GetBytes($credential)
 $base64Credential = [System.Convert]::ToBase64String($credentialBytes)
