@@ -68,6 +68,7 @@ namespace SOS.Import.Jobs
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
                 .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Defects)
                 .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
             var jsonSettings = new JsonSerializerSettings()
