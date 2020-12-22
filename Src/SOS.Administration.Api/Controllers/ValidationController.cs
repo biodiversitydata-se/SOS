@@ -58,9 +58,9 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RunDataValidationJob(
             [FromQuery] string dataProviderIdOrIdentifier,
-            [FromQuery] int maxNrObservationsToRead,
-            [FromQuery] int nrValidObservationsInReport,
-            [FromQuery] int nrInvalidObservationsInReport)
+            [FromQuery] int maxNrObservationsToRead = 100000,
+            [FromQuery] int nrValidObservationsInReport = 10,
+            [FromQuery] int nrInvalidObservationsInReport = 100)
         {
             try
             {

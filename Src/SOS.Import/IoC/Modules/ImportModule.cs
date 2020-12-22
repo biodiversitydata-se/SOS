@@ -4,6 +4,7 @@ using SOS.Import.Containers;
 using SOS.Import.Containers.Interfaces;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
+using SOS.Import.Factories.Validation;
 using SOS.Import.Factories.Vocabularies;
 using SOS.Import.Harvesters;
 using SOS.Import.Harvesters.Interfaces;
@@ -96,6 +97,7 @@ namespace SOS.Import.IoC.Modules
             // Managers
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
 
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
@@ -183,6 +185,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaTypeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DiscoveryMethodVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DeterminationMethodVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
