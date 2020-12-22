@@ -22,8 +22,8 @@ namespace SOS.Administration.Api.Models
         /// <summary>
         /// Max number of valid observations to include in report.
         /// </summary>
-        [DefaultValue(100)]
-        public int NrValidObservationsInReport { get; set; } = 100;
+        [DefaultValue(10)]
+        public int NrValidObservationsInReport { get; set; } = 10;
 
         /// <summary>
         /// Max number of invalid observations to include in report.

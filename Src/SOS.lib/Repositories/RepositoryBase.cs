@@ -327,6 +327,18 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<long> CountAllDocumentsAsync()
+        {
+            return await CountAllDocumentsAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+        }
+
+        /// <inheritdoc />
         public async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
         {
             return await DeleteManyAsync(ids, MongoCollection);

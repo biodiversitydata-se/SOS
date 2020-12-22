@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using SOS.Administration.Api.Models;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -21,19 +23,74 @@ namespace SOS.Administration.Api.Controllers
     public class ValidationController : ControllerBase, IValidationController
     {
         private readonly DwcaConfiguration _dwcaConfiguration;
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<ValidationController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="dwcaConfiguration"></param>
+        /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public ValidationController(
             DwcaConfiguration dwcaConfiguration,
+            IDataProviderManager dataProviderManager,
             ILogger<ValidationController> logger)
         {
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
+            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Create data validation report for a specific data provider.
+        /// Prerequisite: The observations must have been harvested to MongoDB.
+        /// </summary>
+        /// <param name="dataProviderIdOrIdentifier">The Id or Identifier of the data provider.</param>
+        /// <param name="maxNrObservationsToRead">Max number of observations to read and process.</param>
+        /// <param name="nrValidObservationsInReport">Max number of valid observations to include in report.</param>
+        /// <param name="nrInvalidObservationsInReport">Max number of invalid observations to include in report.</param>
+        /// <returns></returns>
+        [HttpPost("CreateDataValidationReport/Run")]
+        [DisableRequestSizeLimit]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> RunDataValidationJob(
+            [FromQuery] string dataProviderIdOrIdentifier,
+            [FromQuery] int maxNrObservationsToRead = 100000,
+            [FromQuery] int nrValidObservationsInReport = 10,
+            [FromQuery] int nrInvalidObservationsInReport = 100)
+        {
+            try
+            {
+                var dataProvider =
+                    await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
+                if (dataProvider == null)
+                {
+                    return new BadRequestObjectResult(
+                        $"No data provider exist with Id={dataProviderIdOrIdentifier}");
+                }
+
+                if (maxNrObservationsToRead <= 0) return new BadRequestObjectResult("MxNrObservationsToRead must be > 0");
+                if (maxNrObservationsToRead < nrInvalidObservationsInReport + nrInvalidObservationsInReport)
+                    return new BadRequestObjectResult("MxNrObservationsToRead must be > NrInvalidObservationsInReport + NrInvalidObservationsInReport");
+
+                // Enqueue job to Hangfire.
+                BackgroundJob.Enqueue<IDataValidationReportJob>(job =>
+                    job.RunAsync(
+                        dataProvider.Identifier,
+                        maxNrObservationsToRead,
+                        nrValidObservationsInReport,
+                        nrInvalidObservationsInReport,
+                        JobCancellationToken.Null));
+                return new OkObjectResult($"Create data validation report job for data provider \"{dataProvider}\" was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
