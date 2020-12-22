@@ -1,4 +1,5 @@
-﻿using SOS.Observations.Api.Dtos.Enum;
+﻿using SOS.Lib.Models.Gis;
+using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -8,6 +9,11 @@ namespace SOS.Observations.Api.Dtos
         ///     Type of area
         /// </summary>
         public AreaTypeDto AreaType { get; set; }
+
+        /// <summary>
+        /// Area bounding box
+        /// </summary>
+        public LatLonBoundingBox BoundingBox { get; set; }
 
         /// <summary>
         /// Feature id

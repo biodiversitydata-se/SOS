@@ -14,6 +14,24 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IAreaManager
     {
         /// <summary>
+        /// Get areas by id
+        /// </summary>
+        /// <param name="areaKeys"></param>
+        /// <returns></returns>
+        Task<IEnumerable<AreaBaseDto>> GetAreasAsync(IEnumerable<(AreaTypeDto, string)> areaKeys);
+
+        /// <summary>
+        ///     Get areas matching provided filter
+        /// </summary>
+        /// <param name="areaTypes"></param>
+        /// <param name="searchString"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
+            int skip, int take);
+
+        /// <summary>
         /// Get zipped json bytes with an area json file
         /// </summary>
         /// <param name="areaType"></param>
@@ -35,16 +53,5 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="areaKeys"></param>
         /// <returns></returns>
         Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
-
-        /// <summary>
-        ///     Get areas matching provided filter
-        /// </summary>
-        /// <param name="areaTypes"></param>
-        /// <param name="searchString"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
-            int skip, int take);
     }
 }

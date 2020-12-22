@@ -86,7 +86,9 @@ namespace SOS.Observations.Api.Controllers
             // If areas passed, adjust bounding box to them
             if (filter.Areas?.Any() ?? false)
             {
-               var areaGeometries = await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
+                var areas = await _areaManager.GetAreasAsync(filter.Areas.Select(a => (a.AreaType, a.FeatureId)));
+                var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
+                //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
                 foreach (var areaGeometry in areaGeometries)
                 {
                     AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
