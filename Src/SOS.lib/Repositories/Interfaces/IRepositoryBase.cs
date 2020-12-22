@@ -151,6 +151,13 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<TEntity> GetAsync(TKey id);
 
         /// <summary>
+        /// Get multiple items by id
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids);
+
+        /// <summary>
         ///     Get entity batch
         /// </summary>
         /// <param name="skip"></param>

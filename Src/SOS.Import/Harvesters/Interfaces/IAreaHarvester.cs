@@ -15,11 +15,5 @@ namespace SOS.Import.Harvesters.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestAreasAsync();
-
-        /// <summary>
-        ///     Get all areas.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Area>> GetAreasAsync();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
@@ -19,14 +20,11 @@ namespace SOS.Lib.Models.Shared
         }
 
         /// <summary>
-        ///     Name of area
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         ///     Type of area
         /// </summary>
         public AreaType AreaType { get; set; }
+
+        public LatLonBoundingBox BoundingBox { get; set; }
 
         /// <summary>
         ///     Feature Id.
@@ -37,5 +35,10 @@ namespace SOS.Lib.Models.Shared
         ///     Area Id
         /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        ///     Name of area
+        /// </summary>
+        public string Name { get; set; }
     }
 }

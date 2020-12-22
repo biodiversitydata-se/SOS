@@ -1,10 +1,7 @@
-﻿using System;
-using CSharpFunctionalExtensions;
+﻿
 using NetTopologySuite.Geometries;
-using NGeoHash;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Lib.Models.Gis
 {
@@ -43,7 +40,12 @@ namespace SOS.Lib.Models.Gis
             return webMercatorPolygon;
         }
 
-        public static Result<LatLonBoundingBox> Create(
+        public static LatLonBoundingBox Create(Envelope envelope)
+        {
+            return Create(envelope?.MinX, envelope?.MaxY, envelope?.MaxX, envelope?.MinY);
+        }
+
+        public static LatLonBoundingBox Create(
             double? left,
             double? top,
             double? right,
@@ -52,16 +54,6 @@ namespace SOS.Lib.Models.Gis
             LatLonBoundingBox bbox;
             if (left.HasValue && top.HasValue && right.HasValue && bottom.HasValue)
             {
-                if (left >= right)
-                {
-                    return Result.Failure<LatLonBoundingBox>("Bbox left value is >= right value.");
-                }
-
-                if (bottom >= top)
-                {
-                    return Result.Failure<LatLonBoundingBox>("Bbox bottom value is >= top value.");
-                }
-
                 bbox = new LatLonBoundingBox
                 {
                     TopLeft = new LatLonCoordinate(top.Value, left.Value),
@@ -77,26 +69,7 @@ namespace SOS.Lib.Models.Gis
                 };
             }
 
-            return Result.Success(bbox);
-        }
-
-        public static Result<LatLonBoundingBox> CreateFromGeohash(string geohash)
-        {
-            try
-            {
-                var geohashBbox = GeoHash.DecodeBbox(geohash);
-                var bbox = new LatLonBoundingBox
-                {
-                    TopLeft = new LatLonCoordinate(geohashBbox.Maximum.Lat, geohashBbox.Minimum.Lon),
-                    BottomRight = new LatLonCoordinate(geohashBbox.Minimum.Lat, geohashBbox.Maximum.Lon)
-                };
-
-                return Result.Success(bbox);
-            }
-            catch (Exception)
-            {
-                return Result.Failure<LatLonBoundingBox>("The geohash is invalid.");
-            }
+            return bbox;
         }
     }
 }

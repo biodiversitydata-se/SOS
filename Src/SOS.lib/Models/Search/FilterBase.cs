@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using MongoDB.Bson;
 
 namespace SOS.Lib.Models.Search
 {
@@ -95,23 +93,9 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     True if any filter property is set.
+        ///     Decides whether to search for the exact taxa or
+        ///     for the hierarchical underlying taxa.
         /// </summary>
-        public bool IsFilterActive =>
-            (Areas?.Any() ?? false) ||
-            (CountyIds?.Any() ?? false) ||
-            (DataProviderIds?.Any() ?? false) ||
-            EndDate != null ||
-            (GeometryFilter?.IsValid ?? false) ||
-            (GenderIds?.Any() ?? false) ||
-            (MunicipalityIds?.Any() ?? false) ||
-            OnlyValidated.HasValue ||
-            (ParishIds?.Any() ?? false) || 
-            PositiveSightings.HasValue ||
-            (ProvinceIds?.Any() ?? false) ||
-            (RedListCategories?.Any() ?? false) ||
-            StartDate != null ||
-            (TaxonIds?.Any() ?? false);
 
         /// <summary>
         ///     Municipalities to match. Queryable values are available in Field Mappings.

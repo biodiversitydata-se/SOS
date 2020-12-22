@@ -8,6 +8,7 @@ using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -24,7 +25,6 @@ namespace SOS.Import.Harvesters
         private readonly IAreaRepository _areaProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<AreaHarvester> _logger;
-        private readonly AreaHarvestFactory _harvestFactory;
 
         /// <summary>
         ///     Constructor
@@ -43,8 +43,6 @@ namespace SOS.Import.Harvesters
                 areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _harvestFactory = new AreaHarvestFactory();
         }
 
         /// <inheritdoc />
@@ -55,11 +53,11 @@ namespace SOS.Import.Harvesters
             {
                 _logger.LogDebug("Start getting areas");
 
-                var areas = await _areaRepository.GetAsync();
+                var areaEntities = await _areaRepository.GetAsync();
                 _logger.LogDebug("Finish getting areas");
 
                 // Make sure we have an empty collection
-                if ((areas?.Any() ?? false) && await _areaProcessedRepository.DeleteCollectionAsync())
+                if ((areaEntities?.Any() ?? false) && await _areaProcessedRepository.DeleteCollectionAsync())
                 {
                     _logger.LogDebug("Start preparing area collection");
                     await _areaProcessedRepository.DropGeometriesAsync();
@@ -67,18 +65,22 @@ namespace SOS.Import.Harvesters
                     if (await _areaProcessedRepository.AddCollectionAsync())
                     {
                         _logger.LogDebug("Finish preparing area collection");
+
+                        _logger.LogDebug("Start casting geometries");
+                        var geometries = areaEntities.ToDictionary(a => ((AreaType)a.AreaDatasetId).ToAreaId(a.FeatureId), a => a
+                            .PolygonWKT?
+                            .ToGeometry()
+                            .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
+                        _logger.LogDebug("Finish casting geometries");
+
+                        var harvestFactory = new AreaHarvestFactory(geometries);
+                        var areas = await harvestFactory.CastEntitiesToVerbatimsAsync(areaEntities);
+
                         _logger.LogDebug("Start adding areas");
 
-                        if (await _areaProcessedRepository.AddManyAsync(await _harvestFactory.CastEntitiesToVerbatimsAsync(areas)))
+                        if (await _areaProcessedRepository.AddManyAsync(areas))
                         {
                             _logger.LogDebug("Finish adding areas");
-
-                            _logger.LogDebug("Start casting geometries");
-                            var geometries = areas.ToDictionary(a => ((AreaType)a.AreaDatasetId).ToAreaId(a.FeatureId), a => a
-                                .PolygonWKT?
-                                .ToGeometry()
-                                .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
-                            _logger.LogDebug("Finish casting geometries");
 
                             _logger.LogDebug("Start storing geometries");
                             if (await _areaProcessedRepository.StoreGeometriesAsync(geometries))
@@ -114,12 +116,6 @@ namespace SOS.Import.Harvesters
             }
 
             return harvestInfo;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<Area>> GetAreasAsync()
-        {
-            return await _harvestFactory.CastEntitiesToVerbatimsAsync(await _areaRepository.GetAsync());
         }
     }
 }

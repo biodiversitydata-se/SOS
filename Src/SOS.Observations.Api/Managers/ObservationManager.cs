@@ -217,7 +217,6 @@ namespace SOS.Observations.Api.Managers
                 TranslateLocalizedValue(observation.Occurrence?.DiscoveryMethod, VocabularyId.DiscoveryMethod, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.Gender, VocabularyId.Gender, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.ReproductiveCondition, VocabularyId.ReproductiveCondition, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.Behavior, VocabularyId.Behavior, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.LifeStage, VocabularyId.LifeStage, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnit, VocabularyId.Unit,
                     cultureCode);
@@ -260,8 +259,6 @@ namespace SOS.Observations.Api.Managers
                                 nameof(Observation.Occurrence.Gender), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.ReproductiveCondition,
                                 nameof(Observation.Occurrence.ReproductiveCondition), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Behavior,
-                                nameof(Observation.Occurrence.Behavior), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.LifeStage,
                                 nameof(Observation.Occurrence.LifeStage), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Unit,
