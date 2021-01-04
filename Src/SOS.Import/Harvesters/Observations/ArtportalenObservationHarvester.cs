@@ -7,7 +7,6 @@ using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
@@ -373,10 +372,9 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestSightingsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(ArtportalenObservationVerbatim),
-                DataProviderType.ArtportalenObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
 
             try
             {

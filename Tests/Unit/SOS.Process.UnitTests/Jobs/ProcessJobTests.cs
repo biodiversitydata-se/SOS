@@ -192,23 +192,21 @@ namespace SOS.Process.UnitTests.Jobs
 
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenObservationVerbatim),
-                    DataProviderType.ArtportalenObservations, DateTime.Now));
+                .ReturnsAsync(new HarvestInfo(DateTime.Now));
             _artportalenProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
                     DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
-                    DateTime.Now));
+                .ReturnsAsync(new HarvestInfo(DateTime.Now));
             _clamPortalProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
                     DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations,
+                .ReturnsAsync(new HarvestInfo(
                     DateTime.Now));
             _kulProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))

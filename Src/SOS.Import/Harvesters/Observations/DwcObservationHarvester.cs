@@ -75,8 +75,7 @@ namespace SOS.Import.Harvesters.Observations
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
-            var harvestInfo = new HarvestInfo(harvestInfoId, DataProviderType.DwcA, DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
 
             try
             {
@@ -135,7 +134,7 @@ namespace SOS.Import.Harvesters.Observations
             bool emptyCollectionsBeforeHarvest,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataProviderType.DwcA, DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
             var latestFilePath = "";
             try
             {

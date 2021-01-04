@@ -10,7 +10,6 @@ using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -45,10 +44,9 @@ namespace SOS.Import.Harvesters.Observations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(SharkObservationVerbatim), DataProviderType.SharkObservations,
-                DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
 
             try

@@ -207,19 +207,9 @@ namespace SOS.Import.IoC.Modules
 
             // Add jobs
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ClamPortalHarvestJob>().As<IClamPortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
-            builder.RegisterType<FishDataHarvestJob>().As<IFishDataHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<MvmHarvestJob>().As<IMvmHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<NorsHarvestJob>().As<INorsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<SersHarvestJob>().As<ISersHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<SharkHarvestJob>().As<ISharkHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
-                .InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();
         }

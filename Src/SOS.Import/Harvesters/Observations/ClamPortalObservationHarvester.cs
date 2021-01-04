@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -45,10 +44,9 @@ namespace SOS.Import.Harvesters.Observations
         ///     Aggregate clams
         /// </summary>
         /// <returns></returns>
-        public async Task<HarvestInfo> HarvestClamsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
-                DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
             try
             {
                 _logger.LogDebug("Start storing clams verbatim");

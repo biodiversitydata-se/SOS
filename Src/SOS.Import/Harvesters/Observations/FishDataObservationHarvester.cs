@@ -47,10 +47,9 @@ namespace SOS.Import.Harvesters.Observations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(FishDataObservationVerbatim), DataProviderType.KULObservations,
-                DateTime.Now);
+            var harvestInfo = new HarvestInfo(DateTime.Now);
 
             try
             {

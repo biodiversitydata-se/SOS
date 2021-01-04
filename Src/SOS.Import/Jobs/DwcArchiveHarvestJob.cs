@@ -110,7 +110,7 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            throw new NotImplementedException("Method not implemented for Darwin core");
+            return await RunAsync(cancellationToken);
         }
     }
 }

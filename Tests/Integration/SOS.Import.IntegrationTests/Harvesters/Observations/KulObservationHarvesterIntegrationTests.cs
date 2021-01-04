@@ -51,7 +51,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -82,7 +82,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

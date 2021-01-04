@@ -114,34 +114,37 @@ namespace SOS.Lib.Models.Shared
         public string HarvestSchedule { get; set; }
 
         /// <summary>
-        /// Last harvest time
-        /// </summary>
-        public DateTime? LastSuccessfulHarvest { get; set; }
-
-        /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
         /// </summary>
         public bool HarvestFailPreventProcessing { get; set; }
 
         /// <summary>
-        /// Indicates that provider is ready to harvest
+        ///  Indicates that provider is ready to harvest
         /// </summary>
-        [JsonIgnore]
-        public bool IsReadyToHarvest
+        /// <param name="lastSuccessfulHarvest"></param>
+        /// <returns></returns>
+        public bool IsReadyToHarvest(DateTime? lastSuccessfulHarvest)
         {
-            get
+            var nextOccurrence = NextHarvestFrom(lastSuccessfulHarvest);
+
+            if (!nextOccurrence.HasValue)
             {
-                var expression  = CronExpression.Parse(string.IsNullOrEmpty(HarvestSchedule) ? "* * * * *" : HarvestSchedule);
-
-                var nextOccurrence = expression.GetNextOccurrence(LastSuccessfulHarvest?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime());
-
-                if (!nextOccurrence.HasValue)
-                {
-                    return false;
-                }
-
-                return IsActive && DateTime.UtcNow > nextOccurrence;
+                return false;
             }
+
+            return IsActive && DateTime.UtcNow > nextOccurrence;
+        }
+
+        /// <summary>
+        /// Get time when next harvest can run 
+        /// </summary>
+        /// <param name="lastSuccessfulHarvest"></param>
+        /// <returns></returns>
+        public DateTime? NextHarvestFrom(DateTime? lastSuccessfulHarvest)
+        {
+            var expression = CronExpression.Parse(string.IsNullOrEmpty(HarvestSchedule) ? "* * * * *" : HarvestSchedule);
+
+            return expression.GetNextOccurrence(lastSuccessfulHarvest?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime());
         }
 
         public bool EqualsIdOrIdentifier(string idOrIdentifier)

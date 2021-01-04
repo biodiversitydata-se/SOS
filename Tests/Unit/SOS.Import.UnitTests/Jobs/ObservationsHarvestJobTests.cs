@@ -8,13 +8,6 @@ namespace SOS.Import.UnitTests.Managers
     public class ObservationsHarvestJobTests
     {
         private readonly Mock<IVocabulariesImportJob> _vocabularyImportJobMock;
-        private readonly Mock<IArtportalenHarvestJob> _artportalenHarvestJobMock;
-        private readonly Mock<IClamPortalHarvestJob> _clamPortalHarvestJobMock;
-        private readonly Mock<IKulHarvestJob> _kulHarvestJobMock;
-        private readonly Mock<IMvmHarvestJob> _mvmHarvestJobMock;
-        private readonly Mock<INorsHarvestJob> _norsHarvestJobMock;
-        private readonly Mock<ISersHarvestJob> _sersHarvestJobMock;
-        private readonly Mock<ISharkHarvestJob> _sharkHarvestJobMock;
         private readonly Mock<IVirtualHerbariumHarvestJob> _virtualHerbariumHarvestJobMock;
         private readonly Mock<ILogger<ObservationsHarvestJob>> _loggerMock;
 
@@ -37,14 +30,7 @@ namespace SOS.Import.UnitTests.Managers
         public ObservationsHarvestJobTests()
         {
           _vocabularyImportJobMock = new Mock<IVocabulariesImportJob>();
-            _artportalenHarvestJobMock = new Mock<IArtportalenHarvestJob>();
-            _clamPortalHarvestJobMock = new Mock<IClamPortalHarvestJob>();
-            _kulHarvestJobMock = new Mock<IKulHarvestJob>();
-            _mvmHarvestJobMock = new Mock<IMvmHarvestJob>();
-            _norsHarvestJobMock = new Mock<INorsHarvestJob>();
-            _sersHarvestJobMock = new Mock<ISersHarvestJob>();
-            _sharkHarvestJobMock = new Mock<ISharkHarvestJob>();
-            _virtualHerbariumHarvestJobMock = new Mock<IVirtualHerbariumHarvestJob>();
+          _virtualHerbariumHarvestJobMock = new Mock<IVirtualHerbariumHarvestJob>();
             _loggerMock = new Mock<ILogger<ObservationsHarvestJob>>();
         }
 

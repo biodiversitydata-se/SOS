@@ -79,7 +79,7 @@ namespace SOS.Import.UnitTests.Managers
             _dwcObservationHarvesterMock.Setup(ts =>
                     ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
                         JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Failed});
+                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Failed});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ namespace SOS.Import.UnitTests.Managers
             _dwcObservationHarvesterMock.Setup(ts =>
                     ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
                         JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success, Count = 1 });
+                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             

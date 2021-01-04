@@ -78,6 +78,8 @@ namespace SOS.Observations.Api.Dtos
         /// </summary>
         public DateTime? LatestIncrementalHarvestDate { get; set; }
 
+        public DateTime? NextHarvestFrom { get; set; }
+
         /// <summary>
         ///     Creates a new DataProviderDto object.
         /// </summary>
@@ -95,7 +97,8 @@ namespace SOS.Observations.Api.Dtos
                 SwedishOrganization = dataProvider.SwedishOrganization,
                 Description = dataProvider.Description,
                 SwedishDescription = dataProvider.SwedishDescription,
-                Url = dataProvider.Url
+                Url = dataProvider.Url,
+                NextHarvestFrom = dataProvider.NextHarvestFrom(null)
             };
         }
 
@@ -132,7 +135,8 @@ namespace SOS.Observations.Api.Dtos
                 ProtectedObservations = protectedObservations,
                 LatestHarvestDate = latestHarvestDate,
                 LatestProcessDate = latestProcessDate,
-                LatestIncrementalHarvestDate = latestIncrementalHarvestDate
+                LatestIncrementalHarvestDate = latestIncrementalHarvestDate,
+                NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate)
             };
         }
     }

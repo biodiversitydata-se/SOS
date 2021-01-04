@@ -329,8 +329,7 @@ namespace SOS.Process.Jobs
                     var processResult = taskProvider.Value.Result;
 
                     // Get harvest info and create a provider info object 
-                    var harvestInfoId = HarvestInfo.GetIdFromDataProvider(provider);
-                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId);
+                    var harvestInfo = await GetHarvestInfoAsync(provider.Identifier);
                     var providerInfo = new ProviderInfo(provider)
                     {
                         HarvestCount = harvestInfo?.Count,
