@@ -78,7 +78,15 @@ namespace SOS.Observations.Api.Dtos
         /// </summary>
         public DateTime? LatestIncrementalHarvestDate { get; set; }
 
+        /// <summary>
+        /// Date time from where next harvest can be run
+        /// </summary>
         public DateTime? NextHarvestFrom { get; set; }
+
+        /// <summary>
+        /// CRONE expression used to schedule harvest
+        /// </summary>
+        public string HarvestSchedule { get; set; }
 
         /// <summary>
         ///     Creates a new DataProviderDto object.
@@ -98,7 +106,8 @@ namespace SOS.Observations.Api.Dtos
                 Description = dataProvider.Description,
                 SwedishDescription = dataProvider.SwedishDescription,
                 Url = dataProvider.Url,
-                NextHarvestFrom = dataProvider.NextHarvestFrom(null)
+                NextHarvestFrom = dataProvider.NextHarvestFrom(null),
+                HarvestSchedule = dataProvider.HarvestSchedule
             };
         }
 
@@ -136,7 +145,8 @@ namespace SOS.Observations.Api.Dtos
                 LatestHarvestDate = latestHarvestDate,
                 LatestProcessDate = latestProcessDate,
                 LatestIncrementalHarvestDate = latestIncrementalHarvestDate,
-                NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate)
+                NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate),
+                HarvestSchedule = dataProvider.HarvestSchedule
             };
         }
     }
