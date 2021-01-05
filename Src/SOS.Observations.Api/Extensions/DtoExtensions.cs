@@ -20,6 +20,7 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
+            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
             filter.Areas = searchFilterBaseDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
             filter.TaxonIds = searchFilterBaseDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
@@ -27,6 +28,7 @@ namespace SOS.Observations.Api.Extensions
             filter.DataProviderIds = searchFilterBaseDto.DataProviderIds;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
+            filter.GenderIds = searchFilterBaseDto.Taxon?.GenderIds;
             filter.GeometryFilter = searchFilterBaseDto.Geometry == null ? null : new GeometryFilter
             {
                 Geometries = searchFilterBaseDto.Geometry.Geometries,

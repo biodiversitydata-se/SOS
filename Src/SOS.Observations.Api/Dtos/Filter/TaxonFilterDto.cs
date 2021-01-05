@@ -8,9 +8,9 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class TaxonFilterDto
     {
         /// <summary>
-        ///     Taxa to match. Queryable values are available in Field Mappings.
+        /// Id of genders to match
         /// </summary>
-        public IEnumerable<int> TaxonIds { get; set; }
+        public IEnumerable<int> GenderIds { get; set; }
 
         /// <summary>
         ///     Decides whether to search for the exact taxa or
@@ -22,5 +22,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         ///     Redlist categories to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
+
+        /// <summary>
+        ///     Taxa to match. Queryable values are available in Field Mappings.
+        /// </summary>
+        public IEnumerable<int> TaxonIds { get; set; }
     }
 }

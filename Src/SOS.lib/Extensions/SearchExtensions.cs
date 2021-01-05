@@ -28,31 +28,35 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         private static void AddDateRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
         {
-            if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
+            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
             {
-                query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
-            }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
-            {
-                query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
-                query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
-
-            }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
-            {
-                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
                     query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                    query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
-                }
-            }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
-            {
-                if (filter.StartDate.HasValue && filter.EndDate.HasValue)
-                {
-                    query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
                     query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                }
+                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                {
+                    query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                    query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+
+                }
+                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                {
+                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    {
+                        query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                        query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                    }
+                }
+                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                {
+                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    {
+                        query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                        query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
+                    }
                 }
             }
         }
@@ -84,46 +88,48 @@ namespace SOS.Lib.Extensions
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             FilterBase filter)
         {
-            if (filter.GeometryFilter?.IsValid ?? false)
+            if (!filter.GeometryFilter?.IsValid ?? true)
             {
-                var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                foreach (var geom in filter.GeometryFilter.Geometries)
-                {
-                    switch (geom.Type.ToLower())
-                    {
-                        case "point":
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.pointLocation")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-
-                            break;
-                        case "polygon":
-                        case "multipolygon":
-                            if (filter.GeometryFilter.UsePointAccuracy)
-                            {
-                                geometryContainers.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
-                            }
-                            else
-                            {
-                                geometryContainers.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
-                            }
-
-                            break;
-                    }
-                }
-
-                query.Add(q => q
-                    .Bool(b => b
-                        .Should(geometryContainers)
-                    )
-                );
+               return;
             }
+
+            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            foreach (var geom in filter.GeometryFilter.Geometries)
+            {
+                switch (geom.Type.ToLower())
+                {
+                    case "point":
+                        geometryContainers.Add(q => q
+                            .GeoDistance(gd => gd
+                                .Field("location.pointLocation")
+                                .DistanceType(GeoDistanceType.Arc)
+                                .Location(geom.ToGeoLocation())
+                                .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                            )
+                        );
+
+                        break;
+                    case "polygon":
+                    case "multipolygon":
+                        if (filter.GeometryFilter.UsePointAccuracy)
+                        {
+                            geometryContainers.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
+                        }
+                        else
+                        {
+                            geometryContainers.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
+                        }
+
+                        break;
+                }
+            }
+
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(geometryContainers)
+                )
+            );
         }
 
         /// <summary>
@@ -429,6 +435,48 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add time range filters
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
+        private static void AddTimeRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            if (!filter.TimeRanges?.Any() ?? true)
+            {
+                return;
+            }
+
+            var timeRangeContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            foreach (var timeRange in filter.TimeRanges)
+            {
+                switch (timeRange)
+                {
+                    case FilterBase.TimeRange.Morning:
+                        timeRangeContainers.AddScript($@"[4, 5, 6, 7, 8].contains(doc['event.startDate'].value.getHour())");
+                        break;
+                    case FilterBase.TimeRange.Forenoon:
+                        timeRangeContainers.AddScript($@"[9, 10, 11, 12].contains(doc['event.startDate'].value.getHour())");
+                        break;
+                    case FilterBase.TimeRange.Afternoon:
+                        timeRangeContainers.AddScript($@"[13, 14, 15, 16, 17].contains(doc['event.startDate'].value.getHour())");
+                        break;
+                    case FilterBase.TimeRange.Evening:
+                        timeRangeContainers.AddScript($@"[18, 19, 20, 21, 22].contains(doc['event.startDate'].value.getHour())");
+                        break;
+                    default:
+                        timeRangeContainers.AddScript($@"[23, 0, 1, 2, 3].contains(doc['event.startDate'].value.getHour())");
+                        break;
+                }
+            }
+
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(timeRangeContainers)
+                )
+            );
+        }
+
+        /// <summary>
         /// Add wildcard criteria
         /// </summary>
         /// <param name="query"></param>
@@ -709,12 +757,8 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("taxon.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
 
-            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
-            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
-            {
-                query.AddDateRangeFilters(filter);
-            }
-
+            query.AddDateRangeFilters(filter);
+            query.AddTimeRangeFilters(filter);
             query.AddGeometryFilters(filter);
             query.AddSightingTypeFilters(filter);
 

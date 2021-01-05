@@ -211,8 +211,12 @@ namespace SOS.Import.Harvesters.Observations
 
                 if (_artportalenConfiguration.HarvestStartDate.HasValue && (sightings?.Any() ?? false))
                 {
+                    _logger.LogDebug($"Start removing sightings prior to: {_artportalenConfiguration.HarvestStartDate.Value}");
+
                     sightings = sightings.Where(s => s.StartDate >= _artportalenConfiguration.HarvestStartDate.Value)
                         ?.ToArray();
+
+                    _logger.LogDebug($"Finish removing sightings prior to: {_artportalenConfiguration.HarvestStartDate.Value}");
                 }
 
                 if (!sightings?.Any() ?? true)

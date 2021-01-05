@@ -43,6 +43,33 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
+        /// Pre defined time ranges
+        /// </summary>
+        public enum TimeRange
+        {
+            /// <summary>
+            /// 04:00-09:00
+            /// </summary>
+            Morning,
+            /// <summary>
+            /// 09:00-13:00
+            /// </summary>
+            Forenoon,
+            /// <summary>
+            /// 13:00-18:00
+            /// </summary>
+            Afternoon,
+            /// <summary>
+            /// 18:00-23:00
+            /// </summary>
+            Evening,
+            /// <summary>
+            /// 23:00-04:00
+            /// </summary>
+            Night
+        }
+
+        /// <summary>
         /// Geographical areas to filter by
         /// </summary>
         public IEnumerable<AreaFilter> Areas { get; set; }
@@ -84,7 +111,6 @@ namespace SOS.Lib.Models.Search
         ///     Gender to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> GenderIds { get; set; }
-
 
         /// <summary>
         ///     Decides whether to search for the exact taxa or
@@ -145,6 +171,11 @@ namespace SOS.Lib.Models.Search
         ///     Taxa to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
+
+        /// <summary>
+        /// Pre defined time ranges
+        /// </summary>
+        public IEnumerable<TimeRange> TimeRanges { get; set; }
 
         public FilterBase Clone()
         {
