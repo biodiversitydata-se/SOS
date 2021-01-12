@@ -52,6 +52,7 @@ namespace SOS.Process.Processors.Kul
 
         public override DataProviderType Type => DataProviderType.KULObservations;
 
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,

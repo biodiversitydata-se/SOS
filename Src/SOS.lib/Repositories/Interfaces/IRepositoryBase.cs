@@ -248,6 +248,11 @@ namespace SOS.Lib.Repositories.Interfaces
         bool IncrementalMode { get; set; }
 
         /// <summary>
+        /// True when working with protected observations
+        /// </summary>
+        bool ProtectedObservations { get; set; }
+
+        /// <summary>
         ///     Update entity
         /// </summary>
         /// <param name="id"></param>

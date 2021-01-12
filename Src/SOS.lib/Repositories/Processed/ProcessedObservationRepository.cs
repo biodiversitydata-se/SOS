@@ -60,6 +60,86 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        ///     Write data to elastic search
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items)
+        {
+            if (!items.Any())
+            {
+                return null;
+            }
+
+            //check
+            var currentAllocation = _elasticClient.Cat.Allocation();
+            if (currentAllocation != null && currentAllocation.IsValid)
+            {
+                string diskUsageDescription = "Current diskusage in cluster:";
+                foreach (var record in currentAllocation.Records)
+                {
+                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
+                    {
+                        diskUsageDescription += percentageUsed + "% ";
+                        if (percentageUsed > 90)
+                        {
+                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
+                            return null;
+                        }
+                    }
+                }
+                Logger.LogDebug(diskUsageDescription);
+            }
+
+            var count = 0;
+            return _elasticClient.BulkAll(items, b => b
+                    .Index(IndexName)
+                    // how long to wait between retries
+                    .BackOffTime("30s")
+                    // how many retries are attempted if a failure occurs                        .
+                    .BackOffRetries(2)
+                    // how many concurrent bulk requests to make
+                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                    // number of items per bulk request
+                    .Size(1000)
+                    .DroppedDocumentCallback((r, o) =>
+                    {
+                        Logger.LogError(r.Error.Reason);
+                    })
+                )
+                .Wait(TimeSpan.FromDays(1),
+                    next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
+        }
+
+        private async Task<ScrollResult<Observation>> ScrollObservationsAsync(int dataProviderId,
+            string scrollId)
+        {
+            ISearchResponse<Observation> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient
+                    .SearchAsync<Observation>(s => s
+                        .Index(IndexName)
+                        .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
+                        .Scroll(ScrollTimeOut)
+                        .Size(_scrollBatchSize)
+                    );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+            }
+
+            return new ScrollResult<Observation>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+        /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="client"></param>
@@ -78,12 +158,13 @@ namespace SOS.Lib.Repositories.Processed
             _scrollBatchSize = client.ReadBatchSize;
             _numberOfReplicas = elasticConfiguration.NumberOfReplicas;
             _numberOfShards = elasticConfiguration.NumberOfShards;
+            WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
-        public string IndexName => string.IsNullOrEmpty(_indexPrefix)
-            ? $"{CurrentInstanceName.ToLower()}"
-            : $"{_indexPrefix.ToLower()}-{CurrentInstanceName.ToLower()}";
-
+        /// <summary>
+        /// Get name of index
+        /// </summary>
+        public string IndexName => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{CurrentInstanceName}".ToLower();
 
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<Observation> items)
@@ -423,84 +504,7 @@ namespace SOS.Lib.Repositories.Processed
             return !response.Exists;
         }
 
-        /// <summary>
-        ///     Write data to elastic search
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items)
-        {
-            if (!items.Any())
-            {
-                return null;
-            }
-
-            //check
-            var currentAllocation = _elasticClient.Cat.Allocation();
-            if (currentAllocation != null && currentAllocation.IsValid)
-            {
-                string diskUsageDescription = "Current diskusage in cluster:";
-                foreach (var record in currentAllocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentageUsed)) 
-                    {
-                        diskUsageDescription += percentageUsed + "% ";
-                        if (percentageUsed > 90)
-                        {
-                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                            return null;
-                        }
-                    }
-                }
-                Logger.LogDebug(diskUsageDescription);
-            }
-
-            var count = 0;
-            return _elasticClient.BulkAll(items, b => b
-                    .Index(IndexName)
-                    // how long to wait between retries
-                    .BackOffTime("30s")
-                    // how many retries are attempted if a failure occurs                        .
-                    .BackOffRetries(2)
-                    // how many concurrent bulk requests to make
-                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                    // number of items per bulk request
-                    .Size(1000)
-                    .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError(r.Error.Reason);
-                    })
-                )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
-        }
-
-        private async Task<ScrollResult<Observation>> ScrollObservationsAsync(int dataProviderId,
-            string scrollId)
-        {
-            ISearchResponse<Observation> searchResponse;
-            if (string.IsNullOrEmpty(scrollId))
-            {
-                searchResponse = await _elasticClient
-                    .SearchAsync<Observation>(s => s
-                        .Index(IndexName)
-                        .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
-                        .Scroll(ScrollTimeOut)
-                        .Size(_scrollBatchSize)
-                    );
-            }
-            else
-            {
-                searchResponse = await _elasticClient
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
-            }
-
-            return new ScrollResult<Observation>
-            {
-                Records = searchResponse.Documents,
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
-            };
-        }
+        /// <inheritdoc />
+        public int WriteBatchSize { get; set; }
     }
 }

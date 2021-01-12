@@ -44,7 +44,7 @@ namespace SOS.Process.UnitTests.TestHelpers
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
-                false).Result;
+                false, false).Result;
             return factory;
         }
     }

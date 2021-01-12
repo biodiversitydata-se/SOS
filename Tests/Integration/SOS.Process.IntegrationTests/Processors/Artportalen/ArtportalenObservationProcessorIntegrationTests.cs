@@ -54,7 +54,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, false, JobRunModes.Full, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
             dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 

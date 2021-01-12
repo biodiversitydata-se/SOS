@@ -30,12 +30,22 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
+        private readonly bool _protected;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="vocabularyById"></param>
+        /// <param name="incrementalMode"></param>
+        /// <param name="protectedObservations"></param>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            bool incrementalMode)
+            bool incrementalMode,
+            bool protectedObservations)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             {
@@ -44,17 +54,19 @@ namespace SOS.Process.Processors.Artportalen
             }
 
             _incrementalMode = incrementalMode;
+            _protected = protectedObservations;
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            bool incrementalMode)
+            bool incrementalMode,
+            bool protectedObservations)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, protectedObservations);
         }
 
         public ICollection<Observation> CreateProcessedObservations(
@@ -85,7 +97,6 @@ namespace SOS.Process.Processors.Artportalen
 
                 if (ShouldBeDiffused(verbatimObservation, taxon))
                 {
-                    return null;
 #if INCLUDE_DIFFUSED_OBSERVATIONS
                     //If it is a protected sighting it should not be possible to find it in the current month
                     if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
@@ -112,9 +123,13 @@ namespace SOS.Process.Processors.Artportalen
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
 
-                var obs = new Observation();
+                var obs = new Observation()
+                {
+                    Protected = _protected
+                };
 
                 // Record level
+
                 obs.DataProviderId = _dataProvider.Id;
                 obs.AccessRights = !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                                    verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
@@ -470,6 +485,7 @@ namespace SOS.Process.Processors.Artportalen
                 return (0, 0);
             }
         }
+
         private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
             if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
@@ -491,6 +507,7 @@ namespace SOS.Process.Processors.Artportalen
             }
             return false;
         }
+
         /// <summary>
         /// Diffuse the point dependent on the sightings protection level
         /// </summary>

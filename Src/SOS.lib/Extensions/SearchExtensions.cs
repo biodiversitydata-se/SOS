@@ -22,6 +22,39 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add filter to limit response to only show observations user is allowed to see
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
+        private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            // Allow all public observations
+            var publicQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            publicQuery.TryAddTermCriteria("protected", false);
+
+            var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            // Allow protected observations matching user extended authorization
+            if (filter?.ExtendedAuthorization != null)
+            {
+                protectedQuery.TryAddTermCriteria("protected", true);
+                protectedQuery.TryAddTermsCriteria("location.county.featureId", filter.ExtendedAuthorization.CountyIds);
+                protectedQuery.TryAddTermsCriteria("location.municipality.featureId", filter.ExtendedAuthorization.MunicipalityIds);
+                protectedQuery.TryAddTermsCriteria("location.province.featureId", filter.ExtendedAuthorization.ProvinceIds);
+                protectedQuery.TryAddTermsCriteria("taxon.id", filter.ExtendedAuthorization.TaxonIds);
+            }
+
+            query.Add(q => q
+                   .Bool(b => b
+                       .Filter(publicQuery)
+                   ) || q
+                   .Bool(b => b
+                       .Filter(protectedQuery)
+                )
+            );
+        }
+
+        /// <summary>
         /// Add date range query to filter
         /// </summary>
         /// <param name="query"></param>
@@ -86,15 +119,15 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         private static void AddGeometryFilters(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            FilterBase filter)
+            GeometryFilter geometryFilter)
         {
-            if (!filter.GeometryFilter?.IsValid ?? true)
+            if (!geometryFilter?.IsValid ?? true)
             {
-               return;
+                return;
             }
 
             var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-            foreach (var geom in filter.GeometryFilter.Geometries)
+            foreach (var geom in geometryFilter.Geometries)
             {
                 switch (geom.Type.ToLower())
                 {
@@ -104,7 +137,7 @@ namespace SOS.Lib.Extensions
                                 .Field("location.pointLocation")
                                 .DistanceType(GeoDistanceType.Arc)
                                 .Location(geom.ToGeoLocation())
-                                .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
                                 .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
                             )
                         );
@@ -112,7 +145,7 @@ namespace SOS.Lib.Extensions
                         break;
                     case "polygon":
                     case "multipolygon":
-                        if (filter.GeometryFilter.UsePointAccuracy)
+                        if (geometryFilter.UsePointAccuracy)
                         {
                             geometryContainers.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
                         }
@@ -173,13 +206,13 @@ namespace SOS.Lib.Extensions
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
-            //    query.AddWildcardCriteria("occurrence.associatedMedia", "http*");
+                //    query.AddWildcardCriteria("occurrence.associatedMedia", "http*");
             }
 
             if (internalFilter.OnlyWithNotes)
             {
                 query.AddMustExistsCriteria("occurrence.occurrenceRemarks");
-              //  query.AddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
+                //  query.AddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
             }
 
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
@@ -220,7 +253,7 @@ namespace SOS.Lib.Extensions
             if (internalFilter.OnlyWithBarcode)
             {
                 query.AddMustExistsCriteria("taxon.individualId");
-               // query.AddWildcardCriteria("taxon.individualId", "?*");
+                // query.AddWildcardCriteria("taxon.individualId", "?*");
             }
 
             switch (internalFilter.DeterminationFilter)
@@ -757,9 +790,10 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("taxon.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
 
+            query.AddAuthorizationFilters(filter);
             query.AddDateRangeFilters(filter);
             query.AddTimeRangeFilters(filter);
-            query.AddGeometryFilters(filter);
+            query.AddGeometryFilters(filter.GeometryFilter);
             query.AddSightingTypeFilters(filter);
 
             if (filter is SearchFilterInternal)

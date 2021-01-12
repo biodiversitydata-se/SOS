@@ -95,6 +95,11 @@ namespace SOS.Lib.Models.Search
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        /// Filter used to give user extended authorization
+        /// </summary>
+        public ExtendedAuthorizationFilter ExtendedAuthorization { get; set; }
+
+        /// <summary>
         ///     Field mapping translation culture code.
         ///     Available values.
         ///     sv-SE (Swedish)

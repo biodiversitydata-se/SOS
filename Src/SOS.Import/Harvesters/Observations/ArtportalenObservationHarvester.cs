@@ -57,11 +57,13 @@ namespace SOS.Import.Harvesters.Observations
         /// Harvest all sightings
         /// </summary>
         /// <param name="harvestFactory"></param>
+        /// <param name="protectedObservations"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
+        private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, bool protectedObservations, IJobCancellationToken cancellationToken)
         {
             _sightingRepository.Live = false;
+            _sightingRepository.Protected = protectedObservations;
 
             // Get source min and max id
             var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
@@ -79,7 +81,7 @@ namespace SOS.Import.Harvesters.Observations
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
 
-                _logger.LogDebug("Start getting Artportalen sightings");
+                _logger.LogDebug($"Start getting Artportalen {(protectedObservations ? "protected" : "public")} sightings");
                 
                 var batchIndex = 0;
                 // Loop until all sightings are fetched
@@ -111,7 +113,7 @@ namespace SOS.Import.Harvesters.Observations
                 // Sum each batch harvested
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-                _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
+                _logger.LogDebug($"Finish getting Artportalen {(protectedObservations ? "protected" : "public")} sightings ({ nrSightingsHarvested })");
 
                 return nrSightingsHarvested;
             }
@@ -121,13 +123,22 @@ namespace SOS.Import.Harvesters.Observations
         #endregion Full
 
         #region Incremental
-        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory,
+        /// <summary>
+        /// Harvest incremental
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="harvestFactory"></param>
+        /// <param name="protectedObservations"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, bool protectedObservations,
             IJobCancellationToken cancellationToken)
         {
             // Make sure incremental mode is true to get max id from live instance
             _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
+            _sightingRepository.Protected = protectedObservations;
 
             // We start from last harvested sighting 
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
@@ -142,7 +153,7 @@ namespace SOS.Import.Harvesters.Observations
 
             var harvestBatchTasks = new List<Task<int>>();
 
-            _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
+            _logger.LogDebug($"Start getting Artportalen {(protectedObservations ? "protected" : "public")} sightings ({mode})");
 
             var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.ChunkSize);
             var batchCount = 0;
@@ -171,7 +182,7 @@ namespace SOS.Import.Harvesters.Observations
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen sightings ({mode}) ({ nrSightingsHarvested })");
+            _logger.LogDebug($"Finish getting Artportalen {(protectedObservations ? "protected" : "public")} sightings ({mode}) ({ nrSightingsHarvested })");
 
             return nrSightingsHarvested;
         }
@@ -439,17 +450,33 @@ namespace SOS.Import.Harvesters.Observations
                 };
                 _logger.LogDebug("Finish creating factory");
 
+                _artportalenVerbatimRepository.ProtectedObservations = false;
                 _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
-                // Make sure we have an empty collection
-                _logger.LogDebug("Empty collection");
+                // Make sure we have an empty public collection
+                _logger.LogDebug("Start empty public collection");
                 await _artportalenVerbatimRepository.DeleteCollectionAsync();
                 await _artportalenVerbatimRepository.AddCollectionAsync();
+                _logger.LogDebug("Finish empty public collection");
 
                 var nrSightingsHarvested = mode == JobRunModes.Full ?
-                    await HarvestAllAsync(harvestFactory, cancellationToken)
+                    await HarvestAllAsync(harvestFactory, false, cancellationToken)
                     :
-                    await HarvestIncrementalAsync(mode, harvestFactory, cancellationToken);
+                    await HarvestIncrementalAsync(mode, harvestFactory, false, cancellationToken);
+
+                // Get protected observations
+                _artportalenVerbatimRepository.ProtectedObservations = true;
+
+                // Make sure we have an empty protected collection
+                _logger.LogDebug("Start empty protected collection");
+                await _artportalenVerbatimRepository.DeleteCollectionAsync();
+                await _artportalenVerbatimRepository.AddCollectionAsync();
+                _logger.LogDebug("Finish empty protected collection");
+
+                nrSightingsHarvested += mode == JobRunModes.Full ?
+                    await HarvestAllAsync(harvestFactory, true, cancellationToken)
+                    :
+                    await HarvestIncrementalAsync(mode, harvestFactory, true, cancellationToken);
 
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;

@@ -165,7 +165,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, false, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -194,7 +194,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, false, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -80,6 +80,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public override async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            bool protectedObservations,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -122,13 +123,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
         }
 
-        /// <summary>
-        ///     Process all observations
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,

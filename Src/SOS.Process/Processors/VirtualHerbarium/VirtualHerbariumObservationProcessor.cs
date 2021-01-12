@@ -29,7 +29,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {

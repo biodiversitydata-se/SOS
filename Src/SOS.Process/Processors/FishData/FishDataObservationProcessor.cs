@@ -53,6 +53,7 @@ namespace SOS.Process.Processors.FishData
 
         public override DataProviderType Type => DataProviderType.FishDataObservations;
 
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,

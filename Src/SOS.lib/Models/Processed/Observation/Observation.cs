@@ -233,7 +233,12 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     to in the record.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
-        
+
+        /// <summary>
+        /// Observation is protected by the system
+        /// </summary>
+        public bool Protected { get; set; }
+
         /// <summary>
         ///     Protection level
         /// </summary>

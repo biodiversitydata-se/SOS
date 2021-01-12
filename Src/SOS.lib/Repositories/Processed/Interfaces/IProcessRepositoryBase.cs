@@ -44,6 +44,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         bool LiveMode { get; set; }
 
         /// <summary>
+        /// True if repository is handling protected data
+        /// </summary>
+        bool Protected { get; set; }
+
+        /// <summary>
         /// Set active instance
         /// </summary>
         /// <param name="instance"></param>

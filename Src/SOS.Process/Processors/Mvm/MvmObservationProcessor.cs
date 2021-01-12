@@ -52,6 +52,7 @@ namespace SOS.Process.Processors.Mvm
 
         public override DataProviderType Type => DataProviderType.MvmObservations;
 
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,

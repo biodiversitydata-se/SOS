@@ -114,5 +114,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
+
+        /// <summary>
+        /// Batch size used for write
+        /// </summary>
+        int WriteBatchSize { get; set; }
     }
 }

@@ -87,7 +87,7 @@ namespace SOS.Lib.Repositories
         /// <summary>
         /// Name of collection
         /// </summary>
-        protected string CollectionName => IncrementalMode ? $"{_collectionName}_incremental" : _collectionName;
+        protected string CollectionName => $"{_collectionName}{(IncrementalMode ? "_incremental" : "")}{(ProtectedObservations ? "_protected" : "")}";
 
         protected readonly IMongoClient Client;
 
@@ -532,6 +532,9 @@ namespace SOS.Lib.Repositories
 
         /// <inheritdoc />
         public bool IncrementalMode { get; set; }
+
+        /// <inheritdoc />
+        public bool ProtectedObservations { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)

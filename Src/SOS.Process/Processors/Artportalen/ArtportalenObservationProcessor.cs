@@ -91,40 +91,66 @@ namespace SOS.Process.Processors.Artportalen
 
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
-        /// <summary>
-        ///  Process all observations
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="taxa"></param>
-        /// <param name="mode"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            if (_processConfiguration.ParallelProcessing)
-            {
-                return await ProcessObservationsParallel(dataProvider, taxa, mode, cancellationToken);
-            }
-
-            // Sequential processing is used for easier debugging.
-            return await ProcessObservationsSequential(dataProvider, taxa, mode, cancellationToken);
+            return await ProcessAsync(dataProvider, taxa, false, mode, cancellationToken);
         }
 
-        private async Task<int> ProcessObservationsParallel(
+        /// <inheritdoc />
+        protected override async Task<int> ProcessProtectedObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full);
-            // Get min and max id from db
+            return await ProcessAsync(dataProvider, taxa, true, mode, cancellationToken);
+        }
 
+        /// <summary>
+        /// Process verbatim
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="protectedObservations"></param>
+        /// <param name="mode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> ProcessAsync(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            bool protectedObservations,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            var observationFactory =
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full, protectedObservations);
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
+
+            if (_processConfiguration.ParallelProcessing)
+            {
+                // 1. process public observations
+                return await ProcessObservationsParallel(dataProvider, observationFactory, protectedObservations, mode, cancellationToken);
+            }
+
+            // Sequential processing is used for easier debugging.
+            return await ProcessObservationsSequential(dataProvider, observationFactory, taxa, mode, cancellationToken);
+        }
+
+        private async Task<int> ProcessObservationsParallel(
+            DataProvider dataProvider,
+            ArtportalenObservationFactory observationFactory,
+            bool protectedObservations,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            _artportalenVerbatimRepository.ProtectedObservations = protectedObservations;
+            ProcessRepository.Protected = protectedObservations;
+
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
             var processBatchTasks = new List<Task<int>>();
@@ -133,7 +159,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 await _semaphore.WaitAsync();
 
-                var batchEndId = batchStartId + _processedVocabularyRepository.BatchSizeWrite - 1;
+                var batchEndId = batchStartId + ProcessRepository.WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;
@@ -200,15 +226,14 @@ namespace SOS.Process.Processors.Artportalen
 
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
+            ArtportalenObservationFactory observationFactory,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full);
             ICollection<Observation> observations = new List<Observation>();
-            _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
+           
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
             var batchId = 0;
            

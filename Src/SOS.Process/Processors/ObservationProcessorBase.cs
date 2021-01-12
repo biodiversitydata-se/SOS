@@ -46,12 +46,14 @@ namespace SOS.Process.Processors
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
+        /// <param name="protectedObservations"></param>
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            bool protectedObservations,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -72,7 +74,11 @@ namespace SOS.Process.Processors
                 }
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var verbatimCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
+                var verbatimCount = protectedObservations ? 
+                    await ProcessProtectedObservations(dataProvider, taxa, mode, cancellationToken) 
+                    : 
+                    await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
+
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
@@ -95,6 +101,22 @@ namespace SOS.Process.Processors
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
 
+        /// <summary>
+        /// Process protected observations
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="mode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected virtual Task<int> ProcessProtectedObservations(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException($"Processing protected observation is NOT implemented for {dataProvider.Name}");
+        }
 
         protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
