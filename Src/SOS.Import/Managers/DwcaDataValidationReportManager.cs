@@ -66,6 +66,7 @@ namespace SOS.Import.Managers
                 ExternalSystemId.DarwinCore,
                 allVocabularies,
                 true);
+            await _areaHelper.InitializeAsync();
         }
 
         public async Task<DwcaDataValidationReport<DwcObservationVerbatim, Observation>>
@@ -107,6 +108,7 @@ namespace SOS.Import.Managers
                 verbatimFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, HashSet<string>>());
             }
             HashSet<string> nonMatchingScientificNames = new HashSet<string>();
+            HashSet<string> nonMatchingTaxonIds = new HashSet<string>();
             await foreach (var observationsBatch in observationsBatches)
             {
                 if (nrProcessedObservations >= maxNrObservationsToRead) continue;
@@ -160,6 +162,7 @@ namespace SOS.Import.Managers
                             if (validationDefect == "Taxon not found" && string.IsNullOrWhiteSpace(verbatimObservation.TaxonID))
                             {
                                 nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
+                                nonMatchingTaxonIds.Add(verbatimObservation.TaxonID);
                             }
                             if (!observationDefects.ContainsKey(validationDefect))
                             {
@@ -217,7 +220,8 @@ namespace SOS.Import.Managers
                     NrInvalidObservations = nrInvalidObservations,
                     Remarks = remarks,
                     ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key, Count = m.Value}).ToList(),
-                    NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList()
+                    NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList(),
+                    NonMatchingTaxonIds = nonMatchingTaxonIds.Count == 0 ? null : nonMatchingTaxonIds.ToList()
                 },
                 InvalidObservations = invalidObservations,
                 ValidObservations = validObservations,
