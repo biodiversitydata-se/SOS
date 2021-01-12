@@ -13,7 +13,7 @@ namespace SOS.Lib.Jobs.Import
         ///     Run create DwC-A validation report job.
         /// </summary>
         /// <returns></returns>
-        [DisplayName("DwC-A Data Validation Report - {0}, File: \"{1}\"")]
+        [DisplayName("DwC-A Data Validation Report, File: \"{0}\"")]
         Task<string> RunAsync(
             string archivePath,
             int maxNrObservationsToRead,
