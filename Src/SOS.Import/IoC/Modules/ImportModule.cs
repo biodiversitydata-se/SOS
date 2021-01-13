@@ -185,6 +185,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaTypeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DiscoveryMethodVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DeterminationMethodVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SersDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
