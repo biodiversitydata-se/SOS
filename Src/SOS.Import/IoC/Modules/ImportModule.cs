@@ -186,6 +186,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<DiscoveryMethodVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DeterminationMethodVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SersDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
 
             // Add Services
