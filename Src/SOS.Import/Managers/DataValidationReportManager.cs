@@ -16,12 +16,14 @@ namespace SOS.Import.Managers
         private readonly Dictionary<DataProviderType, IDataValidationReportFactory> _reportCreatorByType;
 
         public DataValidationReportManager(
+            FishDataValidationReportFactory fishDataValidationReportFactory,
             MvmDataValidationReportFactory mvmDataValidationReportFactory,
             KulDataValidationReportFactory kulDataValidationReportFactory,
             SersDataValidationReportFactory sersDataValidationReportFactory,
             NorsDataValidationReportFactory norsDataValidationReportFactory, 
             VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
         {
+            if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
             if (mvmDataValidationReportFactory == null) throw new ArgumentNullException(nameof(mvmDataValidationReportFactory));
             if (kulDataValidationReportFactory == null) throw new ArgumentNullException(nameof(kulDataValidationReportFactory));
             if (sersDataValidationReportFactory == null) throw new ArgumentNullException(nameof(sersDataValidationReportFactory));
@@ -30,6 +32,7 @@ namespace SOS.Import.Managers
 
             _reportCreatorByType = new Dictionary<DataProviderType, IDataValidationReportFactory>
             {
+                {DataProviderType.FishDataObservations, fishDataValidationReportFactory},
                 {DataProviderType.MvmObservations, mvmDataValidationReportFactory},
                 {DataProviderType.KULObservations, kulDataValidationReportFactory},
                 {DataProviderType.SersObservations, sersDataValidationReportFactory},
