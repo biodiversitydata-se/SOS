@@ -19,5 +19,6 @@ namespace SOS.Lib.Managers.Interfaces
         Task<Report> GetReportAsync(string reportId);
         Task<IEnumerable<Report>> GetAllReportsAsync();
         Task<Result<int>> DeleteOldReportsAndFilesAsync(TimeSpan timeSpan);
+        Task DeleteReportAsync(string reportId);
     }
 }

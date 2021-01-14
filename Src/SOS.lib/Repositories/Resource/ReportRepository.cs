@@ -40,7 +40,7 @@ namespace SOS.Lib.Repositories.Resource
 
         public async Task<bool> DeleteFileAsync(string filename)
         {
-            var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename == filename, true);
+            var filter = Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, filename);
             var fileInfo = (await (await _gridFsBucket.FindAsync(filter)).ToListAsync()).FirstOrDefault();
             if (fileInfo != null)
             {

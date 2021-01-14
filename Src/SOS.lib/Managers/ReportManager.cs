@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Managers
@@ -61,7 +54,6 @@ namespace SOS.Lib.Managers
             var filename = FilenameHelper.CreateFilenameWithDate($"{report.Type}-{report.Name}", report.FileExtension, report.CreatedDate);
             var reportFileDownload = new ReportFile
             {
-                //Filename = $"{report.Type}-{report.Name}.{report.FileExtension}", File = file, ContentType = "application/zip"
                 Filename = filename,
                 File = file,
                 ContentType = "application/zip"
@@ -78,6 +70,12 @@ namespace SOS.Lib.Managers
         public async Task<IEnumerable<Report>> GetAllReportsAsync()
         {
             return await _reportRepository.GetAllAsync();
+        }
+
+        public async Task DeleteReportAsync(string reportId)
+        {
+            await _reportRepository.DeleteAsync(reportId);
+            await _reportRepository.DeleteFileAsync(reportId);
         }
 
         public async Task<Result<int>> DeleteOldReportsAndFilesAsync(TimeSpan timeSpan)

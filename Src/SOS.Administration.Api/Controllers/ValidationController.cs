@@ -90,7 +90,7 @@ namespace SOS.Administration.Api.Controllers
                         nrValidObservationsInReport,
                         nrInvalidObservationsInReport,
                         JobCancellationToken.Null));
-                return new OkObjectResult($"Create data validation report job for data provider \"{dataProvider}\" with Id \"{reportId}\"was enqueued to Hangfire.");
+                return new OkObjectResult($"Create data validation report job for data provider \"{dataProvider}\" with Id \"{reportId}\" was enqueued to Hangfire.");
             }
             catch (Exception e)
             {

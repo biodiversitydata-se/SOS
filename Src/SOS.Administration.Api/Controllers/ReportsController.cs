@@ -34,29 +34,56 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-
         /// <summary>
         /// Delete reports and their associated files older than the specified number of days.
         /// </summary>
         /// <param name="nrOfDays">Delete reports and files older than this number of days.</param>
         /// <returns></returns>
-        [HttpPost("DeleteOld")]
+        [HttpDelete("DeleteOld")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DeleteOldFilesAsync([FromQuery] int nrOfDays = 30)
+        public async Task<IActionResult> DeleteOldReportsAndFilesAsync([FromQuery] int nrOfDays = 30)
         {
             try
             {
                 if (nrOfDays < 0 || nrOfDays > 10000) return BadRequest($"nrOfDays is not in supported range 0-10000");
                 var result = await _reportManager.DeleteOldReportsAndFilesAsync(TimeSpan.FromDays(nrOfDays));
                 if (result.IsFailure) return BadRequest(result.Error);
-                if (result.Value == 0) return Ok($"No files found that is older than {nrOfDays} days.");
-                return Ok($"Ok. {result.Value} files deleted.");
+                if (result.Value == 0) return Ok($"No reports found that is older than {nrOfDays} days.");
+                return Ok($"Ok. {result.Value} reports deleted.");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Delete a specific report and its associated file.
+        /// </summary>
+        /// <param name="reportId">The reportId.</param>
+        /// <returns></returns>
+        [HttpDelete("Delete/{reportId}")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> DeleteReportAndFileAsync([FromRoute] string reportId)
+        {
+            try
+            {
+                var report = await _reportManager.GetReportAsync(reportId);
+                if (report == null)
+                {
+                    return NotFound($"reportId \"{reportId}\" not found");
+                }
+
+                await _reportManager.DeleteReportAsync(reportId);
+                return Ok($"Ok. Report With Id \"{reportId}\" was deleted.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
@@ -72,7 +99,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 var reports = await _reportManager.GetAllReportsAsync();
-                reports = reports.OrderBy(m => m.CreatedDate).ToList();
+                reports = reports.OrderByDescending(m => m.CreatedDate).ToList();
                 return new OkObjectResult(reports);
             }
             catch (Exception e)
