@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -13,8 +14,10 @@ namespace SOS.Lib.Jobs.Import
         ///     Run create DwC-A validation report job.
         /// </summary>
         /// <returns></returns>
-        [DisplayName("DwC-A Data Validation Report, File: \"{0}\"")]
-        Task<string> RunAsync(
+        [DisplayName("DwC-A Data Validation Report, Id: \"{0}\", File: \"{2}\"")]
+        Task<Report> RunAsync(
+            string reportId, 
+            string createdBy, 
             string archivePath,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,

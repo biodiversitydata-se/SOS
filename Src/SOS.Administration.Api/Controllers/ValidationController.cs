@@ -13,6 +13,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -78,7 +79,7 @@ namespace SOS.Administration.Api.Controllers
                 if (maxNrObservationsToRead <= 0) return new BadRequestObjectResult("MxNrObservationsToRead must be > 0");
                 if (maxNrObservationsToRead < nrInvalidObservationsInReport + nrInvalidObservationsInReport)
                     return new BadRequestObjectResult("MxNrObservationsToRead must be > NrInvalidObservationsInReport + NrInvalidObservationsInReport");
-                var reportId = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                var reportId = Report.CreateReportId();
 
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<IDataValidationReportJob>(job =>
@@ -90,6 +91,7 @@ namespace SOS.Administration.Api.Controllers
                         nrValidObservationsInReport,
                         nrInvalidObservationsInReport,
                         JobCancellationToken.Null));
+
                 return new OkObjectResult($"Create data validation report job for data provider \"{dataProvider}\" with Id \"{reportId}\" was enqueued to Hangfire.");
             }
             catch (Exception e)
@@ -126,16 +128,20 @@ namespace SOS.Administration.Api.Controllers
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+                var reportId = Report.CreateReportId();
 
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<ICreateDwcaDataValidationReportJob>(job =>
                     job.RunAsync(
-                        filePath, 
+                        reportId, 
+                        model.CreatedBy, 
+                        filePath,
                         model.MaxNrObservationsToRead,
                         model.NrValidObservationsInReport,
                         model.NrInvalidObservationsInReport,
                         JobCancellationToken.Null));
-                return new OkObjectResult($"Create DwC-A data validation report job for file \"{model.DwcaFile.FileName}\" was enqueued to Hangfire.");
+
+                return new OkObjectResult($"Create DwC-A data validation report job for file \"{model.DwcaFile.FileName}\" with Id \"{reportId}\" was enqueued to Hangfire.");
             }
             catch (Exception e)
             {

@@ -10,6 +10,7 @@ using JsonDiffPatchDotNet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Helpers.Interfaces;
@@ -52,7 +53,7 @@ namespace SOS.Process.Helpers
             var generatedFile = Encoding.UTF8.GetBytes(generatedVocabulariesJson);
             var jsonFilesFile = Encoding.UTF8.GetBytes(jsonFilesVocabulariesJson);
             var processedFile = Encoding.UTF8.GetBytes(processedVocabulariesJson);
-            var zipFile = CreateZipFile(new[]
+            var zipFile = ZipFileHelper.CreateZipFile(new[]
             {
                 (Filename: "1.GeneratedVocabularies.json", Bytes: generatedFile),
                 (Filename: "2.JsonFilesVocabularies.json", Bytes: jsonFilesFile),
@@ -147,22 +148,6 @@ namespace SOS.Process.Helpers
                 : $"{fileName} (Changes detected).json";
             var diffBytes = Encoding.UTF8.GetBytes(diff == null ? "" : diff.ToString());
             return (Filename: newFilename, Bytes: diffBytes);
-        }
-
-        private byte[] CreateZipFile(IEnumerable<(string Filename, byte[] Bytes)> files)
-        {
-            using var ms = new MemoryStream();
-            using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
-            {
-                foreach (var file in files)
-                {
-                    var zipEntry = archive.CreateEntry(file.Filename, CompressionLevel.Optimal);
-                    using var zipStream = zipEntry.Open();
-                    zipStream.Write(file.Bytes, 0, file.Bytes.Length);
-                }
-            }
-
-            return ms.ToArray();
         }
     }
 }

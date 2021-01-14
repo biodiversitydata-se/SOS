@@ -30,5 +30,10 @@ namespace SOS.Administration.Api.Models
         /// </summary>
         [DefaultValue(100)]
         public int NrInvalidObservationsInReport { get; set; } = 100;
+
+        /// <summary>
+        /// Name of the person that requested the report.
+        /// </summary>
+        public string CreatedBy { get; set; } = "";
     }
 }

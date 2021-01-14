@@ -10,6 +10,7 @@ using SOS.Lib.Jobs.Import;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -68,7 +69,7 @@ namespace SOS.Import.Jobs
             var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
             var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
 
-            var zipFile = CreateZipFile(new[]
+            var zipFile = ZipFileHelper.CreateZipFile(new[]
             {
                 (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
                 (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
@@ -127,22 +128,6 @@ namespace SOS.Import.Jobs
             };
 
             return jsonSettings;
-        }
-
-        private byte[] CreateZipFile(IEnumerable<(string Filename, byte[] Bytes)> files)
-        {
-            using var ms = new MemoryStream();
-            using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
-            {
-                foreach (var file in files)
-                {
-                    var zipEntry = archive.CreateEntry(file.Filename, CompressionLevel.Optimal);
-                    using var zipStream = zipEntry.Open();
-                    zipStream.Write(file.Bytes, 0, file.Bytes.Length);
-                }
-            }
-
-            return ms.ToArray();
         }
     }
 }

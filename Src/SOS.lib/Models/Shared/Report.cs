@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
@@ -22,5 +23,10 @@ namespace SOS.Lib.Models.Shared
         public long FileSizeInKb { get; set; }
         public string FileExtension { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public static string CreateReportId()
+        {
+            return Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+        }
     }
 }
