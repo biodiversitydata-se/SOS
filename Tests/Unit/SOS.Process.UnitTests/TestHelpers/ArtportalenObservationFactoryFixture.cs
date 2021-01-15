@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Processors.Artportalen;
@@ -40,10 +42,12 @@ namespace SOS.Process.UnitTests.TestHelpers
                     @"Resources\MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
+            var areaHelperStub = new Mock<IAreaHelper>();            
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
+                areaHelperStub.Object,
                 false, false).Result;
             return factory;
         }

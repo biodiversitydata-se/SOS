@@ -113,6 +113,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
+            var areaHelper = new AreaHelper(
+            new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
                 processedObservationRepository,
@@ -121,7 +124,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
-                new NullLogger<ArtportalenObservationProcessor>());
+                new NullLogger<ArtportalenObservationProcessor>(),
+                areaHelper);
         }
 
         private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()

@@ -30,6 +30,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly IAreaHelper _areaHelper;
         private readonly SemaphoreSlim _semaphore;
 
         /// <summary>
@@ -71,7 +72,8 @@ namespace SOS.Process.Processors.Artportalen
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ILogger<ArtportalenObservationProcessor> logger) : 
+            ILogger<ArtportalenObservationProcessor> logger,
+            IAreaHelper areaHelper) : 
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
@@ -80,6 +82,9 @@ namespace SOS.Process.Processors.Artportalen
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _processConfiguration =
                 processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
+
+            _areaHelper =
+              areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             if (processConfiguration == null)
             {
@@ -94,21 +99,21 @@ namespace SOS.Process.Processors.Artportalen
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            return await ProcessAsync(dataProvider, taxa, false, mode, cancellationToken);
+            return await ProcessAsync(dataProvider, taxa, _areaHelper, false, mode, cancellationToken);
         }
 
         /// <inheritdoc />
         protected override async Task<int> ProcessProtectedObservations(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            return await ProcessAsync(dataProvider, taxa, true, mode, cancellationToken);
+            return await ProcessAsync(dataProvider, taxa, _areaHelper, true, mode, cancellationToken);
         }
 
         /// <summary>
@@ -121,14 +126,15 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> ProcessAsync(
-            DataProvider dataProvider,
+            DataProvider dataProvider,            
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IAreaHelper areaHelper,
             bool protectedObservations,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full, protectedObservations);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, areaHelper, mode != JobRunModes.Full, protectedObservations);
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
             if (_processConfiguration.ParallelProcessing)

@@ -184,7 +184,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
-                new NullLogger<ArtportalenObservationProcessor>());
+                new NullLogger<ArtportalenObservationProcessor>(),
+                areaHelper);
             var instanceManager = new InstanceManager(
                 new ProcessedObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
