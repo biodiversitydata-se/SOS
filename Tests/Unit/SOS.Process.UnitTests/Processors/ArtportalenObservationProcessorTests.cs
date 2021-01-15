@@ -39,6 +39,7 @@ namespace SOS.Process.UnitTests.Processors
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
+            _areaHelperMock = new Mock<IAreaHelper>();
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
@@ -49,6 +50,8 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
+        private readonly Mock<IAreaHelper> _areaHelperMock;
+
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
@@ -58,7 +61,8 @@ namespace SOS.Process.UnitTests.Processors
             _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _validationManagerMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _areaHelperMock.Object);
 
         /// <summary>
         ///     Test processing fail

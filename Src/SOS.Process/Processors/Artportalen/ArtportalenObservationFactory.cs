@@ -11,6 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -31,6 +32,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
         private readonly bool _protected;
+        private readonly IAreaHelper _areaHelper;
 
         /// <summary>
         /// Constructor
@@ -44,6 +46,7 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
+            IAreaHelper areaHelper,
             bool incrementalMode,
             bool protectedObservations)
         {
@@ -55,18 +58,20 @@ namespace SOS.Process.Processors.Artportalen
 
             _incrementalMode = incrementalMode;
             _protected = protectedObservations;
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
+            IAreaHelper areaHelper,
             bool incrementalMode,
             bool protectedObservations)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, protectedObservations);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, areaHelper, incrementalMode, protectedObservations);
         }
 
         public ICollection<Observation> CreateProcessedObservations(
@@ -94,8 +99,8 @@ namespace SOS.Process.Processors.Artportalen
                 {
                     taxon.IndividualId = verbatimObservation.URL;
                 }
-
-                if (ShouldBeDiffused(verbatimObservation, taxon))
+                bool shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
+                if (shouldBeDiffused)
                 {
 #if INCLUDE_DIFFUSED_OBSERVATIONS
                     //If it is a protected sighting it should not be possible to find it in the current month
@@ -105,7 +110,7 @@ namespace SOS.Process.Processors.Artportalen
                         return null;
                     }
                     //Diffuse the observation depending on the protectionlevel                
-                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
+                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);                    
 #endif
                 }
 
@@ -293,6 +298,11 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
+                if (shouldBeDiffused)
+                {
+                    _areaHelper.AddAreaDataToProcessedObservation(obs);
+                }
+
                 return obs;
             }
             catch (Exception e)
@@ -428,7 +438,7 @@ namespace SOS.Process.Processors.Artportalen
             verbatimObservation.ReportedBy = "";
             verbatimObservation.ReportedByUserAlias = "";
             verbatimObservation.ReportedByUserId = -1;
-            verbatimObservation.Observers = "";
+            verbatimObservation.Observers = "";            
             verbatimObservation.ObserversInternal = new List<UserInternal>();
 
             if(verbatimObservation.ReportedDate.HasValue)
@@ -439,8 +449,7 @@ namespace SOS.Process.Processors.Artportalen
                 verbatimObservation.EndDate = new DateTime(verbatimObservation.EndDate.Value.Year, verbatimObservation.EndDate.Value.Month, 1);
             verbatimObservation.EditDate = new DateTime(verbatimObservation.EditDate.Year, verbatimObservation.EditDate.Month, 1);
             
-            var diffusedPoint = DiffusePoint(verbatimObservation.Site?.Point, verbatimObservation, taxon);
-            var diffusedPolygon= DiffusePolygon(verbatimObservation.Site?.PointWithBuffer, verbatimObservation, taxon);
+            (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) = DiffuseCoordinates(verbatimObservation.Site?.Point, verbatimObservation.Site?.PointWithBuffer, verbatimObservation, taxon);            
 
             var newSite = new Site();
             newSite.Point = diffusedPoint;
@@ -458,7 +467,7 @@ namespace SOS.Process.Processors.Artportalen
             newSite.WaterArea = verbatimObservation.Site.WaterArea;
             newSite.Accuracy = verbatimObservation.Site.Accuracy;
 
-            verbatimObservation.Site = newSite;
+            verbatimObservation.Site = newSite;            
 
             return verbatimObservation;
         }
@@ -488,91 +497,71 @@ namespace SOS.Process.Processors.Artportalen
 
         private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (taxon?.ProtectionLevel == null)
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
                 return false;
             }
 
             if (observationVerbatim.ProtectedBySystem)
             {
-                if(taxon.ProtectionLevel.Id > 2)
+                var regex = new Regex(@"^\d");
+
+                if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
                 {
-                    return true;
+                    if(protectionLevel > 2)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
 
         /// <summary>
-        /// Diffuse the point dependent on the sightings protection level
+        /// Diffuse the point based on the sightings protection level
         /// </summary>
         /// <param name="point"></param>
         /// <param name="verbatimObservation"></param>
         /// <param name="obs"></param>
         /// <returns></returns>
-        private GeoJsonGeometry DiffusePoint(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
+        private (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) DiffuseCoordinates(GeoJsonGeometry point, GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (taxon?.ProtectionLevel == null) {
-                return point;
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            {
+                return (point, polygon);
             }
 
             var originalPoint = point;
             var diffusedPoint = point;
+            GeoJsonGeometry diffusedPolygon = polygon;
             if(observationVerbatim.ProtectedBySystem)
             {
-                var diffValues = GetDiffusionValues(taxon.ProtectionLevel.Id);
-                var latitude = (double)originalPoint.Coordinates[1];
-                var longitude = (double)originalPoint.Coordinates[0];
-                //transform the point into the same format as Artportalen so that we can use the same diffusion as them
-                var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
-                var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-                var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffValues.mod + diffValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffValues.mod + diffValues.add);
-                var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-                //retransform to the correct format again
-                diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
-
-            }
-            return diffusedPoint;
-        }
-        /// <summary>
-        /// Diffuse the point dependent on the sightings protection level
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="verbatimObservation"></param>
-        /// <param name="obs"></param>
-        /// <returns></returns>
-        private GeoJsonGeometry DiffusePolygon(GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            if (taxon?.ProtectionLevel == null)
-            {
-                return polygon;
-            }
-
-            var originalPoint = polygon;
-            var diffusedPoint = polygon;
-            if (observationVerbatim.ProtectedBySystem)
-            {
-                var diffValues = GetDiffusionValues(taxon.ProtectionLevel.Id);
-                var newCoordinates = new double[((double[][])originalPoint.Coordinates[0]).Length][];
-                int index = 0;
-                foreach (var point in ((double[][])originalPoint.Coordinates[0]))
+                var regex = new Regex(@"^\d");
+                
+                if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
                 {
-                    newCoordinates[index] = new double[2];
-                    var latitude = (double)point[1];
-                    var longitude = (double)point[0];
+                    var diffusionValues = GetDiffusionValues(protectionLevel);
+                    var latitude = (double)originalPoint.Coordinates[1];
+                    var longitude = (double)originalPoint.Coordinates[0];
+
+                    //transform the point into the same format as Artportalen so that we can use the same diffusion as them
                     var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
                     var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-                    var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffValues.mod + diffValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffValues.mod + diffValues.add);
+                    var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
+
+                    //retransform to the correct format again
                     var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-                    newCoordinates[index][0] = retransformedPoint.Coordinates[0].X;
-                    newCoordinates[index][1] = retransformedPoint.Coordinates[0].Y;                        
-                    index++;
+                    
+                    //create the point with buffer from the diffused point
+                    var pointForCircle = new NetTopologySuite.Geometries.Point(retransformedPoint.Coordinate.X, retransformedPoint.Coordinate.Y);
+                    pointForCircle.SRID = (int)CoordinateSys.WGS84;
+                    diffusedPolygon = pointForCircle.ToCircle(diffusionValues.mod).ToGeoJson();
+                    
+                    diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
+
                 }
-                diffusedPoint.Coordinates = new System.Collections.ArrayList() { newCoordinates };
-                diffusedPoint.Type = "Polygon";                    
-   
             }
-            return diffusedPoint;
+            return (diffusedPoint, diffusedPolygon);
         }
 
         /// <summary>
@@ -731,23 +720,27 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
-            if (taxon?.ProtectionLevel == null)
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
                 return 1;
             }
 
-       
-            if (taxon.ProtectionLevel.Id <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
+            var regex = new Regex(@"^\d");
+
+            if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
             {
-                return 3;
+                if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
+                {
+                    return 3;
+                }
+
+                if (protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
+                    protectedBySystem)
+                {
+                    return protectionLevel;
+                }
             }
 
-            if (taxon.ProtectionLevel.Id > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
-                protectedBySystem)
-            {
-                return taxon.ProtectionLevel.Id;
-            }
-          
             return 1;
         }
 
