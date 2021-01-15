@@ -273,12 +273,4 @@ namespace SOS.Import.Managers
             }
         }
     }
-
-    public static class ProcessedFieldMapValueExtension
-    {
-        public static bool IsCustomValue(this VocabularyValue processedFieldMapValue)
-        {
-            return processedFieldMapValue != null && processedFieldMapValue.Id == -1;
-        }
-    }
 }

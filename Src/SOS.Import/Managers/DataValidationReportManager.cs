@@ -18,6 +18,7 @@ namespace SOS.Import.Managers
         public DataValidationReportManager(
             ClamPortalDataValidationReportFactory clamPortalDataValidationReportFactory,
             FishDataValidationReportFactory fishDataValidationReportFactory,
+            DwcaDataValidationReportFactory dwcaDataValidationReportFactory,
             MvmDataValidationReportFactory mvmDataValidationReportFactory,
             KulDataValidationReportFactory kulDataValidationReportFactory,
             SersDataValidationReportFactory sersDataValidationReportFactory,
@@ -26,6 +27,7 @@ namespace SOS.Import.Managers
         {
             if (clamPortalDataValidationReportFactory == null) throw new ArgumentNullException(nameof(clamPortalDataValidationReportFactory));
             if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
+            if (dwcaDataValidationReportFactory == null) throw new ArgumentNullException(nameof(dwcaDataValidationReportFactory));
             if (mvmDataValidationReportFactory == null) throw new ArgumentNullException(nameof(mvmDataValidationReportFactory));
             if (kulDataValidationReportFactory == null) throw new ArgumentNullException(nameof(kulDataValidationReportFactory));
             if (sersDataValidationReportFactory == null) throw new ArgumentNullException(nameof(sersDataValidationReportFactory));
@@ -40,7 +42,8 @@ namespace SOS.Import.Managers
                 {DataProviderType.KULObservations, kulDataValidationReportFactory},
                 {DataProviderType.SersObservations, sersDataValidationReportFactory},
                 {DataProviderType.NorsObservations, norsDataValidationReportFactory},
-                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory}
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory},
+                {DataProviderType.DwcA, dwcaDataValidationReportFactory}
             };
         }
 

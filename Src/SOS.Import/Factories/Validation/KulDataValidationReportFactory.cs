@@ -35,12 +35,12 @@ namespace SOS.Import.Factories.Validation
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<KulObservationVerbatim>> GetAllObservationsByCursorAsync()
+        protected override async Task<IAsyncCursor<KulObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
             return await _kulObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
-        protected override async Task<long> GetTotalObservationsCountAsync()
+        protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
             return await _kulObservationVerbatimRepository.CountAllDocumentsAsync();
         }

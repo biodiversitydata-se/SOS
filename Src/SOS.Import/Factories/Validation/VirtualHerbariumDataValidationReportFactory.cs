@@ -35,12 +35,12 @@ namespace SOS.Import.Factories.Validation
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync()
+        protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
             return await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
-        protected override async Task<long> GetTotalObservationsCountAsync()
+        protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
             return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
         }

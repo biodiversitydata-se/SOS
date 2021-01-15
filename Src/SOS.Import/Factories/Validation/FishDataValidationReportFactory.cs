@@ -35,12 +35,12 @@ namespace SOS.Import.Factories.Validation
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<FishDataObservationVerbatim>> GetAllObservationsByCursorAsync()
+        protected override async Task<IAsyncCursor<FishDataObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
             return await _fishDataObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
-        protected override async Task<long> GetTotalObservationsCountAsync()
+        protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
             return await _fishDataObservationVerbatimRepository.CountAllDocumentsAsync();
         }

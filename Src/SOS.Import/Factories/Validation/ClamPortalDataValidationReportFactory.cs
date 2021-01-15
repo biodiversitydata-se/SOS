@@ -35,12 +35,12 @@ namespace SOS.Import.Factories.Validation
             _clamPortalObservationVerbatimRepository = clamPortalObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<ClamObservationVerbatim>> GetAllObservationsByCursorAsync()
+        protected override async Task<IAsyncCursor<ClamObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
             return await _clamPortalObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
-        protected override async Task<long> GetTotalObservationsCountAsync()
+        protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
             return await _clamPortalObservationVerbatimRepository.CountAllDocumentsAsync();
         }
