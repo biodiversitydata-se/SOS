@@ -75,16 +75,6 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<AreaFilter> Areas { get; set; }
 
         /// <summary>
-        /// Bird validation area id's
-        /// </summary>
-        public ICollection<string> BirdValidationAreaIds { get; set; }
-
-        /// <summary>
-        /// County id's
-        /// </summary>
-        public ICollection<string> CountyIds { get; set; }
-
-        /// <summary>
         ///     Only get data from these providers
         /// </summary>
         public IEnumerable<int> DataProviderIds { get; set; }
@@ -97,7 +87,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Filter used to give user extended authorization
         /// </summary>
-        public ExtendedAuthorizationFilter ExtendedAuthorization { get; set; }
+        public IEnumerable<ExtendedAuthorizationFilter> ExtendedAuthorizations { get; set; }
 
         /// <summary>
         ///     Field mapping translation culture code.
@@ -108,14 +98,14 @@ namespace SOS.Lib.Models.Search
         public string FieldTranslationCultureCode { get; set; }
 
         /// <summary>
-        ///     Geometry filter 
-        /// </summary>
-        public GeometryFilter GeometryFilter { get; set; }
-
-        /// <summary>
         ///     Gender to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> GenderIds { get; set; }
+
+        /// <summary>
+        /// Filter on geographical areas
+        /// </summary>
+        public GeographicFilter GeographicAreas { get; set; }
 
         /// <summary>
         ///     Decides whether to search for the exact taxa or
@@ -124,24 +114,9 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     Decides whether to search for the exact taxa or
-        ///     for the hierarchical underlying taxa.
-        /// </summary>
-
-        /// <summary>
-        ///     Municipalities to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> MunicipalityIds { get; set; }
-
-        /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
-
-        /// <summary>
-        ///     Parish to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> ParishIds { get; set; }
 
         /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
@@ -149,11 +124,6 @@ namespace SOS.Lib.Models.Search
         ///     An negative observation is an observation that was expected to be found but wasn't.
         /// </summary>
         public bool? PositiveSightings { get; set; }
-
-        /// <summary>
-        ///     Provinces to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> ProvinceIds { get; set; }
 
         /// <summary>
         ///     Redlist categories to match. Queryable values are available in Field Mappings.

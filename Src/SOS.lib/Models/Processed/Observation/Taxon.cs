@@ -278,7 +278,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     True if taxon is protected by law
         /// </summary>
-        public string ProtectionLevel { get; set; }
+        public VocabularyValue ProtectionLevel { get; set; }
 
         /// <summary>
         ///     Redlist category

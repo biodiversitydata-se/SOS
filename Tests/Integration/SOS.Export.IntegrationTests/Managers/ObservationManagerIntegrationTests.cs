@@ -20,6 +20,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers
@@ -65,7 +66,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path}, 
-                new FilterManager(taxonManager, new AreaCache(new AreaRepository(exportClient, new NullLogger<AreaRepository>()))), 
+                new FilterManager(taxonManager, null /*Todo*/,  new AreaCache(new AreaRepository(exportClient, new NullLogger<AreaRepository>()))), 
                 new Mock<ILogger<ObservationManager>>().Object);
 
             return observationManager;

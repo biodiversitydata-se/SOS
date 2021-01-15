@@ -29,12 +29,17 @@ namespace SOS.Observations.Api.Extensions
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.GenderIds = searchFilterBaseDto.Taxon?.GenderIds;
-            filter.GeometryFilter = searchFilterBaseDto.Geometry == null ? null : new GeometryFilter
-            {
-                Geometries = searchFilterBaseDto.Geometry.Geometries,
-                MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
-                UsePointAccuracy = searchFilterBaseDto.Geometry.UsePointAccuracy
-            };
+            filter.GeographicAreas = searchFilterBaseDto.Geometry?.Geometries == null
+                ? null
+                : new GeographicFilter
+                {
+                    GeometryFilter = new GeometryFilter
+                        {
+                            Geometries = searchFilterBaseDto.Geometry.Geometries,
+                            MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
+                            UsePointAccuracy = searchFilterBaseDto.Geometry.UsePointAccuracy
+                        }
+                };
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
             {

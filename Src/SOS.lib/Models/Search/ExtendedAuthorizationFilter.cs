@@ -8,19 +8,14 @@ namespace SOS.Lib.Models.Search
     public class ExtendedAuthorizationFilter
     {
         /// <summary>
-        /// County id's where user has extended authorization
+        /// Parish id's where user has extended authorization
         /// </summary>
-        public IEnumerable<string> CountyIds { get; set; }
+        public GeographicFilter GeographicAreas { get; set; }
 
         /// <summary>
-        /// Municipality id's where user has extended authorization
+        /// User can see observations of taxa with protection level equal or below this  
         /// </summary>
-        public IEnumerable<string> MunicipalityIds { get; set; }
-
-        /// <summary>
-        /// Province id's where user has extended authorization
-        /// </summary>
-        public IEnumerable<string> ProvinceIds { get; set; }
+        public int MaxProtectionLevel { get; set; }
 
         /// <summary>
         /// Taxa user has extended authorization to see

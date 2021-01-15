@@ -211,7 +211,7 @@ namespace SOS.Process.Processors.Taxon
                 await AddTaxonAttributesAsync(dwcTaxa);
                 _logger.LogDebug("Finish adding taxon attributes");
 
-                var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon()).ToList();
+                var taxa = dwcTaxa.ToProcessedTaxa().ToList();
 
                 _logger.LogDebug("Start calculating higher classification for taxa");
                 CalculateHigherClassificationField(taxa);

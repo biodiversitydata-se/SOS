@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Repositories
         {
             var publicIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
 
-            if (filter?.ExtendedAuthorization == null)
+            if (!filter?.ExtendedAuthorizations?.Any() ?? true)
             {
                 return publicIndex;
             }

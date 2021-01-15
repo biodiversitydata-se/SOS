@@ -38,7 +38,7 @@ namespace SOS.Lib.Models.Search
             DataProviderIds = searchFilter.DataProviderIds;
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             OnlyValidated = searchFilter.OnlyValidated;
-            GeometryFilter = searchFilter.GeometryFilter;
+            GeographicAreas = searchFilter.GeographicAreas;
             PositiveSightings = searchFilter.PositiveSightings;
         }
 

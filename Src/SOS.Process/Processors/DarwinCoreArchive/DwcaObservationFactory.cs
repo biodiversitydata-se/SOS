@@ -470,18 +470,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
 
-        private double? ParseDouble(string strValue, string fieldName)
-        {
-            var result = strValue.ParseDouble();
-            if (!result.HasValue && strValue.HasValue())
-            {
-                var errorText = $"The field {fieldName} with a value of [{strValue}] is not a valid {typeof(double)}";
-                errors.Add(errorText);
-            }
-
-            return result;
-        }
-
         private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatimObservation)
         {
             var processedOccurrence = new Occurrence();
@@ -638,45 +626,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
 
-        /// <summary>
-        ///     Get SOS internal Id for the id specific for the data provider.
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="sosIdByValue"></param>
-        /// <returns></returns>
-        private static VocabularyValue GetSosId(int? val, IDictionary<object, int> sosIdByValue)
-        {
-            if (!val.HasValue || sosIdByValue == null) return null;
-
-            if (sosIdByValue.TryGetValue(val.Value, out var sosId))
-            {
-                return new VocabularyValue {Id = sosId};
-            }
-
-            return new VocabularyValue
-                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
-        }
-
-        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Lib.Models.Verbatim.Artportalen.Project project)
-        {
-            if (project == null) return null;
-
-            return new Lib.Models.Processed.Observation.Project
-            {
-                IsPublic = project.IsPublic,
-                Category = project.Category,
-                Description = project.Description,
-                EndDate = project.EndDate?.ToUniversalTime(),
-                Id = project.Id,
-                Name = project.Name,
-                Owner = project.Owner,
-                StartDate = project.StartDate?.ToUniversalTime(),
-                SurveyMethod = project.SurveyMethod,
-                SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(this.CreateProcessedProjectParameter)
-            };
-        }
-
         private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
         {
             if (projectParameter == null)
@@ -693,180 +642,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 Id = projectParameter.Id,
                 Unit = projectParameter.Unit
             };
-        }
-
-        private string GetSamplingProtocol(IEnumerable<Lib.Models.Verbatim.Artportalen.Project> projects)
-        {
-            if (!projects?.Any() ?? true) return null;
-
-            var project = projects.First();
-
-            if (projects.Count() == 1)
-            {
-                return project?.SurveyMethod ?? project?.SurveyMethodUrl;
-            }
-
-            var firstSurveyMethod = project.SurveyMethod;
-            if (firstSurveyMethod != null && projects.All(p => p.SurveyMethod == firstSurveyMethod))
-            {
-                return firstSurveyMethod;
-            }
-
-            var firstSurveyMethodUrl = project.SurveyMethodUrl;
-            if (firstSurveyMethodUrl != null && projects.All(p => p.SurveyMethod == firstSurveyMethodUrl))
-            {
-                return firstSurveyMethodUrl;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///     Calculate protection level
-        /// </summary>
-        /// <param name="taxon"></param>
-        /// <param name="hiddenByProvider"></param>
-        /// <param name="protectedBySystem"></param>
-        /// <returns></returns>
-        private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
-        {
-            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
-            {
-                return 1;
-            }
-
-            var regex = new Regex(@"^\d");
-
-            if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
-            {
-                if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
-                {
-                    return 3;
-                }
-
-                if (protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
-                    protectedBySystem)
-                {
-                    return protectionLevel;
-                }
-            }
-
-            return 1;
-        }
-
-        /// <summary>
-        ///     Build the substrate description string
-        /// </summary>
-        /// <param name="verbatimObservation"></param>
-        /// <param name="taxa"></param>
-        /// <returns></returns>
-        private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
-        {
-            if (verbatimObservation == null)
-            {
-                return null;
-            }
-
-            var substrateDescription = new StringBuilder();
-
-            if (verbatimObservation.QuantityOfSubstrate.HasValue)
-            {
-                substrateDescription.Append($"{verbatimObservation.QuantityOfSubstrate.Value} substratenheter");
-            }
-
-            if (verbatimObservation.Substrate != null)
-            {
-                substrateDescription.Append(
-                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.Substrate.Translate(Cultures.en_GB)}");
-            }
-
-            if (!string.IsNullOrEmpty(verbatimObservation.SubstrateDescription))
-            {
-                substrateDescription.Append(
-                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateDescription}");
-            }
-
-            if (verbatimObservation.SubstrateSpeciesId.HasValue &&
-                taxa != null &&
-                taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var taxon))
-            {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{taxon.ScientificName}");
-            }
-
-            if (!string.IsNullOrEmpty(verbatimObservation.SubstrateSpeciesDescription))
-            {
-                substrateDescription.Append(
-                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateSpeciesDescription}");
-            }
-
-            var res = substrateDescription.Length > 0 ? substrateDescription.ToString().WithMaxLength(255) : null;
-            return res;
-        }
-
-        /// <summary>
-        ///     Get bird nest activity id
-        /// </summary>
-        /// <param name="verbatimObservation"></param>
-        /// <param name="taxon"></param>
-        /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            if (verbatimObservation == null || taxon == null)
-            {
-                return null;
-            }
-
-            if (taxon.OrganismGroup?.StartsWith("fåg", StringComparison.CurrentCultureIgnoreCase) ?? false)
-            {
-                return (verbatimObservation.Activity?.Id ?? 0) == 0 ? 1000000 : verbatimObservation.Activity.Id;
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        ///     Get associated references
-        /// </summary>
-        /// <param name="verbatimObservation"></param>
-        /// <returns></returns>
-        private string GetAssociatedReferences(ArtportalenObservationVerbatim verbatimObservation)
-        {
-            if (!verbatimObservation?.MigrateSightingObsId.HasValue ?? true)
-            {
-                return null;
-            }
-
-            string associatedReferences = null;
-            switch (verbatimObservation.MigrateSightingPortalId ?? 0)
-            {
-                case 1:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Bird.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-                case 2:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-                case 6:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-                case 7:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-                case 8:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:Fish.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-                case 9:
-                    associatedReferences =
-                        $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatimObservation.MigrateSightingObsId.Value}";
-                    break;
-            }
-
-            return associatedReferences;
         }
 
         /// <summary>
@@ -904,32 +679,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             return dic;
-        }
-
-        private static string GetMappingKey(VocabularyId vocabularyId)
-        {
-            switch (vocabularyId)
-            {
-                case VocabularyId.Gender:
-                    return "sex";
-                    return "stateProvince";
-                case VocabularyId.BasisOfRecord:
-                    return "basisOfRecord";
-                case VocabularyId.Continent:
-                    return "continent";
-                case VocabularyId.EstablishmentMeans:
-                    return "establishmentMeans";
-                case VocabularyId.OccurrenceStatus:
-                    return "occurrenceStatus";
-                case VocabularyId.AccessRights:
-                    return "accessRights";
-                case VocabularyId.Country:
-                    return "country";
-                case VocabularyId.Type:
-                    return "type";
-                default:
-                    throw new ArgumentException($"No mapping exist for the field: {vocabularyId}");
-            }
         }
 
         private enum MappingNotFoundLogic
