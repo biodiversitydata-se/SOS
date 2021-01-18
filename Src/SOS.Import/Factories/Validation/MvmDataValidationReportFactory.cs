@@ -54,10 +54,10 @@ namespace SOS.Import.Factories.Validation
 
         protected override void ValidateVerbatimTaxon(
             MvmObservationVerbatim verbatimObservation,
-            HashSet<int> nonMatchingTaxonIds,
+            HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames)
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId);
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
         }
 
         protected override void ValidateVerbatimData(MvmObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
