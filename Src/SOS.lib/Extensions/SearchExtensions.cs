@@ -47,7 +47,7 @@ namespace SOS.Lib.Extensions
 
                     protectedQuerys.Add(q => q
                         .Bool(b => b
-                            .Filter(protectedQuery)
+                            .Should(protectedQuery)
                         )
                     );
                 }

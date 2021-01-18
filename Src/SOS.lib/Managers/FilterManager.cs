@@ -16,6 +16,7 @@ namespace SOS.Lib.Managers
     public class FilterManager : IFilterManager
     {
         private const int BiotaTaxonId = 0;
+        
         private readonly ITaxonManager _taxonManager;
         private readonly IUserService _userService;
         private readonly IAreaCache _areaCache;
@@ -59,8 +60,17 @@ namespace SOS.Lib.Managers
                 };
                 var areaFilters = new List<AreaFilter>();
 
+                var authorizedToSweden = false;
+
                 foreach (var area in authority.Areas)
                 {
+                    // 100 = sweden, no meaning to add since all processed observations are in sweden
+                    if (area.AreaTypeId == 18 && area.FeatureId == "100")
+                    {
+                        authorizedToSweden = true;
+                        continue;
+                    }
+
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
                 extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters);
@@ -73,6 +83,7 @@ namespace SOS.Lib.Managers
                             (authority.TaxonIds?.Contains(BiotaTaxonId) ?? false)
                         ) &&
                         (
+                            authorizedToSweden ||
                             (extendedAuthorizationFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter.Geometries?.Any() ?? false) ||
@@ -130,6 +141,12 @@ namespace SOS.Lib.Managers
                         (geographicFilter.ParishIds ??= new List<string>()).Add(areaFilter.FeatureId);
                         break;
                     case AreaType.BirdValidationArea:
+                        if (areaFilter.FeatureId == "100")
+                        {
+                            // 100 = sweden, no meaning to add since all processed observations are in sweden
+                            continue;
+                        }
+
                         (geographicFilter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                         break;
                     default:
