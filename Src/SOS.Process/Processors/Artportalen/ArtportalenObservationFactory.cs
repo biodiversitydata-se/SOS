@@ -497,21 +497,16 @@ namespace SOS.Process.Processors.Artportalen
 
         private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            if (taxon?.ProtectionLevel == null)
             {
                 return false;
             }
 
             if (observationVerbatim.ProtectedBySystem)
-            {
-                var regex = new Regex(@"^\d");
-
-                if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
+            {                
+                if(taxon.ProtectionLevel.Id > 2)
                 {
-                    if(protectionLevel > 2)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
@@ -526,7 +521,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) DiffuseCoordinates(GeoJsonGeometry point, GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            if (taxon?.ProtectionLevel == null)
             {
                 return (point, polygon);
             }
@@ -535,31 +530,27 @@ namespace SOS.Process.Processors.Artportalen
             var diffusedPoint = point;
             GeoJsonGeometry diffusedPolygon = polygon;
             if(observationVerbatim.ProtectedBySystem)
-            {
-                var regex = new Regex(@"^\d");
-                
-                if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
-                {
-                    var diffusionValues = GetDiffusionValues(protectionLevel);
-                    var latitude = (double)originalPoint.Coordinates[1];
-                    var longitude = (double)originalPoint.Coordinates[0];
+            {                
+                var protectionLevel = taxon.ProtectionLevel.Id;
 
-                    //transform the point into the same format as Artportalen so that we can use the same diffusion as them
-                    var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
-                    var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-                    var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
+                var diffusionValues = GetDiffusionValues(protectionLevel);
+                var latitude = (double)originalPoint.Coordinates[1];
+                var longitude = (double)originalPoint.Coordinates[0];
 
-                    //retransform to the correct format again
-                    var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                //transform the point into the same format as Artportalen so that we can use the same diffusion as them
+                var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
+                var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+                var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
+
+                //retransform to the correct format again
+                var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
                     
-                    //create the point with buffer from the diffused point
-                    var pointForCircle = new NetTopologySuite.Geometries.Point(retransformedPoint.Coordinate.X, retransformedPoint.Coordinate.Y);
-                    pointForCircle.SRID = (int)CoordinateSys.WGS84;
-                    diffusedPolygon = pointForCircle.ToCircle(diffusionValues.mod).ToGeoJson();
+                //create the point with buffer from the diffused point
+                var pointForCircle = new NetTopologySuite.Geometries.Point(retransformedPoint.Coordinate.X, retransformedPoint.Coordinate.Y);
+                pointForCircle.SRID = (int)CoordinateSys.WGS84;
+                diffusedPolygon = pointForCircle.ToCircle(diffusionValues.mod).ToGeoJson();
                     
-                    diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
-
-                }
+                diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
             }
             return (diffusedPoint, diffusedPolygon);
         }
@@ -720,27 +711,22 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
-            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
+            if (taxon?.ProtectionLevel == null)
             {
                 return 1;
-            }
-
-            var regex = new Regex(@"^\d");
-
-            if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
+            }            
+            
+            if (taxon.ProtectionLevel.Id <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
             {
-                if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
-                {
-                    return 3;
-                }
-
-                if (protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
-                    protectedBySystem)
-                {
-                    return protectionLevel;
-                }
+                return 3;
             }
 
+            if (taxon.ProtectionLevel.Id > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
+                protectedBySystem)
+            {
+                return taxon.ProtectionLevel.Id;
+            }
+            
             return 1;
         }
 
