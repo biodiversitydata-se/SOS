@@ -503,7 +503,7 @@ namespace SOS.Process.Processors.Artportalen
             }
 
             if (observationVerbatim.ProtectedBySystem)
-            {
+            {                
                 if(taxon.ProtectionLevel.Id > 2)
                 {
                     return true;
@@ -530,8 +530,10 @@ namespace SOS.Process.Processors.Artportalen
             var diffusedPoint = point;
             GeoJsonGeometry diffusedPolygon = polygon;
             if(observationVerbatim.ProtectedBySystem)
-            {
-                var diffusionValues = GetDiffusionValues(taxon.ProtectionLevel.Id);
+            {                
+                var protectionLevel = taxon.ProtectionLevel.Id;
+
+                var diffusionValues = GetDiffusionValues(protectionLevel);
                 var latitude = (double)originalPoint.Coordinates[1];
                 var longitude = (double)originalPoint.Coordinates[0];
 
@@ -542,13 +544,13 @@ namespace SOS.Process.Processors.Artportalen
 
                 //retransform to the correct format again
                 var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-                
+                    
                 //create the point with buffer from the diffused point
                 var pointForCircle = new NetTopologySuite.Geometries.Point(retransformedPoint.Coordinate.X, retransformedPoint.Coordinate.Y);
                 pointForCircle.SRID = (int)CoordinateSys.WGS84;
                 diffusedPolygon = pointForCircle.ToCircle(diffusionValues.mod).ToGeoJson();
-                
-                diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };
+                    
+                diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
             }
             return (diffusedPoint, diffusedPolygon);
         }
@@ -712,8 +714,8 @@ namespace SOS.Process.Processors.Artportalen
             if (taxon?.ProtectionLevel == null)
             {
                 return 1;
-            }
-
+            }            
+            
             if (taxon.ProtectionLevel.Id <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
             {
                 return 3;
@@ -724,8 +726,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 return taxon.ProtectionLevel.Id;
             }
-   
-
+            
             return 1;
         }
 
