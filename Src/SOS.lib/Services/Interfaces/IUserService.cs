@@ -10,7 +10,7 @@ namespace SOS.Lib.Services.Interfaces
     public interface IUserService
     {
         /// <summary>
-        /// Get current user
+        ///  Get current user
         /// </summary>
         /// <returns></returns>
         Task<UserModel> GetUser();

@@ -36,6 +36,7 @@ namespace SOS.Observations.Api.Managers
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyManager vocabularyManager,
             IFilterManager filterManager,
+           
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??

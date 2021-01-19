@@ -40,6 +40,8 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Security;
+using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
@@ -283,6 +285,9 @@ namespace SOS.Observations.Api
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+
+            // Add security
+            services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();

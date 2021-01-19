@@ -180,11 +180,7 @@ namespace SOS.Lib.Managers
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
         }
 
-        /// <summary>
-        /// Creates a cloned filter with additional information if necessary. E.g. adding underlying taxon ids.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns>A cloned filter with additional information.</returns>
+        /// <inheritdoc />
         public async Task PrepareFilter(FilterBase filter)
         {
             filter.ExtendedAuthorizations = await AddAuthorizationAsync();

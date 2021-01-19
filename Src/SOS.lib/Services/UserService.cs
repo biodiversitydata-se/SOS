@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Models.UserService;
+using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
@@ -14,6 +15,7 @@ namespace SOS.Lib.Services
     /// </summary>
     public class UserService : IUserService
     {
+        private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientService _httpClientService;
         private readonly UserServiceConfiguration _userServiceConfiguration;
         private readonly ILogger<UserService> _logger;
@@ -21,14 +23,18 @@ namespace SOS.Lib.Services
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="authorizationProvider"></param>
         /// <param name="httpClientService"></param>
         /// <param name="userServiceConfiguration"></param>
         /// <param name="logger"></param>
         public UserService(
+            IAuthorizationProvider authorizationProvider,
             IHttpClientService httpClientService,
             UserServiceConfiguration userServiceConfiguration,
             ILogger<UserService> logger)
         {
+            _authorizationProvider =
+                authorizationProvider ?? throw new ArgumentNullException(nameof(authorizationProvider));
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
             _userServiceConfiguration = userServiceConfiguration ??
                                         throw new ArgumentNullException(nameof(userServiceConfiguration));
@@ -40,9 +46,16 @@ namespace SOS.Lib.Services
         public async Task<UserModel> GetUser()
         {
             try
-            { 
+            {
+                var authorizationHeader = _authorizationProvider.GetAuthHeader();
+                if (string.IsNullOrEmpty(authorizationHeader))
+                {
+                    return null;
+                } 
+               
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/100"));
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/Current"),
+                   new Dictionary<string, string> { { "Authorization", authorizationHeader } });
 
                 return response.Success
                     ? response.Result
