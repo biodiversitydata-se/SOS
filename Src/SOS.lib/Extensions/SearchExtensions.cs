@@ -98,18 +98,9 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
             query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
+            query.TryAddBoundingBoxCriteria("location.pointLocation", internalFilter.BoundingBox);
 
-
-            if (internalFilter.BoundingBox != null)
-            {
-                query.Add(q => q
-                    .GeoBoundingBox(g => g
-                        .Field(new Field("location.pointLocation"))
-                        .BoundingBox(internalFilter.BoundingBox[1],
-                            internalFilter.BoundingBox[0],
-                            internalFilter.BoundingBox[3],
-                            internalFilter.BoundingBox[2])));
-            }
+           
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
@@ -398,6 +389,28 @@ namespace SOS.Lib.Extensions
             return new Field(string.Join('.', property.Split('.').Select(p => p
                 .ToCamelCase()
             )));
+        }
+
+
+        /// <summary>
+        /// Try to add bounding box criteria
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
+        /// <param name="coordinates"></param>
+        private static void TryAddBoundingBoxCriteria(this
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IReadOnlyList<double> coordinates)
+        {
+            if ((coordinates?.Count ?? 0) > 3)
+            {
+                query.Add(q => q
+                    .GeoBoundingBox(g => g
+                        .Field(new Field(field))
+                        .BoundingBox(coordinates[1],
+                            coordinates[0],
+                            coordinates[3],
+                            coordinates[2])));
+            }
         }
 
         /// <summary>
