@@ -6,6 +6,25 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Repositories.Interfaces
 {
+
+    /// <summary>
+    /// Type of observations
+    /// </summary>
+    public enum ObservationType
+    {
+        /// <summary>
+        /// Non protected
+        /// </summary>
+        Public,
+        /// <summary>
+        /// Protected but diffused
+        /// </summary>            
+        Diffused,
+        /// <summary>
+        /// Protected
+        /// </summary>
+        Protected
+    }
     /// <summary>
     /// Repository base
     /// </summary>
@@ -250,7 +269,7 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <summary>
         /// True when working with protected observations
         /// </summary>
-        bool ProtectedObservations { get; set; }
+        ObservationType ObservationsType { get; set; }
 
         /// <summary>
         ///     Update entity

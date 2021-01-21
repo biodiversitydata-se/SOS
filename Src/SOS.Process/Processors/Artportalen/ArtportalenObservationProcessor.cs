@@ -14,6 +14,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -103,7 +104,7 @@ namespace SOS.Process.Processors.Artportalen
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            return await ProcessAsync(dataProvider, taxa, _areaHelper, false, mode, cancellationToken);
+            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Public, mode, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -113,7 +114,17 @@ namespace SOS.Process.Processors.Artportalen
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            return await ProcessAsync(dataProvider, taxa, _areaHelper, true, mode, cancellationToken);
+            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Protected, mode, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        protected override async Task<int> ProcessDiffusedObservations(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Diffused, mode, cancellationToken);
         }
 
         /// <summary>
@@ -129,18 +140,18 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,            
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IAreaHelper areaHelper,
-            bool protectedObservations,
+            ObservationType observationType,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, areaHelper, mode != JobRunModes.Full, protectedObservations);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, areaHelper, mode != JobRunModes.Full, observationType);
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
             if (_processConfiguration.ParallelProcessing)
             {
                 // 1. process public observations
-                return await ProcessObservationsParallel(dataProvider, observationFactory, protectedObservations, mode, cancellationToken);
+                return await ProcessObservationsParallel(dataProvider, observationFactory, observationType, mode, cancellationToken);
             }
 
             // Sequential processing is used for easier debugging.
@@ -150,12 +161,12 @@ namespace SOS.Process.Processors.Artportalen
         private async Task<int> ProcessObservationsParallel(
             DataProvider dataProvider,
             ArtportalenObservationFactory observationFactory,
-            bool protectedObservations,
+            ObservationType observationType,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            _artportalenVerbatimRepository.ProtectedObservations = protectedObservations;
-            ProcessRepository.Protected = protectedObservations;
+            _artportalenVerbatimRepository.ObservationsType = observationType;
+            ProcessRepository.ObservationType = observationType;
 
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);

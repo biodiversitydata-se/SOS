@@ -8,6 +8,7 @@ using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -22,7 +23,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         private string SightingsFromBasics => @$"
             SearchableSightings s WITH(NOLOCK)
             INNER JOIN SightingState ss ON s.SightingId = ss.SightingId 
-            {(Protected ? "INNER JOIN Taxon t ON s.TaxonId = t.Id": "")}";
+            {((ObservationType != ObservationType.Public) ? "INNER JOIN Taxon t ON s.TaxonId = t.Id": "")}";
 
         // Todo arguments for protected sightings
         private string SightingWhereBasics => @$" 
@@ -31,7 +32,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	        AND s.ValidationStatusId <> 50
             AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 
-            AND {(Protected ?
+            AND {((ObservationType != ObservationType.Public) ?
                 @"s.ProtectedBySystem > 0 
                 AND t.ProtectionLevelId > 2"
                 :
@@ -307,6 +308,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
         public bool Live { get; set; }
 
         /// <inheritdoc />
-        public bool Protected { get; set; }
+        public ObservationType ObservationType{ get; set; }
     }
 }

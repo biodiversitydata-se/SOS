@@ -16,6 +16,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
@@ -31,7 +32,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
-        private readonly bool _protected;
+        private readonly ObservationType _observationType;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
             bool incrementalMode,
-            bool protectedObservations)
+            ObservationType observationType)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             {
@@ -57,7 +58,7 @@ namespace SOS.Process.Processors.Artportalen
             }
 
             _incrementalMode = incrementalMode;
-            _protected = protectedObservations;
+            _observationType = observationType;
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
@@ -67,11 +68,11 @@ namespace SOS.Process.Processors.Artportalen
             IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper,
             bool incrementalMode,
-            bool protectedObservations)
+            ObservationType observationType)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, areaHelper, incrementalMode, protectedObservations);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, areaHelper, incrementalMode, observationType);
         }
 
         public ICollection<Observation> CreateProcessedObservations(
@@ -99,10 +100,13 @@ namespace SOS.Process.Processors.Artportalen
                 {
                     taxon.IndividualId = verbatimObservation.URL;
                 }
-                bool shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
-                if (shouldBeDiffused)
+                if(_observationType == ObservationType.Diffused)
                 {
-#if INCLUDE_DIFFUSED_OBSERVATIONS
+                    taxon = taxon;
+                }
+                bool shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
+                if (shouldBeDiffused && _observationType == ObservationType.Diffused)
+                {
                     //If it is a protected sighting it should not be possible to find it in the current month
                     if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
                         (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
@@ -111,7 +115,11 @@ namespace SOS.Process.Processors.Artportalen
                     }
                     //Diffuse the observation depending on the protectionlevel                
                     verbatimObservation = DiffuseObservation(verbatimObservation, taxon);                    
-#endif
+                }
+                // if we are in diffused mode and the observation should not be diffused then we skip the observation
+                else if(_observationType == ObservationType.Diffused && !shouldBeDiffused)
+                {
+                    return null;
                 }
 
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
@@ -130,7 +138,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 var obs = new Observation()
                 {
-                    Protected = _protected
+                    Protected = _observationType != ObservationType.Public
                 };
 
                 // Record level
@@ -223,6 +231,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.SightingId.ToString();
+                obs.Occurrence.CatalogId = verbatimObservation.SightingId;
                 obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.SightingId}";
                 obs.Occurrence.IndividualCount = verbatimObservation.Quantity?.ToString() ?? "";
                 obs.Occurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous;
@@ -298,7 +307,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
-                if (shouldBeDiffused)
+                if (shouldBeDiffused && _observationType == ObservationType.Diffused)
                 {
                     _areaHelper.AddAreaDataToProcessedObservation(obs);
                 }

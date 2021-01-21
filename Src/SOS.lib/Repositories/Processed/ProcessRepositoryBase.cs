@@ -7,6 +7,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Repositories.Processed
@@ -135,7 +136,20 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="instance"></param>
 
         /// <returns></returns>
-        protected string GetInstanceName(byte instance, bool protectedObservations) => $"{typeof(TEntity).Name.UntilNonAlfanumeric()}{(protectedObservations ? "-protected" : string.Empty)}{(_toggleable ? $"-{instance}" : string.Empty)}";
+        protected string GetInstanceName(byte instance, ObservationType observationType) 
+        {
+            var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+            if(observationType == ObservationType.Protected)
+            {
+                instanceName += "-protected";
+            }
+            else if(observationType == ObservationType.Diffused)
+            {
+                instanceName += "-diffused";
+            }
+            instanceName += $"{(_toggleable ? $"-{instance}" : string.Empty)}";
+            return instanceName;
+        }
 
         /// <summary>
         ///  Constructor
@@ -184,10 +198,10 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
+        public string ActiveInstanceName => GetInstanceName(ActiveInstance, ObservationType);
 
         /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
+        public string InactiveInstanceName => GetInstanceName(InActiveInstance, ObservationType);
 
         /// <inheritdoc />
         public string CurrentInstanceName=> LiveMode ? ActiveInstanceName : InactiveInstanceName;
@@ -196,7 +210,7 @@ namespace SOS.Lib.Repositories.Processed
         public bool LiveMode { get; set; }
 
         /// <inheritdoc />
-        public bool Protected { get; set; }
+        public ObservationType ObservationType{ get; set; }
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)
