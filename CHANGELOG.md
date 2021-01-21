@@ -34,3 +34,39 @@ All notable changes to Observation API will be documented in this file. The form
 
 ## [0.9.1] - 2020-11-30
 Initial release
+
+## [1.0.0] - 2021-01-21
+Areas
+Id i areaobjektet är borttagen. En area identifieras av sin areaType och featureid.
+Resursen Areas/{areaId}/Export är borttagen
+Area-objektet är ändrat.
+Från:
+{
+  "areaType": "Municipality",
+  "feature": "1440",
+  "id": 53,
+  "name": "Ale"
+},
+
+Till:
+{
+  "areaType": "Municipality",
+  "featureId": "1440",
+  "name": "Ale"
+}
+
+Observations
+Generellt
+TranslationCultureCode är flyttad ut från sökfiltret och skickas numera in som en query-parameter
+AreaId är borttaget från sökfiltret. Areas anges enligt:
+"areas": [
+  {
+    "type": "AreaType",
+    "featureId": "string"
+  }
+]
+Aggregerade sökningar
+OutputFields är borttagen från aggregerade sökningar då den inte fyllde någon funktion
+SearchAggregatedInternal
+SortBy, sortOrder borttagna då den inte fyllde någon funktion
+
