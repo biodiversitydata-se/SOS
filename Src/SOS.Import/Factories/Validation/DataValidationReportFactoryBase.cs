@@ -57,8 +57,8 @@ namespace SOS.Import.Factories.Validation
             await _areaHelper.InitializeAsync();
         }
 
-        protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync();
-        protected abstract Task<long> GetTotalObservationsCountAsync();
+        protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync(DataProvider dataProvider);
+        protected abstract Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider);
         protected abstract Observation CreateProcessedObservation(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
         protected abstract void ValidateVerbatimData(TVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder);
         protected abstract void UpdateTermDictionaryValueSummary(
@@ -68,7 +68,7 @@ namespace SOS.Import.Factories.Validation
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues);
         protected abstract void ValidateVerbatimTaxon(
             TVerbatimObservation verbatimObservation,
-            HashSet<int> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingTaxonIds, 
             HashSet<string> nonMatchingScientificNames);
 
         public async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
@@ -91,10 +91,10 @@ namespace SOS.Import.Factories.Validation
                 processedFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, int>());
                 verbatimFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, HashSet<string>>());
             }
-            HashSet<int> nonMatchingTaxonIds = new HashSet<int>();
+            HashSet<string> nonMatchingTaxonIds = new HashSet<string>();
             HashSet<string> nonMatchingScientificNames = new HashSet<string>();
-            var totalCount = await GetTotalObservationsCountAsync();
-            using var cursor = await GetAllObservationsByCursorAsync();
+            var totalCount = await GetTotalObservationsCountAsync(dataProvider);
+            using var cursor = await GetAllObservationsByCursorAsync(dataProvider);
             while (await cursor.MoveNextAsync())
             {
                 if (nrProcessedObservations >= maxNrObservationsToRead) continue;

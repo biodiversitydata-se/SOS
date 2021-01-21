@@ -29,6 +29,10 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
             int dataProviderId,
             string dataProviderIdentifier);
 
+        Task<long> CountAllDocumentsAsync(
+            int dataProviderId,
+            string dataProviderIdentifier);
+
         List<DistinictValueCount<string>> GetDistinctValuesCount(
             string collectionName,
             Expression<Func<DwcObservationVerbatim, DistinctValueObject<string>>> expression,

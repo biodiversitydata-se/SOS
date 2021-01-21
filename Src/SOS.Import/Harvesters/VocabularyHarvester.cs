@@ -15,6 +15,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Harvesters
@@ -152,7 +153,7 @@ namespace SOS.Import.Harvesters
                 fielMappingFileTuples.Add(await CreateVocabularyFileAsync(vocabularyId));
             }
 
-            var zipFile = CreateZipFile(fielMappingFileTuples);
+            var zipFile = ZipFileHelper.CreateZipFile(fielMappingFileTuples);
             return zipFile;
         }
 
@@ -231,22 +232,6 @@ namespace SOS.Import.Harvesters
         {
             var result = JsonConvert.SerializeObject(value, formatting, jsonSerializerSettings);
             return Encoding.UTF8.GetBytes(result);
-        }
-
-        private byte[] CreateZipFile(IEnumerable<(string Filename, byte[] Bytes)> files)
-        {
-            using var ms = new MemoryStream();
-            using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
-            {
-                foreach (var file in files)
-                {
-                    var zipEntry = archive.CreateEntry(file.Filename, CompressionLevel.Optimal);
-                    using var zipStream = zipEntry.Open();
-                    zipStream.Write(file.Bytes, 0, file.Bytes.Length);
-                }
-            }
-
-            return ms.ToArray();
         }
     }
 }

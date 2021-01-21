@@ -7,45 +7,45 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.VirtualHerbarium;
+using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Processors.Mvm;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Import.Factories.Validation
 {
     /// <summary>
-    /// Virtual Herbarium data validation manager.
+    /// MVM data validation manager.
     /// </summary>
-    public class VirtualHerbariumValidationReportFactory : DataValidationReportFactoryBase<VirtualHerbariumObservationVerbatim>
+    public class MvmDataValidationReportFactory : DataValidationReportFactoryBase<MvmObservationVerbatim>
     {
-        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private VirtualHerbariumObservationFactory _virtualHerbariumObservationFactory;
+        private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
+        private MvmObservationFactory _mvmObservationFactory;
 
-        public VirtualHerbariumValidationReportFactory(
+        public MvmDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository)
+            IMvmObservationVerbatimRepository mvmObservationVerbatimRepository) 
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
+            _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
+        protected override async Task<IAsyncCursor<MvmObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
+            return await _mvmObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
         protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
+            return await _mvmObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override Observation CreateProcessedObservation(MvmObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
             var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
@@ -53,18 +53,18 @@ namespace SOS.Import.Factories.Validation
         }
 
         protected override void ValidateVerbatimTaxon(
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            MvmObservationVerbatim verbatimObservation,
             HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames)
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
         }
 
-        protected override void ValidateVerbatimData(VirtualHerbariumObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
+        protected override void ValidateVerbatimData(MvmObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
         {
             validationRemarksBuilder.NrValidatedObservations++;
 
-            if (!verbatimObservation.CoordinatePrecision.HasValue)
+            if (!verbatimObservation.CoordinateUncertaintyInMeters.HasValue)
             {
                 validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
             }
@@ -72,21 +72,23 @@ namespace SOS.Import.Factories.Validation
 
         protected override void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            MvmObservationVerbatim verbatimObservation,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
-            // Virtual Herbarium doesn't contain any vocabulary fields.
+            // MVM doesn't contain any vocabulary fields.
         }
 
-        private VirtualHerbariumObservationFactory GetObservationFactory(DataProvider dataProvider)
+        private MvmObservationFactory GetObservationFactory(DataProvider dataProvider)
         {
-            if (_virtualHerbariumObservationFactory == null)
+            if (_mvmObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById);
+                _mvmObservationFactory = new MvmObservationFactory(
+                    dataProvider,
+                    _taxonById);
             }
 
-            return _virtualHerbariumObservationFactory;
+            return _mvmObservationFactory;
         }
     }
 }

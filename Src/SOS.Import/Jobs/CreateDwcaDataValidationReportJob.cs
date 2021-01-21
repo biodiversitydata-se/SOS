@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
 using Hangfire;
@@ -7,9 +10,13 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Json;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -22,6 +29,7 @@ namespace SOS.Import.Jobs
     {
         private readonly IDwcaDataValidationReportManager _dwcaDataValidationReportManager;
         private readonly DwcaConfiguration _dwcaConfiguration;
+        private readonly IReportManager _reportManager;
         private readonly ILogger<CreateDwcaDataValidationReportJob> _logger;
 
         /// <summary>
@@ -29,18 +37,23 @@ namespace SOS.Import.Jobs
         /// </summary>
         /// <param name="dwcaDataValidationReportManager"></param>
         /// <param name="dwcaConfiguration"></param>
+        /// <param name="reportManager"></param>
         /// <param name="logger"></param>
-        /// <param name="processedTaxonRepository"></param>
-        public CreateDwcaDataValidationReportJob(IDwcaDataValidationReportManager dwcaDataValidationReportManager,
+        public CreateDwcaDataValidationReportJob(
+            IDwcaDataValidationReportManager dwcaDataValidationReportManager,
             DwcaConfiguration dwcaConfiguration,
-            ILogger<CreateDwcaDataValidationReportJob> logger, ITaxonRepository processedTaxonRepository)
+            IReportManager reportManager,
+            ILogger<CreateDwcaDataValidationReportJob> logger)
         {
             _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
+            _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<string> RunAsync(
+        public async Task<Report> RunAsync(
+            string reportId, 
+            string createdBy, 
             string archivePath,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,
@@ -50,8 +63,6 @@ namespace SOS.Import.Jobs
             try
             {
                 _logger.LogInformation("Start DwC-A Test Import Job");
-                string compactSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Compact-DwcaDataValidationReport-{Path.GetFileNameWithoutExtension(archivePath)}.json");
-                string verboseSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Verbose-DwcaDataValidationReport-{Path.GetFileNameWithoutExtension(archivePath)}.json");
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
                 var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(
                     archiveReader,
@@ -62,14 +73,33 @@ namespace SOS.Import.Jobs
                 // Serialize and save compact JSON file
                 var compactJsonSettings = CreateCompactJsonSerializerSettings();
                 var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);
-                await File.WriteAllTextAsync(compactSavePath, compactJson);
+                var compactJsonFile = Encoding.UTF8.GetBytes(compactJson);
 
                 // Serialize and save verbose JSON file
                 var verboseJsonSettings = CreateVerboseJsonSerializerSettings();
                 var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
-                await File.WriteAllTextAsync(verboseSavePath, verboseJson);
+                var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
 
-                return compactSavePath;
+                var zipFile = ZipFileHelper.CreateZipFile(new[]
+                {
+                    (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
+                    (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
+                });
+
+                var report = new Report(reportId)
+                {
+                    Type = ReportType.DataValidationReport,
+                    Name = Path.GetFileNameWithoutExtension(archivePath),
+                    FileExtension = "zip",
+                    CreatedBy = createdBy ?? "",
+                    FileSizeInKb = zipFile.Length / 1024
+                };
+
+                // Export to file system
+                //string zipExportPath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
+                //await File.WriteAllBytesAsync(zipExportPath, zipFile);
+                await _reportManager.AddReportAsync(report, zipFile);
+                return report;
             }
             finally
             {
@@ -122,6 +152,5 @@ namespace SOS.Import.Jobs
 
             return jsonSettings;
         }
-
     }
 }

@@ -36,5 +36,10 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             return HashCode.Combine(Id, Value);
         }
+
+        public bool IsCustomValue()
+        {
+            return Id == -1;
+        }
     }
 }

@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Jobs.Import;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Jobs
 {
@@ -19,20 +25,28 @@ namespace SOS.Import.Jobs
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IDataValidationReportManager _dataValidationReportManager;
+        private readonly IReportManager _reportManager;
         private readonly DwcaConfiguration _dwcaConfiguration;
 
-        public DataValidationReportJob(IDataProviderManager dataProviderManager, IDataValidationReportManager dataValidationReportManager, DwcaConfiguration dwcaConfiguration)
+        public DataValidationReportJob(
+            IDataProviderManager dataProviderManager, 
+            IDataValidationReportManager dataValidationReportManager, 
+            IReportManager reportManager,
+            DwcaConfiguration dwcaConfiguration)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _dataValidationReportManager = dataValidationReportManager ?? throw new ArgumentNullException(nameof(dataValidationReportManager));
+            _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
         }
 
-        public async Task<string> RunAsync(
-            string dataProviderIdentifier, 
-            int maxNrObservationsToRead, 
+        public async Task<Report> RunAsync(
+            string reportId,
+            string createdBy,
+            string dataProviderIdentifier,
+            int maxNrObservationsToRead,
             int nrValidObservationsInReport,
-            int nrInvalidObservationsInReport, 
+            int nrInvalidObservationsInReport,
             IJobCancellationToken cancellationToken)
         {
             var dataProvider =
@@ -45,20 +59,36 @@ namespace SOS.Import.Jobs
                 nrValidObservationsInReport,
                 nrInvalidObservationsInReport);
 
-            string compactSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Compact-DataValidationReport-{dataProvider.Name}.json");
-            string verboseSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Verbose-DataValidationReport-{dataProvider.Name}.json");
-
-            // Serialize and save compact JSON file
+            // Create compact JSON file
             var compactJsonSettings = CreateCompactJsonSerializerSettings();
             var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);
-            await File.WriteAllTextAsync(compactSavePath, compactJson);
-
-            // Serialize and save verbose JSON file
+            var compactJsonFile = Encoding.UTF8.GetBytes(compactJson);
+            
+            // Create verbose JSON file
             var verboseJsonSettings = CreateVerboseJsonSerializerSettings();
             var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
-            await File.WriteAllTextAsync(verboseSavePath, verboseJson);
+            var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
 
-            return compactSavePath;
+            var zipFile = ZipFileHelper.CreateZipFile(new[]
+            {
+                (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
+                (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
+            });
+
+            var report = new Report(reportId)
+            {
+                Type = ReportType.DataValidationReport,
+                Name = dataProvider.Name,
+                FileExtension = "zip",
+                CreatedBy = createdBy ?? "",
+                FileSizeInKb = zipFile.Length / 1024
+            };
+
+            // Export to file system
+            //string zipExportPath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
+            //await File.WriteAllBytesAsync(zipExportPath, zipFile);
+            await _reportManager.AddReportAsync(report, zipFile);
+            return report;
         }
 
         private JsonSerializerSettings CreateCompactJsonSerializerSettings()

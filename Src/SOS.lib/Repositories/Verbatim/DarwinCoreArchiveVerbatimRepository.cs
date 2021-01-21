@@ -94,6 +94,15 @@ namespace SOS.Lib.Repositories.Verbatim
             return await GetAllByCursorAsync(mongoCollection);
         }
 
+        public async Task<long> CountAllDocumentsAsync(
+            int dataProviderId,
+            string dataProviderIdentifier)
+        {
+            var collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
+            var mongoCollection = GetMongoCollection(collectionName);
+            return await base.CountAllDocumentsAsync(mongoCollection);
+        }
+
         public List<DistinictValueCount<string>> GetDistinctValuesCount(
             string collectionName,
             Expression<Func<DwcObservationVerbatim, DistinctValueObject<string>>> expression,
