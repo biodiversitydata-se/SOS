@@ -264,6 +264,11 @@ namespace SOS.Lib.Extensions
             excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeValidationStatusIds);
         }
 
+        /// <summary>
+        /// Add field must exists criteria
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
         private static void AddMustExistsCriteria(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
         {
@@ -272,6 +277,27 @@ namespace SOS.Lib.Extensions
             );
         }
 
+        /// <summary>
+        /// Add field not exists criteria
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
+        private static void AddNotExistsCriteria(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
+        {
+            query.Add(q => q
+                .Bool(b => b
+                    .MustNot(mn => mn
+                        .Exists(e => e
+                            .Field(field)
+                        )
+                    )
+                )
+            );
+        }
+
+        // Get observations from other than Artportalen too
+        
         /// <summary>
         /// Add numeric filter with relation operator
         /// </summary>
@@ -353,15 +379,7 @@ namespace SOS.Lib.Extensions
             if (filter.TypeFilter != SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
             {
                 // Get observations from other than Artportalen too
-                sightingTypeQuery.Add(q => q
-                            .Bool(b => b
-                                .MustNot( mn => mn
-                                    .Exists(e => e
-                                        .Field("artportalenInternal.sightingTypeSearchGroupId")
-                                    )
-                                )
-                            )
-                );
+                sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
             }
 
             query.Add(q => q
