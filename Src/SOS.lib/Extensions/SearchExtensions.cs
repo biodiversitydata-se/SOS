@@ -354,7 +354,13 @@ namespace SOS.Lib.Extensions
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.Add(q => q
-                        !.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
+                            .Bool(b => b
+                                .MustNot( mn => mn
+                                    .Exists(e => e
+                                        .Field("artportalenInternal.sightingTypeSearchGroupId")
+                                    )
+                                )
+                            )
                 );
             }
 
