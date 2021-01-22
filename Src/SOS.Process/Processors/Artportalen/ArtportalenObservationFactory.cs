@@ -519,7 +519,7 @@ namespace SOS.Process.Processors.Artportalen
             // Diffuse observation in public index WHERE taxon protection level is greater than 2 OR
             // observation is protected by system OR
             // observation is hidden by provider to a future date
-            return !_protected && (
+            return _observationType != ObservationType.Protected && (
                 (taxon?.ProtectionLevel?.Id ?? 0) > 2 ||
                 observationVerbatim.ProtectedBySystem ||
                 IsHiddenByProvider(observationVerbatim)
