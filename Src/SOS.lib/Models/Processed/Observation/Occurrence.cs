@@ -75,6 +75,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     within the data set or collection.
         /// </summary>
         public string CatalogNumber { get; set; }
+        /// <summary>
+        /// Catalog Id
+        /// </summary>
+        public int CatalogId { get; set; }
 
         /// <summary>
         ///    DiscoveryMethod from Artportalen

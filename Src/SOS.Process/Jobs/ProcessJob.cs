@@ -32,6 +32,7 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
+using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Process.Jobs
 {
@@ -175,15 +176,20 @@ namespace SOS.Process.Jobs
                 //------------------------------------------------------------------------
                 // 5. Create public observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                var success = await ProcessVerbatim(dataProvidersToProcess, mode, false, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
+                var success = await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Public, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
 
                 //------------------------------------------------------------------------
                 // 6. Create protected observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                success = success && await ProcessVerbatim(dataProvidersToProcess, mode, true, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
+                success = success && await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Protected, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
+
+                //------------------------------------------------------------------------
+                // 7. Create diffused observation processing tasks, and wait for them to complete
+                //------------------------------------------------------------------------
+                success = await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Diffused, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
 
                 //---------------------------------
-                // 7. Create ElasticSearch index
+                // 8. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
@@ -208,7 +214,7 @@ namespace SOS.Process.Jobs
                         }
                         
                         //----------------------------------------------------------------------------
-                        // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
                         var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
 
@@ -229,7 +235,7 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation($"Processing done: {success} {mode}");
 
                 //-------------------------------
-                // 9. Return processing result
+                // 10. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception("Failed to process observations.");
             }
@@ -264,9 +270,9 @@ namespace SOS.Process.Jobs
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, bool protectedObservations, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, ObservationType observationType, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
         {
-            _processedObservationRepository.Protected = protectedObservations;
+            _processedObservationRepository.ObservationType = observationType;
 
             await InitializeElasticSearch(mode, cleanStart);
 
@@ -279,14 +285,14 @@ namespace SOS.Process.Jobs
             {
                 if (!dataProvider.IsActive || 
                     (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest) || 
-                    (protectedObservations && !dataProvider.SupportProtectedHarvest))
+                    ((observationType == ObservationType.Protected || observationType == ObservationType.Diffused) && !dataProvider.SupportProtectedHarvest))
                 {
                     continue;
                 }
 
                 var processor = _processorByType[dataProvider.Type];
                 processTaskByDataProvider.Add(dataProvider,
-                    processor.ProcessAsync(dataProvider, taxonById, protectedObservations, mode, cancellationToken));
+                    processor.ProcessAsync(dataProvider, taxonById, observationType, mode, cancellationToken));
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);

@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.TestHelpers
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
                 areaHelperStub.Object,
-                false, false).Result;
+                false, Lib.Repositories.Interfaces.ObservationType.Public).Result;
             return factory;
         }
     }

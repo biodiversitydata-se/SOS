@@ -52,14 +52,14 @@ namespace SOS.Observations.Api.Repositories
         /// <returns></returns>
         private string GetIndexNames(FilterBase filter)
         {
-            var publicIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
+            var publicIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, Lib.Repositories.Interfaces.ObservationType.Public)}".ToLower();
 
             if (!filter?.ExtendedAuthorizations?.Any() ?? true)
             {
                 return publicIndex;
             }
             
-            var protectedIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, true)}".ToLower();
+            var protectedIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, Lib.Repositories.Interfaces.ObservationType.Protected)}".ToLower();
 
             return $"{publicIndex},{protectedIndex}";
         }

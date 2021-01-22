@@ -83,7 +83,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, false, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -113,7 +113,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, false, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa, false, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
