@@ -863,6 +863,11 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            query.AddAuthorizationFilters(filter);
+            query.TryAddDateRangeFilters(filter);
+            query.TryAddTimeRangeFilters(filter);
+            query.TryAddGeographicFilter(filter.GeographicAreas);
+            query.AddSightingTypeFilters(filter);
 
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("occurrence.gender.id", filter.GenderIds);
@@ -870,12 +875,6 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             query.TryAddTermsCriteria("taxon.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
-
-            query.AddAuthorizationFilters(filter);
-            query.TryAddDateRangeFilters(filter);
-            query.TryAddTimeRangeFilters(filter);
-            query.TryAddGeographicFilter(filter.GeographicAreas);
-            query.AddSightingTypeFilters(filter);
 
             if (filter is SearchFilterInternal)
             {

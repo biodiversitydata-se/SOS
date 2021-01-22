@@ -32,11 +32,15 @@ namespace SOS.Import.Repositories.Source.Artportalen
             AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 
             AND {(Protected ?
-                @"s.ProtectedBySystem > 0 
-                AND t.ProtectionLevelId > 2"
+                @"(
+                    (
+                        s.ProtectedBySystem > 0 
+                        AND t.ProtectionLevelId > 2
+                    ) OR 
+                    s.HiddenByProvider > GETDATE()
+                )"
                 :
-                @"s.TaxonId IS NOT NULL 
-                AND s.HiddenByProvider IS NULL"
+                @"s.TaxonId IS NOT NULL"
             )}";
         
         /// <summary>

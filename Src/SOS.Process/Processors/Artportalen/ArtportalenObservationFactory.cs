@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Constants;
@@ -99,10 +98,9 @@ namespace SOS.Process.Processors.Artportalen
                 {
                     taxon.IndividualId = verbatimObservation.URL;
                 }
-                bool shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
+                var shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
                 if (shouldBeDiffused)
                 {
-#if INCLUDE_DIFFUSED_OBSERVATIONS
                     //If it is a protected sighting it should not be possible to find it in the current month
                     if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
                         (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
@@ -110,8 +108,7 @@ namespace SOS.Process.Processors.Artportalen
                         return null;
                     }
                     //Diffuse the observation depending on the protectionlevel                
-                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);                    
-#endif
+                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
                 }
 
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
@@ -449,7 +446,7 @@ namespace SOS.Process.Processors.Artportalen
                 verbatimObservation.EndDate = new DateTime(verbatimObservation.EndDate.Value.Year, verbatimObservation.EndDate.Value.Month, 1);
             verbatimObservation.EditDate = new DateTime(verbatimObservation.EditDate.Year, verbatimObservation.EditDate.Month, 1);
             
-            (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) = DiffuseCoordinates(verbatimObservation.Site?.Point, verbatimObservation.Site?.PointWithBuffer, verbatimObservation, taxon);            
+            (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) = DiffuseCoordinates(verbatimObservation.Site?.Point, verbatimObservation, taxon);            
 
             var newSite = new Site();
             newSite.Point = diffusedPoint;
@@ -495,102 +492,59 @@ namespace SOS.Process.Processors.Artportalen
             }
         }
 
+        /// <summary>
+        /// Check if observation is hidden by provider
+        /// </summary>
+        /// <param name="observationVerbatim"></param>
+        /// <returns></returns>
+        private static bool IsHiddenByProvider(ArtportalenObservationVerbatim observationVerbatim) =>
+            (observationVerbatim.HiddenByProvider.HasValue &&
+             observationVerbatim.HiddenByProvider.Value > DateTime.Now);
+
+        /// <summary>
+        /// Check if observation should be diffused
+        /// </summary>
+        /// <param name="observationVerbatim"></param>
+        /// <param name="taxon"></param>
+        /// <returns></returns>
         private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (taxon?.ProtectionLevel == null)
-            {
-                return false;
-            }
-
-            if (observationVerbatim.ProtectedBySystem)
-            {                
-                if(taxon.ProtectionLevel.Id > 2)
-                {
-                    return true;
-                }
-            }
-            return false;
+            // Diffuse observation in public index WHERE taxon protection level is greater than 2 OR
+            // observation is protected by system OR
+            // observation is hidden by provider to a future date
+            return !_protected && (
+                (taxon?.ProtectionLevel?.Id ?? 0) > 2 ||
+                observationVerbatim.ProtectedBySystem ||
+                IsHiddenByProvider(observationVerbatim)
+            );
         }
 
         /// <summary>
         /// Diffuse the point based on the sightings protection level
         /// </summary>
         /// <param name="point"></param>
-        /// <param name="verbatimObservation"></param>
-        /// <param name="obs"></param>
+        /// <param name="polygon"></param>
+        /// <param name="observationVerbatim"></param>
+        /// <param name="taxon"></param>
         /// <returns></returns>
-        private (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) DiffuseCoordinates(GeoJsonGeometry point, GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
+        private (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) DiffuseCoordinates(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
-            if (taxon?.ProtectionLevel == null)
-            {
-                return (point, polygon);
-            }
+            var protectionLevel = IsHiddenByProvider(observationVerbatim) && taxon.ProtectionLevel.Id < 3 ? 3 : taxon.ProtectionLevel.Id;
 
-            var originalPoint = point;
-            var diffusedPoint = point;
-            GeoJsonGeometry diffusedPolygon = polygon;
-            if(observationVerbatim.ProtectedBySystem)
-            {                
-                var protectionLevel = taxon.ProtectionLevel.Id;
+            var diffusionValues = GetDiffusionValues(protectionLevel);
+            var latitude = (double)point.Coordinates[1];
+            var longitude = (double)point.Coordinates[0];
+            
+            //transform the point into the same format as Artportalen so that we can use the same diffusion as them
+            var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
+            var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+            var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
 
-                var diffusionValues = GetDiffusionValues(protectionLevel);
-                var latitude = (double)originalPoint.Coordinates[1];
-                var longitude = (double)originalPoint.Coordinates[0];
+            //retransform to the correct format again
+            var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            var diffusedPolygon = ((NetTopologySuite.Geometries.Point) retransformedPoint).ToCircle(diffusionValues.mod);
 
-                //transform the point into the same format as Artportalen so that we can use the same diffusion as them
-                var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
-                var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-                var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
-
-                //retransform to the correct format again
-                var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-                    
-                //create the point with buffer from the diffused point
-                var pointForCircle = new NetTopologySuite.Geometries.Point(retransformedPoint.Coordinate.X, retransformedPoint.Coordinate.Y);
-                pointForCircle.SRID = (int)CoordinateSys.WGS84;
-                diffusedPolygon = pointForCircle.ToCircle(diffusionValues.mod).ToGeoJson();
-                    
-                diffusedPoint.Coordinates = new System.Collections.ArrayList { retransformedPoint.Coordinates[0].X, retransformedPoint.Coordinates[0].Y };                        
-            }
-            return (diffusedPoint, diffusedPolygon);
-        }
-
-        /// <summary>
-        ///     Get SOS internal Id for the id specific for the data provider.
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="vocabularyId"></param>
-        /// <param name="defaultId"></param>
-        /// <param name="valueIfValNotFound"></param>
-        /// <returns></returns>
-        private VocabularyValue GetSosId(
-            int? val, 
-            VocabularyId vocabularyId,
-            int? defaultId = null,
-            string valueIfValNotFound = null)
-        {
-            IDictionary<object, int> sosIdByProviderValue = _vocabularyById.GetValue(vocabularyId);
-
-            if (!val.HasValue || sosIdByProviderValue == null) return null;
-
-            if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
-            {
-                return new VocabularyValue {Id = sosId};
-            }
-
-            if (defaultId.HasValue)
-            {
-                return new VocabularyValue {Id = defaultId.Value};
-            }
-
-            if (!string.IsNullOrEmpty(valueIfValNotFound))
-            {
-                return new VocabularyValue
-                    { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = valueIfValNotFound };
-            }
-
-            return new VocabularyValue
-                {Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
+            return (retransformedPoint.ToGeoJson(), diffusedPolygon.ToGeoJson());
         }
 
         /// <summary>
