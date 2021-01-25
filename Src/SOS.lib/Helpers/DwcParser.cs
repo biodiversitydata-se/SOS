@@ -22,6 +22,13 @@ namespace SOS.Lib.Helpers
                 return new[]
                 {
                     "yyyy-MM-dd'T'HH:mm:ssK",
+                    "yyyy-MM-dd'T'HH:mm:ss.fK",
+                    "yyyy-MM-dd'T'HH:mm:ss.ffK",
+                    "yyyy-MM-dd'T'HH:mm:ss.fffK",
+                    "yyyy-MM-dd'T'HH:mm:ss.ffffK",
+                    "yyyy-MM-dd'T'HH:mm:ss.fffffK",
+                    "yyyy-MM-dd'T'HH:mm:ss.ffffffK",
+                    "yyyy-MM-dd'T'HH:mm:ss.fffffffK",
                     "yyyy-MM-dd'T'HH:mmK",
                     "yyyy-MM-dd'T'HHK",
                     "yyyy-MM-dd",
@@ -38,8 +45,6 @@ namespace SOS.Lib.Helpers
                     "yyyy-MM-dd HH:mm:ss",
                     "yyyy-MM-dd HH:mm:ss.f",
                     "yyyy-MM-dd HH:mm:ss.fffffff",
-                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
-                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
                     "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
                     "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
                     "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
