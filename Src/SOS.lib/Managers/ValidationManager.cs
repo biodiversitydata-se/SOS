@@ -79,6 +79,11 @@ namespace SOS.Lib.Managers
         {
             var observationValidation = new InvalidObservation(observation.DataProviderId.ToString(), dataProvider.Name, observation.Occurrence.OccurrenceId);
 
+            if (observation.Event?.StartDate == null || observation.Event.EndDate == null)
+            {
+                observationValidation.Defects.Add("Event StartDate and/or EndDate is missing");
+            }
+
             if (observation.Taxon == null)
             {
                 observationValidation.Defects.Add("Taxon not found");
