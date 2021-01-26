@@ -36,7 +36,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         ///     Constructor
         /// </summary>
         /// <param name="dwcaVerbatimRepository"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="areaHelper"></param>
@@ -45,7 +45,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public DwcaObservationProcessor(IDarwinCoreArchiveVerbatimRepository dwcaVerbatimRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,
@@ -53,7 +53,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<DwcaObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _dwcaVerbatimRepository =
                 dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
@@ -95,7 +95,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 }
 
                 Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
+                if (!await PublicRepository.DeleteProviderDataAsync(dataProvider))
                 {
                     Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
                 }
@@ -159,7 +159,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
                 }
@@ -172,7 +172,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
             }

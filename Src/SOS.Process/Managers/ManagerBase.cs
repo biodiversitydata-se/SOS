@@ -10,19 +10,23 @@ namespace SOS.Process.Managers
     public class ManagerBase<TEntity>
     {
         protected readonly ILogger<TEntity> Logger;
-        protected readonly IProcessedObservationRepository ProcessRepository;
-
+        protected readonly IProcessedPublicObservationRepository PublicProcessRepository;
+        protected readonly IProcessedProtectedObservationRepository ProtectedProcessRepository;
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="logger"></param>
         public ManagerBase(
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = processedObservationRepository ??
-                                throw new ArgumentNullException(nameof(processedObservationRepository));
+            PublicProcessRepository = processedPublicObservationRepository ??
+                                      throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            ProtectedProcessRepository = processedProtectedObservationRepository ??
+                                         throw new ArgumentNullException(
+                                             nameof(processedProtectedObservationRepository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
     }

@@ -31,20 +31,23 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IDiffusionManager _diffusionManager;
-        private readonly SemaphoreSlim _semaphore;
+        private readonly SemaphoreSlim _semaphoreBatch;
 
         /// <summary>
-        /// Delete batch
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="verbatimIds"></param>
-        /// <returns></returns>
-        private async Task<bool> DeleteBatchAsync(
+    /// Delete batch
+    /// </summary>
+    /// <param name="dataProvider"></param>
+    /// <param name="verbatimIds"></param>
+    /// <returns></returns>
+    private async Task<bool> DeleteBatchAsync(
+            bool protectedObservations,
             ICollection<int> sightingIds)
         {
             try
             {
-                return await ProcessRepository.DeleteArtportalenBatchAsync(sightingIds);
+                return protectedObservations ? 
+                    await ProtectedRepository.DeleteArtportalenBatchAsync(sightingIds):
+                    await PublicRepository.DeleteArtportalenBatchAsync(sightingIds);
             }
             catch (Exception e)
             {
@@ -55,18 +58,21 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="artportalenVerbatimRepository"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="diffusionManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             ProcessConfiguration processConfiguration,
@@ -74,7 +80,7 @@ namespace SOS.Process.Processors.Artportalen
             IDiffusionManager diffusionManager,
             IValidationManager validationManager,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
@@ -88,7 +94,7 @@ namespace SOS.Process.Processors.Artportalen
                 throw new ArgumentNullException(nameof(processConfiguration));
             }
 
-            _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads);
+            _semaphoreBatch = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
@@ -111,9 +117,9 @@ namespace SOS.Process.Processors.Artportalen
 
             while (batchStartId <= maxId)
             {
-                await _semaphore.WaitAsync();
+                await _semaphoreBatch.WaitAsync();
 
-                var batchEndId = batchStartId + ProcessRepository.WriteBatchSize - 1;
+                var batchEndId = batchStartId + WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     taxa, cancellationToken));
                 batchStartId = batchEndId + 1;
@@ -203,10 +209,15 @@ namespace SOS.Process.Processors.Artportalen
                 }
 
                 Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
-               
-                var publicCount = await ValidateAndStoreObservations(dataProvider, publicObservations, mode, false, $"{startId}-{endId}", cancellationToken);
-                var protectedCount = await ValidateAndStoreObservations(dataProvider, protectedObservations, mode, true,$"{startId}-{endId}", cancellationToken);
 
+                var validateAndStoreTasks = new []
+                {
+                    ValidateAndStoreObservations(dataProvider, publicObservations, mode, false, $"{startId}-{endId}", cancellationToken),
+                    ValidateAndStoreObservations(dataProvider, protectedObservations, mode, true,$"{startId}-{endId}", cancellationToken)
+                };
+                await Task.WhenAll(validateAndStoreTasks);
+
+                var publicCount = validateAndStoreTasks[0].Result;
                 return publicCount; // Since public contains protected (diffused) observations, we return public count             // + protectedCount;
             }
             catch (JobAbortedException e)
@@ -220,7 +231,7 @@ namespace SOS.Process.Processors.Artportalen
             }
             finally
             {
-                _semaphore.Release();
+                _semaphoreBatch.Release();
             }
 
             return 0;
@@ -243,26 +254,25 @@ namespace SOS.Process.Processors.Artportalen
 
             observations = await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
 
-            Protected = protectedObservations;
-
-            if (mode != JobRunModes.Full)
-            {
-                Logger.LogDebug($"Start deleteing live data ({batchId})");
-                var success = await DeleteBatchAsync(observations.Select(v => v.ArtportalenInternal.SightingId).ToArray());
-                Logger.LogDebug($"Finish deleteing live data ({batchId}) {success}");
-            }
-
-            var verbatimCount = await CommitBatchAsync(dataProvider, observations, batchId);
-
             if (mode == JobRunModes.Full && !protectedObservations)
             {
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }
 
+            if (mode != JobRunModes.Full)
+            {
+                Logger.LogDebug($"Start deleteing live data ({batchId})");
+                var success = await DeleteBatchAsync(protectedObservations, observations.Select(v => v.ArtportalenInternal.SightingId).ToArray());
+                Logger.LogDebug($"Finish deleteing live data ({batchId}) {success}");
+            }
+
+            var verbatimCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
+
             observations.Clear();
             Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
 
             return verbatimCount;
+            
         }
     }
 }

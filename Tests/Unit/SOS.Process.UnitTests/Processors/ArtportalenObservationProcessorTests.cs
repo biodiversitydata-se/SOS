@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Processors
         public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
@@ -44,7 +44,8 @@ namespace SOS.Process.UnitTests.Processors
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
@@ -56,7 +57,8 @@ namespace SOS.Process.UnitTests.Processors
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
-            _processedObservationRepositoryMock.Object,
+            _processedPublicObservationRepositoryMock.Object,
+            _processedProtectedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
             _vocabularyResolverMock.Object,
             _processConfiguration,
@@ -132,8 +134,11 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedPublicObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
+            _processedProtectedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
                 .ReturnsAsync(new[]
                 {
@@ -143,14 +148,19 @@ namespace SOS.Process.UnitTests.Processors
                     }
                 });
 
-            _processedObservationRepositoryMock
+            _processedPublicObservationRepositoryMock
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+                .ReturnsAsync(1);
+
+            _processedProtectedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 
             var dataProvider = new DataProvider
             {
                 Name = "Artportalen",
-                Type = DataProviderType.ArtportalenObservations
+                Type = DataProviderType.ArtportalenObservations,
+                SupportProtectedHarvest = true
             };
 
             var taxa = new Dictionary<int, Taxon>

@@ -15,9 +15,9 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedObservationRepository> Create(string fileName)
+        public static Mock<IProcessedPublicObservationRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedPublicObservationRepository>();
             var observations = LoadObservations(fileName);
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
@@ -26,9 +26,9 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             return stub;
         }
 
-        public static Mock<IProcessedObservationRepository> Create(Observation observation)
+        public static Mock<IProcessedPublicObservationRepository> Create(Observation observation)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedPublicObservationRepository>();
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<Observation> {Records = new[] {observation}});

@@ -32,7 +32,6 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Process.Jobs
 {
@@ -47,7 +46,8 @@ namespace SOS.Process.Jobs
         private readonly IInstanceManager _instanceManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
@@ -98,56 +98,66 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish initialize area cache");
         }
 
-        private async Task InitializeElasticSearchAsync(JobRunModes mode, bool cleanStart, bool protectedObservations)
+        private async Task InitializeElasticSearchAsync(JobRunModes mode, bool cleanStart)
         {
-            _processedObservationRepository.Protected = protectedObservations;
-
             if (cleanStart && mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
-                    $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
-                await _processedObservationRepository.ClearCollectionAsync();
+                    $"Start clear ElasticSearch index: {_processedPublicObservationRepository.IndexName}");
+                await _processedPublicObservationRepository.ClearCollectionAsync();
                
                 _logger.LogInformation(
-                    $"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    $"Finish clear ElasticSearch index: {_processedPublicObservationRepository.IndexName}");
+
+                _logger.LogInformation(
+                    $"Start clear ElasticSearch index: {_processedProtectedObservationRepository.IndexName}");
+                await _processedProtectedObservationRepository.ClearCollectionAsync();
+
+                _logger.LogInformation(
+                    $"Finish clear ElasticSearch index: {_processedProtectedObservationRepository.IndexName}");
             }
             else
             {
-                _logger.LogInformation($"Start ensure collection exists ({_processedObservationRepository.IndexName})");
+                _logger.LogInformation($"Start ensure collection exists ({_processedPublicObservationRepository.IndexName})");
                 // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
-                await _processedObservationRepository.VerifyCollectionAsync();
-                _logger.LogInformation($"Finish ensure collection exists ({_processedObservationRepository.IndexName})");
-            }
+                await _processedPublicObservationRepository.VerifyCollectionAsync();
+                _logger.LogInformation($"Finish ensure collection exists ({_processedPublicObservationRepository.IndexName})");
 
-           
+                _logger.LogInformation($"Start ensure collection exists ({_processedProtectedObservationRepository.IndexName})");
+                // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
+                await _processedProtectedObservationRepository.VerifyCollectionAsync();
+                _logger.LogInformation($"Finish ensure collection exists ({_processedProtectedObservationRepository.IndexName})");
+            }
         }
 
         /// <summary>
         /// Disable Elasticsearch indexing
         /// </summary>
-        /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        private async Task DisableIndexingAsync(bool protectedObservations)
+        private async Task DisableIndexingAsync()
         {
-            _processedObservationRepository.Protected = protectedObservations;
+            _logger.LogInformation($"Start disable indexing ({_processedPublicObservationRepository.IndexName})");
+            await _processedPublicObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedPublicObservationRepository.IndexName})");
 
-            _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.IndexName})");
-            await _processedObservationRepository.DisableIndexingAsync();
-            _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.IndexName})");
+            _logger.LogInformation($"Start disable indexing ({_processedProtectedObservationRepository.IndexName})");
+            await _processedProtectedObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedProtectedObservationRepository.IndexName})");
         }
 
         /// <summary>
         /// Enable Elasticsearch indexing
         /// </summary>
-        /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        private async Task EnableIndexingAsync(bool protectedObservations)
+        private async Task EnableIndexingAsync()
         {
-            _processedObservationRepository.Protected = protectedObservations;
+            _logger.LogInformation($"Start enable indexing ({_processedPublicObservationRepository.IndexName})");
+            await _processedPublicObservationRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedPublicObservationRepository.IndexName})");
 
-            _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.IndexName})");
-            await _processedObservationRepository.EnableIndexingAsync();
-            _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.IndexName})");
+            _logger.LogInformation($"Start enable indexing ({_processedProtectedObservationRepository.IndexName})");
+            await _processedProtectedObservationRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedProtectedObservationRepository.IndexName})");
         }
 
         /// <summary>
@@ -172,7 +182,8 @@ namespace SOS.Process.Jobs
                 // 1. Arrange
                 //-----------------
                 var processStart = DateTime.Now;
-                _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+                _processedPublicObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+                _processedProtectedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
 
                 //-----------------
                 // 2. Validation
@@ -218,8 +229,8 @@ namespace SOS.Process.Jobs
                     // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
-                        _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstanceName} => {_processedObservationRepository.InactiveInstanceName}");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                        _logger.LogInformation($"Toggle instance {_processedPublicObservationRepository.ActiveInstance} => {_processedPublicObservationRepository.InActiveInstance}");
+                        await _processedPublicObservationRepository.SetActiveInstanceAsync(_processedPublicObservationRepository
                             .InActiveInstance);
                     }
 
@@ -295,11 +306,8 @@ namespace SOS.Process.Jobs
         private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
         {
             // Init public index
-            await InitializeElasticSearchAsync(mode, cleanStart, false);
-            await DisableIndexingAsync(false);
-            // Init protected index
-            await InitializeElasticSearchAsync(mode, cleanStart, true);
-            await DisableIndexingAsync(true);
+            await InitializeElasticSearchAsync(mode, cleanStart);
+            await DisableIndexingAsync();
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
@@ -340,9 +348,8 @@ namespace SOS.Process.Jobs
             }
 
             // Enable indexing for public and protected index
-            await EnableIndexingAsync(false);
-            await EnableIndexingAsync(true);
-            
+            await EnableIndexingAsync();
+
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
 
             return success;
@@ -371,7 +378,7 @@ namespace SOS.Process.Jobs
             // Try to get process info for current instance
             var processInfo = (await GetProcessInfoAsync(new[]
             {
-                   _processedObservationRepository.CurrentInstanceName
+                _processedPublicObservationRepository.IndexName
                 })).FirstOrDefault();
 
             if (processInfo == null || mode == JobRunModes.Full)
@@ -406,7 +413,7 @@ namespace SOS.Process.Jobs
                         nameof(Taxon)
                     });
 
-                processInfo = new ProcessInfo(_processedObservationRepository.CurrentInstanceName, processStart)
+                processInfo = new ProcessInfo(_processedPublicObservationRepository.IndexName, processStart)
                 {
                     Count = processTaskByDataProvider.Sum(pi => pi.Value.Result.Count),
                     End = DateTime.Now,
@@ -440,9 +447,10 @@ namespace SOS.Process.Jobs
         }
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="artportalenObservationProcessor"></param>
@@ -456,15 +464,17 @@ namespace SOS.Process.Jobs
         /// <param name="virtualHerbariumObservationProcessor"></param>
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
-        /// <param name="dataProviderManager"></param>
+        /// <param name="dataProviderCache"></param>
         /// <param name="instanceManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        public ProcessJob(IProcessedObservationRepository processedObservationRepository,
-            IProcessInfoRepository processInfoRepository,
+        public ProcessJob(IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+        IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
@@ -486,8 +496,10 @@ namespace SOS.Process.Jobs
             ProcessConfiguration processConfiguration,
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _processedObservationRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedPublicObservationRepository = processedPublicObservationRepository ??
+                                                    throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedProtectedObservationRepository = processedProtectedObservationRepository ??
+                                                       throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _taxonCache = taxonCache ??
                           throw new ArgumentNullException(nameof(taxonCache));

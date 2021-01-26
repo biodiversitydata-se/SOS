@@ -30,7 +30,7 @@ namespace SOS.Export.UnitTests.Managers
         public ObservationManagerTests()
         {
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
             _blobStorageServiceMock = new Mock<IBlobStorageService>();
@@ -40,7 +40,7 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
         private readonly Mock<IBlobStorageService> _blobStorageServiceMock;

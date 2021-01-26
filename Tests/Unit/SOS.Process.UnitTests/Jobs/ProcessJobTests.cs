@@ -49,7 +49,8 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessJobTests()
         {
-            _darwinCoreRepository = new Mock<IProcessedObservationRepository>();
+            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _instanceManager = new Mock<IInstanceManager>();
@@ -73,7 +74,8 @@ namespace SOS.Process.UnitTests.Jobs
             _processConfigurationMock = new Mock<ProcessConfiguration>();
         }
 
-        private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
@@ -97,7 +99,8 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
         private ProcessJob TestObject => new ProcessJob(
-            _darwinCoreRepository.Object,
+            _processedPublicObservationRepositoryMock.Object,
+            _processedProtectedObservationRepository.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
             _artportalenProcessor.Object,
@@ -188,8 +191,8 @@ namespace SOS.Process.UnitTests.Jobs
                     new Taxon {Id = 100024, ScientificName = "Canus Lupus"}
                 });
 
-            _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
-
+            _processedPublicObservationRepositoryMock.Setup(r => r.VerifyCollectionAsync());
+            _processedProtectedObservationRepository.Setup(r => r.VerifyCollectionAsync());
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo(DateTime.Now));
@@ -213,7 +216,8 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
                     DateTime.Now, DateTime.Now, 1));
 
-            _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
+            _processedPublicObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
+            _processedProtectedObservationRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
 

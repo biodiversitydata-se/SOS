@@ -99,16 +99,21 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedPublicObservationRepository processedPublicObservationRepository;
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
+                processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
+                processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
             }
             else
             {
-                processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
+                processedPublicObservationRepository = CreateProcessedPublicObservationRepositoryMock(batchSize).Object;
+                processedProtectedObservationRepository = CreateProcessedProtectedObservationRepositoryMock(batchSize).Object;
             }
+
 
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
@@ -120,7 +125,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
-                processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 processConfiguration, 
@@ -154,9 +160,17 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedPublicObservationRepository> CreateProcessedPublicObservationRepositoryMock(int batchSize)
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedPublicObservationRepository>();
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
+            mock.Setup(m => m.BatchSize).Returns(batchSize);
+            return mock;
+        }
+
+        private Mock<IProcessedProtectedObservationRepository> CreateProcessedProtectedObservationRepositoryMock(int batchSize)
+        {
+            var mock = new Mock<IProcessedProtectedObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(batchSize);
             return mock;

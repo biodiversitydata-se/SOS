@@ -30,19 +30,19 @@ namespace SOS.Process.Processors.Mvm
         /// </summary>
         /// <param name="mvmObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public MvmObservationProcessor(IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<MvmObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(
@@ -78,7 +78,7 @@ namespace SOS.Process.Processors.Mvm
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"MVM observations processed: {processedCount}");
                 }
@@ -91,7 +91,7 @@ namespace SOS.Process.Processors.Mvm
 
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"MVM observations processed: {processedCount}");
             }

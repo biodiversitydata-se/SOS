@@ -16,9 +16,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedObservationRepository> Create(string fileName)
+        public static Mock<IProcessedPublicObservationRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
+            var stub = new Mock<IProcessedPublicObservationRepository>();
             var observations = new ScrollResult<Observation>
             {
                 Records = LoadObservations(fileName)
@@ -30,10 +30,10 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
 
-        public static Mock<IProcessedObservationRepository> Create(Observation observation)
+        public static Mock<IProcessedPublicObservationRepository> Create(Observation observation)
         {
-            var stub = new Mock<IProcessedObservationRepository>();
-
+            var stub = new Mock<IProcessedPublicObservationRepository>();
+            
             stub.SetupSequence(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<Observation>
                 {

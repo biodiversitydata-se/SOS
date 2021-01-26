@@ -194,19 +194,10 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
-
-        /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
-
-        /// <inheritdoc />
-        public string CurrentInstanceName=> LiveMode ? ActiveInstanceName : InactiveInstanceName;
+        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
 
         /// <inheritdoc />
         public bool LiveMode { get; set; }
-
-        /// <inheritdoc />
-       public bool Protected { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)

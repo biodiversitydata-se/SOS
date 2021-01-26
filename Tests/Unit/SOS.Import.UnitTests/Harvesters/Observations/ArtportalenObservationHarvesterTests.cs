@@ -39,7 +39,8 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _organizationRepository = new Mock<IOrganizationRepository>();
             _sightingRelationRepository = new Mock<ISightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<ISpeciesCollectionItemRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _artportalenMetadataContainerMock = new Mock<IArtportalenMetadataContainer>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationHarvester>>();
         }
@@ -54,7 +55,8 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<ISpeciesCollectionItemRepository> _speciesCollectionItemRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IArtportalenMetadataContainer> _artportalenMetadataContainerMock;
         private readonly Mock<ILogger<ArtportalenObservationHarvester>> _loggerMock;
 
@@ -69,7 +71,8 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _organizationRepository.Object,
             _sightingRelationRepository.Object,
             _speciesCollectionItemRepository.Object,
-            _processedObservationRepositoryMock.Object,
+            _processedPublicObservationRepositoryMock.Object,
+            _processedProtectedObservationRepositoryMock.Object,
             _artportalenMetadataContainerMock.Object,
             _loggerMock.Object);
 

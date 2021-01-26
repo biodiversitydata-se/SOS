@@ -21,26 +21,47 @@ namespace SOS.Process.Processors
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
         protected readonly ILogger<TEntity> Logger;
-        protected readonly IProcessedObservationRepository ProcessRepository;
+        protected readonly IProcessedPublicObservationRepository PublicRepository;
+        protected readonly IProcessedProtectedObservationRepository ProtectedRepository;
         protected readonly IValidationManager ValidationManager;
 
         /// <summary>
-        /// Set protection mode
+        /// Constructor for public only 
         /// </summary>
-        protected bool Protected
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
+        /// <param name="logger"></param>
+        protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IVocabularyValueResolver vocabularyValueResolver,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IValidationManager validationManager,
+            ILogger<TEntity> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
-            get => ProcessRepository.Protected; 
-            set => ProcessRepository.Protected = value;
         }
 
-        protected ObservationProcessorBase(IProcessedObservationRepository processedObservationRepository,
+        /// <summary>
+        /// Constructor for public and protected
+        /// </summary>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
+        /// <param name="logger"></param>
+        protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = processedObservationRepository ??
-                                throw new ArgumentNullException(nameof(processedObservationRepository));
+            PublicRepository = processedPublicObservationRepository ??
+                               throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+
+            ProtectedRepository = processedProtectedObservationRepository;
+
             this.vocabularyValueResolver = vocabularyValueResolver ??
                                            throw new ArgumentNullException(nameof(vocabularyValueResolver));
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
@@ -72,9 +93,14 @@ namespace SOS.Process.Processors
                 if (mode == JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
-                    if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
+                    if (!await PublicRepository.DeleteProviderDataAsync(dataProvider))
                     {
-                        Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
+                        Logger.LogError($"Failed to delete {dataProvider.Identifier} public data");
+                    }
+
+                    if (dataProvider.SupportProtectedHarvest && !await ProtectedRepository.DeleteProviderDataAsync(dataProvider))
+                    {
+                        Logger.LogError($"Failed to delete {dataProvider.Identifier} protected data");
                     }
 
                     Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
@@ -107,6 +133,7 @@ namespace SOS.Process.Processors
 
         protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
+            bool protectedData,
             ICollection<Observation> processedObservations,
             string batchId)
         {
@@ -121,7 +148,9 @@ namespace SOS.Process.Processors
                 }
 
                 Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
-                var processedCount = await ProcessRepository.AddManyAsync(processedObservations);
+                var processedCount = protectedData
+                    ? await ProtectedRepository.AddManyAsync(processedObservations)
+                    : await PublicRepository.AddManyAsync(processedObservations);
                 Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
@@ -134,12 +163,12 @@ namespace SOS.Process.Processors
            
         }
 
-        protected async Task<int> ValidateAndStoreObservation(DataProvider dataProvider, ICollection<Observation> observations, string batchId)
+        protected async Task<int> ValidateAndStoreObservation(DataProvider dataProvider, bool protectedData, ICollection<Observation> observations, string batchId)
         {
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
 
-            var processedCount = await CommitBatchAsync(dataProvider, observations, batchId);
+            var processedCount = await CommitBatchAsync(dataProvider, protectedData, observations, batchId);
 
             await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
 
@@ -183,7 +212,9 @@ namespace SOS.Process.Processors
 
         protected bool IsBatchFilledToLimit(int count)
         {
-            return count % ProcessRepository.BatchSize == 0;
+            return count % PublicRepository.BatchSize == 0;
         }
+
+        protected int WriteBatchSize => PublicRepository.WriteBatchSize;
     }
 }

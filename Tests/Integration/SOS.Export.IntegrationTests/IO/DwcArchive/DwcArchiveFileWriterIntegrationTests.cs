@@ -55,7 +55,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         }
 
 
-        private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient)
+        private static ProcessedPublicObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient)
         {
             /*  var processedObservationRepository = new ProcessedObservationRepository(
                   exportClient,

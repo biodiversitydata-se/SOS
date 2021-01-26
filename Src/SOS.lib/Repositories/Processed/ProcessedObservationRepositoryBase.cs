@@ -21,8 +21,8 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
-        IProcessedObservationRepository
+    public class ProcessedObservationRepositoryBase : ProcessRepositoryBase<Observation>,
+        IProcessedObservationRepositoryBase
     {
         private const string ScrollTimeOut = "45s";
         private readonly IElasticClient _elasticClient;
@@ -30,6 +30,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly int _scrollBatchSize;
         private readonly int _numberOfShards;
         private readonly int _numberOfReplicas;
+        private readonly bool _protected;
 
         private async Task<bool> AddCollectionAsync()
         {
@@ -140,19 +141,22 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
+        /// <param name="protectedIndex"></param>
         /// <param name="client"></param>
         /// <param name="elasticClient"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
-        public ProcessedObservationRepository(
+        public ProcessedObservationRepositoryBase(
+            bool protectedIndex,
             IProcessClient client,
             IElasticClient elasticClient,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationRepository> logger
+            ILogger<ProcessedPublicObservationRepository> logger
         ) : base(client, true, logger)
         {
+            _protected = protectedIndex;
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _indexPrefix = elasticConfiguration?.IndexPrefix ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _scrollBatchSize = client.ReadBatchSize;
@@ -164,7 +168,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         /// Get name of index
         /// </summary>
-        public string IndexName => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{CurrentInstanceName}".ToLower();
+        public string IndexName => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{GetInstanceName(CurrentInstance, _protected)}".ToLower();
 
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<Observation> items)

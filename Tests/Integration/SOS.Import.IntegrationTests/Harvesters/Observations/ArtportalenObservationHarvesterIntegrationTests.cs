@@ -57,7 +57,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
 
-            var _processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
+            var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
 
             var observationHarvester = new ArtportalenObservationHarvester(
@@ -71,7 +72,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                _processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 new ArtportalenMetadataContainer(), 
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
@@ -114,7 +116,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
-            var _processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
+            var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -127,7 +130,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                _processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 new ArtportalenMetadataContainer(), 
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 

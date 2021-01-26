@@ -117,7 +117,9 @@ namespace SOS.Process.IoC.Modules
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories destination 
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedProtectedObservationRepository>().As<IProcessedProtectedObservationRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>()
                 .InstancePerLifetimeScope();

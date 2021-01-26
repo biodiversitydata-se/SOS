@@ -19,11 +19,16 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IProcessClient _client;
 
-       
         /// <summary>
         ///     Mongo db
         /// </summary>
         protected IMongoDatabase Database;
+
+        /// <summary>
+        ///     Get collection
+        /// </summary>
+        /// <returns></returns>
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentInstanceName);
 
         /// <summary>
         ///     Constructor
@@ -42,13 +47,18 @@ namespace SOS.Lib.Repositories.Processed
             Database = _client.GetDatabase();
         }
 
-        /// <summary>
-        ///     Get collection
-        /// </summary>
-        /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentInstanceName);
+        /// <inheritdoc />
+        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
 
-       
+        /// <inheritdoc />
+        public string CurrentInstanceName => GetInstanceName(CurrentInstance, Protected);
+
+        /// <inheritdoc />
+        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
+
+        /// <inheritdoc />
+        public bool Protected { get; set; }
+
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
         {

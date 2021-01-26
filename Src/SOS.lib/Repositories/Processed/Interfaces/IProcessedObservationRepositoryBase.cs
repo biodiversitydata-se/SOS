@@ -11,7 +11,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
+    public interface IProcessedObservationRepositoryBase : IProcessRepositoryBase<Observation>
     {
         public string IndexName { get; }
 

@@ -56,11 +56,11 @@ namespace SOS.Export.IntegrationTests.Managers
                 new NullLogger<DwcArchiveFileWriter>());
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
-                new ProcessedObservationRepository(
+                new ProcessedPublicObservationRepository(
                     exportClient,
                     elasticClient,
                     new ElasticSearchConfiguration(),
-                    new Mock<ILogger<ProcessedObservationRepository>>().Object),
+                    new Mock<ILogger<ProcessedPublicObservationRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,

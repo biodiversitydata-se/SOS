@@ -35,7 +35,8 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
@@ -133,13 +134,16 @@ namespace SOS.Import.Harvesters.Observations
             IJobCancellationToken cancellationToken)
         {
             // Make sure incremental mode is true to get max id from live instance
-            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            _processedPublicObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            _processedProtectedObservationRepository.LiveMode = _processedPublicObservationRepository.LiveMode;
             harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
 
             // We start from last harvested sighting 
-            var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
-            
+            var lastModifiedPublic = await _processedPublicObservationRepository.GetLatestModifiedDateForProviderAsync(1);
+            var lastModifiedProtected = await _processedProtectedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
+            var lastModified = lastModifiedProtected > lastModifiedPublic ? lastModifiedProtected : lastModifiedPublic;
+
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
 
@@ -338,12 +342,14 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
-        /// <param name="sightingVerbatimRepository"></param>
+        /// <param name="artportalenVerbatimRepository"></param>
         /// <param name="personRepository"></param>
         /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="artportalenMetadataContainer"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
@@ -356,7 +362,8 @@ namespace SOS.Import.Harvesters.Observations
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             ILogger<ArtportalenObservationHarvester> logger)
         {
@@ -375,7 +382,8 @@ namespace SOS.Import.Harvesters.Observations
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
-            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedPublicObservationRepository = processedPublicObservationRepository ?? throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedProtectedObservationRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

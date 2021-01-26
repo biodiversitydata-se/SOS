@@ -79,11 +79,11 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedPublicObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
+                processedObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
             }
             else
             {
@@ -115,9 +115,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcaObservationProcessor>());
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
+        private Mock<IProcessedPublicObservationRepository> CreateProcessedObservationRepositoryMock()
         {
-            var mock = new Mock<IProcessedObservationRepository>();
+            var mock = new Mock<IProcessedPublicObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(100000);
             return mock;
