@@ -7,7 +7,6 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Repositories.Processed
@@ -136,17 +135,14 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="instance"></param>
 
         /// <returns></returns>
-        protected string GetInstanceName(byte instance, ObservationType observationType) 
+        protected string GetInstanceName(byte instance, bool protectedObservations) 
         {
             var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
-            if(observationType == ObservationType.Protected)
+            if(protectedObservations)
             {
                 instanceName += "-protected";
             }
-            else if(observationType == ObservationType.Diffused)
-            {
-                instanceName += "-diffused";
-            }
+
             instanceName += $"{(_toggleable ? $"-{instance}" : string.Empty)}";
             return instanceName;
         }
@@ -198,10 +194,10 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance, ObservationType);
+        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
 
         /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance, ObservationType);
+        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
 
         /// <inheritdoc />
         public string CurrentInstanceName=> LiveMode ? ActiveInstanceName : InactiveInstanceName;
@@ -210,7 +206,7 @@ namespace SOS.Lib.Repositories.Processed
         public bool LiveMode { get; set; }
 
         /// <inheritdoc />
-        public ObservationType ObservationType{ get; set; }
+       public bool Protected { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)

@@ -148,6 +148,7 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Add managers
+            builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationManager>().As<IValidationManager>().InstancePerLifetimeScope();

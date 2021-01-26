@@ -54,7 +54,7 @@ namespace SOS.Process.Jobs
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
 
-        private async Task<IDictionary<int, Taxon>> GetTaxa(JobRunModes mode)
+        private async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
             // Use current taxa if we are in incremental mode, to speed things up
             if (mode == JobRunModes.Full)
@@ -91,15 +91,17 @@ namespace SOS.Process.Jobs
             return taxonById;
         }
 
-        private async Task InitializeAreaHelperAsync(JobRunModes mode)
+        private async Task InitializeAreaHelperAsync()
         {
             _logger.LogDebug("Start initialize area cache");
             await _areaHelper.InitializeAsync();
             _logger.LogDebug("Finish initialize area cache");
         }
 
-        private async Task InitializeElasticSearch(JobRunModes mode, bool cleanStart)
+        private async Task InitializeElasticSearchAsync(JobRunModes mode, bool cleanStart, bool protectedObservations)
         {
+            _processedObservationRepository.Protected = protectedObservations;
+
             if (cleanStart && mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
@@ -116,6 +118,36 @@ namespace SOS.Process.Jobs
                 await _processedObservationRepository.VerifyCollectionAsync();
                 _logger.LogInformation($"Finish ensure collection exists ({_processedObservationRepository.IndexName})");
             }
+
+           
+        }
+
+        /// <summary>
+        /// Disable Elasticsearch indexing
+        /// </summary>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        private async Task DisableIndexingAsync(bool protectedObservations)
+        {
+            _processedObservationRepository.Protected = protectedObservations;
+
+            _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.IndexName})");
+            await _processedObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.IndexName})");
+        }
+
+        /// <summary>
+        /// Enable Elasticsearch indexing
+        /// </summary>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        private async Task EnableIndexingAsync(bool protectedObservations)
+        {
+            _processedObservationRepository.Protected = protectedObservations;
+
+            _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.IndexName})");
+            await _processedObservationRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.IndexName})");
         }
 
         /// <summary>
@@ -153,8 +185,8 @@ namespace SOS.Process.Jobs
                 //----------------------------------------------------------------------
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
-                var getTaxaTask = GetTaxa(mode);
-                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(mode), _validationManager.VerifyCollectionAsync(mode));
+                var getTaxaTask = GetTaxaAsync(mode);
+                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
 
@@ -176,17 +208,7 @@ namespace SOS.Process.Jobs
                 //------------------------------------------------------------------------
                 // 5. Create public observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                var success = await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Public, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
-
-                //------------------------------------------------------------------------
-                // 6. Create protected observation processing tasks, and wait for them to complete
-                //------------------------------------------------------------------------
-                success = success && await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Protected, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
-
-                //------------------------------------------------------------------------
-                // 7. Create diffused observation processing tasks, and wait for them to complete
-                //------------------------------------------------------------------------
-                success = await ProcessVerbatim(dataProvidersToProcess, mode, ObservationType.Diffused, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
+                var success = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
 
                 //---------------------------------
                 // 8. Create ElasticSearch index
@@ -270,29 +292,27 @@ namespace SOS.Process.Jobs
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, ObservationType observationType, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
         {
-            _processedObservationRepository.ObservationType = observationType;
-
-            await InitializeElasticSearch(mode, cleanStart);
-
-            _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.IndexName})");
-            await _processedObservationRepository.DisableIndexingAsync();
-            _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.IndexName})");
+            // Init public index
+            await InitializeElasticSearchAsync(mode, cleanStart, false);
+            await DisableIndexingAsync(false);
+            // Init protected index
+            await InitializeElasticSearchAsync(mode, cleanStart, true);
+            await DisableIndexingAsync(true);
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
             {
                 if (!dataProvider.IsActive || 
-                    (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest) || 
-                    ((observationType == ObservationType.Protected || observationType == ObservationType.Diffused) && !dataProvider.SupportProtectedHarvest))
+                    (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
                 {
                     continue;
                 }
 
                 var processor = _processorByType[dataProvider.Type];
                 processTaskByDataProvider.Add(dataProvider,
-                    processor.ProcessAsync(dataProvider, taxonById, observationType, mode, cancellationToken));
+                    processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
@@ -319,10 +339,10 @@ namespace SOS.Process.Jobs
                 }
             }
 
-            _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.IndexName})");
-            await _processedObservationRepository.EnableIndexingAsync();
-            _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.IndexName})");
-
+            // Enable indexing for public and protected index
+            await EnableIndexingAsync(false);
+            await EnableIndexingAsync(true);
+            
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
 
             return success;

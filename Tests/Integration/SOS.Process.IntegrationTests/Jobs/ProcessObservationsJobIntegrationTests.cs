@@ -75,6 +75,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
@@ -183,9 +184,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 fieldMappingResolverHelper,
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
+                diffusionManager,
                 validationManager,
-                new NullLogger<ArtportalenObservationProcessor>(),
-                areaHelper);
+                new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
                 new ProcessedObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),

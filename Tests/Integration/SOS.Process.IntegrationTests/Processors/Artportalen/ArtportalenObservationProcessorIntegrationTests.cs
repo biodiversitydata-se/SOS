@@ -24,6 +24,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using Xunit;
 
@@ -54,7 +55,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
             dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
@@ -113,9 +114,10 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
+            
             var areaHelper = new AreaHelper(
-            new AreaRepository(processClient, new NullLogger<AreaRepository>()));
-
+                new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+            var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
                 processedObservationRepository,
@@ -123,9 +125,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
+                diffusionManager, 
                 validationManager,
-                new NullLogger<ArtportalenObservationProcessor>(),
-                areaHelper);
+                new NullLogger<ArtportalenObservationProcessor>());
         }
 
         private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()

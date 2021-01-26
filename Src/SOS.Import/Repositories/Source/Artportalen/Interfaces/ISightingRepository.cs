@@ -59,10 +59,5 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// True if live data base should be used
         /// </summary>
         bool Live { get; set; }
-
-        /// <summary>
-        /// Harvest protected observations
-        /// </summary>
-        ObservationType ObservationType { get; set; }
     }
 }

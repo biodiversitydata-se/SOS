@@ -4,7 +4,6 @@ using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Process.Processors.Interfaces
 {
@@ -19,7 +18,6 @@ namespace SOS.Process.Processors.Interfaces
         Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            ObservationType observationType,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
     }

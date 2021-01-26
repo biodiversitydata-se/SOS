@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Repositories.Interfaces;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -47,7 +46,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <summary>
         /// True if repository is handling protected data
         /// </summary>
-        ObservationType ObservationType{ get; set; }
+        bool Protected{ get; set; }
 
         /// <summary>
         /// Set active instance

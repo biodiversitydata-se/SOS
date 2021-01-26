@@ -16,6 +16,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen;
 using Xunit;
 
@@ -37,9 +38,9 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+            _diffusionManagerMock = new Mock<IDiffusionManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
-            _areaHelperMock = new Mock<IAreaHelper>();
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
@@ -50,7 +51,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
-        private readonly Mock<IAreaHelper> _areaHelperMock;
+        private readonly Mock<IDiffusionManager> _diffusionManagerMock;
 
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
@@ -60,9 +61,9 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock.Object,
             _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _diffusionManagerMock.Object,
             _validationManagerMock.Object,
-            _loggerMock.Object,
-            _areaHelperMock.Object);
+            _loggerMock.Object);
 
         /// <summary>
         ///     Test processing fail
@@ -83,7 +84,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -113,7 +114,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null,  JobRunModes.Full, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -165,7 +166,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa, Lib.Repositories.Interfaces.ObservationType.Public, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

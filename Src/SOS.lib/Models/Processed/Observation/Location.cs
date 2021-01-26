@@ -371,22 +371,19 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Point (WGS84)
         /// </summary>
-        [GeoShape]
-        [SwaggerExclude]
+        [GeoShape, SwaggerExclude]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
         ///     Point used in distance from point search
         /// </summary>
-        [GeoPoint]
-        [SwaggerExclude]
+        [GeoPoint, SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
-        [GeoShape]
-        [SwaggerExclude]
+        [GeoShape, SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>

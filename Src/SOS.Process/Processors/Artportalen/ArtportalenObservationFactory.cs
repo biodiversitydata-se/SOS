@@ -1,5 +1,4 @@
-﻿//#define INCLUDE_DIFFUSED_OBSERVATIONS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,12 +9,10 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
@@ -31,53 +28,33 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
-        private readonly ObservationType _observationType;
-        private readonly IAreaHelper _areaHelper;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
-        /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="incrementalMode"></param>
-        /// <param name="protectedObservations"></param>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper,
-            bool incrementalMode,
-            ObservationType observationType)
+
+            bool incrementalMode)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            {
-                _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
-                _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
-            }
-
+            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
-            _observationType = observationType;
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            IAreaHelper areaHelper,
-            bool incrementalMode,
-            ObservationType observationType)
+            bool incrementalMode)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, areaHelper, incrementalMode, observationType);
-        }
-
-        public ICollection<Observation> CreateProcessedObservations(
-            IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
-        {
-            return verbatimObservations.Select(CreateProcessedObservation).Where(p=>p!=null).ToArray();
+            return new ArtportalenObservationFactory(dataProvider, processedVocabularies, incrementalMode);
         }
 
         /// <summary>
@@ -85,38 +62,10 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
         {
             try
             {
-                if (verbatimObservation == null)
-                {
-                    return null;
-                }
-
-                var taxonId = verbatimObservation.TaxonId ?? -1;
-                if (_taxa.TryGetValue(taxonId, out var taxon))
-                {
-                    taxon.IndividualId = verbatimObservation.URL;
-                }
-                var shouldBeDiffused = ShouldBeDiffused(verbatimObservation, taxon);
-                if (shouldBeDiffused && _observationType == ObservationType.Diffused)
-                {
-                    //If it is a protected sighting it should not be possible to find it in the current month
-                    if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
-                        (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
-                    {
-                        return null;
-                    }
-                    //Diffuse the observation depending on the protectionlevel                
-                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);                    
-                }
-                // if we are in diffused mode and the observation should not be diffused then we skip the observation
-                else if(_observationType == ObservationType.Diffused && !shouldBeDiffused)
-                {
-                    return null;
-                }
-
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
                 var point = (PointGeoShape) verbatimObservation.Site?.Point?.ToGeoShape();                                              
@@ -131,10 +80,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
 
-                var obs = new Observation()
-                {
-                    Protected = _observationType != ObservationType.Public
-                };
+                var obs = new Observation();
 
                 // Record level
 
@@ -302,11 +248,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
-                if (shouldBeDiffused && _observationType == ObservationType.Diffused)
-                {
-                    _areaHelper.AddAreaDataToProcessedObservation(obs);
-                }
-
                 return obs;
             }
             catch (Exception e)
@@ -431,130 +372,6 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        /// Diffuse the observation data depending on the protectionlevel
-        /// </summary>
-        /// <param name="verbatimObservation"></param>
-        /// <param name="taxon"></param>
-        /// <returns></returns>
-        private ArtportalenObservationVerbatim DiffuseObservation(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            verbatimObservation.Comment = "";
-            verbatimObservation.ReportedBy = "";
-            verbatimObservation.ReportedByUserAlias = "";
-            verbatimObservation.ReportedByUserId = -1;
-            verbatimObservation.Observers = "";            
-            verbatimObservation.ObserversInternal = new List<UserInternal>();
-
-            if(verbatimObservation.ReportedDate.HasValue)
-                verbatimObservation.ReportedDate = new DateTime(verbatimObservation.ReportedDate.Value.Year, verbatimObservation.ReportedDate.Value.Month, 1);
-            if (verbatimObservation.StartDate.HasValue)
-                verbatimObservation.StartDate = new DateTime(verbatimObservation.StartDate.Value.Year, verbatimObservation.StartDate.Value.Month, 1);
-            if (verbatimObservation.EndDate.HasValue)
-                verbatimObservation.EndDate = new DateTime(verbatimObservation.EndDate.Value.Year, verbatimObservation.EndDate.Value.Month, 1);
-            verbatimObservation.EditDate = new DateTime(verbatimObservation.EditDate.Year, verbatimObservation.EditDate.Month, 1);
-            
-            (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) = DiffuseCoordinates(verbatimObservation.Site?.Point, verbatimObservation, taxon);            
-
-            var newSite = new Site();
-            newSite.Point = diffusedPoint;
-            newSite.PointWithBuffer = diffusedPolygon;
-            newSite.Name = "";
-            newSite.CountryPart = verbatimObservation.Site.CountryPart;
-            newSite.CountryRegion = verbatimObservation.Site.CountryRegion;
-            newSite.County= verbatimObservation.Site.County;
-            newSite.Municipality = verbatimObservation.Site.Municipality;
-            newSite.Parish = verbatimObservation.Site.Parish;
-            newSite.PresentationNameParishRegion = verbatimObservation.Site.PresentationNameParishRegion;
-            newSite.ProtectedNature = verbatimObservation.Site.ProtectedNature;
-            newSite.Province = verbatimObservation.Site.Province;
-            newSite.SpecialProtectionArea = verbatimObservation.Site.SpecialProtectionArea;
-            newSite.WaterArea = verbatimObservation.Site.WaterArea;
-            newSite.Accuracy = verbatimObservation.Site.Accuracy;
-
-            verbatimObservation.Site = newSite;            
-
-            return verbatimObservation;
-        }
-        private (int mod, int add) GetDiffusionValues(int protectionLevel)
-        {
-            if (protectionLevel == 2)
-            {
-               return (1000,555);
-            }
-            if (protectionLevel == 3)
-            {
-                return (5000, 2505);                
-            }
-            if (protectionLevel == 4)
-            {
-                return (25000, 12505);                
-            }
-            if (protectionLevel == 5)
-            {
-                return (50000, 25005);                
-            }
-            else
-            {
-                return (0, 0);
-            }
-        }
-
-        /// <summary>
-        /// Check if observation is hidden by provider
-        /// </summary>
-        /// <param name="observationVerbatim"></param>
-        /// <returns></returns>
-        private static bool IsHiddenByProvider(ArtportalenObservationVerbatim observationVerbatim) =>
-            (observationVerbatim.HiddenByProvider.HasValue &&
-             observationVerbatim.HiddenByProvider.Value > DateTime.Now);
-
-        /// <summary>
-        /// Check if observation should be diffused
-        /// </summary>
-        /// <param name="observationVerbatim"></param>
-        /// <param name="taxon"></param>
-        /// <returns></returns>
-        private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            // Diffuse observation in public index WHERE taxon protection level is greater than 2 OR
-            // observation is protected by system OR
-            // observation is hidden by provider to a future date
-            return _observationType != ObservationType.Protected && (
-                (taxon?.ProtectionLevel?.Id ?? 0) > 2 ||
-                observationVerbatim.ProtectedBySystem ||
-                IsHiddenByProvider(observationVerbatim)
-            );
-        }
-
-        /// <summary>
-        /// Diffuse the point based on the sightings protection level
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="polygon"></param>
-        /// <param name="observationVerbatim"></param>
-        /// <param name="taxon"></param>
-        /// <returns></returns>
-        private (GeoJsonGeometry diffusedPoint, GeoJsonGeometry diffusedPolygon) DiffuseCoordinates(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            var protectionLevel = IsHiddenByProvider(observationVerbatim) && taxon.ProtectionLevel.Id < 3 ? 3 : taxon.ProtectionLevel.Id;
-
-            var diffusionValues = GetDiffusionValues(protectionLevel);
-            var latitude = (double)point.Coordinates[1];
-            var longitude = (double)point.Coordinates[0];
-            
-            //transform the point into the same format as Artportalen so that we can use the same diffusion as them
-            var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
-            var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
-            var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % diffusionValues.mod + diffusionValues.add, transformedPoint.Coordinates[0].Y - transformedPoint.Coordinates[0].Y % diffusionValues.mod + diffusionValues.add);
-
-            //retransform to the correct format again
-            var retransformedPoint = diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            var diffusedPolygon = ((NetTopologySuite.Geometries.Point) retransformedPoint).ToCircle(diffusionValues.mod);
-
-            return (retransformedPoint.ToGeoJson(), diffusedPolygon.ToGeoJson());
-        }
-
-        /// <summary>
         ///     Get SOS internal Id for the id specific for the data provider.
         /// </summary>
         /// <param name="metadata"></param>
@@ -599,7 +416,7 @@ namespace SOS.Process.Processors.Artportalen
         }
 
 
-        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Lib.Models.Verbatim.Artportalen.Project project)
+        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Project project)
         {
             if (project == null) return null;
 
@@ -619,7 +436,7 @@ namespace SOS.Process.Processors.Artportalen
             };
         }
 
-        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
+        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
@@ -637,7 +454,7 @@ namespace SOS.Process.Processors.Artportalen
             };
         }
 
-        private string GetSamplingProtocol(IEnumerable<Lib.Models.Verbatim.Artportalen.Project> projects)
+        private string GetSamplingProtocol(IEnumerable<Project> projects)
         {
             if (!projects?.Any() ?? true) return null;
 

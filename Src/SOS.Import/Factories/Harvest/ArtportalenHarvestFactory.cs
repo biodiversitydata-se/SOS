@@ -275,7 +275,7 @@ namespace SOS.Import.Factories.Harvest
                     }
 
                     // Get project from all projects
-                    project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId].Clone();
+                    project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId];
                     sightingProjects.Add(project.Id, project.Clone());
                 }
 

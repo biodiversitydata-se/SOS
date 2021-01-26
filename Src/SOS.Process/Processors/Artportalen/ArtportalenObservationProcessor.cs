@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 
 namespace SOS.Process.Processors.Artportalen
@@ -29,9 +29,8 @@ namespace SOS.Process.Processors.Artportalen
         IArtportalenObservationProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
-        private readonly ProcessConfiguration _processConfiguration;
         private readonly IVocabularyRepository _processedVocabularyRepository;
-        private readonly IAreaHelper _areaHelper;
+        private readonly IDiffusionManager _diffusionManager;
         private readonly SemaphoreSlim _semaphore;
 
         /// <summary>
@@ -72,20 +71,17 @@ namespace SOS.Process.Processors.Artportalen
             IVocabularyValueResolver vocabularyValueResolver,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IDiffusionManager diffusionManager,
             IValidationManager validationManager,
-            ILogger<ArtportalenObservationProcessor> logger,
-            IAreaHelper areaHelper) : 
+            ILogger<ArtportalenObservationProcessor> logger) : 
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
-            _processConfiguration =
-                processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
-            _areaHelper =
-              areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
 
             if (processConfiguration == null)
             {
@@ -104,69 +100,10 @@ namespace SOS.Process.Processors.Artportalen
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Public, mode, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        protected override async Task<int> ProcessProtectedObservations(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Protected, mode, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        protected override async Task<int> ProcessDiffusedObservations(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            return await ProcessAsync(dataProvider, taxa, _areaHelper, ObservationType.Diffused, mode, cancellationToken);
-        }
-
-        /// <summary>
-        /// Process verbatim
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="taxa"></param>
-        /// <param name="protectedObservations"></param>
-        /// <param name="mode"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<int> ProcessAsync(
-            DataProvider dataProvider,            
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IAreaHelper areaHelper,
-            ObservationType observationType,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, areaHelper, mode != JobRunModes.Full, observationType);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, _processedVocabularyRepository, mode != JobRunModes.Full);
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
-            if (_processConfiguration.ParallelProcessing)
-            {
-                // 1. process public observations
-                return await ProcessObservationsParallel(dataProvider, observationFactory, observationType, mode, cancellationToken);
-            }
-
-            // Sequential processing is used for easier debugging.
-            return await ProcessObservationsSequential(dataProvider, observationFactory, taxa, mode, cancellationToken);
-        }
-
-        private async Task<int> ProcessObservationsParallel(
-            DataProvider dataProvider,
-            ArtportalenObservationFactory observationFactory,
-            ObservationType observationType,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            _artportalenVerbatimRepository.ObservationsType = observationType;
-            ProcessRepository.ObservationType = observationType;
 
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
@@ -178,7 +115,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 var batchEndId = batchStartId + ProcessRepository.WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
-                    cancellationToken));
+                    taxa, cancellationToken));
                 batchStartId = batchEndId + 1;
             }
 
@@ -195,6 +132,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="endId"></param>
         /// <param name="mode"></param>
         /// <param name="observationFactory"></param>
+        /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> ProcessBatchAsync(
@@ -203,6 +141,7 @@ namespace SOS.Process.Processors.Artportalen
             int endId,
             JobRunModes mode,
             ArtportalenObservationFactory observationFactory,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -218,11 +157,61 @@ namespace SOS.Process.Processors.Artportalen
                 }
 
                 Logger.LogDebug($"Start processing Artportalen batch ({startId}-{endId})");
-                var processedObservationsBatch =
-                    observationFactory.CreateProcessedObservations(verbatimObservationsBatch);
-                Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
 
-                return await ValidateAndStoreObservations(dataProvider, processedObservationsBatch, mode, $"{startId}-{endId}", cancellationToken);
+                var publicObservations = new List<Observation>();
+                var protectedObservations = new List<Observation>();
+
+                foreach (var verbatimObservation in verbatimObservationsBatch)
+                {
+                    var taxonId = verbatimObservation.TaxonId ?? -1;
+                    if (taxa.TryGetValue(taxonId, out var taxon))
+                    {
+                        if (!string.IsNullOrEmpty(verbatimObservation.URL))
+                        {
+                            // If we gone change properties for referenced taxon, we need to make a new object
+                            taxon = taxon.Clone();
+                            taxon.IndividualId = verbatimObservation.URL;
+                        }
+                    }
+
+                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, taxon);
+
+                    if (observation == null)
+                    {
+                        continue;
+                    }
+                    var taxonProtectionLevel = taxon?.ProtectionLevel?.Id ?? 0;
+                    if (verbatimObservation.IsProtected(taxonProtectionLevel))
+                    {
+                        observation.Protected = true;
+                        protectedObservations.Add(observation);
+
+                        //If it is a protected sighting, public users should not be possible to find it in the current month 
+                        if ((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
+                            (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
+                        {
+                            continue;
+                        }
+
+                        // Diffuse protected observation. Must recreate observation since cloned observation fails to store in ElasticSearch
+                        
+                        var protectionLevel = verbatimObservation.IsHiddenByProvider && taxonProtectionLevel < 3
+                            ? 3
+                            : taxonProtectionLevel;
+                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, taxon);
+                        _diffusionManager.DiffuseObservation(observation, protectionLevel);
+                    }
+
+                    // Add public observation
+                    publicObservations.Add(observation);
+                }
+
+                Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
+               
+                var publicCount = await ValidateAndStoreObservations(dataProvider, publicObservations, mode, false, $"{startId}-{endId}", cancellationToken);
+                var protectedCount = await ValidateAndStoreObservations(dataProvider, protectedObservations, mode, true,$"{startId}-{endId}", cancellationToken);
+
+                return publicCount; // Since public contains protected (diffused) observations, we return public count             // + protectedCount;
             }
             catch (JobAbortedException e)
             {
@@ -241,48 +230,24 @@ namespace SOS.Process.Processors.Artportalen
             return 0;
         }
 
-        private async Task<int> ProcessObservationsSequential(
-            DataProvider dataProvider,
-            ArtportalenObservationFactory observationFactory,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            var verbatimCount = 0;
-            ICollection<Observation> observations = new List<Observation>();
-           
-            using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
-            var batchId = 0;
-           
-            // Process and commit in batches.
-            await cursor.ForEachAsync(async verbatimObservation =>
-            {
-                observations.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
-                if (IsBatchFilledToLimit(observations.Count))
-                {
-                    verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, mode, batchId++.ToString(), cancellationToken);
-                }
-            });
-
-            // Commit remaining batch (not filled to limit).
-            if (observations.Any())
-            {
-                verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, mode, batchId.ToString(), cancellationToken);
-            }
-
-            return verbatimCount;
-        }
-
         private async Task<int> ValidateAndStoreObservations(
             DataProvider dataProvider,
             ICollection<Observation> observations,
             JobRunModes mode, 
+            bool protectedObservations,
             string batchId,
             IJobCancellationToken cancellationToken)
         {
             cancellationToken?.ThrowIfCancellationRequested();
 
+            if (!observations?.Any() ?? true)
+            {
+                return 0;
+            }
+
             observations = await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
+
+            Protected = protectedObservations;
 
             if (mode != JobRunModes.Full)
             {
@@ -293,7 +258,7 @@ namespace SOS.Process.Processors.Artportalen
 
             var verbatimCount = await CommitBatchAsync(dataProvider, observations, batchId);
 
-            if (mode == JobRunModes.Full)
+            if (mode == JobRunModes.Full && !protectedObservations)
             {
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }

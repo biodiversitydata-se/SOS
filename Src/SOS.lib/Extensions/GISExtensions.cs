@@ -259,7 +259,7 @@ namespace SOS.Lib.Extensions
                     break;
             }
 
-            return circle;
+            return circle is Polygon circlePolygon ? circlePolygon.MakeValid() : circle;
         }
 
         public static IFeature ToFeature(this IGeoShape geoShape, IDictionary<string, object> attributes = null)

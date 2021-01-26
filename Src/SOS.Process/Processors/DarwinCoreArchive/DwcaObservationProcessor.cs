@@ -14,7 +14,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -81,7 +80,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public override async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            ObservationType observationType,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
