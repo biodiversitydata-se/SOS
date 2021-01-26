@@ -19,7 +19,7 @@ namespace SOS.Process.Managers
         /// </summary>
         /// <param name="observation"></param>
         /// <param name="protectionLevel"></param>
-        private void DiffuseGeographicalData(Observation observation, int protectionLevel)
+        private void DiffuseGeographicalData(Observation observation)
         {
             if (observation.Location == null)
             {
@@ -64,7 +64,7 @@ namespace SOS.Process.Managers
                 return;
             }
 
-            var (mod, add) = GetDiffusionValues(protectionLevel);
+            var (mod, add) = GetDiffusionValues(observation.ProtectionLevel);
 
            
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
@@ -119,11 +119,11 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public Observation DiffuseObservation(Observation observation, int protectionLevel)
+        public void DiffuseObservation(Observation observation)
         {
             if (observation == null)
             {
-                return null;
+                return;
             }
 
             // Diffused observations is not protected
@@ -168,9 +168,7 @@ namespace SOS.Process.Managers
                 observation.Occurrence.RecordedBy = string.Empty;
             }
 
-            DiffuseGeographicalData(observation, protectionLevel);
-
-            return observation;
+            DiffuseGeographicalData(observation);
         }
     }
 }

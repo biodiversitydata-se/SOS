@@ -8,8 +8,7 @@ namespace SOS.Process.Managers.Interfaces
         ///  Diffuse a observation
         /// </summary>
         /// <param name="observation"></param>
-        /// <param name="protectionLevel"></param>
         /// <returns></returns>
-        Observation DiffuseObservation(Observation observation, int protectionLevel);
+        void DiffuseObservation(Observation observation);
     }
 }

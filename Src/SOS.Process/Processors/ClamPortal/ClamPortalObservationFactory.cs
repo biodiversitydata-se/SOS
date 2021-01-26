@@ -120,6 +120,7 @@ namespace SOS.Process.Processors.ClamPortal
                     OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
                     OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
+                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
                 DynamicProperties = string.IsNullOrEmpty(verbatimObservation.ProjectName)
                     ? null
                     : JsonConvert.SerializeObject(new {ProjectName = verbatimObservation.ProjectName}),

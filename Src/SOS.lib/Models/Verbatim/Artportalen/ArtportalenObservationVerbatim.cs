@@ -292,19 +292,5 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public IEnumerable<int> SightingPublishTypeIds { get; set; }
 
         public IEnumerable<int> SpeciesFactsIds { get; set; }
-
-        /// <summary>
-        /// Check if observation is hidden by provider
-        /// </summary>
-        /// <returns></returns>
-        [BsonIgnore]
-        public bool IsHiddenByProvider => HiddenByProvider.HasValue && HiddenByProvider.Value > DateTime.Now;
-
-        /// <summary>
-        /// Check if observation is protected
-        /// </summary>
-        /// <param name="taxonProtectionLevelId"></param>
-        /// <returns></returns>
-        public bool IsProtected(int taxonProtectionLevelId) => ProtectedBySystem || taxonProtectionLevelId > 2 || IsHiddenByProvider;
     }
 }

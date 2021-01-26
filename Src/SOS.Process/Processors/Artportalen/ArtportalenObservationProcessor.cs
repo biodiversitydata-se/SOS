@@ -180,8 +180,8 @@ namespace SOS.Process.Processors.Artportalen
                     {
                         continue;
                     }
-                    var taxonProtectionLevel = taxon?.ProtectionLevel?.Id ?? 0;
-                    if (verbatimObservation.IsProtected(taxonProtectionLevel))
+                   
+                    if (observation.ProtectionLevel > 2)
                     {
                         observation.Protected = true;
                         protectedObservations.Add(observation);
@@ -193,13 +193,9 @@ namespace SOS.Process.Processors.Artportalen
                             continue;
                         }
 
-                        // Diffuse protected observation. Must recreate observation since cloned observation fails to store in ElasticSearch
-                        
-                        var protectionLevel = verbatimObservation.IsHiddenByProvider && taxonProtectionLevel < 3
-                            ? 3
-                            : taxonProtectionLevel;
+                        // Diffuse protected observation before adding it to public index. Must recreate observation since cloned observation fails to store in ElasticSearch
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation, taxon);
-                        _diffusionManager.DiffuseObservation(observation, protectionLevel);
+                        _diffusionManager.DiffuseObservation(observation);
                     }
 
                     // Add public observation
