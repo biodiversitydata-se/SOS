@@ -98,9 +98,9 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish initialize area cache");
         }
 
-        private async Task InitializeElasticSearchAsync(JobRunModes mode, bool cleanStart)
+        private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
-            if (cleanStart && mode == JobRunModes.Full)
+            if (mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
                     $"Start clear ElasticSearch index: {_processedPublicObservationRepository.IndexName}");
@@ -165,14 +165,12 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
         /// <param name="mode"></param>
-        /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<bool> RunAsync(
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
-            bool cleanStart,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
@@ -181,7 +179,6 @@ namespace SOS.Process.Jobs
                 //-----------------
                 // 1. Arrange
                 //-----------------
-                var processStart = DateTime.Now;
                 _processedPublicObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
                 _processedProtectedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
 
@@ -216,16 +213,24 @@ namespace SOS.Process.Jobs
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
                 }
 
+                // Init indexes
+                await InitializeElasticSearchAsync(mode);
+                // Disable indexing for public and protected index
+                await DisableIndexingAsync();
+
                 //------------------------------------------------------------------------
-                // 5. Create public observation processing tasks, and wait for them to complete
+                // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                var success = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cleanStart, processStart, copyFromActiveOnFail, cancellationToken);
+                var success = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, copyFromActiveOnFail, cancellationToken);
 
                 //---------------------------------
-                // 8. Create ElasticSearch index
+                // 6. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
+                    // Enable indexing for public and protected index
+                    await EnableIndexingAsync();
+
                     // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
@@ -247,7 +252,7 @@ namespace SOS.Process.Jobs
                         }
                         
                         //----------------------------------------------------------------------------
-                        // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
                         var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
 
@@ -268,7 +273,7 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation($"Processing done: {success} {mode}");
 
                 //-------------------------------
-                // 10. Return processing result
+                // 8. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception("Failed to process observations.");
             }
@@ -296,18 +301,13 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
         /// <param name="mode"></param>
-        /// <param name="protectedObservations"></param>
         /// <param name="taxonById"></param>
-        /// <param name="cleanStart"></param>
-        /// <param name="processStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool cleanStart, DateTime processStart, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
         {
-            // Init public index
-            await InitializeElasticSearchAsync(mode, cleanStart);
-            await DisableIndexingAsync();
+            var processStart = DateTime.Now;
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
@@ -346,9 +346,6 @@ namespace SOS.Process.Jobs
                     success = copyTasks.All(t => t.Result);
                 }
             }
-
-            // Enable indexing for public and protected index
-            await EnableIndexingAsync();
 
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
 
@@ -578,14 +575,12 @@ namespace SOS.Process.Jobs
                 dataProvidersToProcess,
                 mode,
                 false,
-                false,
                 cancellationToken);
         }
 
         /// <inheritdoc />
         [DisplayName("Process verbatim observations for all active providers")]
         public async Task<bool> RunAsync(
-            bool cleanStart,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
@@ -596,7 +591,6 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 JobRunModes.Full,
-                true,
                 copyFromActiveOnFail,
                 cancellationToken);
         }

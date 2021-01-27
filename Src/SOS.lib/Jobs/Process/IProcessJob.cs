@@ -24,12 +24,10 @@ namespace SOS.Lib.Jobs.Process
         /// <summary>
         /// Run full process job
         /// </summary>
-        /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> RunAsync(
-            bool cleanStart,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken);
     }
