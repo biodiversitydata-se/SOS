@@ -44,7 +44,6 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob(
-            [FromQuery] bool cleanStart = true,
             [FromQuery] bool copyFromActiveOnFail = false)
         {
             try
@@ -56,7 +55,7 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult("No data providers is active.");
                 }
 
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(cleanStart, copyFromActiveOnFail,
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(copyFromActiveOnFail,
                     JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}.");

@@ -19,7 +19,6 @@ using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Managers.Interfaces;
@@ -98,9 +97,9 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish initialize area cache");
         }
 
-        private async Task InitializeMongoDbCollections(JobRunModes mode, bool cleanStart)
+        private async Task InitializeMongoDbCollections(JobRunModes mode)
         {
-            if (cleanStart && mode == JobRunModes.Full)
+            if (mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
                     $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
@@ -136,7 +135,6 @@ namespace SOS.Process.Jobs
         private async Task<bool> RunAsync(
             List<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
-            bool cleanStart,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
@@ -161,7 +159,7 @@ namespace SOS.Process.Jobs
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
                 var getTaxaTask = GetTaxa(mode);
-                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(mode), InitializeMongoDbCollections(mode, cleanStart));
+                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(mode), InitializeMongoDbCollections(mode));
 
                 var taxonById = await getTaxaTask;
 
@@ -512,14 +510,12 @@ namespace SOS.Process.Jobs
                 dataProvidersToProcess,
                 mode,
                 false,
-                false,
                 cancellationToken);
         }
 
         /// <inheritdoc />
         [DisplayName("Process verbatim observations for all active providers")]
         public async Task<bool> RunAsync(
-            bool cleanStart,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
@@ -530,7 +526,6 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 JobRunModes.Full,
-                true,
                 copyFromActiveOnFail,
                 cancellationToken);
         }
