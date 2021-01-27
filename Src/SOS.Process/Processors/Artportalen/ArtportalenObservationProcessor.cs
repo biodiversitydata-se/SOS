@@ -111,18 +111,18 @@ namespace SOS.Process.Processors.Artportalen
             _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
 
-            (await _artportalenVerbatimRepository.GetIdSpanAsync())
-                .Deconstruct(out var batchStartId, out var maxId);
+            var minId = 1;
+            var maxId = await _artportalenVerbatimRepository.GetMaxIdAsync();
             var processBatchTasks = new List<Task<int>>();
 
-            while (batchStartId <= maxId)
+            while (minId <= maxId)
             {
                 await _semaphoreBatch.WaitAsync();
 
-                var batchEndId = batchStartId + WriteBatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
+                var batchEndId = minId + WriteBatchSize - 1;
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, minId, batchEndId, mode, observationFactory,
                     taxa, cancellationToken));
-                batchStartId = batchEndId + 1;
+                minId = batchEndId + 1;
             }
 
             await Task.WhenAll(processBatchTasks);

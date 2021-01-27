@@ -26,7 +26,6 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\Vocabularies.json";
-            const int batchSize = 50000;
             var verbatimDbConfiguration = GetProcessDbConfiguration();
             var verbatimClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -58,7 +57,6 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\Vocabularies.msgpck";
-            const int batchSize = 50000;
             var verbatimDbConfiguration = GetProcessDbConfiguration();
             var verbatimClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
