@@ -681,8 +681,8 @@ namespace SOS.Observations.Api.Repositories
 
             var result = new GeoGridTileTaxonPageResult
             {
-                GeoTilePage = nextPageKey?["geoTile"].ToString(),
-                TaxonIdPage = nextPageKey == null ? null : (int?) Convert.ToInt32((long) nextPageKey["taxon"]),
+                NextGeoTilePage = nextPageKey?["geoTile"].ToString(),
+                NextTaxonIdPage = nextPageKey == null ? null : (int?) Convert.ToInt32((long) nextPageKey["taxon"]),
                 HasMorePages = nextPageKey != null,
                 GridCells = georesult
             };

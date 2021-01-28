@@ -135,8 +135,8 @@ namespace SOS.Observations.Api.Extensions
         {
             return new GeoGridTileTaxonPageResultDto
             {
-                GeoTilePage = pageResult.GeoTilePage,
-                TaxonIdPage = pageResult.TaxonIdPage,
+                NextGeoTilePage = pageResult.NextGeoTilePage,
+                NextTaxonIdPage = pageResult.NextTaxonIdPage,
                 HasMorePages = pageResult.HasMorePages,
                 GridCells = pageResult.GridCells.Select(m => m.ToGeoGridTileTaxaCellDto())
             };

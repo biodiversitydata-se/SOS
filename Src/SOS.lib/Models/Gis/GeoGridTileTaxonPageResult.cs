@@ -9,12 +9,12 @@ namespace SOS.Lib.Models.Gis
         /// <summary>
         /// The GeoTile page key.
         /// </summary>
-        public string GeoTilePage { get; set; }
+        public string NextGeoTilePage { get; set; }
 
         /// <summary>
         /// The TaxonId page key.
         /// </summary>
-        public int? TaxonIdPage { get; set; }
+        public int? NextTaxonIdPage { get; set; }
         public IEnumerable<GeoGridTileTaxaCell> GridCells { get; set; }
     }
 }

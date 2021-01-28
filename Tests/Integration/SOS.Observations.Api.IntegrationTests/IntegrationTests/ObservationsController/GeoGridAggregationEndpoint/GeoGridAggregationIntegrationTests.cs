@@ -91,8 +91,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 response = await _fixture.ObservationsController.InternalPagedGeogridTaxaAggregationAsync(
                     searchFilter, 
                     zoom, 
-                    result.GeoTilePage, 
-                    result.TaxonIdPage);
+                    result.NextGeoTilePage, 
+                    result.NextTaxonIdPage);
                 result = response.GetResult<GeoGridTileTaxonPageResultDto>();
                 gridCells.AddRange(result.GridCells);
                 nrRequests++;
