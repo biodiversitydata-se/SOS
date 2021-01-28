@@ -131,6 +131,34 @@ namespace SOS.Observations.Api.Extensions
 
         }
 
+        public static GeoGridTileTaxonPageResultDto ToGeoGridTileTaxonPageResultDto(this GeoGridTileTaxonPageResult pageResult)
+        {
+            return new GeoGridTileTaxonPageResultDto
+            {
+                GeoTilePage = pageResult.GeoTilePage,
+                TaxonIdPage = pageResult.TaxonIdPage,
+                HasMorePages = pageResult.HasMorePages,
+                GridCells = pageResult.GridCells.Select(m => m.ToGeoGridTileTaxaCellDto())
+            };
+        }
+
+        public static GeoGridTileTaxaCellDto ToGeoGridTileTaxaCellDto(this GeoGridTileTaxaCell cell)
+        {
+            return new GeoGridTileTaxaCellDto
+            {
+                BoundingBox = ToLatLonBoundingBoxDto(cell.BoundingBox),
+                GeoTile = cell.GeoTile,
+                X = cell.X,
+                Y = cell.Y,
+                Zoom = cell.Zoom,
+                Taxa = cell.Taxa.Select(m => new GeoGridTileTaxonObservationCountDto
+                {
+                    TaxonId = m.TaxonId,
+                    ObservationCount = m.ObservationCount
+                })
+            };
+        }
+
         public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult)
         {
             return new GeoGridResultDto
