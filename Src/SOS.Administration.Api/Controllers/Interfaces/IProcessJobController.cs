@@ -13,10 +13,9 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <summary>
         ///     Run process job
         /// </summary>
-        /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <returns></returns>
-        Task<IActionResult> RunProcessJob(bool cleanStart, bool copyFromActiveOnFail);
+        Task<IActionResult> RunProcessJob(bool copyFromActiveOnFail);
 
         /// <summary>
         /// Run process job for selected data providers
