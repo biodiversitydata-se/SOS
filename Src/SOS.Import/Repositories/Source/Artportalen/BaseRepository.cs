@@ -12,7 +12,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
     /// </summary>
     public class BaseRepository<T> : IBaseRepository<T>
     {
-        private readonly IArtportalenDataService _artportalenDataService;
+        /// <summary>
+        /// Data service
+        /// </summary>
+        protected IArtportalenDataService DataService
+        {
+            get;
+        }
 
         /// <summary>
         ///     Logger
@@ -26,7 +32,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         /// <param name="logger"></param>
         public BaseRepository(IArtportalenDataService artportalenDataService, ILogger<T> logger)
         {
-            _artportalenDataService =
+            DataService =
                 artportalenDataService ?? throw new ArgumentNullException(nameof(artportalenDataService));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -34,7 +40,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         /// <inheritdoc />
         public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null, bool live = false)
         {
-            return await _artportalenDataService.QueryAsync<E>(query, parameters, live);
+            return await DataService.QueryAsync<E>(query, parameters, live);
         }
     }
 }

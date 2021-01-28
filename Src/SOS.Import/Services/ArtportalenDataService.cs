@@ -15,23 +15,24 @@ namespace SOS.Import.Services
     /// </summary>
     public class ArtportalenDataService : IArtportalenDataService
     {
-        private readonly ArtportalenConfiguration _configuration;
+        /// <summary>
+        /// Create new db connection
+        /// </summary>
+        /// <param name="live"></param>
+        /// <returns></returns>
+        private IDbConnection Connection(bool live) => new SqlConnection(live ? Configuration.ConnectionStringLive : Configuration.ConnectionStringBackup);
 
         /// <summary>
         ///     Constructor
         /// </summary>
         public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration)
         {
-            _configuration = artportalenConfiguration ??
-                             throw new ArgumentNullException(nameof(artportalenConfiguration));
+            Configuration = artportalenConfiguration ??
+                            throw new ArgumentNullException(nameof(artportalenConfiguration));
         }
 
-        /// <summary>
-        /// Create new db connection
-        /// </summary>
-        /// <param name="live"></param>
-        /// <returns></returns>
-        private IDbConnection Connection (bool live )=> new SqlConnection(live ? _configuration.ConnectionStringLive : _configuration.ConnectionStringBackup);
+        /// <inheritdoc />
+        public ArtportalenConfiguration Configuration { get; }
 
         /// <inheritdoc />
         public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null, bool live = false)

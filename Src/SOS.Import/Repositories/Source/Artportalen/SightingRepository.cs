@@ -30,7 +30,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	        AND s.ValidationStatusId <> 50
             AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 
-            AND s.TaxonId IS NOT NULL";
+            AND s.TaxonId IS NOT NULL 
+             {(DataService.Configuration.HarvestStartDate.HasValue ?
+            $"AND s.StartDate >= '{DataService.Configuration.HarvestStartDate}'" 
+            :
+            "")}";
         
         /// <summary>
         /// Create sighting query
