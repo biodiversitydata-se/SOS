@@ -12,7 +12,7 @@ namespace SOS.Observations.Api.Extensions
 {
     public static class DtoExtensions
     {
-        private static FilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode)
+        private static FilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode, bool protectedObservations)
         {
             if (searchFilterBaseDto == null) return default;
 
@@ -29,6 +29,7 @@ namespace SOS.Observations.Api.Extensions
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.GenderIds = searchFilterBaseDto.Taxon?.GenderIds;
+            filter.ProtectedObservations = protectedObservations;
             filter.GeographicAreas = searchFilterBaseDto.Geometry?.Geometries == null
                 ? null
                 : new GeographicFilter
@@ -203,30 +204,30 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
-            return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
-            string translationCultureCode)
+            string translationCultureCode, bool protectedObservations)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
-        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode)
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
-        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode)
+        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
         public static IEnumerable<VocabularyDto> ToVocabularyDtos(this IEnumerable<Vocabulary> vocabularies, bool includeSystemMappings = true)

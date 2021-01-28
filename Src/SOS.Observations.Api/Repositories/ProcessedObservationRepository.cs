@@ -17,6 +17,7 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
+using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Models.AggregatedResult;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -54,14 +55,19 @@ namespace SOS.Observations.Api.Repositories
         {
             var publicIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
 
-            if (!filter?.ExtendedAuthorizations?.Any() ?? true)
+            if (!filter.ProtectedObservations)
             {
                 return publicIndex;
+            }           
+
+            if(filter.ProtectedObservations && (!filter?.ExtendedAuthorizations?.Any() ?? true))
+            {
+                throw new AuthenticationRequiredException("Not authorized");
             }
             
             var protectedIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, true)}".ToLower();
 
-            return $"{publicIndex},{protectedIndex}";
+            return protectedIndex;
         }
 
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;

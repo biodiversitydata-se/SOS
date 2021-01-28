@@ -10,6 +10,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -61,6 +62,10 @@ namespace SOS.Observations.Api.Managers
                 ResolveNonLocalizedVocabularyFields(processedObservations.Records);
                 return processedObservations;
             }
+            catch (AuthenticationRequiredException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get chunk of observations");
@@ -82,6 +87,10 @@ namespace SOS.Observations.Api.Managers
                     return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
                 return null;
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
