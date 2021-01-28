@@ -19,6 +19,7 @@ using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Swagger;
@@ -200,6 +201,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -215,6 +217,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Search")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SearchAsync(
             [FromBody] SearchFilterDto filter,
@@ -223,7 +226,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = true,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
 
             try
@@ -235,10 +239,14 @@ namespace SOS.Observations.Api.Controllers
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode);
+                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
                 var result = await ObservationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -260,6 +268,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -275,6 +284,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("SearchInternal")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchInternalAsync(
@@ -284,7 +294,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -296,9 +307,13 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var result = await ObservationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -311,6 +326,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("SearchAggregatedInternal")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchAggregatedInternalAsync(
@@ -319,7 +335,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -333,9 +350,13 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode), aggregationType, skip, take);
+                var result = await ObservationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -385,10 +406,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
             [FromBody] SearchFilterAggregationDto filter,
@@ -398,7 +421,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = true,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -414,7 +438,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoom, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoom, bbox);
 
                 if (result.IsFailure)
                 {
@@ -423,6 +447,10 @@ namespace SOS.Observations.Api.Controllers
 
                 GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -472,10 +500,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationInternal")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
@@ -486,7 +516,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -502,7 +533,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), zoom, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -510,6 +541,10 @@ namespace SOS.Observations.Api.Controllers
 
                 GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -529,10 +564,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
@@ -543,7 +580,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -559,7 +597,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode), zoomOrError.Value, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -568,6 +606,10 @@ namespace SOS.Observations.Api.Controllers
                 string strJson = result.Value.GetFeatureCollectionGeoJson();
                 var bytes = Encoding.UTF8.GetBytes(strJson);
                 return File(bytes, "application/json", "grid.geojson");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -588,10 +630,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregationAsync(
             [FromBody] SearchFilterAggregationDto filter,
@@ -602,7 +646,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = true,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -619,7 +664,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), bbox, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -627,6 +672,10 @@ namespace SOS.Observations.Api.Controllers
 
                 PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
                 return new OkObjectResult(dto);
+            }
+            catch(AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {
@@ -647,10 +696,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregationInternal")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternalAsync(
@@ -662,7 +713,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE")
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -680,7 +732,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), bbox, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -688,6 +740,10 @@ namespace SOS.Observations.Api.Controllers
 
                 PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {

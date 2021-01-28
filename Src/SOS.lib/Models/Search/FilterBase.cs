@@ -90,6 +90,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<ExtendedAuthorizationFilter> ExtendedAuthorizations { get; set; }
 
         /// <summary>
+        /// Only include ProtectedObservations
+        /// </summary>
+        public bool ProtectedObservations { get; set; }
+
+        /// <summary>
         ///     Field mapping translation culture code.
         ///     Available values.
         ///     sv-SE (Swedish)
