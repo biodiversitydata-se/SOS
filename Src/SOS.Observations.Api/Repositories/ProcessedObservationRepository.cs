@@ -125,28 +125,18 @@ namespace SOS.Observations.Api.Repositories
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
-            
+
+            var includeRealCount = totalCount >= ElasticSearchMaxRecords;
+
             if (filter is SearchFilterInternal)
             {
                 var internalFilter = filter as SearchFilterInternal;
-                if (internalFilter.IncludeRealCount)
-                {
-                    var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
-                        .Index(indexNames)
-                        .Query(q => q
-                            .Bool(b => b
-                                .MustNot(excludeQuery)
-                                .Filter(query)
-                            )
-                        )
-                    );
-                    if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
-                    totalCount = countResponse.Count;
-                }
+                includeRealCount = internalFilter.IncludeRealCount;
             }
-            else if (totalCount >= ElasticSearchMaxRecords) // calculate correct number of observations
+
+            if (includeRealCount)
             {
-                var observationCountResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
                     .Index(indexNames)
                     .Query(q => q
                         .Bool(b => b
@@ -155,8 +145,8 @@ namespace SOS.Observations.Api.Repositories
                         )
                     )
                 );
-                if (!observationCountResponse.IsValid) throw new InvalidOperationException(observationCountResponse.DebugInformation);
-                totalCount = observationCountResponse.Count;
+                if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
+                totalCount = countResponse.Count;
             }
 
             // Optional: explicitly send telemetry item:

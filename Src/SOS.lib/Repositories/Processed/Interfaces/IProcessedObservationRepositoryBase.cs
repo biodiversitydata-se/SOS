@@ -49,7 +49,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Delete observations by occurence id
         /// </summary>
         /// <param name="occurenceIds"></param>
-        Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds);
+        Task<bool> DeleteByOccurrenceIdAsync(IEnumerable<string> occurenceIds);
 
         /// <summary>
         /// Turn of indexing
@@ -108,6 +108,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
             FilterBase filter,
             string scrollId);
+
+        /// <summary>
+        /// Make sure no protected observations are in public index or no public observations are in protected index
+        /// </summary>
+        /// <returns>true if everything is fine</returns>
+        Task<bool?> ValidateProtectionLevelAsync();
 
         /// <summary>
         /// Verify that collection exists

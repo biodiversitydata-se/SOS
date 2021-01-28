@@ -160,6 +160,31 @@ namespace SOS.Process.Jobs
             _logger.LogInformation($"Finish enable indexing ({_processedProtectedObservationRepository.IndexName})");
         }
 
+        private async Task<bool> ValidateIndexesAsync()
+        {
+            var validationTasks = new[]
+            {
+                _processedPublicObservationRepository.ValidateProtectionLevelAsync(),
+                _processedProtectedObservationRepository.ValidateProtectionLevelAsync()
+            };
+
+            // Make sure no protected observations exists in public index and vice versa
+            await Task.WhenAll(validationTasks);
+            var success = (await Task.WhenAll(validationTasks)).All(t => t.HasValue && t.Value);
+
+            if (!success)
+            {
+                return false;
+            }
+
+            // Get 1000 occurence ids from protected index
+            var occurrenceIds = await _processedProtectedObservationRepository.GetOccurrenceIdsAsync(1000);
+            // Make sure that non of the protected observations exist in public
+            var absence = await _processedPublicObservationRepository.CheckAbsenceByOccurrenceIdAsync(occurrenceIds);
+
+            return absence.HasValue && absence.Value;
+        }
+
         /// <summary>
         ///  Run process job
         /// </summary>
@@ -230,6 +255,11 @@ namespace SOS.Process.Jobs
                 {
                     // Enable indexing for public and protected index
                     await EnableIndexingAsync();
+
+                    if (!await ValidateIndexesAsync())
+                    {
+                        throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                    }
 
                     // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)

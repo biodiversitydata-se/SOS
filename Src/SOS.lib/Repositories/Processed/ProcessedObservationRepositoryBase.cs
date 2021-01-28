@@ -25,7 +25,6 @@ namespace SOS.Lib.Repositories.Processed
         IProcessedObservationRepositoryBase
     {
         private const string ScrollTimeOut = "45s";
-        private readonly IElasticClient _elasticClient;
         private readonly string _indexPrefix;
         private readonly int _scrollBatchSize;
         private readonly int _numberOfShards;
@@ -34,7 +33,7 @@ namespace SOS.Lib.Repositories.Processed
 
         private async Task<bool> AddCollectionAsync()
         {
-            var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
+            var createIndexResponse = await ElasticClient.Indices.CreateAsync(IndexName, s => s
                 .IncludeTypeName(false)
                 .Settings(s => s
                     .NumberOfShards(_numberOfShards)
@@ -61,6 +60,16 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Delete collection
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> DeleteCollectionAsync()
+        {
+            var res = await ElasticClient.Indices.DeleteAsync(IndexName);
+            return res.IsValid;
+        }
+
+        /// <summary>
         ///     Write data to elastic search
         /// </summary>
         /// <param name="items"></param>
@@ -73,7 +82,7 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             //check
-            var currentAllocation = _elasticClient.Cat.Allocation();
+            var currentAllocation = ElasticClient.Cat.Allocation();
             if (currentAllocation != null && currentAllocation.IsValid)
             {
                 string diskUsageDescription = "Current diskusage in cluster:";
@@ -93,7 +102,7 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             var count = 0;
-            return _elasticClient.BulkAll(items, b => b
+            return ElasticClient.BulkAll(items, b => b
                     .Index(IndexName)
                     // how long to wait between retries
                     .BackOffTime("30s")
@@ -118,7 +127,7 @@ namespace SOS.Lib.Repositories.Processed
             ISearchResponse<Observation> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .SearchAsync<Observation>(s => s
                         .Index(IndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
@@ -128,7 +137,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
@@ -139,6 +148,8 @@ namespace SOS.Lib.Repositories.Processed
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
+
+        protected readonly IElasticClient ElasticClient;
 
         /// <summary>
         /// Constructor
@@ -157,7 +168,7 @@ namespace SOS.Lib.Repositories.Processed
         ) : base(client, true, logger)
         {
             _protected = protectedIndex;
-            _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+            ElasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _indexPrefix = elasticConfiguration?.IndexPrefix ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _scrollBatchSize = client.ReadBatchSize;
             _numberOfReplicas = elasticConfiguration.NumberOfReplicas;
@@ -181,20 +192,11 @@ namespace SOS.Lib.Repositories.Processed
             return items.Count();
         }
 
-        public async Task<bool> DisableIndexingAsync()
-        {
-            var updateSettingsResponse =
-                await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
-                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
-
-            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
-        }
-
         /// <inheritdoc />
-        public async Task EnableIndexingAsync()
+        public async Task<bool> ClearCollectionAsync()
         {
-            await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(1)));
+            await DeleteCollectionAsync();
+            return await AddCollectionAsync();
         }
 
         /// <inheritdoc />
@@ -214,25 +216,13 @@ namespace SOS.Lib.Repositories.Processed
             return success;
         }
 
-        public async Task<bool> ClearCollectionAsync()
-        {
-            await DeleteCollectionAsync();
-            return await AddCollectionAsync();
-        }
-
-        public async Task<bool> DeleteCollectionAsync()
-        {
-            var res = await _elasticClient.Indices.DeleteAsync(IndexName);
-            return res.IsValid;
-        }
-
         /// <inheritdoc />
-        public async Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds)
+        public async Task<bool> DeleteByOccurrenceIdAsync(IEnumerable<string> occurenceIds)
         {
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
+                var res = await ElasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Terms(t => t
@@ -257,7 +247,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
+                var res = await ElasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -279,7 +269,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
+                var res = await ElasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Terms(t => t
@@ -299,11 +289,28 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<bool> DisableIndexingAsync()
+        {
+            var updateSettingsResponse =
+                await ElasticClient.Indices.UpdateSettingsAsync(IndexName,
+                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
+
+            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
+        }
+
+        /// <inheritdoc />
+        public async Task EnableIndexingAsync()
+        {
+            await ElasticClient.Indices.UpdateSettingsAsync(IndexName,
+                p => p.IndexSettings(g => g.RefreshInterval(1)));
+        }
+
+        /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
             try
             {
-                var res = await _elasticClient.SearchAsync<Observation>(s => s
+                var res = await ElasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -334,7 +341,7 @@ namespace SOS.Lib.Repositories.Processed
             ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                searchResponse = await ElasticClient.SearchAsync<dynamic>(s => s
                     .Index(IndexName)
                     .Source(source => source
                         .Includes(fieldsDescriptor => fieldsDescriptor
@@ -351,7 +358,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
             }
 
@@ -374,7 +381,7 @@ namespace SOS.Lib.Repositories.Processed
             ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                searchResponse = await ElasticClient.SearchAsync<dynamic>(s => s
                     .Index(IndexName)
                     .Source(source => source
                         .Includes(fieldsDescriptor => fieldsDescriptor
@@ -391,7 +398,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
@@ -422,7 +429,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Field("location.pointWithBuffer")
                     );
                
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .SearchAsync<dynamic>(s => s
                         .Index(IndexName)
                         .Source(p => projection)
@@ -438,7 +445,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
@@ -465,7 +472,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Field("location.pointWithBuffer")
                     );
 
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .SearchAsync<dynamic>(s => s
                         .Index(IndexName)
                         .Source(p => projection)
@@ -480,7 +487,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await ElasticClient
                     .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
             }
 
@@ -496,9 +503,35 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<bool?> ValidateProtectionLevelAsync()
+        {
+            try
+            {
+                var countResponse = await ElasticClient.CountAsync<Observation>(s => s
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Term(t => t.Field(f => f.Protected).Value(!_protected))
+                    )
+                );
+
+                if (!countResponse.IsValid)
+                {
+                    throw new InvalidOperationException(countResponse.DebugInformation);
+                }
+
+                return countResponse.Count.Equals(0);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()
         {
-            var response = await _elasticClient.Indices.ExistsAsync(IndexName);
+            var response = await ElasticClient.Indices.ExistsAsync(IndexName);
 
             if (!response.Exists)
             {
