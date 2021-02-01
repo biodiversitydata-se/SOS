@@ -12,6 +12,7 @@ using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using Xunit;
@@ -59,7 +60,12 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
             var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
-            siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>())).ReturnsAsync(new List<SiteEntity>());
+
+            var processedDbConfiguration = GetProcessDbConfiguration();
+            var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
+            var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
+            var areaHelper = new AreaHelper(areaRepository);
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -74,7 +80,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 speciesCollectionItemRepository,
                 processedPublicObservationRepository,
                 processedProtectedObservationRepository,
-                new ArtportalenMetadataContainer(), 
+                new ArtportalenMetadataContainer(),
+                areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -115,9 +122,14 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
-            siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()));
             var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
             var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
+
+            var processedDbConfiguration = GetProcessDbConfiguration();
+            var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
+            var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
+            var areaHelper = new AreaHelper(areaRepository);
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -132,7 +144,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 speciesCollectionItemRepository,
                 processedPublicObservationRepository,
                 processedProtectedObservationRepository,
-                new ArtportalenMetadataContainer(), 
+                new ArtportalenMetadataContainer(),
+                areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

@@ -181,6 +181,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Red list database: urn:lsid:artdata.slu.se:SpeciesObservation:{id}
         /// </summary>
         // ReSharper disable once InconsistentNaming
+        [Keyword]
         public string OccurrenceId { get; set; }
 
         /// <summary>

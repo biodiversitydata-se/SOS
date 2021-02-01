@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Containers.Interfaces;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -38,6 +39,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
         private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
+        private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
 
@@ -58,7 +60,6 @@ namespace SOS.Import.Harvesters.Observations
         /// Harvest all sightings
         /// </summary>
         /// <param name="harvestFactory"></param>
-        /// <param name="protectedObservations"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
@@ -340,6 +341,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
@@ -355,6 +357,7 @@ namespace SOS.Import.Harvesters.Observations
             IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
+            IAreaHelper areaHelper,
             ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
@@ -375,6 +378,7 @@ namespace SOS.Import.Harvesters.Observations
             _processedPublicObservationRepository = processedPublicObservationRepository ?? throw new ArgumentNullException(nameof(processedPublicObservationRepository));
             _processedProtectedObservationRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -438,7 +442,8 @@ namespace SOS.Import.Harvesters.Observations
                     _siteRepository,
                     _sightingRelationRepository,
                     _speciesCollectionRepository,
-                    _artportalenMetadataContainer
+                    _artportalenMetadataContainer,
+                    _areaHelper
                 )
                 {
                     IncrementalMode = mode != JobRunModes.Full

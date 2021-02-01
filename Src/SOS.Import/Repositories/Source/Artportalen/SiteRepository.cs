@@ -19,76 +19,17 @@ namespace SOS.Import.Repositories.Source.Artportalen
         private string GetSiteQuery(string join) =>
             $@"
                 SELECT 
-	               s.Id,
+	                s.Id,
 	                ISNULL(s.PresentationName, s.Name) AS Name,
 	                s.XCoord,
 	                s.YCoord,
                     s.Accuracy,
-					s.ExternalId,
-	                am.FeatureId AS MunicipalityFeatureId,
-	                am.Name AS MunicipalityName,
-	                amp.FeatureId AS CountyFeatureId,
-	                amp.Name AS CountyName,
-	                ap.FeatureId AS ProvinceFeatureId,
-	                ap.Name AS ProvinceName,
-	                acp.FeatureId AS CountryPartFeatureId,
-	                acp.Name AS CountryPartName,
-	                apa.FeatureId AS ParishFeatureId,
-	                apa.Name AS ParishName,
-					s.ParentId AS ParentSiteId,
-					s.PresentationNameParishRegion
+				    s.ExternalId,
+				    s.ParentId AS ParentSiteId,
+				    s.PresentationNameParishRegion
                 FROM 
 	                Site s 
-                    { join } 
-	                LEFT JOIN -- Bad data exists, some sites are connected to more than one Municipality
-	                (
-		                 SELECT
-			                sa.SiteId,
-			                sa.AreasId,
-							a.FeatureId,
-							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS MunicipalityIndex
-		                FROM
-			                SiteAreas sa
-			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 1 
-	                ) AS sam ON s.Id = sam.SiteId AND sam.MunicipalityIndex = 1
-	                LEFT JOIN Area am ON sam.AreasId = am.Id
-					LEFT JOIN Area amp ON am.ParentId = amp.Id
-	                LEFT JOIN -- Bad data exists, some sites are connected to more than one province
-	                (
-		                SELECT
-			                sa.SiteId,
-			                sa.AreasId,
-							a.FeatureId,
-							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS ProvinceIndex
-		                FROM
-			                SiteAreas sa
-			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 16 
-	                ) AS sap ON s.Id = sap.SiteId AND sap.ProvinceIndex = 1
-	                LEFT JOIN Area ap ON sap.AreasId = ap.Id
-	                LEFT JOIN -- Bad data exists, some sites are connected to more than one country part
-	                (
-		                SELECT
-			                sa.SiteId,
-			                sa.AreasId,
-							a.FeatureId,
-							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS CountyIndex
-		                FROM
-			                SiteAreas sa
-			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 13 
-	                ) AS sacp ON s.Id = sacp.SiteId AND sacp.CountyIndex = 1
-	                LEFT JOIN Area acp ON sacp.AreasId = acp.Id
-	                LEFT JOIN -- Bad data exists, some sites are connected to more than one parish
-	                (
-		                SELECT
-			                sa.SiteId,
-			                sa.AreasId,
-							a.FeatureId,
-							ROW_NUMBER() OVER (PARTITION BY sa.SiteId ORDER BY sa.AreasId) AS ParishIndex
-						FROM
-			                SiteAreas sa
-			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 19 
-	                ) AS sapa ON s.Id = sapa.SiteId AND sapa.ParishIndex = 1
-	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
+                    { join }";
 
 
         /// <summary>
@@ -130,15 +71,49 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SiteEntity>> GetAsync()
+        public async Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds)
         {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
             try
             {
-                return await QueryAsync<SiteEntity>(GetSiteQuery("INNER JOIN SearchableSightings ss ON s.Id = ss.SiteId"));
+                const string query = @"
+                SELECT 
+                    sa.SiteId,
+                    a.AreaDatasetId,
+		            a.FeatureId,
+                    a.Name
+	            FROM 
+		            SiteAreas sa
+		            INNER JOIN Area a ON sa.AreasId = a.Id 
+                    INNER JOIN @sid s ON sa.SiteId = s.Id
+                WHERE
+                    a.AreaDatasetId IN (1, 16, 18, 19, 21)";
+
+                var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
+
+                var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
+                if (siteAreaEntities?.Any() ?? false)
+                {
+                    foreach (var siteAreaEntity in siteAreaEntities)
+                    {
+                        if (!siteAreas.TryGetValue(siteAreaEntity.SiteId, out var areas))
+                        {
+                            areas = new List<AreaEntityBase>();
+                            siteAreas.Add(siteAreaEntity.SiteId, areas);
+                        }
+                        areas.Add(siteAreaEntity);
+                    }
+                }
+                return siteAreas;
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error getting sites");
+                Logger.LogError(e, "Error getting sites areas");
                 return null;
             }
         }
@@ -155,7 +130,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<string>>> GetSiteBirdValidationAreaIds(int[] siteIds)
+        public async Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -166,30 +141,16 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 const string query = @"
                 SELECT 
-                    sa.SiteId,
-		            a.FeatureId
+                    sg.SiteId,
+                    sg.Geometry.STAsText() AS GeometryWKT
 	            FROM 
-		            SiteAreas sa
-		            INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 18
-                    INNER JOIN @sid s ON sa.SiteId = s.Id";
+		            SiteGeometry sg 
+                    INNER JOIN @sid s ON sg.SiteId = s.Id";
 
-                var siteBirdValidationAreas = (await QueryAsync<(int SiteId, string FeatureId)>(query,
+                var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
                     new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
 
-                var siteAreas = new Dictionary<int, ICollection<string>>();
-                if (siteBirdValidationAreas?.Any() ?? false)
-                {
-                    foreach (var siteBirdValidationArea in siteBirdValidationAreas)
-                    {
-                        if (!siteAreas.TryGetValue(siteBirdValidationArea.SiteId, out var areas))
-                        {
-                            areas = new List<string>();
-                            siteAreas.Add(siteBirdValidationArea.SiteId, areas);
-                        }
-                        areas.Add(siteBirdValidationArea.FeatureId);
-                    }
-                }
-                return siteAreas;
+                return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
             }
             catch (Exception e)
             {

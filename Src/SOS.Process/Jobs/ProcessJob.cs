@@ -160,29 +160,82 @@ namespace SOS.Process.Jobs
             _logger.LogInformation($"Finish enable indexing ({_processedProtectedObservationRepository.IndexName})");
         }
 
+        /// <summary>
+        /// Validate that no protected data is accessable (undiffusedgf) from public index
+        /// </summary>
+        /// <returns></returns>
         private async Task<bool> ValidateIndexesAsync()
         {
+            var protectedCount = (int)await _processedProtectedObservationRepository.IndexCount();
+            if (protectedCount < 1)
+            {
+                // No protected observations found. No more validation can be done
+                return true;
+            }
+
             var validationTasks = new[]
             {
                 _processedPublicObservationRepository.ValidateProtectionLevelAsync(),
-                _processedProtectedObservationRepository.ValidateProtectionLevelAsync()
+                _processedProtectedObservationRepository.ValidateProtectionLevelAsync(),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount)
             };
 
             // Make sure no protected observations exists in public index and vice versa
             await Task.WhenAll(validationTasks);
-            var success = (await Task.WhenAll(validationTasks)).All(t => t.HasValue && t.Value);
+            return (await Task.WhenAll(validationTasks)).All(t => t);
+        }
 
-            if (!success)
+        /// <summary>
+        /// Validate 1000 random observations
+        /// </summary>
+        /// <param name="protectedCount"></param>
+        /// <returns></returns>
+        private async Task<bool> ValidateRandomObservations(int protectedCount)
+        {
+            var observationsCount = 1000;
+            var skip = protectedCount > observationsCount ? new Random().Next(1, protectedCount - observationsCount) : 1;
+
+            // Get 1000 random observations from protected index
+            var protectedObservations = (await _processedProtectedObservationRepository.GetObservationsAsync(skip, observationsCount))?
+                .Where(o => o.Occurrence != null)
+                .ToDictionary(o => o.Occurrence.OccurrenceId, o => o);
+
+            if (protectedObservations?.Any() ?? false)
             {
-                return false;
+                // Try to get diffused observations 
+                var diffusedObservations = (await _processedPublicObservationRepository.GetObservationsAsync(protectedObservations.Keys))?
+                    .Where(o => o.Occurrence != null)
+                    .ToDictionary(o => o.Occurrence.OccurrenceId, o => o); ;
+
+                if (!diffusedObservations?.Any() ?? true)
+                {
+                    return true;
+                }
+
+                foreach (var protectedObservation in protectedObservations)
+                {
+                    // Try to get diffused observation with same occurenceId from public index
+                    if (!diffusedObservations.TryGetValue(protectedObservation.Key, out var publicObservation))
+                    {
+                        continue;
+                    }
+
+                    // If observation coordinates equals, something is wrong. Validation failed
+                    if (protectedObservation.Value.Location.DecimalLatitude ==
+                        publicObservation.Location.DecimalLatitude ||
+                        protectedObservation.Value.Location.DecimalLongitude ==
+                        publicObservation.Location.DecimalLongitude)
+                    {
+                        return false;
+                    }
+                }
             }
 
-            // Get 1000 occurence ids from protected index
-            var occurrenceIds = await _processedProtectedObservationRepository.GetOccurrenceIdsAsync(1000);
-            // Make sure that non of the protected observations exist in public
-            var absence = await _processedPublicObservationRepository.CheckAbsenceByOccurrenceIdAsync(occurrenceIds);
-
-            return absence.HasValue && absence.Value;
+            return true;
         }
 
         /// <summary>
@@ -256,12 +309,14 @@ namespace SOS.Process.Jobs
                     // Enable indexing for public and protected index
                     await EnableIndexingAsync();
 
+                    _logger.LogInformation($"Start validate indexes");
                     if (!await ValidateIndexesAsync())
                     {
                         throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
                     }
+                    _logger.LogInformation($"Finish validate indexes");
 
-                    // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
+                    // Toggle active instance if we are done
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
                         _logger.LogInformation($"Toggle instance {_processedPublicObservationRepository.ActiveInstance} => {_processedPublicObservationRepository.InActiveInstance}");

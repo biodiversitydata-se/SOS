@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -9,10 +10,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IProcessedProtectedObservationRepository : IProcessedObservationRepositoryBase
     {
         /// <summary>
-        /// Get occurrences id's
+        ///  Get random observations
         /// </summary>
-        /// <param name="noOfOccurrences"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<string>> GetOccurrenceIdsAsync(int noOfOccurrences);
+        Task<IEnumerable<Observation>> GetObservationsAsync(int skip, int take);
     }
 }

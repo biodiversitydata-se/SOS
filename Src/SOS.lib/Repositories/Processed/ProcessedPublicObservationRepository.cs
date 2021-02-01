@@ -34,13 +34,16 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool?> CheckAbsenceByOccurrenceIdAsync(IEnumerable<string> occurrenceIds)
+        public async Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds)
         {
             try
             {
-                var countResponse = await ElasticClient.CountAsync<Observation>(s => s
+                var searchResponse = await ElasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
-                    .Query(q => q
+                    .Source(s => s
+                        .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
+                    )
+                   .Query(q => q
                         .Terms(t => t
                             .Field(f => f.Occurrence.OccurrenceId)
                             .Terms(occurrenceIds)
@@ -48,12 +51,12 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 );
 
-                if (!countResponse.IsValid)
+                if (!searchResponse.IsValid)
                 {
-                    throw new InvalidOperationException(countResponse.DebugInformation);
+                    throw new InvalidOperationException(searchResponse.DebugInformation);
                 }
 
-                return countResponse.Count.Equals(0);
+                return searchResponse.Documents;
             }
             catch (Exception e)
             {
@@ -61,6 +64,5 @@ namespace SOS.Lib.Repositories.Processed
                 return null;
             }
         }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -35,21 +34,31 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> GetOccurrenceIdsAsync(int noOfOccurrences)
+        public async Task<IEnumerable<Observation>> GetObservationsAsync(int skip, int take)
         {
-            var searchResponse = await ElasticClient.SearchAsync<Observation>(s => s
-                .Index(IndexName)
-                .Source(s => s.Includes(i => i.Fields(f => f.Occurrence.OccurrenceId)))
-                .From(0)
-                .Size(noOfOccurrences)
-            );
-
-            if (!searchResponse.IsValid)
+            try
             {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
+                var searchResponse = await ElasticClient.SearchAsync<Observation>(s => s
+                    .Index(IndexName)
+                    .Source(s => s
+                        .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
+                    )
+                    .From(skip)
+                    .Size(take)
+                );
 
-            return searchResponse.Documents.Select(o => o.Occurrence.OccurrenceId);
+                if (!searchResponse.IsValid)
+                {
+                    throw new InvalidOperationException(searchResponse.DebugInformation);
+                }
+
+                return searchResponse.Documents;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return null;
+            }
         }
     }
 }

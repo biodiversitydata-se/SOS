@@ -71,6 +71,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <returns></returns>
+        Task<long> IndexCount();
+
+        /// <summary>
         ///     Get observation by scroll
         /// </summary>
         /// <param name="filter"></param>
@@ -113,7 +119,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Make sure no protected observations are in public index or no public observations are in protected index
         /// </summary>
         /// <returns>true if everything is fine</returns>
-        Task<bool?> ValidateProtectionLevelAsync();
+        Task<bool> ValidateProtectionLevelAsync();
 
         /// <summary>
         /// Verify that collection exists

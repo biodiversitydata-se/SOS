@@ -334,6 +334,29 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<long> IndexCount()
+        {
+            try
+            {
+                var countResponse = await ElasticClient.CountAsync<Observation>(s => s
+                    .Index(IndexName)
+                );
+
+                if (!countResponse.IsValid)
+                {
+                    throw new InvalidOperationException(countResponse.DebugInformation);
+                }
+
+                return countResponse.Count;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return -1;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
             FilterBase filter,
             string scrollId)
@@ -503,7 +526,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool?> ValidateProtectionLevelAsync()
+        public async Task<bool> ValidateProtectionLevelAsync()
         {
             try
             {
@@ -524,7 +547,7 @@ namespace SOS.Lib.Repositories.Processed
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                return null;
+                return false;
             }
         }
 

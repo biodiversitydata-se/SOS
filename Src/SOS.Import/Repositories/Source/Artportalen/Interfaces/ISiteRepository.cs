@@ -10,10 +10,11 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
     public interface ISiteRepository
     {
         /// <summary>
-        ///     Get all sites
+        /// Get areas connected to sites
         /// </summary>
+        /// <param name="siteIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<SiteEntity>> GetAsync();
+        Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds);
 
         /// <summary>
         /// Get sites by id
@@ -24,10 +25,10 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live = false);
 
         /// <summary>
-        /// 
+        /// Get site geometry
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<string>>> GetSiteBirdValidationAreaIds(int[] siteIds);
+        Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds);
     }
 }

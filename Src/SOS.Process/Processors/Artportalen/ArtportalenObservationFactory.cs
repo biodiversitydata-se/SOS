@@ -143,6 +143,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Country = new VocabularyValue {Id = (int) CountryId.Sweden};
                 obs.Location.CountryCode = CountryCode.Sweden;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
+                obs.Location.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
                 obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
                 obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
@@ -160,6 +161,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
+                obs.Location.ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate;
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord.ToString() : null;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";

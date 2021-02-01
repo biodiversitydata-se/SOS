@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -9,10 +10,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IProcessedPublicObservationRepository : IProcessedObservationRepositoryBase
     {
         /// <summary>
-        /// Make sure that no observation with passed occurrence id's exists in index
+        /// Get observations by occurrence id
         /// </summary>
         /// <param name="occurrenceIds"></param>
         /// <returns></returns>
-        Task<bool?> CheckAbsenceByOccurrenceIdAsync(IEnumerable<string> occurrenceIds);
+        Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds);
     }
 }
