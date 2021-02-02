@@ -6,7 +6,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
-    public class SharkObservationVerbatimRepository : RepositoryBase<SharkObservationVerbatim, ObjectId>,
+    public class SharkObservationVerbatimRepository : VerbatimRepositoryBase<SharkObservationVerbatim, ObjectId>,
         ISharkObservationVerbatimRepository
     {
         public SharkObservationVerbatimRepository(

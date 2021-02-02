@@ -87,7 +87,7 @@ namespace SOS.Lib.Repositories
         /// <summary>
         /// Name of collection
         /// </summary>
-        protected string CollectionName => $"{_collectionName}{(IncrementalMode ? "_incremental" : "")}";
+        protected virtual string CollectionName => $"{_collectionName}{(IncrementalMode ? "_incremental" : "")}";
 
         protected readonly IMongoClient Client;
 
@@ -126,7 +126,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>

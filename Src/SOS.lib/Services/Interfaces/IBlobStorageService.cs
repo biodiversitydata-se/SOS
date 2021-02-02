@@ -46,7 +46,7 @@ namespace SOS.Lib.Services.Interfaces
         /// List export files
         /// </summary>
         /// <returns></returns>
-        IEnumerable<File> GetExportFiles();
+        Task<IEnumerable<File>> GetExportFilesAsync();
 
         /// <summary>
         ///     Upload blob to storage

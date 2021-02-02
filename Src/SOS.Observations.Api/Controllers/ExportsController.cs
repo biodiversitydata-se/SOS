@@ -52,11 +52,11 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult GetExportFiles()
+        public async Task<IActionResult> GetExportFilesAsync()
         {
             try
             {
-                var files = _blobStorageManager.GetExportFiles();
+                var files = await _blobStorageManager.GetExportFilesAsync();
 
                 return new OkObjectResult(files);
             }

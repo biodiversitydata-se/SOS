@@ -45,6 +45,8 @@ namespace SOS.Import.Harvesters.Observations
             _sersServiceConfiguration = sersServiceConfiguration ??
                                         throw new ArgumentNullException(nameof(sersServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _sersObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -104,6 +106,11 @@ namespace SOS.Import.Harvesters.Observations
 
                     xmlDocument = await _sersObservationService.GetAsync(changeId + 1);
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for SERS verbatim");
+                await _sersObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for SERS verbatim");
+
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");
 
                 // Update harvest info

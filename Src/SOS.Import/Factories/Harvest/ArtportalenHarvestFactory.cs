@@ -220,7 +220,6 @@ namespace SOS.Import.Factories.Harvest
                 return null;
             }
 
-            
             var sightingProjectIds = (await _sightingRepository.GetSightingProjectIdsAsync(sightingIds))?.ToArray();
 
             if (!sightingProjectIds?.Any() ?? true)
@@ -243,12 +242,14 @@ namespace SOS.Import.Factories.Harvest
                 if (!sightingsProjects.TryGetValue(sightingId, out var sightingProjects))
                 {
                     sightingProjects = new Dictionary<int, Project>();
-                    sightingsProjects.Add(sightingId, sightingProjects);
+                    sightingsProjects.TryAdd(sightingId, sightingProjects);
                 }
 
                 if (!sightingProjects.ContainsKey(projectId))
                 {
-                    sightingProjects.Add(project.Id, project.Clone());
+                    
+                    // Make a copy of project so we can add params to it later
+                    sightingProjects.TryAdd(project.Id, project.Clone());
                 }
             }
 
@@ -271,26 +272,22 @@ namespace SOS.Import.Factories.Harvest
                     {
                         // Sighting projects is missing, add it
                         sightingProjects = new Dictionary<int, Project>();
-                        sightingsProjects.Add(projectParameterEntity.SightingId, sightingProjects);
+                        sightingsProjects.TryAdd(projectParameterEntity.SightingId, sightingProjects);
                     }
 
                     if (project == null)
                     {
-                        if (!_artportalenMetadataContainer.Projects.ContainsKey(projectParameterEntity.ProjectId))
+                        if (!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project))
                         {
                             continue;
                         }
 
                         // Get project from all projects
-                        project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId];
-                        sightingProjects.Add(project.Id, project.Clone());
+             
+                        sightingProjects.TryAdd(project.Id, project.Clone());
                     }
 
-                    if (project.ProjectParameters == null)
-                    {
-                        project.ProjectParameters = new List<ProjectParameter>();
-                    }
-
+                    project.ProjectParameters ??= new List<ProjectParameter>();
                     project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
                 }
             }
@@ -392,7 +389,7 @@ namespace SOS.Import.Factories.Harvest
             Geometry siteGeometry = null;
             if (!string.IsNullOrEmpty(geometryWkt))
             {
-                siteGeometry = geometryWkt.ToGeometry()
+                siteGeometry = geometryWkt.ToGeometry().Buffer(0)
                     .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 

@@ -346,7 +346,7 @@ namespace SOS.Lib.Extensions
                             new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
                         .ToArray();
 
-                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
+                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray()).MakeValid();
                 case "multipolygon":
                     var multiPolygons = (MultiPolygonGeoShape)geoShape;
                     var polygons = new List<Polygon>();

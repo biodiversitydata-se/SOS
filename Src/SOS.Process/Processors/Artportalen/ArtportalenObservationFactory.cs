@@ -159,7 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Point = point;
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
-                obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
+                obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer?.ToGeoShape();
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
                 obs.Location.ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate;
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;

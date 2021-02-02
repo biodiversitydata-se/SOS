@@ -45,6 +45,8 @@ namespace SOS.Import.Harvesters.Observations
             _kulServiceConfiguration = kulServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(kulServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _kulObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -96,6 +98,10 @@ namespace SOS.Import.Harvesters.Observations
              
                     xmlDocument = await _kulObservationService.GetAsync(changeId + 1 );
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for KUL verbatim");
+                await _kulObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for KUL verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
 

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using FastDeepCloner;
 
 namespace SOS.Lib.Extensions
 {
@@ -94,14 +92,6 @@ namespace SOS.Lib.Extensions
             }
         }
 
-        private static FastDeepCloner.FastDeepClonerSettings CloneSettings => new FastDeepCloner.FastDeepClonerSettings()
-        {
-            FieldType = FastDeepCloner.FieldType.FieldInfo,
-            CloneLevel = CloneLevel.Hierarki,
-            OnCreateInstance = new FastDeepCloner.Extensions.CreateInstance((Type type) =>
-                FormatterServices.GetUninitializedObject(type))
-        };
-
         /// <summary>
         /// Creates a deep copy of an object.
         /// </summary>
@@ -110,7 +100,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static T Clone<T>(this T original) where T : class
         {
-            return FastDeepCloner.DeepCloner.Clone(original, CloneSettings);
+            return DotNetCore.Mapping.Extensions.Clone(original);
         }
 
         #region ConcurrentDictionary

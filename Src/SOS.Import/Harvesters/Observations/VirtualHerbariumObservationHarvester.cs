@@ -44,6 +44,8 @@ namespace SOS.Import.Harvesters.Observations
                                                     throw new ArgumentNullException(
                                                         nameof(virtualHerbariumServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _virtualHerbariumObservationVerbatimRepository.TempMode = true;
         }
 
         /// <inheritdoc />
@@ -100,6 +102,10 @@ namespace SOS.Import.Harvesters.Observations
                         await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
                     _logger.LogDebug($"Finish getting observations page: {pageIndex}");
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for Virtual Herbarium verbatim");
+                await _virtualHerbariumObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for Virtual Herbarium verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for Virtual Herbarium data provider");
 

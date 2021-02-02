@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 
