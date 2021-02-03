@@ -379,7 +379,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
             processedLocation.CoordinateUncertaintyInMeters =
-                verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt() ?? DefaultCoordinateUncertaintyInMeters;
+                verbatimObservation.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
             processedLocation.Country = GetSosId(
                 verbatimObservation.Country,
                 _vocabularyById[VocabularyId.Country],

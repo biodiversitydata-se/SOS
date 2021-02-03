@@ -190,6 +190,22 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Parses the value as Double and then converts it to Int32.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public static int? ParseDoubleConvertToInt(this string value, bool trim = true)
+        {
+            if (TryParseDouble(value, out double result, trim))
+            {
+                return Convert.ToInt32(result);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         ///     Parse a Int32 value.
         /// </summary>
         /// <param name='value'>String Int32 value to parse.</param>

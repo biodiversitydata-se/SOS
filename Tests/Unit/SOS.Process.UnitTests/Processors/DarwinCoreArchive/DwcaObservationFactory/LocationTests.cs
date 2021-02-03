@@ -213,5 +213,34 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLongitude.Should().BeApproximately(14.98998, 0.0001);
             result.Location.GeodeticDatum.Should().Be("EPSG:4326");
         }
+
+        [Theory]
+        [InlineData("5", 5)]
+        [InlineData(null, 5000)]
+        [InlineData("4.699999809265137", 5)]
+        [InlineData("11.28600025177002", 11)]
+        public void Succeeds_to_parse_coordinateUncertaintyInMeters(
+            string input,
+            int? expectedValue)
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithCoordinateUncertaintyInMeters(input)
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Location.CoordinateUncertaintyInMeters.Should().Be(expectedValue);
+        }
     }
 }
