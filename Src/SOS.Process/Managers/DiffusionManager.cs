@@ -126,6 +126,8 @@ namespace SOS.Process.Managers
                 return;
             }
 
+            observation.DiffuseStatus = DiffuseStatus.DiffusedBySystem;
+
             // Diffused observations is not protected
             observation.Protected = false;
             observation.ReportedBy = string.Empty;

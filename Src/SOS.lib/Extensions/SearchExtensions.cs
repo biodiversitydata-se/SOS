@@ -869,6 +869,7 @@ namespace SOS.Lib.Extensions
             query.TryAddGeographicFilter(filter.GeographicAreas);
             query.AddSightingTypeFilters(filter);
 
+            query.TryAddTermsCriteria("diffuseStatus", filter.DiffuseStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("occurrence.gender.id", filter.GenderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);

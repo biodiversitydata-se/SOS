@@ -7,6 +7,22 @@ using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
+    public enum DiffuseStatus
+    {
+        /// <summary>
+        /// Observation is not diffused
+        /// </summary>
+        NotDiffused = 0,
+        /// <summary>
+        /// Observation is diffused by the system and the non diffused original exists in the protected index
+        /// </summary>
+        DiffusedBySystem,
+        /// <summary>
+        /// Observation is diffused by provider. No original data exists in the system
+        /// </summary>
+        DiffusedByProvider
+    }
+
     /// <summary>
     ///     This class contains information about a species sighting
     /// </summary>
@@ -18,7 +34,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public Observation()
         {
             Created = DateTime.Now;
+            DiffuseStatus = DiffuseStatus.NotDiffused;
         }
+
 
         /// <summary>
         ///     List of defects found in harvest
@@ -26,6 +44,11 @@ namespace SOS.Lib.Models.Processed.Observation
         [Object]
         [SwaggerExclude]
         public IDictionary<string, string> Defects { get; set; }
+
+        /// <summary>
+        /// Observation diffuse status
+        /// </summary>
+        public DiffuseStatus DiffuseStatus { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to an event (an

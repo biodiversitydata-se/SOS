@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Search
 {
@@ -78,6 +79,11 @@ namespace SOS.Lib.Models.Search
         ///     Only get data from these providers
         /// </summary>
         public IEnumerable<int> DataProviderIds { get; set; }
+
+        /// <summary>
+        /// Filter by diffuse status
+        /// </summary>
+        public IEnumerable<DiffuseStatus> DiffuseStatuses { get; set; }
 
         /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.

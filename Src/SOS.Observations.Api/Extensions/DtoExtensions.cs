@@ -2,6 +2,7 @@
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
@@ -17,6 +18,7 @@ namespace SOS.Observations.Api.Extensions
             if (searchFilterBaseDto == null) return default;
 
             var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? new SearchFilterInternal() : new SearchFilter();
+
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
@@ -58,6 +60,8 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
+            filter.DiffuseStatuses = searchFilterBaseDto.DiffuseStatuses?.Select(dsd => (DiffuseStatus) dsd);
+
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
                 filter.OutputFields = searchFilterDto.OutputFields;
@@ -73,8 +77,8 @@ namespace SOS.Observations.Api.Extensions
                     filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
                     filter.OutputFields = searchFilterInternalDto.OutputFields;
                 }
-            } 
-            
+            }
+
             return filter;
         }
 
