@@ -199,8 +199,8 @@ namespace SOS.Process.Processors.Artportalen
                             continue;
                         }
 
-                        // Diffuse protected observation before adding it to public index. Must recreate observation since cloned observation fails to store in ElasticSearch
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, taxon);
+                        // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
+                        observation = observation.Clone();
                         _diffusionManager.DiffuseObservation(observation);
                     }
 

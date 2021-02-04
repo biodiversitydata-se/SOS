@@ -188,6 +188,46 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        
+        /// <summary>
+        /// Count matching observations
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpPost("Count")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> CountAsync(
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
+                var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
+                var matchCount = await ObservationManager.GetMatchCountAsync(searchFilter);
+
+                return new OkObjectResult(matchCount);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Count error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <summary>
         ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
         ///     object
@@ -251,6 +291,46 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Search error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Count matching observations using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpPost("CountInternal")]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> CountInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
+                var matchCount = await ObservationManager.GetMatchCountAsync(searchFilter);
+
+                return new OkObjectResult(matchCount);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Internal count error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

@@ -11,6 +11,18 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IObservationsController
     {
         /// <summary>
+        /// Count matching observations
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> CountAsync(
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool protectedObservations = false);
+
+        /// <summary>
         ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
         ///     object
         ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
@@ -41,6 +53,18 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
+
+        /// <summary>
+        /// Count matching observations using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> CountInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool protectedObservations = false);
 
         /// <summary>
         ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
