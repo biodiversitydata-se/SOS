@@ -32,16 +32,13 @@ namespace SOS.Observations.Api.Extensions
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.GenderIds = searchFilterBaseDto.Taxon?.GenderIds;
             filter.ProtectedObservations = protectedObservations;
-            filter.GeographicAreas = searchFilterBaseDto.Geometry?.Geometries == null
+            filter.Geometries = searchFilterBaseDto.Geometry?.Geometries == null
                 ? null
-                : new GeographicFilter
+                : new GeometryFilter
                 {
-                    GeometryFilter = new GeometryFilter
-                        {
-                            Geometries = searchFilterBaseDto.Geometry.Geometries,
-                            MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
-                            UsePointAccuracy = searchFilterBaseDto.Geometry.UsePointAccuracy
-                        }
+                    Geometries = searchFilterBaseDto.Geometry.Geometries,
+                    MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
+                    UsePointAccuracy = searchFilterBaseDto.Geometry.UsePointAccuracy
                 };
 
             if (searchFilterBaseDto.OccurrenceStatus != null)

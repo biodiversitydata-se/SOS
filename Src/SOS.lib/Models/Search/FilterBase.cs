@@ -71,6 +71,16 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
+        /// Area geometry will be used for all types of areas if true
+        /// </summary>
+        public bool AreaGeometrySearchForced { get; set; }
+
+        /// <summary>
+        /// Filter on area geometries 
+        /// </summary>
+        public GeographicFilter AreaGeographic { get; set; }
+
+        /// <summary>
         /// Geographical areas to filter by
         /// </summary>
         public IEnumerable<AreaFilter> Areas { get; set; }
@@ -114,9 +124,9 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<int> GenderIds { get; set; }
 
         /// <summary>
-        /// Filter on geographical areas
+        /// Geometry filter
         /// </summary>
-        public GeographicFilter GeographicAreas { get; set; }
+        public GeometryFilter Geometries { get; set; }
 
         /// <summary>
         ///     Decides whether to search for the exact taxa or

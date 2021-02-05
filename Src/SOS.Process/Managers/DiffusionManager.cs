@@ -77,9 +77,10 @@ namespace SOS.Process.Managers
                 add);
 
             //retransform to the correct format again
+            var coordinateUncertaintyInMeters = location.CoordinateUncertaintyInMeters ?? 0;
             var diffusedPoint =
                 diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            var diffusedPolygon = ((NetTopologySuite.Geometries.Point) diffusedPoint).ToCircle(mod);
+            var diffusedPolygon = ((NetTopologySuite.Geometries.Point) diffusedPoint).ToCircle(coordinateUncertaintyInMeters > mod ? coordinateUncertaintyInMeters : mod);
 
             // Set location diffused geographical data
             location.DecimalLongitude = diffusedPoint.Coordinate.X;

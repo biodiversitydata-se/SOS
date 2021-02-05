@@ -73,7 +73,7 @@ namespace SOS.Lib.Managers
 
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
-                extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters);
+                extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, false);
                 extendedAuthorizationFilter.TaxonIds = PopulateTaxonFilter(authority.TaxonIds, true);
 
                 // To get extended authorization, taxon id's and some area must be set 
@@ -116,7 +116,13 @@ namespace SOS.Lib.Managers
             return taxonIds.Contains(BiotaTaxonId) ? null : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
         }
 
-        private async Task<GeographicFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas)
+        /// <summary>
+        /// Populate geographical filter
+        /// </summary>
+        /// <param name="areas"></param>
+        /// <param name="areaGeometrySearchForced"></param>
+        /// <returns></returns>
+        private async Task<GeographicFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, bool areaGeometrySearchForced)
         {
             if (!areas?.Any() ?? true)
             {
@@ -126,6 +132,12 @@ namespace SOS.Lib.Managers
             var geographicFilter = new GeographicFilter();
             foreach (var areaFilter in areas)
             {
+                if (areaGeometrySearchForced)
+                {
+                    await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, true);
+                    continue;
+                }
+
                 switch (areaFilter.AreaType)
                 {
                     case AreaType.County:
@@ -150,21 +162,34 @@ namespace SOS.Lib.Managers
                         (geographicFilter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                         break;
                     default:
-                        var geometry = await _areaCache.GetGeometryAsync(areaFilter.AreaType, areaFilter.FeatureId);
-
-                        if (geometry != null)
-                        {
-                            (geographicFilter.GeometryFilter ??= new GeometryFilter
-                            {
-                                MaxDistanceFromPoint = 0
-                            }).Geometries.Add(geometry);
-                        }
-
+                        await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, false);
                         break;
                 }
             }
 
             return geographicFilter;
+        }
+
+        /// <summary>
+        /// Add geometry to geographic filter
+        /// </summary>
+        /// <param name="geographicFilter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <param name="usePointAccuracy"></param>
+        /// <returns></returns>
+        private async Task AddGeometryAsync(GeographicFilter geographicFilter, AreaType areaType, string featureId, bool usePointAccuracy)
+        {
+            var geometry = await _areaCache.GetGeometryAsync(areaType, featureId);
+
+            if (geometry != null)
+            {
+                (geographicFilter.GeometryFilter ??= new GeometryFilter
+                {
+                    MaxDistanceFromPoint = 0,
+                    UsePointAccuracy = usePointAccuracy
+                }).Geometries.Add(geometry);
+            }
         }
 
         /// <summary>
@@ -184,7 +209,7 @@ namespace SOS.Lib.Managers
         public async Task PrepareFilter(FilterBase filter)
         {
             filter.ExtendedAuthorizations = await AddAuthorizationAsync();
-            filter.GeographicAreas = await PopulateGeographicalFilterAsync(filter.Areas);
+            filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, filter.AreaGeometrySearchForced);
             filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa);
         }
     }

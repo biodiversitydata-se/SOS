@@ -866,7 +866,8 @@ namespace SOS.Lib.Extensions
             query.AddAuthorizationFilters(filter);
             query.TryAddDateRangeFilters(filter);
             query.TryAddTimeRangeFilters(filter);
-            query.TryAddGeographicFilter(filter.GeographicAreas);
+            query.TryAddGeographicFilter(filter.AreaGeographic);
+            query.TryAddGeometryFilters(filter.Geometries);
             query.AddSightingTypeFilters(filter);
 
             query.TryAddTermsCriteria("diffuseStatus", filter.DiffuseStatuses?.Select(ds => (int)ds));
@@ -894,14 +895,14 @@ namespace SOS.Lib.Extensions
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            if (filter.GeographicAreas?.GeometryFilter?.IsValid ?? false)
+            if (filter.AreaGeographic?.GeometryFilter?.IsValid ?? false)
             {
-                foreach (var geom in filter.GeographicAreas?.GeometryFilter.Geometries)
+                foreach (var geom in filter.AreaGeographic?.GeometryFilter.Geometries)
                 {
                     switch (geom.Type.ToLower())
                     {
                         case "holepolygon":
-                            if (filter.GeographicAreas.GeometryFilter.UsePointAccuracy)
+                            if (filter.AreaGeographic.GeometryFilter.UsePointAccuracy)
                             {
                                 query.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
                             }

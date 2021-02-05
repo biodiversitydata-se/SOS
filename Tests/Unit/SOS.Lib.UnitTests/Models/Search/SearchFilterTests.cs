@@ -20,7 +20,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                GeographicAreas = new GeographicFilter
+                AreaGeographic = new GeographicFilter
                 {
                     CountyIds = new[] { "5", "24", "14" },
                     GeometryFilter = new GeometryFilter
@@ -64,7 +64,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                GeographicAreas = new GeographicFilter
+                AreaGeographic = new GeographicFilter
                 {
                     CountyIds = new[] { "14", "5", "24" },
                     GeometryFilter = new GeometryFilter
