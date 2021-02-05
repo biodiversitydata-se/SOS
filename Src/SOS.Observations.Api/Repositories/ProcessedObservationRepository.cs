@@ -650,5 +650,36 @@ namespace SOS.Observations.Api.Repositories
             // When operation is disposed, telemetry item is sent.
             return Result.Success(gridResult);
         }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
+            SearchFilter filter) 
+        {
+            var indexNames = GetIndexNames(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("taxon_group", t => t
+                        .Field("taxon.id")
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return searchResponse.Aggregations
+                .Terms("taxon_group")
+                .Buckets
+                .Select(b => new TaxonAggregationItem{ TaxonId = int.Parse(b.Key), ObservationCount = (int)(b.DocCount ?? 0) });
+        }
     }
 }

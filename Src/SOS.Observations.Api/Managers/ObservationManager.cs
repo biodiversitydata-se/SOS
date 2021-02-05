@@ -10,7 +10,9 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Exceptions;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -168,6 +170,23 @@ namespace SOS.Observations.Api.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get taxon aggregation");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            SearchFilter filter)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter);
+                var result = await _processedObservationRepository.GetTaxonExistsIndicationAsync(filter);
+                return result?.ToTaxonAggregationItemDtos();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get taxon exists indication");
                 throw;
             }
         }

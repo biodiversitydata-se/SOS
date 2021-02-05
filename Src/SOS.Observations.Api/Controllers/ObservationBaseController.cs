@@ -170,6 +170,53 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        /// <summary>
+        /// Make sure filter contains taxa
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="allowUnderlyingTaxa"></param>
+        /// <returns></returns>
+        protected Result ValidateTaxonExists(SearchFilterBaseDto filter, bool allowUnderlyingTaxa)
+        {
+            var errors = new List<string>();
+
+            var taxonCount = filter?.Taxon?.TaxonIds?.Count() ?? 0;
+
+            if (taxonCount == 0)
+            {
+                errors.Add("You must provide taxon id's");
+            }
+
+            if (taxonCount > 10000)
+            {
+                errors.Add("You can not provide more than 10000 taxon id's in one request");
+            }
+
+            if ((filter?.Taxon?.IncludeUnderlyingTaxa ?? false) && !allowUnderlyingTaxa)
+            {
+                errors.Add("You are not allowed to include underlying taxa");
+            }
+
+            return errors.Count > 0 
+                ? Result.Failure(string.Join(". ", errors))
+                : Result.Success();
+        }
+
+        /// <summary>
+        /// Make sure geographical data 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        protected Result ValidateGeographicalAreaExists(SearchFilterBaseDto filter)
+        {
+            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries.Any() ?? true))
+            {
+                Result.Failure("You must provide area/s or geometry");
+            }
+
+            return Result.Success();
+        }
+
         protected Result ValidateTranslationCultureCode(string translationCultureCode)
         {
             // No culture code, set default

@@ -296,6 +296,31 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetTaxonExistsIndicationAsync(
+            SearchFilterDto filter,
+            bool validateSearchFilter = true,
+            bool protectedObservations = false);
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetTaxonExistsIndicationInternalAsync(
+           SearchFilterInternalDto filter,
+           bool validateSearchFilter = false,
+           bool protectedObservations = false);
+
         /// <summary>
         /// Get latest data modified date for passed provider 
         /// </summary>

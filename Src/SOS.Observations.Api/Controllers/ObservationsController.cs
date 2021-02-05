@@ -303,7 +303,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
         [HttpPost("CountInternal")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -828,6 +828,99 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "TaxonAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpPost("TaxonExistsIndication")]
+        [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTaxonExistsIndicationAsync(
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(), 
+                    ValidateTaxonExists(filter, false),
+                    ValidateGeographicalAreaExists(filter));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
+               // Force area geometry search in order to use point with buffer
+                searchFilter.AreaGeometrySearchForced = true;
+                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
+
+                return new OkObjectResult(taxonFound);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Get indication if taxon exists error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpPost("TaxonExistsIndicationInternal")]
+        [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetTaxonExistsIndicationInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateTaxonExists(filter, false),
+                    ValidateGeographicalAreaExists(filter));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
+                // Force area geometry search in order to use point with buffer
+                searchFilter.AreaGeometrySearchForced = true;
+                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
+
+                return new OkObjectResult(taxonFound);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Get indication if taxon exists Internal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

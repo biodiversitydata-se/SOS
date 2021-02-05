@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
@@ -80,5 +81,13 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             LatLonBoundingBox bbox,
             int skip,
             int take);
+
+        /// <summary>
+        /// Get indication if taxa exists in specified area
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
+            SearchFilter filter);
     }
 }
