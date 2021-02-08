@@ -28,7 +28,7 @@ export class InvalidMapComponent implements OnInit {
       tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenStreetMap' })
     ],
     zoom: 5,
-    center: latLng(46.879966, -121.726909)
+    center: latLng(59.819541868159256, 17.73797190347293)
   };  
   loadingData: boolean = false;
   markerClusterOptions = {};

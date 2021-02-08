@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
+using System.Text.Json.Serialization;
 
 namespace SOS.Administration.Gui
 {
@@ -28,6 +30,10 @@ namespace SOS.Administration.Gui
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            services.AddMvcCore().AddJsonOptions(options =>
+                  {
+                      options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                  });
             services.Configure<MongoDbConfiguration>(
                 Configuration.GetSection(nameof(MongoDbConfiguration)));
 
@@ -42,6 +48,8 @@ namespace SOS.Administration.Gui
 
             services.Configure<ApplicationInsightsConfiguration>(
               Configuration.GetSection(nameof(ApplicationInsightsConfiguration)));
+            services.AddTransient<ISearchService, SearchService>();
+            services.AddTransient<ITestService, TestService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
