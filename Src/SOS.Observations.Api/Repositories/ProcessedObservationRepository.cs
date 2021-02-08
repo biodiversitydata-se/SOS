@@ -47,17 +47,25 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <summary>
+        /// Name of public index 
+        /// </summary>
+        private string PublicIndex => $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
+
+        /// <summary>
+        /// Name of protected index 
+        /// </summary>
+        private string ProtectedIndex => $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, true)}".ToLower();
+        
+        /// <summary>
         /// Get public index name and also protected index name if user is authorized
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private string GetIndexNames(FilterBase filter)
+        private string GetCurrentIndex(FilterBase filter)
         {
-            var publicIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
-
             if (!filter.ProtectedObservations)
             {
-                return publicIndex;
+                return PublicIndex;
             }           
 
             if(filter.ProtectedObservations && (!filter?.ExtendedAuthorizations?.Any() ?? true))
@@ -65,9 +73,7 @@ namespace SOS.Observations.Api.Repositories
                 throw new AuthenticationRequiredException("Not authorized");
             }
             
-            var protectedIndex = $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, true)}".ToLower();
-
-            return protectedIndex;
+            return ProtectedIndex;
         }
 
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
@@ -100,7 +106,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
@@ -166,7 +172,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType)
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
             
@@ -233,7 +239,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
 
@@ -351,7 +357,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
-            var indexNames = GetIndexNames(null);
+            var indexNames = GetCurrentIndex(null);
           
             try
             {
@@ -381,7 +387,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
@@ -404,7 +410,7 @@ namespace SOS.Observations.Api.Repositories
             int skip,
             int take)
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
 
@@ -505,7 +511,7 @@ namespace SOS.Observations.Api.Repositories
                 LatLonBoundingBox bbox)
         {
             const int maxNrReturnedBuckets = 10000;
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
@@ -581,7 +587,7 @@ namespace SOS.Observations.Api.Repositories
                 LatLonBoundingBox bbox)
         {
             const int maxNrReturnedBuckets = 10000;
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
@@ -770,7 +776,7 @@ namespace SOS.Observations.Api.Repositories
             if (nextPage == null) // First request
             {
                 searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                    .Index(_indexName)
+                    .Index(PublicIndex)
                     .Size(0)
                     .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
                         .Size(MaxNrElasticSearchAggregationBuckets)
@@ -791,7 +797,7 @@ namespace SOS.Observations.Api.Repositories
             else
             {
                 searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                    .Index(_indexName)
+                    .Index(PublicIndex)
                     .Size(0)
                     .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
                         .Size(MaxNrElasticSearchAggregationBuckets)
@@ -838,7 +844,7 @@ namespace SOS.Observations.Api.Repositories
             if (nextPage == null) // First request
             {
                 searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                    .Index(_indexName)
+                    .Index(PublicIndex)
                     .Size(0)
                     .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
                         .Size(MaxNrElasticSearchAggregationBuckets)
@@ -870,7 +876,7 @@ namespace SOS.Observations.Api.Repositories
             else
             {
                 searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                    .Index(_indexName)
+                    .Index(PublicIndex)
                     .Size(0)
                     .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
                         .Size(MaxNrElasticSearchAggregationBuckets)
@@ -904,8 +910,6 @@ namespace SOS.Observations.Api.Repositories
             return searchResponse;
         }
 
-
-
         private static int AddGeoTileTaxonResultToDictionary(
             CompositeBucketAggregate compositeAgg, 
             Dictionary<string, Dictionary<int, long?>> taxaByGeoTile)
@@ -925,7 +929,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
             SearchFilter filter) 
         {
-            var indexNames = GetIndexNames(filter);
+            var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s

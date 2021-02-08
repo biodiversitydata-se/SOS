@@ -717,7 +717,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bbox, geoTilePage, taxonIdPage);
+                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, false), zoom, bbox, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
