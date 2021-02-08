@@ -61,12 +61,12 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class DateFilterDto
     {
         /// <summary>
-        ///     Observation start date specified in the ISO 8601 standard.
+        ///     Observation start date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed
         /// </summary>
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        ///     Observation end date specified in the ISO 8601 standard.
+        ///     Observation end date specified in the ISO 8601 standard. If no timezone is specified, GMT+1 (CEST) is assumed
         /// </summary>
         [JsonConverter(typeof(EndDayConverter))]
         public DateTime? EndDate { get; set; }

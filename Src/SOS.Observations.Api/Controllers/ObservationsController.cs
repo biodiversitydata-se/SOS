@@ -134,7 +134,14 @@ namespace SOS.Observations.Api.Controllers
             return boundingBox;
         }
 
-        private async Task<Result<Envelope>> ValidateBoundingBoxAsync(double? left, double? top, double? right, double? bottom, int zoom, SearchFilterBaseDto filter)
+        private async Task<Result<Envelope>> ValidateBoundingBoxAsync(
+            double? left, 
+            double? top, 
+            double? right, 
+            double? bottom, 
+            int zoom, 
+            SearchFilterBaseDto filter,
+            bool checkNrTilesLimit = true)
         {
             if (left.HasValue && top.HasValue && right.HasValue && bottom.HasValue)
             {
@@ -160,7 +167,7 @@ namespace SOS.Observations.Api.Controllers
             var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
             var maxTilesTot = maxLonTiles * maxLatTiles;
 
-            if (maxTilesTot > _tilesLimit)
+            if (checkNrTilesLimit && maxTilesTot > _tilesLimit)
             {
                 return Result.Failure<Envelope>($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using lower zoom or a smaller bounding box.");
             }
@@ -633,6 +640,185 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Aggregates observations into grid cells and taxa. Each grid cell contains a list of all taxa (usually species)
+        /// in the grid cell and the number of observations. 
+        /// The grid cells are squares in WGS84 coordinate system which means that they also
+        /// will be squares in the WGS84 Web Mercator coordinate system.
+        /// </summary>
+        /// <remarks>
+        /// Due to paging, the last grid cell in the result usually does not contain all its taxa.
+        /// The remaining taxa will be retrieved in the next page.
+        /// The following table shows the approximate grid cell size (width) in different
+        /// coordinate systems for the different zoom levels.
+        /// | Zoom level | WGS84    | Web Mercator  |  SWEREF99TM(Southern Sweden) |  SWEREF99TM(North Sweden) |
+        /// |------------|----------|---------------|:----------------------------:|:-------------------------:|
+        /// | 1          |      180 |       20000km |                       8000km |                   12000km |
+        /// | 2          |       90 |       10000km |                       4000km |                    6000km |
+        /// | 3          |       45 |        5000km |                       2000km |                    3000km |
+        /// | 4          |     22.5 |        2500km |                       1000km |                    1500km |
+        /// | 5          |    11.25 |        1250km |                        500km |                     750km |
+        /// | 6          |    5.625 |         600km |                        250km |                     360km |
+        /// | 7          |   2.8125 |         300km |                        120km |                     180km |
+        /// | 8          | 1.406250 |         150km |                         60km |                      90km |
+        /// | 9          | 0.703125 |          80km |                         30km |                      45km |
+        /// | 10         | 0.351563 |          40km |                         15km |                      23km |
+        /// | 11         | 0.175781 |          20km |                          8km |                      11km |
+        /// | 12         | 0.087891 |          10km |                          4km |                       6km |
+        /// | 13         | 0.043945 |           5km |                          2km |                       3km |
+        /// | 14         | 0.021973 |         2500m |                        1000m |                     1400m |
+        /// | 15         | 0.010986 |         1200m |                         500m |                      700m |
+        /// | 16         | 0.005493 |          600m |                         240m |                      350m |
+        /// | 17         | 0.002747 |          300m |                         120m |                      180m |
+        /// | 18         | 0.001373 |          150m |                          60m |                       90m |
+        /// | 19         | 0.000687 |           80m |                          30m |                       45m |
+        /// | 20         | 0.000343 |           40m |                          15m |                       22m |
+        /// | 21         | 0.000172 |           19m |                           7m |                       11m |
+        /// </remarks>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="zoom">A zoom level between 1 and 21.</param>
+        /// <param name="geoTilePage">The GeoTile key used to retrieve the next next page of data. Should be null in the first request.</param>
+        /// <param name="taxonIdPage">The TaxonId key used to retrieve the next page of data. Should be null in the first request.</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <returns></returns>
+        [HttpPost("GeoGridTaxaAggregationInternal")]
+        [ProducesResponseType(typeof(GeoGridTileTaxonPageResultDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> InternalPagedGeogridTaxaAggregationAsync(
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] int zoom = 1,
+            [FromQuery] string geoTilePage = null,
+            [FromQuery] int? taxonIdPage = null,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE")
+        {
+            try
+            {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter, false);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
+                if (paramsValidationResult.IsFailure)
+                {
+                    return BadRequest(paramsValidationResult.Error);
+                }
+
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bbox, geoTilePage, taxonIdPage);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                GeoGridTileTaxonPageResultDto dto = result.Value.ToGeoGridTileTaxonPageResultDto();
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GeoGridAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        ///// <summary>
+        ///// Aggregates observations into grid cells. Each grid cell contains a list of all taxa (usually species)
+        ///// in the grid cell and the number of observations.
+        ///// The grid cells are squares in WGS84 coordinate system which means that they also
+        ///// will be squares in the WGS84 Web Mercator coordinate system.
+        ///// </summary>
+        ///// <remarks>
+        ///// The following table shows the approximate grid cell size (width) in different
+        ///// coordinate systems for the different zoom levels.
+        ///// | Zoom level | WGS84    | Web Mercator  |  SWEREF99TM(Southern Sweden) |  SWEREF99TM(North Sweden) |
+        ///// |------------|----------|---------------|:----------------------------:|:-------------------------:|
+        ///// | 1          |      180 |       20000km |                       8000km |                   12000km |
+        ///// | 2          |       90 |       10000km |                       4000km |                    6000km |
+        ///// | 3          |       45 |        5000km |                       2000km |                    3000km |
+        ///// | 4          |     22.5 |        2500km |                       1000km |                    1500km |
+        ///// | 5          |    11.25 |        1250km |                        500km |                     750km |
+        ///// | 6          |    5.625 |         600km |                        250km |                     360km |
+        ///// | 7          |   2.8125 |         300km |                        120km |                     180km |
+        ///// | 8          | 1.406250 |         150km |                         60km |                      90km |
+        ///// | 9          | 0.703125 |          80km |                         30km |                      45km |
+        ///// | 10         | 0.351563 |          40km |                         15km |                      23km |
+        ///// | 11         | 0.175781 |          20km |                          8km |                      11km |
+        ///// | 12         | 0.087891 |          10km |                          4km |                       6km |
+        ///// | 13         | 0.043945 |           5km |                          2km |                       3km |
+        ///// | 14         | 0.021973 |         2500m |                        1000m |                     1400m |
+        ///// | 15         | 0.010986 |         1200m |                         500m |                      700m |
+        ///// | 16         | 0.005493 |          600m |                         240m |                      350m |
+        ///// | 17         | 0.002747 |          300m |                         120m |                      180m |
+        ///// | 18         | 0.001373 |          150m |                          60m |                       90m |
+        ///// | 19         | 0.000687 |           80m |                          30m |                       45m |
+        ///// | 20         | 0.000343 |           40m |                          15m |                       22m |
+        ///// | 21         | 0.000172 |           19m |                           7m |                       11m |
+        ///// </remarks>
+        ///// <param name="filter">The search filter.</param>
+        ///// <param name="zoom">A zoom level between 1 and 21.</param>
+        ///// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        ///// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        ///// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        ///// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        ///// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        ///// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        ///// <returns></returns>
+        //[HttpPost("GeoGridTaxaAggregationCompleteInternal")]
+        //[ProducesResponseType(typeof(IEnumerable<GeoGridTileTaxaCellDto>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        //[ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        //[InternalApi]
+        //public async Task<IActionResult> InternalCompleteGeogridTaxaAggregationAsync(
+        //    [FromBody] SearchFilterAggregationInternalDto filter,
+        //    [FromQuery] int zoom = 1,
+        //    [FromQuery] double? bboxLeft = null,
+        //    [FromQuery] double? bboxTop = null,
+        //    [FromQuery] double? bboxRight = null,
+        //    [FromQuery] double? bboxBottom = null,
+        //    [FromQuery] bool validateSearchFilter = false,
+        //    [FromQuery] string translationCultureCode = "sv-SE")
+        //{
+        //    try
+        //    {
+        //        var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter, false);
+        //        var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+        //        var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
+
+        //        var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
+        //            ValidateTranslationCultureCode(translationCultureCode));
+        //        if (paramsValidationResult.IsFailure)
+        //        {
+        //            return BadRequest(paramsValidationResult.Error);
+        //        }
+
+        //        var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+        //        var result = await ObservationManager.GetCompleteGeoTileTaxaAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode), zoom, bbox);
+        //        if (result.IsFailure)
+        //        {
+        //            return BadRequest(result.Error);
+        //        }
+
+        //        IEnumerable<GeoGridTileTaxaCellDto> dto = result.Value.Select(m => m.ToGeoGridTileTaxaCellDto());
+        //        return new OkObjectResult(dto);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e, "GeoGridAggregation error.");
+        //        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        //    }
+        //}
 
         /// <summary>
         /// Aggregates observations into grid cells and returns a GeoJSON file with all grid cells.

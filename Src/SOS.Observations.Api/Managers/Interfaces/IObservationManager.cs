@@ -54,6 +54,18 @@ namespace SOS.Observations.Api.Managers.Interfaces
 
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
 
+        Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            SearchFilter filter, 
+            int zoom,
+            LatLonBoundingBox bbox);
+
+        Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            SearchFilter filter,
+            int zoom,
+            LatLonBoundingBox bbox,
+            string geoTilePage,
+            int? taxonIdPage);
+
         /// <summary>
         /// Get latest data modified date for passed provider 
         /// </summary>

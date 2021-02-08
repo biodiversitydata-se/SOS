@@ -92,6 +92,7 @@ namespace SOS.Lib.Configuration.Shared
                 mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray();
                 mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
                 mongoSettings.ReplicaSetName = ReplicaSetName;
+                mongoSettings.ReadPreference = ReadPreference.PrimaryPreferred;
             }
             return mongoSettings;
         }

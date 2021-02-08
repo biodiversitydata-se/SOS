@@ -651,6 +651,276 @@ namespace SOS.Observations.Api.Repositories
             return Result.Success(gridResult);
         }
 
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxa. This method uses paging.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="bbox"></param>
+        /// <param name="geoTilePage">The GeoTile key. Should be null in the first request.</param>
+        /// <param name="taxonIdPage">The TaxonId key. Should be null in the first request.</param>
+        /// <returns></returns>
+        public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+                SearchFilter filter,
+                int zoom,
+                LatLonBoundingBox bbox,
+                string geoTilePage,
+                int? taxonIdPage)
+        {
+            int maxNrBucketsInPageResult = MaxNrElasticSearchAggregationBuckets * 3;
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            query.Add(q => q.GeoBoundingBox(bb => bb
+                .Field("location.pointLocation")
+                .BoundingBox(b =>
+                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
+
+            int nrAdded = 0;
+            var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
+            CompositeKey nextPageKey = null;
+            if (!string.IsNullOrEmpty(geoTilePage) && taxonIdPage.HasValue)
+            {
+                nextPageKey = new CompositeKey(new Dictionary<string, object> { { "geoTile", geoTilePage }, { "taxon", taxonIdPage } });
+            }
+            
+            do
+            {
+                var searchResponse = await PageGeoTileAndTaxaAsync(query, excludeQuery, zoom, nextPageKey);
+                var compositeAgg = searchResponse.Aggregations.Composite("geoTileTaxonComposite");
+                nextPageKey = compositeAgg.AfterKey;
+                nrAdded += AddGeoTileTaxonResultToDictionary(compositeAgg, taxaByGeoTile);
+            } while (nrAdded < maxNrBucketsInPageResult && nextPageKey != null);
+
+            var georesult = taxaByGeoTile
+                .Select(b => GeoGridTileTaxaCell.Create(
+                    b.Key,
+                    b.Value.Select(m => new GeoGridTileTaxonObservationCount()
+                    {
+                        ObservationCount = (int)m.Value.GetValueOrDefault(0),
+                        TaxonId = m.Key
+                    }).ToList())).ToList();
+
+            var result = new GeoGridTileTaxonPageResult
+            {
+                NextGeoTilePage = nextPageKey?["geoTile"].ToString(),
+                NextTaxonIdPage = nextPageKey == null ? null : (int?) Convert.ToInt32((long) nextPageKey["taxon"]),
+                HasMorePages = nextPageKey != null,
+                GridCells = georesult
+            };
+
+            return Result.Success(result);
+        }
+
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxa. This method handles all paging and returns the complete result.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+                SearchFilter filter,
+                int zoom,
+                LatLonBoundingBox bbox)
+        {
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            query.Add(q => q.GeoBoundingBox(bb => bb
+                .Field("location.pointLocation")
+                .BoundingBox(b =>
+                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
+            
+            var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
+            CompositeKey nextPageKey = null;
+
+            do
+            {
+                var searchResponse = await PageGeoTileAndTaxaAsync(query, excludeQuery, zoom, nextPageKey);
+                var compositeAgg = searchResponse.Aggregations.Composite("geoTileTaxonComposite");
+                nextPageKey = compositeAgg.AfterKey;
+                AddGeoTileTaxonResultToDictionary(compositeAgg, taxaByGeoTile);
+            } while (nextPageKey != null);
+
+            var georesult = taxaByGeoTile
+                .Select(b => GeoGridTileTaxaCell.Create(
+                    b.Key,
+                    b.Value.Select(m => new GeoGridTileTaxonObservationCount()
+                    {
+                        ObservationCount = (int)m.Value.GetValueOrDefault(0),
+                        TaxonId = m.Key
+                    }).ToList()));
+
+            return Result.Success(georesult);
+        }
+
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxon.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="excludeQuery"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="nextPage">The key is a combination of GeoTile string and TaxonId. Should be null in the first request.</param>
+        /// <returns></returns>
+        private async Task<ISearchResponse<dynamic>> PageGeoTileAndTaxaAsync(
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            int zoom,
+            CompositeKey nextPage)
+        {
+            ISearchResponse<dynamic> searchResponse;
+            
+            if (nextPage == null) // First request
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(_indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
+                        .Size(MaxNrElasticSearchAggregationBuckets)
+                        .Sources(src => src
+                            .GeoTileGrid("geoTile", h => h
+                                .Field("location.pointLocation")
+                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
+                            .Terms("taxon", tt => tt
+                                .Field("taxon.id").Order(SortOrder.Ascending)
+                            ))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+            else
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(_indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
+                        .Size(MaxNrElasticSearchAggregationBuckets)
+                        .After(nextPage)
+                        .Sources(src => src
+                            .GeoTileGrid("geoTile", h => h
+                                .Field("location.pointLocation")
+                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
+                            .Terms("taxon", tt => tt
+                                .Field("taxon.id").Order(SortOrder.Ascending)
+                            ))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse;
+        }
+
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxon. Also include the latest observation occurrenceId and date for each tile and taxon.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="excludeQuery"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="nextPage">The key is a combination of GeoTile string and TaxonId. Should be null in the first request.</param>
+        /// <returns></returns>
+        private async Task<ISearchResponse<dynamic>> PageGeoTileAndTaxaIncludeLatestObservationAsync(
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            int zoom,
+            CompositeKey nextPage)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            if (nextPage == null) // First request
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(_indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
+                        .Size(MaxNrElasticSearchAggregationBuckets)
+                        .Sources(s => s
+                            .GeoTileGrid("geoTile", h => h
+                                .Field("location.pointLocation")
+                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
+                            .Terms("taxon", tt => tt
+                                .Field("taxon.id").Order(SortOrder.Ascending)
+                            )).Aggregations(agg => agg
+                            .TopHits("topHits", t => t
+                                .Size(1)
+                                .Source(src => src
+                                    .Includes(inc => inc
+                                        .Fields("event.endDate", "occurrence.occurrenceId")))
+                                .Sort(f => f.Field("event.endDate", SortOrder.Descending))))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+
+                // This is how you get the latest observation info for the first tile.
+                var compositeAgg = searchResponse.Aggregations.Composite("geoTileTaxonComposite");
+                var firstTileTopHit = compositeAgg.Buckets.First().TopHits("topHits");
+                var firstTileLatestObservation = firstTileTopHit.Documents<dynamic>().FirstOrDefault();
+            }
+            else
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(_indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
+                        .Size(MaxNrElasticSearchAggregationBuckets)
+                        .After(nextPage)
+                        .Sources(s => s
+                            .GeoTileGrid("geoTile", h => h
+                                .Field("location.pointLocation")
+                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
+                            .Terms("taxon", tt => tt
+                                .Field("taxon.id").Order(SortOrder.Ascending)
+                            )).Aggregations(agg => agg
+                            .TopHits("topHits", t => t
+                                .Size(1)
+                                .Source(src => src
+                                    .Includes(inc => inc
+                                        .Fields("event.endDate", "occurrence.occurrenceId")))
+                                .Sort(f => f.Field("event.endDate", SortOrder.Descending))))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse;
+        }
+
+
+
+        private static int AddGeoTileTaxonResultToDictionary(
+            CompositeBucketAggregate compositeAgg, 
+            Dictionary<string, Dictionary<int, long?>> taxaByGeoTile)
+        {
+            foreach (var bucket in compositeAgg.Buckets)
+            {
+                var geoTile = (string) bucket.Key["geoTile"];
+                var taxonId = Convert.ToInt32((long) bucket.Key["taxon"]);
+                if (!taxaByGeoTile.ContainsKey(geoTile)) taxaByGeoTile.Add(geoTile, new Dictionary<int, long?>());
+                taxaByGeoTile[geoTile].Add(taxonId, bucket.DocCount);
+            }
+
+            return compositeAgg.Buckets.Count;
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
             SearchFilter filter) 

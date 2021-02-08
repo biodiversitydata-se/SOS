@@ -146,6 +146,58 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxa. This method handles all paging and returns the complete result.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            SearchFilter filter, 
+            int zoom, 
+            LatLonBoundingBox bbox)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom, bbox);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Aggregate observations by GeoTile and Taxa. This method uses paging.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
+        /// <param name="bbox"></param>
+        /// <param name="geoTilePage">The GeoTile key. Should be null in the first request.</param>
+        /// <param name="taxonIdPage">The TaxonId key. Should be null in the first request.</param>
+        /// <returns></returns>
+        public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            SearchFilter filter,
+            int zoom,
+            LatLonBoundingBox bbox,
+            string geoTilePage,
+            int? taxonIdPage)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, bbox, geoTilePage, taxonIdPage);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to aggregate to geogrids.");
+                throw;
+            }
+        }
+
         /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
