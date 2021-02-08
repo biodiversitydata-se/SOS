@@ -73,10 +73,17 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
         {
-            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaType.ToAreaId(featureId));
-            var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            try
+            {
+                var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaType.ToAreaId(featureId));
+                var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
-            return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
+                return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task<List<Area>> GetAsync(AreaType[] areaTypes)

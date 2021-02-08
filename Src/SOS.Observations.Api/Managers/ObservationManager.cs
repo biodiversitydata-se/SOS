@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
@@ -153,9 +155,11 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
+            await _filterManager.PrepareFilter(filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
+        /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             LatLonBoundingBox bbox,
@@ -181,6 +185,12 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilter(filter);
+
+                if (filter?.TaxonIds?.Count() > 10000)
+                {
+                    throw new TaxonValidationException("Your filter exceeds 10000 taxon id's");
+                }
+
                 var result = await _processedObservationRepository.GetTaxonExistsIndicationAsync(filter);
                 return result?.ToTaxonAggregationItemDtos();
             }

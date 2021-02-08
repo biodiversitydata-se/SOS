@@ -176,29 +176,11 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter"></param>
         /// <param name="allowUnderlyingTaxa"></param>
         /// <returns></returns>
-        protected Result ValidateTaxonExists(SearchFilterBaseDto filter, bool allowUnderlyingTaxa)
+        protected Result ValidateTaxonExists(SearchFilterBaseDto filter)
         {
-            var errors = new List<string>();
-
             var taxonCount = filter?.Taxon?.TaxonIds?.Count() ?? 0;
-
-            if (taxonCount == 0)
-            {
-                errors.Add("You must provide taxon id's");
-            }
-
-            if (taxonCount > 10000)
-            {
-                errors.Add("You can not provide more than 10000 taxon id's in one request");
-            }
-
-            if ((filter?.Taxon?.IncludeUnderlyingTaxa ?? false) && !allowUnderlyingTaxa)
-            {
-                errors.Add("You are not allowed to include underlying taxa");
-            }
-
-            return errors.Count > 0 
-                ? Result.Failure(string.Join(". ", errors))
+            return taxonCount == 0 
+                ? Result.Failure("You must provide taxon id's") 
                 : Result.Success();
         }
 

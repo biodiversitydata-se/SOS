@@ -11,6 +11,7 @@ using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
@@ -852,7 +853,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(), 
-                    ValidateTaxonExists(filter, false),
+                    ValidateTaxonExists(filter),
                     ValidateGeographicalAreaExists(filter));
 
                 if (validationResult.IsFailure)
@@ -870,6 +871,10 @@ namespace SOS.Observations.Api.Controllers
             catch (AuthenticationRequiredException e)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TaxonValidationException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (Exception e)
             {
@@ -898,8 +903,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateTaxonExists(filter, false),
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateTaxonExists(filter),
                     ValidateGeographicalAreaExists(filter));
 
                 if (validationResult.IsFailure)
@@ -916,7 +922,11 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (AuthenticationRequiredException e)
             {
-                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+                return new StatusCodeResult((int) HttpStatusCode.Unauthorized);
+            }
+            catch (TaxonValidationException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (Exception e)
             {
