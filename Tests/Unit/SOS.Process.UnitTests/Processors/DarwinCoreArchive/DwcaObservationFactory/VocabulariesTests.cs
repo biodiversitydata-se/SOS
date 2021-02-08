@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using SOS.Lib.Constants;
-using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;

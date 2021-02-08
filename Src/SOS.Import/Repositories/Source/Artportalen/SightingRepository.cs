@@ -31,7 +31,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 
             AND s.TaxonId IS NOT NULL 
-             {(DataService.Configuration.HarvestStartDate.HasValue ?
+             {((DataService?.Configuration?.HarvestStartDate.HasValue ?? false) ?
             $"AND s.StartDate >= '{DataService.Configuration.HarvestStartDate}'" 
             :
             "")}";

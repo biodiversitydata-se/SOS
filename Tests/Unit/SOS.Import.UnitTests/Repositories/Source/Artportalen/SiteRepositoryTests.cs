@@ -66,13 +66,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
                 new SiteEntity {Id = 2, Name = "Site 2"}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>());
+            var result = await TestObject.GetByIdsAsync(new []{1,2}, It.IsAny<bool>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

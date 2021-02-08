@@ -34,6 +34,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
             _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
