@@ -15,15 +15,35 @@ namespace SOS.Import.Managers
     {
         private readonly Dictionary<DataProviderType, IDataValidationReportFactory> _reportCreatorByType;
 
-        public DataValidationReportManager(NorsDataValidationReportFactory norsDataValidationReportFactory, VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
+        public DataValidationReportManager(
+            ClamPortalDataValidationReportFactory clamPortalDataValidationReportFactory,
+            FishDataValidationReportFactory fishDataValidationReportFactory,
+            DwcaDataValidationReportFactory dwcaDataValidationReportFactory,
+            MvmDataValidationReportFactory mvmDataValidationReportFactory,
+            KulDataValidationReportFactory kulDataValidationReportFactory,
+            SersDataValidationReportFactory sersDataValidationReportFactory,
+            NorsDataValidationReportFactory norsDataValidationReportFactory, 
+            VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
         {
-            if  (norsDataValidationReportFactory == null) throw new ArgumentNullException(nameof(norsDataValidationReportFactory));
+            if (clamPortalDataValidationReportFactory == null) throw new ArgumentNullException(nameof(clamPortalDataValidationReportFactory));
+            if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
+            if (dwcaDataValidationReportFactory == null) throw new ArgumentNullException(nameof(dwcaDataValidationReportFactory));
+            if (mvmDataValidationReportFactory == null) throw new ArgumentNullException(nameof(mvmDataValidationReportFactory));
+            if (kulDataValidationReportFactory == null) throw new ArgumentNullException(nameof(kulDataValidationReportFactory));
+            if (sersDataValidationReportFactory == null) throw new ArgumentNullException(nameof(sersDataValidationReportFactory));
+            if (norsDataValidationReportFactory == null) throw new ArgumentNullException(nameof(norsDataValidationReportFactory));
             if (virtualHerbariumDataValidationReportFactory == null) throw new ArgumentNullException(nameof(virtualHerbariumDataValidationReportFactory));
 
             _reportCreatorByType = new Dictionary<DataProviderType, IDataValidationReportFactory>
             {
+                {DataProviderType.ClamPortalObservations, clamPortalDataValidationReportFactory},
+                {DataProviderType.FishDataObservations, fishDataValidationReportFactory},
+                {DataProviderType.MvmObservations, mvmDataValidationReportFactory},
+                {DataProviderType.KULObservations, kulDataValidationReportFactory},
+                {DataProviderType.SersObservations, sersDataValidationReportFactory},
                 {DataProviderType.NorsObservations, norsDataValidationReportFactory},
-                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory}
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory},
+                {DataProviderType.DwcA, dwcaDataValidationReportFactory}
             };
         }
 

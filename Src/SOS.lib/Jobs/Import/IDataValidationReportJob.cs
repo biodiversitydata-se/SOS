@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -13,8 +14,10 @@ namespace SOS.Lib.Jobs.Import
         ///     Run create a data validation report job for a specific data provider.
         /// </summary>
         /// <returns></returns>
-        [DisplayName("Data Validation Report, Data provider: \"{0}\"")]
-        Task<string> RunAsync(
+        [DisplayName("Data Validation Report, Id: \"{0}\",  Data provider: \"{2}\"")]
+        Task<Report> RunAsync(
+            string reportId, 
+            string createdBy, 
             string dataProviderIdentifier,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,

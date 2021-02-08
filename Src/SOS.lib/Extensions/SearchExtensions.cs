@@ -379,7 +379,9 @@ namespace SOS.Lib.Extensions
             if (filter.TypeFilter != SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
             {
                 // Get observations from other than Artportalen too
-                sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
+                sightingTypeQuery.Add(q => q
+                        !.Exists(e => e.Field("artportalenInternal.sightingTypeSearchGroupId"))
+                );
             }
 
             query.Add(q => q

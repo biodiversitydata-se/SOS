@@ -85,6 +85,21 @@ namespace SOS.TestHelpers.Helpers.Builders
             return With(entity => entity.TaxonID = taxonId);
         }
 
+        public DwcObservationVerbatimBuilder WithEventDate(string eventDate)
+        {
+            return With(entity => entity.EventDate = eventDate);
+        }
+
+        public DwcObservationVerbatimBuilder WithEventDate(DateTime eventDate)
+        {
+            return With(entity => entity.EventDate = DwcFormatter.CreateDateString(eventDate));
+        }
+
+        public DwcObservationVerbatimBuilder WithEventTime(string eventTime)
+        {
+            return With(entity => entity.EventTime = eventTime);
+        }
+
         public DwcObservationVerbatimBuilder WithDateIdentified(string dateIdentified)
         {
             return With(entity => entity.DateIdentified = dateIdentified);

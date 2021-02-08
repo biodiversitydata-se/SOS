@@ -7,45 +7,45 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.VirtualHerbarium;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Processors.ClamPortal;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Import.Factories.Validation
 {
     /// <summary>
-    /// Virtual Herbarium data validation manager.
+    /// Clamp Portal validation manager.
     /// </summary>
-    public class VirtualHerbariumValidationReportFactory : DataValidationReportFactoryBase<VirtualHerbariumObservationVerbatim>
+    public class ClamPortalDataValidationReportFactory : DataValidationReportFactoryBase<ClamObservationVerbatim>
     {
-        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private VirtualHerbariumObservationFactory _virtualHerbariumObservationFactory;
+        private readonly IClamObservationVerbatimRepository _clamPortalObservationVerbatimRepository;
+        private ClamPortalObservationFactory _clamPortalObservationFactory;
 
-        public VirtualHerbariumValidationReportFactory(
+        public ClamPortalDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository)
+            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository) 
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
+            _clamPortalObservationVerbatimRepository = clamPortalObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
+        protected override async Task<IAsyncCursor<ClamObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
+            return await _clamPortalObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
         protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
+            return await _clamPortalObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override Observation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
             var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
@@ -53,18 +53,21 @@ namespace SOS.Import.Factories.Validation
         }
 
         protected override void ValidateVerbatimTaxon(
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            ClamObservationVerbatim verbatimObservation,
             HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames)
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
+            if (verbatimObservation.DyntaxaTaxonId.HasValue)
+            {
+                nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.Value.ToString());
+            }
         }
 
-        protected override void ValidateVerbatimData(VirtualHerbariumObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
+        protected override void ValidateVerbatimData(ClamObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
         {
             validationRemarksBuilder.NrValidatedObservations++;
 
-            if (!verbatimObservation.CoordinatePrecision.HasValue)
+            if (!verbatimObservation.CoordinateUncertaintyInMeters.HasValue)
             {
                 validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
             }
@@ -72,21 +75,23 @@ namespace SOS.Import.Factories.Validation
 
         protected override void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            ClamObservationVerbatim verbatimObservation,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
-            // Virtual Herbarium doesn't contain any vocabulary fields.
+            // Clam Portal doesn't contain any vocabulary fields.
         }
 
-        private VirtualHerbariumObservationFactory GetObservationFactory(DataProvider dataProvider)
+        private ClamPortalObservationFactory GetObservationFactory(DataProvider dataProvider)
         {
-            if (_virtualHerbariumObservationFactory == null)
+            if (_clamPortalObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById);
+                _clamPortalObservationFactory = new ClamPortalObservationFactory(
+                    dataProvider,
+                    _taxonById);
             }
 
-            return _virtualHerbariumObservationFactory;
+            return _clamPortalObservationFactory;
         }
     }
 }

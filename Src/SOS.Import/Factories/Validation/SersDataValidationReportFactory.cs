@@ -7,45 +7,45 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.VirtualHerbarium;
+using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Processors.Sers;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Import.Factories.Validation
 {
     /// <summary>
-    /// Virtual Herbarium data validation manager.
+    /// SERS data validation manager.
     /// </summary>
-    public class VirtualHerbariumValidationReportFactory : DataValidationReportFactoryBase<VirtualHerbariumObservationVerbatim>
+    public class SersDataValidationReportFactory : DataValidationReportFactoryBase<SersObservationVerbatim>
     {
-        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private VirtualHerbariumObservationFactory _virtualHerbariumObservationFactory;
+        private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
+        private SersObservationFactory _sersObservationFactory;
 
-        public VirtualHerbariumValidationReportFactory(
+        public SersDataValidationReportFactory(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository)
+            ISersObservationVerbatimRepository sersObservationVerbatimRepository) 
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
+            _sersObservationVerbatimRepository = sersObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
+        protected override async Task<IAsyncCursor<SersObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
+            return await _sersObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
         protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
-            return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
+            return await _sersObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override Observation CreateProcessedObservation(SersObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
             var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
@@ -53,18 +53,18 @@ namespace SOS.Import.Factories.Validation
         }
 
         protected override void ValidateVerbatimTaxon(
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            SersObservationVerbatim verbatimObservation,
             HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames)
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
         }
 
-        protected override void ValidateVerbatimData(VirtualHerbariumObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
+        protected override void ValidateVerbatimData(SersObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
         {
             validationRemarksBuilder.NrValidatedObservations++;
 
-            if (!verbatimObservation.CoordinatePrecision.HasValue)
+            if (!verbatimObservation.CoordinateUncertaintyInMeters.HasValue)
             {
                 validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
             }
@@ -72,21 +72,23 @@ namespace SOS.Import.Factories.Validation
 
         protected override void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
-            VirtualHerbariumObservationVerbatim verbatimObservation,
+            SersObservationVerbatim verbatimObservation,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
-            // Virtual Herbarium doesn't contain any vocabulary fields.
+            // SERS doesn't contain any vocabulary fields.
         }
 
-        private VirtualHerbariumObservationFactory GetObservationFactory(DataProvider dataProvider)
+        private SersObservationFactory GetObservationFactory(DataProvider dataProvider)
         {
-            if (_virtualHerbariumObservationFactory == null)
+            if (_sersObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById);
+                _sersObservationFactory = new SersObservationFactory(
+                    dataProvider,
+                    _taxonById);
             }
 
-            return _virtualHerbariumObservationFactory;
+            return _sersObservationFactory;
         }
     }
 }

@@ -35,12 +35,12 @@ namespace SOS.Import.Factories.Validation
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository;
         }
 
-        protected override async Task<IAsyncCursor<NorsObservationVerbatim>> GetAllObservationsByCursorAsync()
+        protected override async Task<IAsyncCursor<NorsObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
             return await _norsObservationVerbatimRepository.GetAllByCursorAsync();
         }
 
-        protected override async Task<long> GetTotalObservationsCountAsync()
+        protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
             return await _norsObservationVerbatimRepository.CountAllDocumentsAsync();
         }
@@ -54,10 +54,10 @@ namespace SOS.Import.Factories.Validation
 
         protected override void ValidateVerbatimTaxon(
             NorsObservationVerbatim verbatimObservation,
-            HashSet<int> nonMatchingTaxonIds,
+            HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames)
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId);
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
         }
 
         protected override void ValidateVerbatimData(NorsObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)

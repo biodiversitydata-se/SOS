@@ -95,6 +95,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
 
             // Managers
+            builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
@@ -118,7 +119,7 @@ namespace SOS.Import.IoC.Modules
 
             // Repositories destination
             builder.RegisterType<Lib.Repositories.Resource.AreaRepository>().As<Lib.Repositories.Resource.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
-
+            builder.RegisterType<ReportRepository>().As<IReportRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>().InstancePerLifetimeScope();
@@ -185,7 +186,13 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaTypeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DiscoveryMethodVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DeterminationMethodVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<FishDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SersDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
 
             // Add Services
