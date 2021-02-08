@@ -43,7 +43,7 @@ namespace SOS.Lib.Services
 
 
         /// <inheritdoc />
-        public async Task<UserModel> GetUser()
+        public async Task<UserModel> GetUserAsync()
         {
             try
             {
@@ -70,7 +70,7 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<AuthorityModel>> GetUserAuthorities(int userId)
+        public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId)
         {
             try
             {

@@ -28,7 +28,7 @@ namespace SOS.Lib.Managers
         private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync()
         {
             // Get user
-            var user = await _userService.GetUser();
+            var user = await _userService.GetUserAsync();
 
             if (user == null)
             {
@@ -36,7 +36,7 @@ namespace SOS.Lib.Managers
             }
 
             // Get user authorities
-            var authorities = await _userService.GetUserAuthorities(user.Id);
+            var authorities = await _userService.GetUserAuthoritiesAsync(user.Id);
 
             if (authorities == null)
             {

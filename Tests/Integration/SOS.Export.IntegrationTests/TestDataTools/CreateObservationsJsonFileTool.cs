@@ -20,7 +20,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
         /// <summary>
         ///     Reads observations from MongoDb and saves them as a JSON file.
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Not working")]
         [Trait("Category", "Tool")]
         public async Task CreateObservationsJsonFile()
         {

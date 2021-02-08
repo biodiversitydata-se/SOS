@@ -13,14 +13,14 @@ namespace SOS.Lib.Services.Interfaces
         ///  Get current user
         /// </summary>
         /// <returns></returns>
-        Task<UserModel> GetUser();
+        Task<UserModel> GetUserAsync();
 
         /// <summary>
         /// Get authorities for user
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<AuthorityModel>> GetUserAuthorities(int userId);
+        Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId);
 
         /// <summary>
         /// Get user roles
