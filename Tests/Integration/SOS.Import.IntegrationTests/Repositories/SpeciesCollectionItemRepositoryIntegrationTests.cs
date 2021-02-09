@@ -23,7 +23,7 @@ namespace SOS.Import.IntegrationTests.Repositories
                 artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
 
-            var sightingIds = new[] {1, 2, 3, 4, 5};
+            var sightingIds = new[] { 64768, 3580540, 4164924, 6700000, 2896107 };
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
