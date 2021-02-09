@@ -23,6 +23,16 @@ namespace SOS.Lib.Configuration.Import
         public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
 
         /// <summary>
+        ///     Configuration for area import.
+        /// </summary>
+        public AreaHarvestConfiguration AreaHarvestConfiguration { get; set; }
+
+        /// <summary>
+        ///     Configuration for GeoRegion API.
+        /// </summary>
+        public GeoRegionApiConfiguration GeoRegionApiConfiguration { get; set; }
+
+        /// <summary>
         /// Fish data configuration
         /// </summary>
         public FishDataServiceConfiguration FishDataServiceConfiguration { get; set; }
