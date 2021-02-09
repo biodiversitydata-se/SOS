@@ -9,7 +9,7 @@ namespace SOS.Lib.Jobs.Import
         ///     Run geo harvest
         /// </summary>
         /// <returns></returns>
-        [DisplayName("Harvest areas from Artportalen db")]
+        [DisplayName("Harvest areas")]
         Task<bool> RunAsync();
     }
 }
