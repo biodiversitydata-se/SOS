@@ -42,6 +42,8 @@ namespace SOS.Import.Harvesters.Observations
             _sharkServiceConfiguration = sharkServiceConfiguration ??
                                          throw new ArgumentNullException(nameof(sharkServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _sharkObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -123,6 +125,10 @@ namespace SOS.Import.Harvesters.Observations
                     // Add sightings to MongoDb
                     await _sharkObservationVerbatimRepository.AddManyAsync(verbatims);
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for SHARK verbatim");
+                await _sharkObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for SHARK verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for SHARK data provider");
 

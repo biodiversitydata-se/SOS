@@ -11,6 +11,26 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IMongoDbProcessedRepositoryBase<TEntity, in TKey> : IProcessRepositoryBase<TEntity> where TEntity : IEntity<TKey>
     {
         /// <summary>
+        /// Name of active instance
+        /// </summary>
+        string ActiveInstanceName { get; }
+
+        /// <summary>
+        /// Current instance
+        /// </summary>
+        string CurrentInstanceName { get; }
+
+        /// <summary>
+        /// Name of inactive instance
+        /// </summary>
+        string InactiveInstanceName { get; }
+
+        /// <summary>
+        /// Collection contains protected data
+        /// </summary>
+        bool Protected { get; set; }
+
+        /// <summary>
         ///     Add one item
         /// </summary>
         /// <param name="item"></param>

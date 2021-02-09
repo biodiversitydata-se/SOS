@@ -29,18 +29,15 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
         {
             using var readMemoryStream = new MemoryStream(memoryStream.ToArray());
             using var streamReader = new StreamReader(readMemoryStream);
-            using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.InvariantCulture));
-            SetCsvConfigurations(csvReader);
+            using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                Delimiter = "\t",
+                Encoding = Encoding.UTF8,
+                BadDataFound = x => { Console.WriteLine($"Bad data: <{x}>"); }
+            });
             var records = csvReader.GetRecords<dynamic>().ToList();
             return records;
-        }
-
-        private void SetCsvConfigurations(CsvReader csv)
-        {
-            csv.Configuration.HasHeaderRecord = true;
-            csv.Configuration.Delimiter = "\t";
-            csv.Configuration.Encoding = Encoding.UTF8;
-            csv.Configuration.BadDataFound = x => { Console.WriteLine($"Bad data: <{x.RawRecord}>"); };
         }
 
         private DwcArchiveOccurrenceCsvWriter CreateDwcArchiveOccurrenceCsvWriter()

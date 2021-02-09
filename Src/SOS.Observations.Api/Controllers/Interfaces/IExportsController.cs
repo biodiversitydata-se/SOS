@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// Get list of available export files
         /// </summary>
         /// <returns></returns>
-        IActionResult GetExportFiles();
+        Task<IActionResult> GetExportFilesAsync();
 
         /// <summary>
         /// Get url to export file

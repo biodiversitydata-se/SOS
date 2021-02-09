@@ -78,6 +78,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Internal field used for searches by Artportalen, contains extra user information
         /// </summary>
+        [Nested]
         public IEnumerable<UserInternal> OccurrenceRecordedByInternal { get; set; }
 
         /// <summary>
@@ -89,12 +90,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     User id of the person that reported the species observation.
         /// </summary>
         public int? ReportedByUserId { get; set; }
-
-        /// <summary>
-        ///     List of userids and aliases matching the IdentifiedBy string, internal use only
-        /// </summary>
-        [SwaggerExclude]
-        public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
 
         /// <summary>
         ///     Alias for the reporter, internal use only

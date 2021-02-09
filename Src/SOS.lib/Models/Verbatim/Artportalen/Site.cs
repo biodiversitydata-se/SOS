@@ -25,9 +25,9 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea County { get; set; }
 
         /// <summary>
-        ///     Country part of site
+        /// 
         /// </summary>
-        public GeographicalArea CountryPart { get; set; }
+        public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
         ///     Country Region
@@ -37,7 +37,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Bird validation areas
         /// </summary>
-        public IEnumerable<string> BirdValidationAreaIds { get; set; }
+        public ICollection<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
         ///     External Id of site
@@ -113,6 +113,10 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// </summary>
         public GeographicalArea Province { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ProvincePartIdByCoordinate { get; set; }
 
         /// <summary>
         ///     Special Protection Area, Natura 2000, Birds Directive

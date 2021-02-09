@@ -544,7 +544,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             package.Save();
         }
 
-        [Fact]
+        [Fact(Skip = "Not working")]
         public async Task Harvest_all_dwca_files_in_specified_folder()
         {
             //-----------------------------------------------------------------------------------------------------------

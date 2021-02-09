@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Containers.Interfaces;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -35,8 +36,10 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
+        private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
 
@@ -79,7 +82,7 @@ namespace SOS.Import.Harvesters.Observations
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
 
-                _logger.LogDebug("Start getting Artportalen sightings");
+                _logger.LogDebug($"Start getting Artportalen sightings");
                 
                 var batchIndex = 0;
                 // Loop until all sightings are fetched
@@ -121,17 +124,27 @@ namespace SOS.Import.Harvesters.Observations
         #endregion Full
 
         #region Incremental
-        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory,
+        /// <summary>
+        /// Harvest incremental
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="harvestFactory"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, 
             IJobCancellationToken cancellationToken)
         {
             // Make sure incremental mode is true to get max id from live instance
-            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            _processedPublicObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            _processedProtectedObservationRepository.LiveMode = _processedPublicObservationRepository.LiveMode;
             harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
 
             // We start from last harvested sighting 
-            var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
-            
+            var lastModifiedPublic = await _processedPublicObservationRepository.GetLatestModifiedDateForProviderAsync(1);
+            var lastModifiedProtected = await _processedProtectedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
+            var lastModified = lastModifiedProtected > lastModifiedPublic ? lastModifiedProtected : lastModifiedPublic;
+
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
 
@@ -207,16 +220,6 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug("Start adding test sightings");
                     AddTestSightings(_sightingRepository, ref sightings, _artportalenConfiguration.AddTestSightingIds);
                     _logger.LogDebug("Finish adding test sightings");
-                }
-
-                if (_artportalenConfiguration.HarvestStartDate.HasValue && (sightings?.Any() ?? false))
-                {
-                    _logger.LogDebug($"Start removing sightings prior to: {_artportalenConfiguration.HarvestStartDate.Value}");
-
-                    sightings = sightings.Where(s => s.StartDate >= _artportalenConfiguration.HarvestStartDate.Value)
-                        ?.ToArray();
-
-                    _logger.LogDebug($"Finish removing sightings prior to: {_artportalenConfiguration.HarvestStartDate.Value}");
                 }
 
                 if (!sightings?.Any() ?? true)
@@ -330,12 +333,15 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
-        /// <param name="sightingVerbatimRepository"></param>
+        /// <param name="artportalenVerbatimRepository"></param>
         /// <param name="personRepository"></param>
         /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="artportalenMetadataContainer"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
@@ -348,8 +354,10 @@ namespace SOS.Import.Harvesters.Observations
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
+            IAreaHelper areaHelper,
             ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
@@ -367,8 +375,10 @@ namespace SOS.Import.Harvesters.Observations
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
-            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedPublicObservationRepository = processedPublicObservationRepository ?? throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedProtectedObservationRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -432,7 +442,8 @@ namespace SOS.Import.Harvesters.Observations
                     _siteRepository,
                     _sightingRelationRepository,
                     _speciesCollectionRepository,
-                    _artportalenMetadataContainer
+                    _artportalenMetadataContainer,
+                    _areaHelper
                 )
                 {
                     IncrementalMode = mode != JobRunModes.Full
@@ -441,10 +452,11 @@ namespace SOS.Import.Harvesters.Observations
 
                 _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
-                // Make sure we have an empty collection
-                _logger.LogDebug("Empty collection");
+                // Make sure we have an empty public collection
+                _logger.LogDebug("Start empty artportalen verbatim collection");
                 await _artportalenVerbatimRepository.DeleteCollectionAsync();
                 await _artportalenVerbatimRepository.AddCollectionAsync();
+                _logger.LogDebug("Finish empty artportalen verbatim collection");
 
                 var nrSightingsHarvested = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)

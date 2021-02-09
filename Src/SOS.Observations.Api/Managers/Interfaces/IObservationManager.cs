@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -85,5 +85,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
             LatLonBoundingBox bbox,
             int skip,
             int take);
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            SearchFilter filter);
     }
 }

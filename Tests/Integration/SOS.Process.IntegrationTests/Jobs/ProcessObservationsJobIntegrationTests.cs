@@ -75,16 +75,21 @@ namespace SOS.Process.IntegrationTests.Jobs
             var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedObservationRepository processedObservationRepository;
+            IProcessedPublicObservationRepository processedPublicObservationRepository;
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
+                processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
+                processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
             }
             else
             {
-                processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+                processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
+                processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
             }
             
             var processInfoRepository =
@@ -108,7 +113,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ClamObservationVerbatimRepository(verbatimClient,
                     new NullLogger<ClamObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
@@ -117,7 +122,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new FishDataObservationVerbatimRepository(verbatimClient,
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
@@ -126,7 +131,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new KulObservationVerbatimRepository(verbatimClient,
                     new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -135,7 +140,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new MvmObservationVerbatimRepository(verbatimClient,
                     new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -144,7 +149,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NorsObservationVerbatimRepository(verbatimClient,
                     new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -153,7 +158,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new SersObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -162,7 +167,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new SharkObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -171,23 +176,27 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
                     new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
-                processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyRepository,
                 fieldMappingResolverHelper,
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
+                diffusionManager,
                 validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
+                new ProcessedPublicObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>()),
+                new ProcessedProtectedObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
             
@@ -195,7 +204,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
                 new DarwinCoreArchiveVerbatimRepository(verbatimClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
-                processedObservationRepository,
+                processedPublicObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 areaHelper,
@@ -208,7 +217,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             
 
             var processJob = new ProcessJob(
-                processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
                 artportalenProcessor,

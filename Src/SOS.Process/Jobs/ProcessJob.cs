@@ -46,14 +46,15 @@ namespace SOS.Process.Jobs
         private readonly IInstanceManager _instanceManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
 
-        private async Task<IDictionary<int, Taxon>> GetTaxa(JobRunModes mode)
+        private async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
             // Use current taxa if we are in incremental mode, to speed things up
             if (mode == JobRunModes.Full)
@@ -90,37 +91,151 @@ namespace SOS.Process.Jobs
             return taxonById;
         }
 
-        private async Task InitializeAreaHelperAsync(JobRunModes mode)
+        private async Task InitializeAreaHelperAsync()
         {
             _logger.LogDebug("Start initialize area cache");
             await _areaHelper.InitializeAsync();
             _logger.LogDebug("Finish initialize area cache");
         }
 
-        private async Task InitializeMongoDbCollections(JobRunModes mode)
+        private async Task InitializeElasticSearchAsync(JobRunModes mode)
         {
             if (mode == JobRunModes.Full)
             {
                 _logger.LogInformation(
-                    $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
-                await _processedObservationRepository.ClearCollectionAsync();
+                    $"Start clear ElasticSearch index: {_processedPublicObservationRepository.IndexName}");
+                await _processedPublicObservationRepository.ClearCollectionAsync();
                
                 _logger.LogInformation(
-                    $"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    $"Finish clear ElasticSearch index: {_processedPublicObservationRepository.IndexName}");
+
+                _logger.LogInformation(
+                    $"Start clear ElasticSearch index: {_processedProtectedObservationRepository.IndexName}");
+                await _processedProtectedObservationRepository.ClearCollectionAsync();
+
+                _logger.LogInformation(
+                    $"Finish clear ElasticSearch index: {_processedProtectedObservationRepository.IndexName}");
             }
             else
             {
-                _logger.LogInformation($"Start ensure collection exists ({_processedObservationRepository.IndexName})");
+                _logger.LogInformation($"Start ensure collection exists ({_processedPublicObservationRepository.IndexName})");
                 // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
-                await _processedObservationRepository.VerifyCollectionAsync();
-                _logger.LogInformation($"Finish ensure collection exists ({_processedObservationRepository.IndexName})");
+                await _processedPublicObservationRepository.VerifyCollectionAsync();
+                _logger.LogInformation($"Finish ensure collection exists ({_processedPublicObservationRepository.IndexName})");
+
+                _logger.LogInformation($"Start ensure collection exists ({_processedProtectedObservationRepository.IndexName})");
+                // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
+                await _processedProtectedObservationRepository.VerifyCollectionAsync();
+                _logger.LogInformation($"Finish ensure collection exists ({_processedProtectedObservationRepository.IndexName})");
+            }
+        }
+
+        /// <summary>
+        /// Disable Elasticsearch indexing
+        /// </summary>
+        /// <returns></returns>
+        private async Task DisableIndexingAsync()
+        {
+            _logger.LogInformation($"Start disable indexing ({_processedPublicObservationRepository.IndexName})");
+            await _processedPublicObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedPublicObservationRepository.IndexName})");
+
+            _logger.LogInformation($"Start disable indexing ({_processedProtectedObservationRepository.IndexName})");
+            await _processedProtectedObservationRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedProtectedObservationRepository.IndexName})");
+        }
+
+        /// <summary>
+        /// Enable Elasticsearch indexing
+        /// </summary>
+        /// <returns></returns>
+        private async Task EnableIndexingAsync()
+        {
+            _logger.LogInformation($"Start enable indexing ({_processedPublicObservationRepository.IndexName})");
+            await _processedPublicObservationRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedPublicObservationRepository.IndexName})");
+
+            _logger.LogInformation($"Start enable indexing ({_processedProtectedObservationRepository.IndexName})");
+            await _processedProtectedObservationRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedProtectedObservationRepository.IndexName})");
+        }
+
+        /// <summary>
+        /// Validate that no protected data is accessable (undiffusedgf) from public index
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> ValidateIndexesAsync()
+        {
+            var protectedCount = (int)await _processedProtectedObservationRepository.IndexCount();
+            if (protectedCount < 1)
+            {
+                // No protected observations found. No more validation can be done
+                return true;
             }
 
-            _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.IndexName})");
-            await _processedObservationRepository.DisableIndexingAsync();
-            _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.IndexName})");
+            var validationTasks = new[]
+            {
+                _processedPublicObservationRepository.ValidateProtectionLevelAsync(),
+                _processedProtectedObservationRepository.ValidateProtectionLevelAsync(),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount),
+                ValidateRandomObservations(protectedCount)
+            };
 
-            await _validationManager.VerifyCollectionAsync(mode);
+            // Make sure no protected observations exists in public index and vice versa
+            await Task.WhenAll(validationTasks);
+            return (await Task.WhenAll(validationTasks)).All(t => t);
+        }
+
+        /// <summary>
+        /// Validate 1000 random observations
+        /// </summary>
+        /// <param name="protectedCount"></param>
+        /// <returns></returns>
+        private async Task<bool> ValidateRandomObservations(int protectedCount)
+        {
+            var observationsCount = 1000;
+            var skip = protectedCount > observationsCount ? new Random().Next(1, protectedCount - observationsCount) : 1;
+
+            // Get 1000 random observations from protected index
+            var protectedObservations = (await _processedProtectedObservationRepository.GetObservationsAsync(skip, observationsCount))?
+                .Where(o => o.Occurrence != null)
+                .ToDictionary(o => o.Occurrence.OccurrenceId, o => o);
+
+            if (protectedObservations?.Any() ?? false)
+            {
+                // Try to get diffused observations 
+                var diffusedObservations = (await _processedPublicObservationRepository.GetObservationsAsync(protectedObservations.Keys))?
+                    .Where(o => o.Occurrence != null)
+                    .ToDictionary(o => o.Occurrence.OccurrenceId, o => o); ;
+
+                if (!diffusedObservations?.Any() ?? true)
+                {
+                    return true;
+                }
+
+                foreach (var protectedObservation in protectedObservations)
+                {
+                    // Try to get diffused observation with same occurenceId from public index
+                    if (!diffusedObservations.TryGetValue(protectedObservation.Key, out var publicObservation))
+                    {
+                        continue;
+                    }
+
+                    // If observation coordinates equals, something is wrong. Validation failed
+                    if (protectedObservation.Value.Location.DecimalLatitude ==
+                        publicObservation.Location.DecimalLatitude ||
+                        protectedObservation.Value.Location.DecimalLongitude ==
+                        publicObservation.Location.DecimalLongitude)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -128,12 +243,11 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
         /// <param name="mode"></param>
-        /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<bool> RunAsync(
-            List<DataProvider> dataProvidersToProcess,
+            IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
@@ -143,9 +257,8 @@ namespace SOS.Process.Jobs
                 //-----------------
                 // 1. Arrange
                 //-----------------
-
-                var processStart = DateTime.Now;
-                _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+                _processedPublicObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+                _processedProtectedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
 
                 //-----------------
                 // 2. Validation
@@ -158,8 +271,8 @@ namespace SOS.Process.Jobs
                 //----------------------------------------------------------------------
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
-                var getTaxaTask = GetTaxa(mode);
-                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(mode), InitializeMongoDbCollections(mode));
+                var getTaxaTask = GetTaxaAsync(mode);
+                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
 
@@ -170,68 +283,44 @@ namespace SOS.Process.Jobs
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                //------------------------------------------------------------------------
-                // 4. Create observation processing tasks, and wait for them to complete
-                //------------------------------------------------------------------------
                 if (mode == JobRunModes.Full)
                 {
+                    //------------------------------------------------------------------------
+                    // 4. Start DWC file writing
+                    //------------------------------------------------------------------------
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
                 }
 
-                var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
-                foreach (var dataProvider in dataProvidersToProcess)
-                {
-                    if (!dataProvider.IsActive || (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
-                    {
-                        continue;
-                    }
+                // Init indexes
+                await InitializeElasticSearchAsync(mode);
+                // Disable indexing for public and protected index
+                await DisableIndexingAsync();
 
-                    var processor = _processorByType[dataProvider.Type];
-                    processTaskByDataProvider.Add(dataProvider,
-                        processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
-                }
-
-                var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
-                var success = processingResult.All(t => t.Status == RunStatus.Success);
-
-                await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
-
-                if (mode == JobRunModes.Full)
-                {
-                    //----------------------------------------------------------------------------
-                    // 5. If a data provider failed to process and it was not Artportalen,
-                    //     then try to copy that data from the active instance.
-                    //----------------------------------------------------------------------------
-
-                    var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
-                        pair.Key.Type == DataProviderType.ArtportalenObservations &&
-                        pair.Value.Result.Status == RunStatus.Failed);
-
-                    if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
-                    {
-                        var copyTasks = processTaskByDataProvider
-                            .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                            .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
-
-                        await Task.WhenAll(copyTasks);
-                        success = copyTasks.All(t => t.Result);
-                    }
-                }
+                //------------------------------------------------------------------------
+                // 5. Create observation processing tasks, and wait for them to complete
+                //------------------------------------------------------------------------
+                var success = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, copyFromActiveOnFail, cancellationToken);
 
                 //---------------------------------
                 // 6. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
-                    _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.IndexName})");
-                    await _processedObservationRepository.EnableIndexingAsync();
-                    _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.IndexName})");
+                    // Enable indexing for public and protected index
+                    await EnableIndexingAsync();
 
-                    // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
+                    _logger.LogInformation($"Start validate indexes");
+                    if (!await ValidateIndexesAsync())
+                    {
+                        throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                    }
+                    _logger.LogInformation($"Finish validate indexes");
+
+                    // Toggle active instance if we are done
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
-                        _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstanceName} => {_processedObservationRepository.InactiveInstanceName}");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                        _logger.LogInformation($"Toggle instance {_processedPublicObservationRepository.ActiveInstance} => {_processedPublicObservationRepository.InActiveInstance}");
+                        await _processedPublicObservationRepository.SetActiveInstanceAsync(_processedPublicObservationRepository
                             .InActiveInstance);
                     }
 
@@ -293,6 +382,62 @@ namespace SOS.Process.Jobs
         }
 
         /// <summary>
+        /// Process verbatim observations
+        /// </summary>
+        /// <param name="dataProvidersToProcess"></param>
+        /// <param name="mode"></param>
+        /// <param name="taxonById"></param>
+        /// <param name="copyFromActiveOnFail"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        {
+            var processStart = DateTime.Now;
+
+            var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
+            foreach (var dataProvider in dataProvidersToProcess)
+            {
+                if (!dataProvider.IsActive || 
+                    (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
+                {
+                    continue;
+                }
+
+                var processor = _processorByType[dataProvider.Type];
+                processTaskByDataProvider.Add(dataProvider,
+                    processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
+            }
+
+            var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
+            
+            if (mode == JobRunModes.Full)
+            {
+                //----------------------------------------------------------------------------
+                //  If a data provider failed to process and it was not Artportalen,
+                //     then try to copy that data from the active instance.
+                //----------------------------------------------------------------------------
+
+                var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
+                    pair.Key.Type == DataProviderType.ArtportalenObservations &&
+                    pair.Value.Result.Status == RunStatus.Failed);
+
+                if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
+                {
+                    var copyTasks = processTaskByDataProvider
+                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
+                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+
+                    await Task.WhenAll(copyTasks);
+                    success = copyTasks.All(t => t.Result);
+                }
+            }
+
+            await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
+
+            return success;
+        }
+
+        /// <summary>
         /// Update process info
         /// </summary>
         /// <param name="mode"></param>
@@ -302,8 +447,9 @@ namespace SOS.Process.Jobs
         /// <returns></returns>
         private async Task UpdateProcessInfoAsync(JobRunModes mode, 
             DateTime processStart, 
-            Dictionary<DataProvider, 
-                Task<ProcessingStatus>> processTaskByDataProvider, bool success)
+            IDictionary<DataProvider, 
+                Task<ProcessingStatus>> processTaskByDataProvider,
+            bool success)
         {
 
             if (!processTaskByDataProvider?.Any() ?? true)
@@ -314,7 +460,7 @@ namespace SOS.Process.Jobs
             // Try to get process info for current instance
             var processInfo = (await GetProcessInfoAsync(new[]
             {
-                   _processedObservationRepository.CurrentInstanceName
+                _processedPublicObservationRepository.IndexName
                 })).FirstOrDefault();
 
             if (processInfo == null || mode == JobRunModes.Full)
@@ -349,7 +495,7 @@ namespace SOS.Process.Jobs
                         nameof(Taxon)
                     });
 
-                processInfo = new ProcessInfo(_processedObservationRepository.CurrentInstanceName, processStart)
+                processInfo = new ProcessInfo(_processedPublicObservationRepository.IndexName, processStart)
                 {
                     Count = processTaskByDataProvider.Sum(pi => pi.Value.Result.Count),
                     End = DateTime.Now,
@@ -364,9 +510,8 @@ namespace SOS.Process.Jobs
                 {
                     var provider = taskProvider.Key;
                     var processResult = taskProvider.Value.Result;
-
+                    
                     // Get provider info and update incremental values
-
                     var providerInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId == provider.Id);
                     if (providerInfo != null)
                     {
@@ -384,9 +529,10 @@ namespace SOS.Process.Jobs
         }
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="artportalenObservationProcessor"></param>
@@ -400,15 +546,17 @@ namespace SOS.Process.Jobs
         /// <param name="virtualHerbariumObservationProcessor"></param>
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
-        /// <param name="dataProviderManager"></param>
+        /// <param name="dataProviderCache"></param>
         /// <param name="instanceManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        public ProcessJob(IProcessedObservationRepository processedObservationRepository,
-            IProcessInfoRepository processInfoRepository,
+        public ProcessJob(IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+        IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
@@ -430,8 +578,10 @@ namespace SOS.Process.Jobs
             ProcessConfiguration processConfiguration,
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _processedObservationRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedPublicObservationRepository = processedPublicObservationRepository ??
+                                                    throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedProtectedObservationRepository = processedProtectedObservationRepository ??
+                                                       throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _taxonCache = taxonCache ??
                           throw new ArgumentNullException(nameof(taxonCache));

@@ -20,7 +20,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
         /// <summary>
         ///     Reads observations from MongoDb and saves them as a JSON file.
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Not working")]
         [Trait("Category", "Tool")]
         public async Task CreateObservationsJsonFile()
         {
@@ -35,11 +35,11 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedObservationRepository = new ProcessedObservationRepository(
+            var processedObservationRepository = new ProcessedPublicObservationRepository(
                 exportClient,
                 elasticClient,
                 new ElasticSearchConfiguration(),
-                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+                new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

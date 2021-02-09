@@ -88,6 +88,11 @@ namespace SOS.Lib.Models.Shared
         public bool SupportIncrementalHarvest { get; set; }
 
         /// <summary>
+        /// True if provider support protected observation harvest
+        /// </summary>
+        public bool SupportProtectedHarvest { get; set; }
+
+        /// <summary>
         ///     Decides whether the data quality is approved.
         /// </summary>
         public bool DataQualityIsApproved { get; set; }

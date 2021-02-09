@@ -7,6 +7,8 @@ namespace SOS.Export.UnitTests
     {
         protected ExportConfiguration GetExportConfiguration()
         {
+            return null;
+            /*
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
@@ -14,7 +16,7 @@ namespace SOS.Export.UnitTests
                 .Build();
 
             var exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
-            return exportConfiguration;
+            return exportConfiguration;*/
         }
     }
 }

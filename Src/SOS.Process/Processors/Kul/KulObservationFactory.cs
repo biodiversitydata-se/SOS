@@ -106,7 +106,7 @@ namespace SOS.Process.Processors.Kul
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
-                ProtectionLevel = GetProtectionLevel(),
+                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
                 ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
@@ -137,18 +137,6 @@ namespace SOS.Process.Processors.Kul
             }
 
             return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
-        }
-
-        /// <summary>
-        ///     An integer value corresponding to the Enum of the Main field of the SpeciesFact FactorId 761.
-        ///     By default the value is 1. If the taxon is subordinate to the taxon category Species it is nessecary
-        ///     to check the Species Fact values of parent taxa.
-        ///     If the value is greater than 1 for any parent then the value should equal to the max value among parents.
-        /// </summary>
-        /// <returns></returns>
-        private int GetProtectionLevel()
-        {
-            return 1;
         }
 
         /// <summary>

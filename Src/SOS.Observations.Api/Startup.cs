@@ -40,12 +40,12 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Security;
+using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Services;
-using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -279,12 +279,15 @@ namespace SOS.Observations.Api
 
             var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
                 .Get<BlobStorageConfiguration>();
-
+        
             // Add configuration
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
-            services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
+            services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+
+            // Add security
+            services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();

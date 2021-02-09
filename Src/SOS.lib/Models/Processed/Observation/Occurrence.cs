@@ -75,6 +75,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     within the data set or collection.
         /// </summary>
         public string CatalogNumber { get; set; }
+        /// <summary>
+        /// Catalog Id
+        /// </summary>
+        public int CatalogId { get; set; }
 
         /// <summary>
         ///    DiscoveryMethod from Artportalen
@@ -177,6 +181,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Red list database: urn:lsid:artdata.slu.se:SpeciesObservation:{id}
         /// </summary>
         // ReSharper disable once InconsistentNaming
+        [Keyword]
         public string OccurrenceId { get; set; }
 
         /// <summary>

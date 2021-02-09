@@ -87,7 +87,7 @@ namespace SOS.Lib.Repositories
         /// <summary>
         /// Name of collection
         /// </summary>
-        protected string CollectionName => IncrementalMode ? $"{_collectionName}_incremental" : _collectionName;
+        protected virtual string CollectionName => $"{_collectionName}{(IncrementalMode ? "_incremental" : "")}";
 
         protected readonly IMongoClient Client;
 
@@ -126,7 +126,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -496,23 +496,16 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<TKey, TKey>> GetIdSpanAsync()
+        public async Task<TKey> GetMaxIdAsync()
         {
-            return await GetIdSpanAsync(MongoCollection);
+            return await GetMaxIdAsync(MongoCollection);
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<TKey, TKey>> GetIdSpanAsync(IMongoCollection<TEntity> mongoCollection)
+        public async Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
-                var min = await mongoCollection
-                    .Find(FilterDefinition<TEntity>.Empty)
-                    .Project(d => d.Id)
-                    .Sort(Builders<TEntity>.Sort.Ascending("_id"))
-                    .Limit(1)
-                    .FirstOrDefaultAsync();
-
                 var max = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     .Project(d => d.Id)
@@ -520,7 +513,7 @@ namespace SOS.Lib.Repositories
                     .Limit(1)
                     .FirstOrDefaultAsync();
 
-                return new Tuple<TKey, TKey>(min, max);
+                return max;
             }
             catch (Exception e)
             {

@@ -133,10 +133,19 @@ namespace SOS.Lib.Repositories.Processed
         /// Get name of instance
         /// </summary>
         /// <param name="instance"></param>
+
         /// <returns></returns>
-        protected string GetInstanceName(byte instance) =>  _toggleable
-                ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}"
-                : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+        protected string GetInstanceName(byte instance, bool protectedObservations) 
+        {
+            var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+            if(protectedObservations)
+            {
+                instanceName += "-protected";
+            }
+
+            instanceName += $"{(_toggleable ? $"-{instance}" : string.Empty)}";
+            return instanceName;
+        }
 
         /// <summary>
         ///  Constructor
@@ -185,13 +194,7 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance);
-
-        /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance);
-
-        /// <inheritdoc />
-        public string CurrentInstanceName=> LiveMode ? ActiveInstanceName : InactiveInstanceName;
+        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
 
         /// <inheritdoc />
         public bool LiveMode { get; set; }

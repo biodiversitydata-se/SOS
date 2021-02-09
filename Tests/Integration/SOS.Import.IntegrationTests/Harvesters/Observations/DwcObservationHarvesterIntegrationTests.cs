@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -142,6 +143,12 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = @"C:\DwC-A\Riksskogstaxeringen\Riksskogstaxeringen-RTFulldataset20200626.zip";
+
+            if (!File.Exists(archivePath))
+            {
+                return;
+            }
+
             var dataProvider = new DataProvider
             {
                 Id = 104,

@@ -29,7 +29,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -60,7 +60,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
                             batchId++;
 
-                            processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                            processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                             observations.Clear();
                             Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                         }
@@ -74,7 +74,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                 }
@@ -93,7 +93,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// </summary>
         /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
@@ -101,12 +101,12 @@ namespace SOS.Process.Processors.VirtualHerbarium
         public VirtualHerbariumObservationProcessor(
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<VirtualHerbariumObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(

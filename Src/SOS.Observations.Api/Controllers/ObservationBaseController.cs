@@ -170,6 +170,35 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        /// <summary>
+        /// Make sure filter contains taxa
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="allowUnderlyingTaxa"></param>
+        /// <returns></returns>
+        protected Result ValidateTaxonExists(SearchFilterBaseDto filter)
+        {
+            var taxonCount = filter?.Taxon?.TaxonIds?.Count() ?? 0;
+            return taxonCount == 0 
+                ? Result.Failure("You must provide taxon id's") 
+                : Result.Success();
+        }
+
+        /// <summary>
+        /// Make sure geographical data 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        protected Result ValidateGeographicalAreaExists(SearchFilterBaseDto filter)
+        {
+            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries.Any() ?? true))
+            {
+                Result.Failure("You must provide area/s or geometry");
+            }
+
+            return Result.Success();
+        }
+
         protected Result ValidateTranslationCultureCode(string translationCultureCode)
         {
             // No culture code, set default

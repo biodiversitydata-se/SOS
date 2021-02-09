@@ -19,24 +19,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         byte ActiveInstance { get; }
 
         /// <summary>
+        /// Return current instance
+        /// </summary>
+        byte CurrentInstance { get; }
+
+        /// <summary>
         ///     Get 0 or 1 depending of witch instance to update
         /// </summary>
         byte InActiveInstance { get; }
-
-        /// <summary>
-        /// Name of active instance
-        /// </summary>
-        string ActiveInstanceName { get; }
-
-        /// <summary>
-        /// Name of inactive instance
-        /// </summary>
-        string InactiveInstanceName { get; }
-
-        /// <summary>
-        /// Current instance
-        /// </summary>
-        string CurrentInstanceName { get; }
 
         /// <summary>
         /// Run mode

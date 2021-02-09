@@ -44,6 +44,8 @@ namespace SOS.Import.Harvesters.Observations
             _mvmServiceConfiguration = mvmServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(mvmServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _mvmObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -95,6 +97,10 @@ namespace SOS.Import.Harvesters.Observations
                     result = await _mvmObservationService.GetAsync(maxId + 1);
                     maxId = result?.Item1 ?? 0;
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for MVM verbatim");
+                await _mvmObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for MVM verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for MVM data provider");
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
@@ -16,6 +17,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Date filter.
         /// </summary>
         public DateFilterDto Date { get; set; }
+
+        /// <summary>
+        /// Filter by diffuse status
+        /// </summary>
+        public IEnumerable<DiffuseStatusDto> DiffuseStatuses { get; set; }
 
         /// <summary>
         /// Taxon filter.

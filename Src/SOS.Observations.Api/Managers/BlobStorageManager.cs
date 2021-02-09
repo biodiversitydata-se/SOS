@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Misc;
 using SOS.Lib.Services.Interfaces;
@@ -36,9 +37,9 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public IEnumerable<File> GetExportFiles()
+        public async Task<IEnumerable<File>> GetExportFilesAsync()
         {
-            return _blobStorageService.GetExportFiles();
+            return await _blobStorageService.GetExportFilesAsync();
         }
     }
 }

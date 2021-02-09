@@ -21,12 +21,14 @@ namespace SOS.Process.UnitTests.Managers
         /// </summary>
         public InstanceManagerTests()
         {
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _loggerMock = new Mock<ILogger<InstanceManager>>();
         }
 
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<ILogger<InstanceManager>> _loggerMock;
 
@@ -43,11 +45,15 @@ namespace SOS.Process.UnitTests.Managers
             _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
+            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ThrowsAsync(new Exception("Failed"));
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -77,6 +83,7 @@ namespace SOS.Process.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -102,10 +109,19 @@ namespace SOS.Process.UnitTests.Managers
             _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
+            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
             _processedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
+            _processedProtectedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
             _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
+            _processedProtectedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -113,6 +129,7 @@ namespace SOS.Process.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -138,11 +155,15 @@ namespace SOS.Process.UnitTests.Managers
             _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ThrowsAsync(new Exception("Failed"));
 
+            _processedProtectedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+                .ThrowsAsync(new Exception("Failed"));
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -171,6 +192,7 @@ namespace SOS.Process.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -195,11 +217,14 @@ namespace SOS.Process.UnitTests.Managers
             _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ReturnsAsync(true);
 
+            _processedProtectedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
+                _processedProtectedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 

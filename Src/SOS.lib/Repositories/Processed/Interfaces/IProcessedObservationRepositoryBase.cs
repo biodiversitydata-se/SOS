@@ -11,7 +11,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
+    public interface IProcessedObservationRepositoryBase : IProcessRepositoryBase<Observation>
     {
         public string IndexName { get; }
 
@@ -49,7 +49,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Delete observations by occurence id
         /// </summary>
         /// <param name="occurenceIds"></param>
-        Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds);
+        Task<bool> DeleteByOccurrenceIdAsync(IEnumerable<string> occurenceIds);
 
         /// <summary>
         /// Turn of indexing
@@ -69,6 +69,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <returns></returns>
+        Task<long> IndexCount();
 
         /// <summary>
         ///     Get observation by scroll
@@ -110,9 +116,20 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             string scrollId);
 
         /// <summary>
+        /// Make sure no protected observations are in public index or no public observations are in protected index
+        /// </summary>
+        /// <returns>true if everything is fine</returns>
+        Task<bool> ValidateProtectionLevelAsync();
+
+        /// <summary>
         /// Verify that collection exists
         /// </summary>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
+
+        /// <summary>
+        /// Batch size used for write
+        /// </summary>
+        int WriteBatchSize { get; set; }
     }
 }

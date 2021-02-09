@@ -12,7 +12,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// Creates a with additional information if necessary. E.g. adding underlying taxon ids.
         /// </summary>
         /// <param name="filter"></param>
-        /// <returns>A cloned filter with additional information.</returns>
+        /// <returns></returns>
         Task PrepareFilter(FilterBase filter);
     }
 }

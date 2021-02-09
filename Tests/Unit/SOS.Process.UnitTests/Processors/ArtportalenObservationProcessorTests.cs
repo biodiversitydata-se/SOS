@@ -16,6 +16,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen;
 using Xunit;
 
@@ -32,31 +33,38 @@ namespace SOS.Process.UnitTests.Processors
         public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+            _diffusionManagerMock = new Mock<IDiffusionManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
+        private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
-            _processedObservationRepositoryMock.Object,
+            _processedPublicObservationRepositoryMock.Object,
+            _processedProtectedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
             _vocabularyResolverMock.Object,
             _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _diffusionManagerMock.Object,
             _validationManagerMock.Object,
             _loggerMock.Object);
 
@@ -109,7 +117,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null,  JobRunModes.Full, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -127,8 +135,11 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedPublicObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
+            _processedProtectedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
                 .ReturnsAsync(new[]
                 {
@@ -138,14 +149,19 @@ namespace SOS.Process.UnitTests.Processors
                     }
                 });
 
-            _processedObservationRepositoryMock
+            _processedPublicObservationRepositoryMock
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+                .ReturnsAsync(1);
+
+            _processedProtectedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 
             var dataProvider = new DataProvider
             {
                 Name = "Artportalen",
-                Type = DataProviderType.ArtportalenObservations
+                Type = DataProviderType.ArtportalenObservations,
+                SupportProtectedHarvest = true
             };
 
             var taxa = new Dictionary<int, Taxon>

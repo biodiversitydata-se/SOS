@@ -91,9 +91,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
-            var filterManager = new FilterManager(taxonManager, areaCache);
+            var filterManager = new FilterManager(taxonManager, null /*Todo*/, areaCache);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
-                filterManager, new NullLogger<ObservationManager>());
+                filterManager,  new NullLogger<ObservationManager>());
 
             return observationsManager;
         }

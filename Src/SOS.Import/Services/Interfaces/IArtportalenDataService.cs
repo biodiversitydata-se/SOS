@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Import.Services.Interfaces
 {
@@ -8,6 +9,11 @@ namespace SOS.Import.Services.Interfaces
     /// </summary>
     public interface IArtportalenDataService
     {
+        /// <summary>
+        ///  Service configuration
+        /// </summary>
+        ArtportalenConfiguration Configuration { get; }
+
         /// <summary>
         /// Query data base
         /// </summary>

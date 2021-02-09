@@ -15,7 +15,6 @@ using SOS.Lib.Configuration.Process;
 using SOS.Process.Services.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Mappings;
 
 namespace SOS.Process.Services
 {
@@ -25,6 +24,16 @@ namespace SOS.Process.Services
         private readonly ILogger<TaxonService> _logger;
         private readonly string _taxonDwcUrl;
         private readonly ITaxonServiceProxy _taxonServiceProxy;
+
+        private static CsvConfiguration GetCsvConfiguration(string csvFieldDelimiter) => new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            Delimiter = csvFieldDelimiter,
+            Encoding = Encoding.UTF8,
+            HasHeaderRecord = true,
+            PrepareHeaderForMatch = (string header, int index) => header.ToLower(),
+            HeaderValidated = null,
+            MissingFieldFound = null
+        };
 
         /// <summary>
         ///     Constructor
@@ -97,15 +106,9 @@ namespace SOS.Process.Services
 
             // Read taxon data
             using var taxonReader = new StreamReader(taxonFile.Open(), Encoding.UTF8);
-            using var taxonCsv = new CsvReader(taxonReader, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = csvFieldDelimiter,
-                Encoding = Encoding.UTF8,
-                HasHeaderRecord = true
-            });
+            using var taxonCsv = new CsvReader(taxonReader, GetCsvConfiguration(csvFieldDelimiter));
 
             // Get all taxa from file
-            taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
             var alltaxa = taxonCsv
                 .GetRecords<DarwinCoreTaxon>().ToArray();
             
@@ -180,15 +183,7 @@ namespace SOS.Process.Services
 
             // Read taxon relations data
             using var taxonRelationsReader = new StreamReader(taxonRelationsFile.Open(), Encoding.UTF8);
-            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader,
-                new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    Delimiter = csvFieldDelimiter,
-                    Encoding = Encoding.UTF8,
-                    HasHeaderRecord = true
-                });
-
-            taxonRelationsCsv.Configuration.RegisterClassMap<TaxonRelationMapper>();
+            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, GetCsvConfiguration(csvFieldDelimiter));
 
             // Get taxon relations using Guids (string) and convert to taxon relations using Dyntaxa Taxon Id (int)
             var allTaxonRelations = taxonRelationsCsv
@@ -240,14 +235,7 @@ namespace SOS.Process.Services
 
             // Read taxon sort order data
             using var taxonSortOrdersReader = new StreamReader(taxonSortOrdersFile.Open(), Encoding.UTF8);
-            using var taxonSortOrdersCsv = new CsvReader(taxonSortOrdersReader, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = csvFieldDelimiter,
-                Encoding = Encoding.UTF8,
-                HasHeaderRecord = true
-            });
-
-            taxonSortOrdersCsv.Configuration.RegisterClassMap<TaxonSortOrderMapper>();
+            using var taxonSortOrdersCsv = new CsvReader(taxonSortOrdersReader, GetCsvConfiguration(csvFieldDelimiter));
 
             // Get taxon sort orders by guid
             var allTaxonSortOrders = taxonSortOrdersCsv
@@ -289,16 +277,9 @@ namespace SOS.Process.Services
 
             // Read vernacular name data
             using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
-            using var vernacularNameCsv = new CsvReader(vernacularNameReader,
-                new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    Delimiter = csvFieldDelimiter,
-                    Encoding = Encoding.UTF8,
-                    HasHeaderRecord = true
-                });
+            using var vernacularNameCsv = new CsvReader(vernacularNameReader, GetCsvConfiguration(csvFieldDelimiter));
 
             // Get all vernacular names from file
-            vernacularNameCsv.Configuration.RegisterClassMap<VernacularNameMapper>();
             var vernacularNames = vernacularNameCsv.GetRecords<DarwinCoreVernacularName>().ToArray();
             var vernacularNamesByTaxonId = vernacularNames
                 .GroupBy(m => m.TaxonID)

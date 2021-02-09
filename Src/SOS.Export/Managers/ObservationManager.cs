@@ -30,7 +30,7 @@ namespace SOS.Export.Managers
         private readonly string _exportPath;
         private readonly IFileService _fileService;
         private readonly ILogger<ObservationManager> _logger;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IZendToService _zendToService;
 
@@ -38,7 +38,7 @@ namespace SOS.Export.Managers
         ///     Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="blobStorageService"></param>
@@ -48,7 +48,7 @@ namespace SOS.Export.Managers
         /// <param name="logger"></param>
         public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
@@ -57,8 +57,8 @@ namespace SOS.Export.Managers
             IFilterManager filterManager,
             ILogger<ObservationManager> logger)
         {
-            _processedObservationRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedPublicObservationRepository = processedPublicObservationRepository ??
+                                                    throw new ArgumentNullException(nameof(processedPublicObservationRepository));
             _processInfoRepository =
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -159,13 +159,13 @@ namespace SOS.Export.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.ActiveInstanceName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedPublicObservationRepository.IndexName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
-                    _processedObservationRepository,
+                    _processedPublicObservationRepository,
                     fieldDescriptions,
                     processInfo,
                     _exportPath,

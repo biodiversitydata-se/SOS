@@ -28,18 +28,19 @@ namespace SOS.Lib.Models.Search
                 return;
             }
 
-            StartDate = searchFilter.StartDate;
-            EndDate = searchFilter.EndDate;
-            DateFilterType = searchFilter.DateFilterType;
+            AreaGeographic = searchFilter.AreaGeographic;
             Areas = searchFilter.Areas;
-            TaxonIds = searchFilter.TaxonIds;
-            IncludeUnderlyingTaxa = searchFilter.IncludeUnderlyingTaxa;
-            RedListCategories = searchFilter.RedListCategories;
             DataProviderIds = searchFilter.DataProviderIds;
+            DateFilterType = searchFilter.DateFilterType;
+            EndDate = searchFilter.EndDate;
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
+            Geometries = searchFilter.Geometries;
+            IncludeUnderlyingTaxa = searchFilter.IncludeUnderlyingTaxa;
             OnlyValidated = searchFilter.OnlyValidated;
-            GeometryFilter = searchFilter.GeometryFilter;
             PositiveSightings = searchFilter.PositiveSightings;
+            RedListCategories = searchFilter.RedListCategories;
+            StartDate = searchFilter.StartDate;
+            TaxonIds = searchFilter.TaxonIds;
         }
 
         public int? ReportedByUserId { get; set; }

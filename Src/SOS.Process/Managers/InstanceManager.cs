@@ -15,15 +15,17 @@ namespace SOS.Process.Managers
         private readonly IProcessInfoRepository _processInfoRepository;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public InstanceManager(
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IProcessInfoRepository processInfoRepository,
-            ILogger<InstanceManager> logger) : base(processedObservationRepository, logger)
+            ILogger<InstanceManager> logger) : base(processedPublicObservationRepository, processedProtectedObservationRepository, logger)
         {
             _processInfoRepository =
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
@@ -35,16 +37,21 @@ namespace SOS.Process.Managers
             try
             {
                 Logger.LogDebug("Start deleting data from inactive instance");
-                if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
+                if (!await PublicProcessRepository.DeleteProviderDataAsync(dataProvider))
                 {
-                    Logger.LogError("Failed to delete from inactive instance");
+                    Logger.LogError("Failed to delete delete public data from inactive instance");
                     return false;
                 }
-
+                if (!await ProtectedProcessRepository.DeleteProviderDataAsync(dataProvider))
+                {
+                    Logger.LogError("Failed to delete protected data from inactive instance");
+                    return false;
+                }
                 Logger.LogDebug("Finish deleting data from inactive instance");
 
                 Logger.LogDebug("Start copying data from active to inactive instance");
-                if (await ProcessRepository.CopyProviderDataAsync(dataProvider))
+                if (await PublicProcessRepository.CopyProviderDataAsync(dataProvider) && 
+                    await ProtectedProcessRepository.CopyProviderDataAsync(dataProvider))
                 {
                     Logger.LogDebug("Finish copying data from active to inactive instance");
 
@@ -70,7 +77,7 @@ namespace SOS.Process.Managers
             {
                 Logger.LogDebug($"Activating instance: {instance}");
 
-                return await ProcessRepository.SetActiveInstanceAsync(instance);
+                return await PublicProcessRepository.SetActiveInstanceAsync(instance);
             }
             catch (Exception e)
             {

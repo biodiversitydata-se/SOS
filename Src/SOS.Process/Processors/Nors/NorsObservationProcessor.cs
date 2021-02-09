@@ -31,19 +31,19 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="norsObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<NorsObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(
@@ -79,7 +79,7 @@ namespace SOS.Process.Processors.Nors
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"NORS observations processed: {processedCount}");
                 }
@@ -92,7 +92,7 @@ namespace SOS.Process.Processors.Nors
 
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"NORS observations processed: {processedCount}");
             }

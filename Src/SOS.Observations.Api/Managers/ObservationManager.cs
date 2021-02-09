@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Exceptions;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -36,6 +41,7 @@ namespace SOS.Observations.Api.Managers
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyManager vocabularyManager,
             IFilterManager filterManager,
+           
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -60,6 +66,10 @@ namespace SOS.Observations.Api.Managers
                 ResolveNonLocalizedVocabularyFields(processedObservations.Records);
                 return processedObservations;
             }
+            catch (AuthenticationRequiredException e)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get chunk of observations");
@@ -81,6 +91,10 @@ namespace SOS.Observations.Api.Managers
                     return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take);
 
                 return null;
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -193,9 +207,11 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
+            await _filterManager.PrepareFilter(filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
+        /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             LatLonBoundingBox bbox,
@@ -210,6 +226,29 @@ namespace SOS.Observations.Api.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get taxon aggregation");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            SearchFilter filter)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter);
+
+                if (filter?.TaxonIds?.Count() > 10000)
+                {
+                    throw new TaxonValidationException("Your filter exceeds 10000 taxon id's");
+                }
+
+                var result = await _processedObservationRepository.GetTaxonExistsIndicationAsync(filter);
+                return result?.ToTaxonAggregationItemDtos();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get taxon exists indication");
                 throw;
             }
         }

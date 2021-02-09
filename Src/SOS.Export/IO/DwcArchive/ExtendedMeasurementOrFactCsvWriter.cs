@@ -31,19 +31,19 @@ namespace SOS.Export.IO.DwcArchive
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>True if any records is written to the file; otherwise false.</returns>
         public async Task<bool> CreateCsvFileAsync(
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
+                var scrollResult = await processedPublicObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
@@ -68,7 +68,7 @@ namespace SOS.Export.IO.DwcArchive
                     await streamWriter.FlushAsync();
 
                     // Get next batch of observations.
-                    scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedPublicObservationRepository.ScrollMeasurementOrFactsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

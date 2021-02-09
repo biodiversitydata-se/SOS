@@ -65,7 +65,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
 
             // Repositories mongo
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository> ()
                 .InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();

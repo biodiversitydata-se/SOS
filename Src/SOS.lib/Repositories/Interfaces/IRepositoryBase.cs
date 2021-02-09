@@ -231,16 +231,16 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
-        ///     Get min and max id in collection
+        ///     Get  max id in collection
         /// </summary>
         /// <returns></returns>
-        Task<Tuple<TKey, TKey>> GetIdSpanAsync();
+        Task<TKey> GetMaxIdAsync();
 
         /// <summary>
-        ///     Get min and max id in collection
+        ///     Get max id in collection
         /// </summary>
         /// <returns></returns>
-        Task<Tuple<TKey, TKey>> GetIdSpanAsync(IMongoCollection<TEntity> mongoCollection);
+        Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
         /// Set incremental mode

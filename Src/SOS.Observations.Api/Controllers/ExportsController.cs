@@ -52,11 +52,11 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult GetExportFiles()
+        public async Task<IActionResult> GetExportFilesAsync()
         {
             try
             {
-                var files = _blobStorageManager.GetExportFiles();
+                var files = await _blobStorageManager.GetExportFilesAsync();
 
                 return new OkObjectResult(files);
             }
@@ -108,7 +108,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResults.Error);
                 }
 
-                var exportFilter = filter.ToSearchFilter("en-GB");
+                var exportFilter = filter.ToSearchFilter("en-GB", false);
                 var matchCount = await ObservationManager.GetMatchCountAsync(exportFilter);
 
                 if (matchCount == 0)

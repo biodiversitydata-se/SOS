@@ -12,6 +12,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Helpers
@@ -24,7 +25,6 @@ namespace SOS.Lib.Helpers
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
-        private bool _initialized;
 
         /// <summary>
         ///     Constructor
@@ -65,13 +65,54 @@ namespace SOS.Lib.Helpers
             processedObservation.Location.Parish = positionLocation?.Parish;
             processedObservation.Location.Province = positionLocation?.Province;
             processedObservation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
-            SetCountyPartIdByCoordinate(processedObservation);
-            SetProvincePartIdByCoordinate(processedObservation);
+
+            processedObservation.Location.ProvincePartIdByCoordinate =
+                GetProvincePartIdByCoordinate(processedObservation.Location.Province?.FeatureId);
+
+            processedObservation.Location.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
+                processedObservation.Location.County?.FeatureId, processedObservation.Location.Province?.FeatureId);
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToSite(Site site)
+        {
+            if (site.Point == null)
+            {
+                return;
+            }
+
+         /*   var coordinates = site.Point.Coordinates.ToArray().Select(p => (double)p).ToArray();
+            var positionLocation = GetPositionLocation(coordinates[0], coordinates[1]);
+            site.County = positionLocation?.County == null ? null :new GeographicalArea
+            {
+                FeatureId = positionLocation.County.FeatureId,
+                Name = positionLocation.County.Name
+            };
+            site.Municipality = positionLocation?.Municipality == null ? null : new GeographicalArea
+            {
+                FeatureId = positionLocation.Municipality.FeatureId,
+                Name = positionLocation.Municipality.Name
+            };
+            site.Parish = positionLocation?.Parish == null ? null : new GeographicalArea
+            {
+                FeatureId = positionLocation.Parish.FeatureId,
+                Name = positionLocation.Parish.Name
+            };
+            site.Province = positionLocation?.Province == null ? null : new GeographicalArea
+            {
+                FeatureId = positionLocation.Province.FeatureId,
+                Name = positionLocation.Province.Name
+            };*/
+            site.ProvincePartIdByCoordinate =
+                GetProvincePartIdByCoordinate(site.Province?.FeatureId);
+
+            site.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
+               site.County?.FeatureId, site.Province?.FeatureId);
         }
 
         public void ClearCache()
         {
-            _initialized = false;
+            IsInitialized = false;
             _featureCache = new ConcurrentDictionary<string, PositionLocation>();
             _strTree = new STRtree<IFeature>();
         }
@@ -80,7 +121,7 @@ namespace SOS.Lib.Helpers
         public async Task InitializeAsync()
         {
             // If tree already initialized, return
-            if (_initialized)
+            if (IsInitialized)
             {
                 return;
             }
@@ -101,8 +142,11 @@ namespace SOS.Lib.Helpers
             }
 
             _strTree.Build();
-            _initialized = true;
+            IsInitialized = true;
         }
+
+        /// <inheritdoc />
+        public bool IsInitialized { get; private set; }
 
         /// <summary>
         ///     Get all features where position is inside area
@@ -214,6 +258,40 @@ namespace SOS.Lib.Helpers
                     processedObservation.Location.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
                 }
             }
+        }
+
+        private static string GetProvincePartIdByCoordinate(string provinceFeatureId)
+        {
+            if (new[]
+            {
+                ProvinceIds.LuleLappmark,
+                ProvinceIds.LyckseleLappmark,
+                ProvinceIds.PiteLappmark,
+                ProvinceIds.TorneLappmark,
+                ProvinceIds.ÅseleLappmark
+            }.Contains(provinceFeatureId))
+            {
+               return SpecialProvincePartId.Lappland;
+            }
+
+            return provinceFeatureId;
+        }
+
+        private static string GetCountyPartIdByCoordinate(string countyFeatureId, string provinceFeatureId)
+        {
+            if (countyFeatureId == CountyId.Kalmar)
+            {
+                if (provinceFeatureId == ProvinceIds.Öland)
+                {
+                    return SpecialCountyPartId.Öland;
+                }
+                else
+                {
+                    return SpecialCountyPartId.KalmarFastland;
+                }
+            }
+
+            return countyFeatureId;
         }
     }
 }

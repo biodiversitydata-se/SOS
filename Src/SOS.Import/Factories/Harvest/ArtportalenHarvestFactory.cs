@@ -10,6 +10,7 @@ using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
@@ -23,6 +24,7 @@ namespace SOS.Import.Factories.Harvest
         private readonly ISiteRepository _siteRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
+        private readonly IAreaHelper _areaHelper;
 
         private int _idCounter;
         private int NextId => Interlocked.Increment(ref _idCounter);
@@ -218,7 +220,6 @@ namespace SOS.Import.Factories.Harvest
                 return null;
             }
 
-            var projectParameterEntities = await _projectRepository.GetSightingProjectParametersAsync(sightingIds);
             var sightingProjectIds = (await _sightingRepository.GetSightingProjectIdsAsync(sightingIds))?.ToArray();
 
             if (!sightingProjectIds?.Any() ?? true)
@@ -241,50 +242,54 @@ namespace SOS.Import.Factories.Harvest
                 if (!sightingsProjects.TryGetValue(sightingId, out var sightingProjects))
                 {
                     sightingProjects = new Dictionary<int, Project>();
-                    sightingsProjects.Add(sightingId, sightingProjects);
+                    sightingsProjects.TryAdd(sightingId, sightingProjects);
                 }
 
                 if (!sightingProjects.ContainsKey(projectId))
                 {
-                    sightingProjects.Add(project.Id, project.Clone());
+                    
+                    // Make a copy of project so we can add params to it later
+                    sightingProjects.TryAdd(project.Id, project.Clone());
                 }
             }
 
-            foreach (var projectParameterEntity in projectParameterEntities)
+            var projectParameterEntities = (await _projectRepository.GetSightingProjectParametersAsync(sightingIds))?.ToArray();
+
+            if (projectParameterEntities?.Any() ?? false)
             {
-                Project project = null;
+                for (var i = 0; i < projectParameterEntities.Length; i++)
+                {
+                    var projectParameterEntity = projectParameterEntities[i];
+                    Project project = null;
 
-                // Try to get projects by sighting id
-                if (sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
-                {
-                    // Try to get sighting project 
-                    sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out project);
-                }
-                else
-                {
-                    // Sighting projects is missing, add it
-                    sightingProjects = new Dictionary<int, Project>();
-                    sightingsProjects.Add(projectParameterEntity.SightingId, sightingProjects);
-                }
-
-                if (project == null)
-                {
-                    if (!_artportalenMetadataContainer.Projects.ContainsKey(projectParameterEntity.ProjectId))
+                    // Try to get projects by sighting id
+                    if (sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
                     {
-                        continue;
+                        // Try to get sighting project 
+                        sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out project);
+                    }
+                    else
+                    {
+                        // Sighting projects is missing, add it
+                        sightingProjects = new Dictionary<int, Project>();
+                        sightingsProjects.TryAdd(projectParameterEntity.SightingId, sightingProjects);
                     }
 
-                    // Get project from all projects
-                    project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId].Clone();
-                    sightingProjects.Add(project.Id, project.Clone());
-                }
+                    if (project == null)
+                    {
+                        if (!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project))
+                        {
+                            continue;
+                        }
 
-                if (project.ProjectParameters == null)
-                {
-                    project.ProjectParameters = new List<ProjectParameter>();
-                }
+                        // Get project from all projects
+             
+                        sightingProjects.TryAdd(project.Id, project.Clone());
+                    }
 
-                project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
+                    project.ProjectParameters ??= new List<ProjectParameter>();
+                    project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
+                }
             }
 
             return sightingsProjects.Any() ? sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray()) : null;
@@ -297,45 +302,37 @@ namespace SOS.Import.Factories.Harvest
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        private async Task AddMissingSitesAsync(HashSet<int> newSiteIds)
+        private async Task AddMissingSitesAsync(IEnumerable<int> siteIds)
         {
-            if (!newSiteIds?.Any() ?? true)
+            if (!siteIds?.Any() ?? true)
             {
                 return;
             }
 
-            var batchSize = 10000;
-            var startIndex = 0;
-            var idBatch = newSiteIds.Take(batchSize).ToArray();
+            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
+            var siteAreas = await _siteRepository.GetSitesAreas(siteIds);
+            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds); // It's faster to get geometries in separate query than join it in site query
 
-            while (idBatch?.Any() ?? false)
+            var sites = CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+
+            if (sites?.Any() ?? false)
             {
-                var siteEntities = await _siteRepository.GetByIdsAsync(idBatch, IncrementalMode);
-                var siteBirdValidationAreaIds = await _siteRepository.GetSiteBirdValidationAreaIds(idBatch);
-
-                var sites = CastSiteEntitiesToVerbatim(siteEntities?.ToList(), siteBirdValidationAreaIds);
-
-                if (sites?.Any() ?? false)
+                foreach (var site in sites)
                 {
-                    foreach (var site in sites)
-                    {
-                        _sites.TryAdd(site.Id, site);
-                    }
-
-                    startIndex += batchSize;
-                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize)?.ToArray();
+                    _sites.TryAdd(site.Id, site);
                 }
             }
         }
 
         /// <summary>
-        ///  Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
+        /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
         ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
         /// </summary>
         /// <param name="siteEntities"></param>
-        /// <param name="siteBirdValidationAreaIds"></param>
+        /// <param name="sitesAreas"></param>
+        /// <param name="sitesGeometry"></param>
         /// <returns></returns>
-        private IEnumerable<Site> CastSiteEntitiesToVerbatim(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<string>> siteBirdValidationAreaIds)
+        private IEnumerable<Site> CastSiteEntitiesToVerbatim(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<AreaEntityBase>> sitesAreas, IDictionary<int, string> sitesGeometry)
         {
             var sites = new List<Site>();
 
@@ -344,20 +341,23 @@ namespace SOS.Import.Factories.Harvest
                 return sites;
             }
 
-            while (siteEntities.Count > 0)
-            {
-                var siteEntity = siteEntities.First();
+            // Make sure metadata are initialized
+            sitesAreas ??= new Dictionary<int, ICollection<AreaEntityBase>>();
+            sitesGeometry ??= new Dictionary<int, string>();
 
-                var site = CastSiteEntityToVerbatim(siteEntity, siteBirdValidationAreaIds);
-                
+            foreach (var siteEntity in siteEntities)
+            {
+                sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
+                sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
+
+                var site = CastSiteEntityToVerbatim(siteEntity, siteAreas, geometryWkt);
+
                 if (site != null)
                 {
                     sites.Add(site);
                 }
-               
-                siteEntities.Remove(siteEntity);
             }
-
+          
             return sites;
         }
 
@@ -365,9 +365,10 @@ namespace SOS.Import.Factories.Harvest
         /// Cast site itemEntity to aggregate
         /// </summary>
         /// <param name="entity"></param>
-        /// <param name="siteBirdValidationAreaIds"></param>
+        /// <param name="areas"></param>
+        /// <param name="geometryWkt"></param>
         /// <returns></returns>
-        private Site CastSiteEntityToVerbatim(SiteEntity entity, IDictionary<int, ICollection<string>> siteBirdValidationAreaIds)
+        private Site CastSiteEntityToVerbatim(SiteEntity entity, ICollection<AreaEntityBase> areas, string geometryWkt)
         {
             if (entity == null)
             {
@@ -385,25 +386,22 @@ namespace SOS.Import.Factories.Harvest
                 wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
+            Geometry siteGeometry = null;
+            if (!string.IsNullOrEmpty(geometryWkt))
+            {
+                siteGeometry = geometryWkt.ToGeometry().Buffer(0)
+                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            }
+
             var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
             var site = new Site
             {
                 Accuracy = accuracy,
-                County = string.IsNullOrEmpty(entity.CountyFeatureId)
-                    ? null : new GeographicalArea { FeatureId = entity.CountyFeatureId, Name = entity.CountyName },
-                CountryPart = string.IsNullOrEmpty(entity.CountryPartFeatureId)
-                    ? null : new GeographicalArea { FeatureId = entity.CountryPartFeatureId, Name = entity.CountryPartName },
                 ExternalId = entity.ExternalId,
                 Id = entity.Id,
-                Municipality = string.IsNullOrEmpty(entity.MunicipalityFeatureId)
-                    ? null : new GeographicalArea { FeatureId = entity.MunicipalityFeatureId, Name = entity.MunicipalityName },
-                Province = string.IsNullOrEmpty(entity.ProvinceFeatureId)
-                    ? null : new GeographicalArea { FeatureId = entity.ProvinceFeatureId, Name = entity.ProvinceName },
-                Parish = string.IsNullOrEmpty(entity.ParishFeatureId)
-                    ? null : new GeographicalArea { FeatureId = entity.ParishFeatureId, Name = entity.ParishName },
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry ?? wgs84Point?.ToCircle(accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
@@ -411,10 +409,34 @@ namespace SOS.Import.Factories.Harvest
                 ParentSiteId = entity.ParentSiteId
             };
 
-            if (siteBirdValidationAreaIds != null && siteBirdValidationAreaIds.TryGetValue(site.Id, out var birdValidationAreaIds))
+            if (!areas?.Any() ?? true)
             {
-                site.BirdValidationAreaIds = birdValidationAreaIds;
+                return site;
             }
+
+            foreach (var area in areas)
+            {
+                switch ((AreaType)area.AreaDatasetId)
+                {
+                    case AreaType.BirdValidationArea:
+                        (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
+                        break;
+                    case AreaType.County:
+                        site.County = new GeographicalArea{FeatureId = area.FeatureId, Name = area.Name};
+                        break;
+                    case AreaType.Municipality:
+                        site.Municipality = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                        break;
+                    case AreaType.Parish:
+                        site.Parish = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                        break;
+                    case AreaType.Province:
+                        site.Province = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                        break;
+                }
+            }
+
+            _areaHelper.AddAreaDataToSite(site);
 
             return site;
         }
@@ -493,21 +515,23 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
+        /// <param name="areaHelper"></param>
         public ArtportalenHarvestFactory(
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionRepository,
-            IArtportalenMetadataContainer artportalenMetadataContainer)
+            IArtportalenMetadataContainer artportalenMetadataContainer,
+            IAreaHelper areaHelper)
         {
             _projectRepository = projectRepository;
             _sightingRepository = sightingRepository;
             _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
             _speciesCollectionRepository = speciesCollectionRepository;
-
             _artportalenMetadataContainer = artportalenMetadataContainer;
+            _areaHelper = areaHelper;
             _sites = new ConcurrentDictionary<int, Site>();
         }
 

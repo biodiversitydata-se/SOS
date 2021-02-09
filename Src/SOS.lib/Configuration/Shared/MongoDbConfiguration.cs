@@ -63,6 +63,7 @@ namespace SOS.Lib.Configuration.Shared
             // Create settings object
             var mongoSettings = new MongoClientSettings
             {
+                ReadPreference = ReadPreference.PrimaryPreferred,
                 UseTls = UseTls,
                 SslSettings = UseTls ? new SslSettings
                     {

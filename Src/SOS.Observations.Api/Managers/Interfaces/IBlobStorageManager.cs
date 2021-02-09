@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Misc;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -18,6 +19,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// Get export files list
         /// </summary>
         /// <returns></returns>
-        IEnumerable<File> GetExportFiles();
+        Task<IEnumerable<File>> GetExportFilesAsync();
     }
 }

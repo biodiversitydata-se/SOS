@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Search
 {
@@ -70,19 +71,19 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
+        /// Area geometry will be used for all types of areas if true
+        /// </summary>
+        public bool AreaGeometrySearchForced { get; set; }
+
+        /// <summary>
+        /// Filter on area geometries 
+        /// </summary>
+        public GeographicFilter AreaGeographic { get; set; }
+
+        /// <summary>
         /// Geographical areas to filter by
         /// </summary>
         public IEnumerable<AreaFilter> Areas { get; set; }
-
-        /// <summary>
-        /// Bird validation area id's
-        /// </summary>
-        public ICollection<string> BirdValidationAreaIds { get; set; }
-
-        /// <summary>
-        /// County id's
-        /// </summary>
-        public ICollection<string> CountyIds { get; set; }
 
         /// <summary>
         ///     Only get data from these providers
@@ -90,9 +91,24 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<int> DataProviderIds { get; set; }
 
         /// <summary>
+        /// Filter by diffuse status
+        /// </summary>
+        public IEnumerable<DiffuseStatus> DiffuseStatuses { get; set; }
+
+        /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// Filter used to give user extended authorization
+        /// </summary>
+        public IEnumerable<ExtendedAuthorizationFilter> ExtendedAuthorizations { get; set; }
+
+        /// <summary>
+        /// Only include ProtectedObservations
+        /// </summary>
+        public bool ProtectedObservations { get; set; }
 
         /// <summary>
         ///     Field mapping translation culture code.
@@ -103,14 +119,14 @@ namespace SOS.Lib.Models.Search
         public string FieldTranslationCultureCode { get; set; }
 
         /// <summary>
-        ///     Geometry filter 
-        /// </summary>
-        public GeometryFilter GeometryFilter { get; set; }
-
-        /// <summary>
         ///     Gender to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> GenderIds { get; set; }
+
+        /// <summary>
+        /// Geometry filter
+        /// </summary>
+        public GeometryFilter Geometries { get; set; }
 
         /// <summary>
         ///     Decides whether to search for the exact taxa or
@@ -119,24 +135,9 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     Decides whether to search for the exact taxa or
-        ///     for the hierarchical underlying taxa.
-        /// </summary>
-
-        /// <summary>
-        ///     Municipalities to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> MunicipalityIds { get; set; }
-
-        /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
-
-        /// <summary>
-        ///     Parish to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> ParishIds { get; set; }
 
         /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
@@ -144,11 +145,6 @@ namespace SOS.Lib.Models.Search
         ///     An negative observation is an observation that was expected to be found but wasn't.
         /// </summary>
         public bool? PositiveSightings { get; set; }
-
-        /// <summary>
-        ///     Provinces to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public ICollection<string> ProvinceIds { get; set; }
 
         /// <summary>
         ///     Redlist categories to match. Queryable values are available in Field Mappings.

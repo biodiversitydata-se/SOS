@@ -45,6 +45,8 @@ namespace SOS.Import.Harvesters.Observations
             _norsServiceConfiguration = norsServiceConfiguration ??
                                         throw new ArgumentNullException(nameof(norsServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _norsObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -104,6 +106,10 @@ namespace SOS.Import.Harvesters.Observations
 
                     xmlDocument = await _norsObservationService.GetAsync(changeId + 1);
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for NORS verbatim");
+                await _norsObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for NORS verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
 

@@ -11,6 +11,18 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IObservationsController
     {
         /// <summary>
+        /// Count matching observations
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> CountAsync(
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool protectedObservations = false);
+
+        /// <summary>
         ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
         ///     object
         ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
@@ -23,6 +35,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -38,7 +51,20 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> SearchAsync(SearchFilterDto filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
+
+        /// <summary>
+        /// Count matching observations using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> CountInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool protectedObservations = false);
 
         /// <summary>
         ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
@@ -53,6 +79,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="sortOrder">Sort order (ASC, DESC)</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns>List of matching observations</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -72,7 +99,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string sortBy,
             SearchSortOrder sortOrder,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
 
         Task<IActionResult> SearchAggregatedInternalAsync(
@@ -81,7 +109,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int skip,
             int take,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
         /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
@@ -124,6 +153,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
             SearchFilterAggregationDto filter,
@@ -133,7 +163,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             double? bboxRight,
             double? bboxBottom, 
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
         /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
@@ -176,6 +207,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
             SearchFilterAggregationInternalDto filter,
@@ -185,7 +217,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             double? bboxRight,
             double? bboxBottom,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
         /// <summary>
         /// Aggregates observations into grid cells and returns a GeoJSON file with all grid cells.
@@ -198,6 +231,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
             SearchFilterAggregationDto filter,
@@ -207,7 +241,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             double? bboxRight,
             double? bboxBottom,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
         /// <summary>
         /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
@@ -221,6 +256,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         Task<IActionResult> TaxonAggregationAsync(
             SearchFilterAggregationDto filter,
@@ -231,7 +267,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             double? bboxRight,
             double? bboxBottom,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
 
         /// <summary>
         /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
@@ -245,6 +282,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
         /// <returns></returns>
         Task<IActionResult> TaxonAggregationInternalAsync(
             SearchFilterAggregationInternalDto filter,
@@ -255,7 +293,33 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             double? bboxRight,
             double? bboxBottom,
             bool validateSearchFilter,
-            string translationCultureCode = "sv-SE");
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
+
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetTaxonExistsIndicationAsync(
+            SearchFilterDto filter,
+            bool validateSearchFilter = true,
+            bool protectedObservations = false);
+
+        /// <summary>
+        /// Get a indication if taxon exist in specified area using internal filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetTaxonExistsIndicationInternalAsync(
+           SearchFilterInternalDto filter,
+           bool validateSearchFilter = false,
+           bool protectedObservations = false);
 
         /// <summary>
         /// Get latest data modified date for passed provider 

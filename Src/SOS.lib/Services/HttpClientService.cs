@@ -56,32 +56,34 @@ namespace SOS.Lib.Services
                 Timeout = TimeSpan.FromMinutes(30)
             };
 
-            if (headerData?.Any() ?? false)
+            if (!headerData?.Any() ?? true)
             {
-                var userName = headerData
-                    .FirstOrDefault(hd => hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase)).Value;
-                var password = headerData
-                    .FirstOrDefault(hd => hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase)).Value;
+                return httpClient;
+            }
 
-                // Add basic authentication if user name and password is passed in header data
-                if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
-                {
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                        AuthenticationSchemes.Basic.ToString(),
-                        Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"))
-                    );
-                }
+            var userName = headerData
+                .FirstOrDefault(hd => hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase)).Value;
+            var password = headerData
+                .FirstOrDefault(hd => hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase)).Value;
 
-                foreach (var data in headerData.Where(
+            // Add basic authentication if user name and password is passed in header data
+            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    AuthenticationSchemes.Basic.ToString(),
+                    Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"))
+                );
+            }
+
+            foreach (var data in headerData.Where(
                     hd => !
                     (
                         hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase) ||
                         hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase))
-                    )
                 )
-                {
-                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                }
+            )
+            {
+                httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
             }
 
             return httpClient;
@@ -133,16 +135,18 @@ namespace SOS.Lib.Services
         public async Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData)
         {
             var httpClient = GetClient(headerData);
+            var responsePhrase = string.Empty;
             try
             {
                 var httpResponseMessage = await httpClient.GetAsync(requestUri);
+                responsePhrase = httpResponseMessage.ReasonPhrase;
                 httpResponseMessage.EnsureSuccessStatusCode();
  
                 return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
+                _logger.LogError($"{requestUri.PathAndQuery} \n{responsePhrase}: {ex.Message}");
             }
             finally
             {

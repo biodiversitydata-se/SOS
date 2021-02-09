@@ -31,19 +31,19 @@ namespace SOS.Process.Processors.Shark
         /// </summary>
         /// <param name="sharkObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public SharkObservationProcessor(ISharkObservationVerbatimRepository sharkObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<SharkObservationProcessor> logger) : 
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+            base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
                                                   throw new ArgumentNullException(
@@ -79,7 +79,7 @@ namespace SOS.Process.Processors.Shark
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"SHARK observations processed: {processedCount}");
                 }
@@ -92,7 +92,7 @@ namespace SOS.Process.Processors.Shark
 
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"SHARK observations processed: {processedCount}");
             }

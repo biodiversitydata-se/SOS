@@ -30,12 +30,12 @@ namespace SOS.Export.IO.DwcArchive
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
+                var scrollResult = await processedPublicObservationRepository.ScrollMultimediaAsync(filter, null);
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
@@ -60,7 +60,7 @@ namespace SOS.Export.IO.DwcArchive
                     await streamWriter.FlushAsync();
 
                     // Get next batch of observations.
-                    scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedPublicObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

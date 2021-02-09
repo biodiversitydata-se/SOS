@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -10,6 +13,13 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class DarwinCoreTaxonExtensions
     {
+        private static IDictionary<int, VocabularyValue> _protectionLevelCache = new ConcurrentDictionary<int, VocabularyValue>();
+
+        public static IEnumerable<Taxon> ToProcessedTaxa(this IEnumerable<DarwinCoreTaxon> sourceTaxa)
+        {
+            return sourceTaxa?.Select(t => t.ToProcessedTaxon());
+        }
+
         public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
             return new Taxon
@@ -51,7 +61,7 @@ namespace SOS.Lib.Extensions
                 ParentNameUsage = sourceTaxon.ParentNameUsage,
                 ParentNameUsageId = sourceTaxon.ParentNameUsageID,
                 Phylum = sourceTaxon.Phylum,
-                ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel,
+                ProtectionLevel =  sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
                 ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw,
                 RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                 ScientificName = sourceTaxon.ScientificName,
@@ -69,18 +79,6 @@ namespace SOS.Lib.Extensions
                 VernacularName = sourceTaxon.VernacularName,
                 VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
                 SortOrder = sourceTaxon.SortOrder
-            };
-        }
-
-        public static BasicTaxon ToProcessedBasicTaxon(this DarwinCoreTaxon sourceTaxon)
-        {
-            return new BasicTaxon
-            {
-                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
-                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
-                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds,
-                Id = sourceTaxon.Id,
-                ScientificName = sourceTaxon.ScientificName
             };
         }
 
@@ -138,6 +136,40 @@ namespace SOS.Lib.Extensions
                 //NameId = synonyme.NameId, // probably not needed
                 //Remarks = synonyme.TaxonRemarks // probably not needed
             };
+        }
+
+        /// <summary>
+        /// Try to parse string as protection level object
+        /// </summary>
+        /// <param name="protectionLevelString"></param>
+        /// <returns></returns>
+        private static VocabularyValue ToProtectionLevel(
+            this string protectionLevelString)
+        {
+            if (string.IsNullOrEmpty(protectionLevelString))
+            {
+                return null;
+            }
+
+            var regex = new Regex(@"^\d");
+            if (!int.TryParse(regex.Match(protectionLevelString).Value, out var protectionLevelId))
+            {
+                return null;
+            }
+
+            if (!_protectionLevelCache.TryGetValue(protectionLevelId, out var protectionLevel))
+            {
+                regex = new Regex(@"(?<=\.)(.*?)((?=\.)|$)");
+                protectionLevel = new VocabularyValue
+                {
+                    Id = protectionLevelId,
+                    Value = regex.Match(protectionLevelString).Value?.Trim()
+                };
+
+                _protectionLevelCache.Add(protectionLevelId, protectionLevel);
+            }
+
+            return protectionLevel;
         }
     }
 }

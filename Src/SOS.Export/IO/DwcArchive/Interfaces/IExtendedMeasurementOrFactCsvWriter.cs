@@ -18,12 +18,12 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

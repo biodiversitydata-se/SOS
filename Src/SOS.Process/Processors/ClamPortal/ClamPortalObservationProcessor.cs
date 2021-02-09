@@ -31,19 +31,19 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public ClamPortalObservationProcessor(IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<ClamPortalObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(
@@ -53,6 +53,7 @@ namespace SOS.Process.Processors.ClamPortal
 
         public override DataProviderType Type => DataProviderType.ClamPortalObservations;
 
+        /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
@@ -77,7 +78,7 @@ namespace SOS.Process.Processors.ClamPortal
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
                 }
@@ -89,7 +90,7 @@ namespace SOS.Process.Processors.ClamPortal
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 batchId++;
-                processedCount += await ValidateAndStoreObservation(dataProvider, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
 
                 Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
             }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Lib.Helpers.Interfaces
 {
@@ -20,6 +21,12 @@ namespace SOS.Lib.Helpers.Interfaces
         void AddAreaDataToProcessedObservation(Observation processedObservation);
 
         /// <summary>
+        /// Add area data to site
+        /// </summary>
+        /// <param name="site"></param>
+        void AddAreaDataToSite(Site site);
+
+        /// <summary>
         /// Clear area cache
         /// </summary>
         void ClearCache();
@@ -29,5 +36,10 @@ namespace SOS.Lib.Helpers.Interfaces
         /// </summary>
         /// <returns></returns>
         Task InitializeAsync();
+
+        /// <summary>
+        /// Return true if object is initialized
+        /// </summary>
+        bool IsInitialized { get; }
     }
 }

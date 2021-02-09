@@ -19,18 +19,22 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
         private string GetSightingQuery(string join, string where) => GetSightingQuery(0, join, where);
 
-        private string SightingsFromBasics => @"
+        private string SightingsFromBasics => @$"
             SearchableSightings s WITH(NOLOCK)
             INNER JOIN SightingState ss ON s.SightingId = ss.SightingId";
 
-        private string SightingWhereBasics => @"
-            s.TaxonId IS NOT NULL	 
-            AND s.SightingTypeId IN (0,3,8)
-            AND s.SightingTypeSearchGroupId IN (1,16,32,256)
-	        AND s.HiddenByProvider IS NULL
+        // Todo arguments for protected sightings
+        private string SightingWhereBasics => @$" 
+            s.SightingTypeId IN (0,3,8)
+            AND s.SightingTypeSearchGroupId IN (1,16,32,256) 
 	        AND s.ValidationStatusId <> 50
             AND ss.IsActive = 1
-	        AND ss.SightingStateTypeId = 30 --Published";
+	        AND ss.SightingStateTypeId = 30 
+            AND s.TaxonId IS NOT NULL 
+             {((DataService?.Configuration?.HarvestStartDate.HasValue ?? false) ?
+            $"AND s.StartDate >= '{DataService.Configuration.HarvestStartDate}'" 
+            :
+            "")}";
         
         /// <summary>
         /// Create sighting query

@@ -45,6 +45,8 @@ namespace SOS.Import.Harvesters.Observations
             _fishDataServiceConfiguration = fishDataServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _fishDataObservationVerbatimRepository.TempMode = true;
         }
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -96,6 +98,10 @@ namespace SOS.Import.Harvesters.Observations
              
                     xmlDocument = await _fishDataObservationService.GetAsync(changeId + 1 );
                 }
+
+                _logger.LogInformation("Start permanentize temp collection for Fish Data verbatim");
+                await _fishDataObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for Fish Data verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for Fish Data data provider");
 
