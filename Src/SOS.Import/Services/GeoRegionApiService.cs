@@ -37,8 +37,9 @@ namespace SOS.Import.Services
         public async Task<FeatureCollection> GetFeatureCollectionFromZipAsync(IEnumerable<int> areaDatasetIds, int srid = 4326)
         {
             using var client = new HttpClient();
-            var datasetQueryParams = string.Join("&", areaDatasetIds.Select(m => $"areaDatasetIds={m}"));
-            using var response = await client.GetAsync($"{_apiUrl}Areas/GeoJsonZip?srid={srid}&{datasetQueryParams}");
+            var jsonBody = new StringContent(JsonConvert.SerializeObject(areaDatasetIds), Encoding.UTF8,
+                "application/json");
+            using var response = await client.PostAsync($"{_apiUrl}Areas/GeoJsonZip?srid={srid}", jsonBody);
             if (!response.IsSuccessStatusCode) throw new Exception($"Call to API failed, responseCode: {response.StatusCode}");
 
             var stream = await response.Content.ReadAsStreamAsync();
