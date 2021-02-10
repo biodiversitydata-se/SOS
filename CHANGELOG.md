@@ -13,8 +13,21 @@ All notable changes to Observation API will be documented in this file. The form
 - `Security` in case of vulnerabilities.
 
 
-
 ## [Unreleased]
+### Added
+
+### Changed
+- `Validated` value is set to true when `IdentificationVerificationStatus` has value `Reported by expert`.
+
+### Fixed
+
+
+### Removed
+- `Occurrence.OrganismQuantityInt` field removed.
+
+
+## [1.0.0] - 2021-01-21
+
 ### Added
 - New field: `Observation.Occurrence.ReproductiveCondition`
 - New vocabularies: `ReproductiveCondition` and `Behavior`
@@ -27,14 +40,11 @@ All notable changes to Observation API will be documented in this file. The form
 - Sort order in `/Observations/TaxonAggregation` endpoint. Now the paging will work.
 
 ### Removed
-- `OutputFields` field from search filter for aggregation endpoints. Affected endpoints:  
+- `OutputFields` field from search filter for aggregation endpoints.  
 - `SortBy` and `SortOrder` query parameters from the `Observations/SearchAggregatedInternal` endpoint.
 - `AreaIds` field in search filter. Replaced by `Areas`
 
-## [0.9.1] - 2020-11-30
-Initial release
-
-## [1.0.0] - 2021-01-21
+### Other
 Areas
 Id i areaobjektet är borttagen. En area identifieras av sin areaType och featureid.
 Resursen Areas/{areaId}/Export är borttagen
@@ -68,4 +78,9 @@ Aggregerade sökningar
 OutputFields är borttagen från aggregerade sökningar då den inte fyllde någon funktion
 SearchAggregatedInternal
 SortBy, sortOrder borttagna då den inte fyllde någon funktion
+
+## [0.9.1] - 2020-11-30
+Initial release
+
+
 
