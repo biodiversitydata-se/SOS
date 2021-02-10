@@ -133,7 +133,15 @@ namespace SOS.Process.Processors.Artportalen
                 // Identification
                 obs.Identification = new Identification();
                 obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy;
-                obs.Identification.Validated = new[] {60, 61, 62, 63, 64, 65}.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
+                obs.Identification.Validated = new[]
+                {
+                    (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
+                    (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator,
+                    (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
+                    (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm,
+                    (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
+                    (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
+                }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
                 obs.Identification.UncertainDetermination = verbatimObservation.UnsureDetermination;
 
                 // Location
