@@ -6,7 +6,6 @@
         ///     Darwin Core term name: bed.
         ///     The full name of the lithostratigraphic bed from which
         ///     the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string Bed { get; set; }
 
@@ -16,7 +15,6 @@
         ///     age or lowest chronostratigraphic stage attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string EarliestAgeOrLowestStage { get; set; }
 
@@ -26,7 +24,6 @@
         ///     or lowest chrono-stratigraphic eonothem or the informal
         ///     name ("Precambrian") attributable to the stratigraphic
         ///     horizon from which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string EarliestEonOrLowestEonothem { get; set; }
 
@@ -36,7 +33,6 @@
         ///     epoch or lowest chronostratigraphic series attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string EarliestEpochOrLowestSeries { get; set; }
 
@@ -46,7 +42,6 @@
         ///     era or lowest chronostratigraphic erathem attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string EarliestEraOrLowestErathem { get; set; }
 
@@ -64,7 +59,6 @@
         ///     period or lowest chronostratigraphic system attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string EarliestPeriodOrLowestSystem { get; set; }
 
@@ -72,7 +66,6 @@
         ///     Darwin Core term name: formation.
         ///     The full name of the lithostratigraphic formation from
         ///     which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string Formation { get; set; }
 
@@ -82,7 +75,6 @@
         ///     with a GeologicalContext (the location within a geological
         ///     context, such as stratigraphy). May be a global unique
         ///     identifier or an identifier specific to the data set.
-        ///     This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string GeologicalContextId { get; set; }
@@ -91,7 +83,6 @@
         ///     Darwin Core term name: group.
         ///     The full name of the lithostratigraphic group from
         ///     which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string Group { get; set; }
 
@@ -100,7 +91,6 @@
         ///     The full name of the highest possible geological
         ///     biostratigraphic zone of the stratigraphic horizon
         ///     from which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string HighestBiostratigraphicZone { get; set; }
 
@@ -110,7 +100,6 @@
         ///     age or highest chronostratigraphic stage attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LatestAgeOrHighestStage { get; set; }
 
@@ -120,7 +109,6 @@
         ///     or highest chrono-stratigraphic eonothem or the informal
         ///     name ("Precambrian") attributable to the stratigraphic
         ///     horizon from which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LatestEonOrHighestEonothem { get; set; }
 
@@ -130,7 +118,6 @@
         ///     epoch or highest chronostratigraphic series attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LatestEpochOrHighestSeries { get; set; }
 
@@ -140,7 +127,6 @@
         ///     era or highest chronostratigraphic erathem attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LatestEraOrHighestErathem { get; set; }
 
@@ -157,7 +143,6 @@
         ///     period or highest chronostratigraphic system attributable
         ///     to the stratigraphic horizon from which the cataloged
         ///     item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LatestPeriodOrHighestSystem { get; set; }
 
@@ -165,7 +150,6 @@
         ///     Darwin Core term name: lithostratigraphicTerms.
         ///     The combination of all litho-stratigraphic names for
         ///     the rock from which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LithostratigraphicTerms { get; set; }
 
@@ -174,7 +158,6 @@
         ///     The full name of the lowest possible geological
         ///     biostratigraphic zone of the stratigraphic horizon
         ///     from which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string LowestBiostratigraphicZone { get; set; }
 
@@ -182,7 +165,6 @@
         ///     Darwin Core term name: member.
         ///     The full name of the lithostratigraphic member from
         ///     which the cataloged item was collected.
-        ///     This property is currently not used.
         /// </summary>
         public string Member { get; set; }
     }
