@@ -3,6 +3,7 @@ import { Component, Inject, Input, OnInit } from '@angular/core';
 import { circle, icon, latLng, Layer, marker, tileLayer } from 'leaflet';
 import { InvalidLocation } from '../models/invalidlocation';
 import { PagedObservations } from '../models/observation';
+import { RealObservation } from '../models/realobservation';
 
 @Component({
   selector: 'app-observation-viewer',
@@ -52,6 +53,22 @@ export class ObservationViewerComponent implements OnInit {
           radius: val.diffusionRadius
         });
         return m;
+      });
+      result.records.forEach((val) => {
+        this.http.get<RealObservation>(this.baseUrl + 'observations/real/' + val.occurrenceId).subscribe(innerResult => {
+          console.log(innerResult);
+          var description = '<span>' + val.occurrenceId + '</span>';
+
+          var m = marker([innerResult.lat, innerResult.lon], {
+            icon: icon({
+              iconSize: [25, 41],
+              iconAnchor: [13, 41],
+              iconUrl: 'assets/marker-icon-realpos.png',
+              shadowUrl: 'assets/marker-shadow.png'
+            })
+          }).bindPopup(description);;
+          this.markers.push(m);
+        })
       });
       this.markers = this.markers.concat(circles);
       this.loadingData = false;
