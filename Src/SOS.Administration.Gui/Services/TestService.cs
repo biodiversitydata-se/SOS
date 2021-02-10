@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json;
 using SOS.Observations.Api.Dtos.Enum;
+using Microsoft.Extensions.Options;
 
 namespace SOS.Administration.Gui.Services
 {
@@ -47,28 +48,39 @@ namespace SOS.Administration.Gui.Services
     {
         public int Id { get; set; }
         public ObservationPlace Municipality { get; set; }
+        public double DecimalLatitude { get; set; }
+        public double DecimalLongitude { get; set; }
+        public double CoordinateUncertaintyInMeters { get; set; }
     }
     public class ObservationPlace
     {
         public int Id { get; set; }
         public string Value { get; set; }
     }
-    public class Observation
+    public class ObservationOccurrence
     {
+        public string OccurrenceId { get; set; }
+    }
+    public class SOSObservation
+    {
+        public string DataSetId { get; set; }
+        public string DataSetName { get; set; }
+        public ObservationOccurrence Occurrence { get; set; }
         public ObservationTaxon Taxon { get; set; }
         public ObservationLocation Location { get; set; }
     }
-    public class TestService
+    public class TestService : ITestService
     {
 
         private readonly HttpClient _client;
         private readonly string _apiUrl;
         private readonly List<Test> _tests;
-
-        public TestService(ApiTestConfiguration testConfiguration)
-        {       
+        private readonly ISearchService _searchService;
+        public TestService(IOptionsMonitor<ApiTestConfiguration> optionsMonitor, ISearchService searchService)
+        {
             _client = new HttpClient();
-            _apiUrl = testConfiguration.ApiUrl;
+            _apiUrl = optionsMonitor.CurrentValue.ApiUrl;
+            _searchService = searchService;
             _tests = new List<Test>() {
                 new Test()
                 {
@@ -83,7 +95,7 @@ namespace SOS.Administration.Gui.Services
                     Id = 1,
                     Description = "Search for Otters in Tranås",
                     Group = "Search",
-                    Route = "test_searchotteratlocation",    
+                    Route = "test_searchotteratlocation",
                     RunTest = Test_SearchOtterAtLocation
                 },
                 new Test()
@@ -124,7 +136,7 @@ namespace SOS.Administration.Gui.Services
                     Id = 6,
                     Description = "TaxonAggregation of all taxon",
                     Group = "Aggregations",
-                    Route = "test_taxonaggregation", 
+                    Route = "test_taxonaggregation",
                     RunTest = Test_TaxonAggregation
                 },
                  new Test()
@@ -137,55 +149,11 @@ namespace SOS.Administration.Gui.Services
                 }
             };
 
-        }        
+        }
         public IEnumerable<Test> GetTests()
         {
             return _tests;
         }
-        private async Task<PagedResult<Observation>> SearchSOS(SearchFilterDto searchFilter, int take, int skip)
-        {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/Search?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<PagedResult<Observation>>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
-        }
-        private async Task<PagedResult<TaxonAggregationItemDto>> SearchSOSTaxonAggregation(SearchFilterDto searchFilter, int take, int skip, double? bboxleft = null, double? bboxtop = null, double? bboxright = null, double? bboxbottom = null)
-        {
-            var bboxstring = "";
-            if (bboxleft.HasValue && bboxtop.HasValue && bboxright.HasValue && bboxbottom.HasValue)
-            {
-                bboxstring = $"&bboxLeft={bboxleft}&bboxTop={bboxtop}&bboxRight={bboxright}&bboxBottom={bboxbottom}".Replace(',', '.');
-            }
-            var response = await _client.PostAsync($"{_apiUrl}Observations/TaxonAggregation?take={take}&skip={skip}" + bboxstring, new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<PagedResult<TaxonAggregationItemDto>>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
-        }
-        private async Task<GeoGridResultDto> SearchSOSGeoAggregation(SearchFilterDto searchFilter)
-        {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/geogridaggregation?zoom=10", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<GeoGridResultDto>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
-        }        
         public async Task<TestResults> Test_SearchOtter()
         {
             TestResults testResults = new TestResults();
@@ -205,12 +173,12 @@ namespace SOS.Administration.Gui.Services
             };
             searchFilter.OnlyValidated = false;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
-            PagedResult<Observation> result;
+            PagedResult<SOSObservation> result;
             Stopwatch sw = new Stopwatch();
             sw.Start();
             try
             {
-                result = await SearchSOS(searchFilter, 2, 0);
+                result = await _searchService.SearchSOS(searchFilter, 2, 0);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -247,7 +215,7 @@ namespace SOS.Administration.Gui.Services
                 TaxonIds = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
-            searchFilter.Areas = new [] { new AreaFilterDto{ AreaType = AreaTypeDto.County, FeatureId = "6" }, new AreaFilterDto{ AreaType = AreaTypeDto.Municipality, FeatureId = "687"} };
+            searchFilter.Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } };
             searchFilter.Date = new DateFilterDto()
             {
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
@@ -255,12 +223,12 @@ namespace SOS.Administration.Gui.Services
             };
             searchFilter.OnlyValidated = false;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
-            PagedResult<Observation> result;
+            PagedResult<SOSObservation> result;
             Stopwatch sw = new Stopwatch();
             sw.Start();
             try
             {
-                result = await SearchSOS(searchFilter, 2, 0);
+                result = await _searchService.SearchSOS(searchFilter, 2, 0);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -295,13 +263,13 @@ namespace SOS.Administration.Gui.Services
             };
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
 
-            PagedResult<Observation> result;
+            PagedResult<SOSObservation> result;
             Stopwatch sw = new Stopwatch();
             sw.Start();
             try
             {
 
-                result = await SearchSOS(searchFilter, 10, 0);
+                result = await _searchService.SearchSOS(searchFilter, 10, 0);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -319,7 +287,7 @@ namespace SOS.Administration.Gui.Services
 
             return testResults;
         }
-        
+
         public async Task<TestResults> Test_GeoGridAggregation()
         {
             TestResults testResults = new TestResults();
@@ -346,7 +314,7 @@ namespace SOS.Administration.Gui.Services
             try
             {
 
-                result = await SearchSOSGeoAggregation(searchFilter);
+                result = await _searchService.SearchSOSGeoAggregation(searchFilter);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -366,7 +334,7 @@ namespace SOS.Administration.Gui.Services
             catch (Exception e) { results.Add(new TestResult() { Result = "Returns >1000 observations in first gridcell:" + e.Message, Status = "Failed" }); }
 
             return testResults;
-        }        
+        }
         public async Task<TestResults> Test_TaxonAggregation()
         {
             TestResults testResults = new TestResults();
@@ -388,7 +356,7 @@ namespace SOS.Administration.Gui.Services
             try
             {
 
-                result = await SearchSOSTaxonAggregation(searchFilter, 100, 0);
+                result = await _searchService.SearchSOSTaxonAggregation(searchFilter, 100, 0);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -430,7 +398,7 @@ namespace SOS.Administration.Gui.Services
             try
             {
 
-                result = await SearchSOSTaxonAggregation(searchFilter, 500, 0, 17.9296875, 59.355596110016315, 18.28125, 59.17592824927137);
+                result = await _searchService.SearchSOSTaxonAggregation(searchFilter, 500, 0, 17.9296875, 59.355596110016315, 18.28125, 59.17592824927137);
                 sw.Stop();
                 testResults.TimeTakenMs = sw.ElapsedMilliseconds;
                 results.Add(new TestResult() { Result = "Call api", Status = "Succeeded" });
@@ -488,7 +456,7 @@ namespace SOS.Administration.Gui.Services
             catch (Exception e) { results.Add(new TestResult() { Result = "Returns >10 records:" + e.Message, Status = "Failed" }); }
 
             return testResults;
-        }        
+        }
         public async Task<TestResults> Test_Vocabulary()
         {
             TestResults testResults = new TestResults();

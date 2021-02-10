@@ -24,11 +24,11 @@ namespace SOS.Administration.Gui.Controllers
     [ApiController]
     public class TestsController : ControllerBase
     {        
-        private readonly TestService _service;
+        private readonly ITestService _service;
 
-        public TestsController(IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
+        public TestsController(ITestService testService)
         {
-            _service = new TestService(optionsMonitor.CurrentValue);
+            _service = testService;
         }
         [HttpGet]        
         public IEnumerable<Test> GetTests()

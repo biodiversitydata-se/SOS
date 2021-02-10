@@ -20,6 +20,7 @@ import { InvalidMapComponent } from './invalid-map/invalid-map.component';
 import { FunctionalTestsComponent } from './functional-tests/functional-tests.component';
 import { PerformanceChartComponent } from './performance-chart/performance-chart.component';
 import { LoadTestComponent } from './load-test/load-test.component';
+import { ObservationViewerComponent } from './observation-viewer/observation-viewer.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { LoadTestComponent } from './load-test/load-test.component';
     InvalidMapComponent,
     FunctionalTestsComponent,
     PerformanceChartComponent,
-    LoadTestComponent
+    LoadTestComponent,
+    ObservationViewerComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -45,6 +47,7 @@ import { LoadTestComponent } from './load-test/load-test.component';
       { path: 'test', component: FunctionalTestsComponent },
       { path: 'stats', component: PerformanceChartComponent },
       { path: 'loadtest', component: LoadTestComponent },
+      { path: 'observation-viewer', component: ObservationViewerComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,
