@@ -91,7 +91,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetIdSpanAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeNull();
+            result.Should().Be((0,0));
         }
 
         /// <summary>
