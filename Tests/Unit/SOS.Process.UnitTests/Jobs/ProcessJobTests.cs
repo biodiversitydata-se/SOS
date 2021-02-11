@@ -32,6 +32,7 @@ using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
+using SOS.Process.Processors.ObservationDatabase.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
@@ -62,6 +63,7 @@ namespace SOS.Process.UnitTests.Jobs
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _mvmProcessor = new Mock<IMvmObservationProcessor>();
             _norsProcessor = new Mock<INorsObservationProcessor>();
+            _observationDatabaseProcessorMock = new Mock<IObservationDatabaseProcessor>();
             _sersProcessor = new Mock<ISersObservationProcessor>();
             _sharkProcessor = new Mock<ISharkObservationProcessor>();
             _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
@@ -84,6 +86,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<IMvmObservationProcessor> _mvmProcessor;
         private readonly Mock<INorsObservationProcessor> _norsProcessor;
+        private readonly Mock<IObservationDatabaseProcessor> _observationDatabaseProcessorMock;
         private readonly Mock<ISersObservationProcessor> _sersProcessor;
         private readonly Mock<ISharkObservationProcessor> _sharkProcessor;
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
@@ -109,6 +112,7 @@ namespace SOS.Process.UnitTests.Jobs
             _kulProcessor.Object,
             _mvmProcessor.Object,
             _norsProcessor.Object,
+            _observationDatabaseProcessorMock.Object,
             _sersProcessor.Object,
             _sharkProcessor.Object,
             _virtualHerbariumProcessor.Object,

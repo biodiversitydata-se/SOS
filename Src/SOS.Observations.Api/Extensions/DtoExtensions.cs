@@ -30,7 +30,6 @@ namespace SOS.Observations.Api.Extensions
             filter.DataProviderIds = searchFilterBaseDto.DataProviderIds;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
-            filter.GenderIds = searchFilterBaseDto.Taxon?.GenderIds;
             filter.ProtectedObservations = protectedObservations;
             filter.Geometries = searchFilterBaseDto.Geometry?.Geometries == null
                 ? null
@@ -134,6 +133,7 @@ namespace SOS.Observations.Api.Extensions
                     searchFilterInternalDto.ArtportalenFilter.RegionalSightingStateIdsFilter;
                 internalFilter.SiteIds = searchFilterInternalDto.ArtportalenFilter.SiteIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ArtportalenFilter.SpeciesFactsIds;
+                internalFilter.GenderIds = searchFilterInternalDto.ArtportalenFilter.GenderIds;
             }
 
         }

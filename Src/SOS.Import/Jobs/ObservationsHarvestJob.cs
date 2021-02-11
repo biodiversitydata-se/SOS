@@ -153,10 +153,12 @@ namespace SOS.Import.Jobs
         /// <param name="kulObservationHarvester"></param>
         /// <param name="mvmObservationHarvester"></param>
         /// <param name="norsObservationHarvester"></param>
+        /// <param name="observationDatabaseHarvester"></param>
         /// <param name="sersObservationHarvester"></param>
         /// <param name="sharkObservationHarvester"></param>
         /// <param name="virtualHerbariumObservationHarvester"></param>
         /// <param name="dataProviderManager"></param>
+        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public ObservationsHarvestJob(
             IArtportalenObservationHarvester artportalenObservationHarvester,
@@ -165,6 +167,7 @@ namespace SOS.Import.Jobs
             IKulObservationHarvester kulObservationHarvester,
             IMvmObservationHarvester mvmObservationHarvester,
             INorsObservationHarvester norsObservationHarvester,
+            IObservationDatabaseHarvester observationDatabaseHarvester,
             ISersObservationHarvester sersObservationHarvester,
             ISharkObservationHarvester sharkObservationHarvester,
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
@@ -183,6 +186,7 @@ namespace SOS.Import.Jobs
             if (kulObservationHarvester == null) throw new ArgumentNullException(nameof(kulObservationHarvester));
             if (mvmObservationHarvester == null) throw new ArgumentNullException(nameof(mvmObservationHarvester));
             if (norsObservationHarvester == null) throw new ArgumentNullException(nameof(norsObservationHarvester));
+            if (observationDatabaseHarvester == null) throw new ArgumentNullException(nameof(observationDatabaseHarvester));
             if (sersObservationHarvester == null) throw new ArgumentNullException(nameof(sersObservationHarvester));
             if (sharkObservationHarvester == null) throw new ArgumentNullException(nameof(sharkObservationHarvester));
             if (virtualHerbariumObservationHarvester == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationHarvester));
@@ -196,6 +200,7 @@ namespace SOS.Import.Jobs
                 {DataProviderType.KULObservations, kulObservationHarvester},
                 {DataProviderType.MvmObservations, mvmObservationHarvester},
                 {DataProviderType.NorsObservations, norsObservationHarvester},
+                {DataProviderType.ObservationDatabase, observationDatabaseHarvester},
                 {DataProviderType.SersObservations, sersObservationHarvester},
                 {DataProviderType.SharkObservations, sharkObservationHarvester},
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationHarvester}

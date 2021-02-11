@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Moq;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
@@ -110,12 +112,9 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetIdSpanAsyncSuccess()
         {
-            var span = new[]
-            {
-                new Tuple<int, int>(1, 2)
-            };
+            (int minId, int maxId)[] span = new [] { (1, 2) };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null, false))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int minId, int maxId)>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(span);
 
             //-----------------------------------------------------------------------------------------------------------

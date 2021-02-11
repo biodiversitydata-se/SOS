@@ -42,10 +42,7 @@ namespace SOS.Import.Harvesters.Observations
             clamObservationVerbatimRepository.TempMode = true;
         }
 
-        /// <summary>
-        ///     Aggregate clams
-        /// </summary>
-        /// <returns></returns>
+        /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);

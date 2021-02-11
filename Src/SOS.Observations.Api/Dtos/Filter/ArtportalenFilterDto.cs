@@ -49,6 +49,12 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
         /// </summary>
         public List<double> BoundingBox { get; set; }
+
+        /// <summary>
+        /// Id of genders to match
+        /// </summary>
+        public IEnumerable<int> GenderIds { get; set; }
+
         /// <summary>
         /// Only include hits with media associated
         /// </summary>

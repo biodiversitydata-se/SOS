@@ -31,6 +31,7 @@ using SOS.Process.Processors.FishData;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Nors;
+using SOS.Process.Processors.ObservationDatabase;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
 using SOS.Process.Processors.VirtualHerbarium;
@@ -213,6 +214,18 @@ namespace SOS.Process.IntegrationTests.Jobs
                 validationManager,
                 new NullLogger<DwcaObservationProcessor>());
 
+            var observationDatabaseProcessor = new ObservationDatabaseProcessor(
+                new ObservationDatabaseVerbatimRepository(verbatimClient,
+                    new NullLogger<ObservationDatabaseVerbatimRepository>()),
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
+                fieldMappingResolverHelper,
+                dwcArchiveFileWriterCoordinator,
+                diffusionManager,
+                validationManager,
+                areaHelper,
+                new NullLogger<ObservationDatabaseProcessor>());
+
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
             
 
@@ -227,6 +240,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 kulProcessor,
                 mvmProcessor,
                 norsProcessor,
+                observationDatabaseProcessor,
                 sersProcessor,
                 sharkProcessor,
                 virtualHrbariumProcessor,

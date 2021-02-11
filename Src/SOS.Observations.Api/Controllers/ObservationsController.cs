@@ -44,29 +44,33 @@ namespace SOS.Observations.Api.Controllers
             ref double? bboxRight,
             ref double? bboxBottom)
         {
-            if (geoShape != null)
+            if (geoShape == null)
             {
-                var envelope = geoShape.ToGeometry().EnvelopeInternal;
+                return;
+            }
 
-                if (!envelope.IsNull)
-                {
-                    if (!bboxLeft.HasValue || envelope.MinX < bboxLeft)
-                    {
-                        bboxLeft = envelope.MinX;
-                    }
-                    if (!bboxRight.HasValue || envelope.MaxX > bboxRight)
-                    {
-                        bboxRight = envelope.MaxX;
-                    }
-                    if (!bboxBottom.HasValue || envelope.MinY < bboxBottom)
-                    {
-                        bboxBottom = envelope.MinY;
-                    }
-                    if (!bboxTop.HasValue || envelope.MaxY > bboxTop)
-                    {
-                        bboxTop = envelope.MaxY;
-                    }
-                }
+            var envelope = geoShape.ToGeometry().EnvelopeInternal;
+
+            if (envelope.IsNull)
+            {
+                return;
+            }
+
+            if (!bboxLeft.HasValue || envelope.MinX > bboxLeft)
+            {
+                bboxLeft = envelope.MinX;
+            }
+            if (!bboxRight.HasValue || envelope.MaxX < bboxRight)
+            {
+                bboxRight = envelope.MaxX;
+            }
+            if (!bboxBottom.HasValue || envelope.MinY > bboxBottom)
+            {
+                bboxBottom = envelope.MinY;
+            }
+            if (!bboxTop.HasValue || envelope.MaxY < bboxTop)
+            {
+                bboxTop = envelope.MaxY;
             }
         }
 

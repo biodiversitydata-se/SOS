@@ -15,6 +15,8 @@ using SOS.Import.Managers;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
+using SOS.Import.Repositories.Source.ObservationsDatabase;
+using SOS.Import.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -67,6 +69,9 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.NorsServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.NorsServiceConfiguration).As<NorsServiceConfiguration>()
                     .SingleInstance();
+            if (Configurations.ImportConfiguration.ObservationDatabaseConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.ObservationDatabaseConfiguration).As<ObservationDatabaseConfiguration>()
+                    .SingleInstance();
             if (Configurations.ImportConfiguration.SersServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.SersServiceConfiguration).As<SersServiceConfiguration>()
                     .SingleInstance();
@@ -103,6 +108,7 @@ namespace SOS.Import.IoC.Modules
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseRepository>().As<IObservationDatabaseRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
@@ -118,6 +124,8 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination
+            builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<Lib.Repositories.Resource.AreaRepository>().As<Lib.Repositories.Resource.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ReportRepository>().As<IReportRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
@@ -132,20 +140,19 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseVerbatimRepository>().As<IObservationDatabaseVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
-                .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
-            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository>()
-               .InstancePerLifetimeScope();
-
             // Repositories resource
-            builder.RegisterType<Lib.Repositories.Resource.DataProviderRepository>().As<Lib.Repositories.Resource.Interfaces.IDataProviderRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
@@ -159,6 +166,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationHarvester>().As<INorsObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseHarvester>().As<IObservationDatabaseHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>()
                 .InstancePerLifetimeScope();
@@ -203,6 +211,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationService>().As<IMvmObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationService>().As<INorsObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseDataService>().As<IObservationDatabaseDataService>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationService>().As<ISersObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationService>().As<ISharkObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>()

@@ -8,11 +8,6 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class TaxonFilterDto
     {
         /// <summary>
-        /// Id of genders to match
-        /// </summary>
-        public IEnumerable<int> GenderIds { get; set; }
-
-        /// <summary>
         ///     Decides whether to search for the exact taxa or
         ///     for the hierarchical underlying taxa.
         /// </summary>

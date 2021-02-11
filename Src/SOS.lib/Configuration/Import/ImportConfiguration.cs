@@ -43,6 +43,10 @@ namespace SOS.Lib.Configuration.Import
         public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
 
         /// <summary>
+        /// Observations database configuration
+        /// </summary>
+        public ObservationDatabaseConfiguration ObservationDatabaseConfiguration { get; set; }
+        /// <summary>
         ///     SERS configuration
         /// </summary>
         public SersServiceConfiguration SersServiceConfiguration { get; set; }

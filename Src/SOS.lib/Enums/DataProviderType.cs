@@ -18,6 +18,7 @@
         MvmObservations,
         SharkObservations,
         VirtualHerbariumObservations,
-        FishDataObservations
+        FishDataObservations,
+        ObservationDatabase
     }
 }

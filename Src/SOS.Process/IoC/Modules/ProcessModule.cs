@@ -40,6 +40,8 @@ using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Nors.Interfaces;
+using SOS.Process.Processors.ObservationDatabase;
+using SOS.Process.Processors.ObservationDatabase.Interfaces;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark;
@@ -109,6 +111,8 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseVerbatimRepository>().As<IObservationDatabaseVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>()
@@ -140,6 +144,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationProcessor>().As<IMvmObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationDatabaseProcessor>().As<IObservationDatabaseProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationProcessor>().As<ISersObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationProcessor>().As<ISharkObservationProcessor>()
                 .InstancePerLifetimeScope();

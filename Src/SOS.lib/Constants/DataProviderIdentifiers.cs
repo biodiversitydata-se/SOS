@@ -18,5 +18,6 @@
         public const string ButterflyMonitoring = "ButterflyMonitoring";
         public const string SharkZooplankton = "SharkZooplankton";
         public const string ForestInventory = "ForestInventory";
+        public const string ObservationDatabase = "ObservationDatabase";
     }
 }

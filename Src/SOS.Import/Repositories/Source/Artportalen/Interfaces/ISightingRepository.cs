@@ -32,7 +32,7 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         ///     Get min and max id
         /// </summary>
         /// <returns></returns>
-        Task<Tuple<int, int>> GetIdSpanAsync();
+        Task<(int minId, int maxId)> GetIdSpanAsync();
 
         /// <summary>
         ///     Get last modified date for sightings

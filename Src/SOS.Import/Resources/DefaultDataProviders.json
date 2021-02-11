@@ -446,5 +446,33 @@
         "HarvestSchedule": "* * * * *",
         "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
+    },
+    {
+        "Type": "ObservationDatabase",
+        "IsActive": true,
+        "Name": "Observation database",
+        "SwedishName": "Observationsdatabasen",
+        "Organization": "SLU Swedish Species Information Centre (SLU Artdatabanken)",
+        "SwedishOrganization": "SLU Artdatabanken",
+        "Description": "",
+        "SwedishDescription": "",
+        "Url": "",
+        "ContactPerson": {
+            "FirstName": "",
+            "LastName": "",
+            "Email": ""
+        },
+        "ContactEmail": "",
+        "DownloadUrl": null,
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": true,
+        "DataQualityIsApproved": true,
+        "Id": 17,
+        "Identifier": "ObservationDatabase",
+        "EmlMetadata": null,
+        "HarvestSchedule": "* * * * *",
+        "LastSuccessfulHarvest": null,
+        "HarvestFailPreventProcessing": false
     }
 ]

@@ -29,6 +29,7 @@ using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
+using SOS.Process.Processors.ObservationDatabase.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
@@ -541,6 +542,7 @@ namespace SOS.Process.Jobs
         /// <param name="kulObservationProcessor"></param>
         /// <param name="mvmObservationProcessor"></param>
         /// <param name="norsObservationProcessor"></param>
+        /// <param name="observationDatabaseProcessor"></param>
         /// <param name="sersObservationProcessor"></param>
         /// <param name="sharkObservationProcessor"></param>
         /// <param name="virtualHerbariumObservationProcessor"></param>
@@ -564,6 +566,7 @@ namespace SOS.Process.Jobs
             IKulObservationProcessor kulObservationProcessor,
             IMvmObservationProcessor mvmObservationProcessor,
             INorsObservationProcessor norsObservationProcessor,
+            IObservationDatabaseProcessor observationDatabaseProcessor,
             ISersObservationProcessor sersObservationProcessor,
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
@@ -610,21 +613,21 @@ namespace SOS.Process.Jobs
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationProcessor},
                 {DataProviderType.ClamPortalObservations, clamPortalObservationProcessor},
+                {DataProviderType.DwcA, dwcaObservationProcessor},
                 {DataProviderType.FishDataObservations, fishDataObservationProcessor},
-                {DataProviderType.SersObservations, sersObservationProcessor},
-                {DataProviderType.NorsObservations, norsObservationProcessor},
                 {DataProviderType.KULObservations, kulObservationProcessor},
                 {DataProviderType.MvmObservations, mvmObservationProcessor},
+                {DataProviderType.NorsObservations, norsObservationProcessor},
+                {DataProviderType.ObservationDatabase, observationDatabaseProcessor},
+                {DataProviderType.SersObservations, sersObservationProcessor},
                 {DataProviderType.SharkObservations, sharkObservationProcessor},
-                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
-                {DataProviderType.DwcA, dwcaObservationProcessor}
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor}
             };
 
             _exportContainer = processConfiguration?.Export_Container ??
                                throw new ArgumentNullException(nameof(processConfiguration));
             _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
         }
-
 
         /// <inheritdoc />
         [DisplayName("Process Observations [Mode={1}]")]

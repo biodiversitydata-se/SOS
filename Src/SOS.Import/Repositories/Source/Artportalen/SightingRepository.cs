@@ -11,7 +11,7 @@ using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
-    public class SightingRepository : BaseRepository<SightingRepository>, ISightingRepository
+    public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
     {
         private string GetSightingQuery(string where) => GetSightingQuery(0, null, where);
 
@@ -203,26 +203,26 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<Tuple<int, int>> GetIdSpanAsync()
+        public async Task<(int minId, int maxId)> GetIdSpanAsync()
         {
             try
             {
                 string query = $@"
                 SELECT 
-                    MIN(s.SightingId) AS Item1,
-                    MAX(s.SightingId) AS Item2
+                    MIN(s.SightingId) AS minId,
+                    MAX(s.SightingId) AS maxId
 		        FROM 
 		            {SightingsFromBasics}
                 WHERE 
                     {SightingWhereBasics}";
 
-                return (await QueryAsync<Tuple<int, int>>(query, null, Live)).FirstOrDefault();
+                return (await QueryAsync<(int minId, int maxId)>(query, null, Live)).FirstOrDefault();
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting min and max id");
 
-                return null;
+                return default;
             }
         }
 
