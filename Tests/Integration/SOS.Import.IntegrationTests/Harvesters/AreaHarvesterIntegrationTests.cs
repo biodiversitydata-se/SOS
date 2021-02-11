@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters;
 using SOS.Import.Services;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -37,7 +38,9 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var areaHarvester = new AreaHarvester(
                 new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
-                new AreaHelper(new Mock<IAreaRepository>().Object), 
+                new AreaHelper(new Mock<IAreaRepository>().Object),
+                new GeoRegionApiService(new GeoRegionApiConfiguration {ApiUrl = "https://georegionapi-dev.artdata.slu.se/"}), 
+                new AreaHarvestConfiguration {UseGeoRegionApiHarvest = true}, 
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -73,6 +76,8 @@ namespace SOS.Import.IntegrationTests.Harvesters
                 new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
+                new GeoRegionApiService(new GeoRegionApiConfiguration { ApiUrl = "https://georegionapi-dev.artdata.slu.se/" }),
+                new AreaHarvestConfiguration { UseGeoRegionApiHarvest = true },
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

@@ -357,6 +357,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             switch (validationStatus.Id)
             {
                 case (int)ValidationStatusId.Verified:
+                case (int)ValidationStatusId.ReportedByExpert:
                 case (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification:
                 case (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording:
                 case (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation:

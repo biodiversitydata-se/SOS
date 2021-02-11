@@ -7,6 +7,8 @@ using Moq;
 using NetTopologySuite.Geometries;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters;
+using SOS.Import.Services.Interfaces;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -28,18 +30,22 @@ namespace SOS.Import.UnitTests.Harvesters
             _areaRepositoryMock = new Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository>();
             _areaProcessedRepository = new Mock<IAreaRepository>();
             _areaHelperMock = new Mock<IAreaHelper>();
+            _geoRegionApiServiceMock = new Mock<IGeoRegionApiService>();
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
         private readonly Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository> _areaRepositoryMock;
         private readonly Mock<IAreaRepository> _areaProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelperMock;
+        private readonly Mock<IGeoRegionApiService> _geoRegionApiServiceMock;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
 
         private AreaHarvester TestObject => new AreaHarvester(
             _areaRepositoryMock.Object,
             _areaProcessedRepository.Object,
             _areaHelperMock.Object,
+            _geoRegionApiServiceMock.Object,
+            new AreaHarvestConfiguration(), 
             _loggerMock.Object);
 
         /// <summary>

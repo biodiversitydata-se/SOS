@@ -113,7 +113,6 @@ namespace SOS.Process.Processors.ClamPortal
                     IsNotRediscoveredObservation = verbatimObservation.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatimObservation.IsPositiveObservation,
                     LifeStage = GetLifeStageIdFromString(verbatimObservation.LifeStage),
-                    OrganismQuantityInt = verbatimObservation.Quantity,
                     OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
                     RecordedBy = verbatimObservation.RecordedBy,

@@ -57,6 +57,12 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.ClamServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
                     .SingleInstance();
+            if (Configurations.ImportConfiguration.AreaHarvestConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.AreaHarvestConfiguration).As<AreaHarvestConfiguration>()
+                    .SingleInstance();
+            if (Configurations.ImportConfiguration.GeoRegionApiConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.GeoRegionApiConfiguration).As<GeoRegionApiConfiguration>()
+                    .SingleInstance();
             if (Configurations.ImportConfiguration.FishDataServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.FishDataServiceConfiguration).As<FishDataServiceConfiguration>()
                     .SingleInstance();
@@ -204,6 +210,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
 
             // Add Services
+            builder.RegisterType<GeoRegionApiService>().As<IGeoRegionApiService>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationService>().As<IFishDataObservationService>().InstancePerLifetimeScope();
