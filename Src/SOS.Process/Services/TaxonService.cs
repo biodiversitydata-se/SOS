@@ -46,8 +46,16 @@ namespace SOS.Process.Services
             TaxonServiceConfiguration taxonServiceConfiguration,
             ILogger<TaxonService> logger)
         {
-            _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ??
-                           throw new ArgumentNullException(nameof(taxonServiceConfiguration));
+            if (taxonServiceConfiguration.UseTaxonApi)
+            {
+                _taxonDwcUrl = taxonServiceConfiguration?.TaxonApiAddress ??
+                               throw new ArgumentNullException(nameof(taxonServiceConfiguration));
+            }
+            else
+            {
+                _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ??
+                               throw new ArgumentNullException(nameof(taxonServiceConfiguration));
+            }
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _taxonServiceProxy = taxonServiceProxy ?? throw new ArgumentNullException(nameof(taxonServiceProxy));
         }
