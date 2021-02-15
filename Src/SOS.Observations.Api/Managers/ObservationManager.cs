@@ -304,20 +304,19 @@ namespace SOS.Observations.Api.Managers
         {
             foreach (var observation in processedObservations)
             {
+                TranslateLocalizedValue(observation.Event?.Biotope, VocabularyId.Biotope, cultureCode);
+                TranslateLocalizedValue(observation.Event?.DiscoveryMethod, VocabularyId.DiscoveryMethod, cultureCode);
+                TranslateLocalizedValue(observation.Identification?.ValidationStatus,
+                    VocabularyId.ValidationStatus, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.Activity, VocabularyId.Activity, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.DiscoveryMethod, VocabularyId.DiscoveryMethod, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.Gender, VocabularyId.Gender, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.Sex, VocabularyId.Sex, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.Substrate?.Name, VocabularyId.Substrate, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.ReproductiveCondition, VocabularyId.ReproductiveCondition, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.LifeStage, VocabularyId.LifeStage, cultureCode);
                 TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnit, VocabularyId.Unit,
                     cultureCode);
-                TranslateLocalizedValue(observation.Event?.Biotope, VocabularyId.Biotope, cultureCode);
-                TranslateLocalizedValue(observation.Event?.Substrate, VocabularyId.Substrate, cultureCode);
-                TranslateLocalizedValue(observation.Identification?.ValidationStatus,
-                    VocabularyId.ValidationStatus, cultureCode);
             }
         }
-
 
         private void ResolveLocalizedVocabularyMappedValues(
             IEnumerable<dynamic> processedObservations,
@@ -334,8 +333,8 @@ namespace SOS.Observations.Api.Managers
                             var eventDictionary = eventObject as IDictionary<string, object>;
                             TranslateLocalizedValue(eventDictionary, VocabularyId.Biotope,
                                 nameof(Observation.Event.Biotope), cultureCode);
-                            TranslateLocalizedValue(eventDictionary, VocabularyId.Substrate,
-                                nameof(Observation.Event.Substrate), cultureCode);
+                            TranslateLocalizedValue(eventDictionary, VocabularyId.DiscoveryMethod,
+                                nameof(Observation.Event.DiscoveryMethod), cultureCode);
                         }
 
                         if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
@@ -344,16 +343,22 @@ namespace SOS.Observations.Api.Managers
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Activity,
                                 nameof(Observation.Occurrence.Activity), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.DiscoveryMethod,
-                                nameof(Observation.Occurrence.DiscoveryMethod), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Gender,
-                                nameof(Observation.Occurrence.Gender), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Sex,
+                                nameof(Observation.Occurrence.Sex), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.ReproductiveCondition,
                                 nameof(Observation.Occurrence.ReproductiveCondition), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.LifeStage,
                                 nameof(Observation.Occurrence.LifeStage), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Unit,
                                 nameof(Observation.Occurrence.OrganismQuantityUnit), cultureCode);
+
+                            if (obs.TryGetValue(nameof(Observation.Occurrence.Substrate).ToLower(),
+                                out var substrateObject))
+                            {
+                                var substrateDictionary = substrateObject as IDictionary<string, object>;
+                                TranslateLocalizedValue(substrateDictionary, VocabularyId.Substrate,
+                                    nameof(Observation.Occurrence.Substrate.Name), cultureCode);
+                            }
                         }
 
                         if (obs.TryGetValue(nameof(Observation.Identification).ToLower(),

@@ -57,7 +57,7 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
             Observation observation)
         {
-            return observation?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         private static SimpleMultimediaRow ToSimpleMultimediaRow(

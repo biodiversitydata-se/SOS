@@ -60,16 +60,18 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.Continent]);
                 ResolveVocabularyMappedValue(observation.Event?.Biotope,
                     valueMappingDictionaries[VocabularyId.Biotope]);
-                ResolveVocabularyMappedValue(observation.Event?.Substrate,
-                    valueMappingDictionaries[VocabularyId.Substrate]);
+                ResolveVocabularyMappedValue(observation.Event?.DiscoveryMethod,
+                    valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
                 ResolveVocabularyMappedValue(observation.Identification?.ValidationStatus,
                     valueMappingDictionaries[VocabularyId.ValidationStatus]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.LifeStage,
                     valueMappingDictionaries[VocabularyId.LifeStage]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.Activity,
                     valueMappingDictionaries[VocabularyId.Activity]);
-                ResolveVocabularyMappedValue(observation.Occurrence?.Gender,
-                    valueMappingDictionaries[VocabularyId.Gender]);
+                ResolveVocabularyMappedValue(observation.Occurrence?.Sex,
+                    valueMappingDictionaries[VocabularyId.Sex]);
+                ResolveVocabularyMappedValue(observation.Occurrence?.Substrate?.Name,
+                    valueMappingDictionaries[VocabularyId.Substrate]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.ReproductiveCondition,
                     valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.Behavior,
@@ -80,8 +82,6 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.EstablishmentMeans]);
                 ResolveVocabularyMappedValue(observation.Occurrence?.OccurrenceStatus,
                     valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
-                ResolveVocabularyMappedValue(observation.Occurrence?.DiscoveryMethod,
-                    valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
                 ResolveVocabularyMappedValue(observation.Identification?.DeterminationMethod,
                     valueMappingDictionaries[VocabularyId.DeterminationMethod]);
             }

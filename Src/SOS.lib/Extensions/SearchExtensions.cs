@@ -41,7 +41,7 @@ namespace SOS.Lib.Extensions
                 foreach (var extendedAuthorization in filter.ExtendedAuthorizations)
                 {
                     protectedQuery.TryAddTermCriteria("protected", true);
-                    protectedQuery.TryAddNumericRangeCriteria("taxon.protectionLevel.id", extendedAuthorization.MaxProtectionLevel, RangeTypes.LessThanOrEquals);
+                    protectedQuery.TryAddNumericRangeCriteria("occurrence.protectionLevel", extendedAuthorization.MaxProtectionLevel, RangeTypes.LessThanOrEquals);
                     protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
                     TryAddGeographicFilter(protectedQuery, extendedAuthorization.GeographicAreas);
 
@@ -114,8 +114,8 @@ namespace SOS.Lib.Extensions
             }
 
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
-            query.TryAddDateRangeCriteria("reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
-            query.TryAddDateRangeCriteria("reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
+            query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
+            query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", internalFilter.MaxAccuracy, RangeTypes.LessThanOrEquals);
 
             if (internalFilter.Months?.Any() ?? false)
@@ -123,7 +123,7 @@ namespace SOS.Lib.Extensions
                 query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
             }
 
-            query.TryAddTermsCriteria("occurrence.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
+            query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
             query.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
             query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
 
@@ -185,10 +185,10 @@ namespace SOS.Lib.Extensions
             }
 
             query.TryAddTermCriteria("collectionId.keyword", internalFilter.SpeciesCollectionLabel);
-            query.TryAddTermCriteria("occurrence.publicCollection.keyword", internalFilter.PublicCollection);
-            query.TryAddTermCriteria("artportalenInternal.privateCollection.keyword", internalFilter.PrivateCollection);
-            query.TryAddTermCriteria("event.substrateSpeciesId", internalFilter.SubstrateSpeciesId);
-            query.TryAddTermCriteria("event.substrate.id", internalFilter.SubstrateId);
+            query.TryAddTermCriteria("publicCollection.keyword", internalFilter.PublicCollection);
+            query.TryAddTermCriteria("privateCollection.keyword", internalFilter.PrivateCollection);
+            query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
+            query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
             query.TryAddTermCriteria("event.biotope.id", internalFilter.BiotopeId);
 
 
@@ -274,6 +274,19 @@ namespace SOS.Lib.Extensions
         {
             query.Add(q => q
                 .Regexp(re => re.Field(field).Value(".+"))
+            );
+        }
+
+        private static void AddNestedMustExistsCriteria(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
+        {
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(field)
+                    .Query(nq => nq
+                        .Exists(e => e
+                            .Field(field))
+                    ))
             );
         }
 
@@ -826,15 +839,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.Add(q => q
-                .Nested(n => n
-                    .Path("media")
-                    .Query(nq => nq
-                        .Exists(e => e
-                            .Field("media"))
-                    ))
-            );
-
+            query.AddNestedMustExistsCriteria("occurrence.media");
             return query;
         }
 
@@ -842,15 +847,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.Add(q => q
-                .Nested(n => n
-                    .Path("measurementOrFacts")
-                    .Query(nq => nq
-                        .Exists(e => e
-                            .Field("measurementOrFacts"))
-                    ))
-            );
-
+            query.AddNestedMustExistsCriteria("measurementOrFacts");
             return query;
         }
 
@@ -872,10 +869,10 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermsCriteria("diffuseStatus", filter.DiffuseStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-            query.TryAddTermsCriteria("occurrence.gender.id", filter.GenderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
-            query.TryAddTermsCriteria("taxon.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
+            query.TryAddTermsCriteria("occurrence.sex.id", filter.GenderIds);
+            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
 
             if (filter is SearchFilterInternal)
@@ -953,7 +950,6 @@ namespace SOS.Lib.Extensions
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
-                    .Field("location.parentLocationId")
                     .Field("isInEconomicZoneOfSweden")
                 );
             }

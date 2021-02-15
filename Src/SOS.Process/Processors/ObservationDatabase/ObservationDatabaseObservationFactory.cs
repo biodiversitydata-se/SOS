@@ -88,6 +88,11 @@ namespace SOS.Process.Processors.ObservationDatabase
                 InstitutionId = verbatim.SCI_code,
                 Location = new Lib.Models.Processed.Observation.Location
                 {
+                    Attributes = new LocationAttributes
+                    {
+                        VerbatimMunicipality = verbatim.Municipality,
+                        VerbatimProvince = verbatim.Province
+                    },
                     Continent = new VocabularyValue { Id = (int)ContinentId.Europe },
                     CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters,
                     Country = new VocabularyValue { Id = (int)CountryId.Sweden },
@@ -117,12 +122,11 @@ namespace SOS.Process.Processors.ObservationDatabase
                     OccurrenceId = $"urn:lsid:observationsdatabasen.se:Observation:{verbatim.Id}",
                     OccurrenceRemarks = verbatim.OccurrenceRemarks,
                     OccurrenceStatus = new VocabularyValue { Id = (int)(verbatim.TaxonId == 0 ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
-                    RecordedBy = verbatim.Observers
-                   
+                    ProtectionLevel = verbatim.ProtectionLevel,
+                    RecordedBy = verbatim.Observers,
+                    ReportedDate = verbatim.StartDate.ToUniversalTime()
                 },
                 OwnerInstitutionCode = verbatim.SCI_code,
-                ProtectionLevel = verbatim.ProtectionLevel,
-                ReportedDate = verbatim.StartDate.ToUniversalTime(),
                 RightsHolder = verbatim.SCI_name,
                 Taxon = taxon
             };

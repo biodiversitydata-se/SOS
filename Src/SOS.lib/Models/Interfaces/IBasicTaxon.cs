@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Interfaces
 {
@@ -12,16 +13,6 @@ namespace SOS.Lib.Models.Interfaces
         ///     Object id
         /// </summary>
         int Id { get; set; }
-
-        /// <summary>
-        ///     Dyntaxa taxon id.
-        /// </summary>
-        int DyntaxaTaxonId { get; set; }
-
-        /// <summary>
-        ///     Main parent Dyntaxa taxon id.
-        /// </summary>
-        int? ParentDyntaxaTaxonId { get; set; }
 
         /// <summary>
         ///     Secondary parents dyntaxa taxon ids.
@@ -40,5 +31,10 @@ namespace SOS.Lib.Models.Interfaces
         ///     Currently scientific name without author is provided.
         /// </summary>
         string ScientificName { get; set; }
+
+        /// <summary>
+        /// Taxon attributes
+        /// </summary>
+        TaxonAttributes Attributes { get; set; }
     }
 }

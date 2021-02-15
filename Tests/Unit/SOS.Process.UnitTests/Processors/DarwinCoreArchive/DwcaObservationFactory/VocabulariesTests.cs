@@ -36,7 +36,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Should().BeNull();
+            result.Occurrence.Sex.Should().BeNull();
         }
 
         [Fact]
@@ -59,8 +59,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.Gender.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
-            result.Occurrence.Gender.Value.Should().Be("Malle");
+            result.Occurrence.Sex.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
+            result.Occurrence.Sex.Value.Should().Be("Malle");
         }
     }
 }

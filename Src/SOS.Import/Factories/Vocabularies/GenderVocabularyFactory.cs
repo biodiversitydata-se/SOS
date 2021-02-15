@@ -32,7 +32,7 @@ namespace SOS.Import.Factories.Vocabularies
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected override VocabularyId FieldId => VocabularyId.Gender;
+        protected override VocabularyId FieldId => VocabularyId.Sex;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()

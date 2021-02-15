@@ -24,6 +24,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string BiotopeDescription { get; set; }
 
         /// <summary>
+        ///    DiscoveryMethod from Artportalen
+        /// </summary>
+        [Object]
+        public VocabularyValue DiscoveryMethod { get; set; }
+
+        /// <summary>
         ///     End date/time of the event
         /// </summary>
         [Date]
@@ -70,11 +76,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ParentEventId { get; set; }
 
         /// <summary>
-        ///     Quality of substrate
-        /// </summary>
-        public int? QuantityOfSubstrate { get; set; }
-
-        /// <summary>
         ///     The amount of effort expended during an Event.
         /// </summary>
         public string SamplingEffort { get; set; }
@@ -109,40 +110,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Date]
         public DateTime? StartDate { get; set; }
-
-        /// <summary>
-        ///     Substrate.
-        /// </summary>
-        /// <remarks>
-        ///     This field uses a controlled vocabulary.
-        /// </remarks>
-        [Object]
-        public VocabularyValue Substrate { get; set; }
-
-        /// <summary>
-        ///     Description of substrate
-        /// </summary>
-        public string SubstrateDescription { get; set; }
-
-        /// <summary>
-        ///     Description of substrate species
-        /// </summary>
-        public string SubstrateSpeciesDescription { get; set; }
-
-        /// <summary>
-        ///     Vernacular name of substrate species
-        /// </summary>
-        public string SubstrateSpeciesVernacularName { get; set; }
-
-        /// <summary>
-        ///     Scientific name of substrate species
-        /// </summary>
-        public string SubstrateSpeciesScientificName { get; set; }
-
-        /// <summary>
-        ///     Substrate taxon id
-        /// </summary>
-        public int? SubstrateSpeciesId { get; set; }
 
         /// <summary>
         ///     The verbatim original representation of the date and time information for an Event.

@@ -9,6 +9,19 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Location
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Location()
+        {
+            Attributes = new LocationAttributes();
+        }
+
+        /// <summary>
+        /// Location attributes
+        /// </summary>
+        public LocationAttributes Attributes { get; set; }
+
+        /// <summary>
         ///     The name of the continent in which the Location occurs.
         ///     Recommended best practice is to use a controlled
         ///     vocabulary such as the Getty Thesaurus of Geographi
@@ -50,11 +63,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Country { get; set; }
 
         /// <summary>
-        ///     Special handling of Kalmar/Öland
-        /// </summary>
-        public string CountyPartIdByCoordinate { get; set; }
-
-        /// <summary>
         ///     The standard code for the country in which the
         ///     Location occurs.
         ///     Recommended best practice is to use ISO 3166-1-alpha-2
@@ -81,11 +89,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public Area Municipality { get; set; }
 
         /// <summary>
-        ///     The original municipality value from data provider.
-        /// </summary>
-        public string VerbatimMunicipality { get; set; }
-
-        /// <summary>
         ///     Parish ('socken' in swedish).
         /// </summary>
         [Object]
@@ -100,11 +103,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public Area Province { get; set; }
-
-        /// <summary>
-        ///     The original StateProvince value from data provider.
-        /// </summary>
-        public string VerbatimProvince { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: decimalLatitude.
@@ -405,14 +403,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string PointRadiusSpatialFit { get; set; }
 
-
-        //public ProcessedArea Province { get; set; }
-
-        /// <summary>
-        ///     Spacial handling of Lappland
-        /// </summary>
-        public string ProvincePartIdByCoordinate { get; set; }
-
         /// <summary>
         ///     Darwin Core term name: verbatimCoordinates.
         ///     The verbatim original spatial coordinates of the Location.
@@ -496,17 +486,5 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     vocabulary such as the Getty Thesaurus of Geographic Names.
         /// </summary>
         public string WaterBody { get; set; }
-
-        /// <summary>
-        ///     Internal field: The parent location id of the current location, this is used by Artportalen for bird locations that
-        ///     have one main location and several sublocation
-        /// </summary>
-        [SwaggerExclude]
-        public int? ParentLocationId { get; set; }
-
-        /// <summary>
-        ///     Internal field: Name of parent location, if any.
-        /// </summary>
-        public string ParentLocality { get; set; }
     }
 }

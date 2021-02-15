@@ -14,6 +14,8 @@ namespace SOS.Import.Entities.ObservationsDatabase
 
         public string CollectionId { get; set; }
 
+        public string County { get; set; }
+        
         public DateTime EditDate { get; set; }
 
         public DateTime EndDate { get; set; }
@@ -30,13 +32,19 @@ namespace SOS.Import.Entities.ObservationsDatabase
 
         public string Locality { get; set; }
 
+        public string Municipality { get; set; }
+
         public string Observers { get; set; }
 
         public string OccurrenceRemarks { get; set; }
 
         public string Origin { get; set; }
 
+        public string Parish { get; set; }
+
         public int ProtectionLevel { get; set; }
+
+        public string Province { get; set; }
 
         public DateTime RegisterDate { get; set; }
 

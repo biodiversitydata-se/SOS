@@ -13,6 +13,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Taxon : IEntity<int>, IBasicTaxon
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        public Taxon()
+        {
+            Attributes = new TaxonAttributes();
+        }
+
+        /// <summary>
         ///     Darwin Core term name: acceptedNameUsage.
         ///     The full name, with authorship and date information
         ///     if known, of the currently valid (zoological) or
@@ -30,9 +38,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public string AcceptedNameUsageID { get; set; }
 
         /// <summary>
-        ///     Action plan
+        /// Taxon attributes
         /// </summary>
-        public string ActionPlan { get; set; }
+        public TaxonAttributes Attributes { get; set; }
 
         /// <summary>
         ///     Part of bird directive?
@@ -45,16 +53,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     the taxon is classified.
         /// </summary>
         public string Class { get; set; }
-
-        /// <summary>
-        ///     Radius of disturbance
-        /// </summary>
-        public int? DisturbanceRadius { get; set; }
-
-        /// <summary>
-        ///     Dyntaxa taxon id.
-        /// </summary>
-        public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: family.
@@ -151,21 +149,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string NamePublishedInYear { get; set; }
 
         /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
-
-        /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
-
-        /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: nomenclaturalCode.
         ///     The nomenclatural code (or codes in the case of an
         ///     ambiregnal name) under which the scientificName is
@@ -192,11 +175,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Order { get; set; }
 
         /// <summary>
-        ///     Organism group
-        /// </summary>
-        public string OrganismGroup { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: originalNameUsage.
         ///     The taxon name, with authorship and date information
         ///     if known, as it originally appeared when first established
@@ -216,11 +194,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string OriginalNameUsageId { get; set; }
-
-        /// <summary>
-        ///     Main parent Dyntaxa taxon id.
-        /// </summary>
-        public int? ParentDyntaxaTaxonId { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: parentNameUsage.
@@ -248,21 +221,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     in which the taxon is classified.
         /// </summary>
         public string Phylum { get; set; }
-
-        /// <summary>
-        ///     True if taxon is protected by law
-        /// </summary>
-        public bool? ProtectedByLaw { get; set; }
-
-        /// <summary>
-        ///     True if taxon is protected by law
-        /// </summary>
-        public VocabularyValue ProtectionLevel { get; set; }
-
-        /// <summary>
-        ///     Redlist category
-        /// </summary>
-        public string RedlistCategory { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: scientificName.
@@ -300,11 +258,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
         /// <summary>
-        ///     Systematic sort order
-        /// </summary>
-        public int SortOrder { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: specificEpithet.
         ///     The name of the first or species epithet of
         ///     the scientificName.
@@ -318,22 +271,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     genus to avoid homonym confusion.
         /// </summary>
         public string Subgenus { get; set; }
-
-        /// <summary>
-        ///     Do taxon occur in sweden
-        /// </summary>
-        public string SwedishOccurrence { get; set; }
-
-        /// <summary>
-        ///     Do taxon occur in sweden
-        /// </summary>
-        public string SwedishHistory { get; set; }
-
-        /// <summary>
-        ///     Synonyme names.
-        /// </summary>
-        [Nested]
-        public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: taxonConceptID.
@@ -395,11 +332,5 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
-
-        /// <summary>
-        ///     Vernacular names.
-        /// </summary>
-        [Nested]
-        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
     }
 }

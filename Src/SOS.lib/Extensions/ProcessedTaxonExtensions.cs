@@ -24,8 +24,7 @@ namespace SOS.Lib.Extensions
         {
             return new BasicTaxon
             {
-                DyntaxaTaxonId = sourceTaxon.DyntaxaTaxonId,
-                ParentDyntaxaTaxonId = sourceTaxon.ParentDyntaxaTaxonId,
+                Attributes = sourceTaxon.Attributes,
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.SecondaryParentDyntaxaTaxonIds,
                 Id = sourceTaxon.Id,
                 ScientificName = sourceTaxon.ScientificName

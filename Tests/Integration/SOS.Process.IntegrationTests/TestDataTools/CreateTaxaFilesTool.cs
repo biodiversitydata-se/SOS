@@ -52,7 +52,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa);
             var mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
-            var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.DyntaxaTaxonId));
+            var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.Id));
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             var bin = MessagePackSerializer.Serialize(mammaliaProcessedTaxa, options);
             File.WriteAllBytes(filePath, bin);

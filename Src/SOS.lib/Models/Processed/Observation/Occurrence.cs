@@ -1,4 +1,6 @@
-﻿using Nest;
+﻿using System;
+using System.Collections.Generic;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -81,12 +83,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public int CatalogId { get; set; }
 
         /// <summary>
-        ///    DiscoveryMethod from Artportalen
-        /// </summary>
-        [Object]
-        public VocabularyValue DiscoveryMethod { get; set; }
-
-        /// <summary>
         ///     The current state of a specimen with respect to the
         ///     collection identified in collectionCode or collectionID.
         ///     Recommended best practice is to use a controlled vocabulary.
@@ -161,7 +157,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </remarks>
         [Object]
         public VocabularyValue LifeStage { get; set; }
-        
+
         /// <summary>
         ///     An identifier for the Occurrence (as opposed to a
         ///     particular digital record of the occurrence).
@@ -180,6 +176,13 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     urn:lsid:artportalen.se:Sighting:{id}
         ///     Red list database: urn:lsid:artdata.slu.se:SpeciesObservation:{id}
         /// </summary>
+
+        /// <summary>
+        ///     Media linked to the observation
+        /// </summary>
+        [Nested]
+        public ICollection<Multimedia> Media { get; set; }
+
         // ReSharper disable once InconsistentNaming
         [Keyword]
         public string OccurrenceId { get; set; }
@@ -188,6 +191,17 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Comments or notes about the Occurrence.
         /// </summary>
         public string OccurrenceRemarks { get; set; }
+
+        /// <summary>
+        ///     A statement about the presence or absence of a Taxon at a
+        ///     Location.
+        ///     Recommended best practice is to use a controlled vocabulary.
+        /// </summary>
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        [Object]
+        public VocabularyValue OccurrenceStatus { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of previous or
@@ -235,6 +249,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PreviousIdentifications { get; set; }
 
         /// <summary>
+        ///     Protection level
+        /// </summary>
+        public int ProtectionLevel { get; set; }
+
+        /// <summary>
         ///     A list (concatenated and separated) of names of people,
         ///     groups, or organizations responsible for recording the
         ///     original Occurrence. The primary collector or observer,
@@ -249,6 +268,18 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     an Occurrence record, such as a specimen collector's number.
         /// </summary>
         public string RecordNumber { get; set; }
+
+        /// <summary>
+        ///     Name of the person that reported the species observation.
+        /// </summary>
+        [Keyword]
+        public string ReportedBy { get; set; }
+
+        /// <summary>
+        ///     Date and time when the species observation was reported.
+        /// </summary>
+        [Date]
+        public DateTime? ReportedDate { get; set; }
 
         /// <summary>
         ///     The reproductive condition of the biological individual(s) represented in the Occurrence.
@@ -268,18 +299,13 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
-        public VocabularyValue Gender { get; set; }
+        public VocabularyValue Sex { get; set; }
 
         /// <summary>
-        ///     A statement about the presence or absence of a Taxon at a
-        ///     Location.
-        ///     Recommended best practice is to use a controlled vocabulary.
+        /// Substrate
         /// </summary>
-        /// <remarks>
-        ///     This field uses a controlled vocabulary.
-        /// </remarks>
         [Object]
-        public VocabularyValue OccurrenceStatus { get; set; }
+        public Substrate Substrate { get; set; }
 
         /// <summary>
         ///     URL to occurrence
@@ -295,30 +321,5 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     The reported weight
         /// </summary>
         public int? Weight { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string DeterminedBy { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int? DeterminationYear { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string ConfirmedBy { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int? ConfirmationYear { get; set; }
-
-        /// <summary>
-        ///     Public Collection
-        /// </summary>
-        public string PublicCollection { get; set; }
     }
 }

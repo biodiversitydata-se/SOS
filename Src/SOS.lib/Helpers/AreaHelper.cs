@@ -52,8 +52,8 @@ namespace SOS.Lib.Helpers
         /// <inheritdoc />
         public void AddAreaDataToProcessedObservation(Observation processedObservation)
         {
-            if (processedObservation.Location == null || !processedObservation.Location.DecimalLatitude.HasValue ||
-                !processedObservation.Location.DecimalLongitude.HasValue)
+            if ((processedObservation?.Location?.DecimalLongitude ?? 0) == 0 
+                || (processedObservation?.Location?.DecimalLatitude ?? 0) == 0)
             {
                 return;
             }
@@ -66,10 +66,10 @@ namespace SOS.Lib.Helpers
             processedObservation.Location.Province = positionLocation?.Province;
             processedObservation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
 
-            processedObservation.Location.ProvincePartIdByCoordinate =
+            processedObservation.Location.Attributes.ProvincePartIdByCoordinate =
                 GetProvincePartIdByCoordinate(processedObservation.Location.Province?.FeatureId);
 
-            processedObservation.Location.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
+            processedObservation.Location.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
                 processedObservation.Location.County?.FeatureId, processedObservation.Location.Province?.FeatureId);
         }
 
@@ -229,7 +229,7 @@ namespace SOS.Lib.Helpers
         private static void SetProvincePartIdByCoordinate(Observation processedObservation)
         {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.Province?.FeatureId;
+            processedObservation.Location.Attributes.ProvincePartIdByCoordinate = processedObservation.Location.Province?.FeatureId;
             if (new[]
             {
                 ProvinceIds.LuleLappmark,
@@ -239,23 +239,23 @@ namespace SOS.Lib.Helpers
                 ProvinceIds.ÅseleLappmark
             }.Contains(processedObservation.Location.Province?.FeatureId))
             {
-                processedObservation.Location.ProvincePartIdByCoordinate = SpecialProvincePartId.Lappland;
+                processedObservation.Location.Attributes.ProvincePartIdByCoordinate = SpecialProvincePartId.Lappland;
             }
         }
 
         private static void SetCountyPartIdByCoordinate(Observation processedObservation)
         {
             // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.County?.FeatureId;
+            processedObservation.Location.Attributes.CountyPartIdByCoordinate = processedObservation.Location.County?.FeatureId;
             if (processedObservation.Location.County?.FeatureId == CountyId.Kalmar)
             {
                 if (processedObservation.Location.Province?.FeatureId == ProvinceIds.Öland)
                 {
-                    processedObservation.Location.CountyPartIdByCoordinate = SpecialCountyPartId.Öland;
+                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.Öland;
                 }
                 else
                 {
-                    processedObservation.Location.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
+                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
                 }
             }
         }

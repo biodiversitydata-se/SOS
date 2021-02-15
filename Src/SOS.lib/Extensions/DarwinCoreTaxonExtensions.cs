@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SOS.Lib.Models.DarwinCore;
@@ -24,17 +23,11 @@ namespace SOS.Lib.Extensions
         {
             return new Taxon
             {
-                DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,
-                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds,
-                VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames(),
-                Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymeNames(),
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,
-                ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
                 BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective,
                 Class = sourceTaxon.Class,
-                DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius,
                 Family = sourceTaxon.Family,
                 Genus = sourceTaxon.Genus,
                 HigherClassification = sourceTaxon.HigherClassification,
@@ -46,39 +39,49 @@ namespace SOS.Lib.Extensions
                 NamePublishedIn = sourceTaxon.NamePublishedIn,
                 NamePublishedInId = sourceTaxon.NamePublishedInID,
                 NamePublishedInYear = sourceTaxon.NamePublishedInYear,
-                Natura2000HabitatsDirectiveArticle2 =
-                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
-                Natura2000HabitatsDirectiveArticle4 =
-                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4,
-                Natura2000HabitatsDirectiveArticle5 =
-                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5,
                 NomenclaturalCode = sourceTaxon.NomenclaturalCode,
                 NomenclaturalStatus = sourceTaxon.NomenclaturalStatus,
                 Order = sourceTaxon.Order,
-                OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup,
                 OriginalNameUsage = sourceTaxon.OriginalNameUsage,
                 OriginalNameUsageId = sourceTaxon.OriginalNameUsageID,
                 ParentNameUsage = sourceTaxon.ParentNameUsage,
                 ParentNameUsageId = sourceTaxon.ParentNameUsageID,
                 Phylum = sourceTaxon.Phylum,
-                ProtectionLevel =  sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
-                ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw,
-                RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                 ScientificName = sourceTaxon.ScientificName,
                 ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
                 ScientificNameId = sourceTaxon.ScientificNameID,
                 SpecificEpithet = sourceTaxon.SpecificEpithet,
                 Subgenus = sourceTaxon.Subgenus,
-                SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
-                SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
                 TaxonConceptId = sourceTaxon.TaxonConceptID,
+                Attributes = new TaxonAttributes
+                {
+                    ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
+                    DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius,
+                    DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,
+                    Natura2000HabitatsDirectiveArticle2 =
+                        sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
+                    Natura2000HabitatsDirectiveArticle4 =
+                        sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4,
+                    Natura2000HabitatsDirectiveArticle5 =
+                        sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5,
+                    OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup,
+                    ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
+                    ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
+                    ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw,
+                    RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
+                    SortOrder = sourceTaxon.SortOrder,
+                    SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
+                    SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
+                    Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymeNames(),
+                    VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames()
+                },
                 TaxonId = sourceTaxon.TaxonID,
                 TaxonRank = sourceTaxon.TaxonRank,
                 TaxonRemarks = sourceTaxon.TaxonRemarks,
                 TaxonomicStatus = sourceTaxon.TaxonomicStatus,
                 VernacularName = sourceTaxon.VernacularName,
                 VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
-                SortOrder = sourceTaxon.SortOrder
+               
             };
         }
 

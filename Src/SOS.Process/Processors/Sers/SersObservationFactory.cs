@@ -101,13 +101,13 @@ namespace SOS.Process.Processors.Sers
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
+                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatim.RecordedBy,
+                    ReportedBy = verbatim.ReportedBy,
+                    ReportedDate = verbatim.Start.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
-                ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
             };
 

@@ -37,11 +37,10 @@ namespace SOS.Lib.Repositories.Resource
                 .Find(x => true)
                 .Project(m => new BasicTaxon
                 {
-                    DyntaxaTaxonId = m.DyntaxaTaxonId,
                     Id = m.Id,
-                    ParentDyntaxaTaxonId = m.ParentDyntaxaTaxonId,
                     SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
-                    ScientificName = m.ScientificName
+                    ScientificName = m.ScientificName,
+                    Attributes = m.Attributes
                 })
                 .Skip(skip)
                 .Limit(take)

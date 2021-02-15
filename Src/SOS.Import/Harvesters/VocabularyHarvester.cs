@@ -86,7 +86,7 @@ namespace SOS.Import.Harvesters
             {
                 {VocabularyId.LifeStage, lifeStageVocabularyFactory},
                 {VocabularyId.Activity, activityVocabularyFactory},
-                {VocabularyId.Gender, genderVocabularyFactory},
+                {VocabularyId.Sex, genderVocabularyFactory},
                 {VocabularyId.Biotope, biotopeVocabularyFactory},
                 {VocabularyId.Substrate, substrateVocabularyFactory},
                 {VocabularyId.ValidationStatus, validationStatusVocabularyFactory},

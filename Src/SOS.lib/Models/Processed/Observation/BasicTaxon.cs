@@ -10,14 +10,13 @@ namespace SOS.Lib.Models.Processed.Observation
     public class BasicTaxon : IEntity<int>, IBasicTaxon
     {
         /// <summary>
-        ///     Dyntaxa taxon id.
+        /// Taxon attributes
         /// </summary>
-        public int DyntaxaTaxonId { get; set; }
-
+        public TaxonAttributes Attributes { get; set; }
         /// <summary>
-        ///     Main parent Dyntaxa taxon id.
+        ///     Object id
         /// </summary>
-        public int? ParentDyntaxaTaxonId { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         ///     Secondary parents dyntaxa taxon ids.
@@ -37,9 +36,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string ScientificName { get; set; }
 
-        /// <summary>
-        ///     Object id
-        /// </summary>
-        public int Id { get; set; }
+       
     }
 }

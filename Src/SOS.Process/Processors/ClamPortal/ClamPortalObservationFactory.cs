@@ -115,16 +115,16 @@ namespace SOS.Process.Processors.ClamPortal
                     LifeStage = GetLifeStageIdFromString(verbatimObservation.LifeStage),
                     OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
+                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatimObservation.RecordedBy,
+                    ReportedBy = verbatimObservation.ReportedBy,
+                    ReportedDate = verbatimObservation.ReportedDate.ToUniversalTime(),
                     OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
                     OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
                 DynamicProperties = string.IsNullOrEmpty(verbatimObservation.ProjectName)
                     ? null
                     : JsonConvert.SerializeObject(new {ProjectName = verbatimObservation.ProjectName}),
-                ReportedBy = verbatimObservation.ReportedBy,
-                ReportedDate = verbatimObservation.ReportedDate.ToUniversalTime(),
                 RightsHolder = verbatimObservation.RightsHolder,
                 Taxon = taxon
             };

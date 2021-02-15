@@ -116,11 +116,11 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
+                    ProtectionLevel = taxon?.Attributes.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
                 Taxon = taxon
             };
 
