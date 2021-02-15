@@ -174,11 +174,11 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Theory]
-        [InlineData("female", GenderId.Female)]
-        [InlineData("Male", GenderId.Male)]
+        [InlineData("female", SexId.Female)]
+        [InlineData("Male", SexId.Male)]
         public void Sex_field_with_valid_value_is_mapped_to_gender_vocabulary(
             string sexFieldValue,
-            GenderId expectedGenderId)
+            SexId expectedGenderId)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

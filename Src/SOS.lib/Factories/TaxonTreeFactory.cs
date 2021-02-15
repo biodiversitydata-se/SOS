@@ -46,7 +46,7 @@ namespace SOS.Lib.Factories
                 }
 
                 // Add main parent
-                if (taxon.Attributes.ParentDyntaxaTaxonId.HasValue)
+                if (taxon.Attributes?.ParentDyntaxaTaxonId != null)
                 {
                     if (!treeNodeById.TryGetValue(taxon.Attributes.ParentDyntaxaTaxonId.Value, out var parentNode))
                     {

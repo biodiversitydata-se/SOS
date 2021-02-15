@@ -91,6 +91,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<int> DataProviderIds { get; set; }
 
         /// <summary>
+        ///     Which type of date filtering that should be used
+        /// </summary>
+        public DateRangeFilterType DateFilterType { get; set; } = DateRangeFilterType.OverlappingStartDateAndEndDate;
+
+        /// <summary>
         /// Filter by diffuse status
         /// </summary>
         public IEnumerable<DiffuseStatus> DiffuseStatuses { get; set; }
@@ -117,11 +122,6 @@ namespace SOS.Lib.Models.Search
         ///     en-GB (English)
         /// </summary>
         public string FieldTranslationCultureCode { get; set; }
-
-        /// <summary>
-        ///     Gender to match. Queryable values are available in Field Mappings.
-        /// </summary>
-        public IEnumerable<int> GenderIds { get; set; }
 
         /// <summary>
         /// Geometry filter
@@ -152,11 +152,9 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     Which type of date filtering that should be used
+        ///     Sex id's to match. Queryable values are available in Field Mappings.
         /// </summary>
-        public DateRangeFilterType DateFilterType { get; set; } = DateRangeFilterType.OverlappingStartDateAndEndDate;
-
-        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+        public IEnumerable<int> SexIds { get; set; }
 
         /// <summary>
         ///     Observation start date specified in the ISO 8601 standard.
@@ -172,6 +170,8 @@ namespace SOS.Lib.Models.Search
         /// Pre defined time ranges
         /// </summary>
         public IEnumerable<TimeRange> TimeRanges { get; set; }
+
+        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
 
         public FilterBase Clone()
         {

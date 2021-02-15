@@ -44,7 +44,7 @@
     <None Update="Resources\Vocabularies.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\GenderVocabulary.json">
+    <None Update="Resources\SexVocabulary.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

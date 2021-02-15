@@ -51,9 +51,9 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<double> BoundingBox { get; set; }
 
         /// <summary>
-        /// Id of genders to match
+        /// Id of sex to match
         /// </summary>
-        public IEnumerable<int> GenderIds { get; set; }
+        public IEnumerable<int> SexIds { get; set; }
 
         /// <summary>
         /// Only include hits with media associated

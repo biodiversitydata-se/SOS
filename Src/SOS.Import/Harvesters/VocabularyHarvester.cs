@@ -34,7 +34,7 @@ namespace SOS.Import.Harvesters
         ///     Constructor
         /// </summary>
         /// <param name="vocabularyRepository"></param>
-        /// <param name="genderVocabularyFactory"></param>
+        /// <param name="sexVocabularyFactory"></param>
         /// <param name="lifeStageVocabularyFactory"></param>
         /// <param name="validationStatusVocabularyFactory"></param>
         /// <param name="institutionVocabularyFactory"></param>
@@ -58,7 +58,7 @@ namespace SOS.Import.Harvesters
         public VocabularyHarvester(
             IVocabularyRepository vocabularyRepository,
             ActivityVocabularyFactory activityVocabularyFactory,
-            GenderVocabularyFactory genderVocabularyFactory,
+            SexVocabularyFactory sexVocabularyFactory,
             LifeStageVocabularyFactory lifeStageVocabularyFactory,
             BiotopeVocabularyFactory biotopeVocabularyFactory,
             SubstrateVocabularyFactory substrateVocabularyFactory,
@@ -86,7 +86,7 @@ namespace SOS.Import.Harvesters
             {
                 {VocabularyId.LifeStage, lifeStageVocabularyFactory},
                 {VocabularyId.Activity, activityVocabularyFactory},
-                {VocabularyId.Sex, genderVocabularyFactory},
+                {VocabularyId.Sex, sexVocabularyFactory},
                 {VocabularyId.Biotope, biotopeVocabularyFactory},
                 {VocabularyId.Substrate, substrateVocabularyFactory},
                 {VocabularyId.ValidationStatus, validationStatusVocabularyFactory},

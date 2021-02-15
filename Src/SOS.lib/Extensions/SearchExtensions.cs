@@ -871,7 +871,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
-            query.TryAddTermsCriteria("occurrence.sex.id", filter.GenderIds);
+            query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
 
