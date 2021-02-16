@@ -68,6 +68,20 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Behavior { get; set; }
 
         /// <summary>
+        ///     Biotope.
+        /// </summary>
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        [Object]
+        public VocabularyValue Biotope { get; set; }
+
+        /// <summary>
+        ///     Description of biotope
+        /// </summary>
+        public string BiotopeDescription { get; set; }
+
+        /// <summary>
         ///     Bird nest activity property
         /// </summary>
         public int? BirdNestActivityId { get; set; }

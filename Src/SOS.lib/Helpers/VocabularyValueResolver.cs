@@ -58,7 +58,7 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.Country]);
                 ResolveVocabularyMappedValue(observation.Location?.Continent,
                     valueMappingDictionaries[VocabularyId.Continent]);
-                ResolveVocabularyMappedValue(observation.Event?.Biotope,
+                ResolveVocabularyMappedValue(observation.Occurrence?.Biotope,
                     valueMappingDictionaries[VocabularyId.Biotope]);
                 ResolveVocabularyMappedValue(observation.Event?.DiscoveryMethod,
                     valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
