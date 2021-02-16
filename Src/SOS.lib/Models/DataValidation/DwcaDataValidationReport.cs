@@ -11,6 +11,7 @@ namespace SOS.Lib.Models.DataValidation
         public List<ValidObservationTuple<TVerbatim, TProcessed>> ValidObservations { get; set; }
         public List<InvalidObservationTuple<TVerbatim>> InvalidObservations { get; set; }
         public List<DistinctValuesSummary> DictionaryValues { get; set; }
+        public TaxaStatisticsSummary TaxaStatistics { get; set; }
     }
 
     public class DwcaDatavalidationReportDescription
@@ -37,6 +38,77 @@ namespace SOS.Lib.Models.DataValidation
         public List<DefectItem> ObservationDefects { get; set; }
         public List<string> NonMatchingScientificNames { get; set; }
         public List<string> NonMatchingTaxonIds { get; set; }
+    }
+
+    public class ProtectedByLawStats
+    {
+        public int ObservationCount { get; set; }
+        public int TaxaCount { get; set; }
+        public List<TaxonInfo> Taxa { get; set; }
+    }
+
+    public class TaxaStatisticsSummary
+    {
+        public int TaxaCount { get; set; }
+        public List<TaxonRedlistStats> RedListTaxa { get; set; }
+        public ProtectedByLawStats ProtectedByLawTaxa { get; set; }
+    }
+
+    public class TaxonRedlistStats
+    {
+        public TaxonRedlistStats(string redlistCategory)
+        {
+            RedlistCategory = redlistCategory;
+        }
+
+        public string RedlistCategory { get; set; }
+        public int ObservationCount { get; set; }
+        public int TaxaCount { get; set; }
+        public List<TaxonInfo> Taxa { get; set; }
+
+        public static TaxonRedlistStats Create(string redlistCategory)
+        {
+            string redlistCategoryName = "";
+            switch (redlistCategory)
+            {
+                case "RE":
+                    redlistCategoryName = "Regionally Extinct (RE)";
+                    break;
+                case "CR":
+                    redlistCategoryName = "Critically Endangered (CR)";
+                    break;
+                case "EN":
+                    redlistCategoryName = "Endangered (EN)";
+                    break;
+                case "VU":
+                    redlistCategoryName = "Vulnerable (VU)";
+                    break;
+                case "NT":
+                    redlistCategoryName = "Near Threatened (NT)";
+                    break;
+                case "DD":
+                    redlistCategoryName = "Data Deficient (DD)";
+                    break;
+            }
+
+            return new TaxonRedlistStats(redlistCategoryName);
+        }
+    }
+
+    public class TaxonInfo
+    {
+        public TaxonInfo(int taxonId, string taxonRank, string scientificName, string vernacularName)
+        {
+            TaxonRank = taxonRank;
+            ScientificName = scientificName;
+            VernacularName = vernacularName;
+        }
+
+        public int TaxonId { get; set; }
+        public string TaxonRank { get; set; }
+        public string ScientificName { get; set; }
+        public string VernacularName { get; set; }
+        public int ObservationCount { get; set; }
     }
 
     public class DistinctValuesSummary

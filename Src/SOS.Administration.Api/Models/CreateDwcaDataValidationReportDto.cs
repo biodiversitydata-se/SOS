@@ -32,6 +32,12 @@ namespace SOS.Administration.Api.Models
         public int NrInvalidObservationsInReport { get; set; } = 100;
 
         /// <summary>
+        /// The number of taxa that will be listed for each category in taxon statistics.
+        /// </summary>
+        [DefaultValue(20)]
+        public int NrTaxaInTaxonStatistics { get; set; } = 20;
+
+        /// <summary>
         /// Name of the person that requested the report.
         /// </summary>
         public string CreatedBy { get; set; } = "";
