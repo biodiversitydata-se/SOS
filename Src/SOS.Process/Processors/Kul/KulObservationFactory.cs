@@ -58,6 +58,7 @@ namespace SOS.Process.Processors.Kul
 
             var obs = new Observation
             {
+                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.KUL}",

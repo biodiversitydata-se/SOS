@@ -64,6 +64,7 @@ namespace SOS.Process.Processors.ObservationDatabase
 
             var obs = new Observation
             {
+                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage },
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 CollectionCode = verbatim.CollectionCode,
