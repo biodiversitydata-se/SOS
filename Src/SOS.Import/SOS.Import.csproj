@@ -73,7 +73,7 @@
     <Compile Update="Factories\Vocabularies\EstablishmentMeansVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\Vocabularies\GenderVocabularyFactory.cs">
+    <Compile Update="Factories\Vocabularies\SexVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
     <Compile Update="Factories\Vocabularies\GeoRegionVocabularyFactoryBase.cs">
@@ -142,7 +142,7 @@
     <None Update="Resources\Vocabularies\EstablishmentMeansVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Vocabularies\GenderVocabulary.json">
+    <None Update="Resources\Vocabularies\SexVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vocabularies\InstitutionVocabulary.json">

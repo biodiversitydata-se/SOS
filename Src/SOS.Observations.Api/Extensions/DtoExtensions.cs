@@ -133,7 +133,7 @@ namespace SOS.Observations.Api.Extensions
                     searchFilterInternalDto.ArtportalenFilter.RegionalSightingStateIdsFilter;
                 internalFilter.SiteIds = searchFilterInternalDto.ArtportalenFilter.SiteIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ArtportalenFilter.SpeciesFactsIds;
-                internalFilter.GenderIds = searchFilterInternalDto.ArtportalenFilter.GenderIds;
+                internalFilter.SexIds = searchFilterInternalDto.ArtportalenFilter.SexIds;
             }
 
         }

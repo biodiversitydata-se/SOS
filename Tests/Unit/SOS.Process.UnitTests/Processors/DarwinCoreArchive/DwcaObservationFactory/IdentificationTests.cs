@@ -37,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Identification.DateIdentified.Should().Be(new DateTime(2019, 5, 29).ToUniversalTime());
+            result.Identification.DateIdentified.Should().Be(new DateTime(2019, 5, 29).ToUniversalTime().ToString());
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Identification.DateIdentified.Should().Be(date);
+            result.Identification.DateIdentified.Should().Be(date.ToString());
         }
 
         [Theory]

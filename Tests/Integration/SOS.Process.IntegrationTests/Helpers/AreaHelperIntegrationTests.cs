@@ -43,7 +43,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.Öland);
+            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.Öland);
             observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
         }
 
@@ -73,7 +73,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.KalmarFastland);
+            observation.Location.Attributes.CountyPartIdByCoordinate.Should().Be((string) SpecialCountyPartId.KalmarFastland);
             observation.Location.County.FeatureId.Should().Be((string) CountyId.Kalmar);
         }
 
@@ -102,7 +102,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.ProvincePartIdByCoordinate.Should().Be((string) SpecialProvincePartId.Lappland);
+            observation.Location.Attributes.ProvincePartIdByCoordinate.Should().Be((string) SpecialProvincePartId.Lappland);
             observation.Location.Province.FeatureId.Should().Be((string) ProvinceIds.TorneLappmark);
         }
     }

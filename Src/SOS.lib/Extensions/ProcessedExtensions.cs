@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
@@ -54,6 +55,12 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
+            string dateIdentifiedString = null;
+            if (DateTime.TryParse(source.DateIdentified, out var dateIdentified))
+            {
+                dateIdentifiedString = $"{dateIdentified.ToString("s")}Z";
+            }
+
             return new DarwinCoreIdentification
             {
                 IdentificationVerificationStatus = source.ValidationStatus?.Value,
@@ -62,9 +69,7 @@ namespace SOS.Lib.Extensions
                 IdentificationRemarks = source.IdentificationRemarks,
                 IdentificationID = source.IdentificationId,
                 IdentificationQualifier = source.IdentificationQualifier,
-                DateIdentified = source.DateIdentified.HasValue
-                    ? $"{source.DateIdentified.Value.ToString("s")}Z" ?? ""
-                    : null,
+                DateIdentified = dateIdentifiedString,
                 TypeStatus = source.TypeStatus
             };
         }
@@ -162,7 +167,7 @@ namespace SOS.Lib.Extensions
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
                 ReproductiveCondition = source.ReproductiveCondition?.Value,
-                Sex = source.Gender?.Value
+                Sex = source.Sex?.Value
             };
         }
 

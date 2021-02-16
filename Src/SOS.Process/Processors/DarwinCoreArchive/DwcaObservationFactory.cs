@@ -56,9 +56,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
-                if (processedTaxon.Synonyms != null)
+                if (processedTaxon.Attributes?.Synonyms != null)
                 {
-                    foreach (var synonyme in processedTaxon.Synonyms)
+                    foreach (var synonyme in processedTaxon.Attributes.Synonyms)
                     {
                         _taxonBySynonymeName.Add(synonyme.Name.ToLower(), processedTaxon);
                     }
@@ -109,9 +109,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //obs.DataProviderIdentifier = verbatimObservation.DataProviderIdentifier;
 
             // Record level
-            obs.Media = CreateProcessedMultimedia(
-                verbatimObservation.ObservationMultimedia,
-                verbatimObservation.ObservationAudubonMedia);
             if (verbatimObservation.ObservationMeasurementOrFacts.HasItems())
                 obs.MeasurementOrFacts = verbatimObservation.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             else if (verbatimObservation.ObservationExtendedMeasurementOrFacts.HasItems())
@@ -337,8 +334,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         private Identification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
         {
+            string dateIdentifiedString = null;
+            if (DateTime.TryParse(verbatimObservation.DateIdentified, out var dateIdentified))
+            {
+                dateIdentifiedString = dateIdentified.ToUniversalTime().ToString();
+            }
+
             var processedIdentification = new Identification();
-            processedIdentification.DateIdentified = verbatimObservation.DateIdentified?.ParseDateTime()?.ToUniversalTime();
+            processedIdentification.DateIdentified = dateIdentifiedString;
             processedIdentification.IdentificationId = verbatimObservation.IdentificationID;
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
@@ -417,9 +420,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatimObservation.MinimumDistanceAboveSurfaceInMeters.ParseDouble();
             processedLocation.MinimumElevationInMeters = verbatimObservation.MinimumElevationInMeters.ParseDouble();
             //processedLocation.Municipality = GetSosId(verbatimObservation.Municipality, _fieldMappings[FieldMappingFieldId.Municipality]); // Mapped by AreaHelper
-            processedLocation.VerbatimMunicipality = verbatimObservation.Municipality;
+            processedLocation.Attributes.VerbatimMunicipality = verbatimObservation.Municipality;
             //processedLocation.Province = GetSosId(verbatimObservation.StateProvince, _fieldMappings[FieldMappingFieldId.Province]); // Mapped by AreaHelper
-            processedLocation.VerbatimProvince = verbatimObservation.StateProvince;
+            processedLocation.Attributes.VerbatimProvince = verbatimObservation.StateProvince;
             processedLocation.VerbatimCoordinates = verbatimObservation.VerbatimCoordinates;
             processedLocation.VerbatimCoordinateSystem = verbatimObservation.VerbatimCoordinateSystem;
             processedLocation.VerbatimDepth = verbatimObservation.VerbatimDepth;
@@ -485,6 +488,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.IndividualCount = verbatimObservation.IndividualCount;
             processedOccurrence.LifeStage = GetSosId(verbatimObservation.LifeStage,
                 _vocabularyById[VocabularyId.LifeStage]); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
+            processedOccurrence.Media = CreateProcessedMultimedia(
+                verbatimObservation.ObservationMultimedia,
+                verbatimObservation.ObservationAudubonMedia);
             processedOccurrence.OccurrenceId = verbatimObservation.OccurrenceID;
             processedOccurrence.OccurrenceRemarks = verbatimObservation.OccurrenceRemarks;
             processedOccurrence.OccurrenceStatus = GetSosId(
@@ -501,7 +507,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.Activity = GetSosId(verbatimObservation.ReproductiveCondition,
                 _vocabularyById[VocabularyId.Activity]); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
 
-            processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Gender]);
+            processedOccurrence.Sex = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Sex]);
             processedOccurrence.ReproductiveCondition = GetSosId(verbatimObservation.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
             processedOccurrence.Behavior = GetSosId(verbatimObservation.Behavior, _vocabularyById.GetValue(VocabularyId.Behavior));
             processedOccurrence.IsNaturalOccurrence = true;

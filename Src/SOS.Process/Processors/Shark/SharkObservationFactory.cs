@@ -58,6 +58,7 @@ namespace SOS.Process.Processors.Shark
             var sharkSampleId = verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId;
             var obs = new Observation
             {
+                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
@@ -101,12 +102,12 @@ namespace SOS.Process.Processors.Shark
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
+                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatim.Taxonomist,
+                    ReportedBy = verbatim.ReportedStationName,
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)
                 },
                 OwnerInstitutionCode = verbatim.ReportingInstituteNameSv,
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
-                ReportedBy = verbatim.ReportedStationName,
                 Taxon = taxon
             };
 

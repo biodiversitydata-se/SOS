@@ -78,10 +78,15 @@ namespace SOS.Import.Repositories.Source.ObservationsDatabase
 	                CASE 
 		                WHEN (t.ProtectionLevel < 4) THEN 3 
 		                ELSE t.ProtectionLevel
-	                END AS [ProtectionLevel]
+	                END AS [ProtectionLevel],
+	                COALESCE(s.[LänsNamn], '')	AS County,
+	                COALESCE(s.Landskapsnamn, '') AS Province,
+	                COALESCE(s.[KommunNamn], '') AS Municipality,
+	                COALESCE(s.[Församlingunik], '') AS Parish
                 FROM	
 	                huvudtabell h
 	                INNER JOIN Taxon AS t ON h.artnr = t.TaxonId
+                    LEFT JOIN Socknar s ON h.fgnr = s.fgnr
                 WHERE
 	                h.ArtDataIDNR BETWEEN @StartId AND @EndId AND t.ProtectionLevel < 2 
 	                AND (

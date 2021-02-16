@@ -74,6 +74,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
             var obs = new Observation
             {
+                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
@@ -116,11 +117,11 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
+                    ProtectionLevel = taxon?.Attributes.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
                 Taxon = taxon
             };
 

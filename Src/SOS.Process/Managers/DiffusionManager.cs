@@ -37,6 +37,8 @@ namespace SOS.Process.Managers
                 observation.ArtportalenInternal.BirdValidationAreaIds = null;
                 observation.ArtportalenInternal.LocationExternalId = null;
                 observation.ArtportalenInternal.LocationPresentationNameParishRegion = null;
+                observation.ArtportalenInternal.ParentLocality = null;
+                observation.ArtportalenInternal.ParentLocationId = null;
             }
 
             // Make sure all location data are erased
@@ -45,8 +47,6 @@ namespace SOS.Process.Managers
             location.County = null;
             location.Locality = null;
             location.Municipality = null;
-            location.ParentLocality = null;
-            location.ParentLocationId = null;
             location.Parish = null;
             location.Point = null;
             location.PointLocation = null;
@@ -56,15 +56,15 @@ namespace SOS.Process.Managers
             location.VerbatimLatitude = null;
             location.VerbatimLongitude = null;
             location.VerbatimLocality = null;
-            location.VerbatimMunicipality = null;
-            location.VerbatimProvince = null;
+            location.Attributes.VerbatimMunicipality = null;
+            location.Attributes.VerbatimProvince = null;
 
             if (latitude == 0 || longitude == 0)
             {
                 return;
             }
 
-            var (mod, add) = GetDiffusionValues(observation.ProtectionLevel);
+            var (mod, add) = GetDiffusionValues(observation.Occurrence?.ProtectionLevel ?? 0);
 
            
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
@@ -133,16 +133,16 @@ namespace SOS.Process.Managers
 
             // Diffused observations is not protected
             observation.Protected = false;
-            observation.ReportedBy = string.Empty;
+            observation.Occurrence.ReportedBy = string.Empty;
             
             if (observation.Modified.HasValue)
             {
                 observation.Modified = new DateTime(observation.Modified.Value.Year, observation.Modified.Value.Month, 1);
             }
 
-            if (observation.ReportedDate.HasValue)
+            if (observation.Occurrence.ReportedDate.HasValue)
             {
-                observation.ReportedDate = new DateTime(observation.ReportedDate.Value.Year, observation.ReportedDate.Value.Month, 1);
+                observation.Occurrence.ReportedDate = new DateTime(observation.Occurrence.ReportedDate.Value.Year, observation.Occurrence.ReportedDate.Value.Month, 1);
             }
 
             if (observation.ArtportalenInternal != null)

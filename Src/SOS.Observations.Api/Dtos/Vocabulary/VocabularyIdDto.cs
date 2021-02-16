@@ -2,7 +2,7 @@
 {
     public enum VocabularyIdDto
     {
-        Gender = 0,
+        Sex = 0,
         Activity = 1,
         County = 2,
         Parish = 3,

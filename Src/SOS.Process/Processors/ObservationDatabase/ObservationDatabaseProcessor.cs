@@ -53,7 +53,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 var observation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(observation);
 
-                if (observation.ProtectionLevel > 2)
+                if (observation.Occurrence.ProtectionLevel > 2)
                 {
                     observation.Protected = true;
                     protectedObservations.Add(observation);
@@ -68,8 +68,8 @@ namespace SOS.Process.Processors.ObservationDatabase
                     }
 
                     //If it is a protected sighting, public users should not be possible to find it in the current month 
-                    if ((verbatimObservation?.StartDate.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Year == DateTime.Now.Year) &&
-                        (verbatimObservation?.StartDate.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Month == DateTime.Now.Month))
+                    if ((verbatimObservation.StartDate.Year == DateTime.Now.Year || verbatimObservation.EndDate.Year == DateTime.Now.Year) &&
+                        (verbatimObservation.StartDate.Month == DateTime.Now.Month || verbatimObservation.EndDate.Month == DateTime.Now.Month))
                     {
                         return;
                     }

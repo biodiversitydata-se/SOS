@@ -46,23 +46,23 @@ namespace SOS.Lib.Factories
                 }
 
                 // Add main parent
-                if (taxon.ParentDyntaxaTaxonId.HasValue)
+                if (taxon.Attributes?.ParentDyntaxaTaxonId != null)
                 {
-                    if (!treeNodeById.TryGetValue(taxon.ParentDyntaxaTaxonId.Value, out var parentNode))
+                    if (!treeNodeById.TryGetValue(taxon.Attributes.ParentDyntaxaTaxonId.Value, out var parentNode))
                     {
-                        if (!taxonById.TryGetValue(taxon.ParentDyntaxaTaxonId.Value, out var parentTaxon))
+                        if (!taxonById.TryGetValue(taxon.Attributes.ParentDyntaxaTaxonId.Value, out var parentTaxon))
                         {
                             parentTaxon = new BasicTaxon
                             {
-                                Id = taxon.ParentDyntaxaTaxonId.Value
+                                Id = taxon.Attributes.ParentDyntaxaTaxonId.Value
                             };
                         }
 
                         parentNode = new TaxonTreeNode<IBasicTaxon>(
-                            taxon.ParentDyntaxaTaxonId.Value,
+                            taxon.Attributes.ParentDyntaxaTaxonId.Value,
                             parentTaxon.ScientificName,
                             parentTaxon);
-                        treeNodeById.Add(taxon.ParentDyntaxaTaxonId.Value, parentNode);
+                        treeNodeById.Add(taxon.Attributes.ParentDyntaxaTaxonId.Value, parentNode);
                     }
 
                     treeNode.Parent = parentNode;

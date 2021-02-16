@@ -11,34 +11,34 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Gender field mapping.
+    ///     Class for creating sex field mapping.
     /// </summary>
-    public class GenderVocabularyFactory : ArtportalenVocabularyFactoryBase
+    public class SexVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<GenderVocabularyFactory> _logger;
+        private readonly ILogger<SexVocabularyFactory> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
-        public GenderVocabularyFactory(
+        public SexVocabularyFactory(
             IMetadataRepository metadataRepository,
-            ILogger<GenderVocabularyFactory> logger)
+            ILogger<SexVocabularyFactory> logger)
         {
             _artportalenMetadataRepository =
                 metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected override VocabularyId FieldId => VocabularyId.Gender;
+        protected override VocabularyId FieldId => VocabularyId.Sex;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
         {
-            var genders = await _artportalenMetadataRepository.GetGendersAsync();
-            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(genders.ToArray());
+            var sexes = await _artportalenMetadataRepository.GetGendersAsync();
+            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(sexes.ToArray());
             return vocabularyValues;
         }
 

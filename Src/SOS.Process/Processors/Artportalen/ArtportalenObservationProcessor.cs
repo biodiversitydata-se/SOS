@@ -187,7 +187,7 @@ namespace SOS.Process.Processors.Artportalen
                         continue;
                     }
                    
-                    if (observation.ProtectionLevel > 2)
+                    if (observation.Occurrence.ProtectionLevel > 2)
                     {
                         observation.Protected = true;
                         protectedObservations.Add(observation);

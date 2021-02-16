@@ -58,6 +58,7 @@ namespace SOS.Process.Processors.Mvm
 
             var obs = new Observation
             {
+                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.MVM}",
@@ -101,13 +102,13 @@ namespace SOS.Process.Processors.Mvm
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
+                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
                     RecordedBy = verbatim.RecordedBy,
+                    ReportedBy = verbatim.ReportedBy,
+                    ReportedDate = verbatim.Start.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
-                ProtectionLevel = taxon?.ProtectionLevel?.Id ?? 1,
-                ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
             };
 

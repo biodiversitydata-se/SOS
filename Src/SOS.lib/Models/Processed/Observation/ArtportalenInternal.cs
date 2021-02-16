@@ -16,6 +16,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
+        /// Year of confirmation
+        /// </summary>
+        public int? ConfirmationYear { get; set; }
+
+        /// <summary>
+        /// Year of determination
+        /// </summary>
+        public int? DeterminationYear { get; set; }
+
+        /// <summary>
         ///     Ids of Species Facts connected to Taxon
         /// </summary>
         public IEnumerable<int> SpeciesFactsIds { get; set; }
@@ -24,11 +34,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Id of SightingSpeciesCollectionItem in Artportalen.
         /// </summary>
         public int? SightingSpeciesCollectionItemId { get; set; }
-
-        /// <summary>
-        ///     Private Collection
-        /// </summary>
-        public string PrivateCollection { get; set; }
 
         /// <summary>
         ///     Has Triggered Validation Rules
@@ -85,6 +90,18 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     The original presentation name for ParisRegion from data provider
         /// </summary>
         public string LocationPresentationNameParishRegion { get; set; }
+
+        /// <summary>
+        ///     Internal field: The parent location id of the current location, this is used by Artportalen for bird locations that
+        ///     have one main location and several sublocation
+        /// </summary>
+        [SwaggerExclude]
+        public int? ParentLocationId { get; set; }
+
+        /// <summary>
+        ///     Internal field: Name of parent location, if any.
+        /// </summary>
+        public string ParentLocality { get; set; }
 
         /// <summary>
         ///     User id of the person that reported the species observation.

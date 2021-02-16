@@ -5,7 +5,7 @@
     /// </summary>
     public enum VocabularyId
     {
-        Gender = 0,
+        Sex = 0,
         Activity = 1,
         LifeStage = 6,
         Biotope = 7,

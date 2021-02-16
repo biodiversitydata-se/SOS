@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Nest;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -12,12 +9,21 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Identification
     {
         /// <summary>
+        /// Confirmed by
+        /// </summary>
+        public string ConfirmedBy { get; set; }
+
+        /// <summary>
+        /// Date of confirmation
+        /// </summary>
+        public string ConfirmedDate { get; set; }
+
+        /// <summary>
         ///     The date on which the subject was identified as
         ///     representing the Taxon. Recommended best practice is
         ///     to use an encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
-        [Date]
-        public DateTime? DateIdentified { get; set; }
+        public string DateIdentified { get; set; }
 
         /// <summary>
         ///     An identifier for the Identification (the body of

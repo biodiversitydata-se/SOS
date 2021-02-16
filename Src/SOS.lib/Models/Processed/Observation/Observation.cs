@@ -35,8 +35,8 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             Created = DateTime.Now;
             DiffuseStatus = DiffuseStatus.NotDiffused;
+            Occurrence = new Occurrence();
         }
-
 
         /// <summary>
         ///     List of defects found in harvest
@@ -172,6 +172,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string DataGeneralizations { get; set; }
 
         /// <summary>
+        ///     Data provider id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+
+        /// <summary>
         ///     An identifier for the set of data.
         ///     May be a global unique identifier or an identifier
         ///     specific to a collection or institution.
@@ -258,37 +263,25 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode { get; set; }
 
         /// <summary>
+        ///     Private Collection
+        /// </summary>
+        public string PrivateCollection { get; set; }
+
+        /// <summary>
         /// Observation is protected by the system
         /// </summary>
         public bool Protected { get; set; }
 
         /// <summary>
-        ///     Protection level
+        ///     Public Collection
         /// </summary>
-        public int ProtectionLevel { get; set; }
-
-        /// <summary>
-        ///     Data provider id.
-        /// </summary>
-        public int DataProviderId { get; set; }
+        public string PublicCollection { get; set; }
 
         /// <summary>
         ///     A related resource that is referenced, cited,
         ///     or otherwise pointed to by the described resource.
         /// </summary>
         public string References { get; set; }
-
-        /// <summary>
-        ///     Name of the person that reported the species observation.
-        /// </summary>
-        [Keyword]
-        public string ReportedBy { get; set; }
-
-        /// <summary>
-        ///     Date and time when the species observation was reported.
-        /// </summary>
-        [Date]
-        public DateTime? ReportedDate { get; set; }
 
         /// <summary>
         ///     A person or organization owning or
@@ -314,12 +307,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public ArtportalenInternal ArtportalenInternal { get; set; }
 
         #endregion Record level
-
-        /// <summary>
-        ///     Media linked to the observation
-        /// </summary>
-        [Nested]
-        public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
         ///     Measurement or fact linked to the observation.

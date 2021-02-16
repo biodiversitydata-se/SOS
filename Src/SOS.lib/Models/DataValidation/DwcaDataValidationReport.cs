@@ -24,7 +24,7 @@ namespace SOS.Lib.Models.DataValidation
         public string ObservationDefects => "Validation error information.";
         public string ValidObservations => "A listing of valid observations (default is 100). For each observation, the following is shown: VerbatimObservation = raw data from the DwC-A CSV files. ProcessedObservation = this is what the observation looks like in the SOS database after it has been processed. DwcExport = this is what the observation looks like when the processed observation is exported to DwC.";
         public string InvalidObservations => "A listing of invalid observations (default is 100). For each observation, the following is shown: VerbatimObservation = raw data from the DwC-A CSV files. ProcessedObservationDefects = a list of defects.";
-        public string DictionaryValues => "Some fields have a predefined dictionary in SOS, for example the fields BasisOfRecord, Gender, LifeStage, ValidationStatus, OccurrenceStatus & Municipality. This is a summary of what values that could be mapped to those dictionary entries.";
+        public string DictionaryValues => "Some fields have a predefined dictionary in SOS, for example the fields BasisOfRecord, Sex, LifeStage, ValidationStatus, OccurrenceStatus & Municipality. This is a summary of what values that could be mapped to those dictionary entries.";
     }
 
     public class DwcaDataValidationReportSummary

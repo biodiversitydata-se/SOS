@@ -1,9 +1,9 @@
 ﻿namespace SOS.Lib.Enums.VocabularyValues
 {
     /// <summary>
-    ///     Enumeration of Gender.
+    ///     Enumeration of sexes.
     /// </summary>
-    public enum GenderId
+    public enum SexId
     {
         /// <summary>
         ///     Empty.
