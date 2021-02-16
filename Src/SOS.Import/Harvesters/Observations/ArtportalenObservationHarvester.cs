@@ -242,6 +242,12 @@ namespace SOS.Import.Harvesters.Observations
                 await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
+                // If sleep is required to free resources to other systems
+                if (_artportalenConfiguration.SleepAfterBatch > 0)
+                {
+                    Thread.Sleep(_artportalenConfiguration.SleepAfterBatch);
+                }
+
                 return verbatimObservations?.Count() ?? 0;
             }
             catch (Exception e)

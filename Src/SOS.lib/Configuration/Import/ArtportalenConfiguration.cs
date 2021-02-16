@@ -47,5 +47,10 @@ namespace SOS.Lib.Configuration.Import
         /// Harvest sightings from this start date
         /// </summary>
         public DateTime? HarvestStartDate { get; set; }
+
+        /// <summary>
+        /// Time to sleep after a batch has run (ms) 
+        /// </summary>
+        public int SleepAfterBatch { get; set; }
     }
 }
