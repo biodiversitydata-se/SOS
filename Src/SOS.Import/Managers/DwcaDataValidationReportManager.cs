@@ -326,7 +326,7 @@ namespace SOS.Import.Managers
             var taxon = _taxonById[processedObservation.Taxon.Id];
             taxaStatistics.TaxaSet.Add(taxon.Id);
 
-            if (taxon.ProtectedByLaw.GetValueOrDefault(false))
+            if (taxon.Attributes.ProtectedByLaw.GetValueOrDefault(false))
             {
                 if (!taxaStatistics.ProtectedByLawTaxa.ContainsKey(taxon.Id))
                 {
@@ -336,10 +336,10 @@ namespace SOS.Import.Managers
                 taxaStatistics.ProtectedByLawTaxa[taxon.Id].ObservationCount++;
             }
 
-            if (!string.IsNullOrWhiteSpace(taxon.RedlistCategory))
+            if (!string.IsNullOrWhiteSpace(taxon.Attributes.RedlistCategory))
             {
                 // Remove degree sign in redlist category
-                var redlistCategory = taxon.RedlistCategory.Length > 2 ? taxon.RedlistCategory.Substring(0, 2) : taxon.RedlistCategory;
+                var redlistCategory = taxon.Attributes.RedlistCategory.Length > 2 ? taxon.Attributes.RedlistCategory.Substring(0, 2) : taxon.Attributes.RedlistCategory;
                 if (redlistCategory == "NA" || redlistCategory == "LC" || redlistCategory == "NE") return;
 
                 if (!taxaStatistics.RedlistTaxa.ContainsKey(redlistCategory))
