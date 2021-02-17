@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
+		Install.md = Install.md
 		README.md = README.md
 		Docs\Vocabularies.md = Docs\Vocabularies.md
 	EndProjectSection
