@@ -139,6 +139,7 @@ namespace SOS.Administration.Api.Controllers
                         model.MaxNrObservationsToRead,
                         model.NrValidObservationsInReport,
                         model.NrInvalidObservationsInReport,
+                        model.NrTaxaInTaxonStatistics,
                         JobCancellationToken.Null));
 
                 return new OkObjectResult($"Create DwC-A data validation report job for file \"{model.DwcaFile.FileName}\" with Id \"{reportId}\" was enqueued to Hangfire.");

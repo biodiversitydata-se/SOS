@@ -58,6 +58,7 @@ namespace SOS.Import.Jobs
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,
             int nrInvalidObservationsInReport,
+            int nrTaxaInTaxonStatistics,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -68,7 +69,8 @@ namespace SOS.Import.Jobs
                     archiveReader,
                     maxNrObservationsToRead,
                     nrValidObservationsInReport,
-                    nrInvalidObservationsInReport);
+                    nrInvalidObservationsInReport,
+                    nrTaxaInTaxonStatistics);
                 
                 // Serialize and save compact JSON file
                 var compactJsonSettings = CreateCompactJsonSerializerSettings();

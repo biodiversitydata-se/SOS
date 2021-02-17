@@ -16,6 +16,7 @@ namespace SOS.Import.Managers.Interfaces
             ArchiveReader archiveReader,
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 100, 
-            int nrInvalidObservationsInReport = 100);
+            int nrInvalidObservationsInReport = 100,
+            int nrTaxaInSummary = 20);
     }
 }

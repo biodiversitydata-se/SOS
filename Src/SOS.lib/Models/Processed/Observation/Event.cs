@@ -10,20 +10,6 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Event
     {
         /// <summary>
-        ///     Biotope.
-        /// </summary>
-        /// <remarks>
-        ///     This field uses a controlled vocabulary.
-        /// </remarks>
-        [Object]
-        public VocabularyValue Biotope { get; set; }
-
-        /// <summary>
-        ///     Description of biotope
-        /// </summary>
-        public string BiotopeDescription { get; set; }
-
-        /// <summary>
         ///    DiscoveryMethod from Artportalen
         /// </summary>
         [Object]

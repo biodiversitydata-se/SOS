@@ -70,10 +70,11 @@ namespace SOS.Import.Managers
         }
 
         public async Task<DwcaDataValidationReport<DwcObservationVerbatim, Observation>>
-            CreateDataValidationSummary(ArchiveReader archiveReader,
+        CreateDataValidationSummary(ArchiveReader archiveReader,
                 int maxNrObservationsToRead = 100000,
                 int nrValidObservationsInReport = 100, 
-                int nrInvalidObservationsInReport = 100)
+                int nrInvalidObservationsInReport = 100,
+                int nrTaxaInSummary = 20)
         {
             var dataProvider = new DataProvider
             {
@@ -102,6 +103,7 @@ namespace SOS.Import.Managers
             var observationDefects = new Dictionary<string, int>();
             var processedFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, int>>();
             var verbatimFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>>();
+            var taxaStatistics = new TaxaStatistics();
             foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
             {
                 processedFieldValues.Add(vocabularyId, new Dictionary<VocabularyValue, int>());
@@ -122,6 +124,8 @@ namespace SOS.Import.Managers
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
                     var observationValidation = _validationManager.ValidateObservation(processedObservation, dataProvider);
+                    UpdateTaxaStatistics(taxaStatistics, processedObservation);
+
                     if (observationValidation.IsValid)
                     {
                         nrValidObservations++;
@@ -179,35 +183,10 @@ namespace SOS.Import.Managers
                 if (nrProcessedObservations >= maxNrObservationsToRead) break;
             }
 
-            var distinctValuesSummaries = processedFieldValues
-                .Where(pair => pair.Value.Any())
-                .Select(pair => new DistinctValuesSummary
-                {
-                    Term = pair.Key.ToString(),
-                    MappedValues = pair.Value.Where(valuePair => !valuePair.Key.IsCustomValue())
-                        .Select(valuePair => new DistinctValuesSummaryItem
-                        {
-                            Id = valuePair.Key.Id, 
-                            Value = valuePair.Key.Value, 
-                            Count = valuePair.Value, 
-                            VerbatimValues = verbatimFieldValues[pair.Key].Single(k => Equals(k.Key, valuePair.Key)).Value.ToList(),
-                        }).ToList(),
-                    CustomValues = pair.Value.Where(valuePair => valuePair.Key.IsCustomValue())
-                        .Select(valuePair => new DistinctValuesSummaryItem
-                        {
-                            Id = valuePair.Key.Id, 
-                            Value = valuePair.Key.Value, 
-                            Count = valuePair.Value,
-                            Comment = "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
-                        } ).ToList(),
-                    SosVocabulary = _vocabularyById[pair.Key].Values.Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
-                }).ToList();
-
+            var distinctValuesSummaries = GetDistinctDictionaryValuesSummary(processedFieldValues, verbatimFieldValues);
             var remarks = validationRemarksBuilder.CreateRemarks();
-            if (!remarks.HasItems())
-            {
-                remarks.Add("No remarks.");
-            }
+            var taxaStatisticsSummary = CreateTaxaStatisticsSummary(taxaStatistics, nrTaxaInSummary);
+
             return new DwcaDataValidationReport<DwcObservationVerbatim, Observation>
             {
                 Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport},
@@ -225,8 +204,40 @@ namespace SOS.Import.Managers
                 },
                 InvalidObservations = invalidObservations,
                 ValidObservations = validObservations,
-                DictionaryValues = distinctValuesSummaries
+                DictionaryValues = distinctValuesSummaries,
+                TaxaStatistics = taxaStatisticsSummary
             };
+        }
+
+        private List<DistinctValuesSummary> GetDistinctDictionaryValuesSummary(Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues, Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
+        {
+            var distinctValuesSummaries = processedFieldValues
+                .Where(pair => pair.Value.Any())
+                .Select(pair => new DistinctValuesSummary
+                {
+                    Term = pair.Key.ToString(),
+                    MappedValues = pair.Value.Where(valuePair => !valuePair.Key.IsCustomValue())
+                        .Select(valuePair => new DistinctValuesSummaryItem
+                        {
+                            Id = valuePair.Key.Id,
+                            Value = valuePair.Key.Value,
+                            Count = valuePair.Value,
+                            VerbatimValues = verbatimFieldValues[pair.Key].Single(k => Equals(k.Key, valuePair.Key)).Value
+                                .ToList(),
+                        }).ToList(),
+                    CustomValues = pair.Value.Where(valuePair => valuePair.Key.IsCustomValue())
+                        .Select(valuePair => new DistinctValuesSummaryItem
+                        {
+                            Id = valuePair.Key.Id,
+                            Value = valuePair.Key.Value,
+                            Count = valuePair.Value,
+                            Comment =
+                                "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
+                        }).ToList(),
+                    SosVocabulary = _vocabularyById[pair.Key].Values
+                        .Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
+                }).ToList();
+            return distinctValuesSummaries;
         }
 
         private void UpdateTermDictionaryValueSummary(
@@ -272,5 +283,85 @@ namespace SOS.Import.Managers
                 }
             }
         }
+
+        private TaxaStatisticsSummary CreateTaxaStatisticsSummary(TaxaStatistics taxaStatistics, int nrTaxaToShow = 20)
+        {
+            List<TaxonRedlistStats> redlistStats = new List<TaxonRedlistStats>();
+            foreach (var item in taxaStatistics.RedlistTaxa)
+            {
+                var redlistStat = TaxonRedlistStats.Create(item.Key);
+                redlistStat.TaxaCount = item.Value.Count;
+                redlistStat.ObservationCount = item.Value.Values.Sum(m => m.ObservationCount);
+                redlistStat.Taxa = item
+                    .Value
+                    .Values
+                    .OrderByDescending(entry => entry.ObservationCount)
+                    .Take(nrTaxaToShow).ToList();
+                redlistStats.Add(redlistStat);
+            }
+
+            var protectedByLawStats = new ProtectedByLawStats();
+            protectedByLawStats.ObservationCount =
+                taxaStatistics.ProtectedByLawTaxa.Values.Sum(m => m.ObservationCount);
+            protectedByLawStats.TaxaCount = taxaStatistics.ProtectedByLawTaxa.Count;
+            protectedByLawStats.Taxa = taxaStatistics
+                .ProtectedByLawTaxa
+                .Values
+                .OrderByDescending(m => m.ObservationCount)
+                .Take(nrTaxaToShow).ToList();
+
+            var summary = new TaxaStatisticsSummary
+            {
+                TaxaCount = taxaStatistics.TaxaSet.Count,
+                RedListTaxa = redlistStats,
+                ProtectedByLawTaxa = protectedByLawStats
+            };
+
+            return summary;
+        }
+
+        private void UpdateTaxaStatistics(TaxaStatistics taxaStatistics, Observation processedObservation)
+        {
+            if (processedObservation.Taxon == null) return;
+            var taxon = _taxonById[processedObservation.Taxon.Id];
+            taxaStatistics.TaxaSet.Add(taxon.Id);
+
+            if (taxon.Attributes.ProtectedByLaw.GetValueOrDefault(false))
+            {
+                if (!taxaStatistics.ProtectedByLawTaxa.ContainsKey(taxon.Id))
+                {
+                    taxaStatistics.ProtectedByLawTaxa.Add(taxon.Id, new TaxonInfo(taxon.Id, taxon.TaxonRank, taxon.ScientificName, taxon.VernacularName));
+                }
+
+                taxaStatistics.ProtectedByLawTaxa[taxon.Id].ObservationCount++;
+            }
+
+            if (!string.IsNullOrWhiteSpace(taxon.Attributes.RedlistCategory))
+            {
+                // Remove degree sign in redlist category
+                var redlistCategory = taxon.Attributes.RedlistCategory.Length > 2 ? taxon.Attributes.RedlistCategory.Substring(0, 2) : taxon.Attributes.RedlistCategory;
+                if (redlistCategory == "NA" || redlistCategory == "LC" || redlistCategory == "NE") return;
+
+                if (!taxaStatistics.RedlistTaxa.ContainsKey(redlistCategory))
+                {
+                    taxaStatistics.RedlistTaxa.Add(redlistCategory, new Dictionary<int, TaxonInfo>());
+                }
+
+                var taxonRedlistStats = taxaStatistics.RedlistTaxa[redlistCategory];
+                if (!taxonRedlistStats.ContainsKey(taxon.Id))
+                {
+                    taxonRedlistStats.Add(taxon.Id, new TaxonInfo(taxon.Id, taxon.TaxonRank, taxon.ScientificName, taxon.VernacularName));
+                }
+
+                taxonRedlistStats[taxon.Id].ObservationCount++;
+            }
+        }
+    }
+
+    public class TaxaStatistics
+    {
+        public HashSet<int> TaxaSet { get; set; } = new HashSet<int>();
+        public Dictionary<string, Dictionary<int, TaxonInfo>> RedlistTaxa { get; set; } = new Dictionary<string, Dictionary<int, TaxonInfo>>();
+        public Dictionary<int, TaxonInfo> ProtectedByLawTaxa { get; set; } = new Dictionary<int, TaxonInfo>();
     }
 }

@@ -304,7 +304,7 @@ namespace SOS.Observations.Api.Managers
         {
             foreach (var observation in processedObservations)
             {
-                TranslateLocalizedValue(observation.Event?.Biotope, VocabularyId.Biotope, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.Biotope, VocabularyId.Biotope, cultureCode);
                 TranslateLocalizedValue(observation.Event?.DiscoveryMethod, VocabularyId.DiscoveryMethod, cultureCode);
                 TranslateLocalizedValue(observation.Identification?.ValidationStatus,
                     VocabularyId.ValidationStatus, cultureCode);
@@ -332,7 +332,7 @@ namespace SOS.Observations.Api.Managers
                         {
                             var eventDictionary = eventObject as IDictionary<string, object>;
                             TranslateLocalizedValue(eventDictionary, VocabularyId.Biotope,
-                                nameof(Observation.Event.Biotope), cultureCode);
+                                nameof(Observation.Occurrence.Biotope), cultureCode);
                             TranslateLocalizedValue(eventDictionary, VocabularyId.DiscoveryMethod,
                                 nameof(Observation.Event.DiscoveryMethod), cultureCode);
                         }

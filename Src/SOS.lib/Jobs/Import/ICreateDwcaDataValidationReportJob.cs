@@ -22,6 +22,7 @@ namespace SOS.Lib.Jobs.Import
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,
             int nrInvalidObservationsInReport,
+            int nrTaxaInTaxonStatistics,
             IJobCancellationToken cancellationToken);
     }
 }

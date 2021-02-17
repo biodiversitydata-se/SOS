@@ -96,5 +96,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public VocabularyValue DeterminationMethod { get; set; }
+
+        /// <summary>
+        ///     A list(concatenated and separated) of names of people,
+        ///     who verified the observation.
+        /// </summary>
+        public string VerifiedBy { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Models.DataValidation
 {
@@ -20,6 +21,12 @@ namespace SOS.Lib.Models.DataValidation
             {
                 remarks.Add("CoordinateUncertaintyInMeters values are missing. Observation.Location.CoordinateUncertaintyInMeters will be set to default value 10 000m for each observation. Consider to provide the coordinateUncertaintyInMeters term in the DwC-A file. Example values: 1, 25, 100, 1000. 0 is not a valid value for this term.");
             }
+
+            if (!remarks.HasItems())
+            {
+                remarks.Add("No remarks.");
+            }
+
             return remarks;
         }
     }

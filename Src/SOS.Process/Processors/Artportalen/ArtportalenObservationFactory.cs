@@ -111,8 +111,6 @@ namespace SOS.Process.Processors.Artportalen
                 
                 // Event
                 obs.Event = new Event();
-                obs.Event.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
-                obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
@@ -126,9 +124,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification = new Identification();
                 obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy;
                 obs.Identification.ConfirmedDate = verbatimObservation.ConfirmationYear?.ToString();
-                obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString(); 
-                obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy; // todo confirm mapping
+                obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString();
                 obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
+                obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy;
                 obs.Identification.Validated = new[]
                 {
                     (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
@@ -179,6 +177,8 @@ namespace SOS.Process.Processors.Artportalen
                     ? $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}#SightingDetailImages"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
+                obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
+                obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.SightingId.ToString();
                 obs.Occurrence.CatalogId = verbatimObservation.SightingId;
@@ -248,10 +248,10 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
 
                 // Set dependent properties
-                var biotope = obs.Event.Biotope?.Value;
+                var biotope = obs.Occurrence.Biotope?.Value;
                 obs.Event.Habitat = (biotope != null
-                    ? $"{biotope}{(string.IsNullOrEmpty(obs.Event.BiotopeDescription) ? "" : " # ")}{obs.Event.BiotopeDescription}"
-                    : obs.Event.BiotopeDescription).WithMaxLength(255);
+                    ? $"{biotope}{(string.IsNullOrEmpty(obs.Occurrence.BiotopeDescription) ? "" : " # ")}{obs.Occurrence.BiotopeDescription}"
+                    : obs.Occurrence.BiotopeDescription).WithMaxLength(255);
 
                 // Get field mapping values
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);
