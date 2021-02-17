@@ -21,6 +21,13 @@ import { FunctionalTestsComponent } from './functional-tests/functional-tests.co
 import { PerformanceChartComponent } from './performance-chart/performance-chart.component';
 import { LoadTestComponent } from './load-test/load-test.component';
 import { ObservationViewerComponent } from './observation-viewer/observation-viewer.component';
+import { LoginComponent } from './login/login.component';
+import { JwtModule } from '@auth0/angular-jwt';
+import { AuthGuard } from './guard/authguard';
+
+export function tokenGetter() {
+  return localStorage.getItem("jwt");
+}
 
 @NgModule({
   declarations: [
@@ -34,7 +41,8 @@ import { ObservationViewerComponent } from './observation-viewer/observation-vie
     FunctionalTestsComponent,
     PerformanceChartComponent,
     LoadTestComponent,
-    ObservationViewerComponent
+    ObservationViewerComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -47,16 +55,24 @@ import { ObservationViewerComponent } from './observation-viewer/observation-vie
       { path: 'test', component: FunctionalTestsComponent },
       { path: 'stats', component: PerformanceChartComponent },
       { path: 'loadtest', component: LoadTestComponent },
-      { path: 'observation-viewer', component: ObservationViewerComponent },
+      { path: 'observation-viewer', component: ObservationViewerComponent, canActivate: [AuthGuard] },
+      { path: 'login', component: LoginComponent },
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,
     ChartsModule,
     AgGridModule.withComponents([]),
     GaugeModule.forRoot(),
-    NgxDatatableModule
+    NgxDatatableModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        whitelistedDomains: ["localhost:44315", "sos-admin.artdata.slu.se","sos-admin-st.artdata.slu.se"],
+        blacklistedRoutes: []
+      }
+    })
   ],
-  providers: [ThemeService],
+  providers: [ThemeService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
