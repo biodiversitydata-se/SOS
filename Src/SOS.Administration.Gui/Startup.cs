@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,8 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace SOS.Administration.Gui
@@ -34,8 +37,28 @@ namespace SOS.Administration.Gui
                   {
                       options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                   });
+            var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration));
+            services.AddAuthentication(opt => {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = authConfig["Issuer"],
+                    ValidAudience = authConfig["Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig["SecretKey"]))
+                };
+            });
             services.Configure<MongoDbConfiguration>(
                 Configuration.GetSection(nameof(MongoDbConfiguration)));
+
+            services.Configure<AuthenticationConfiguration>(authConfig);
 
             services.Configure<ElasticSearchConfiguration>(
               Configuration.GetSection(nameof(ElasticSearchConfiguration)));
@@ -74,6 +97,8 @@ namespace SOS.Administration.Gui
             }
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

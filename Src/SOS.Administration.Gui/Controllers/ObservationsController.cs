@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ namespace SOS.Administration.Gui.Controllers
         public double Lat { get; set; }
         public double Lon { get; set; }
     }
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class ObservationsController : ControllerBase
