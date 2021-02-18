@@ -24,6 +24,7 @@ namespace SOS.Administration.Api
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static ImportConfiguration _importConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
+        private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
 
 
         /// <summary>
@@ -95,10 +96,11 @@ namespace SOS.Administration.Api
                         _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                         _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                         _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
-                        
+                        _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
+
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
+                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (new ProcessConfiguration(), _verbatimDbConfiguration, _processDbConfiguration) })
                         );
                     }

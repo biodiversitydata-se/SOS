@@ -41,7 +41,8 @@ namespace SOS.Import.IoC.Modules
     {
         public (ImportConfiguration ImportConfiguration, 
             MongoDbConfiguration VerbatimDbConfiguration, 
-            MongoDbConfiguration ProcessDbConfiguration) Configurations { get; set; }
+            MongoDbConfiguration ProcessDbConfiguration,
+            ApplicationInsightsConfiguration ApplicationInsightsConfiguration) Configurations { get; set; }
 
         protected override void Load(ContainerBuilder builder)
         {
@@ -85,9 +86,14 @@ namespace SOS.Import.IoC.Modules
                 builder.RegisterInstance(Configurations.ImportConfiguration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
                     .SingleInstance();
            
+
             if (Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration)
                     .As<VirtualHerbariumServiceConfiguration>().SingleInstance();
+
+            if (Configurations.ApplicationInsightsConfiguration != null)
+                builder.RegisterInstance(Configurations.ApplicationInsightsConfiguration).As<ApplicationInsightsConfiguration>()
+                    .SingleInstance();
 
             // Vebatim Mongo Db
             var verbatimSettings = Configurations.VerbatimDbConfiguration.GetMongoDbSettings();
@@ -108,6 +114,7 @@ namespace SOS.Import.IoC.Modules
             // Managers
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ApiUsageStatisticsManager>().As<IApiUsageStatisticsManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
 
@@ -117,6 +124,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ObservationDatabaseRepository>().As<IObservationDatabaseRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ApiUsageStatisticsRepository>().As<IApiUsageStatisticsRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
             builder.RegisterType<OrganizationRepository>().As<IOrganizationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
@@ -223,6 +231,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SharkObservationService>().As<ISharkObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<ApplicationInsightsService>().As<IApplicationInsightsService>()
+                .InstancePerLifetimeScope();
 
             // Service Clients
             builder.RegisterType<MvmService.SpeciesObservationChangeServiceClient>()
@@ -230,6 +240,7 @@ namespace SOS.Import.IoC.Modules
 
             // Add jobs
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();

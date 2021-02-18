@@ -44,6 +44,7 @@ namespace SOS.Hangfire.JobServer
         private static ExportConfiguration _exportConfiguration;
         private static BlobStorageConfiguration _blobStorageConfiguration;
         private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
+        private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -150,7 +151,10 @@ namespace SOS.Hangfire.JobServer
                         .Get<BlobStorageConfiguration>();
                     _dataCiteServiceConfiguration = hostContext.Configuration.GetSection(nameof(DataCiteServiceConfiguration))
                         .Get<DataCiteServiceConfiguration>();
+                    _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration))
+                        .Get<ApplicationInsightsConfiguration>();
                     
+
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
                     services.AddSingleton<IElasticClient>(_searchDbConfiguration.GetClient());
@@ -160,7 +164,7 @@ namespace SOS.Hangfire.JobServer
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
+                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
                                 .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
                         );
