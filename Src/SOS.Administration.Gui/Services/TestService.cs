@@ -54,8 +54,8 @@ namespace SOS.Administration.Gui.Services
     }
     public class ObservationPlace
     {
-        public int Id { get; set; }
-        public string Value { get; set; }
+        public string FeatureId { get; set; }
+        public string Name { get; set; }
     }
     public class ObservationOccurrence
     {
@@ -241,7 +241,7 @@ namespace SOS.Administration.Gui.Services
                 return testResults;
             }
 
-            try { Assert.Equal("Tranås", result.Records.First().Location.Municipality.Value); results.Add(new TestResult() { Result = "Location Municipality equals Tranås", Status = "Succeeded" }); }
+            try { Assert.Equal("Tranås", result.Records.First().Location.Municipality.Name); results.Add(new TestResult() { Result = "Location Municipality equals Tranås", Status = "Succeeded" }); }
             catch (Exception e) { results.Add(new TestResult() { Result = "Location Municipality equals Tranås:" + e.Message, Status = "Failed" }); }
 
             try { Assert.Equal("utter", result.Records.First().Taxon.VernacularName); results.Add(new TestResult() { Result = "Vernacular name equals utter", Status = "Succeeded" }); }
