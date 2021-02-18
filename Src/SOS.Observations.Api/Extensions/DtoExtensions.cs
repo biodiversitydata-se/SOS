@@ -80,60 +80,60 @@ namespace SOS.Observations.Api.Extensions
 
         private static void PopulateInternalBase(SearchFilterInternalBaseDto searchFilterInternalDto, SearchFilterInternal internalFilter)
         {
-            if (searchFilterInternalDto.ArtportalenFilter != null)
+            if (searchFilterInternalDto.ExtendedFilter!= null)
             {
-                internalFilter.ReportedByUserId = searchFilterInternalDto.ArtportalenFilter.ReportedByUserId;
-                internalFilter.ObservedByUserId = searchFilterInternalDto.ArtportalenFilter.ObservedByUserId;
-                internalFilter.ProjectIds = searchFilterInternalDto.ArtportalenFilter.ProjectIds;
-                internalFilter.BoundingBox = searchFilterInternalDto.ArtportalenFilter.BoundingBox;
-                internalFilter.OnlyWithMedia = searchFilterInternalDto.ArtportalenFilter.OnlyWithMedia;
-                internalFilter.OnlyWithNotes = searchFilterInternalDto.ArtportalenFilter.OnlyWithNotes;
-                internalFilter.OnlyWithNotesOfInterest = searchFilterInternalDto.ArtportalenFilter.OnlyWithNotesOfInterest;
-                internalFilter.OnlyWithBarcode = searchFilterInternalDto.ArtportalenFilter.OnlyWithBarcode;
-                internalFilter.ReportedDateFrom = searchFilterInternalDto.ArtportalenFilter.ReportedDateFrom;
-                internalFilter.ReportedDateTo = searchFilterInternalDto.ArtportalenFilter.ReportedDateTo;
-                internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ArtportalenFilter.TypeFilter;
-                internalFilter.MaxAccuracy = searchFilterInternalDto.ArtportalenFilter.MaxAccuracy;
-                internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ArtportalenFilter.UsePeriodForAllYears;
-                internalFilter.Months = searchFilterInternalDto.ArtportalenFilter.Months;
-                internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ArtportalenFilter.DiscoveryMethodIds;
-                internalFilter.LifeStageIds = searchFilterInternalDto.ArtportalenFilter.LifeStageIds;
-                internalFilter.ActivityIds = searchFilterInternalDto.ArtportalenFilter.ActivityIds;
-                internalFilter.HasTriggerdValidationRule = searchFilterInternalDto.ArtportalenFilter.HasTriggerdValidationRule;
+                internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
+                internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
+                internalFilter.ProjectIds = searchFilterInternalDto.ExtendedFilter.ProjectIds;
+                internalFilter.BoundingBox = searchFilterInternalDto.ExtendedFilter.BoundingBox;
+                internalFilter.OnlyWithMedia = searchFilterInternalDto.ExtendedFilter.OnlyWithMedia;
+                internalFilter.OnlyWithNotes = searchFilterInternalDto.ExtendedFilter.OnlyWithNotes;
+                internalFilter.OnlyWithNotesOfInterest = searchFilterInternalDto.ExtendedFilter.OnlyWithNotesOfInterest;
+                internalFilter.OnlyWithBarcode = searchFilterInternalDto.ExtendedFilter.OnlyWithBarcode;
+                internalFilter.ReportedDateFrom = searchFilterInternalDto.ExtendedFilter.ReportedDateFrom;
+                internalFilter.ReportedDateTo = searchFilterInternalDto.ExtendedFilter.ReportedDateTo;
+                internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ExtendedFilter.TypeFilter;
+                internalFilter.MaxAccuracy = searchFilterInternalDto.ExtendedFilter.MaxAccuracy;
+                internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ExtendedFilter.UsePeriodForAllYears;
+                internalFilter.Months = searchFilterInternalDto.ExtendedFilter.Months;
+                internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
+                internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
+                internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;
+                internalFilter.HasTriggerdValidationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule;
                 internalFilter.HasTriggerdValidationRuleWithWarning =
-                    searchFilterInternalDto.ArtportalenFilter.HasTriggerdValidationRuleWithWarning;
-                internalFilter.Length = searchFilterInternalDto.ArtportalenFilter.Length;
-                internalFilter.LengthOperator = searchFilterInternalDto.ArtportalenFilter.LengthOperator;
-                internalFilter.Weight = searchFilterInternalDto.ArtportalenFilter.Weight;
-                internalFilter.WeightOperator = searchFilterInternalDto.ArtportalenFilter.WeightOperator;
-                internalFilter.Quantity = searchFilterInternalDto.ArtportalenFilter.Quantity;
-                internalFilter.QuantityOperator = searchFilterInternalDto.ArtportalenFilter.QuantityOperator;
-                internalFilter.ValidationStatusIds = searchFilterInternalDto.ArtportalenFilter.ValidationStatusIds;
-                internalFilter.ExcludeValidationStatusIds = searchFilterInternalDto.ArtportalenFilter.ExcludeValidationStatusIds;
+                    searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning;
+                internalFilter.Length = searchFilterInternalDto.ExtendedFilter.Length;
+                internalFilter.LengthOperator = searchFilterInternalDto.ExtendedFilter.LengthOperator;
+                internalFilter.Weight = searchFilterInternalDto.ExtendedFilter.Weight;
+                internalFilter.WeightOperator = searchFilterInternalDto.ExtendedFilter.WeightOperator;
+                internalFilter.Quantity = searchFilterInternalDto.ExtendedFilter.Quantity;
+                internalFilter.QuantityOperator = searchFilterInternalDto.ExtendedFilter.QuantityOperator;
+                internalFilter.ValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds;
+                internalFilter.ExcludeValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds;
                 internalFilter.DeterminationFilter =
-                    (SightingDeterminationFilter)searchFilterInternalDto.ArtportalenFilter
+                    (SightingDeterminationFilter)searchFilterInternalDto.ExtendedFilter
                         .DeterminationFilter;
                 internalFilter.UnspontaneousFilter =
-                    (SightingUnspontaneousFilter)searchFilterInternalDto.ArtportalenFilter
+                    (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
                         .UnspontaneousFilter;
                 internalFilter.NotRecoveredFilter =
-                    (SightingNotRecoveredFilter)searchFilterInternalDto.ArtportalenFilter
+                    (SightingNotRecoveredFilter)searchFilterInternalDto.ExtendedFilter
                         .NotRecoveredFilter;
-                internalFilter.SpeciesCollectionLabel = searchFilterInternalDto.ArtportalenFilter.SpeciesCollectionLabel;
-                internalFilter.PublicCollection = searchFilterInternalDto.ArtportalenFilter.PublicCollection;
-                internalFilter.PrivateCollection = searchFilterInternalDto.ArtportalenFilter.PrivateCollection;
-                internalFilter.SubstrateSpeciesId = searchFilterInternalDto.ArtportalenFilter.SubstrateSpeciesId;
-                internalFilter.SubstrateId = searchFilterInternalDto.ArtportalenFilter.SubstrateId;
-                internalFilter.BiotopeId = searchFilterInternalDto.ArtportalenFilter.BiotopeId;
+                internalFilter.SpeciesCollectionLabel = searchFilterInternalDto.ExtendedFilter.SpeciesCollectionLabel;
+                internalFilter.PublicCollection = searchFilterInternalDto.ExtendedFilter.PublicCollection;
+                internalFilter.PrivateCollection = searchFilterInternalDto.ExtendedFilter.PrivateCollection;
+                internalFilter.SubstrateSpeciesId = searchFilterInternalDto.ExtendedFilter.SubstrateSpeciesId;
+                internalFilter.SubstrateId = searchFilterInternalDto.ExtendedFilter.SubstrateId;
+                internalFilter.BiotopeId = searchFilterInternalDto.ExtendedFilter.BiotopeId;
                 internalFilter.NotPresentFilter =
-                    (SightingNotPresentFilter)searchFilterInternalDto.ArtportalenFilter.NotPresentFilter;
-                internalFilter.OnlySecondHandInformation = searchFilterInternalDto.ArtportalenFilter.OnlySecondHandInformation;
-                internalFilter.PublishTypeIdsFilter = searchFilterInternalDto.ArtportalenFilter.PublishTypeIdsFilter;
+                    (SightingNotPresentFilter)searchFilterInternalDto.ExtendedFilter.NotPresentFilter;
+                internalFilter.OnlySecondHandInformation = searchFilterInternalDto.ExtendedFilter.OnlySecondHandInformation;
+                internalFilter.PublishTypeIdsFilter = searchFilterInternalDto.ExtendedFilter.PublishTypeIdsFilter;
                 internalFilter.RegionalSightingStateIdsFilter =
-                    searchFilterInternalDto.ArtportalenFilter.RegionalSightingStateIdsFilter;
-                internalFilter.SiteIds = searchFilterInternalDto.ArtportalenFilter.SiteIds;
-                internalFilter.SpeciesFactsIds = searchFilterInternalDto.ArtportalenFilter.SpeciesFactsIds;
-                internalFilter.SexIds = searchFilterInternalDto.ArtportalenFilter.SexIds;
+                    searchFilterInternalDto.ExtendedFilter.RegionalSightingStateIdsFilter;
+                internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
+                internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
+                internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
             }
 
         }

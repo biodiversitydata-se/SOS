@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos.Filter
 {
-    public class ArtportalenFilterDto
+    public class ExtendedFilterDto
     {
         public enum SightingTypeFilterDto
         {

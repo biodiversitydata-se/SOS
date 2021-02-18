@@ -82,5 +82,64 @@ SortBy, sortOrder borttagna då den inte fyllde någon funktion
 ## [0.9.1] - 2020-11-30
 Initial release
 
+## [1.0.1] - 2021-02-17
 
+# Sökfilter
+- ArtportalenFilter.GenderIds => ExtendedFilter.SexIds
+- ArtportalenFilter => ExtendedFilter
+
+# Observation
+
+- Om Identification.UncertainDetermination=true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
+- ReportedBy => Occurrence.ReportedBy
+- ReportedDate => Occurrence.ReportedDate
+- ProtectionLevel => Occurrence.ProtectionLevel
+- Media => Occurrence.Media
+
+ArtportalenInternal
+- PrivateCollection => Observation.PrivateCollection
+
+Event
+- QuantityOfSubstrate => Occurrence.Substrate.Quantity
+- Substrate => Occurrence.Substrate.Name
+- SubstrateDescription => Occurrence.Substrate.Description
+- SubstrateSpeciesDescription => Occurrence.Substrate.SpeciesDescription
+- SubstrateSpeciesVernacularName => Occurrence.Substrate.SpeciesVernacularName
+- SubstrateSpeciesScientificName => Occurrence.Substrate.SpeciesScientificName
+- SubstrateSpeciesId => Occurrence.Substrate.SpeciesId
+
+Occurrence
+- DiscoveryMethod => Event.DiscoveryMethod
+- Gender => Occurrence.Sex
+- DeterminedBy tas bort och värdet mappas istället till Identification.IdentifiedBy
+- DeterminationYear => ArtportalenInternal.DeterminationYear
+- ConfirmationYear => ArtportalenInternal.ConfirmationYear
+- ConfirmedBy => Identification.ConfirmedBy
+- PublicCollection => Observation.PublicCollection
+
+Taxon
+- Natura2000HabitatsDirectiveArticle2 => Taxon.Attributes.Natura2000HabitatsDirectiveArticle2
+- Natura2000HabitatsDirectiveArticle4 => Taxon.Attributes.Natura2000HabitatsDirectiveArticle4
+- Natura2000HabitatsDirectiveArticle5 => Taxon.Attributes.Natura2000HabitatsDirectiveArticle5
+- RedlistCategory => Taxon.Attributes.RedlistCategory
+- DyntaxaTaxonId => Taxon.Attributes.DyntaxaTaxonId
+- ParentDyntaxaTaxonId => Taxon.Attributes.ParentDyntaxaTaxonId
+- OrganismGroup => Taxon.Attributes.OrganismGroup
+- ProtectionLevel => Taxon.Attributes.ProtectionLevel
+- ActionPlan => Taxon.Attributes.ActionPlan
+- DisturbanceLevel => Taxon.Attributes.DisturbanceLevel
+- ProtectedByLaw => Taxon.Attributes.ProtectedByLaw
+- SortOrder => Taxon.Attributes.SortOrder
+- SwedishOccurrence => Taxon.Attributes.SwedishOccurrence
+- SwedishHistory => Taxon.Attributes.SwedishHistory
+- VernacularNames => Taxon.Attributes.VernacularNames
+- Synonyms => Taxon.Attributes.Synonyms
+
+Location
+- ParentLocationId => ArtportalenInternal.ParentLocationId
+- ParentLocality => ArtportalenInternal.ParentLocality
+- CountyPartIdByCoordinate => Location.Attributes.CountyPartIdByCoordinate
+- ProvincePartIdByCoordinate => Location.Attributes.ProvincePartIdByCoordinate
+- VerbatimMunicipality => Location.Attributes.VerbatimMunicipality
+- VerbatimProvince => Location.Attributes.VerbatimProvince
 
