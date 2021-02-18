@@ -10,6 +10,15 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <returns></returns>
         [DisplayName("Harvest API usage statistics")]
-        Task<bool> RunAsync();
+        Task<bool> RunHarvestStatisticsAsync();
+
+        /// <summary>
+        ///     Run create usage statistics Excel file.
+        /// </summary>
+        /// <param name="reportId"></param>
+        /// <param name="createdBy"></param>
+        /// <returns></returns>
+        [DisplayName("Create API usage statistics Excel file, Id: \"{0}\"")]
+        Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy);
     }
 }
