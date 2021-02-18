@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { circle, icon, latLng, Layer, marker, tileLayer } from 'leaflet';
 import { InvalidLocation } from '../models/invalidlocation';
@@ -55,7 +55,11 @@ export class ObservationViewerComponent implements OnInit {
         return m;
       });
       result.records.forEach((val) => {
-        this.http.get<RealObservation>(this.baseUrl + 'observations/real/' + val.occurrenceId).subscribe(innerResult => {
+        this.http.get<RealObservation>(this.baseUrl + 'observations/real/' + val.occurrenceId, {
+          headers: new HttpHeaders({
+            "Content-Type": "application/json"
+          })
+        }).subscribe(innerResult => {
           console.log(innerResult);
           var description = '<span>' + val.occurrenceId + '</span>';
 
