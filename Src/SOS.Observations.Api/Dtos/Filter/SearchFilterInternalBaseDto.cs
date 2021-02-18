@@ -8,6 +8,6 @@
         /// <summary>
         /// Artportalen specific search properties
         /// </summary>
-        public ArtportalenFilterDto ArtportalenFilter { get; set; }
+        public ExtendedFilterDto ExtendedFilter{ get; set; }
     }
 }
