@@ -33,13 +33,26 @@ namespace SOS.Import.Jobs
 
         /// <inheritdoc />
         [DisplayName("Harvest API usage statistics")]
-        public async Task<bool> RunAsync()
+        public async Task<bool> RunHarvestStatisticsAsync()
         {
             _logger.LogInformation("Start API usage statistics harvest Job");
 
             var result = await _apiUsageStatisticsManager.HarvestStatisticsAsync();
 
             _logger.LogInformation($"End API usage statistics harvest Job. Status: {result}");
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        [DisplayName("Create API usage statistics Excel file, Id: \"{0}\"")]
+        public async Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy)
+        {
+            _logger.LogInformation("Start Create API usage statistics Excel file Job");
+
+            var result = await _apiUsageStatisticsManager.CreateExcelFileReportAsync(reportId, createdBy);
+
+            _logger.LogInformation($"End Create API usage statistics Excel file Job. Status: {result}");
 
             return result;
         }

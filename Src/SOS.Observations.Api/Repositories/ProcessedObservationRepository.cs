@@ -155,6 +155,8 @@ namespace SOS.Observations.Api.Repositories
                 totalCount = countResponse.Count;
             }
 
+            operation.Telemetry.Properties["SpeciesObservationCount"] = searchResponse.Documents.Count.ToString();
+
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
 

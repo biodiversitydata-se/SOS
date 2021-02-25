@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -40,7 +41,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IApiUsageStatisticsHarvestJob>(nameof(IApiUsageStatisticsHarvestJob), job => job.RunAsync(),
+                RecurringJob.AddOrUpdate<IApiUsageStatisticsHarvestJob>(nameof(IApiUsageStatisticsHarvestJob), job => job.RunHarvestStatisticsAsync(),
                     $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("API statistics harvest job added");
             }
@@ -62,12 +63,34 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunAsync());
+                BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunHarvestStatisticsAsync());
                 return new OkObjectResult("API statistics harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing API statistics harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Create Excel file with API usage statistics.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("CreateExcelFileReport/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunCreateApiStatisticsExcelFileJob([FromQuery] string createdBy)
+        {
+            try
+            {
+                var reportId = Report.CreateReportId();
+                BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunCreateExcelFileReportAsync(reportId, createdBy));
+                return new OkObjectResult($"Create API usage statistics Excel report job with Id \"{reportId}\" was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing API usage statistics Excel report job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
