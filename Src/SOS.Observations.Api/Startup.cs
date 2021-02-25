@@ -13,6 +13,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -44,8 +45,10 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
@@ -63,7 +66,6 @@ namespace SOS.Observations.Api
         private const string InternalApiName = "InternalSosObservations";
         private const string PublicApiName = "PublicSosObservations";
         private const string InternalApiPrefix = "Internal";
-        private const string PublicApiPrefix = "Public";
         private readonly string _environment;
         private bool _isDevelopment;
         /// <summary>
@@ -138,10 +140,14 @@ namespace SOS.Observations.Api
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            // Application insights custom
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.ObservationApi.ApplicationInsights>());
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.AddApiVersioning(o =>
             {
@@ -279,7 +285,7 @@ namespace SOS.Observations.Api
 
             var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
                 .Get<BlobStorageConfiguration>();
-        
+
             // Add configuration
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
@@ -320,13 +326,16 @@ namespace SOS.Observations.Api
         }
 
         /// <summary>
-        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        ///  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="apiVersionDescriptionProvider"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration)
+        /// <param name="configuration"></param>
+        /// <param name="applicationInsightsConfiguration"></param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration)
         {
+            
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (_isDevelopment)
             {
@@ -339,6 +348,15 @@ namespace SOS.Observations.Api
 #if DEBUG
             configuration.DisableTelemetry = true;
 #endif
+
+            if (applicationInsightsConfiguration.EnableRequestBodyLogging)
+            {
+                app.UseMiddleware<EnableRequestBufferingMiddelware>();
+            }
+            if (applicationInsightsConfiguration.EnableSearchResponseCountLogging)
+            {
+                app.UseMiddleware<StoreSearchCountMiddleware>();
+            }
 
             app.UseHangfireDashboard();
 
