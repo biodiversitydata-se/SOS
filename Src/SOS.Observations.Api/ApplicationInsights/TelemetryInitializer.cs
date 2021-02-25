@@ -6,7 +6,6 @@ using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
-using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.ApplicationInsights
 {
