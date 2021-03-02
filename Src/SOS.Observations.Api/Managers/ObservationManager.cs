@@ -450,5 +450,21 @@ namespace SOS.Observations.Api.Managers
                 }
             }
         }
+
+        public async Task<dynamic> GetObservationAsync(string occurrenceId, bool protectedObservations, bool includeInternalFields)
+        {
+            SearchFilter filter = new SearchFilter();
+            if (includeInternalFields)
+            {
+                filter = new SearchFilterInternal();
+            }
+            filter.ProtectedObservations = protectedObservations;
+            await _filterManager.PrepareFilter(filter);
+            var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
+            var obs = new List<dynamic>() { processedObservation };
+            ResolveLocalizedVocabularyFields("", obs);
+            ResolveNonLocalizedVocabularyFields(obs);
+            return obs.First();
+        }
     }
 }

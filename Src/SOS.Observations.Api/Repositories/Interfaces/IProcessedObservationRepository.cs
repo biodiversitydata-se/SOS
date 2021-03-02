@@ -101,5 +101,12 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <returns></returns>
         Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
             SearchFilter filter);
+
+        /// <summary>
+        /// Gets a single observation
+        /// </summary>
+        /// <param name="occurrenceId"></param>
+        /// <returns></returns>
+        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
     }
 }
