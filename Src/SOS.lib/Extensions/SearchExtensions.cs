@@ -710,7 +710,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="terms"></param>
-        private static void TryAddTermsCriteria<T>(
+        public static void TryAddTermsCriteria<T>(
                 this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
         {
             if (terms?.Any() ?? false)

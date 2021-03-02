@@ -163,7 +163,7 @@ namespace SOS.Import.Managers
 
                         foreach (var validationDefect in observationValidation.Defects)
                         {
-                            if (validationDefect == "Taxon not found" && string.IsNullOrWhiteSpace(verbatimObservation.TaxonID))
+                            if (validationDefect == "Taxon not found")
                             {
                                 nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
                                 nonMatchingTaxonIds.Add(verbatimObservation.TaxonID);

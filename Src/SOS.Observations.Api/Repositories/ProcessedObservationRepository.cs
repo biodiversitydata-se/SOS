@@ -958,5 +958,36 @@ namespace SOS.Observations.Api.Repositories
                 .Buckets
                 .Select(b => new TaxonAggregationItem{ TaxonId = int.Parse(b.Key), ObservationCount = (int)(b.DocCount ?? 0) });
         }
+
+        public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            query.TryAddTermsCriteria("occurrence.occurrenceId", new List<string>() { occurrenceId });
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
+
+            operation.Telemetry.Properties["OccurrenceId"] = occurrenceId.ToString();
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            // Optional: explicitly send telemetry item:
+            _telemetry.StopOperation(operation);
+
+            return searchResponse.Documents;
+
+        }
     }
 }
