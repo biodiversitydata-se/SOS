@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -47,6 +46,7 @@ namespace SOS.Lib.Managers
             {
                 await _apiUsageStatisticsRepository.VerifyCollection();
                 DateTime dayToProcess = (await GetLastHarvestDate()).AddDays(1);
+     
                 while (dayToProcess < DateTime.Now)
                 {
                     await ProcessUsageStatisticsForOneDay(dayToProcess);
@@ -90,7 +90,7 @@ namespace SOS.Lib.Managers
 
         private async Task ProcessUsageStatisticsForOneDay(DateTime date)
         {
-            var usageStatisticsRows = await _applicationInsightsService.GetUsageStatisticsForSpecificDay(date);
+            var usageStatisticsRows = await _applicationInsightsService.GetUsageStatisticsForSpecificDayAsync(date);
             var usageStatisticsEntities = usageStatisticsRows.Select(m => m.ToApiUsageStatistics());
             await _apiUsageStatisticsRepository.AddManyAsync(usageStatisticsEntities);
         }
@@ -114,9 +114,11 @@ namespace SOS.Lib.Managers
             private const int DateColumnIndex = 1;
             private const int MethodColumnIndex = 2;
             private const int EndpointColumnIndex = 3;
-            private const int RequestCountColumnIndex = 4;
-            private const int FailureCountColumnIndex = 5;
-            private const int AverageDurationColumnIndex = 6;
+            private const int AccountIdColumnIndex = 4;
+            private const int UserIdColumnIndex = 5;
+            private const int RequestCountColumnIndex = 6;
+            private const int FailureCountColumnIndex = 7;
+            private const int AverageDurationColumnIndex = 8;
 
             public ApiUsageStatisticsExcelWriter(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
             {
@@ -138,7 +140,7 @@ namespace SOS.Lib.Managers
 
             private async Task AddData(ExcelWorksheet worksheet)
             {
-                int rowIndex = 2;
+                var rowIndex = 2;
 
                 using var cursor = await _apiUsageStatisticsRepository.GetAllByCursorAsync();
                 while (await cursor.MoveNextAsync())
@@ -148,6 +150,8 @@ namespace SOS.Lib.Managers
                         worksheet.Cells[rowIndex, DateColumnIndex].Value = row.Date;
                         worksheet.Cells[rowIndex, MethodColumnIndex].Value = row.Method;
                         worksheet.Cells[rowIndex, EndpointColumnIndex].Value = row.Endpoint;
+                        worksheet.Cells[rowIndex, AccountIdColumnIndex].Value = row.AccountId;
+                        worksheet.Cells[rowIndex, UserIdColumnIndex].Value = row.UserId;
                         worksheet.Cells[rowIndex, RequestCountColumnIndex].Value = row.RequestCount;
                         worksheet.Cells[rowIndex, FailureCountColumnIndex].Value = row.FailureCount;
                         worksheet.Cells[rowIndex, AverageDurationColumnIndex].Value = row.AverageDuration;
@@ -160,7 +164,7 @@ namespace SOS.Lib.Managers
             private void FormatColumns(ExcelWorksheet worksheet)
             {
                 const int firstDataRow = 2;
-                int lastDataRow = MaxNumberOfExcelRows + 1;
+                var lastDataRow = MaxNumberOfExcelRows + 1;
 
                 worksheet.Cells[firstDataRow, DateColumnIndex, lastDataRow, DateColumnIndex].Style.Numberformat.Format = "yyyy-MM-dd";
                 worksheet.Cells[firstDataRow, RequestCountColumnIndex, lastDataRow, RequestCountColumnIndex].Style.Numberformat.Format = "0";
@@ -173,6 +177,8 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, DateColumnIndex].Value = "Date";
                 worksheet.Cells[1, MethodColumnIndex].Value = "Method";
                 worksheet.Cells[1, EndpointColumnIndex].Value = "Endpoint";
+                worksheet.Cells[1, AccountIdColumnIndex].Value = "AccountId";
+                worksheet.Cells[1, UserIdColumnIndex].Value = "UserId";
                 worksheet.Cells[1, RequestCountColumnIndex].Value = "RequestCount";
                 worksheet.Cells[1, FailureCountColumnIndex].Value = "FailureCount";
                 worksheet.Cells[1, AverageDurationColumnIndex].Value = "AverageDuration";

@@ -145,6 +145,7 @@ namespace SOS.Observations.Api
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
+            services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.ObservationApi.ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
@@ -352,6 +353,7 @@ namespace SOS.Observations.Api
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
+                app.UseMiddleware<StoreRequestBodyMiddleware>();
             }
             if (applicationInsightsConfiguration.EnableSearchResponseCountLogging)
             {

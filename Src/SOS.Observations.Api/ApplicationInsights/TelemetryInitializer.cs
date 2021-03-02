@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -27,30 +25,17 @@ namespace SOS.Observations.Api.ApplicationInsights
         {
             if (new[] { "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
-                if (_loggRequestBody && platformContext.Request.Body.CanRead && platformContext.Request.Body.CanSeek)
+                if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
                 {
-                    try
+                    if (!telemetry.Context.Properties.ContainsKey("Request-body"))
                     {
-                        platformContext.Request.Body.Seek(0, SeekOrigin.Begin);
-
-                        using var streamReader = new StreamReader(platformContext.Request.Body, Encoding.UTF8, true, 1024, true);
-
-                        var body = streamReader.ReadToEnd();
-                        // Rewind, so the core is not lost when it looks the body for the request
-                        platformContext.Request.Body.Position = 0;
-
-                        telemetry.Context.Properties.Add("Request-body", body);
-                    }
-                    catch
-                    {
-
+                        telemetry.Context.Properties.Add("Request-body", requestBody?.ToString());
                     }
                 }
 
-                if (_loggSearchResponseCount)
+                if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Response-count", out var count))
                 {
-                    platformContext.Items.TryGetValue("Response-count", out var count);
-                    if (int.TryParse(count?.ToString(), out var responseCount))
+                    if (int.TryParse(count?.ToString(), out var responseCount) && !telemetry.Context.Properties.ContainsKey("Response-count"))
                     {
                         telemetry.Context.Properties.Add("Response-count", responseCount.ToString());
                     }
@@ -62,13 +47,13 @@ namespace SOS.Observations.Api.ApplicationInsights
             // If we have a logged in user, use nameidentifier
             if (!string.IsNullOrEmpty(nameidentifier))
             {
-                telemetry.Context.User.AuthenticatedUserId = $"U-ID:{nameidentifier}";
+                telemetry.Context.User.AuthenticatedUserId = nameidentifier;
             }
 
             // If it's a call from Azure API management, we should have APU user id in header 
-            if (platformContext.Request.Headers.ContainsKey("request-user-id"))
+            if (platformContext.Request.Headers.TryGetValue("request-user-id", out var accountId))
             {
-                telemetry.Context.User.AuthenticatedUserId = $"API-U-ID:{platformContext.Request.Headers["request-user-id"]}";
+                telemetry.Context.User.AccountId = accountId;
             }
         }
 

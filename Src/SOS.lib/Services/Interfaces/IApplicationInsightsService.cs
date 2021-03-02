@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Models.ApplicationInsights;
 
 namespace SOS.Lib.Services.Interfaces
 {
     public interface IApplicationInsightsService
     {
-        Task<List<ApplicationInsightsService.ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDay(DateTime date);
+        /// <summary>
+        /// Get usage statistics 
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDayAsync(DateTime date);
     }
 }
