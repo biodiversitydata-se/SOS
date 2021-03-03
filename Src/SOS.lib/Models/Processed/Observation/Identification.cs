@@ -1,5 +1,4 @@
-﻿using System;
-using Nest;
+﻿using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -89,7 +88,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     True if determination is uncertain
         /// </summary>
-        public bool UncertainDetermination { get; set; }
+        public bool UncertainIdentification { get; set; }
 
         /// <summary>
         ///    Method used in species determination

@@ -90,7 +90,7 @@ Initial release
 
 # Observation
 
-- Om Identification.UncertainDetermination=true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
+- Om Identification.UncertainIdentification (förr UncertainDetermination) = true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
 - ReportedBy => Occurrence.ReportedBy
 - ReportedDate => Occurrence.ReportedDate
 - ProtectionLevel => Occurrence.ProtectionLevel
@@ -107,6 +107,9 @@ Event
 - SubstrateSpeciesVernacularName => Occurrence.Substrate.SpeciesVernacularName
 - SubstrateSpeciesScientificName => Occurrence.Substrate.SpeciesScientificName
 - SubstrateSpeciesId => Occurrence.Substrate.SpeciesId
+
+Identification
+- Identification.UncertainDetermination => Identification.UncertainIdentification
 
 Occurrence
 - DiscoveryMethod => Event.DiscoveryMethod

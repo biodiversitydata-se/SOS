@@ -157,10 +157,10 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.DeterminationFilter)
             {
                 case SightingDeterminationFilter.NotUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainDetermination", false);
+                    query.TryAddTermCriteria("identification.uncertainIdentification", false);
                     break;
                 case SightingDeterminationFilter.OnlyUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainDetermination", true);
+                    query.TryAddTermCriteria("identification.uncertainIdentification", true);
                     break;
             }
 

@@ -54,7 +54,7 @@
         IdentificationVerificationStatus = 50,
         IdentifiedBy = 51,
         TypeStatus = 52,
-        UncertainDetermination = 53,
+        UncertainIdentification = 53,
         Continent = 54,
         CoordinateM = 55,
         CoordinatePrecision = 56,
