@@ -45,9 +45,9 @@ namespace SOS.Lib.Managers
             try
             {
                 await _apiUsageStatisticsRepository.VerifyCollection();
-                DateTime dayToProcess = (await GetLastHarvestDate()).AddDays(1);
+                var dayToProcess = (await GetLastHarvestDate()).AddDays(1).Date;
      
-                while (dayToProcess < DateTime.Now)
+                while (dayToProcess < DateTime.Now.Date)
                 {
                     await ProcessUsageStatisticsForOneDay(dayToProcess);
                     dayToProcess = dayToProcess.AddDays(1);
