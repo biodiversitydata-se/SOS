@@ -11,23 +11,22 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IAreasController
     {
         /// <summary>
-        ///     Gets all the areas used for searching via areaId in the /search call
+        ///     Search for areas (regions).
         /// </summary>
         /// <param name="areaTypes">Filter used to limit number of areas returned</param>
         /// <param name="searchString">Filter used to limit number of areas returned</param>
         /// <param name="skip">Start index of returned areas</param>
         /// <param name="take">Number of areas to return</param>
-        /// <returns>List of Areas</returns>
+        /// <returns>List of areas</returns>
         Task<IActionResult> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString, int skip = 0,
             int take = 100);
 
         /// <summary>
-        /// Exports an area including its polygon
+        ///     Get an area as a zipped JSON file including its polygon.
         /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="feature"></param>
+        /// <param name="areaType">The area type.</param>
+        /// <param name="featureId">The FeatureId.</param>
         /// <returns></returns>
-        Task<IActionResult> ExportAreaAsync(AreaTypeDto areaType, string feature);
+        Task<IActionResult> ExportAreaAsync(AreaTypeDto areaType, string featureId);
     }
-   
 }

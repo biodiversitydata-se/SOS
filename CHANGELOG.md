@@ -18,6 +18,7 @@ All notable changes to Observation API will be documented in this file. The form
 
 ### Changed
 - `Validated` value is set to true when `IdentificationVerificationStatus` has value `Reported by expert`.
+- `/Areas/{areaType}/{feature}/Export` endpoint changed to `/Areas/{areaType}/{featureId}/Export`.
 
 ### Fixed
 
