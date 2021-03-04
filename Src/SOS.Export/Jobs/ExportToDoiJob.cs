@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -74,7 +75,7 @@ namespace SOS.Export.Jobs
                         Contributors = dataProviders?.Select(dp => new DOIContributor
                         {
                             ContributorType = ContributorType.DataCollector,
-                            Name = dp.Name,
+                            Name = dp.Names.Translate("en-GB"),
                             NameType = NameType.Organizational
                         }),
                         Creators = new[]

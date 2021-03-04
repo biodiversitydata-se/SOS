@@ -136,7 +136,7 @@ namespace SOS.Process.Processors.Artportalen
                     (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
                     (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
                 }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
-                obs.Identification.UncertainDetermination = verbatimObservation.UnsureDetermination;
+                obs.Identification.UncertainIdentification = verbatimObservation.UnsureDetermination;
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
 
                 // Location

@@ -80,7 +80,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             var dataProvider = new DataProvider
             {
-                Name = "Artportalen",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
                 Type = DataProviderType.ArtportalenObservations
             };
 
@@ -107,7 +107,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             var dataProvider = new DataProvider
             {
-                Name = "Artportalen",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
                 Type = DataProviderType.ArtportalenObservations
             };
 
@@ -159,7 +159,7 @@ namespace SOS.Process.UnitTests.Processors
 
             var dataProvider = new DataProvider
             {
-                Name = "Artportalen",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
                 Type = DataProviderType.ArtportalenObservations,
                 SupportProtectedHarvest = true
             };

@@ -77,7 +77,7 @@ namespace SOS.Process.Processors.ClamPortal
                         ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
                     ValidationStatus =
                         GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
-                    UncertainDetermination = verbatimObservation.UncertainDetermination != 0
+                    UncertainIdentification = verbatimObservation.UncertainDetermination != 0
                 },
                 InstitutionCode = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
                 Language = verbatimObservation.Language,

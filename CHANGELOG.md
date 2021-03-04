@@ -87,10 +87,11 @@ Initial release
 # Sökfilter
 - ArtportalenFilter.GenderIds => ExtendedFilter.SexIds
 - ArtportalenFilter => ExtendedFilter
+- dataProviderIds => dataProvider.ids
 
 # Observation
 
-- Om Identification.UncertainDetermination=true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
+- Om Identification.UncertainIdentification (förr UncertainDetermination) = true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
 - ReportedBy => Occurrence.ReportedBy
 - ReportedDate => Occurrence.ReportedDate
 - ProtectionLevel => Occurrence.ProtectionLevel
@@ -107,6 +108,9 @@ Event
 - SubstrateSpeciesVernacularName => Occurrence.Substrate.SpeciesVernacularName
 - SubstrateSpeciesScientificName => Occurrence.Substrate.SpeciesScientificName
 - SubstrateSpeciesId => Occurrence.Substrate.SpeciesId
+
+Identification
+- Identification.UncertainDetermination => Identification.UncertainIdentification
 
 Occurrence
 - DiscoveryMethod => Event.DiscoveryMethod
@@ -143,3 +147,8 @@ Location
 - VerbatimMunicipality => Location.Attributes.VerbatimMunicipality
 - VerbatimProvince => Location.Attributes.VerbatimProvince
 
+# DataProviders
+- Name, swedishName => Names: [{ cultureCode: "", value: "" }]
+- Description, swedishDescription => Descriptions: [{ cultureCode: "", value: "" }]
+- Organization, swedishOrganization => Organizations: [{ cultureCode: "", value: "" }]
+- Paths: [{ cultureCode: "", path: [""] }]

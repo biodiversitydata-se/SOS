@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
@@ -28,34 +29,24 @@ namespace SOS.Lib.Models.Shared
         public bool IsActive { get; set; }
 
         /// <summary>
-        ///     The name of the data provider (in english).
+        ///     The names of the data provider 
         /// </summary>
-        public string Name { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Names { get; set; }
 
         /// <summary>
-        ///     The name of the data provider (in swedish).
+        ///     Descriptions of the data provider 
         /// </summary>
-        public string SwedishName { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
 
         /// <summary>
-        ///     The organization name (in english).
+        ///     The organizations 
         /// </summary>
-        public string Organization { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Organizations { get; set; }
 
         /// <summary>
-        ///     The organization name (in swedish).
+        /// 
         /// </summary>
-        public string SwedishOrganization { get; set; }
-
-        /// <summary>
-        ///     Description of the data provider (in english).
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        ///     Description of the data provider (in swedish).
-        /// </summary>
-        public string SwedishDescription { get; set; }
+        public IEnumerable<DataProviderPath> Paths { get; set; }
 
         /// <summary>
         ///     URL to the data provider source.
@@ -164,7 +155,7 @@ namespace SOS.Lib.Models.Shared
 
         public override string ToString()
         {
-            return $"[Id={Id}, Identfier={Identifier}] - {Name}";
+            return $"[Id={Id}, Identfier={Identifier}] - {Names.Translate("en-GB")}";
         }
 
         protected bool Equals(DataProvider other)
@@ -193,18 +184,22 @@ namespace SOS.Lib.Models.Shared
             {
                 Id = -1,
                 Identifier = "SosDataProvidersCombined",
-                Name = "",
-                SwedishName = "",
-                Organization = "",
-                SwedishOrganization = "",
+                Names = new List<VocabularyValueTranslation>(),
+                Descriptions = new[]
+                {
+                    new VocabularyValueTranslation
+                    {
+                        CultureCode = "en-GB",
+                        Value = "This is the DwC-A for all available data providers in Species Observation System (SOS)"
+                    }
+                },
+                Organizations = new List<VocabularyValueTranslation>(),
                 ContactPerson = new ContactPerson
                 {
                     FirstName = "",
                     LastName = "",
                     Email = ""
                 },
-                Description = "This is the DwC-A for all available data providers in Species Observation System (SOS)",
-                SwedishDescription = "",
                 Url = "",
                 DownloadUrl = ""
             };
@@ -217,18 +212,22 @@ namespace SOS.Lib.Models.Shared
             {
                 Id = -2,
                 Identifier = "SosFilterSubset",
-                Name ="",
-                SwedishName = "",
-                Organization = "",
-                SwedishOrganization = "",
+                Names = new List<VocabularyValueTranslation>(),
+                Descriptions = new[]
+                {
+                    new VocabularyValueTranslation
+                    {
+                        CultureCode = "en-GB",
+                        Value = "This data has been produced with a filter and is a subset of the data available in Species Observation System (SOS)"
+                    }
+                },
+                Organizations = new List<VocabularyValueTranslation>(),
                 ContactPerson = new ContactPerson
                 {
                     FirstName = "",
                     LastName = "",
                     Email = ""
                 },
-                Description = "This data has been produced with a filter and is a subset of the data available in Species Observation System (SOS)",
-                SwedishDescription = "",
                 Url = "",
                 DownloadUrl = ""
             };

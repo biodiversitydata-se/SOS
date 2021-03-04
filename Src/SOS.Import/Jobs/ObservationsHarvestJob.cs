@@ -9,6 +9,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
@@ -104,7 +105,7 @@ namespace SOS.Import.Jobs
                 {
                     var harvestJob = _harvestersByType[dataProvider.Type];
                     harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(mode, cancellationToken));
-                    _logger.LogDebug($"Added {dataProvider.Name} for {mode} harvest");
+                    _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} for {mode} harvest");
                 }
                 _logger.LogInformation($"Finish adding harvesters ({mode}).");
 

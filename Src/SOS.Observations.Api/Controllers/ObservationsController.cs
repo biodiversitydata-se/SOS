@@ -1141,5 +1141,57 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="occurrenceId"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpGet("{occurrenceId}")]
+        [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetObservation([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                return new OkObjectResult(await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations, includeInternalFields: false));
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="occurrenceId"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        [HttpGet("Internal/{occurrenceId}")]
+        [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetObservationInternal([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                return new OkObjectResult(await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations, includeInternalFields:true));
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

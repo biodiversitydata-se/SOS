@@ -10,6 +10,7 @@ using SOS.Lib.Jobs.Import;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Managers.Interfaces;
@@ -78,7 +79,7 @@ namespace SOS.Import.Jobs
             var report = new Report(reportId)
             {
                 Type = ReportType.DataValidationReport,
-                Name = dataProvider.Name,
+                Name = dataProvider.Names.Translate("en-GB"),
                 FileExtension = "zip",
                 CreatedBy = createdBy ?? "",
                 FileSizeInKb = zipFile.Length / 1024

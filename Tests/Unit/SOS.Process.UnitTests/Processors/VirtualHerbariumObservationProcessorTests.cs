@@ -64,7 +64,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             return new DataProvider
             {
-                Name = "Virtual Herbarium",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Virtual Herbarium" } },
                 Type = DataProviderType.VirtualHerbariumObservations
             };
         }

@@ -60,7 +60,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             return new DataProvider
             {
-                Name = "Clam portal",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Clam portal" } },
                 Type = DataProviderType.ClamPortalObservations
             };
         }

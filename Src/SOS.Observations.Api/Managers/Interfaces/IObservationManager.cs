@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
 
@@ -93,5 +94,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <returns></returns>
         Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
             SearchFilter filter);
+        Task<dynamic> GetObservationAsync(string occurrenceId, bool protectedObservations, bool includeInternalFields);
     }
 }

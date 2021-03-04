@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Extensions
             filter.TaxonIds = searchFilterBaseDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
-            filter.DataProviderIds = searchFilterBaseDto.DataProviderIds;
+            filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;

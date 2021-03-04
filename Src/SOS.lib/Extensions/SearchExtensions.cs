@@ -157,10 +157,10 @@ namespace SOS.Lib.Extensions
             switch (internalFilter.DeterminationFilter)
             {
                 case SightingDeterminationFilter.NotUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainDetermination", false);
+                    query.TryAddTermCriteria("identification.uncertainIdentification", false);
                     break;
                 case SightingDeterminationFilter.OnlyUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainDetermination", true);
+                    query.TryAddTermCriteria("identification.uncertainIdentification", true);
                     break;
             }
 
@@ -710,7 +710,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="terms"></param>
-        private static void TryAddTermsCriteria<T>(
+        public static void TryAddTermsCriteria<T>(
                 this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
         {
             if (terms?.Any() ?? false)

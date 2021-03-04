@@ -82,7 +82,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 },
                 Identification = new Identification
                 {
-                    UncertainDetermination = false,
+                    UncertainIdentification = false,
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },

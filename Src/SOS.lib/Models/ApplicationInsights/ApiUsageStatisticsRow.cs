@@ -1,13 +1,11 @@
 ﻿using System;
-using MongoDB.Bson;
-using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Shared
+namespace SOS.Lib.Models.ApplicationInsights
 {
     /// <summary>
-    /// API Usage statistics.
+    /// Application insights statistics row
     /// </summary>
-    public class ApiUsageStatistics : IEntity<ObjectId>
+    public class ApiUsageStatisticsRow
     {
         /// <summary>
         /// API management user account id
@@ -38,11 +36,6 @@ namespace SOS.Lib.Models.Shared
         /// Method, GET, POST PUT etc
         /// </summary>
         public string Method { get; set; }
-
-        /// <summary>
-        ///     Object id
-        /// </summary>
-        public ObjectId Id { get; set; }
 
         /// <summary>
         /// Number of request

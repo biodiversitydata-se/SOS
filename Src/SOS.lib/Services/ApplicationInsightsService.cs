@@ -1,106 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Models.ApplicationInsights;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
 {
-    public class ApplicationInsightsService : Interfaces.IApplicationInsightsService
+    public class ApplicationInsightsService : IApplicationInsightsService
     {
-        private readonly ApplicationInsightsConfiguration _aiConfig;
-        private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
-        private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
+        private readonly IHttpClientService _httpClientService;
+        private readonly ApplicationInsightsConfiguration _applicationInsightsConfiguration;
+        private readonly ILogger<ApplicationInsightsService> _logger;
 
-        public ApplicationInsightsService(ApplicationInsightsConfiguration applicationInsightsConfiguration)
+        /// <summary>
+        /// Post a query to application insights
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private async Task<T> QueryApplicationInsightsAsync<T>(
+            string query)
         {
-            _aiConfig = applicationInsightsConfiguration ?? throw new ArgumentNullException(nameof(applicationInsightsConfiguration));
+            var headerData = new Dictionary<string, string>();
+            headerData.Add("Accept", _applicationInsightsConfiguration.AcceptHeaderContentType);
+            headerData.Add("x-api-key", _applicationInsightsConfiguration.ApiKey);
+
+            var result = await _httpClientService.PostDataAsync<T>(
+                new Uri($"{_applicationInsightsConfiguration.BaseAddress}/apps/{_applicationInsightsConfiguration.ApplicationId }/query"), new { query = query?
+                    .Replace("\n", "")
+                    .Replace("\r", "")
+                    .Replace("\t", "")
+                }, 
+                headerData);
+
+            return result;
         }
 
-        public string GetTelemetry(
-            string appid,
-            string apikey,
-            string queryType,
-            string parameterString)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="httpClientService"></param>
+        /// <param name="applicationInsightsConfiguration"></param>
+        /// <param name="logger"></param>
+        public ApplicationInsightsService(IHttpClientService httpClientService,
+            ApplicationInsightsConfiguration applicationInsightsConfiguration,
+            ILogger<ApplicationInsightsService> logger)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Add("x-api-key", apikey);
-            var req = string.Format(aiQueryURL, appid, queryType, parameterString);
-            HttpResponseMessage response = client.GetAsync(req).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                return response.Content.ReadAsStringAsync().Result;
-            }
-            else
-            {
-                return response.ReasonPhrase;
-            }
+            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+            _applicationInsightsConfiguration = applicationInsightsConfiguration ?? throw new ArgumentNullException(nameof(applicationInsightsConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private string GetUsageStatisticsQueryForspecificDay(DateTime date)
+        
+        /// <inheritdoc />
+        public async Task<IEnumerable<ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDayAsync(DateTime date)
         {
-            var queryTemplate = @"requests 
-                | where timestamp >= datetime(""{0} 00:00:00.0"") and 
-                    timestamp <= datetime(""{0} 23:59:59.9"")
-                | project  dateTime = datetime(""{0} 00:00:00.0""),            
-                    method = operation_Name,
-                    endpoint = substring(tostring(parseurl(url).Path), 1),                        
-                    duration,
-                    failures = success
-                | summarize requestCount = tostring(count()),
-                    failureCount = tostring(count(failures == false)),
-                    averageDuration = tostring(toint(avg(duration)))
-                by dateTime, method, endpoint";
+            var query = $@"requests 
+                    | where 
+                        timestamp >= datetime('{date.ToString("yyyy-MM-dd")} 00:00:00.0')  
+                        and timestamp < datetime('{date.AddDays(1).ToString("yyyy-MM-dd")} 00:00:00.0')
+                    | project 
+                        timestamp, 
+                        method = substring(name, 0, indexof(name, ' ' )), 
+                        endpoint = substring(tostring(parseurl(url).Path), 1),  
+                        user_AccountId,
+                        user_AuthenticatedId, 
+                        duration, 
+                        success
+                    | summarize 
+                        requestCount = count(), 
+                        failureCount = count(success == false), 
+                        averageDuration = toint(avg(duration)) 
+                        by 
+                            method, 
+                            endpoint,
+                            user_AccountId,
+                            user_AuthenticatedId";
 
-            return string.Format(queryTemplate, date.ToString("yyyy-MM-dd"));
-        }
+            var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
-        public async Task<List<ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDay(DateTime date)
-        {
-            var query = GetUsageStatisticsQueryForspecificDay(date);
-            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "query", "query=" + query);
-            var result = JsonConvert.DeserializeObject<ApplicationInsightsQueryReturn>(json);
-            var apiUsageStatisticsRows = new List<ApiUsageStatisticsRow>();
-            foreach (var row in result.Tables[0].Rows)
-            {
-                var usageStatisticsRow = new ApiUsageStatisticsRow()
+            return result?.Tables.FirstOrDefault()?.Rows?.Select(r =>
+                new ApiUsageStatisticsRow()
                 {
-                    Date = (DateTime)row[0],
-                    Method = (string)row[1],
-                    Endpoint = (string)row[2],
-                    RequestCount = long.Parse((string)row[3]),
-                    FailureCount = long.Parse((string)row[4]),
-                    AverageDuration = long.Parse((string)row[5])
-                };
-
-                apiUsageStatisticsRows.Add(usageStatisticsRow);
-            }
-
-            return apiUsageStatisticsRows;
-        }
-
-        public class ApplicationInsightsQueryReturn
-        {
-            public class Table
-            {
-                public string Name { get; set; }
-                public IList<IList<object>> Rows { get; set; }
-            }
-            public Table[] Tables { get; set; }
-        }
-
-        public class ApiUsageStatisticsRow
-        {
-            public DateTime Date { get; set; }
-            public string Method { get; set; }
-            public string Endpoint { get; set; }
-            public long RequestCount { get; set; }
-            public long FailureCount { get; set; }
-            public long AverageDuration { get; set; }
+                    Date = date,
+                    Method = ((JsonElement)r[0]).GetString(),
+                    Endpoint = ((JsonElement)r[1]).GetString(),
+                    AccountId = ((JsonElement)r[2]).GetString(),
+                    UserId = ((JsonElement)r[3]).GetString(),
+                    RequestCount = ((JsonElement)r[4]).GetInt64(),
+                    FailureCount = ((JsonElement)r[5]).GetInt64(),
+                    AverageDuration = ((JsonElement)r[6]).GetInt64()
+                });
         }
     }
 }

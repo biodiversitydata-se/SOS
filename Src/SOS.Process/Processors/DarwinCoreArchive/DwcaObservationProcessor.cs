@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
@@ -161,7 +162,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
                     processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                     observations.Clear();
-                    Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
+                    Logger.LogDebug($"{dataProvider.Names.Translate("en-GB")} observations processed: {processedCount}");
                 }
             });
 
@@ -174,7 +175,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
                 processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
                 observations.Clear();
-                Logger.LogDebug($"{dataProvider.Name} observations processed: {processedCount}");
+                Logger.LogDebug($"{dataProvider.Names.Translate("en-GB")} observations processed: {processedCount}");
             }
 
             return processedCount;

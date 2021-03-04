@@ -71,7 +71,7 @@ namespace SOS.Process.Processors.Kul
                 },
                 Identification = new Identification
                 {
-                    UncertainDetermination = false,
+                    UncertainIdentification = false,
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },

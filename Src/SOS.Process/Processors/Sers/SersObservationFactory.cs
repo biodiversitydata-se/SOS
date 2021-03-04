@@ -71,7 +71,7 @@ namespace SOS.Process.Processors.Sers
                 },
                 Identification = new Identification
                 {
-                    UncertainDetermination = false,
+                    UncertainIdentification = false,
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
