@@ -11,7 +11,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
-        public IEnumerable<int> DataProviderIds { get; set; }
+        public DataProviderFilterDto DataProvider { get; set; }
 
         /// <summary>
         /// Date filter.

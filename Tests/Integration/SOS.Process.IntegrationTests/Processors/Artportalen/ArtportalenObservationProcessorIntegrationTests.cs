@@ -46,7 +46,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             {
                 Id = 1,
                 Identifier = "Artportalen",
-                Name = "Artportalen",
+                Names = new []{ new VocabularyValueTranslation{ CultureCode = "en-GB", Value = "Artportalen" } },
                 Type = DataProviderType.ArtportalenObservations
             };
 

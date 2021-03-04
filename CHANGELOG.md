@@ -87,6 +87,7 @@ Initial release
 # Sökfilter
 - ArtportalenFilter.GenderIds => ExtendedFilter.SexIds
 - ArtportalenFilter => ExtendedFilter
+- dataProviderIds => dataProvider.ids
 
 # Observation
 
@@ -146,3 +147,8 @@ Location
 - VerbatimMunicipality => Location.Attributes.VerbatimMunicipality
 - VerbatimProvince => Location.Attributes.VerbatimProvince
 
+# DataProviders
+- Name, swedishName => Names: [{ cultureCode: "", value: "" }]
+- Description, swedishDescription => Descriptions: [{ cultureCode: "", value: "" }]
+- Organization, swedishOrganization => Organizations: [{ cultureCode: "", value: "" }]
+- Paths: [{ cultureCode: "", path: [""] }]

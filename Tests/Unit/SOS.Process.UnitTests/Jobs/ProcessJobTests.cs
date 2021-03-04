@@ -184,7 +184,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
 
-            _dataProviderCache.Setup(dpm => dpm.GetAllAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Name = "Artportalen", Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
+            _dataProviderCache.Setup(dpm => dpm.GetAllAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Names = new []{ new VocabularyValueTranslation{ CultureCode = "en-GB", Value = "Artportalen" } }, Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
             
             _processTaxaJob.Setup(r => r.RunAsync())
                 .ReturnsAsync(true);

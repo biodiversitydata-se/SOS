@@ -52,7 +52,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             {
                 Id = 13,
                 Identifier = "ButterflyMonitoring",
-                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Swedish Butterfly Monitoring Scheme (SeBMS)" } },
                 Type = DataProviderType.DwcA
             };
 
@@ -83,7 +83,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             {
                 Id = 13,
                 Identifier = "ButterflyMonitoring",
-                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Swedish Butterfly Monitoring Scheme (SeBMS)" } },
                 Type = DataProviderType.DwcA
             };
 

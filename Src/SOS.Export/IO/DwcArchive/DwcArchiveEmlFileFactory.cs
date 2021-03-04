@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
@@ -50,10 +51,10 @@ namespace SOS.Export.IO.DwcArchive
             var xDoc = XDocument.Load(emlTemplatePath);
             var dataset = xDoc.Root.Element("dataset");
             SetPubDateToCurrentDate(dataset);
-            SetTitle(dataset, dataProvider.Name);
-            SetCreator(dataset, dataProvider.ContactPerson, dataProvider.Organization);
+            SetTitle(dataset, dataProvider.Names.Translate("en-GB"));
+            SetCreator(dataset, dataProvider.ContactPerson, dataProvider.Organizations.Translate("en-GB"));
             SetUrl(dataset, dataProvider.Url);
-            SetAbstract(dataset, dataProvider.Description);
+            SetAbstract(dataset, dataProvider.Descriptions.Translate("en-GB"));
             var emlString = xDoc.ToString();
             var emlBytes = Encoding.UTF8.GetBytes(emlString);
             await outStream.WriteAsync(emlBytes, 0, emlBytes.Length);

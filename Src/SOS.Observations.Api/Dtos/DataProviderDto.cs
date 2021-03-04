@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Observations.Api.Dtos
@@ -21,32 +23,22 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     The name of the data provider (in english).
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        ///     The name of the data provider (in swedish).
-        /// </summary>
-        public string SwedishName { get; set; }
-
-        /// <summary>
-        ///     The organization name (in english).
-        /// </summary>
-        public string Organization { get; set; }
-
-        /// <summary>
-        ///     The organization name (in swedish).
-        /// </summary>
-        public string SwedishOrganization { get; set; }
+        public IEnumerable<TranslationDto> Names { get; set; }
 
         /// <summary>
         ///     Description of the data provider (in english).
         /// </summary>
-        public string Description { get; set; }
+        public IEnumerable<TranslationDto> Descriptions { get; set; }
 
         /// <summary>
-        ///     Description of the data provider (in swedish).
+        ///     The organization name (in english).
         /// </summary>
-        public string SwedishDescription { get; set; }
+        public IEnumerable<TranslationDto> Organizations { get; set; }
+
+        /// <summary>
+        /// Paths
+        /// </summary>
+        public IEnumerable<DataProviderPathDto> Paths { get; set; }
 
         /// <summary>
         ///     URL to the data provider source.
@@ -95,16 +87,17 @@ namespace SOS.Observations.Api.Dtos
         /// <returns></returns>
         public static DataProviderDto Create(DataProvider dataProvider)
         {
+            if (dataProvider == null)
+            {
+                return null;
+            }
             return new DataProviderDto
             {
                 Id = dataProvider.Id,
                 Identifier = dataProvider.Identifier,
-                Name = dataProvider.Name,
-                SwedishName = dataProvider.SwedishName,
-                Organization = dataProvider.Organization,
-                SwedishOrganization = dataProvider.SwedishOrganization,
-                Description = dataProvider.Description,
-                SwedishDescription = dataProvider.SwedishDescription,
+                Names = dataProvider.Names?.Select(n => new TranslationDto{ CultureCode = n.CultureCode, Value = n.Value }),
+                Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
+                Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
                 Url = dataProvider.Url,
                 NextHarvestFrom = dataProvider.NextHarvestFrom(null),
                 HarvestSchedule = dataProvider.HarvestSchedule
@@ -129,16 +122,18 @@ namespace SOS.Observations.Api.Dtos
             DateTime? latestProcessDate,
             DateTime? latestIncrementalHarvestDate)
         {
+            if (dataProvider == null)
+            {
+                return null;
+            }
+
             return new DataProviderDto
             {
                 Id = dataProvider.Id,
                 Identifier = dataProvider.Identifier,
-                Name = dataProvider.Name,
-                SwedishName = dataProvider.SwedishName,
-                Organization = dataProvider.Organization,
-                SwedishOrganization = dataProvider.SwedishOrganization,
-                Description = dataProvider.Description,
-                SwedishDescription = dataProvider.SwedishDescription,
+                Names = dataProvider.Names?.Select(n => new TranslationDto { CultureCode = n.CultureCode, Value = n.Value }),
+                Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
+                Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
                 Url = dataProvider.Url,
                 PublicObservations = publicObservations,
                 ProtectedObservations = protectedObservations,

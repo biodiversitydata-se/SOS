@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
@@ -77,7 +78,7 @@ namespace SOS.Lib.Managers
         /// <returns></returns>
         public InvalidObservation ValidateObservation(Observation observation, DataProvider dataProvider)
         {
-            var observationValidation = new InvalidObservation(observation.DataProviderId.ToString(), dataProvider.Name, observation.Occurrence.OccurrenceId);
+            var observationValidation = new InvalidObservation(observation.DataProviderId.ToString(), dataProvider.Names.Translate("en-GB"), observation.Occurrence.OccurrenceId);
 
             if (observation.Event?.StartDate == null || observation.Event.EndDate == null)
             {

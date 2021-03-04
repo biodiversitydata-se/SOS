@@ -61,7 +61,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             return new DataProvider
             {
-                Name = "SERS",
+                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "SERS" } },
                 Type = DataProviderType.SersObservations
             };
         }
