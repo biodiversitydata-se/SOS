@@ -98,6 +98,7 @@ namespace SOS.Observations.Api.Dtos
                 Names = dataProvider.Names?.Select(n => new TranslationDto{ CultureCode = n.CultureCode, Value = n.Value }),
                 Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
                 Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
+                Paths = dataProvider.Paths?.Select(p => new DataProviderPathDto{ CultureCode = p.CultureCode, Path = p.Path }),
                 Url = dataProvider.Url,
                 NextHarvestFrom = dataProvider.NextHarvestFrom(null),
                 HarvestSchedule = dataProvider.HarvestSchedule
@@ -134,6 +135,7 @@ namespace SOS.Observations.Api.Dtos
                 Names = dataProvider.Names?.Select(n => new TranslationDto { CultureCode = n.CultureCode, Value = n.Value }),
                 Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
                 Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
+                Paths = dataProvider.Paths?.Select(p => new DataProviderPathDto { CultureCode = p.CultureCode, Path = p.Path }),
                 Url = dataProvider.Url,
                 PublicObservations = publicObservations,
                 ProtectedObservations = protectedObservations,
