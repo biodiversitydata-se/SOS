@@ -20,7 +20,7 @@ namespace SOS.Lib.Extensions
         {
             return translations
                 ?.FirstOrDefault(t => t.CultureCode.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase))
-                ?.Value;
+                ?.Value ?? string.Empty;
         }
     }
 }
