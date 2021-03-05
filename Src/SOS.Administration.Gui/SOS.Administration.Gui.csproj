@@ -18,10 +18,10 @@
     <PackageReference Include="Microsoft.Azure.ApplicationInsights.Query" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure.Authentication" Version="2.4.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.11.6" />
-    <PackageReference Include="NEST" Version="7.10.1" />
-    <PackageReference Include="NLog" Version="4.7.7" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.10.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.12.0" />
+    <PackageReference Include="NEST" Version="7.11.1" />
+    <PackageReference Include="NLog" Version="4.7.8" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.11.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
 

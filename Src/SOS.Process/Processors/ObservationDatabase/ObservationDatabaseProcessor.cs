@@ -74,8 +74,9 @@ namespace SOS.Process.Processors.ObservationDatabase
                         return;
                     }
 
+                    // Recreate observation to make a new object
+                    observation = observationFactory.CreateProcessedObservation(verbatimObservation);
                     // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
-                    observation = observation.Clone();
                     _diffusionManager.DiffuseObservation(observation);
                 }
 

@@ -90,6 +90,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processedObservationRepository = CreateProcessedObservationRepositoryMock().Object;
             }
 
+            var dataProviderRepository =
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
@@ -102,7 +105,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return new DwcaObservationProcessor(
                 dwcaVerbatimRepository.Object,
                 processedObservationRepository,

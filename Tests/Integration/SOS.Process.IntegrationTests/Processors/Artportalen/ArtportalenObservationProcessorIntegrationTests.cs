@@ -139,15 +139,19 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
         private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
-            var exportClient = new ProcessClient(
+            var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var vocabularyRepository =
-                new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var fieldMappingResolverHelper =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
+
+            var dataProviderRepository =
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,
@@ -156,7 +160,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository,
+                new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return dwcArchiveFileWriterCoordinator;
         }
 

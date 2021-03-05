@@ -62,21 +62,21 @@ namespace SOS.Export.IO.DwcArchive
 
         private static void SetUrl(XElement dataset, string url)
         {
-            dataset.XPathSelectElement("distribution/online/url").SetValue(url);
+            dataset.XPathSelectElement("distribution/online/url").SetValue(url ?? String.Empty);
         }
 
         private static void SetAbstract(XElement dataset, string description)
         {
-            dataset.XPathSelectElement("abstract/para").SetValue(description);
+            dataset.XPathSelectElement("abstract/para").SetValue(description ?? String.Empty);
         }
 
         private static void SetCreator(XElement dataset, ContactPerson contactPerson, string organization)
         {
             var creator = dataset.Element("creator");
-            creator.XPathSelectElement("individualName/givenName").SetValue(contactPerson.FirstName);
-            creator.XPathSelectElement("individualName/surName").SetValue(contactPerson.LastName);
-            creator.XPathSelectElement("organizationName").SetValue(organization);
-            creator.XPathSelectElement("electronicMailAddress").SetValue(contactPerson.Email);
+            creator.XPathSelectElement("individualName/givenName").SetValue(contactPerson?.FirstName ?? String.Empty);
+            creator.XPathSelectElement("individualName/surName").SetValue(contactPerson?.LastName ?? String.Empty);
+            creator.XPathSelectElement("organizationName").SetValue(organization ?? String.Empty);
+            creator.XPathSelectElement("electronicMailAddress").SetValue(contactPerson?.Email ?? String.Empty);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SOS.Export.IO.DwcArchive
 
         private static void SetTitle(XElement dataset, string title)
         {
-            dataset.XPathSelectElement("title").SetValue(title);
+            dataset.XPathSelectElement("title").SetValue(title ?? String.Empty);
         }
     }
 }

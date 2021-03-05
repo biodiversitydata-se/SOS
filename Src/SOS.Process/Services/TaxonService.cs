@@ -27,10 +27,11 @@ namespace SOS.Process.Services
 
         private static CsvConfiguration GetCsvConfiguration(string csvFieldDelimiter) => new CsvConfiguration(CultureInfo.InvariantCulture)
         {
+            
             Delimiter = csvFieldDelimiter,
             Encoding = Encoding.UTF8,
             HasHeaderRecord = true,
-            PrepareHeaderForMatch = (string header, int index) => header.ToLower(),
+            PrepareHeaderForMatch = args => args.Header.ToLower(),
             HeaderValidated = null,
             MissingFieldFound = null
         };

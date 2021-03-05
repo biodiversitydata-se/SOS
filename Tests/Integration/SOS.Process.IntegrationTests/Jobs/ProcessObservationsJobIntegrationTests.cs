@@ -73,6 +73,10 @@ namespace SOS.Process.IntegrationTests.Jobs
             var taxonProcessedRepository =
                 new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
 
+            var dataProviderRepository =
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+
+
             var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
@@ -109,7 +113,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             var clamPortalProcessor = new ClamPortalObservationProcessor(
                 new ClamObservationVerbatimRepository(verbatimClient,
                     new NullLogger<ClamObservationVerbatimRepository>()),

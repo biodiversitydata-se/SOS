@@ -115,6 +115,11 @@ namespace SOS.Lib.Models.Shared
         public bool HarvestFailPreventProcessing { get; set; }
 
         /// <summary>
+        /// Hash of latest uploaded file
+        /// </summary>
+        public string LatestUploadedFileHash { get; set; }
+
+        /// <summary>
         ///  Indicates that provider is ready to harvest
         /// </summary>
         /// <param name="lastSuccessfulHarvest"></param>

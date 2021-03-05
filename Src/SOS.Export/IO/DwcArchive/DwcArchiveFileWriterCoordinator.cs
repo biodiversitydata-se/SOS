@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
@@ -11,6 +13,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -21,16 +24,50 @@ namespace SOS.Export.IO.DwcArchive
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly DwcaFilesCreationConfiguration _dwcaFilesCreationConfiguration;
         private readonly ILogger<DwcArchiveFileWriterCoordinator> _logger;
+        private readonly IDataProviderRepository _dataProviderRepository;
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
+
+        private async Task<string> GetFileHashAsync(string path)
+        {
+            var stream = new MemoryStream();
+            try
+            {
+                using (var zip = ZipFile.Read(path))
+                {
+                    var occurenceFile = zip.FirstOrDefault(
+                        f => f.FileName.Contains("occurrence", StringComparison.CurrentCultureIgnoreCase));
+                    
+                    if (occurenceFile == null)
+                    {
+                        return string.Empty;
+                    }
+
+                    occurenceFile.Extract(stream);
+                }
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                using var md5 = new MD5CryptoServiceProvider();
+                await using var bufferedStream = new BufferedStream(stream, 100_000);
+                
+                return BitConverter.ToString(await md5.ComputeHashAsync(bufferedStream)).Replace("-", string.Empty);
+            }
+            finally
+            {
+                await stream.DisposeAsync();
+            }
+        }
 
         public DwcArchiveFileWriterCoordinator(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IFileService fileService,
+            IDataProviderRepository dataProviderRepository,
             DwcaFilesCreationConfiguration dwcaFilesCreationConfiguration,
             ILogger<DwcArchiveFileWriterCoordinator> logger)
         {
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _dwcaFilesCreationConfiguration = dwcaFilesCreationConfiguration ?? throw new ArgumentNullException(nameof(dwcaFilesCreationConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -55,7 +92,7 @@ namespace SOS.Export.IO.DwcArchive
             DataProvider dataProvider,
             string batchId = "")
         {
-            if (!processedObservations?.Any() ?? true)
+            if (!_dwcaFilesCreationConfiguration.IsEnabled || !(processedObservations?.Any() ?? false))
             {
                 return true;
             }
@@ -63,7 +100,6 @@ namespace SOS.Export.IO.DwcArchive
             // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
-                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
                 if (string.IsNullOrEmpty(dataProvider?.Identifier)) return false;
                 if (batchId == null) batchId = "";
                 Dictionary<DwcaFilePart, string> filePathByFilePart;
@@ -100,21 +136,43 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
-                var dwcaCreationTasks = new List<Task<string>>();
+                var dwcaCreationTasks = new Dictionary<DataProvider, Task<string>>();
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
-                    dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateDwcArchiveFileAsync(pair.Key, _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
+                    dwcaCreationTasks.Add(pair.Key, _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(pair.Key,
+                        _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                 }
 
-                dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                dwcaCreationTasks.Add(new DataProvider(),  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
                     _dwcaFilePartsInfoByDataProvider.Values));
-                var createdDwcaFiles = await Task.WhenAll(dwcaCreationTasks);
-                
+                await Task.WhenAll(dwcaCreationTasks.Values);
+
+                var createdDwcaFiles = new List<string>();
+
+                foreach (var task in dwcaCreationTasks)
+                {
+                    var dataProvider = task.Key;
+                    if (dataProvider.Id == 0)
+                    {
+                        continue;
+                    }
+
+                    var hash = await GetFileHashAsync(task.Value.Result);
+
+                    if (dataProvider.LatestUploadedFileHash == hash)
+                    {
+                        continue;
+                    }
+
+                    createdDwcaFiles.Add(task.Value.Result);
+
+                    dataProvider.LatestUploadedFileHash = hash;
+                    await _dataProviderRepository.UpdateAsync(dataProvider.Id, dataProvider);
+                }
+
                 DeleteTemporaryCreatedCsvFiles();
 
-                return createdDwcaFiles
-                    .Where(fn => !string.IsNullOrEmpty(fn))
-                    .Select(fn => fn);
+                return createdDwcaFiles;
             }
             catch (Exception e)
             {

@@ -497,7 +497,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -559,7 +559,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -621,7 +621,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -683,7 +683,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -915,7 +915,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",

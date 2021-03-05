@@ -100,6 +100,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static T Clone<T>(this T original) where T : class
         {
+
             return DotNetCore.Mapping.Extensions.Clone(original);
         }
 
