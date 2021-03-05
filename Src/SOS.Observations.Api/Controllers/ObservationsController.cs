@@ -20,7 +20,6 @@ using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Swagger;
@@ -989,7 +988,6 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-
                 var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -119,7 +120,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 elasticConfiguration, 
                 new TelemetryClient(), 
                 new NullLogger<Repositories.ProcessedObservationRepository>(),
-                processedConfigurationCache);
+                processedConfigurationCache,
+                new HttpContextAccessor());
             return processedObservationRepository;
         }
     }

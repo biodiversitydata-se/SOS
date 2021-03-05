@@ -34,7 +34,7 @@ namespace SOS.Lib.Managers
             {
                 return null;
             }
-
+            
             // Get user authorities
             var authorities = await _userService.GetUserAuthoritiesAsync(user.Id);
 
@@ -42,7 +42,7 @@ namespace SOS.Lib.Managers
             {
                 return null;
             }
-
+            
             var extendedAuthorizationFilters = new List<ExtendedAuthorizationFilter>();
 
             foreach (var authority in authorities)

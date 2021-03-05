@@ -5,19 +5,20 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
-using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Models.AggregatedResult;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -35,6 +36,7 @@ namespace SOS.Observations.Api.Repositories
         private readonly IElasticClient _elasticClient;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, 
             ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
@@ -66,13 +68,16 @@ namespace SOS.Observations.Api.Repositories
             if (!filter.ProtectedObservations)
             {
                 return PublicIndex;
-            }           
+            }
 
-            if(filter.ProtectedObservations && (!filter?.ExtendedAuthorizations?.Any() ?? true))
+            if (_httpContextAccessor.HttpContext?.User?.Claims?.Count(c =>
+                c.Type.Equals("scope", StringComparison.CurrentCultureIgnoreCase) &&
+                c.Value.Equals("SOS.Observations.Protected", StringComparison.CurrentCultureIgnoreCase)) == 0 
+                || (!filter?.ExtendedAuthorizations?.Any() ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
-            
+
             return ProtectedIndex;
         }
 
@@ -87,19 +92,22 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="httpContextAccessor"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger,
-            IClassCache<ProcessedConfiguration> processedConfigurationCache) : base(client, true, logger, processedConfigurationCache)
+            IClassCache<ProcessedConfiguration> processedConfigurationCache,
+            IHttpContextAccessor httpContextAccessor) : base(client, true, logger, processedConfigurationCache)
         {
             LiveMode = true;
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <inheritdoc />

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Exceptions
+namespace SOS.Lib.Exceptions
 {
     /// <summary>
     /// Thrown when authentication is required, used when accessing protected observations

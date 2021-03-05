@@ -13,7 +13,6 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Exceptions;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -26,12 +25,12 @@ namespace SOS.Observations.Api.Managers
     public class ObservationManager : IObservationManager
     {
         private readonly IVocabularyManager _vocabularyManager;
-        private readonly ILogger<ObservationManager> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFilterManager _filterManager;
+        private readonly ILogger<ObservationManager> _logger;
 
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyManager"></param>
@@ -41,13 +40,13 @@ namespace SOS.Observations.Api.Managers
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyManager vocabularyManager,
             IFilterManager filterManager,
-           
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
+           
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
