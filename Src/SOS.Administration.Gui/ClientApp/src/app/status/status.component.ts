@@ -144,7 +144,7 @@ export class StatusComponent implements OnInit {
       this.searchindexinfo = result;
     }, error => console.error(error));
     this.http.get<LoadTestResult[]>(this.baseUrl + 'performance/loadtestsummary').subscribe(result => {
-      this.loadTestSummary = result.reverse();
+      this.loadTestSummary = result;
     }, error => console.error(error));
     this.http.get<MongoDbInfo>(this.baseUrl + 'statusinfo/mongoinfo').subscribe(result => {
       this.mongodbinfo = []
