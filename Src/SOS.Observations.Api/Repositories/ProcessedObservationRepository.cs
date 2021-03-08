@@ -72,7 +72,7 @@ namespace SOS.Observations.Api.Repositories
 
             if (_httpContextAccessor.HttpContext?.User?.Claims?.Count(c =>
                 c.Type.Equals("scope", StringComparison.CurrentCultureIgnoreCase) &&
-                c.Value.Equals("SOS.Observations.Protected", StringComparison.CurrentCultureIgnoreCase)) == 0 
+                c.Value.Equals(_elasticConfiguration.ProtectedScope, StringComparison.CurrentCultureIgnoreCase)) == 0 
                 || (!filter?.ExtendedAuthorizations?.Any() ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
