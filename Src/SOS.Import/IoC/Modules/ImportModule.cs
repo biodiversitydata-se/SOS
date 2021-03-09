@@ -42,7 +42,8 @@ namespace SOS.Import.IoC.Modules
         public (ImportConfiguration ImportConfiguration, 
             MongoDbConfiguration VerbatimDbConfiguration, 
             MongoDbConfiguration ProcessDbConfiguration,
-            ApplicationInsightsConfiguration ApplicationInsightsConfiguration) Configurations { get; set; }
+            ApplicationInsightsConfiguration ApplicationInsightsConfiguration,
+            SosApiConfiguration SosApiConfiguration) Configurations { get; set; }
 
         protected override void Load(ContainerBuilder builder)
         {
@@ -93,6 +94,10 @@ namespace SOS.Import.IoC.Modules
 
             if (Configurations.ApplicationInsightsConfiguration != null)
                 builder.RegisterInstance(Configurations.ApplicationInsightsConfiguration).As<ApplicationInsightsConfiguration>()
+                    .SingleInstance();
+
+            if (Configurations.SosApiConfiguration != null)
+                builder.RegisterInstance(Configurations.SosApiConfiguration).As<SosApiConfiguration>()
                     .SingleInstance();
 
             // Vebatim Mongo Db

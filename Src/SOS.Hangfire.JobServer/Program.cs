@@ -45,6 +45,7 @@ namespace SOS.Hangfire.JobServer
         private static BlobStorageConfiguration _blobStorageConfiguration;
         private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
+        private static SosApiConfiguration _sosApiConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -153,7 +154,8 @@ namespace SOS.Hangfire.JobServer
                         .Get<DataCiteServiceConfiguration>();
                     _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration))
                         .Get<ApplicationInsightsConfiguration>();
-                    
+                    _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration))
+                        .Get<SosApiConfiguration>();
 
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
@@ -164,7 +166,7 @@ namespace SOS.Hangfire.JobServer
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration) })
+                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
                                 .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
                         );
