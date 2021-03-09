@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
         /// <inheritdoc/>
-        [HttpGet("Provider/{providerId}/LastModified")]
+        [HttpGet("{providerId}/LastModified")]
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute] int providerId)
