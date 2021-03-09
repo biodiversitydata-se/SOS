@@ -13,5 +13,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <returns>List of data providers.</returns>
         Task<IActionResult> GetDataProvidersAsync();
+
+        /// <summary>
+        /// Get latest data modified date for passed provider 
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetLatestModifiedDateForProviderAsync(int providerId);
     }
 }
