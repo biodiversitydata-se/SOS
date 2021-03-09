@@ -158,8 +158,13 @@ namespace SOS.Administration.Gui.Controllers
         [HttpGet]
         [Route("loadtestsummary")]
         public async Task<IEnumerable<LoadTestSummary>> GetLoadTestSummary()
-        {                       
-            var result = await _testElasticClient.SearchAsync<LoadTestSummary>(p => p.Index("sos-st-loadtests-summaries"));
+        {
+            var result = await _testElasticClient.SearchAsync<LoadTestSummary>(p => p
+                .Index("sos-st-loadtests-summaries")
+                .Size(5)
+                .Sort(f => f
+                    .Descending(d=>d.Timestamp))
+                );
             if (result.IsValid) 
             { 
                 return result.Documents;

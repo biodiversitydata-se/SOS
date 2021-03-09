@@ -321,11 +321,5 @@ namespace SOS.Observations.Api.Controllers.Interfaces
            bool validateSearchFilter = false,
            bool protectedObservations = false);
 
-        /// <summary>
-        /// Get latest data modified date for passed provider 
-        /// </summary>
-        /// <param name="providerId"></param>
-        /// <returns></returns>
-        Task<IActionResult> GetLatestModifiedDateForProviderAsync(int providerId);
     }
 }
