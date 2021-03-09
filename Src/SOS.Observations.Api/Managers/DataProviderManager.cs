@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive)
+        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode)
         {
             var dataProviderDtos = new List<DataProviderDto>();
             var processInfos = await _processInfoManager.GetProcessInfoAsync(true);
@@ -61,11 +61,12 @@ namespace SOS.Observations.Api.Managers
                         0,
                         providerInfo.HarvestEnd,
                         providerInfo.ProcessEnd,
-                        providerInfo.LatestIncrementalEnd));
+                        providerInfo.LatestIncrementalEnd,
+                        cultureCode));
                 }
                 else
                 {
-                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider));
+                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
                 }
             }
 

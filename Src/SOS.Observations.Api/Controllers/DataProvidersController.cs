@@ -38,11 +38,11 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersAsync()
+        public async Task<IActionResult> GetDataProvidersAsync([FromQuery] string cultureCode = "en-GB")
         {
             try
             {
-                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false);
+                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode);
                 return Ok(dataProviders);
             }
             catch (Exception e)

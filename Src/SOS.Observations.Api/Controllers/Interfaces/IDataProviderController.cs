@@ -9,9 +9,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IDataProviderController
     {
         /// <summary>
-        ///     Get all data providers.
+        ///  Get all data providers.
         /// </summary>
-        /// <returns>List of data providers.</returns>
-        Task<IActionResult> GetDataProvidersAsync();
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetDataProvidersAsync(string cultureCode = "en-GB");
     }
 }
