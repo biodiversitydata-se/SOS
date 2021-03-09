@@ -1,37 +1,31 @@
 # Changelog
 
-All notable changes to Observation API will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+## [1.0.1]
+
+### Releases
+
+**Test**: 2021-03-09
+
+**Prod**: Unreleased. Preliminary release april 2021
 
 
-
-##### Types of changes
-- `Added` for new features.
-- `Changed` for changes in existing functionality.
-- `Deprecated` for soon-to-be removed features.
-- `Removed` for now removed features.
-- `Fixed` for any bug fixes.
-- `Security` in case of vulnerabilities.
-
-
-## [1.0.1] - 2021-03-18
-
-
-### Changed
-- `Validated` value is set to true when `IdentificationVerificationStatus` has value `Reported by expert`.
-- `/Areas/{areaType}/{feature}/Export` endpoint changed to `/Areas/{areaType}/{featureId}/Export`.
-
+### `Changed`
 
 #### API
 
 ##### Observations 
-All API-endpoints with the suffix Internal have been moved to /Internal/*previous name*.
+All API-endpoints with the suffix Internal have been moved to `/Internal/previous name`.
 
-Ex. */SearchInternal* -> */Internal/Search*
+Ex. `/SearchInternal` -> `/Internal/Search`
 
 
 ##### Dataprovider
 
- */Observations/Provider/{providerId}/LastModified* has been moved to */DataProvider/{providerId}/LastModified*
+ `/Observations/Provider/{providerId}/LastModified` has been moved to `/DataProvider/{providerId}/LastModified`
+
+##### Areas
+
+- `/Areas/{areaType}/{feature}/Export` endpoint changed to `/Areas/{areaType}/{featureId}/Export`.
 
 #### Sökfilter
 - ArtportalenFilter.GenderIds => ExtendedFilter.SexIds
@@ -40,11 +34,12 @@ Ex. */SearchInternal* -> */Internal/Search*
 
 #### Observation
 
-- Om Identification.UncertainIdentification (förr UncertainDetermination) = true så sätts Identification.IdentificationRemarks till värdet "Uncertain determination"
+- Om `Identification.UncertainIdentification` (förr `UncertainDetermination`) = true så sätts `Identification.IdentificationRemarks` till värdet `Uncertain determination`
 - ReportedBy => Occurrence.ReportedBy
 - ReportedDate => Occurrence.ReportedDate
 - ProtectionLevel => Occurrence.ProtectionLevel
 - Media => Occurrence.Media
+- `Validated` value is set to true when `IdentificationVerificationStatus` has value `Reported by expert`.
 
 *ArtportalenInternal*
 - PrivateCollection => Observation.PrivateCollection
@@ -103,29 +98,35 @@ Ex. */SearchInternal* -> */Internal/Search*
 - Path: [string], depending on input parameter
 
 
-### Removed
+### `Removed`
 - `Occurrence.OrganismQuantityInt` field removed.
 
 
 ## [1.0.0] - 2021-01-21
 
-### Added
+### Releases
+
+**Test**: 2021-01-21
+
+**Prod**: 2021-01-21
+
+### `Added`
 - New field: `Observation.Occurrence.ReproductiveCondition`
 - New vocabularies: `ReproductiveCondition` and `Behavior`
 
-### Changed
+### `Changed`
 - Remove the `translationCultureCode` field from search filter, and add it as a query parameter.
 - Change data type for the `Observation.Occurrence.Behavior` field from string to VocabularyValue.
 
-### Fixed
+### `Fixed`
 - Sort order in `/Observations/TaxonAggregation` endpoint. Now the paging will work.
 
-### Removed
+### `Removed`
 - `OutputFields` field from search filter for aggregation endpoints.  
 - `SortBy` and `SortOrder` query parameters from the `Observations/SearchAggregatedInternal` endpoint.
 - `AreaIds` field in search filter. Replaced by `Areas`
 
-### Other
+### `Other`
 Areas
 Id i areaobjektet är borttagen. En area identifieras av sin areaType och featureid.
 Resursen Areas/{areaId}/Export är borttagen
@@ -161,5 +162,29 @@ SearchAggregatedInternal
 SortBy, sortOrder borttagna då den inte fyllde någon funktion
 
 ## [0.9.1] - 2020-11-30
+
+### Releases
+
+**Test**: 2020-11-30
+
+**Prod**: 2020-11-30
+
+
 Initial release
+
+
+## Changelog documentation
+
+
+All notable changes to Observation API will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+
+
+
+##### Types of changes
+- `Added` for new features.
+- `Changed` for changes in existing functionality.
+- `Deprecated` for soon-to-be removed features.
+- `Removed` for now removed features.
+- `Fixed` for any bug fixes.
+- `Security` in case of vulnerabilities.
 
