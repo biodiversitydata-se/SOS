@@ -13,7 +13,7 @@ All notable changes to Observation API will be documented in this file. The form
 - `Security` in case of vulnerabilities.
 
 
-## [1.0.1] - 2021-02-17
+## [1.0.1] - 2021-03-18
 
 
 ### Changed
