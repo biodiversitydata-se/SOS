@@ -1,45 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nest;
+using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Verbatim.Artportalen
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     Project class
+    ///     Project info.
     /// </summary>
-    public class Project
+    public class ProjectInfo : IEntity<int>
     {
         /// <summary>
-        ///     Project category
-        /// </summary>
-        public string Category { get; set; }
-
-        /// <summary>
-        ///     Project description
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        ///     Project end date
-        /// </summary>
-        public DateTime? EndDate { get; set; }
-
-        /// <summary>
-        ///     Id of project
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        ///     True if project is public
+        ///     Indicates if species observations that are reported in
+        ///     a project are publicly available or not.
         /// </summary>
         public bool IsPublic { get; set; }
 
         /// <summary>
-        ///     Name of project
+        ///     Information about the type of project,
+        ///     for example 'Environmental monitoring'.
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
+        ///     Description of a project.
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        ///     Not defined in Darwin Core.
+        ///     Date when the project ends.
+        /// </summary>
+        [Date]
+        public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        ///     An identifier for the project.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        ///     Name of the project.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        ///     Project owner
+        ///     Name of person or organization that owns the project.
         /// </summary>
         public string Owner { get; set; }
 
@@ -52,23 +58,20 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string ProjectURL { get; set; }
 
         /// <summary>
-        ///     Project start date
+        ///     Date when the project starts.
         /// </summary>
+        [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        ///     Survey method used
+        ///     Survey method used in a project to
+        ///     retrieve species observations.
         /// </summary>
         public string SurveyMethod { get; set; }
 
         /// <summary>
-        ///     Survey method url
+        ///     Survey method URL.
         /// </summary>
         public string SurveyMethodUrl { get; set; }
-
-        /// <summary>
-        ///     Project parameters
-        /// </summary>
-        public List<ProjectParameter> ProjectParameters { get; set; }
     }
 }

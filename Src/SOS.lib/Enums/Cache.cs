@@ -4,6 +4,7 @@
     {
         Area,
         DataProviders,
-        Vocabulary
+        Vocabulary,
+        Projects
     }
 }

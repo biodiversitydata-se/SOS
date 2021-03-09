@@ -140,6 +140,7 @@ namespace SOS.Import.Containers
                 Name = entity.Name,
                 Owner = entity.Owner,
                 StartDate = entity.StartDate,
+                ProjectURL = entity.ProjectURL,
                 SurveyMethod = entity.SurveyMethod,
                 SurveyMethodUrl = entity.SurveyMethodUrl
             };

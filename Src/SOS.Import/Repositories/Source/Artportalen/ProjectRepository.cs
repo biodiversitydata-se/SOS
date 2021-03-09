@@ -40,6 +40,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     p.StartDate,
                     p.EndDate,
 	                pc.Name AS Category,
+                    CONCAT('https://www.artportalen.se/Project/View/',p.Id) AS ProjectURL,
 	                sm.Name AS SurveyMethod,
                     sm.Url AS SurveyMethodUrl,
 	                CASE 

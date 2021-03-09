@@ -37,6 +37,28 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        /// Get all projects.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Projects")]
+        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetProjectsAsync()
+        {
+            try
+            {
+                var projects = await _vocabularyManager.GetProjectsAsync();
+                var dtos = projects.ToProjectDtos();
+                return new OkObjectResult(dtos);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting projects");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Get all vocabularies.
         /// </summary>
         /// <returns></returns>

@@ -145,6 +145,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProjectInfoRepository>().As<IProjectInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
@@ -176,6 +177,7 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<VocabularyHarvester>().As<IVocabularyHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<ProjectHarvester>().As<IProjectHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationHarvester>().As<IFishDataObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
@@ -243,6 +245,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportJob>().As<IDataValidationReportJob>().InstancePerLifetimeScope();

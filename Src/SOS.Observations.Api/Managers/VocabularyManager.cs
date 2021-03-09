@@ -9,23 +9,25 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    ///     Field mapping manager.
+    ///     Vocabulary manager.
     /// </summary>
     public class VocabularyManager : IVocabularyManager
     {
         private readonly ILogger<VocabularyManager> _logger;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+        private readonly ICache<int, ProjectInfo> _projectCache;
         private Dictionary<VocabularyId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         
         /// <summary>
         ///     A dictionary with translations grouped by the following properties in order:
-        ///     FieldMappingFieldId, SosId, CultureCode.
+        ///     VocabularyId, SosId, CultureCode.
         /// </summary>
         private Dictionary<VocabularyId, Dictionary<int, Dictionary<string, string>>> _translationDictionary;
 
@@ -33,13 +35,16 @@ namespace SOS.Observations.Api.Managers
         ///     Constructor
         /// </summary>
         /// <param name="vocabularyCache"></param>
+        /// <param name="projectCache"></param>
         /// <param name="logger"></param>
         public VocabularyManager(
             ICache<VocabularyId, Vocabulary> vocabularyCache,
+            ICache<int, ProjectInfo> projectCache,
             ILogger<VocabularyManager> logger)
         {
             _vocabularyCache = vocabularyCache ??
                                throw new ArgumentNullException(nameof(vocabularyCache));
+            _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -51,6 +56,11 @@ namespace SOS.Observations.Api.Managers
             _nonLocalizedTranslationDictionary = await CreateNonLocalizedTranslationDictionaryAsync();
         }
 
+        public async Task<IEnumerable<ProjectInfo>> GetProjectsAsync()
+        {
+            return await _projectCache.GetAllAsync();
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<Vocabulary>> GetVocabulariesAsync()
         {
@@ -58,10 +68,10 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public bool TryGetTranslatedValue(VocabularyId fieldId, string cultureCode, int sosId,
+        public bool TryGetTranslatedValue(VocabularyId vocabularyId, string cultureCode, int sosId,
             out string translatedValue)
         {
-            if (_translationDictionary[fieldId].TryGetValue(sosId, out var translationByCultureCode))
+            if (_translationDictionary[vocabularyId].TryGetValue(sosId, out var translationByCultureCode))
             {
                 translatedValue = translationByCultureCode[cultureCode];
                 return true;
@@ -72,9 +82,9 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public bool TryGetValue(VocabularyId fieldId, int sosId, out string translatedValue)
+        public bool TryGetValue(VocabularyId vocabularyId, int sosId, out string translatedValue)
         {
-            return _nonLocalizedTranslationDictionary[fieldId].TryGetValue(sosId, out translatedValue);
+            return _nonLocalizedTranslationDictionary[vocabularyId].TryGetValue(sosId, out translatedValue);
         }
 
         private async Task<Dictionary<VocabularyId, Dictionary<int, Dictionary<string, string>>>>
@@ -84,15 +94,15 @@ namespace SOS.Observations.Api.Managers
             var processedVocabularies = await _vocabularyCache.GetAllAsync();
             foreach (var vocabularity in processedVocabularies.Where(m => m.Localized))
             {
-                var fieldMappingFieldId = vocabularity.Id;
-                dic.Add(fieldMappingFieldId, new Dictionary<int, Dictionary<string, string>>());
-                foreach (var fieldMappingValue in vocabularity.Values)
+                var vocabularyId = vocabularity.Id;
+                dic.Add(vocabularyId, new Dictionary<int, Dictionary<string, string>>());
+                foreach (var vocabularyValue in vocabularity.Values)
                 {
-                    dic[fieldMappingFieldId].Add(fieldMappingValue.Id, new Dictionary<string, string>());
-                    foreach (var fieldMappingTranslation in fieldMappingValue.Translations)
+                    dic[vocabularyId].Add(vocabularyValue.Id, new Dictionary<string, string>());
+                    foreach (var translation in vocabularyValue.Translations)
                     {
-                        dic[fieldMappingFieldId][fieldMappingValue.Id].Add(fieldMappingTranslation.CultureCode,
-                            fieldMappingTranslation.Value);
+                        dic[vocabularyId][vocabularyValue.Id].Add(translation.CultureCode,
+                            translation.Value);
                     }
                 }
             }
@@ -107,11 +117,11 @@ namespace SOS.Observations.Api.Managers
             var processedVocabularies = await _vocabularyCache.GetAllAsync();
             foreach (var vocabularity in processedVocabularies.Where(m => !m.Localized))
             {
-                var fieldMappingFieldId = vocabularity.Id;
-                dic.Add(fieldMappingFieldId, new Dictionary<int, string>());
-                foreach (var fieldMappingValue in vocabularity.Values)
+                var vocabularyId = vocabularity.Id;
+                dic.Add(vocabularyId, new Dictionary<int, string>());
+                foreach (var vocabularyValue in vocabularity.Values)
                 {
-                    dic[fieldMappingFieldId].Add(fieldMappingValue.Id, fieldMappingValue.Value);
+                    dic[vocabularyId].Add(vocabularyValue.Id, vocabularyValue.Value);
                 }
             }
 

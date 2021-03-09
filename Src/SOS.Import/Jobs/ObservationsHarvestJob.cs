@@ -7,6 +7,7 @@ using CSharpFunctionalExtensions;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -27,6 +28,7 @@ namespace SOS.Import.Jobs
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDictionary<DataProviderType, IObservationHarvester> _harvestersByType;
+        private readonly IProjectHarvester _projectHarvester;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
         /// <summary>
@@ -45,6 +47,7 @@ namespace SOS.Import.Jobs
             IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation($"Start harvest job ({mode})");
+            await HarvestResources(mode, cancellationToken);
             var success = await Harvest(harvestProviders, mode, cancellationToken);
 
             if (!success)
@@ -69,6 +72,32 @@ namespace SOS.Import.Jobs
             return true;
         }
 
+        private async Task<bool> HarvestResources(
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogInformation($"Start {mode} resources harvest jobs");
+                if (mode == JobRunModes.Full)
+                {
+                    await _projectHarvester.HarvestProjectsAsync();
+                }
+
+                _logger.LogInformation($"Finish {mode} resources harvest jobs");
+                return true;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation($"{mode} resources harvest job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{mode} resources harvest job failed.");
+                return false;
+            }
+        }
 
         /// <summary>
         /// Run job
@@ -78,9 +107,9 @@ namespace SOS.Import.Jobs
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<bool> Harvest(
-            IEnumerable<DataProvider> dataProviders,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
+        IEnumerable<DataProvider> dataProviders,
+        JobRunModes mode,
+        IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -158,6 +187,7 @@ namespace SOS.Import.Jobs
         /// <param name="sersObservationHarvester"></param>
         /// <param name="sharkObservationHarvester"></param>
         /// <param name="virtualHerbariumObservationHarvester"></param>
+        /// <param name="projectHarvester"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
@@ -172,6 +202,7 @@ namespace SOS.Import.Jobs
             ISersObservationHarvester sersObservationHarvester,
             ISharkObservationHarvester sharkObservationHarvester,
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
+            IProjectHarvester projectHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<ObservationsHarvestJob> logger)
@@ -179,6 +210,7 @@ namespace SOS.Import.Jobs
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _projectHarvester = projectHarvester ?? throw new ArgumentNullException(nameof(projectHarvester));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));

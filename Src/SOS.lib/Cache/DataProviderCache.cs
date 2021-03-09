@@ -4,7 +4,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 namespace SOS.Lib.Cache
 {
     /// <summary>
-    /// Area cache
+    /// Data provider cache
     /// </summary>
     public class DataProviderCache : CacheBase<int, DataProvider>
     {

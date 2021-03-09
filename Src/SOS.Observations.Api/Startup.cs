@@ -36,6 +36,7 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -299,6 +300,7 @@ namespace SOS.Observations.Api
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
+            services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
 
@@ -319,6 +321,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
+            services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();

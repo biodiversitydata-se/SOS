@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Swagger;
@@ -11,7 +12,7 @@ using SOS.Observations.Api.Swagger;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    ///     Area controller
+    ///     Caches controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
@@ -20,6 +21,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IAreaCache _areaCache;
         private readonly ICache<int, DataProvider> _dataProvidersCache;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+        private readonly ICache<int, ProjectInfo> _projectsCache;
         private readonly ILogger<CachesController> _logger;
 
         /// <summary>
@@ -28,16 +30,19 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="areaCache"></param>
         /// <param name="dataProvidersCache"></param>
         /// <param name="vocabularyCache"></param>
+        /// <param name="projectsCache"></param>
         /// <param name="logger"></param>
         public CachesController(
             IAreaCache areaCache,
             ICache<int, DataProvider> dataProvidersCache,
             ICache<VocabularyId, Vocabulary> vocabularyCache,
+            ICache<int, ProjectInfo> projectsCache,
             ILogger<CachesController> logger)
         {
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _dataProvidersCache = dataProvidersCache ?? throw new ArgumentNullException(nameof(dataProvidersCache));
             _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
+            _projectsCache = projectsCache ?? throw new ArgumentNullException(nameof(projectsCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -60,6 +65,9 @@ namespace SOS.Observations.Api.Controllers
                         break;
                     case Cache.Vocabulary:
                         _vocabularyCache.Clear();
+                        break;
+                    case Cache.Projects:
+                        _projectsCache.Clear();
                         break;
                 }
 

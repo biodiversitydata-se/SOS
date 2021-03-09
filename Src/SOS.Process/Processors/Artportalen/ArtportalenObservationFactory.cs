@@ -453,6 +453,7 @@ namespace SOS.Process.Processors.Artportalen
                 Id = project.Id,
                 Name = project.Name,
                 Owner = project.Owner,
+                ProjectURL = project.ProjectURL,
                 StartDate =  project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,

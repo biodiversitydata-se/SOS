@@ -103,7 +103,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyCache = new VocabularyCache(vocabularyRepository);
-            var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
+            var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
+            var projectInfoCache = new ProjectCache(projectInfoRepository);
+            var vocabularyManager = new VocabularyManager(vocabularyCache, projectInfoCache, new NullLogger<VocabularyManager>());
             return vocabularyManager;
         }
 
