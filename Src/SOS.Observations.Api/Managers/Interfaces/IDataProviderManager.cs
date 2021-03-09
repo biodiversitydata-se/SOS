@@ -10,10 +10,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IDataProviderManager
     {
         /// <summary>
-        ///     Get data providers
+        /// Get data providers
         /// </summary>
-        /// <param name="includeInactive">If true also inactive data providers will be included.</param>
+        /// <param name="includeInactive"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive);
+        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode);
     }
 }

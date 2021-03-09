@@ -65,7 +65,7 @@ namespace SOS.Observations.Api.Repositories
         /// <returns></returns>
         private string GetCurrentIndex(FilterBase filter)
         {
-            if (!filter.ProtectedObservations)
+            if (filter == null || !filter.ProtectedObservations)
             {
                 return PublicIndex;
             }

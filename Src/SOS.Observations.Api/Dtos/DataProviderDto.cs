@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Observations.Api.Dtos
@@ -23,22 +24,22 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     The name of the data provider (in english).
         /// </summary>
-        public IEnumerable<TranslationDto> Names { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         ///     Description of the data provider (in english).
         /// </summary>
-        public IEnumerable<TranslationDto> Descriptions { get; set; }
+        public string Description { get; set; }
 
         /// <summary>
         ///     The organization name (in english).
         /// </summary>
-        public IEnumerable<TranslationDto> Organizations { get; set; }
+        public string Organization { get; set; }
 
         /// <summary>
         /// Paths
         /// </summary>
-        public IEnumerable<DataProviderPathDto> Paths { get; set; }
+        public IEnumerable<string> Path { get; set; }
 
         /// <summary>
         ///     URL to the data provider source.
@@ -81,11 +82,12 @@ namespace SOS.Observations.Api.Dtos
         public string HarvestSchedule { get; set; }
 
         /// <summary>
-        ///     Creates a new DataProviderDto object.
+        /// Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
-        public static DataProviderDto Create(DataProvider dataProvider)
+        public static DataProviderDto Create(DataProvider dataProvider, string cultureCode)
         {
             if (dataProvider == null)
             {
@@ -95,10 +97,10 @@ namespace SOS.Observations.Api.Dtos
             {
                 Id = dataProvider.Id,
                 Identifier = dataProvider.Identifier,
-                Names = dataProvider.Names?.Select(n => new TranslationDto{ CultureCode = n.CultureCode, Value = n.Value }),
-                Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
-                Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
-                Paths = dataProvider.Paths?.Select(p => new DataProviderPathDto{ CultureCode = p.CultureCode, Path = p.Path }),
+                Name = dataProvider.Names?.Translate(cultureCode),
+                Description = dataProvider.Descriptions?.Translate(cultureCode),
+                Organization = dataProvider.Organizations?.Translate(cultureCode),
+                Path = dataProvider.Paths?.Where(p => p.CultureCode?.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase) ?? false)?.SelectMany(p => p.Path),
                 Url = dataProvider.Url,
                 NextHarvestFrom = dataProvider.NextHarvestFrom(null),
                 HarvestSchedule = dataProvider.HarvestSchedule
@@ -106,7 +108,7 @@ namespace SOS.Observations.Api.Dtos
         }
 
         /// <summary>
-        ///     Creates a new DataProviderDto object.
+        /// Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="publicObservations"></param>
@@ -114,6 +116,7 @@ namespace SOS.Observations.Api.Dtos
         /// <param name="latestHarvestDate"></param>
         /// <param name="latestProcessDate"></param>
         /// <param name="latestIncrementalHarvestDate"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
         public static DataProviderDto Create(
             DataProvider dataProvider,
@@ -121,30 +124,23 @@ namespace SOS.Observations.Api.Dtos
             int protectedObservations,
             DateTime? latestHarvestDate,
             DateTime? latestProcessDate,
-            DateTime? latestIncrementalHarvestDate)
+            DateTime? latestIncrementalHarvestDate,
+            string cultureCode)
         {
-            if (dataProvider == null)
+            var dataProviderDto = Create(dataProvider, cultureCode);
+
+            if (dataProviderDto == null)
             {
                 return null;
             }
 
-            return new DataProviderDto
-            {
-                Id = dataProvider.Id,
-                Identifier = dataProvider.Identifier,
-                Names = dataProvider.Names?.Select(n => new TranslationDto { CultureCode = n.CultureCode, Value = n.Value }),
-                Descriptions = dataProvider.Descriptions?.Select(d => new TranslationDto { CultureCode = d.CultureCode, Value = d.Value }),
-                Organizations = dataProvider.Organizations?.Select(o => new TranslationDto { CultureCode = o.CultureCode, Value = o.Value }),
-                Paths = dataProvider.Paths?.Select(p => new DataProviderPathDto { CultureCode = p.CultureCode, Path = p.Path }),
-                Url = dataProvider.Url,
-                PublicObservations = publicObservations,
-                ProtectedObservations = protectedObservations,
-                LatestHarvestDate = latestHarvestDate,
-                LatestProcessDate = latestProcessDate,
-                LatestIncrementalHarvestDate = latestIncrementalHarvestDate,
-                NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate),
-                HarvestSchedule = dataProvider.HarvestSchedule
-            };
+            dataProviderDto.PublicObservations = publicObservations;
+            dataProviderDto.ProtectedObservations = protectedObservations;
+            dataProviderDto.LatestHarvestDate = latestHarvestDate;
+            dataProviderDto.LatestProcessDate = latestProcessDate;
+            dataProviderDto.LatestIncrementalHarvestDate = latestIncrementalHarvestDate;
+
+            return dataProviderDto;
         }
     }
 }
