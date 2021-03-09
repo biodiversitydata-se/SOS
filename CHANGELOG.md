@@ -97,10 +97,10 @@ Ex. */SearchInternal* -> */Internal/Search*
 - VerbatimProvince => Location.Attributes.VerbatimProvince
 
 #### DataProviders
-- Name, swedishName => Names: [{ cultureCode: "", value: "" }]
-- Description, swedishDescription => Descriptions: [{ cultureCode: "", value: "" }]
-- Organization, swedishOrganization => Organizations: [{ cultureCode: "", value: "" }]
-- Paths: [{ cultureCode: "", path: [""] }]
+- Name, swedishName => Name, depending on input parameter
+- Description, swedishDescription => Description, depending on input parameter
+- Organization, swedishOrganization => Organization, depending on input parameter
+- Path: [string], depending on input parameter
 
 
 ### Removed

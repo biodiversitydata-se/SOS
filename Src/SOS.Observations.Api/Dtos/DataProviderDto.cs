@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// Paths
         /// </summary>
-        public IEnumerable<string> Paths { get; set; }
+        public IEnumerable<string> Path { get; set; }
 
         /// <summary>
         ///     URL to the data provider source.
@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.Dtos
                 Name = dataProvider.Names?.Translate(cultureCode),
                 Description = dataProvider.Descriptions?.Translate(cultureCode),
                 Organization = dataProvider.Organizations?.Translate(cultureCode),
-                Paths = dataProvider.Paths?.Where(p => p.CultureCode?.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase) ?? false)?.SelectMany(p => p.Path),
+                Path = dataProvider.Paths?.Where(p => p.CultureCode?.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase) ?? false)?.SelectMany(p => p.Path),
                 Url = dataProvider.Url,
                 NextHarvestFrom = dataProvider.NextHarvestFrom(null),
                 HarvestSchedule = dataProvider.HarvestSchedule
