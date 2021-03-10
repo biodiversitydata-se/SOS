@@ -121,7 +121,14 @@ namespace SOS.Observations.Api.Controllers
 
 
             // Get geometry of sweden economic zone
-            var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "100");
+            var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
+
+            // Todo remove. Only used when area source was AP
+            if (swedenGeometry == null)
+            {
+                swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "100");
+            }
+
             // Get bounding box of swedish economic zone
             var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
 
