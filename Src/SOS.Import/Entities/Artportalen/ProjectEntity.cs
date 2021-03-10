@@ -13,6 +13,11 @@ namespace SOS.Import.Entities.Artportalen
         public string Category { get; set; }
 
         /// <summary>
+        ///     Project category in Swedish
+        /// </summary>
+        public string CategorySwedish { get; set; }
+
+        /// <summary>
         ///     Project description
         /// </summary>
         public string Description { get; set; }
@@ -41,6 +46,12 @@ namespace SOS.Import.Entities.Artportalen
         ///     Project owner
         /// </summary>
         public string Owner { get; set; }
+
+        /// <summary>
+        ///     Web address that leads to more information about the project.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        public string ProjectURL { get; set; }
 
         /// <summary>
         ///     Project start date

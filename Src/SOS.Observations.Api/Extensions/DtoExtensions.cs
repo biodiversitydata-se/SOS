@@ -259,6 +259,30 @@ namespace SOS.Observations.Api.Extensions
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
+        public static IEnumerable<ProjectDto> ToProjectDtos(this IEnumerable<ProjectInfo> projectInfos)
+        {
+            return projectInfos.Select(vocabulary => vocabulary.ToProjectDto());
+        }
+
+        public static ProjectDto ToProjectDto(this ProjectInfo projectInfo)
+        {
+            return new ProjectDto
+            {
+                Id = projectInfo.Id,
+                Name = projectInfo.Name,
+                StartDate = projectInfo.StartDate,
+                EndDate = projectInfo.EndDate,
+                Category = projectInfo.Category,
+                CategorySwedish = projectInfo.CategorySwedish,
+                Description = projectInfo.Description,
+                IsPublic = projectInfo.IsPublic,
+                Owner = projectInfo.Owner,
+                ProjectURL = projectInfo.ProjectURL,
+                SurveyMethod = projectInfo.SurveyMethod,
+                SurveyMethodUrl = projectInfo.SurveyMethodUrl
+            };
+        }
+
         public static IEnumerable<VocabularyDto> ToVocabularyDtos(this IEnumerable<Vocabulary> vocabularies, bool includeSystemMappings = true)
         {
             return vocabularies.Select(vocabulary => vocabulary.ToVocabularyDto(includeSystemMappings));

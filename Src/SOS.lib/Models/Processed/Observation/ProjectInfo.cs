@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Nest;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     Project information.
+    ///     Project info.
     /// </summary>
-    public class Project
+    public class ProjectInfo : IEntity<int>
     {
         /// <summary>
         ///     Indicates if species observations that are reported in
@@ -33,6 +34,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Description { get; set; }
 
         /// <summary>
+        ///     Not defined in Darwin Core.
         ///     Date when the project ends.
         /// </summary>
         [Date]
@@ -40,12 +42,6 @@ namespace SOS.Lib.Models.Processed.Observation
 
         /// <summary>
         ///     An identifier for the project.
-        ///     In the absence of a persistent global unique identifier,
-        ///     construct one from a combination of identifiers in
-        ///     the project that will most closely make the ProjectID
-        ///     globally unique.
-        ///     The format LSID (Life Science Identifiers) is used as GUID
-        ///     (Globally unique identifier).
         /// </summary>
         public int Id { get; set; }
 
@@ -60,18 +56,18 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Owner { get; set; }
 
         /// <summary>
-        ///     Date when the project starts.
-        /// </summary>
-        [Date]
-        public DateTime? StartDate { get; set; }
-
-        /// <summary>
         ///     Web address that leads to more information about the
         ///     project. The information should be accessible
         ///     from the most commonly used web browsers.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string ProjectURL { get; set; }
+
+        /// <summary>
+        ///     Date when the project starts.
+        /// </summary>
+        [Date]
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         ///     Survey method used in a project to
@@ -83,11 +79,5 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Survey method URL.
         /// </summary>
         public string SurveyMethodUrl { get; set; }
-
-        /// <summary>
-        ///     Project parameters.
-        /// </summary>
-        [Nested]
-        public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
     }
 }

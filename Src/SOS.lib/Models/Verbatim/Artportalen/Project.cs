@@ -14,6 +14,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string Category { get; set; }
 
         /// <summary>
+        ///     Project category in Swedish
+        /// </summary>
+        public string CategorySwedish { get; set; }
+
+        /// <summary>
         ///     Project description
         /// </summary>
         public string Description { get; set; }
@@ -42,6 +47,14 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Project owner
         /// </summary>
         public string Owner { get; set; }
+
+        /// <summary>
+        ///     Web address that leads to more information about the
+        ///     project. The information should be accessible
+        ///     from the most commonly used web browsers.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        public string ProjectURL { get; set; }
 
         /// <summary>
         ///     Project start date

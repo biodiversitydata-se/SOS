@@ -93,5 +93,22 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpPost("HarvestProjects/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunHarvestProjectsJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IProjectsHarvestJob>(job => job.RunHarvestProjectsAsync());
+                return new OkObjectResult("Projects harvest job was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing Projects harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

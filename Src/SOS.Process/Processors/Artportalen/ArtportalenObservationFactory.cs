@@ -448,11 +448,13 @@ namespace SOS.Process.Processors.Artportalen
             {
                 IsPublic = project.IsPublic,
                 Category = project.Category,
+                CategorySwedish = project.CategorySwedish,
                 Description = project.Description,
                 EndDate = project.EndDate?.ToUniversalTime(),
                 Id = project.Id,
                 Name = project.Name,
                 Owner = project.Owner,
+                ProjectURL = project.ProjectURL,
                 StartDate =  project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,

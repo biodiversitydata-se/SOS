@@ -39,7 +39,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     p.ProjectDescription AS Description,
                     p.StartDate,
                     p.EndDate,
-	                pc.Name AS Category,
+	                ten.Value AS Category,
+	                t.Value AS CategorySwedish,
+                    CONCAT('https://www.artportalen.se/Project/View/',p.Id) AS ProjectURL,
 	                sm.Name AS SurveyMethod,
                     sm.Url AS SurveyMethodUrl,
 	                CASE 
@@ -49,11 +51,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 FROM 
 	                Project p 
 	                INNER JOIN ProjectCategory pc ON p.ProjectCategoryId = pc.Id
+                    INNER JOIN [Resource] cr ON pc.Name = cr.Label
+                    INNER JOIN Translation t ON cr.Id = t.ResourceId AND t.GlobalizationCultureId = 175
+	                INNER JOIN [Resource] cren ON pc.Name = cren.Label
+                    INNER JOIN Translation ten ON cren.Id = ten.ResourceId AND ten.GlobalizationCultureId = 49
 	                LEFT JOIN SurveyMethod sm ON p.SurveyMethodId = sm.Id 
 	                LEFT JOIN Organization o ON p.ControlingOrganisationId = o.Id
 	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
 	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
-
 
                 return await QueryAsync<ProjectEntity>(query);
             }
