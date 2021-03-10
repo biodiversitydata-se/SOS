@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Enums
 {
-    // todo - extract Areas, FieldMappings and Taxa to a new enum ResourceDataType?
+    // todo - extract Areas, Vocabularies and Taxa to a new enum ResourceDataType?
     /// <summary>
     ///     Data provider types
     /// </summary>

@@ -157,7 +157,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
-            var fieldMappingResolverHelper = new VocabularyValueResolver(vocabularyRepository,
+            var vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository,
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
@@ -167,7 +167,7 @@ namespace SOS.Import.IntegrationTests.Managers
                 vocabularyRepository,
                 CreateValidationManager(),
                 areaHelper,
-                fieldMappingResolverHelper,
+                vocabularyValueResolver,
                 processedTaxonRepository,
                 new NullLogger<DwcaDataValidationReportManager>()
             );

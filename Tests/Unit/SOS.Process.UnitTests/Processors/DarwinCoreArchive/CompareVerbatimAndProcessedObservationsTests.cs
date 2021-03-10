@@ -33,8 +33,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processedFieldMappingRepositoryStub = VocabularyRepositoryStubFactory.Create();
-            var fieldMappingResolverHelper = new VocabularyValueResolver(processedFieldMappingRepositoryStub.Object,
+            var vocabularyRepositoryStub = VocabularyRepositoryStubFactory.Create();
+            var vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepositoryStub.Object,
                 new VocabularyConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
@@ -46,7 +46,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-            fieldMappingResolverHelper.ResolveVocabularyMappedValues(new List<Observation> {processedObservation});
+            vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation> {processedObservation});
             var compareResult = new CompareObservation
             {
                 VerbatimObservation = dwcaObservation,
