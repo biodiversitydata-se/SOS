@@ -130,6 +130,7 @@ namespace SOS.Import.Harvesters
                 StartDate = projectEntity.StartDate,
                 EndDate = projectEntity.EndDate,
                 Category = projectEntity.Category,
+                CategorySwedish = projectEntity.CategorySwedish,
                 Description = projectEntity.Description,
                 IsPublic = projectEntity.IsPublic,
                 Owner = projectEntity.Owner,

@@ -133,6 +133,7 @@ namespace SOS.Import.Containers
             return new Project
             {
                 Category = entity.Category,
+                CategorySwedish = entity.CategorySwedish,
                 Description = entity.Description,
                 EndDate = entity.EndDate,
                 Id = entity.Id,

@@ -273,6 +273,7 @@ namespace SOS.Observations.Api.Extensions
                 StartDate = projectInfo.StartDate,
                 EndDate = projectInfo.EndDate,
                 Category = projectInfo.Category,
+                CategorySwedish = projectInfo.CategorySwedish,
                 Description = projectInfo.Description,
                 IsPublic = projectInfo.IsPublic,
                 Owner = projectInfo.Owner,

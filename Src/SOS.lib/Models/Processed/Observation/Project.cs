@@ -22,6 +22,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Category { get; set; }
 
         /// <summary>
+        ///     Information about the type of project in Swedish,
+        ///     for example 'Miljöövervakning'.
+        /// </summary>
+        public string CategorySwedish { get; set; }
+
+        /// <summary>
         ///     Description of a project.
         /// </summary>
         public string Description { get; set; }

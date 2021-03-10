@@ -13,6 +13,11 @@ namespace SOS.Import.Entities.Artportalen
         public string Category { get; set; }
 
         /// <summary>
+        ///     Project category in Swedish
+        /// </summary>
+        public string CategorySwedish { get; set; }
+
+        /// <summary>
         ///     Project description
         /// </summary>
         public string Description { get; set; }
