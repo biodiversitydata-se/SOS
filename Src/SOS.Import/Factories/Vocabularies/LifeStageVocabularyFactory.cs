@@ -11,7 +11,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating life stage field mapping.
+    ///     Class for creating life stage vocabulary.
     /// </summary>
     public class LifeStageVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

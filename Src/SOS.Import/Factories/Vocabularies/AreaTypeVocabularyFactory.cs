@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Area type field mapping.
+    ///     Class for creating Area type vocabulary.
     /// </summary>
     public class AreaTypeVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

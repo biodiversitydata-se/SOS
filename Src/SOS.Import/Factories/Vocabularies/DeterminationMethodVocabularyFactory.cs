@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating DeterminationMethod field mapping.
+    ///     Class for creating DeterminationMethod vocabulary.
     /// </summary>
     public class DeterminationMethodVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

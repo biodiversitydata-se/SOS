@@ -112,7 +112,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         }
 
         /// <summary>
-        ///     Reads field mappings from MongoDb and create enum file.
+        ///     Reads vocabulary mappings from MongoDb and create enum file.
         /// </summary>
         [Fact]
         [Trait("Category", "Tool")]

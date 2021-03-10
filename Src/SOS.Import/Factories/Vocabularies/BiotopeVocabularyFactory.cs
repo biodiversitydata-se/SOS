@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating biotope field mapping.
+    ///     Class for creating biotope vocabulary.
     /// </summary>
     public class BiotopeVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

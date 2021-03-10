@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating substrate field mapping.
+    ///     Class for creating substrate vocabulary.
     /// </summary>
     public class SubstrateVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

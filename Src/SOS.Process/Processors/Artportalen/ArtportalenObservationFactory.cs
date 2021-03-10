@@ -253,7 +253,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? $"{biotope}{(string.IsNullOrEmpty(obs.Occurrence.BiotopeDescription) ? "" : " # ")}{obs.Occurrence.BiotopeDescription}"
                     : obs.Occurrence.BiotopeDescription).WithMaxLength(255);
 
-                // Get field mapping values
+                // Get vocabulary mapped values
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);
                 obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Activity);
                 
@@ -642,7 +642,7 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        ///     Get field mappings for Artportalen.
+        ///     Get vocabulary mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>

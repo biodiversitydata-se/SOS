@@ -7,7 +7,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Interfaces
 {
     /// <summary>
-    ///     Interface for field mappings.
+    ///     Interface for vocabularies.
     /// </summary>
     public interface IVocabularyHarvester
     {

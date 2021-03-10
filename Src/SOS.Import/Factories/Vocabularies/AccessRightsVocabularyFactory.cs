@@ -5,7 +5,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating AccessRights field mapping.
+    ///     Class for creating AccessRights vocabulary.
     /// </summary>
     public class AccessRightsVocabularyFactory : DwcVocabularyFactoryBase
     {

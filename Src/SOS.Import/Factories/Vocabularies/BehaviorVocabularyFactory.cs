@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating EstablishmentMeans field mapping.
+    ///     Class for creating EstablishmentMeans vocabulary.
     /// </summary>
     public class BehaviorVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

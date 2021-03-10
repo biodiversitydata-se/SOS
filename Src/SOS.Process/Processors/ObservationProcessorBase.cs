@@ -141,7 +141,7 @@ namespace SOS.Process.Processors
             {
                 if (vocabularyValueResolver.Configuration.ResolveValues)
                 {
-                    // used for testing purpose for easier debugging of field mapped data.
+                    // used for testing purpose for easier debugging of vocabulary mapped data.
                     vocabularyValueResolver
                         .ResolveVocabularyMappedValues(
                             processedObservations); 
@@ -189,7 +189,7 @@ namespace SOS.Process.Processors
         }
 
         /// <summary>
-        /// Resolve field mapping values and then write the observations to DwC-A CSV files.
+        /// Resolve vocabulary mapped values and then write the observations to DwC-A CSV files.
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="dataProvider"></param>

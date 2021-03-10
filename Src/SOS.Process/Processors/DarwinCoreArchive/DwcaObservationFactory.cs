@@ -127,7 +127,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.InformationWithheld = verbatimObservation.InformationWithheld;
             obs.InstitutionId = verbatimObservation.InstitutionID;
             obs.InstitutionCode = GetSosId(verbatimObservation.InstitutionCode,
-                _vocabularyById[VocabularyId.Institution]); // todo - Create DarwinCore field mapping.
+                _vocabularyById[VocabularyId.Institution]);
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;
             obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified)?.ToUniversalTime();
@@ -135,13 +135,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.References = verbatimObservation.References;
             obs.RightsHolder = verbatimObservation.RightsHolder;
             obs.Type = GetSosId(verbatimObservation.Type,
-                _vocabularyById[VocabularyId.Type]); // todo - Create DarwinCore field mapping.
-
-            // todo - handle the following fields?
-            // obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
-            // obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-            // obs.ReportedBy = verbatimObservation.ReportedBy;
-            // obs.ReportedDate = verbatimObservation.ReportedDate;
+                _vocabularyById[VocabularyId.Type]);
 
             // Event
             obs.Event = CreateProcessedEvent(verbatimObservation);
@@ -578,7 +572,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        ///     Get field mappings for Artportalen.
+        ///     Get vocabulary mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>

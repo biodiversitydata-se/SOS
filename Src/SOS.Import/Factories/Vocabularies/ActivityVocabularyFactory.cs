@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Activity field mapping.
+    ///     Class for creating Activity vocabulary.
     /// </summary>
     public class ActivityVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

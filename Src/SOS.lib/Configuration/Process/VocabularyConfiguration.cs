@@ -6,7 +6,7 @@
     public class VocabularyConfiguration
     {
         /// <summary>
-        ///     Decides whether field mapping values should be resolved
+        ///     Decides whether vocabulary values should be resolved
         ///     (for debugging purpose) when processing observations.
         /// </summary>
         public bool ResolveValues { get; set; } = false;

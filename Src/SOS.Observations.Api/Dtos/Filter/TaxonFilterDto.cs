@@ -14,12 +14,12 @@ namespace SOS.Observations.Api.Dtos.Filter
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     Redlist categories to match. Queryable values are available in Field Mappings.
+        ///     Redlist categories to match.
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     Taxa to match. Queryable values are available in Field Mappings.
+        ///     Taxa to match. Queryable values are available in Dyntaxa.
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
     }

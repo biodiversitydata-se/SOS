@@ -5,7 +5,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Occurrence Status field mapping.
+    ///     Class for creating Occurrence Status vocabulary.
     /// </summary>
     public class OccurrenceStatusVocabularyFactory : DwcVocabularyFactoryBase
     {

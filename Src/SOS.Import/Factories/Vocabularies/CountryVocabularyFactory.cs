@@ -5,7 +5,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Country field mapping.
+    ///     Class for creating Country vocabulary.
     /// </summary>
     public class CountryVocabularyFactory : DwcVocabularyFactoryBase
     {
