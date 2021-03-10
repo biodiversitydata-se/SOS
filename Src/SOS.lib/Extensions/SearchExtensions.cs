@@ -92,7 +92,7 @@ namespace SOS.Lib.Extensions
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            query.TryAddNestedTermsCriteria("artportalenInternal.projects", "artportalenInternal.projects.id",
+            query.TryAddNestedTermsCriteria("projects", "projects.id",
                 internalFilter.ProjectIds);
            
 

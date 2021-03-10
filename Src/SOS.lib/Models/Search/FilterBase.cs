@@ -140,6 +140,11 @@ namespace SOS.Lib.Models.Search
         public bool? OnlyValidated { get; set; }
 
         /// <summary>
+        /// Project id's to match.
+        /// </summary>
+        public List<int> ProjectIds { get; set; }
+
+        /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
         ///     negative sightings.
         ///     An negative observation is an observation that was expected to be found but wasn't.

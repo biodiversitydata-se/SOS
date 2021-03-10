@@ -31,6 +31,7 @@ namespace SOS.Observations.Api.Extensions
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;
+            filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.Geometries = searchFilterBaseDto.Geometry?.Geometries == null
                 ? null
                 : new GeometryFilter
@@ -84,7 +85,6 @@ namespace SOS.Observations.Api.Extensions
             {
                 internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
                 internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
-                internalFilter.ProjectIds = searchFilterInternalDto.ExtendedFilter.ProjectIds;
                 internalFilter.BoundingBox = searchFilterInternalDto.ExtendedFilter.BoundingBox;
                 internalFilter.OnlyWithMedia = searchFilterInternalDto.ExtendedFilter.OnlyWithMedia;
                 internalFilter.OnlyWithNotes = searchFilterInternalDto.ExtendedFilter.OnlyWithNotes;

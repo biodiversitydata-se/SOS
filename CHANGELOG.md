@@ -29,6 +29,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 
 #### Sökfilter
 - ArtportalenFilter.GenderIds => ExtendedFilter.SexIds
+- ArtportalenFilter.ProjectIds => ProjectIds
 - ArtportalenFilter => ExtendedFilter
 - dataProviderIds => dataProvider.ids
 
@@ -43,6 +44,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 
 *ArtportalenInternal*
 - PrivateCollection => Observation.PrivateCollection
+- Projects => Observation.Projects
 
 *Event*
 - QuantityOfSubstrate => Occurrence.Substrate.Quantity

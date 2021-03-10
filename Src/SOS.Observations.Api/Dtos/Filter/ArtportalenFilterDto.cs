@@ -43,7 +43,6 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public int? ReportedByUserId { get; set; }
         public int? ObservedByUserId { get; set; }
-        public List<int> ProjectIds { get; set; }
         /// <summary>
         /// Limit the search by a bounding box.
         /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
