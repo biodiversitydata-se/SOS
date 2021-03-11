@@ -116,7 +116,7 @@ namespace SOS.Lib.Models.Search
         public bool ProtectedObservations { get; set; }
 
         /// <summary>
-        ///     Field mapping translation culture code.
+        ///     Vocabulary mapping translation culture code.
         ///     Available values.
         ///     sv-SE (Swedish)
         ///     en-GB (English)
@@ -140,6 +140,11 @@ namespace SOS.Lib.Models.Search
         public bool? OnlyValidated { get; set; }
 
         /// <summary>
+        /// Project id's to match.
+        /// </summary>
+        public List<int> ProjectIds { get; set; }
+
+        /// <summary>
         ///     True to return only positive sightings, false to return negative sightings, null to return both positive and
         ///     negative sightings.
         ///     An negative observation is an observation that was expected to be found but wasn't.
@@ -147,12 +152,12 @@ namespace SOS.Lib.Models.Search
         public bool? PositiveSightings { get; set; }
 
         /// <summary>
-        ///     Redlist categories to match. Queryable values are available in Field Mappings.
+        ///     Redlist categories to match.
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     Sex id's to match. Queryable values are available in Field Mappings.
+        ///     Sex id's to match. Queryable values are available in sex vocabulary.
         /// </summary>
         public IEnumerable<int> SexIds { get; set; }
 
@@ -162,12 +167,12 @@ namespace SOS.Lib.Models.Search
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        ///     Taxa to match. Queryable values are available in Field Mappings.
+        ///     Taxa to match. Queryable values are available in Dyntaxa.
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
         /// <summary>
-        /// Pre defined time ranges
+        /// Predefined time ranges.
         /// </summary>
         public IEnumerable<TimeRange> TimeRanges { get; set; }
 

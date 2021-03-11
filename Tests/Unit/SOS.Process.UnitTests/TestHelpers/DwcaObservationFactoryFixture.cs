@@ -15,7 +15,7 @@ namespace SOS.Process.UnitTests.TestHelpers
     ///     A fixture that creates an instance of DwcaObservationFactory with the following properties:
     ///     - Only Mammalia taxa are used.
     ///     - Only County and Province regions are used.
-    ///     - All field mappings are used.
+    ///     - All vocabulary mappings are used.
     ///     All data is loaded from files in the Resources folder.
     /// </summary>
     public class DwcaObservationFactoryFixture : IDisposable

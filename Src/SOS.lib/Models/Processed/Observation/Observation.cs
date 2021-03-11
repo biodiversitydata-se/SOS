@@ -315,6 +315,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
+        ///     Projects from Artportalen connected to sighting.
+        /// </summary>
+        [Nested]
+        public IEnumerable<Project> Projects { get; set; }
+
+        /// <summary>
         /// Date this observation was created
         /// </summary>
         public DateTime Created { get; set; }

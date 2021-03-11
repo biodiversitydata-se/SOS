@@ -5,7 +5,7 @@ using SOS.Lib.Enums;
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
     /// <summary>
-    ///     Interface for field mapping controller
+    ///     Interface for vocabularies controller
     /// </summary>
     public interface IVocabulariesController
     {
@@ -21,7 +21,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId);
 
         /// <summary>
-        ///     Run import field mapping.
+        ///     Run import vocabularies.
         /// </summary>
         /// <returns></returns>
         IActionResult RunImportVocabulariesJob();

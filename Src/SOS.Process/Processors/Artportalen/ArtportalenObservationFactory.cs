@@ -105,10 +105,11 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.PrivateCollection = verbatimObservation.PrivateCollection;
+                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
                 obs.Type = null;
-                
+
                 // Event
                 obs.Event = new Event();
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
@@ -244,7 +245,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
-                obs.ArtportalenInternal.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
 
                 // Set dependent properties
@@ -253,7 +253,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? $"{biotope}{(string.IsNullOrEmpty(obs.Occurrence.BiotopeDescription) ? "" : " # ")}{obs.Occurrence.BiotopeDescription}"
                     : obs.Occurrence.BiotopeDescription).WithMaxLength(255);
 
-                // Get field mapping values
+                // Get vocabulary mapped values
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);
                 obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Activity);
                 
@@ -642,7 +642,7 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        ///     Get field mappings for Artportalen.
+        ///     Get vocabulary mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>

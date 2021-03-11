@@ -103,11 +103,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
-            var fieldMappingResolverHelper =
+            var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    fieldMappingResolverHelper,
+                    vocabularyValueResolver,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
@@ -119,7 +119,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<ClamObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
                 new NullLogger<ClamPortalObservationProcessor>());
@@ -128,7 +128,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
                 new NullLogger<FishDataObservationProcessor>());
@@ -137,7 +137,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<KulObservationProcessor>());
@@ -146,7 +146,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<MvmObservationProcessor>());
@@ -155,7 +155,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<NorsObservationProcessor>());
@@ -164,7 +164,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<SersObservationProcessor>());
@@ -173,7 +173,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<SharkObservationProcessor>());
@@ -182,7 +182,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                fieldMappingResolverHelper, 
+                vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
@@ -191,7 +191,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 processedProtectedObservationRepository,
                 vocabularyRepository,
-                fieldMappingResolverHelper,
+                vocabularyValueResolver,
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,
@@ -223,7 +223,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<ObservationDatabaseVerbatimRepository>()),
                 processedPublicObservationRepository,
                 processedProtectedObservationRepository,
-                fieldMappingResolverHelper,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,
                 validationManager,

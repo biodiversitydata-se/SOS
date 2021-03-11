@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating institution field mapping.
+    ///     Class for creating institution vocabulary.
     /// </summary>
     public class InstitutionVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

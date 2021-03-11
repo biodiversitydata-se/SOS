@@ -35,6 +35,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 SELECT 
 	                p.Id,
                     p.IsPublic,
+                    p.IsHideall,
 	                p.ProjectName AS Name,
                     p.ProjectDescription AS Description,
                     p.StartDate,

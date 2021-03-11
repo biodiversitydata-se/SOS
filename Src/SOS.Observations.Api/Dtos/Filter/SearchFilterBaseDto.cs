@@ -48,5 +48,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// If no value is set, this will be set to include only present observations.
         /// </summary>
         public OccurrenceStatusFilterValuesDto? OccurrenceStatus { get; set; }
+
+        /// <summary>
+        /// Project id's to match.
+        /// </summary>
+        public List<int> ProjectIds { get; set; }
     }
 }

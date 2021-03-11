@@ -23,7 +23,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         }
 
         /// <summary>
-        ///     Reads field mappings from MongoDb and saves them as a JSON file.
+        ///     Reads vocabulary mappings from MongoDb and saves them as a JSON file.
         /// </summary>
         [Fact(Skip = "Not implemented")]
         [Trait("Category", "Tool")]

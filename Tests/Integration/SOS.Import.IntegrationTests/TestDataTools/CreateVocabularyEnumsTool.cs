@@ -36,21 +36,21 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             sb.AppendLine("/// </summary>");
             sb.AppendLine($"public enum {vocabulary.Name}Id");
             sb.AppendLine("{");
-            foreach (var fieldMappingValue in vocabulary.Values)
+            foreach (var vocabularyValue in vocabulary.Values)
             {
-                if (fieldMappingValue.Value == "")
+                if (vocabularyValue.Value == "")
                     continue;
 
                 sb.AppendLine("    /// <summary>");
-                sb.AppendLine($"   /// {CapitalizeFirstChar(fieldMappingValue.Value)}.");
-                if (fieldMappingValue.Localized)
+                sb.AppendLine($"   /// {CapitalizeFirstChar(vocabularyValue.Value)}.");
+                if (vocabularyValue.Localized)
                 {
                     sb.AppendLine(
-                        $"   /// ({CapitalizeFirstChar(fieldMappingValue.Translations.Single(m => m.CultureCode == Cultures.sv_SE).Value)})");
+                        $"   /// ({CapitalizeFirstChar(vocabularyValue.Translations.Single(m => m.CultureCode == Cultures.sv_SE).Value)})");
                 }
 
                 sb.AppendLine("    /// </summary>");
-                sb.AppendLine($"    {TrimName(fieldMappingValue.Value)} = {fieldMappingValue.Id},");
+                sb.AppendLine($"    {TrimName(vocabularyValue.Value)} = {vocabularyValue.Id},");
                 sb.AppendLine();
             }
 
@@ -112,7 +112,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         }
 
         /// <summary>
-        ///     Reads field mappings from MongoDb and create enum file.
+        ///     Reads vocabulary mappings from MongoDb and create enum file.
         /// </summary>
         [Fact]
         [Trait("Category", "Tool")]
@@ -129,13 +129,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize); 
 
-            var fieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processedVocabularies = (await fieldMappingRepository.GetAllAsync()).ToArray();
+            var processedVocabularies = (await vocabularyRepository.GetAllAsync()).ToArray();
             var strEnums = CreateEnums(processedVocabularies);
             File.WriteAllText(filePath, strEnums, Encoding.UTF8);
         }

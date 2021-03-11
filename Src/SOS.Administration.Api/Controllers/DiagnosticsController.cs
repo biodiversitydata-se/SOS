@@ -44,7 +44,7 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
-        ///     Get diff between generated, Json files and processed field mappings.
+        ///     Get diff between generated, Json files and processed vocabularies.
         /// </summary>
         /// <returns></returns>
         [HttpGet("VocabularyDiffAsZipFile")]

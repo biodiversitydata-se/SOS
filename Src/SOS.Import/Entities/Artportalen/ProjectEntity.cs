@@ -38,6 +38,11 @@ namespace SOS.Import.Entities.Artportalen
         public bool IsPublic { get; set; }
 
         /// <summary>
+        ///     True if this project and its observations are hidden.
+        /// </summary>
+        public bool IsHideall { get; set; }
+
+        /// <summary>
         ///     Name of project
         /// </summary>
         public string Name { get; set; }

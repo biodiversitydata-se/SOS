@@ -10,7 +10,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating verification status field mapping.
+    ///     Class for creating validation status vocabulary.
     /// </summary>
     public class ValidationStatusVocabularyFactory : ArtportalenVocabularyFactoryBase
     {

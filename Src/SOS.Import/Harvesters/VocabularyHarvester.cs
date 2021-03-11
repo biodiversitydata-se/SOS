@@ -116,7 +116,7 @@ namespace SOS.Import.Harvesters
             var vocabularies = new List<Vocabulary>();
             try
             {
-                _logger.LogDebug("Start importing field mappings");
+                _logger.LogDebug("Start importing vocabularies");
 
                 foreach (var fileName in Directory.GetFiles(@"Resources\Vocabularies\"))
                 {

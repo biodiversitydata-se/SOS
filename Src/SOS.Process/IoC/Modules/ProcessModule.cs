@@ -61,7 +61,6 @@ namespace SOS.Process.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // Field mapping processing configuration
             if (Configurations.ProcessConfiguration.VocabularyConfiguration != null)
             {
                 builder.RegisterInstance(Configurations.ProcessConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();

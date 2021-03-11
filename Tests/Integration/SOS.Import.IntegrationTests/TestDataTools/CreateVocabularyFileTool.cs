@@ -33,13 +33,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
 
-            var fieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processedVocabularies = await fieldMappingRepository.GetAllAsync();
+            var processedVocabularies = await vocabularyRepository.GetAllAsync();
             var serializerSettings = new JsonSerializerSettings
             {
                 Converters = new List<JsonConverter> {new ObjectIdConverter()}
@@ -63,13 +63,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
-            var fieldMappingRepository =
+            var vocabularyRepository =
                 new VocabularyRepository(importClient, new NullLogger<VocabularyRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processedVocabularies = await fieldMappingRepository.GetAllAsync();
+            var processedVocabularies = await vocabularyRepository.GetAllAsync();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             var bin = MessagePackSerializer.Serialize(processedVocabularies, options);
             File.WriteAllBytes(filePath, bin);

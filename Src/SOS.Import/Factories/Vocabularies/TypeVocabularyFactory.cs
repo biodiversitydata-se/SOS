@@ -5,7 +5,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating Type field mapping.
+    ///     Class for creating Type vocabulary.
     /// </summary>
     public class TypeVocabularyFactory : DwcVocabularyFactoryBase
     {

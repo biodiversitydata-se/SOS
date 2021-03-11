@@ -44,11 +44,11 @@ namespace SOS.Export.IntegrationTests.Managers
                 new Mock<ILogger<TaxonManager>>().Object);
             var vocabularyRepository =
                 new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
-            var fieldMappingResolverHelper =
+            var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    fieldMappingResolverHelper,
+                    vocabularyValueResolver,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 

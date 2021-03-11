@@ -67,7 +67,11 @@ namespace SOS.Import.Harvesters
                     return harvestInfo;
                 }
 
-                var projects = projectEntities.Select(CastToProjectInfo).ToList();
+                var projects = projectEntities
+                    .Where(m => m.IsHideall == false)
+                    .Select(CastToProjectInfo)
+                    .ToList()
+                    .OrderBy(m => m.Id);
                 _logger.LogDebug("Finish getting projects");
 
                 if (await _projectInfoRepository.DeleteCollectionAsync())

@@ -7,19 +7,19 @@ namespace SOS.Lib.Helpers.Interfaces
     public interface IVocabularyValueResolver
     {
         /// <summary>
-        /// Field mapping configuration.
+        /// Vocabulary configuration.
         /// </summary>
         VocabularyConfiguration Configuration { get; }
 
         /// <summary>
-        ///     Resolve field mapped values.
+        ///     Resolve vocabulary mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
         void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, bool forceResolve = false);
 
         /// <summary>
-        ///     Resolve field mapped values.
+        ///     Resolve vocabulary mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="cultureCode"></param>

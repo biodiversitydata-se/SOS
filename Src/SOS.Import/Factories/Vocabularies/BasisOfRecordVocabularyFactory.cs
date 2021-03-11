@@ -5,7 +5,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating BasisOfRecord field mapping.
+    ///     Class for creating BasisOfRecord vocabulary.
     /// </summary>
     public class BasisOfRecordVocabularyFactory : DwcVocabularyFactoryBase
     {

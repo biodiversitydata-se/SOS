@@ -169,7 +169,7 @@ namespace SOS.Process.UnitTests.Processors
                 {0, new Taxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
             };
 
-            var fieldMappingById = new Dictionary<int, Vocabulary>
+            var vocabularyById = new Dictionary<int, Vocabulary>
             {
                 {0, new Vocabulary {Id = 0, Name = "ActivityId"}}
             };

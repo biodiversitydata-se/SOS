@@ -3,12 +3,12 @@
 namespace SOS.Import.Factories.Vocabularies.Interfaces
 {
     /// <summary>
-    ///     Interface for creating field mapping.
+    ///     Interface for creating vocabulary.
     /// </summary>
     public interface IVocabularyFactory
     {
         /// <summary>
-        ///     Create field mapping.
+        ///     Create vocabulary.
         /// </summary>
         /// <returns></returns>
         Task<Lib.Models.Shared.Vocabulary> CreateVocabularyAsync();
