@@ -206,22 +206,20 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-
         /// <summary>
-        ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
-        ///     object
-        ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
-        ///     the substring "Id" (but not exclusively) are mapped in the Field Mappings object.
+        ///     Search for observations matching the provided search filter. Permitted filter values depends on the specific filter field:
+        ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
+        ///     Some are defined by the range of the underlying data type.
         /// </summary>
-        /// <param name="filter">Filter used to limit the search</param>
-        /// <param name="skip">Start index of returned observations</param>
-        /// <param name="take">Max number of observations to return</param>
-        /// <param name="sortBy">Field to sort by</param>
-        /// <param name="sortOrder">Sort order (ASC, DESC)</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
-        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
-        /// <returns>List of matching observations</returns>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="skip">Start index of returned observations.</param>
+        /// <param name="take">Max number of observations to return. Max is 1000 observations in each request.</param>
+        /// <param name="sortBy">Field to sort by.</param>
+        /// <param name="sortOrder">Sort order (Asc, Desc).</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
+        /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
         ///     "geometryFilter": {
@@ -244,11 +242,10 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
-            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
-
             try
             {
                 var validationResult = Result.Combine(
@@ -274,14 +271,13 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-
         /// <summary>
-        /// Count matching observations
+        /// Count the number of observations matching the provided search filter.
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="protectedObservations"></param>
-        /// <returns></returns>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="protectedObservations">If true only protected observations will be searched (this requires authentication and authorization). If false, default, public available observations will be searched.</param>
+        /// <returns>The number of observations matching the provided search filter.</returns>
         [HttpPost("Count")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -289,7 +285,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CountAsync(
             [FromBody] SearchFilterDto filter,
-            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {
             try
@@ -352,9 +348,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -368,7 +364,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
@@ -447,7 +443,7 @@ namespace SOS.Observations.Api.Controllers
         ///// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         ///// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         ///// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        ///// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        ////// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         ///// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         ///// <returns></returns>
         //[HttpPost("GeoGridTaxaAggregationCompleteInternal")]
@@ -496,7 +492,7 @@ namespace SOS.Observations.Api.Controllers
         //}
 
         /// <summary>
-        /// Aggregates observations into grid cells and returns a GeoJSON file with all grid cells.
+        /// Aggregates observations into grid cells and returns them as a GeoJSON file.
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
@@ -504,9 +500,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
@@ -561,7 +557,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
+        /// Aggregates observation by taxon. Each record contains the number of observations for the specific taxon.
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. Skip + Take must be less than or equal to 65535.</param>
@@ -570,9 +566,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -587,7 +583,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
             [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
@@ -625,12 +621,15 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
         /// <summary>
-        /// Get a indication if taxon exist in specified area
+        /// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
+        /// If protectedObservations is set to false, you must be aware of that the result can include false positives
+        /// since the protected observations coordinates are obfuscated.
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="filter">Search criteria filter used to limit the search.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("TaxonExistsIndication")]
         [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -639,7 +638,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetTaxonExistsIndicationAsync(
             [FromBody] SearchFilterDto filter,
-            [FromQuery] bool validateSearchFilter = true,
+            [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {
             try
@@ -675,12 +674,14 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-
         /// <summary>
-        /// Gets a single observation
+        /// Gets a single observation.
         /// </summary>
-        /// <param name="occurrenceId">The occurence id of the observation to get</param>
-        /// <param name="protectedObservations">Include protected observations, requires authentication</param>
+        /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="protectedObservations">
+        /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
+        /// If false, and the requested observation is protected, then diffused data will be returned.
+        /// </param>
         /// <returns></returns>
         [HttpGet("{occurrenceId}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -702,22 +703,20 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        
         /// <summary>
-        ///     Search for observations by the provided filter. All permitted values are either specified in the Field Mappings
-        ///     object
-        ///     retrievable from the Field Mappings endpoint or by the range of the underlying data type. All fields containing
-        ///     the substring "Id" (but not exclusively) are mapped in the Field Mappings object.
+        ///     Search for observations matching the provided search filter. Permitted filter values depends on the specific filter field:
+        ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
+        ///     Some are defined by the range of the underlying data type.
         /// </summary>
-        /// <param name="filter">Filter used to limit the search</param>
-        /// <param name="skip">Start index of returned observations</param>
-        /// <param name="take">Max number of observations to return</param>
-        /// <param name="sortBy">Field to sort by</param>
-        /// <param name="sortOrder">Sort order (ASC, DESC)</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
-        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
-        /// <returns>List of matching observations</returns>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="skip">Start index of returned observations.</param>
+        /// <param name="take">Max number of observations to return.</param>
+        /// <param name="sortBy">Field to sort by.</param>
+        /// <param name="sortOrder">Sort order (Asc, Desc).</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
+        /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
         ///     "geometryFilter": {
@@ -774,9 +773,9 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Count matching observations using internal filter
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("Internal/Count")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
@@ -810,7 +809,18 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        /// <inheritdoc />
+
+        /// <summary>
+        /// Aggregate observations by the specified aggregation type.
+        /// </summary>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="aggregationType">The aggregation type.</param>
+        /// <param name="skip">Start index of returned observations.</param>
+        /// <param name="take">Max number of records to return.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
+        /// <returns></returns>
         [HttpPost("Internal/SearchAggregated")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -891,9 +901,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("Internal/GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -989,7 +999,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
         [HttpPost("Internal/GeoGridTaxaAggregation")]
@@ -1039,7 +1049,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
+        /// Aggregates observations by taxon. Each record contains the number of observations for the specific taxon.
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
@@ -1048,9 +1058,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">Validation of filter properties will ONLY be made if this is set to true</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">Search the protected observations, if this flag is set to true authentication is required</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1106,11 +1116,13 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get a indication if taxon exist in specified area using internal filter
+        /// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
+        /// If protectedObservations is set to false, you must be aware of that the result can include false positives
+        /// since the protected observations coordinates are obfuscated.
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonExistsIndication")]
         [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1156,11 +1168,15 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
         /// <summary>
-        /// Gets a single observation, including internal fields
+        /// Gets a single observation, including internal fields.
         /// </summary>
-        /// <param name="occurrenceId">The occurence id of the observation to fetch</param>
-        /// <param name="protectedObservations">Include protected observations, requires authentication</param>
+        /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="protectedObservations">
+        /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
+        /// If false, and the requested observation is protected, then diffused data will be returned.
+        /// </param>
         /// <returns></returns>
         [HttpGet("Internal/{occurrenceId}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -1182,6 +1198,5 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-
     }
 }
