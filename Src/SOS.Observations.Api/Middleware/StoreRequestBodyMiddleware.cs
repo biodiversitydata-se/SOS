@@ -18,10 +18,11 @@ namespace SOS.Observations.Api.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            if (new[] { "post", "put" }.Contains(context.Request.Method, StringComparer.CurrentCultureIgnoreCase) &&
-                !context.Items.ContainsKey("Request-body") && context.Request.Body.CanRead && context.Request.Body.CanSeek)
+            
+            try
             {
-                try
+                if (new[] { "post", "put" }.Contains(context.Request.Method, StringComparer.CurrentCultureIgnoreCase) &&
+                    !context.Items.ContainsKey("Request-body") && context.Request.Body.CanRead && context.Request.Body.CanSeek)
                 {
                     context.Request.Body.Seek(0, SeekOrigin.Begin);
 
@@ -34,13 +35,11 @@ namespace SOS.Observations.Api.Middleware
 
                     context.Items.Add("Request-body", body);
                 }
-                catch (Exception e)
-                {
-                    var m = e.Message;
-                }
             }
-
-            await _next(context);
+            finally 
+            {
+                await _next(context);
+            }
         }
     }
 }

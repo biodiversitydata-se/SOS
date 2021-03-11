@@ -839,7 +839,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var result = await ObservationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
-                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
+                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)

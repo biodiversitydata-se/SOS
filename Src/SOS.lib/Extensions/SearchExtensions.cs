@@ -934,7 +934,7 @@ namespace SOS.Lib.Extensions
             {
                 projection.Excludes(e => e
                     .Field("defects")
-                    .Field("occurrence.sightingTypeSearchGroupId")
+                    .Field("artportalenInternal.sightingTypeSearchGroupId")
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
