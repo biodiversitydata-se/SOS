@@ -408,15 +408,17 @@ namespace SOS.Import.Factories
             if (!string.IsNullOrEmpty(confirmatorNameTrimmed)
                 || !string.IsNullOrEmpty(confirmatorTextTrimmed))
             {
-                sb.Append($"{(sb.Length > 0 ? " # " : "")}Conf. ");
+                sb.Append($"{(sb.Length > 0 ? " # " : "")}Conf.");
 
                 if (!string.IsNullOrEmpty(confirmatorNameTrimmed))
                 {
+                    sb.Append(" ");
                     sb.Append(confirmatorNameTrimmed);
                 }
 
                 if (!string.IsNullOrEmpty(confirmatorTextTrimmed))
                 {
+                    sb.Append(" ");
                     sb.Append(confirmatorTextTrimmed);
                 }
 
