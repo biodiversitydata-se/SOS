@@ -77,12 +77,11 @@ namespace SOS.Administration.Gui.Controllers
             IEnumerable<string> filterHosts = null;
             IEnumerable<string> filterProcesses = null;
             int dateFilterMinutes = GetDateFilterMinutes(timespan);
-            const string FilterAggName = "filteragg";
             if (filters?.Length > 0)
             {
-                filterLevels = filters.Split(',').Where(p => p.Length > 0).Where(p=>p.StartsWith("levels")).Select(s => s.Substring("levels_".Length));
-                filterHosts = filters.Split(',').Where(p => p.Length > 0).Where(p => p.StartsWith("hosts")).Select(s => s.Substring("hosts_".Length));
-                filterProcesses = filters.Split(',').Where(p => p.Length > 0).Where(p => p.StartsWith("processes")).Select(s=>s.Substring("processes_".Length));
+                filterLevels = filters.Split(',').Where(p => p.Length > 0).Where(p=>p.StartsWith("Log Levels")).Select(s => s.Substring("Log Levels_".Length));
+                filterHosts = filters.Split(',').Where(p => p.Length > 0).Where(p => p.StartsWith("Hosts")).Select(s => s.Substring("Hosts_".Length));
+                filterProcesses = filters.Split(',').Where(p => p.Length > 0).Where(p => p.StartsWith("Processes")).Select(s=>s.Substring("Processes_".Length));
             }
             var queryString = "";
             if(textFilter?.Length > 0)
