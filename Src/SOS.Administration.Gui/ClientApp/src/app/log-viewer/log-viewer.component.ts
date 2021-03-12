@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { LogEntries } from '../models/logentries';
 import { LogEntry } from '../models/logentry';
 import { TermAggregation } from '../models/termaggregation';
+import { debounce } from 'lodash';
 
 @Component({
   selector: 'app-log-viewer',
@@ -14,11 +15,9 @@ export class LogViewerComponent implements OnInit {
   logEntries: LogEntry[];
   aggregations: TermAggregation[];
   filters: { [name: string]: boolean } = {};
-  includeDebug: boolean = false;
-  includeInfo: boolean = true;
-  includeError: boolean = true;
-  includeWarning: boolean = true;
   loading: boolean;
+  filterId = "30m";
+  textFilter: string = "";
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) { }
 
   ngOnInit() {
@@ -29,8 +28,15 @@ export class LogViewerComponent implements OnInit {
     let take = 100;
     this.loading = true;
     let filters = this.getFilters();
-    this.http.get<LogEntries>(this.baseUrl + 'logs/latest?skip=' + skip + "&take=" + take + "&filters=" + filters).subscribe(result => {
+    this.http.get<LogEntries>(this.baseUrl + 'logs/latest?skip=' + skip + "&take=" + take + "&filters=" + filters + "&timespan=" + this.filterId + "&textFilter=" + this.textFilter).subscribe(result => {
       this.logEntries = result.logEntries;
+      if (this.textFilter.length > 0) {
+        for (let entry of this.logEntries) {
+          entry.message = entry.message.replace(new RegExp(this.textFilter, "gi"), match => {
+            return '<span class="highlighttext">' + match + '</span>';
+          });
+        }
+      }
       this.aggregations = result.aggregations;
       if (initFilters) {
         for (let agg of this.aggregations) {
@@ -53,6 +59,12 @@ export class LogViewerComponent implements OnInit {
       }
     }
     return filter;
+  }
+  onTextFilterChanged(textFilter) {
+    debounce(this.fetchLogs(false), 1000);
+  }
+  onChangeTimespan(value) {
+    this.fetchLogs(false);
   }
   getLogEntryClass(level: string) {
     if (level == "Error") { return "list-group-item-danger"; }
