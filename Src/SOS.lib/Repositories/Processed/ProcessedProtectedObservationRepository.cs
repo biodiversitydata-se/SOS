@@ -34,16 +34,21 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Observation>> GetObservationsAsync(int skip, int take)
+        public async Task<IEnumerable<Observation>> GetRandomObservationsAsync(int take)
         {
             try
             {
                 var searchResponse = await ElasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
+                    .Query(q => q
+                        .FunctionScore(fs => fs
+                            .Functions(f=>f
+                                .RandomScore(rs => rs
+                                    .Seed(DateTime.Now.ToBinary())
+                                    .Field(p=>p.Occurrence.OccurrenceId)))))
                     .Source(s => s
                         .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
                     )
-                    .From(skip)
                     .Size(take)
                 );
 
