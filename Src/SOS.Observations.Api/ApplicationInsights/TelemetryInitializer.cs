@@ -25,6 +25,11 @@ namespace SOS.Observations.Api.ApplicationInsights
         {
             if (new[] { "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
+                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.Properties.ContainsKey("Protected-observations") )
+                {
+                    telemetry.Context.Properties.Add("Protected-observations", value);
+                }
+
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
                 {
                     if (!telemetry.Context.Properties.ContainsKey("Request-body"))

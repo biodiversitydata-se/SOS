@@ -1,0 +1,25 @@
+<div class="container" *ngIf="aggregations && !loading">
+  <div class="row">
+    <div class="col-sm" *ngFor="let agg of aggregations">
+      <h3>{{agg.name}}</h3>
+      <div *ngFor="let term of agg.terms">
+        <div class="form-check form-check-inline">
+          <input type="checkbox" class="form-check-input"
+                 [checked]="filters[agg.name + '_' + term.name]"
+                 (change)="changeFilter(agg.name + '_' + term.name)" id="{{agg.name + '-' + term.name}}" />
+          <label class="form-check-label" for="{{agg.name + '-' + term.name}}">{{term.name}} ({{term.docCount}})</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="logEntries && !loading">
+  <div *ngFor="let entry of logEntries">
+    <div [class]="getLogEntryClass(entry.level)">
+      <span style="font-weight:bold">{{formatDate(entry.timestamp)}}</span><span style="margin:5px;font-weight:bold;width:50px;display:inline-block">{{entry.level}}</span> <span style="margin:5px;font-style:italic">{{entry.hostName}}</span><span style="margin:5px;font-style:italic">{{entry.processName}}</span><span>{{entry.message}}</span>
+    </div>
+  </div>
+</div>
+<div *ngIf="loading">
+  Loading...
+</div>

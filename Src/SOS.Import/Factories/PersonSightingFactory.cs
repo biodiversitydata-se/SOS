@@ -63,18 +63,16 @@ namespace SOS.Import.Factories
                             if (pair.Value.confirmator != null)
                             {
                                 users.Add(pair.Value.confirmator);
+                            } 
+                             
+                            if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
+                            {
+                                personSighting = new PersonSighting();
+                                personSightingBySightingId.Add(pair.Key, personSighting);
                             }
 
-                            if (personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
-                            {
-                                personSighting.VerifiedBy = pair.Value.names;
-                                personSighting.VerifiedByInternal = users;
-                            }
-                            else
-                            {
-                                personSightingBySightingId.Add(pair.Key,
-                                    new PersonSighting { VerifiedBy = pair.Value.names, VerifiedByInternal = users });
-                            }
+                            personSighting.VerifiedBy = pair.Value.names;
+                            personSighting.VerifiedByInternal = users;
                         }
                     }
                 }
@@ -91,16 +89,14 @@ namespace SOS.Import.Factories
             {
                 foreach (var pair in observersBySightingId)
                 {
-                    if (personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
+                    if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
                     {
-                        personSighting.Observers = pair.Value.names;
-                        personSighting.ObserversInternal = pair.Value.users;
+                        personSighting = new PersonSighting();
+                        personSightingBySightingId.Add(pair.Key, personSighting);
                     }
-                    else
-                    {
-                        personSightingBySightingId.Add(pair.Key,
-                            new PersonSighting { Observers = pair.Value.names, ObserversInternal = pair.Value.users });
-                    }
+
+                    personSighting.Observers = pair.Value.names;
+                    personSighting.ObserversInternal = pair.Value.users;
                 }
             }
 
@@ -115,22 +111,16 @@ namespace SOS.Import.Factories
             {
                 foreach (var pair in reportedBySightingId)
                 {
-                    if (personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
+                    if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
                     {
-                        personSighting.ReportedBy = pair.Value.FullName;
-                        personSighting.ReportedByUserId = pair.Value.UserId;
-                        personSighting.ReportedByUserAlias = pair.Value.Alias;
+                        personSighting = new PersonSighting();
+                        personSightingBySightingId.Add(pair.Key, personSighting);
                     }
-                    else
-                    {
-                        personSightingBySightingId.Add(pair.Key,
-                            new PersonSighting
-                            {
-                                ReportedBy = pair.Value.FullName,
-                                ReportedByUserId = pair.Value.UserId,
-                                ReportedByUserAlias = pair.Value.Alias
-                            });
-                    }
+
+                    personSighting.ReportedBy = pair.Value.FullName;
+                    personSighting.ReportedByUserId = pair.Value.UserId;
+                    personSighting.ReportedByUserAlias = pair.Value.Alias;
+
                 }
             }
 
@@ -215,6 +205,7 @@ namespace SOS.Import.Factories
             foreach (var grouping in query)
             {
                 var persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId))
+                    .OrderBy(ob => ob.Sort)
                     .Select(v => personsByUserId[v.UserId]);
                 var observers = string.Join(", ", persons.Select(n => n.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
@@ -287,7 +278,11 @@ namespace SOS.Import.Factories
 
             foreach (var determinerRelation in determinerQuery)
             {
-                var vbd = new VerifiedByData {SightingId = determinerRelation.SightingId};
+                var vbd = new VerifiedByData
+                {
+                    SightingId = determinerRelation.SightingId,
+                    SightingRelationDeterminationYear = determinerRelation.DeterminationYear
+                };
 
                 if (!verifiedByDataSightingId.ContainsKey(determinerRelation.SightingId))
                 {
@@ -302,8 +297,6 @@ namespace SOS.Import.Factories
                         vbd.DeterminerInternal = new UserInternal { Id = person.Id, UserAlias = person.Alias };
                     }
                 }
-
-                vbd.SightingRelationDeterminationYear = determinerRelation.DeterminationYear;
             }
 
             var confirmatorQuery = sightingRelations.Where(x =>
@@ -315,7 +308,11 @@ namespace SOS.Import.Factories
             {
                 if (!verifiedByDataSightingId.TryGetValue(confirmatorRelation.SightingId, out var vbd))
                 {
-                    vbd = new VerifiedByData {SightingId = confirmatorRelation.SightingId};
+                    vbd = new VerifiedByData
+                    {
+                        SightingId = confirmatorRelation.SightingId,
+                        SightingRelationConfirmationYear = confirmatorRelation.DeterminationYear
+                    };
                     verifiedByDataSightingId.Add(confirmatorRelation.SightingId, vbd);
                 }
 
@@ -324,8 +321,6 @@ namespace SOS.Import.Factories
                     vbd.ConfirmatorName = person.FullName;
                     vbd.ConfirmatorInternal = new UserInternal {Id = person.Id, UserAlias = person.Alias};
                 }
-
-                vbd.SightingRelationConfirmationYear = confirmatorRelation.DeterminationYear;
             }
 
             if (speciesCollectionItems?.Any() ?? false)
@@ -334,15 +329,17 @@ namespace SOS.Import.Factories
                 {
                     if (!verifiedByDataSightingId.TryGetValue(speciesCollectionItem.SightingId, out var vbd))
                     {
-                        vbd = new VerifiedByData { SightingId = speciesCollectionItem.SightingId };
+                        vbd = new VerifiedByData
+                        {
+                            SightingId = speciesCollectionItem.SightingId,
+                            DeterminerText = speciesCollectionItem.DeterminerText,
+                            SpeciesCollectionItemDeterminerYear = speciesCollectionItem.DeterminerYear,
+                            DeterminationDescription = speciesCollectionItem.Description,
+                            ConfirmatorText = speciesCollectionItem.ConfirmatorText,
+                            SpeciesCollectionItemConfirmatorYear = speciesCollectionItem.ConfirmatorYear
+                        };
                         verifiedByDataSightingId.Add(speciesCollectionItem.SightingId, vbd);
                     }
-
-                    vbd.DeterminerText = speciesCollectionItem.DeterminerText;
-                    vbd.SpeciesCollectionItemDeterminerYear = speciesCollectionItem.DeterminerYear;
-                    vbd.DeterminationDescription = speciesCollectionItem.Description;
-                    vbd.ConfirmatorText = speciesCollectionItem.ConfirmatorText;
-                    vbd.SpeciesCollectionItemConfirmatorYear = speciesCollectionItem.ConfirmatorYear;
                 }
             }
 
@@ -402,7 +399,6 @@ namespace SOS.Import.Factories
                 sb.Append(determinationDescriptionTrimmed);
             }
 
-
             //----------------------------------------------------------------------
             // Set confirmator text
             //----------------------------------------------------------------------
@@ -412,7 +408,7 @@ namespace SOS.Import.Factories
             if (!string.IsNullOrEmpty(confirmatorNameTrimmed)
                 || !string.IsNullOrEmpty(confirmatorTextTrimmed))
             {
-                sb.Append(sb.Length == 0 ? "Conf." : " # Conf.");
+                sb.Append($"{(sb.Length > 0 ? " # " : "")}Conf.");
 
                 if (!string.IsNullOrEmpty(confirmatorNameTrimmed))
                 {
@@ -436,12 +432,7 @@ namespace SOS.Import.Factories
             //----------------------------------------------------------------------
             // Return result
             //----------------------------------------------------------------------
-            if (sb.Length == 0)
-            {
-                return null;
-            }
-
-            return sb.ToString();
+            return sb.Length == 0 ? null : sb.ToString();
         }
     }
 }

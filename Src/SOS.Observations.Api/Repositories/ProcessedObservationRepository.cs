@@ -71,9 +71,9 @@ namespace SOS.Observations.Api.Repositories
             }
 
             if (_httpContextAccessor.HttpContext?.User?.Claims?.Count(c =>
-                c.Type.Equals("scope", StringComparison.CurrentCultureIgnoreCase) &&
-                c.Value.Equals(_elasticConfiguration.ProtectedScope, StringComparison.CurrentCultureIgnoreCase)) == 0 
-                || (!filter?.ExtendedAuthorizations?.Any() ?? true))
+                (c.Type?.Equals("scope", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
+                (c.Value?.Equals(_elasticConfiguration.ProtectedScope, StringComparison.CurrentCultureIgnoreCase) ?? false)) == 0 
+                || (!filter.ExtendedAuthorizations?.Any() ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
@@ -264,7 +264,7 @@ namespace SOS.Observations.Api.Repositories
                 .Terms("species", t => t
                     .Script(s => s
                         // Build a sortable key
-                        .Source("doc['taxon.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
+                        .Source("doc['taxon.attributes.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
                     )
                     .Order(o => o.KeyAscending())
                     .Aggregations(thAgg => thAgg
@@ -272,7 +272,7 @@ namespace SOS.Observations.Api.Repositories
                             .Size(1)
                             .Source(src => src
                                 .Includes(inc => inc
-                                    .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.redlistCategory")
+                                    .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.attributes.redlistCategory")
                                 )
                             )
                         )
@@ -300,7 +300,7 @@ namespace SOS.Observations.Api.Repositories
 
             // Calculate size to fetch. If zero, get all
             var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
-            var size = skip + take < maxResult ? skip + take : maxResult;
+            var size = skip + take < maxResult ? skip + take : maxResult == 0 ? 1 : maxResult;
             if (skip == 0 && take == 0)
             {
                 size = maxResult == 0 ? 1 : maxResult;
