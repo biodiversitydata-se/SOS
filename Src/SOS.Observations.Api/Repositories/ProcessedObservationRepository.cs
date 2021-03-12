@@ -439,7 +439,7 @@ namespace SOS.Observations.Api.Repositories
                     .Aggregations(ac => ac.Cardinality("taxa_count", c => c
                         .Field("taxon.id")
                         .PrecisionThreshold(40000)
-                        )))
+                    )))
                 )
                 .Query(q => q
                     .Bool(b => b
@@ -479,6 +479,7 @@ namespace SOS.Observations.Api.Repositories
                     .Aggregations(ac => ac.Terms("taxa_count", t => t
                         .Field("taxon.id")
                         .Size(size)
+                        .ShardSize(size*10)
                         .Order(o => o.CountDescending().KeyAscending())
                     )))
                 )
