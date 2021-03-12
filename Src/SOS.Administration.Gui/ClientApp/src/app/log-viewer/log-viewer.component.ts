@@ -25,7 +25,7 @@ export class LogViewerComponent implements OnInit {
   }
   private fetchLogs(initFilters: boolean) {
     let skip = 0;
-    let take = 100;
+    let take = 1000;
     this.loading = true;
     let filters = this.getFilters();
     this.http.get<LogEntries>(this.baseUrl + 'logs/latest?skip=' + skip + "&take=" + take + "&filters=" + filters + "&timespan=" + this.filterId + "&textFilter=" + this.textFilter).subscribe(result => {

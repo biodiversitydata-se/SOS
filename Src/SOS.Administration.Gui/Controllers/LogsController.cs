@@ -89,6 +89,7 @@ namespace SOS.Administration.Gui.Controllers
             {
                 queryString = "*" + textFilter + "*";
             }
+            var filterAggregationsNames = new List<string>() { "filtered_levels", "filtered_hosts", "filtered_processes" };
             var result = await _testElasticClient.SearchAsync<LogEntry>(p => p
                 .Index(_indexName)
                 .Size(take)
@@ -102,13 +103,38 @@ namespace SOS.Administration.Gui.Controllers
                                 f => f.DateRange(t=>t.Field(f=>f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
                         ))
                 .Aggregations(a => a.Global("global", g => g.Aggregations(aa => aa
-                .Filter(FilterAggName, f=>f
-                    .Filter(ff => ff
-                        .DateRange(t=>t.Field(tt => tt.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
-                    .Aggregations(fa => fa
-                        .Terms("levels", tt => tt.Field("log.level.keyword"))
-                        .Terms("hosts", tt => tt.Field("host.name.keyword"))
-                        .Terms("processes", tt => tt.Field("process.name.keyword")))))))
+                    .Filter("filtered_levels", f=>f
+                        .Filter(ff => ff.Bool(t=>t
+                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
+                            .Filter(
+                                    f => f.Terms(t => t.Field("host.name.keyword").Terms(filterHosts)),
+                                    f => f.Terms(t => t.Field("process.name.keyword").Terms(filterProcesses)),
+                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
+                            ))
+                        .Aggregations(fa => fa
+                            .Terms("Log Levels", tt => tt.Field("log.level.keyword")))
+                        )
+                    .Filter("filtered_hosts", f => f
+                        .Filter(ff => ff.Bool(t => t
+                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
+                            .Filter(f => f.Terms(t => t.Field("log.level.keyword").Terms(filterLevels)),
+                                    f => f.Terms(t => t.Field("process.name.keyword").Terms(filterProcesses)),
+                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
+                            ))
+                        .Aggregations(fa => fa
+                            .Terms("Hosts", tt => tt.Field("host.name.keyword")))
+                        )
+                     .Filter("filtered_processes", f => f
+                        .Filter(ff => ff.Bool(t => t
+                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
+                            .Filter(f => f.Terms(t => t.Field("log.level.keyword").Terms(filterLevels)),
+                                    f => f.Terms(t => t.Field("host.name.keyword").Terms(filterHosts)),
+                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
+                            ))
+                        .Aggregations(fa => fa
+                            .Terms("Processes", tt => tt.Field("process.name.keyword")))
+                        )
+                    )))
                 .Highlight(h => h
                   .Fields(f => f
                         .Field(ff=>ff.Message)
@@ -134,9 +160,10 @@ namespace SOS.Administration.Gui.Controllers
                 }
                 logEntriesDto.LogEntries = resultsDto;
                 var aggregationsDto = new List<TermAggregationDto>(); 
-                foreach(var a in result.Aggregations.Global("global").Filter(FilterAggName))
+                foreach(var aggName in filterAggregationsNames)
                 {
-                    var agg = result.Aggregations.Global("global").Filter(FilterAggName).Terms(a.Key);
+                    var a = result.Aggregations.Global("global").Filter(aggName).First();
+                    var agg = result.Aggregations.Global("global").Filter(aggName).Terms(a.Key);
                     var terms = new List<TermDto>();
 
                     foreach(var bucket in agg.Buckets)
@@ -146,6 +173,7 @@ namespace SOS.Administration.Gui.Controllers
                     var aggDto = new TermAggregationDto() { Name = a.Key, Terms = terms };
                     aggregationsDto.Add(aggDto);
                 }
+
                 logEntriesDto.Aggregations = aggregationsDto;
                 
                 return logEntriesDto;
