@@ -74,10 +74,9 @@ namespace SOS.Process.Managers
             }
             else if (diffusionCoordinateSys == CoordinateSys.SWEREF99_TM)
             {
-                var newMod = mod / Math.Sqrt(2);
                 diffusedPointSweref99Tm = new NetTopologySuite.Geometries.Point(
-                    originalPointSweref99Tm.Coordinates[0].X - originalPointSweref99Tm.Coordinates[0].X % newMod,
-                    originalPointSweref99Tm.Coordinates[0].Y - originalPointSweref99Tm.Coordinates[0].Y % newMod);
+                    originalPointSweref99Tm.Coordinates[0].X - originalPointSweref99Tm.Coordinates[0].X % mod + (mod/2.0),
+                    originalPointSweref99Tm.Coordinates[0].Y - originalPointSweref99Tm.Coordinates[0].Y % mod + (mod/2.0));
 
                 diffusedPointWgs84 =
                     (NetTopologySuite.Geometries.Point)diffusedPointSweref99Tm.Transform(CoordinateSys.SWEREF99_TM,
