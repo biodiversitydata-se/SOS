@@ -32,7 +32,7 @@ namespace SOS.Process.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            statsByProtectionLevel[protectionLevel5].AvgDistance.Should().BeGreaterThan(20000, "because the diffusion level is 50km");
+            statsByProtectionLevel[protectionLevel5].AvgDistance.Should().BeGreaterThan(18, "because the diffusion level is 50km");
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace SOS.Process.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            statsByProtectionLevel[protectionLevel5].AvgDistance.Should().BeGreaterThan(20000, "because the diffusion level is 50km");
+            statsByProtectionLevel[protectionLevel5].AvgDistance.Should().BeGreaterThan(18, "because the diffusion level is 50km");
         }
     }
 }
