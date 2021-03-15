@@ -28,9 +28,10 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
         {
-            // Allow all public observations
-            var publicQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-            publicQuery.TryAddTermCriteria("protected", false);
+            if (!filter.ProtectedObservations)
+            {
+                return;
+            }
 
             var protectedQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -47,18 +48,15 @@ namespace SOS.Lib.Extensions
 
                     protectedQuerys.Add(q => q
                         .Bool(b => b
-                            .Should(protectedQuery)
+                            .Filter(protectedQuery)
                         )
                     );
                 }
             }
 
             query.Add(q => q
-                   .Bool(b => b
-                       .Filter(publicQuery)
-                   ) || q
-                   .Bool(b => b
-                       .Filter(protectedQuerys)
+                .Bool(b => b
+                       .Should(protectedQuerys)
                 )
             );
         }

@@ -13,5 +13,13 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="date"></param>
         /// <returns></returns>
         Task<IEnumerable<ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDayAsync(DateTime date);
+
+        /// <summary>
+        /// Get log data
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to);
     }
 }
