@@ -198,10 +198,9 @@ namespace SOS.Process.Jobs
         private async Task<bool> ValidateRandomObservations(int protectedCount)
         {
             var observationsCount = 1000;
-            var skip = protectedCount > observationsCount ? new Random().Next(1, protectedCount - observationsCount) : 1;
 
             // Get 1000 random observations from protected index
-            var protectedObservations = (await _processedProtectedObservationRepository.GetObservationsAsync(skip, observationsCount))?
+            var protectedObservations = (await _processedProtectedObservationRepository.GetRandomObservationsAsync(observationsCount))?
                 .Where(o => o.Occurrence != null)
                 .ToDictionary(o => o.Occurrence.OccurrenceId, o => o);
 

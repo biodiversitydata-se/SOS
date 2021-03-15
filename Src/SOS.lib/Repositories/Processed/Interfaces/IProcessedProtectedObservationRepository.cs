@@ -15,6 +15,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<Observation>> GetObservationsAsync(int skip, int take);
+        Task<IEnumerable<Observation>> GetRandomObservationsAsync(int take);
     }
 }

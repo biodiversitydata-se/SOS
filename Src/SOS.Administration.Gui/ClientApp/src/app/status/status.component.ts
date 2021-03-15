@@ -6,6 +6,7 @@ import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
 import { LoadTestMetrics, LoadTestResult } from '../models/loadtestmetrics';
+import { LogEntries } from '../models/logentries';
 import { MongoDbInfo } from '../models/mongodbinfo';
 import { PerformanceData } from '../models/performancedata';
 import { ProcessInfo } from '../models/providerinfo';
@@ -107,6 +108,7 @@ export class StatusComponent implements OnInit {
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
   activeInstanceHarvestIsOlderThanOneDay = false;    
+    logDescription: string;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
@@ -168,6 +170,17 @@ export class StatusComponent implements OnInit {
     }, error => console.error(error));
     this.http.get<Environment>(this.baseUrl + 'hostingenvironment').subscribe(result => {
       this.hostingenvironment = result;
+    }, error => console.error(error));
+    this.http.get<LogEntries>(this.baseUrl + "logs/latest?timespan=24h&take=1").subscribe(result => {
+      let aggregations = result.aggregations;
+      let agg = aggregations.filter(p => p.name === "Log Levels")[0];
+      let infoCount = 0;
+      let debugCount = 0;
+      let errorCount = 0;
+      if (agg.terms.filter(p => p.name == "Info").length > 0) { infoCount = agg.terms.filter(p => p.name == "Info")[0].docCount; }
+      if (agg.terms.filter(p => p.name == "Debug").length > 0) { debugCount = agg.terms.filter(p => p.name == "Debug")[0].docCount; }
+      if (agg.terms.filter(p => p.name == "Error").length > 0) { errorCount = agg.terms.filter(p => p.name == "Error")[0].docCount;}
+      this.logDescription = "Logs last 24h: Info (" + infoCount + ") Debug (" + debugCount + ") Error (" + errorCount + ")";
     }, error => console.error(error));
     this.runTests();
     this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=P3D&interval=P1D').subscribe(result => {

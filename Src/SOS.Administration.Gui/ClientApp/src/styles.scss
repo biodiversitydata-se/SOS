@@ -78,6 +78,9 @@ mwl-gauge > .gauge > .value {
 mwl-gauge > .gauge > .value-text {
   fill: black;
 }
+.highlighttext {
+  background-color: yellow !important;
+}
 
 .ng-valid[required], .ng-valid.required {
   border-left: 5px solid #42A948; /* green */
