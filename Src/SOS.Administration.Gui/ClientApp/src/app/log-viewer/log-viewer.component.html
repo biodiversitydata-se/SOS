@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <h3>Time filter</h3>
+      <div class="form-group">
+        <select name="filter"
+                id="filter"
+                class="form-control"
+                (change)="onChangeTimespan($event.target.value)"
+                [(ngModel)]="filterId">
+          <option value="30m">30 minutes ago</option>
+          <option value="1h">1 hour ago</option>
+          <option value="3h">3 hours ago</option>
+          <option value="6h">6 hours ago</option>
+          <option value="12h">12 hours ago</option>
+          <option value="24h">24 hours ago</option>
+          <option value="3d">3 days ago</option>
+          <option value="7d">7 days ago</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-sm" *ngFor="let agg of aggregations">
+      <div *ngIf="aggregations">
+        <h3>{{agg.name}}</h3>
+        <div *ngFor="let term of agg.terms">
+          <div class="form-check form-check-inline">
+            <input type="checkbox" class="form-check-input"
+                   [checked]="filters[agg.name + '_' + term.name]"
+                   (change)="changeFilter(agg.name + '_' + term.name)" id="{{agg.name + '-' + term.name}}" />
+            <label class="form-check-label" for="{{agg.name + '-' + term.name}}">{{term.name}} ({{term.docCount}})</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="form-group">
+        <label for="textFilterInput">Filter text</label>
+        <input class="form-control" [(ngModel)]="textFilter" (input)="onTextFilterChanged(textFilter)" type="text" id="textFilterInput"/>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="logEntries && !loading">
+  <div *ngFor="let entry of logEntries">
+    <div [class]="getLogEntryClass(entry.level)">
+      <span style="font-weight:bold">{{formatDate(entry.timestamp)}}</span><span style="margin-left:5px;margin-right:5px;font-weight:bold;width:45px;display:inline-block">{{entry.level}}</span> <span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.hostName}}</span><span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.processName}}</span><span [innerHTML]="entry.message"></span>
+    </div>
+  </div>
+</div>
+<div *ngIf="loading">
+  Loading...
+</div>
