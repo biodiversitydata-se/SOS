@@ -1,0 +1,27 @@
+<form #searchForm="ngForm" (ngSubmit)="onSearchFormSubmit(this)" class="row gy-2 gx-3 align-items-center">
+  <div class="col-auto">
+    <label for="startDate" class="form-label">Start date</label>
+    <input type="text" id="startDate" name="startDate" placeholder="YYYY-DD-MM" [(ngModel)]="startDate" aria-label="StartDate" class="form-control" required [pattern]="'^[1,2][0-9]{3}-[0,1][0-9]-[0-3][0-9]$'">
+  </div>
+  <div class="col-auto">
+    <label for="endDate" class="form-label">End date</label>
+    <input type="text" id="endDate" name="endDate" placeholder="YYYY-DD-MM" [(ngModel)]="endDate" aria-label="endDate" class="form-control" required [pattern]="'^[1,2][0-9]{3}-[0,1][0-9]-[0-3][0-9]$'">
+  </div>
+  <div class="col-auto">
+    <br />
+    <button type="submit" [disabled]="!searchForm.form.valid" class="btn btn-primary">Search</button>
+  </div>
+</form>
+<div *ngIf="loadingData" class="spinner-border" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+
+<ngx-datatable class="bootstrap"
+               [rows]="logRows"
+               [columns]="columnDefs"
+               [columnMode]="columnMode.force"
+               [headerHeight]="50"
+               [footerHeight]="50"
+               rowHeight="auto">
+</ngx-datatable>
+

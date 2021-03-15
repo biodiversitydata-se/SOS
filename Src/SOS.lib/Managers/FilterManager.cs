@@ -208,7 +208,11 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilter(FilterBase filter)
         {
-            filter.ExtendedAuthorizations = await AddAuthorizationAsync();
+            if (filter.ProtectedObservations)
+            {
+                filter.ExtendedAuthorizations = await AddAuthorizationAsync();
+            }
+            
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, filter.AreaGeometrySearchForced);
             filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa);
         }

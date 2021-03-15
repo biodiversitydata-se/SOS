@@ -11,6 +11,7 @@ import { GaugeModule } from 'angular-gauge';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 import { AppComponent } from './app.component';
+import { ApplicationInsightsComponent } from './application-insights/application-insights.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { InvalidObservationsComponent } from './invalid-observations/invalid-observations.component';
@@ -32,6 +33,7 @@ export function tokenGetter() {
 @NgModule({
   declarations: [
     AppComponent,
+    ApplicationInsightsComponent,
     NavMenuComponent,
     HomeComponent,
     InvalidObservationsComponent,
@@ -56,6 +58,7 @@ export function tokenGetter() {
       { path: 'stats', component: PerformanceChartComponent },
       { path: 'loadtest', component: LoadTestComponent },
       { path: 'observation-viewer', component: ObservationViewerComponent, canActivate: [AuthGuard] },
+      { path: 'application-insights', component: ApplicationInsightsComponent },
       { path: 'login', component: LoginComponent },
     ]),
     LeafletModule,

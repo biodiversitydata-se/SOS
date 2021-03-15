@@ -96,5 +96,43 @@ namespace SOS.Lib.Services
                     AverageDuration = ((JsonElement)r[6]).GetInt64()
                 });
         }
+
+        public async Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to)
+        {
+            var query = $@"requests 
+                    | where 
+                        timestamp >= datetime('{from.ToString("yyyy-MM-dd hh:mm:00")}') 
+                        and timestamp < datetime('{to.ToString("yyyy-MM-dd hh:mm:00")}') 
+                    | project 
+                        timestamp, 
+                        method = substring(name, 0, indexof(name, ' ' )), 
+                        endpoint = substring(tostring(parseurl(url).Path), 1), 
+                        user_AccountId, 
+                        user_AuthenticatedId, 
+                        duration, 
+                        success, 
+                        resultCode, 
+                        requestBody = customDimensions['Request-body'], 
+                        protectedObservations = customDimensions['Protected-observations'], 
+                        responseCount = customDimensions['Response-count']";
+
+            var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
+
+            return result?.Tables.FirstOrDefault()?.Rows?.Select(r =>
+                new ApiLogRow()
+                {
+                    Date = ((JsonElement)r[0]).GetString(),
+                    Method = r[1] == null ? null : ((JsonElement)r[1]).GetString(),
+                    Endpoint = r[2] == null ? null : ((JsonElement)r[2]).GetString(),
+                    AccountId = r[3] == null ? null : ((JsonElement)r[3]).GetString(),
+                    UserId = r[4] == null ? null : ((JsonElement)r[4]).GetString(),
+                    Duration = r[5] == null ? 0 : ((JsonElement)r[5]).GetDouble(),
+                    Success = r[6] == null ? null : ((JsonElement)r[6]).GetString(),
+                    HttpResponseCode = r[7] == null ? null : ((JsonElement)r[7]).GetString(),
+                    RequestBody = r[8] == null ? null : ((JsonElement)r[8]).GetString(),
+                    ProtectedObservations = r[9] == null ? null : ((JsonElement)r[9]).GetString(),
+                    ResponseCount = r[10] == null ? null : ((JsonElement)r[10]).GetString()
+                });
+        }
     }
 }
