@@ -173,11 +173,14 @@ export class StatusComponent implements OnInit {
     }, error => console.error(error));
     this.http.get<LogEntries>(this.baseUrl + "logs/latest?timespan=24h&take=1").subscribe(result => {
       let aggregations = result.aggregations;
-      let agg = aggregations.filter(p => p.name === "levels")[0];
-      let infoCount = agg.terms.filter(p => p.name == "Info")[0].docCount;
-      let debugCount = agg.terms.filter(p => p.name == "Debug")[0].docCount;
-      let errorCount = agg.terms.filter(p => p.name == "Error")[0].docCount;
-      this.logDescription = "Logs last 24h: Info(" + infoCount + ") Debug(" + debugCount + ") Error (" + errorCount + ")";
+      let agg = aggregations.filter(p => p.name === "Log Levels")[0];
+      let infoCount = 0;
+      let debugCount = 0;
+      let errorCount = 0;
+      if (agg.terms.filter(p => p.name == "Info").length > 0) { infoCount = agg.terms.filter(p => p.name == "Info")[0].docCount; }
+      if (agg.terms.filter(p => p.name == "Debug").length > 0) { debugCount = agg.terms.filter(p => p.name == "Debug")[0].docCount; }
+      if (agg.terms.filter(p => p.name == "Error").length > 0) { errorCount = agg.terms.filter(p => p.name == "Error")[0].docCount;}
+      this.logDescription = "Logs last 24h: Info (" + infoCount + ") Debug (" + debugCount + ") Error (" + errorCount + ")";
     }, error => console.error(error));
     this.runTests();
     this.http.get<PerformanceData>(this.baseUrl + 'performance?timespan=P3D&interval=P1D').subscribe(result => {
