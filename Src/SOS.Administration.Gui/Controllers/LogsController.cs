@@ -23,6 +23,7 @@ namespace SOS.Administration.Gui.Controllers
         public DateTime Timestamp { get; set; }
         public LogProcess Process { get; set; }
         public LogHost Host { get; set; }
+        public LogError Error { get; set; }
     }
     public class LogProcess
     {
@@ -31,6 +32,13 @@ namespace SOS.Administration.Gui.Controllers
     public class LogHost
     {
         public string Name { get; set; }
+    }
+    public class LogError
+    {
+        public string Message { get; set; }
+        [Text(Name = "stack_trace")]
+        public string StackTrace { get; set; }
+        public string Type { get; set; }
     }
     public class LogEntriesDto
     {
@@ -54,6 +62,8 @@ namespace SOS.Administration.Gui.Controllers
         public DateTime Timestamp { get; set; }
         public string ProcessName { get; set; }
         public string HostName { get; set; }
+        public string ErrorMessage { get; set; }
+        public string ErrorStackTrace { get; set; }
     }
     [Route("[controller]")]
     [ApiController]
@@ -154,7 +164,9 @@ namespace SOS.Administration.Gui.Controllers
                         Message = d.Message,
                         Timestamp = d.Timestamp,
                         HostName = d.Host.Name,
-                        ProcessName = d.Process.Name
+                        ProcessName = d.Process.Name,
+                        ErrorMessage = d?.Error?.Message,
+                        ErrorStackTrace = d?.Error?.StackTrace
                     });
                 }
                 logEntriesDto.LogEntries = resultsDto;

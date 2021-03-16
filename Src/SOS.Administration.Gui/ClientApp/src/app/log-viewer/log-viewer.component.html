@@ -45,7 +45,7 @@
 <div *ngIf="logEntries && !loading">
   <div *ngFor="let entry of logEntries">
     <div [class]="getLogEntryClass(entry.level)">
-      <span style="font-weight:bold">{{formatDate(entry.timestamp)}}</span><span style="margin-left:5px;margin-right:5px;font-weight:bold;width:45px;display:inline-block">{{entry.level}}</span> <span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.hostName}}</span><span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.processName}}</span><span [innerHTML]="entry.message"></span>
+      <span style="font-weight:bold">{{formatDate(entry.timestamp)}}</span><span style="margin-left:5px;margin-right:5px;font-weight:bold;width:45px;display:inline-block">{{entry.level}}</span> <span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.hostName}}</span><span style="margin-left:5px;margin-right:5px;font-style:italic">{{entry.processName}}</span><span [innerHTML]="entry.message"></span><br *ngIf="entry.errorMessage"/><span>{{entry.errorMessage}}</span><br *ngIf="entry.errorStackTrace"/><span style="white-space:pre-wrap">{{entry.errorStackTrace}}</span>
     </div>
   </div>
 </div>

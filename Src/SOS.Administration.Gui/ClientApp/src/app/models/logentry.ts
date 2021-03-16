@@ -3,5 +3,7 @@ export interface LogEntry {
   message: string;
   timestamp: Date;
   hostname: string;
-  processname: number
+  processname: number;
+  errorMessage: string;
+  errorStackTrace: string;
 }
