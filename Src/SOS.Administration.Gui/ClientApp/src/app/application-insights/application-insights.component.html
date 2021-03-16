@@ -1,17 +1,32 @@
-<form #searchForm="ngForm" (ngSubmit)="onSearchFormSubmit(this)" class="row gy-2 gx-3 align-items-center">
-  <div class="col-auto">
-    <label for="startDate" class="form-label">Start date</label>
-    <input type="text" id="startDate" name="startDate" placeholder="YYYY-DD-MM" [(ngModel)]="startDate" aria-label="StartDate" class="form-control" required [pattern]="'^[1,2][0-9]{3}-[0,1][0-9]-[0-3][0-9]$'">
-  </div>
-  <div class="col-auto">
-    <label for="endDate" class="form-label">End date</label>
-    <input type="text" id="endDate" name="endDate" placeholder="YYYY-DD-MM" [(ngModel)]="endDate" aria-label="endDate" class="form-control" required [pattern]="'^[1,2][0-9]{3}-[0,1][0-9]-[0-3][0-9]$'">
-  </div>
-  <div class="col-auto">
-    <br />
-    <button type="submit" [disabled]="!searchForm.form.valid" class="btn btn-primary">Search</button>
+<form (ngSubmit)="onSearchFormSubmit(this)" class="gy-2 gx-3 align-items-center">
+  <div class="form-row">
+    <div class="col-md-4">
+      <label for="startDate" class="form-label">Start date</label>
+      <dl-date-time-picker name="startDate"
+                           maxView="year"
+                           minView="minute"
+                           startView="day"
+                           minuteStep="5"
+                           [(ngModel)]="startDate">
+      </dl-date-time-picker>
+    </div>
+    <div class="col-md-4">
+      <label for="endDate" class="form-label">End date</label>
+      <dl-date-time-picker name="endDate"
+                           maxView="year"
+                           minView="minute"
+                           startView="day"
+                           minuteStep="5"
+                           [(ngModel)]="endDate">
+      </dl-date-time-picker>
+    </div>
+    <div class="col-4">
+      <br />
+      <button type="submit" [disabled]="!(startDate && endDate)" class="btn btn-primary">Get log data from {{formatDate(startDate)}} to {{formatDate(endDate)}}</button>
+    </div>
   </div>
 </form>
+
 <div *ngIf="loadingData" class="spinner-border" role="status">
   <span class="sr-only">Loading...</span>
 </div>

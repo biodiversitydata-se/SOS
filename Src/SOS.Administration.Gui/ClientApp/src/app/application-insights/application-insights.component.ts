@@ -1,6 +1,8 @@
 import { Component, Inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ColumnMode } from '@swimlane/ngx-datatable';
+
 
 @Component({
   templateUrl: './application-insights.component.html'
@@ -9,8 +11,8 @@ export class ApplicationInsightsComponent {
   private _http: HttpClient;
   private _baseUrl: string;
 
-  startDate: string;
-  endDate: string;
+  startDate: Date = null;
+  endDate: Date = null;
 
   loadingData: boolean = false;
   columnMode = ColumnMode;
@@ -29,15 +31,19 @@ export class ApplicationInsightsComponent {
   ];
   logRows: ILogRow[];
 
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+  constructor(private datePipe: DatePipe, http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this._http = http;
     this._baseUrl = baseUrl;
+  }
+
+  formatDate(date: Date): string {
+    return this.datePipe.transform(date, "yyyy-MM-dd hh:mm")
   }
 
   onSearchFormSubmit(event) {
     this.loadingData = true;
 
-    this._http.get<ILogRow[]>(`${this._baseUrl}applicationInsights/search?from=${this.startDate}&to=${this.endDate}`)
+    this._http.get<ILogRow[]>(`${this._baseUrl}applicationInsights/search?from=${this.formatDate(this.startDate)}&to=${this.formatDate(this.endDate)}`)
       .subscribe(result => {
         this.logRows = result;
         this.loadingData = false;

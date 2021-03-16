@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +10,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { ChartsModule, ThemeService } from 'ng2-charts';
 import { GaugeModule } from 'angular-gauge';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { DlDateTimeDateModule, DlDateTimePickerModule } from 'angular-bootstrap-datetimepicker';
 
 import { AppComponent } from './app.component';
 import { ApplicationInsightsComponent } from './application-insights/application-insights.component';
@@ -70,6 +72,8 @@ export function tokenGetter() {
     AgGridModule.withComponents([]),
     GaugeModule.forRoot(),
     NgxDatatableModule,
+    DlDateTimeDateModule, 
+    DlDateTimePickerModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
@@ -78,7 +82,7 @@ export function tokenGetter() {
       }
     })
   ],
-  providers: [ThemeService, AuthGuard],
+  providers: [ThemeService, AuthGuard, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
