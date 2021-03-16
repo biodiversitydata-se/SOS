@@ -38,9 +38,10 @@ namespace SOS.Lib.Extensions
             // Allow protected observations matching user extended authorization
             if (filter?.ExtendedAuthorizations?.Any() ?? false)
             {
-                var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
                 foreach (var extendedAuthorization in filter.ExtendedAuthorizations)
                 {
+                    var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
                     protectedQuery.TryAddTermCriteria("protected", true);
                     protectedQuery.TryAddNumericRangeCriteria("occurrence.protectionLevel", extendedAuthorization.MaxProtectionLevel, RangeTypes.LessThanOrEquals);
                     protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
@@ -56,7 +57,7 @@ namespace SOS.Lib.Extensions
 
             query.Add(q => q
                 .Bool(b => b
-                       .Should(protectedQuerys)
+                    .Should(protectedQuerys)
                 )
             );
         }

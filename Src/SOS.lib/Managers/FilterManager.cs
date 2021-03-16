@@ -86,7 +86,7 @@ namespace SOS.Lib.Managers
                             authorizedToSweden ||
                             (extendedAuthorizationFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter.Geometries?.Any() ?? false) ||
+                            (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
                             (extendedAuthorizationFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
