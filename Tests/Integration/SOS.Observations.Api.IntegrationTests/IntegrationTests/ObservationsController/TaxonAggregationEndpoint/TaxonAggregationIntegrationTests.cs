@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -93,89 +94,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 "The taxon with most observations inside the bounding box has more than 2 500 observations");
         }
 
-        [Fact]
-        [Trait("Category", "ApiIntegrationTest")]
-        public async Task TaxonAggregation_paging_with_different_take_size_works_correctly_when_not_using_area_filter()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var searchFilter = new SearchFilterAggregationDto()
-            {
-                Taxon = new TaxonFilterDto()
-                {
-                    IncludeUnderlyingTaxa = true,
-                    TaxonIds = new []{ 5000001 }
-                },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act - take=100
-            //-----------------------------------------------------------------------------------------------------------
-            int skip = 0;
-            int take = 100;
-            var dictionaryTakeSize100 = new Dictionary<int, int>();
-            var duplicateKeysTakeSize100 = new List<int>();
-            do
-            {
-                var response = await _fixture.ObservationsController.TaxonAggregationAsync(searchFilter, skip, take);
-                var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
-                foreach (var record in result.Records)
-                {
-                    if (dictionaryTakeSize100.ContainsKey(record.TaxonId))
-                        duplicateKeysTakeSize100.Add(record.TaxonId);
-                    else
-                        dictionaryTakeSize100.Add(record.TaxonId, record.ObservationCount);
-                }
-                skip += take;
-            } while (skip < 1000);
-            int takeSize100Sum = dictionaryTakeSize100.Values.Sum();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act - take=1000
-            //-----------------------------------------------------------------------------------------------------------
-            skip = 0;
-            take = 1000;
-            var dictionaryTakeSize1000 = new Dictionary<int, int>();
-            var duplicateKeysTakeSize1000 = new List<int>();
-            do
-            {
-                var response = await _fixture.ObservationsController.TaxonAggregationAsync(searchFilter, skip, take);
-                var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
-                foreach (var record in result.Records)
-                {
-                    if (dictionaryTakeSize1000.ContainsKey(record.TaxonId))
-                        duplicateKeysTakeSize1000.Add(record.TaxonId);
-                    else
-                        dictionaryTakeSize1000.Add(record.TaxonId, record.ObservationCount);
-                }
-                skip += take;
-            } while (skip < 1000);
-            int takeSize1000Sum = dictionaryTakeSize1000.Values.Sum();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            duplicateKeysTakeSize100.Count.Should().Be(0);
-            duplicateKeysTakeSize1000.Count.Should().Be(0);
-            dictionaryTakeSize100.Keys.Should().BeEquivalentTo(dictionaryTakeSize1000.Keys);
-            takeSize100Sum.Should().Be(takeSize1000Sum);
-        }
-
         /// <summary>
-        /// When ShardSize is set to default value in ProcessedObservationRepository.GetTaxonAggregationAsync()
-        /// this test will fail.
-        ///
-        /// When ShardSize is set to Size*10 this test will succeed. But setting ShardSize to Size*10 results in more
-        /// resources being used in Elasticsearh to calculate the result. The correct way to do paging in aggregations
-        /// is to use composite aggregations like in ProcessedObservationRepository.GetPageGeoTileTaxaAggregationAsync().
-        /// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
+        /// Get 1000 records by paging and compare with getting all records.
         /// </summary>
         /// <returns></returns>
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task TaxonAggregation_paging_with_different_take_size_works_incorrectly_when_using_area_filter()
+        public async Task TaxonAggregation_paging_first_1000_records_gives_same_result_as_take_1000_records_from_all_records()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -184,14 +109,20 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             {
                 Areas = new[]
                 {
-                    new AreaFilterDto() { AreaType = AreaTypeDto.BirdValidationArea, FeatureId = "1" }
+                    new AreaFilterDto { AreaType = AreaTypeDto.BirdValidationArea, FeatureId = "1" }
                 },
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
             };
 
             //-----------------------------------------------------------------------------------------------------------
-            // Act - take=100
+            // Warmup for benchmark result.
             //-----------------------------------------------------------------------------------------------------------
+            await _fixture.ObservationsController.TaxonAggregationAsync(searchFilter, 0, 10);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act - Paging. Get 100 in each page.
+            //-----------------------------------------------------------------------------------------------------------
+            var spPaging = Stopwatch.StartNew();
             int skip = 0;
             int take = 100;
             var dictionaryTakeSize100 = new Dictionary<int, int>();
@@ -210,37 +141,35 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 skip += take;
             } while (skip < 1000);
             int takeSize100Sum = dictionaryTakeSize100.Values.Sum();
+            spPaging.Stop();
 
             //-----------------------------------------------------------------------------------------------------------
-            // Act - take=1000
+            // Act - Get all records in one request.
             //-----------------------------------------------------------------------------------------------------------
-            skip = 0;
-            take = 1000;
-            var dictionaryTakeSize1000 = new Dictionary<int, int>();
-            var duplicateKeysTakeSize1000 = new List<int>();
-            do
+            var spGetAll = Stopwatch.StartNew();
+            var getAllResponse = await _fixture.ObservationsController.TaxonAggregationAsync(searchFilter, null, null);
+            var getAllResult = getAllResponse.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+            var dictionaryTake1000FromAll = new Dictionary<int, int>();
+            var duplicateKeysTake1000FromAll = new List<int>();
+            foreach (var record in getAllResult.Records.Take(1000))
             {
-                var response = await _fixture.ObservationsController.TaxonAggregationAsync(searchFilter, skip, take);
-                var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
-                foreach (var record in result.Records)
-                {
-                    if (dictionaryTakeSize1000.ContainsKey(record.TaxonId))
-                        duplicateKeysTakeSize1000.Add(record.TaxonId);
-                    else
-                        dictionaryTakeSize1000.Add(record.TaxonId, record.ObservationCount);
-                }
-                skip += take;
-            } while (skip < 1000);
-            int takeSize1000Sum = dictionaryTakeSize1000.Values.Sum();
+                if (dictionaryTake1000FromAll.ContainsKey(record.TaxonId))
+                    duplicateKeysTake1000FromAll.Add(record.TaxonId);
+                else
+                    dictionaryTake1000FromAll.Add(record.TaxonId, record.ObservationCount);
+            }
+            int take1000FromAllSum = dictionaryTake1000FromAll.Values.Sum();
+            spGetAll.Stop();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             duplicateKeysTakeSize100.Count.Should().Be(0);
-            duplicateKeysTakeSize1000.Count.Should().Be(0);
-            dictionaryTakeSize100.Keys.Should().BeEquivalentTo(dictionaryTakeSize1000.Keys);
-            takeSize100Sum.Should().Be(takeSize1000Sum);
+            duplicateKeysTake1000FromAll.Count.Should().Be(0);
+            dictionaryTakeSize100.Keys.Should().BeEquivalentTo(dictionaryTake1000FromAll.Keys);
+            takeSize100Sum.Should().Be(take1000FromAllSum);
+            spGetAll.ElapsedMilliseconds.Should().BeLessThan(spPaging.ElapsedMilliseconds,
+                "because getting all in one request is faster than paging 10 times.");
         }
-
     }
 }

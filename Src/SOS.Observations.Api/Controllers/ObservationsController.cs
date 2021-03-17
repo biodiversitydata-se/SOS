@@ -557,11 +557,15 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Aggregates observation by taxon. Each record contains the number of observations for the specific taxon.
+        /// Aggregates observations by taxon. Each record contains the number of observations for the specific taxon.
+        /// The records are ordered by observation count in descending order.
+        /// To get all records in one request, set skip and take parameters to null.
+        /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
+        /// Skip+take must be less than or equal to 1000.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Start index of returned records. Skip + Take must be less than or equal to 65535.</param>
-        /// <param name="take">Max number of taxa to return. Skip + Take must be less than or equal to 65535.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -577,8 +581,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregationAsync(
             [FromBody] SearchFilterAggregationDto filter,
-            [FromQuery] int skip = 0,
-            [FromQuery] int take = 100,
+            [FromQuery] int? skip = 0,
+            [FromQuery] int? take = 100,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
@@ -591,8 +595,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
-                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-
+                var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
@@ -602,7 +605,11 @@ namespace SOS.Observations.Api.Controllers
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(
+                    filter.ToSearchFilter(translationCultureCode, protectedObservations), 
+                    bbox, 
+                    skip, 
+                    take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -839,7 +846,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var paramsValidationResult = Result.Combine(
-                    ValidatePagingArguments(skip, take),
+                    ValidateAggregationPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode));
 
@@ -1050,10 +1057,14 @@ namespace SOS.Observations.Api.Controllers
 
         /// <summary>
         /// Aggregates observations by taxon. Each record contains the number of observations for the specific taxon.
+        /// The records are ordered by observation count in descending order.
+        /// To get all records in one request, set skip and take parameters to null.
+        /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
+        /// Skip+take must be less than or equal to 1000.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
-        /// <param name="take">Max number of taxa to return. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -1070,8 +1081,8 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternalAsync(
             [FromBody] SearchFilterAggregationInternalDto filter,
-            [FromQuery] int skip = 0,
-            [FromQuery] int take = 100,
+            [FromQuery] int? skip = 0,
+            [FromQuery] int? take = 100,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
@@ -1084,8 +1095,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
-                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-
+                var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)

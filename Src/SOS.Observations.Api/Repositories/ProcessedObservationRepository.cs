@@ -414,102 +414,58 @@ namespace SOS.Observations.Api.Repositories
             return countResponse.Count;
         }
 
+        /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter, 
             LatLonBoundingBox bbox,
-            int skip,
-            int take)
+            int? skip,
+            int? take)
         {
-            var indexNames = GetCurrentIndex(filter);
+            var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
+            query.Add(q => q.GeoBoundingBox(bb => bb
+                .Field("location.pointLocation")
+                .BoundingBox(b =>
+                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
 
+            Dictionary<int,int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+                indexName,
+                query, 
+                excludeQuery);
 
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_TaxonAggregation");
-            operation.Telemetry.Properties["Filter"] = filter.ToString();
-
-            // Get number of taxa
-            var searchResponseCount = await _elasticClient.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Size(0)
-                .Aggregations(a => a.Filter("bbox_filter", f => f
-                    .Filter(fq => fq.GeoBoundingBox(b => b
-                        .Field("location.pointLocation")
-                        .BoundingBox(box => box.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
-                        )))
-                    .Aggregations(ac => ac.Cardinality("taxa_count", c => c
-                        .Field("taxon.id")
-                        .PrecisionThreshold(40000)
-                    )))
-                )
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-            );
-            int? nrTaxa = (int?)searchResponseCount.Aggregations.Filter("bbox_filter").Cardinality("taxa_count").Value;
-            if (!nrTaxa.HasValue || nrTaxa == 0)
+            // Update skip and take
+            if (skip == null)
             {
-                return Result.Success(new PagedResult<TaxonAggregationItem>
-                {
-                    Records = Enumerable.Empty<TaxonAggregationItem>(),
-                    Skip = skip,
-                    Take = take,
-                    TotalCount = 0
-                });
+                skip = 0;
+            }
+            if (skip > observationCountByTaxonId.Count)
+            {
+                skip = observationCountByTaxonId.Count;
+            }
+            if (take == null)
+            {
+                take = observationCountByTaxonId.Count - skip;
+            }
+            else
+            {
+                take = Math.Min(observationCountByTaxonId.Count - skip.Value, take.Value);
             }
 
-            // Calculate size to fetch. 
-            var size = skip + take < nrTaxa ? skip + take : nrTaxa;
-            if (size > MaxNrElasticSearchAggregationBuckets)
-            {
-                return Result.Failure<PagedResult<TaxonAggregationItem>>($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {MaxNrElasticSearchAggregationBuckets}.");
-            }
-            
-            // Get observation count for each taxon
-            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Size(0)
-                .Aggregations(a => a.Filter("bbox_filter", f => f
-                    .Filter(fq => fq.GeoBoundingBox(b => b
-                        .Field("location.pointLocation")
-                        .BoundingBox(box => box.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
-                        )))
-                    .Aggregations(ac => ac.Terms("taxa_count", t => t
-                        .Field("taxon.id")
-                        .Size(size)
-                        .ShardSize(size*10)
-                        .Order(o => o.CountDescending().KeyAscending())
-                    )))
-                )
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-            );
-
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
-            _telemetry.StopOperation(operation);
-
-            IEnumerable<TaxonAggregationItem> observationCountByTaxon = searchResponse
-                .Aggregations
-                .Filter("bbox_filter")
-                .Terms("taxa_count")
-                .Buckets
-                .Select(b => TaxonAggregationItem.Create(int.Parse(b.Key), Convert.ToInt32(b.DocCount)))
-                .Skip(skip)
-                .Take(take);
+            var taxaResult = observationCountByTaxonId
+                .Select(b => TaxonAggregationItem.Create(
+                    b.Key,
+                    b.Value))
+                .OrderByDescending(m => m.ObservationCount)
+                .Skip(skip.Value)
+                .Take(take.Value)
+                .ToList();
 
             var pagedResult = new PagedResult<TaxonAggregationItem>
             {
-                Records = observationCountByTaxon,
-                Skip = skip,
-                Take = take,
-                TotalCount = nrTaxa.Value
+                Records = taxaResult,
+                Skip = skip.Value,
+                Take = take.Value,
+                TotalCount = observationCountByTaxonId.Count
             };
 
             return Result.Success(pagedResult);
@@ -819,6 +775,86 @@ namespace SOS.Observations.Api.Repositories
                                 .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
                             .Terms("taxon", tt => tt
                                 .Field("taxon.id").Order(SortOrder.Ascending)
+                            ))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse;
+        }
+
+        private async Task<Dictionary<int, int>> GetAllObservationCountByTaxonIdAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+        {
+            var observationCountByTaxonId = new Dictionary<int, int>();
+            CompositeKey nextPageKey = null;
+            int pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await PageTaxaCompositeAggregationAsync(indexName, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    var taxonId = Convert.ToInt32((long)bucket.Key["taxonId"]);
+                    observationCountByTaxonId.Add(taxonId, Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0)));
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            return observationCountByTaxonId;
+        }
+        
+
+        private async Task<ISearchResponse<dynamic>> PageTaxaCompositeAggregationAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            if (nextPage == null) // First request
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("taxonComposite", g => g
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms("taxonId", tt => tt
+                                .Field("taxon.id")
+                            ))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+            else
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("taxonComposite", g => g
+                        .Size(take)
+                        .After(nextPage)
+                        .Sources(src => src
+                            .Terms("taxonId", tt => tt
+                                .Field("taxon.id")
                             ))))
                     .Query(q => q
                         .Bool(b => b
