@@ -657,7 +657,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string LocationRemarks { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
         /// Web address that leads to more information about the
         /// location. The information should be accessible
         /// from the most commonly used web browsers.
@@ -733,7 +732,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string Municipality { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
         /// Parish where the species observation where made.
         /// 'Socken/församling' in swedish.
         /// </summary>
