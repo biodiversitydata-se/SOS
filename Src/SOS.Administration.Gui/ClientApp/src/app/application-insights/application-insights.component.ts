@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 
+import * as moment from 'moment';
 
 @Component({
   templateUrl: './application-insights.component.html'
@@ -33,13 +34,25 @@ export class ApplicationInsightsComponent {
   logRows: ILogRow[];
 
   constructor(private datePipe: DatePipe, http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    moment.locale('sv', {
+      longDateFormat: {
+        LT: 'HH:mm',
+        LTS: 'HH:mm:ss',
+        L: 'YYYY-MM-DD',
+        LL: 'D MMMM YYYY',
+        LLL: 'D MMMM YYYY [kl.] HH:mm',
+        LLLL: 'dddd D MMMM YYYY [kl.] HH:mm',
+        lll: 'D MMM YYYY HH:mm',
+        llll: 'ddd D MMM YYYY HH:mm'
+      }
+    });
     this._http = http;
     this._baseUrl = baseUrl;
     this.top = 100;
   }
 
   formatDate(date: Date): string {
-    return this.datePipe.transform(date, "yyyy-MM-dd hh:mm")
+    return this.datePipe.transform(date, "yyyy-MM-dd HH:mm")
   }
 
   onSearchFormSubmit(event) {
