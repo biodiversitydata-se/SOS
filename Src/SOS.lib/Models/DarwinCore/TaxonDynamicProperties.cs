@@ -3,7 +3,7 @@
 namespace SOS.Lib.Models.DarwinCore
 {
     /// <summary>
-    ///     This class contains fields not defined in Darwin Core.
+    ///     Taxon dynamic properties.
     /// </summary>
     public class TaxonDynamicProperties
     {
