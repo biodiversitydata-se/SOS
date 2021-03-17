@@ -32,7 +32,6 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         public string Description { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     Date when the project ends.
         /// </summary>
         public DateTime? EndDate { get; set; }

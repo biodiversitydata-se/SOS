@@ -1,21 +1,18 @@
 ﻿namespace SOS.Lib.Models.DarwinCore
 {
     /// <summary>
-    ///     Not defined in Darwin Core.
     ///     Conservation related information about the taxon that
     ///     the species observation is attached to.
     /// </summary>
     public class DarwinCoreConservation
     {
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     This property indicates whether the species is the subject
         ///     of an action plan ('åtgärdsprogram' in swedish).
         /// </summary>
         public bool ActionPlan { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     This property indicates whether a species has been
         ///     classified as nature conservation relevant
         ///     ('naturvårdsintressant' in swedish).
@@ -25,21 +22,18 @@
         public bool ConservationRelevant { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     This property indicates whether
         ///     the species is included in Natura 2000.
         /// </summary>
         public bool Natura2000 { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     This property indicates whether the species
         ///     is protected by the law in Sweden.
         /// </summary>
         public bool ProtectedByLaw { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     Information about how protected information
         ///     about a species is in Sweden.
         ///     Currently this is a value between 1 to 5.
@@ -48,7 +42,6 @@
         public int ProtectionLevel { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     Redlist category for redlisted species. The property also
         ///     contains information about which redlist that is referenced.
         ///     Example value: CR (Sweden, 2010). Possible redlist values
@@ -60,14 +53,12 @@
         public string RedlistCategory { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     This property contains information about the species
         ///     immigration history.
         /// </summary>
         public string SwedishImmigrationHistory { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     Information about the species occurrence in Sweden.
         ///     For example information about if the species reproduce
         ///     in sweden.

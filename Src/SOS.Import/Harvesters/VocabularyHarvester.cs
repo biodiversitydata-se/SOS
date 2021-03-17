@@ -107,7 +107,7 @@ namespace SOS.Import.Harvesters
         }
 
         /// <summary>
-        ///     Import field mappings.
+        ///     Import vocabularies.
         /// </summary>
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()

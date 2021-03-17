@@ -223,25 +223,25 @@ namespace SOS.Import.Factories.Validation
         protected void UpdateTermDictionaryValue(
             VocabularyId vocabularyId,
             string verbatimValue,
-            VocabularyValue processedFieldMapValue,
+            VocabularyValue vocabularyValue,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, int>> processedFieldValues,
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
-            if (processedFieldMapValue != null)
+            if (vocabularyValue != null)
             {
-                if (!processedFieldValues[vocabularyId].ContainsKey(processedFieldMapValue))
+                if (!processedFieldValues[vocabularyId].ContainsKey(vocabularyValue))
                 {
-                    processedFieldValues[vocabularyId].Add(processedFieldMapValue, 0);
+                    processedFieldValues[vocabularyId].Add(vocabularyValue, 0);
                 }
-                processedFieldValues[vocabularyId][processedFieldMapValue]++;
+                processedFieldValues[vocabularyId][vocabularyValue]++;
 
                 if (!string.IsNullOrWhiteSpace(verbatimValue))
                 {
-                    if (!verbatimFieldValues[vocabularyId].ContainsKey(processedFieldMapValue))
+                    if (!verbatimFieldValues[vocabularyId].ContainsKey(vocabularyValue))
                     {
-                        verbatimFieldValues[vocabularyId].Add(processedFieldMapValue, new HashSet<string>());
+                        verbatimFieldValues[vocabularyId].Add(vocabularyValue, new HashSet<string>());
                     }
-                    verbatimFieldValues[vocabularyId][processedFieldMapValue].Add(verbatimValue);
+                    verbatimFieldValues[vocabularyId][vocabularyValue].Add(verbatimValue);
                 }
             }
         }

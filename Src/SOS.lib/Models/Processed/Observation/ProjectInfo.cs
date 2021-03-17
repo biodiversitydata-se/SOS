@@ -34,7 +34,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Description { get; set; }
 
         /// <summary>
-        ///     Not defined in Darwin Core.
         ///     Date when the project ends.
         /// </summary>
         [Date]
