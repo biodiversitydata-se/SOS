@@ -19,7 +19,8 @@ namespace SOS.Lib.Services.Interfaces
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
+        /// <param name="top"></param>
         /// <returns></returns>
-        Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to);
+        Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to, int top);
     }
 }

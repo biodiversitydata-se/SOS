@@ -34,11 +34,11 @@ namespace SOS.Administration.Gui.Controllers
         [HttpGet("Search")]
         [ProducesResponseType(typeof(IEnumerable<ApiLogRow>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLogDataAsync([FromQuery] DateTime from, [FromQuery] DateTime to)
+        public async Task<IActionResult> GetLogDataAsync([FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int top)
         {
             try
             {
-                var logData = await _applicationInsightsService.GetLogDataAsync(from, to);
+                var logData = await _applicationInsightsService.GetLogDataAsync(from, to, top);
 
                 return Ok(logData);
             }
