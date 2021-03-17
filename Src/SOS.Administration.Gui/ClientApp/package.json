@@ -45,6 +45,7 @@
     "lodash": "4.17.21",
     "ng2-charts": "2.4.2",
     "oidc-client": "1.11.5",
+    "open-iconic": "1.1.1",
     "popper.js": "1.16.1",
     "rxjs": "6.6.6",
     "string-to-color": "2.2.2",

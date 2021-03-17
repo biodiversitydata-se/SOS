@@ -13,6 +13,7 @@ export class ApplicationInsightsComponent {
 
   startDate: Date = null;
   endDate: Date = null;
+  top: number;
 
   loadingData: boolean = false;
   columnMode = ColumnMode;
@@ -34,6 +35,7 @@ export class ApplicationInsightsComponent {
   constructor(private datePipe: DatePipe, http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
     this._http = http;
     this._baseUrl = baseUrl;
+    this.top = 100;
   }
 
   formatDate(date: Date): string {
@@ -43,7 +45,7 @@ export class ApplicationInsightsComponent {
   onSearchFormSubmit(event) {
     this.loadingData = true;
 
-    this._http.get<ILogRow[]>(`${this._baseUrl}applicationInsights/search?from=${this.formatDate(this.startDate)}&to=${this.formatDate(this.endDate)}`)
+    this._http.get<ILogRow[]>(`${this._baseUrl}applicationInsights/search?from=${this.formatDate(this.startDate)}&to=${this.formatDate(this.endDate)}&top=${this.top}`)
       .subscribe(result => {
         this.logRows = result;
         this.loadingData = false;
