@@ -88,11 +88,19 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <returns></returns>
         Task<long> GetMatchCountAsync(FilterBase filter);
 
+        /// <summary>
+        /// Aggregate observations by taxon. Sort by observation count descending.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="bbox"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             LatLonBoundingBox bbox,
-            int skip,
-            int take);
+            int? skip,
+            int? take);
 
         /// <summary>
         /// Get indication if taxa exists in specified area

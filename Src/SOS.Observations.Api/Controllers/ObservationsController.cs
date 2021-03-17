@@ -207,7 +207,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        ///     Search for observations matching the provided search filter. Permitted filter values depends on the specific filter field:
+        ///     Get observations matching the provided search filter. Permitted filter values depends on the specific filter field:
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
@@ -492,76 +492,14 @@ namespace SOS.Observations.Api.Controllers
         //}
 
         /// <summary>
-        /// Aggregates observations into grid cells and returns them as a GeoJSON file.
+        /// Aggregates observations by taxon. Each record contains TaxonId and the number of observations (ObservationCount) matching the search criteria.
+        /// The records are ordered by ObservationCount in descending order.
+        /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
+        /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
-        /// <returns></returns>
-        [HttpPost("GeoGridAggregationGeoJson")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
-        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
-            [FromBody] SearchFilterAggregationDto filter,
-            [FromQuery] int zoom = 1,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
-            [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
-        {
-            try
-            {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
-                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
-                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
-
-                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
-                    ValidateTranslationCultureCode(translationCultureCode));
-                if (paramsValidationResult.IsFailure)
-                {
-                    return BadRequest(paramsValidationResult.Error);
-                }
-
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                string strJson = result.Value.GetFeatureCollectionGeoJson();
-                var bytes = Encoding.UTF8.GetBytes(strJson);
-                return File(bytes, "application/json", "grid.geojson");
-            }
-            catch (AuthenticationRequiredException e)
-            {
-                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "GeoGridAggregationGeoJson error.");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
-        /// Aggregates observation by taxon. Each record contains the number of observations for the specific taxon.
-        /// </summary>
-        /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Start index of returned records. Skip + Take must be less than or equal to 65535.</param>
-        /// <param name="take">Max number of taxa to return. Skip + Take must be less than or equal to 65535.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -577,8 +515,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregationAsync(
             [FromBody] SearchFilterAggregationDto filter,
-            [FromQuery] int skip = 0,
-            [FromQuery] int take = 100,
+            [FromQuery] int? skip = 0,
+            [FromQuery] int? take = 100,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
@@ -591,8 +529,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
-                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-
+                var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
@@ -602,7 +539,11 @@ namespace SOS.Observations.Api.Controllers
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(
+                    filter.ToSearchFilter(translationCultureCode, protectedObservations), 
+                    bbox, 
+                    skip, 
+                    take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -625,7 +566,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
         /// If protectedObservations is set to false, you must be aware of that the result can include false positives
-        /// since the protected observations coordinates are obfuscated.
+        /// since the protected observations coordinates are generalized to a grid depending on the protection level.
         /// </summary>
         /// <param name="filter">Search criteria filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -704,7 +645,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        ///     Search for observations matching the provided search filter. Permitted filter values depends on the specific filter field:
+        ///     Get observations matching the provided search filter. Permitted filter values depends on the specific filter field:
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
@@ -839,7 +780,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var paramsValidationResult = Result.Combine(
-                    ValidatePagingArguments(skip, take),
+                    ValidateAggregationPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode));
 
@@ -957,6 +898,71 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        /// Aggregates observations into grid cells and returns them as a GeoJSON file.
+        /// </summary>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="zoom">A zoom level between 1 and 21.</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched (including diffused protected observations).</param>
+        /// <returns></returns>
+        [HttpPost("Internal/GeoGridAggregationGeoJson")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
+            [FromBody] SearchFilterAggregationDto filter,
+            [FromQuery] int zoom = 1,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
+                var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
+
+                var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
+                    ValidateTranslationCultureCode(translationCultureCode));
+                if (paramsValidationResult.IsFailure)
+                {
+                    return BadRequest(paramsValidationResult.Error);
+                }
+
+                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                string strJson = result.Value.GetFeatureCollectionGeoJson();
+                var bytes = Encoding.UTF8.GetBytes(strJson);
+                return File(bytes, "application/json", "grid.geojson");
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GeoGridAggregationGeoJson error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Aggregates observations into grid cells and taxa. Each grid cell contains a list of all taxa (usually species)
         /// in the grid cell and the number of observations. 
         /// The grid cells are squares in WGS84 coordinate system which means that they also
@@ -1049,11 +1055,14 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Aggregates observations by taxon. Each record contains the number of observations for the specific taxon.
+        /// Aggregates observations by taxon. Each record contains TaxonId and the number of observations (ObservationCount) matching the search criteria.
+        /// The records are ordered by ObservationCount in descending order.
+        /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
+        /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
-        /// <param name="take">Max number of taxa to return. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -1070,8 +1079,8 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternalAsync(
             [FromBody] SearchFilterAggregationInternalDto filter,
-            [FromQuery] int skip = 0,
-            [FromQuery] int take = 100,
+            [FromQuery] int? skip = 0,
+            [FromQuery] int? take = 100,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
@@ -1084,8 +1093,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
-                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
-
+                var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (paramsValidationResult.IsFailure)
@@ -1118,7 +1126,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
         /// If protectedObservations is set to false, you must be aware of that the result can include false positives
-        /// since the protected observations coordinates are obfuscated.
+        /// since the protected observations coordinates are generalized to a grid depending on the protection level.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
