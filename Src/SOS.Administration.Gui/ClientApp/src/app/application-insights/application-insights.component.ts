@@ -26,7 +26,7 @@ export class ApplicationInsightsComponent {
     { prop: 'httpResponseCode', name: 'Http response code' },
     { prop: 'duration', name: 'Duration' },
     { prop: 'responseCount', name: 'Count' },
-    { prop: 'accountId', name: 'APIM acouunt id' },
+    { prop: 'accountId', name: 'APIM account id' },
     { prop: 'userId', name: 'User admin id' }
   ];
   logRows: ILogRow[];
