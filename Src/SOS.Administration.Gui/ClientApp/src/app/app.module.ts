@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,8 +10,10 @@ import { AgGridModule } from 'ag-grid-angular';
 import { ChartsModule, ThemeService } from 'ng2-charts';
 import { GaugeModule } from 'angular-gauge';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { DlDateTimeDateModule, DlDateTimePickerModule } from 'angular-bootstrap-datetimepicker';
 
 import { AppComponent } from './app.component';
+import { ApplicationInsightsComponent } from './application-insights/application-insights.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { InvalidObservationsComponent } from './invalid-observations/invalid-observations.component';
@@ -33,6 +36,7 @@ export function tokenGetter() {
 @NgModule({
   declarations: [
     AppComponent,
+    ApplicationInsightsComponent,
     NavMenuComponent,
     HomeComponent,
     InvalidObservationsComponent,
@@ -59,6 +63,7 @@ export function tokenGetter() {
       { path: 'loadtest', component: LoadTestComponent },
       { path: 'log-viewer', component: LogViewerComponent },
       { path: 'observation-viewer', component: ObservationViewerComponent, canActivate: [AuthGuard] },
+      { path: 'application-insights', component: ApplicationInsightsComponent },
       { path: 'login', component: LoginComponent },
     ]),
     LeafletModule,
@@ -67,15 +72,17 @@ export function tokenGetter() {
     AgGridModule.withComponents([]),
     GaugeModule.forRoot(),
     NgxDatatableModule,
+    DlDateTimeDateModule, 
+    DlDateTimePickerModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
-        whitelistedDomains: ["localhost:44315", "sos-admin.artdata.slu.se","sos-admin-st.artdata.slu.se"],
-        blacklistedRoutes: []
+        allowedDomains: ["localhost:44315", "sos-admin.artdata.slu.se", "sos-admin-st.artdata.slu.se"],
+        disallowedRoutes: []
       }
     })
   ],
-  providers: [ThemeService, AuthGuard],
+  providers: [ThemeService, AuthGuard, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

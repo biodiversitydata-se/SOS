@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using System.Text;
 using System.Text.Json.Serialization;
+using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Administration.Gui
 {
@@ -27,16 +28,16 @@ namespace SOS.Administration.Gui
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();            
+            services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
             services.AddMvcCore().AddJsonOptions(options =>
-                  {
-                      options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                  });
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
             var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration));
             services.AddAuthentication(opt => {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -69,10 +70,13 @@ namespace SOS.Administration.Gui
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));
 
-            services.Configure<ApplicationInsightsConfiguration>(
-              Configuration.GetSection(nameof(ApplicationInsightsConfiguration)));
+            services.Configure<ApplicationInsightsConfiguration>(Configuration.GetSection(nameof(ApplicationInsightsConfiguration)));
             services.AddTransient<ISearchService, SearchService>();
             services.AddTransient<ITestService, TestService>();
+
+            services.AddSingleton(Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>());
+            services.AddSingleton<IHttpClientService, HttpClientService>();
+            services.AddScoped<IApplicationInsightsService, ApplicationInsightsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
