@@ -97,12 +97,15 @@ namespace SOS.Lib.Services
                 });
         }
 
-        public async Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to)
+        public async Task<IEnumerable<ApiLogRow>> GetLogDataAsync(DateTime from, DateTime to, int top)
         {
             var query = $@"requests 
+                    | limit {top} 
                     | where 
                         timestamp >= datetime('{from.ToString("yyyy-MM-dd hh:mm:00")}') 
                         and timestamp < datetime('{to.ToString("yyyy-MM-dd hh:mm:00")}') 
+                    | order by 
+                        timestamp desc 
                     | project 
                         timestamp, 
                         method = substring(name, 0, indexof(name, ' ' )), 
