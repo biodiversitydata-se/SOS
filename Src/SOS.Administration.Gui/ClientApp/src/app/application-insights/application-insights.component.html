@@ -20,9 +20,24 @@
                            [(ngModel)]="endDate">
       </dl-date-time-picker>
     </div>
-    <div class="col-4">
-      <br />
-      <button type="submit" [disabled]="!(startDate && endDate)" class="btn btn-primary">Get log data from {{formatDate(startDate)}} to {{formatDate(endDate)}}</button>
+    <div class="col-md-4">
+      <div>
+        <div class="form-check form-check-inline">
+          <input type="radio" name="top" id="top100" [value]="100" [(ngModel)]="top" class="form-check-input" che>
+          <label for="top100" class="form-check-label">100</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="radio" name="top" id="top500" [value]="500" [(ngModel)]="top" class="form-check-input">
+          <label for="top500" class="form-check-label">500</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="radio" name="top" id="top1000" [value]="1000" [(ngModel)]="top" class="form-check-input">
+          <label for="top1000" class="form-check-label">1000</label>
+        </div>
+      </div>
+      <div>
+        <button type="submit" [disabled]="!(startDate && endDate)" class="btn btn-primary">Get {{top}} log data items from {{formatDate(startDate)}} to {{formatDate(endDate)}}</button>
+      </div>
     </div>
   </div>
 </form>
