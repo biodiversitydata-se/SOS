@@ -38,6 +38,9 @@
           <li class="nav-item" [routerLinkActive]="['link-active']">
             <a class="nav-link text-light" [routerLink]="['observation-viewer']">Observations Viewer</a>
           </li>
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-light" [routerLink]="['/application-insights']">Application Insights</a>
+          </li>
           <li class="nav-item" *ngIf="isUserAuthenticated()">
             <span style="color:lightgreen">Logged in as 'admin'</span>
             <a class="nav-link text-light" (click)="logOut()">Logout</a>
