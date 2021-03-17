@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get all projects.
+        /// Get all Artportalen projects.
         /// </summary>
         /// <returns></returns>
         [HttpGet("Projects")]
