@@ -77,8 +77,8 @@ export function tokenGetter() {
     JwtModule.forRoot({
       config: {
         tokenGetter: tokenGetter,
-        whitelistedDomains: ["localhost:44315", "sos-admin.artdata.slu.se","sos-admin-st.artdata.slu.se"],
-        blacklistedRoutes: []
+        allowedDomains: ["localhost:44315", "sos-admin.artdata.slu.se", "sos-admin-st.artdata.slu.se"],
+        disallowedRoutes: []
       }
     })
   ],
