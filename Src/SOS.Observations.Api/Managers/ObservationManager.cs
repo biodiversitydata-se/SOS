@@ -258,29 +258,29 @@ namespace SOS.Observations.Api.Managers
             {
                 if (observation is IDictionary<string, object> obs)
                 {
-                    ResolveFieldMappedValue(obs, VocabularyId.BasisOfRecord,
+                    ResolveVocabularyMappedValue(obs, VocabularyId.BasisOfRecord,
                         nameof(Observation.BasisOfRecord));
-                    ResolveFieldMappedValue(obs, VocabularyId.Type, nameof(Observation.Type));
-                    ResolveFieldMappedValue(obs, VocabularyId.AccessRights,
+                    ResolveVocabularyMappedValue(obs, VocabularyId.Type, nameof(Observation.Type));
+                    ResolveVocabularyMappedValue(obs, VocabularyId.AccessRights,
                         nameof(Observation.AccessRights));
-                    ResolveFieldMappedValue(obs, VocabularyId.Institution,
+                    ResolveVocabularyMappedValue(obs, VocabularyId.Institution,
                         nameof(Observation.InstitutionCode));
 
                     if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
                     {
                         var locationDictionary = locationObject as IDictionary<string, object>;
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.Continent,
+                        ResolveVocabularyMappedValue(locationDictionary, VocabularyId.Continent,
                             nameof(Observation.Location.Continent));
-                        ResolveFieldMappedValue(locationDictionary, VocabularyId.Country,
+                        ResolveVocabularyMappedValue(locationDictionary, VocabularyId.Country,
                             nameof(Observation.Location.Country));
                     }
 
                     if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject))
                     {
                         var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                        ResolveFieldMappedValue(occurrenceDictionary, VocabularyId.EstablishmentMeans,
+                        ResolveVocabularyMappedValue(occurrenceDictionary, VocabularyId.EstablishmentMeans,
                             nameof(Observation.Occurrence.EstablishmentMeans));
-                        ResolveFieldMappedValue(occurrenceDictionary, VocabularyId.OccurrenceStatus,
+                        ResolveVocabularyMappedValue(occurrenceDictionary, VocabularyId.OccurrenceStatus,
                             nameof(Observation.Occurrence.OccurrenceStatus));
                     }
                 }
@@ -377,7 +377,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private void ResolveFieldMappedValue(
+        private void ResolveVocabularyMappedValue(
             IDictionary<string, object> observationNode,
             VocabularyId vocabularyId,
             string fieldName)
@@ -400,29 +400,29 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private void ResolveFieldMappedValue(VocabularyValue fieldMapValue,
+        private void ResolveVocabularyMappedValue(VocabularyValue vocabularyValue,
             VocabularyId vocabularyId)
         {
-            if (fieldMapValue == null) return;
-            if (fieldMapValue.Id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId
-                && _vocabularyManager.TryGetValue(vocabularyId, fieldMapValue.Id, out var translatedValue))
+            if (vocabularyValue == null) return;
+            if (vocabularyValue.Id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId
+                && _vocabularyManager.TryGetValue(vocabularyId, vocabularyValue.Id, out var translatedValue))
             {
-                fieldMapValue.Value = translatedValue;
+                vocabularyValue.Value = translatedValue;
             }
         }
 
         private void TranslateLocalizedValue(
-            VocabularyValue fieldMapValue,
+            VocabularyValue vocabularyValue,
             VocabularyId vocabularyId,
             string cultureCode)
         {
-            if (fieldMapValue == null) return;
+            if (vocabularyValue == null) return;
 
-            if (fieldMapValue.Id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId
-                && _vocabularyManager.TryGetTranslatedValue(vocabularyId, cultureCode, fieldMapValue.Id,
+            if (vocabularyValue.Id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId
+                && _vocabularyManager.TryGetTranslatedValue(vocabularyId, cultureCode, vocabularyValue.Id,
                     out var translatedValue))
             {
-                fieldMapValue.Value = translatedValue;
+                vocabularyValue.Value = translatedValue;
             }
         }
 

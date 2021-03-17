@@ -6,7 +6,7 @@ namespace SOS.Lib.Jobs.Import
     public interface IVocabulariesImportJob
     {
         /// <summary>
-        ///     Run field mapping import.
+        ///     Run vocabularies import.
         /// </summary>
         /// <returns></returns>
         [DisplayName("Harvest vocabularies from files")]
