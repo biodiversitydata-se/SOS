@@ -80,8 +80,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
 
         Task<IActionResult> TaxonAggregationAsync(
             SearchFilterAggregationDto filter,
-            int skip,
-            int take,
+            int? skip,
+            int? take,
             double? bboxLeft,
             double? bboxTop,
             double? bboxRight,
@@ -92,8 +92,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
 
         Task<IActionResult> TaxonAggregationInternalAsync(
             SearchFilterAggregationInternalDto filter,
-            int skip,
-            int take,
+            int? skip,
+            int? take,
             double? bboxLeft,
             double? bboxTop,
             double? bboxRight,

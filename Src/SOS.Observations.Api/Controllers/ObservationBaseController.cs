@@ -69,12 +69,23 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success(zoom);
         }
 
-        protected Result ValidatePagingArguments(int skip, int take)
+        protected Result ValidateAggregationPagingArguments(int skip, int? take)
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
             if (take <= 0) return Result.Failure("Take must be greater than 0");
-            if (skip + take > ObservationManager.MaxNrElasticSearchAggregationBuckets)
+            if (take != null && skip + take > ObservationManager.MaxNrElasticSearchAggregationBuckets)
                 return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {ObservationManager.MaxNrElasticSearchAggregationBuckets}.");
+
+            return Result.Success();
+        }
+
+        protected Result ValidateTaxonAggregationPagingArguments(int? skip, int? take)
+        {
+            const int maxPagingRecords = 1000;
+            if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
+            if (take <= 0) return Result.Failure("Take must be greater than 0");
+            if (take != null && skip != null && skip + take > maxPagingRecords)
+                return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {maxPagingRecords}. Set Skip & Take to null if you want to retrieve all records.");
 
             return Result.Success();
         }

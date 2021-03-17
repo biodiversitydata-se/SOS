@@ -214,8 +214,8 @@ namespace SOS.Observations.Api.Managers
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             LatLonBoundingBox bbox,
-            int skip,
-            int take)
+            int? skip,
+            int? take)
         {
             try
             {
