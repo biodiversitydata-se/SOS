@@ -263,17 +263,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode { get; set; }
 
         /// <summary>
-        ///     Private Collection
+        ///     Private Collection.
         /// </summary>
         public string PrivateCollection { get; set; }
 
         /// <summary>
-        /// Observation is protected by the system
+        /// Indicates whether the observation is protected by the system.
         /// </summary>
         public bool Protected { get; set; }
 
         /// <summary>
-        ///     Public Collection
+        ///     Public Collection.
         /// </summary>
         public string PublicCollection { get; set; }
 
@@ -302,7 +302,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Type { get; set; }
 
         /// <summary>
-        ///     Properties only used by Artportalen
+        ///     Properties only used by Artportalen.
         /// </summary>
         public ArtportalenInternal ArtportalenInternal { get; set; }
 
@@ -315,13 +315,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
-        ///     Projects from Artportalen connected to sighting.
+        ///     Projects from Artportalen connected to the observation.
         /// </summary>
         [Nested]
         public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
-        /// Date this observation was created
+        /// The date this observation was created.
         /// </summary>
         public DateTime Created { get; set; }
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
