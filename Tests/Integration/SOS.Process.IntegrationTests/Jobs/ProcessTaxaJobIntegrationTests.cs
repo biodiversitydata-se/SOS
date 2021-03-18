@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Nest;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Verbatim;
@@ -14,7 +15,6 @@ namespace SOS.Process.IntegrationTests.Jobs
     {
         private ProcessTaxaJob CreateProcessTaxaJob()
         {
-            var processConfiguration = GetProcessConfiguration();
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -31,10 +31,18 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var taxonProcessor = new TaxonProcessor(null, null, null, null); //Todo
 
+            var elasticClient = new ElasticClient();
+
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
+            var processedPublicObservationRepository = new ProcessedPublicObservationRepository(
+                processClient,
+                elasticClient,
+                GetElasticConfiguration(),
+                new NullLogger<ProcessedPublicObservationRepository>());
+
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, processedPublicObservationRepository, new NullLogger<ProcessInfoRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonProcessor,
                 harvestInfoRepository,

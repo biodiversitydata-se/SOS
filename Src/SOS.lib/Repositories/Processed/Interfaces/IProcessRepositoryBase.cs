@@ -29,6 +29,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         byte InActiveInstance { get; }
 
         /// <summary>
+        /// Get name of index
+        /// </summary>
+        /// <param name="instace"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        string GetIndexName(byte instace, bool protectedObservations = false);
+
+        /// <summary>
         /// Run mode
         /// </summary>
         bool LiveMode { get; set; }

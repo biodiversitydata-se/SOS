@@ -61,7 +61,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 *Occurrence*
 - DiscoveryMethod => Event.DiscoveryMethod
 - Gender => Occurrence.Sex
-- DeterminedBy tas bort och värdet mappas istället till Identification.IdentifiedBy
+- DeterminedBy => Identification.IdentifiedBy
 - DeterminationYear => ArtportalenInternal.DeterminationYear
 - ConfirmationYear => ArtportalenInternal.ConfirmationYear
 - ConfirmedBy => Identification.ConfirmedBy

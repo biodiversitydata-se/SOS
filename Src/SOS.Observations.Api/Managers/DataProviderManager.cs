@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Managers
         public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode)
         {
             var dataProviderDtos = new List<DataProviderDto>();
-            var processInfos = await _processInfoManager.GetProcessInfoAsync(true);
+            var processInfosActive = await _processInfoManager.GetProcessInfoAsync(true);
             var allDataProviders = await _dataProviderCache.GetAllAsync();
             var selectedDataProviders = includeInactive
                 ? allDataProviders
@@ -52,7 +52,8 @@ namespace SOS.Observations.Api.Managers
             {
                
                 var providerInfo =
-                    processInfos?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
+                    processInfosActive?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
+
                 if (providerInfo != null)
                 {
                     dataProviderDtos.Add(DataProviderDto.Create(
@@ -61,7 +62,7 @@ namespace SOS.Observations.Api.Managers
                         0,
                         providerInfo.HarvestEnd,
                         providerInfo.ProcessEnd,
-                        providerInfo.LatestIncrementalEnd,
+                        providerInfo.LatestIncrementalEnd ?? DateTime.MinValue,
                         cultureCode));
                 }
                 else
