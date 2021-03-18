@@ -516,14 +516,13 @@ namespace SOS.Process.Processors.Artportalen
         private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
         {
             var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
-            var taxonProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
 
-            if (taxonProtectionLevel < 3 && (hiddenByProvider || protectedBySystem))
+            if (hiddenByProvider || protectedBySystem)
             {
                 return 3;
             }
 
-            return taxonProtectionLevel;
+            return 1;
         }
 
         /// <summary>
