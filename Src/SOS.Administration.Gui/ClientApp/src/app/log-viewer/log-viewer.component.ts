@@ -16,7 +16,7 @@ export class LogViewerComponent implements OnInit {
   aggregations: TermAggregation[];
   filters: { [name: string]: boolean } = {};
   loading: boolean;
-  filterId = "30m";
+  filterId = "24h";
   textFilter: string = "";
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) { }
 
@@ -51,12 +51,10 @@ export class LogViewerComponent implements OnInit {
   getFilters() {
     if (!this.aggregations) { return;}
     let filter = "";
-    for (let agg of this.aggregations) {
-      for (let term of agg.terms) {
-        if (this.filters[agg.name + '_' + term.name]) {
-          filter += agg.name + '_' + term.name + "," ;
+    for (let key in this.filters) {
+        if (this.filters[key]) {
+          filter += key + "," ;
         }
-      }
     }
     return filter;
   }
