@@ -102,8 +102,8 @@ namespace SOS.Lib.Services
             var query = $@"requests 
                     | limit {top} 
                     | where 
-                        timestamp >= datetime('{from.ToString("yyyy-MM-dd hh:mm:00")}') 
-                        and timestamp < datetime('{to.ToString("yyyy-MM-dd hh:mm:00")}') 
+                        timestamp >= datetime('{from.ToString("yyyy-MM-dd HH:mm:00")}') 
+                        and timestamp < datetime('{to.ToString("yyyy-MM-dd HH:mm:00")}') 
                     | order by 
                         timestamp desc 
                     | project 
