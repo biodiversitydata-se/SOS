@@ -4,78 +4,95 @@ using Nest;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    /// Taxon attributes 
+    /// Taxon attributes.
     /// </summary>
     public class TaxonAttributes 
     {
         /// <summary>
-        ///     Action plan
+        /// Indicates whether the species is the subject
+        /// of an action plan ('åtgärdsprogram' in swedish).
         /// </summary>
         public string ActionPlan { get; set; }
 
         /// <summary>
-        ///     Radius of disturbance
+        /// Disturbance radius.
         /// </summary>
         public int? DisturbanceRadius { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Taxon id value in Dyntaxa.
+        /// </summary>
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
-        ///     part of Habitats directive article 2
+        /// Natura 2000, Habitats directive article 2.
         /// </summary>
         public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
 
         /// <summary>
-        ///     part of Habitats directive article 2
+        /// Natura 2000, Habitats directive article 4.
         /// </summary>
         public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
 
         /// <summary>
-        ///     part of Habitats directive article 2
+        /// Natura 2000, Habitats directive article 5.
         /// </summary>
         public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
 
         /// <summary>
-        ///     Organism group
+        /// Common name of the organism group that observed species
+        /// belongs to. Classification of species groups is the same as
+        /// used in latest 'Red List of Swedish Species'.
         /// </summary>
         public string OrganismGroup { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Parent Dyntaxa TaxonId.
+        /// </summary>
         public int? ParentDyntaxaTaxonId { get; set; }
 
         /// <summary>
-        ///     True if taxon is protected by law
+        /// Indicates whether the species 
+        /// is protected by the law in Sweden.
         /// </summary>
         public bool? ProtectedByLaw { get; set; }
 
         /// <summary>
-        ///     True if taxon is protected by law
+        /// Information about how protected information about a species is in Sweden.
+        /// This is a value between 1 to 5.
+        /// 1 indicates public access and 5 is the highest used security level.
         /// </summary>
         public VocabularyValue ProtectionLevel { get; set; }
 
         /// <summary>
-        ///     Redlist category
+        /// Redlist category for redlisted species. Possible redlist values
+        /// are DD (Data Deficient), EX (Extinct),
+        /// RE (Regionally Extinct), CR (Critically Endangered),
+        /// EN (Endangered), VU (Vulnerable), NT (Near Threatened).
+        /// Not redlisted species has no value in this property.
         /// </summary>
         public string RedlistCategory { get; set; }
 
         /// <summary>
-        ///     Systematic sort order
+        /// Systematic sort order.
         /// </summary>
         public int SortOrder { get; set; }
 
         /// <summary>
-        ///     Do taxon occur in sweden
+        /// This property contains information about the species
+        /// immigration history.
         /// </summary>
         public string SwedishHistory { get; set; }
 
         /// <summary>
-        ///     Do taxon occur in sweden
+        /// Information about the species occurrence in Sweden.
+        /// For example information about if the species reproduce
+        /// in sweden.
         /// </summary>
         public string SwedishOccurrence { get; set; }
 
         /// <summary>
-        ///     Synonyme names.
+        ///     Scientific synonym names.
         /// </summary>
         [Nested]
         public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }

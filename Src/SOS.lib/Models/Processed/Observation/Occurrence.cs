@@ -5,10 +5,7 @@ using Nest;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     This class contains occurrence information about a species
-    ///     observation in Darwin Core 1.5 compatible format.
-    ///     Further information about the properties can
-    ///     be found at http://rs.tdwg.org/dwc/terms/.
+    ///     Occurrence information about a species observation.
     /// </summary>
     public class Occurrence
     {
@@ -77,12 +74,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Biotope { get; set; }
 
         /// <summary>
-        ///     Description of biotope
+        ///     Description of biotope.
         /// </summary>
         public string BiotopeDescription { get; set; }
 
         /// <summary>
-        ///     Bird nest activity property
+        ///     Bird nest activity.
         /// </summary>
         public int? BirdNestActivityId { get; set; }
 
@@ -91,8 +88,9 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     within the data set or collection.
         /// </summary>
         public string CatalogNumber { get; set; }
+        
         /// <summary>
-        /// Catalog Id
+        /// Catalog Id.
         /// </summary>
         public int CatalogId { get; set; }
 
@@ -173,30 +171,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue LifeStage { get; set; }
 
         /// <summary>
-        ///     An identifier for the Occurrence (as opposed to a
-        ///     particular digital record of the occurrence).
-        ///     In the absence of a persistent global unique identifier,
-        ///     construct one from a combination of identifiers in
-        ///     the record that will most closely make the occurrenceID
-        ///     globally unique.
-        ///     The format LSID (Life Science Identifiers) is used as GUID
-        ///     (Globally unique identifier) for species observations.
-        ///     Currently known GUIDs:
-        ///     Species Gateway (Artportalen) 1,
-        ///     urn:lsid:artportalen.se:Sighting:{reporting system}.{id}
-        ///     where {reporting system} is one of Bird, Bugs, Fish,
-        ///     MarineInvertebrates, PlantAndMushroom or Vertebrate.
-        ///     Species Gateway (Artportalen) 2,
-        ///     urn:lsid:artportalen.se:Sighting:{id}
-        ///     Red list database: urn:lsid:artdata.slu.se:SpeciesObservation:{id}
-        /// </summary>
-
-        /// <summary>
         ///     Media linked to the observation
         /// </summary>
         [Nested]
         public ICollection<Multimedia> Media { get; set; }
 
+        /// <summary>
+        /// An identifier for the Occurrence (as opposed to a particular digital record of the occurrence).
+        /// In the absence of a persistent global unique identifier, construct one from a combination of
+        /// identifiers in the record that will most closely make the occurrenceID globally unique.
+        /// </summary>
         // ReSharper disable once InconsistentNaming
         [Keyword]
         public string OccurrenceId { get; set; }
@@ -263,7 +247,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PreviousIdentifications { get; set; }
 
         /// <summary>
-        ///     Protection level
+        /// Information about how protected information about a species is in Sweden.
+        /// This is a value between 1 to 5.
+        /// 1 indicates public access and 5 is the highest used security level.
         /// </summary>
         public int ProtectionLevel { get; set; }
 
@@ -316,23 +302,23 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue Sex { get; set; }
 
         /// <summary>
-        /// Substrate
+        /// Substrate.
         /// </summary>
         [Object]
         public Substrate Substrate { get; set; }
 
         /// <summary>
-        ///     URL to occurrence
+        ///     URL to occurrence.
         /// </summary>
         public string Url { get; set; }
 
         /// <summary>
-        ///     The reported length
+        ///     The reported length.
         /// </summary>
         public int? Length { get; set; }
 
         /// <summary>
-        ///     The reported weight
+        ///     The reported weight.
         /// </summary>
         public int? Weight { get; set; }
     }

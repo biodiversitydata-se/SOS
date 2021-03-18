@@ -1,5 +1,8 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
+    /// <summary>
+    /// Geological information, such as stratigraphy, that qualifies a region or place.
+    /// </summary>
     public class GeologicalContext
     {
         /// <summary>

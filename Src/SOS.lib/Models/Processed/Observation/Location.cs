@@ -4,7 +4,7 @@ using SOS.Lib.Swagger;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     This class contains location information about a species sighting location
+    ///     Location information for a species observation.
     /// </summary>
     public class Location
     {
@@ -17,7 +17,7 @@ namespace SOS.Lib.Models.Processed.Observation
         }
 
         /// <summary>
-        /// Location attributes
+        /// Location attributes.
         /// </summary>
         public LocationAttributes Attributes { get; set; }
 
@@ -80,7 +80,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public Area County { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: municipality.
         ///     The full, unabbreviated name of the next smaller
         ///     administrative region than county (city, municipality, etc.)
         ///     in which the Location occurs.
@@ -105,8 +104,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public Area Province { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: decimalLatitude.
-        ///     Definition in Darwin Core:
         ///     The geographic latitude (in decimal degrees, using
         ///     the spatial reference system given in geodeticDatum)
         ///     of the geographic center of a Location. Positive values
@@ -116,8 +113,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public double? DecimalLatitude { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: decimalLongitude.
-        ///     Definition in Darwin Core:
         ///     The geographic longitude (in decimal degrees, using
         ///     the spatial reference system given in geodeticDatum)
         ///     of the geographic center of a Location. Positive
@@ -128,7 +123,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public double? DecimalLongitude { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: footprintSpatialFit.
         ///     The ratio of the area of the footprint (footprintWKT)
         ///     to the area of the true (original, or most specific)
         ///     spatial representation of the Location. Legal values are
@@ -145,7 +139,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string FootprintSpatialFit { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: footprintSRS.
         ///     A Well-Known Text (WKT) representation of the Spatial
         ///     Reference System (SRS) for the footprintWKT of the
         ///     Location. Do not use this term to describe the SRS of
@@ -157,7 +150,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string FootprintSRS { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: footprintWKT.
         ///     A Well-Known Text (WKT) representation of the shape
         ///     (footprint, geometry) that defines the Location.
         ///     A Location may have both a point-radius representation
@@ -168,7 +160,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string FootprintWKT { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: geodeticDatum.
         ///     The ellipsoid, geodetic datum, or spatial reference
         ///     system (SRS) upon which the geographic coordinates
         ///     given in decimalLatitude and decimalLongitude as based.
@@ -183,7 +174,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeodeticDatum { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferencedBy.
         ///     A list (concatenated and separated) of names of people,
         ///     groups, or organizations who determined the georeference
         ///     (spatial representation) the Location.
@@ -191,7 +181,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferencedBy { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferencedDate.
         ///     The date on which the Location was georeferenced.
         ///     Recommended best practice is to use an encoding scheme,
         ///     such as ISO 8601:2004(E).
@@ -199,7 +188,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferencedDate { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferenceProtocol.
         ///     A description or reference to the methods used to
         ///     determine the spatial footprint, coordinates, and
         ///     uncertainties.
@@ -207,7 +195,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferenceProtocol { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferenceRemarks.
         ///     Notes or comments about the spatial description
         ///     determination, explaining assumptions made in addition
         ///     or opposition to the those formalized in the method
@@ -216,7 +203,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferenceRemarks { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferenceSources.
         ///     A list (concatenated and separated) of maps, gazetteers,
         ///     or other resources used to georeference the Location,
         ///     described specifically enough to allow anyone in the
@@ -225,7 +211,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferenceSources { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: georeferenceVerificationStatus.
         ///     A categorical description of the extent to which the
         ///     georeference has been verified to represent the best
         ///     possible spatial description. Recommended best practice
@@ -234,7 +219,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string GeoreferenceVerificationStatus { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: higherGeography.
         ///     A list (concatenated and separated) of geographic
         ///     names less specific than the information captured
         ///     in the locality term.
@@ -242,7 +226,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string HigherGeography { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: higherGeographyID.
         ///     An identifier for the geographic region within which
         ///     the Location occurred.
         ///     Recommended best practice is to use an
@@ -253,7 +236,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string HigherGeographyID { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: island.
         ///     The name of the island on or near which the Location occurs.
         ///     Recommended best practice is to use a controlled
         ///     vocabulary such as the Getty Thesaurus of Geographic Names.
@@ -261,7 +243,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Island { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: islandGroup.
         ///     The name of the island group in which the Location occurs.
         ///     Recommended best practice is to use a controlled
         ///     vocabulary such as the Getty Thesaurus of Geographic Names.
@@ -269,7 +250,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IslandGroup { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: locality.
         ///     The specific description of the place. Less specific
         ///     geographic information can be provided in other
         ///     geographic terms (higherGeography, continent, country,
@@ -282,7 +262,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Locality { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: locationAccordingTo.
         ///     Information about the source of this Location information.
         ///     Could be a publication (gazetteer), institution,
         ///     or team of individuals.
@@ -290,7 +269,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationAccordingTo { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: locationID.
         ///     An identifier for the set of location information
         ///     (data associated with dcterms:Location).
         ///     May be a global unique identifier or an identifier
@@ -300,20 +278,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationId { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: locationRemarks.
         ///     Comments or notes about the Location.
         /// </summary>
         public string LocationRemarks { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: maximumDepthInMeters.
         ///     The greater depth of a range of depth below
         ///     the local surface, in meters.
         /// </summary>
         public double? MaximumDepthInMeters { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: maximumDistanceAboveSurfaceInMeters.
         ///     The greater distance in a range of distance from a
         ///     reference surface in the vertical direction, in meters.
         ///     Use positive values for locations above the surface,
@@ -325,21 +300,18 @@ namespace SOS.Lib.Models.Processed.Observation
         public double? MaximumDistanceAboveSurfaceInMeters { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: maximumElevationInMeters.
         ///     The upper limit of the range of elevation (altitude,
         ///     usually above sea level), in meters.
         /// </summary>
         public double? MaximumElevationInMeters { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: minimumDepthInMeters.
         ///     The lesser depth of a range of depth below the
         ///     local surface, in meters.
         /// </summary>
         public double? MinimumDepthInMeters { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: minimumDistanceAboveSurfaceInMeters.
         ///     The lesser distance in a range of distance from a
         ///     reference surface in the vertical direction, in meters.
         ///     Use positive values for locations above the surface,
@@ -351,41 +323,30 @@ namespace SOS.Lib.Models.Processed.Observation
         public double? MinimumDistanceAboveSurfaceInMeters { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: minimumElevationInMeters.
         ///     The lower limit of the range of elevation (altitude,
         ///     usually above sea level), in meters.
         /// </summary>
         public double? MinimumElevationInMeters { get; set; }
 
-
-        //public ProcessedArea Municipality { get; set; }
-
-        ///// <summary>
-        ///// Parish property
-        ///// </summary>
-        //public ProcessedArea Parish { get; set; }
-
-
         /// <summary>
-        ///     Point (WGS84)
+        ///     Point (WGS84).
         /// </summary>
         [GeoShape, SwaggerExclude]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
-        ///     Point used in distance from point search
+        ///     Point used in distance from point search.
         /// </summary>
         [GeoPoint, SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>
-        ///     Point with accuracy buffer (WGS84)
+        ///     Point with accuracy buffer (WGS84).
         /// </summary>
         [GeoShape, SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: pointRadiusSpatialFit.
         ///     The ratio of the area of the point-radius
         ///     (decimalLatitude, decimalLongitude,
         ///     coordinateUncertaintyInMeters) to the area of the true
@@ -404,7 +365,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PointRadiusSpatialFit { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimCoordinates.
         ///     The verbatim original spatial coordinates of the Location.
         ///     The coordinate ellipsoid, geodeticDatum, or full
         ///     Spatial Reference System (SRS) for these coordinates
@@ -414,7 +374,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimCoordinates { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimCoordinateSystem.
         ///     The spatial coordinate system for the verbatimLatitude
         ///     and verbatimLongitude or the verbatimCoordinates of the
         ///     Location.
@@ -423,21 +382,18 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimCoordinateSystem { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimDepth.
         ///     The original description of the
         ///     depth below the local surface.
         /// </summary>
         public string VerbatimDepth { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimElevation.
         ///     The original description of the elevation (altitude,
         ///     usually above sea level) of the Location.
         /// </summary>
         public string VerbatimElevation { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimLatitude.
         ///     The verbatim original latitude of the Location.
         ///     The coordinate ellipsoid, geodeticDatum, or full
         ///     Spatial Reference System (SRS) for these coordinates
@@ -447,7 +403,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimLatitude { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimLocality.
         ///     The original textual description of the place.
         /// </summary>
         public string VerbatimLocality { get; set; }
@@ -463,7 +418,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimLongitude { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: verbatimSRS.
         ///     The ellipsoid, geodetic datum, or spatial reference
         ///     system (SRS) upon which coordinates given in
         ///     verbatimLatitude and verbatimLongitude, or
@@ -480,7 +434,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimSRS { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: waterBody.
         ///     The name of the water body in which the Location occurs.
         ///     Recommended best practice is to use a controlled
         ///     vocabulary such as the Getty Thesaurus of Geographic Names.

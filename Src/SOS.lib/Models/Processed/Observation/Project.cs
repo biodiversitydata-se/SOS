@@ -5,7 +5,7 @@ using Nest;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     Project information.
+    ///     Artportalen project information.
     /// </summary>
     public class Project
     {
@@ -39,13 +39,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        ///     An identifier for the project.
-        ///     In the absence of a persistent global unique identifier,
-        ///     construct one from a combination of identifiers in
-        ///     the project that will most closely make the ProjectID
-        ///     globally unique.
-        ///     The format LSID (Life Science Identifiers) is used as GUID
-        ///     (Globally unique identifier).
+        /// An identifier for the project.
         /// </summary>
         public int Id { get; set; }
 

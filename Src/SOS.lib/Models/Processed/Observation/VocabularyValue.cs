@@ -4,13 +4,13 @@ using SOS.Lib.Constants;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    /// Describes a value associated with a dictionary.
+    /// Describes a value associated with a vocabulary.
     /// </summary>
     public class VocabularyValue
     {
         /// <summary>
-        /// If the entry exist in the dictionary, then Id is greater than or equal to 0.
-        /// If the entry doesn't exist in the dictionary, then Id is equal to -1.
+        /// If the entry exist in the vocabulary, then Id is greater than or equal to 0.
+        /// If the entry doesn't exist in the vocabulary, then Id is equal to -1.
         /// </summary>
         public int Id { get; set; }
 
@@ -18,6 +18,15 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The value.
         /// </summary>
         public string Value { get; set; }
+
+        /// <summary>
+        /// Indicates whether this value exists in the vocabulary.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsCustomValue()
+        {
+            return Id == -1;
+        }
 
         public static VocabularyValue Create(int? val)
         {
@@ -46,11 +55,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public override int GetHashCode()
         {
             return HashCode.Combine(Id, Value);
-        }
-
-        public bool IsCustomValue()
-        {
-            return Id == -1;
         }
     }
 }

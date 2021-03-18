@@ -3,17 +3,17 @@
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     This class contains identification information about sighting identification
+    ///     Identification information about an species observation.
     /// </summary>
     public class Identification
     {
         /// <summary>
-        /// Confirmed by
+        /// Confirmed by.
         /// </summary>
         public string ConfirmedBy { get; set; }
 
         /// <summary>
-        /// Date of confirmation
+        /// Date of confirmation.
         /// </summary>
         public string ConfirmedDate { get; set; }
 
@@ -30,7 +30,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     name). May be a global unique identifier or an identifier
         ///     specific to the data set.
         /// </summary>
-        // ReSharper disable once InconsistentNaming
         public string IdentificationId { get; set; }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IdentificationRemarks { get; set; }
 
         /// <summary>
-        ///     True if sighting is validated
+        ///     True if sighting is validated.
         /// </summary>
         public bool Validated { get; set; }
 
@@ -86,12 +85,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TypeStatus { get; set; }
 
         /// <summary>
-        ///     True if determination is uncertain
+        ///     True if determination is uncertain.
         /// </summary>
         public bool UncertainIdentification { get; set; }
 
         /// <summary>
-        ///    Method used in species determination
+        ///    Method used in species determination.
         /// </summary>
         [Object]
         public VocabularyValue DeterminationMethod { get; set; }

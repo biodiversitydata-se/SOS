@@ -1,14 +1,17 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
+    /// <summary>
+    /// Location attributes.
+    /// </summary>
     public class LocationAttributes
     {
         /// <summary>
-        ///     Special handling of Kalmar/Öland
+        ///     Special handling of Kalmar/Öland.
         /// </summary>
         public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
-        ///     Spacial handling of Lappland
+        ///     Spacial handling of Lappland.
         /// </summary>
         public string ProvincePartIdByCoordinate { get; set; }
 
