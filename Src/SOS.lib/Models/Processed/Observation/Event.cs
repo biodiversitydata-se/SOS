@@ -5,18 +5,18 @@ using Nest;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     This class contains event information about a species observation
+    ///     Event information about a species observation.
     /// </summary>
     public class Event
     {
         /// <summary>
-        ///    DiscoveryMethod from Artportalen
+        ///    DiscoveryMethod from Artportalen.
         /// </summary>
         [Object]
         public VocabularyValue DiscoveryMethod { get; set; }
 
         /// <summary>
-        ///     End date/time of the event
+        ///     End date/time of the event.
         /// </summary>
         [Date]
         public DateTime? EndDate { get; set; }
@@ -26,7 +26,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (publication, global unique identifier, URI) of
         ///     media associated with the Occurrence.
         /// </summary>
-        // ReSharper disable once InconsistentNaming
         public string EventId { get; set; }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     sampleSizeUnit.
         /// </summary>
         /// <example>
-        ///     minute, hour, day, metre, square metre, cubic metre
+        ///     minute, hour, day, metre, square metre, cubic metre.
         /// </example>
         public string SampleSizeUnit { get; set; }
 
@@ -92,19 +91,19 @@ namespace SOS.Lib.Models.Processed.Observation
         public string SampleSizeValue { get; set; }
 
         /// <summary>
-        ///     Start date/time of the event
+        ///     Start date/time of the event.
         /// </summary>
         [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
         ///     The verbatim original representation of the date and time information for an Event.
-        ///     Examples: spring 1910, Marzo 2002, 1999-03-XX, 17IV1934
+        ///     Examples: spring 1910, Marzo 2002, 1999-03-XX, 17IV1934.
         /// </summary>
         public string VerbatimEventDate { get; set; }
 
         /// <summary>
-        ///     Multimedia linked to the event
+        ///     Multimedia linked to the event.
         /// </summary>
         [Nested]
         public ICollection<Multimedia> Media { get; set; }

@@ -7,24 +7,27 @@ using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
+    /// <summary>
+    /// Observation diffuse status.
+    /// </summary>
     public enum DiffuseStatus
     {
         /// <summary>
-        /// Observation is not diffused
+        /// Observation is not diffused.
         /// </summary>
         NotDiffused = 0,
         /// <summary>
-        /// Observation is diffused by the system and the non diffused original exists in the protected index
+        /// Observation is diffused by the SOS system and the non diffused original exists in the protected index.
         /// </summary>
         DiffusedBySystem,
         /// <summary>
-        /// Observation is diffused by provider. No original data exists in the system
+        /// Observation is diffused by provider. No original data exists in the system.
         /// </summary>
         DiffusedByProvider
     }
 
     /// <summary>
-    ///     This class contains information about a species sighting
+    ///     Information about a species observation.
     /// </summary>
     public class Observation : IEntity<string>
     {
@@ -39,14 +42,14 @@ namespace SOS.Lib.Models.Processed.Observation
         }
 
         /// <summary>
-        ///     List of defects found in harvest
+        ///     List of defects found in harvest.
         /// </summary>
         [Object]
         [SwaggerExclude]
         public IDictionary<string, string> Defects { get; set; }
 
         /// <summary>
-        /// Observation diffuse status
+        /// Observation diffuse status.
         /// </summary>
         public DiffuseStatus DiffuseStatus { get; set; }
 
@@ -197,8 +200,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string DynamicProperties { get; set; }
 
         /// <summary>
-        ///     Unique id, Omit to automatically generate an id on insert (best performance)
+        ///     Unique id.
         /// </summary>
+        /// <remarks>
+        /// Omit to automatically generate an id on insert (best performance).
+        /// </remarks>
         public string Id { get; set; }
 
         /// <summary>
@@ -268,7 +274,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PrivateCollection { get; set; }
 
         /// <summary>
-        /// Indicates whether the observation is protected by the system.
+        /// Indicates whether the observation is protected.
         /// </summary>
         public bool Protected { get; set; }
 
@@ -309,7 +315,7 @@ namespace SOS.Lib.Models.Processed.Observation
         #endregion Record level
 
         /// <summary>
-        ///     Measurement or fact linked to the observation.
+        ///     Measurement or facts linked to the observation.
         /// </summary>
         [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
@@ -321,7 +327,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
-        /// The date this observation was created.
+        /// The date the observation was created.
         /// </summary>
         public DateTime Created { get; set; }
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
