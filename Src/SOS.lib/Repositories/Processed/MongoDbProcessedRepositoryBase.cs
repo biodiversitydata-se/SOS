@@ -40,7 +40,7 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             bool toggleable,
             ILogger<ProcessRepositoryBase<TEntity>> logger
-        ) : base (client, toggleable, logger)
+        ) : base (client, toggleable, logger, null)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             

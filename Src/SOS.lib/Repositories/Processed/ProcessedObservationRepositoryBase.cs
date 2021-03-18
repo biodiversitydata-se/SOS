@@ -165,7 +165,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClient elasticClient,
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedPublicObservationRepository> logger
-        ) : base(client, true, logger)
+        ) : base(client, true, logger, elasticConfiguration)
         {
             _protected = protectedIndex;
             ElasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
@@ -176,10 +176,11 @@ namespace SOS.Lib.Repositories.Processed
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
+
         /// <summary>
         /// Get name of index
         /// </summary>
-        public string IndexName => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{GetInstanceName(CurrentInstance, _protected)}".ToLower();
+        public string IndexName => GetIndexName(CurrentInstance);
 
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<Observation> items)
@@ -304,6 +305,9 @@ namespace SOS.Lib.Repositories.Processed
             await ElasticClient.Indices.UpdateSettingsAsync(IndexName,
                 p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
+
+        /// <inheritdoc />
+        public string GetIndexName(byte instance) => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{GetInstanceName(instance, _protected)}".ToLower();
 
         /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -15,19 +14,26 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessInfoRepository : MongoDbProcessedRepositoryBase<ProcessInfo, string>, IProcessInfoRepository
     {
+        private IProcessedPublicObservationRepository _processedPublicObservationRepository;
+
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="client"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
             IProcessClient client,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             ILogger<ProcessInfoRepository> logger
         ) : base(client, false, logger)
         {
+            _processedPublicObservationRepository = processedPublicObservationRepository ??
+                                                    throw new ArgumentNullException(
+                                                        nameof(processedPublicObservationRepository));
         }
 
-        private string GetProcessInfoId(int instance) => $"{nameof(Observation)}-{instance}";
+        private string GetProcessInfoId(byte instance) => _processedPublicObservationRepository.GetIndexName(instance);
 
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)

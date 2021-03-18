@@ -51,12 +51,12 @@ namespace SOS.Observations.Api.Repositories
         /// <summary>
         /// Name of public index 
         /// </summary>
-        private string PublicIndex => $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, false)}".ToLower();
+        private string PublicIndex => GetIndexName(ActiveInstance);
 
         /// <summary>
         /// Name of protected index 
         /// </summary>
-        private string ProtectedIndex => $"{(string.IsNullOrEmpty(_elasticConfiguration.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(ActiveInstance, true)}".ToLower();
+        private string ProtectedIndex => GetIndexName(ActiveInstance, true);
         
         /// <summary>
         /// Get public index name and also protected index name if user is authorized
@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.Repositories
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger,
             IClassCache<ProcessedConfiguration> processedConfigurationCache,
-            IHttpContextAccessor httpContextAccessor) : base(client, true, logger, processedConfigurationCache)
+            IHttpContextAccessor httpContextAccessor) : base(client, true, logger, elasticConfiguration, processedConfigurationCache)
         {
             LiveMode = true;
 
