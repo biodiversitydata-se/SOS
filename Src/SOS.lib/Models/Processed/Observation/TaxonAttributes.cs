@@ -95,7 +95,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Scientific synonym names.
         /// </summary>
         [Nested]
-        public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }
+        public IEnumerable<TaxonSynonymName> Synonyms { get; set; }
 
         /// <summary>
         ///     Vernacular names.

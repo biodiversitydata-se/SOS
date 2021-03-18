@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Models.DarwinCore
 {
-    public class DarwinCoreSynonymeName
+    public class DarwinCoreSynonymName
     {
         public string ScientificName { get; set; }
         public string ScientificNameAuthorship { get; set; }

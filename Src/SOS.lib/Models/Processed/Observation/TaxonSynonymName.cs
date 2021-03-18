@@ -3,7 +3,7 @@
     /// <summary>
     /// Taxon synonym.
     /// </summary>
-    public class TaxonSynonymeName
+    public class TaxonSynonymName
     {
         /// <summary>
         /// Name.

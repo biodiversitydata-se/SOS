@@ -135,11 +135,11 @@ namespace SOS.Process.Services
             {
                 if (synonymsByTaxonId.TryGetValue(taxon.TaxonID, out DarwinCoreTaxon[] synonyms))
                 {
-                    var synonymeNames = new List<DarwinCoreSynonymeName>();
+                    var synonymeNames = new List<DarwinCoreSynonymName>();
                     
                     foreach (var dwcSynonyme in synonyms)
                     {
-                        synonymeNames.Add(CreateDarwinCoreSynonymeName(dwcSynonyme));
+                        synonymeNames.Add(CreateDarwinCoreSynonymName(dwcSynonyme));
                     }
 
                     taxon.Synonyms = synonymeNames;
@@ -155,16 +155,16 @@ namespace SOS.Process.Services
             return taxonByTaxonId;
         }
 
-        private static DarwinCoreSynonymeName CreateDarwinCoreSynonymeName(DarwinCoreTaxon dwcSynonyme)
+        private static DarwinCoreSynonymName CreateDarwinCoreSynonymName(DarwinCoreTaxon dwcSynonyme)
         {
-            DarwinCoreSynonymeName synonyme = new DarwinCoreSynonymeName();
-            synonyme.ScientificName = dwcSynonyme.ScientificName;
-            synonyme.NomenclaturalStatus = dwcSynonyme.NomenclaturalStatus;
-            synonyme.ScientificNameAuthorship = dwcSynonyme.ScientificNameAuthorship;
-            synonyme.TaxonomicStatus = dwcSynonyme.TaxonomicStatus;
+            DarwinCoreSynonymName synonym = new DarwinCoreSynonymName();
+            synonym.ScientificName = dwcSynonyme.ScientificName;
+            synonym.NomenclaturalStatus = dwcSynonyme.NomenclaturalStatus;
+            synonym.ScientificNameAuthorship = dwcSynonyme.ScientificNameAuthorship;
+            synonym.TaxonomicStatus = dwcSynonyme.TaxonomicStatus;
             //synonyme.NameId = synonyme.TaxonID; // probably not needed
             //synonyme.TaxonRemarks = synonyme.TaxonRemarks; // probably not needed
-            return synonyme;
+            return synonym;
         }
 
         private static int GetTaxonIdfromDyntaxaGuid(string dyntaxaTaxonGuid)
