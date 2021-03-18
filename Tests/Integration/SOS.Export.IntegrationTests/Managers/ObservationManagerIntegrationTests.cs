@@ -61,14 +61,16 @@ namespace SOS.Export.IntegrationTests.Managers
                 .Setup(us => us
                     .PrepareFilter(new SearchFilter())
                 );
+
+            var processedPublicObservationRepository = new ProcessedPublicObservationRepository(
+                exportClient,
+                elasticClient,
+                new ElasticSearchConfiguration {IndexPrefix = "test"},
+                new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
-                new ProcessedPublicObservationRepository(
-                    exportClient,
-                    elasticClient,
-                    new ElasticSearchConfiguration{ IndexPrefix = "test"},
-                    new Mock<ILogger<ProcessedPublicObservationRepository>>().Object),
-                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                processedPublicObservationRepository,
+                new ProcessInfoRepository(exportClient, processedPublicObservationRepository, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,

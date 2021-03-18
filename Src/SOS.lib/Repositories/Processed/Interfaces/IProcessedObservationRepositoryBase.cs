@@ -64,6 +64,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task EnableIndexingAsync();
 
         /// <summary>
+        /// Get index name
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        string GetIndexName(byte instance);
+
+        /// <summary>
         /// Get latest modified document date for passed provider
         /// </summary>
         /// <param name="providerId"></param>

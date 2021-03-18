@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
@@ -19,6 +20,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly IProcessClient _client;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
         private IClassCache<ProcessedConfiguration> _processedConfigurationCache;
+        private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly bool _toggleable;
 
         /// <summary>
@@ -148,21 +150,24 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         public ProcessRepositoryBase(
             IProcessClient client,
             bool toggleable,
             ILogger<ProcessRepositoryBase<TEntity>> logger,
+            ElasticSearchConfiguration elasticConfiguration,
             IClassCache<ProcessedConfiguration> processedConfigurationCache = null
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _toggleable = toggleable;
+            _elasticConfiguration = elasticConfiguration;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _processedConfigurationCache = processedConfigurationCache;
 
@@ -195,6 +200,12 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
+
+        /// <summary>
+        /// Name of public index 
+        /// </summary>
+        public string GetIndexName(byte instance, bool protectedObservations = false) => $"{(string.IsNullOrEmpty(_elasticConfiguration?.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(instance, protectedObservations)}".ToLower();
+
 
         /// <inheritdoc />
         public bool LiveMode { get; set; }
