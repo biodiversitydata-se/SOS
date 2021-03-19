@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto {TaxonIds = new List<int> {TestData.TaxonIds.Otter}, IncludeUnderlyingTaxa = true},
+                Taxon = new TaxonFilterDto { Ids = new List<int> {TestData.TaxonIds.Otter}, IncludeUnderlyingTaxa = true},
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Areas = new[]
                 {
                     TestData.Areas.TranasMunicipality, // Tranås Municipality
@@ -95,7 +95,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
                 OnlyValidated = false,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };

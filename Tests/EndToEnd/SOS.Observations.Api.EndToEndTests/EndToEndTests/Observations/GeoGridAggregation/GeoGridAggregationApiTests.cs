@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.GeoGridA
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto {TaxonIds = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true},
+                Taxon = new TaxonFilterDto { Ids = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true},
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
