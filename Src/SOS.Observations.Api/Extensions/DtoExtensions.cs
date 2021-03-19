@@ -57,7 +57,7 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
-            filter.DiffuseStatuses = searchFilterBaseDto.DiffuseStatuses?.Select(dsd => (DiffuseStatus) dsd);
+            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus) dsd);
 
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
