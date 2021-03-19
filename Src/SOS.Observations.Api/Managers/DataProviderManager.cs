@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -62,7 +61,7 @@ namespace SOS.Observations.Api.Managers
                         0,
                         providerInfo.HarvestEnd,
                         providerInfo.ProcessEnd,
-                        providerInfo.LatestIncrementalEnd ?? DateTime.MinValue,
+                        providerInfo.LatestIncrementalEnd,
                         cultureCode));
                 }
                 else

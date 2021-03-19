@@ -4,7 +4,7 @@
     /// <summary>
     /// Diffuse status dto
     /// </summary>
-    public enum DiffuseStatusDto
+    public enum DiffusionStatusDto
     {
         /// <summary>
         /// Observation is not diffused

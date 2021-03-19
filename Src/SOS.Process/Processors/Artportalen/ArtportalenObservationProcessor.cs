@@ -170,16 +170,7 @@ namespace SOS.Process.Processors.Artportalen
                 foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
                     var taxonId = verbatimObservation.TaxonId ?? -1;
-                    if (taxa.TryGetValue(taxonId, out var taxon))
-                    {
-                        if (!string.IsNullOrEmpty(verbatimObservation.URL))
-                        {
-                            // If we gone change properties for referenced taxon, we need to make a new object
-                            taxon = taxon.Clone();
-                            taxon.IndividualId = verbatimObservation.URL;
-                        }
-                    }
-
+                    taxa.TryGetValue(taxonId, out var taxon);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, taxon);
 
                     if (observation == null)

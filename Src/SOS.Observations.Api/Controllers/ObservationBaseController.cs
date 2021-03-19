@@ -125,9 +125,9 @@ namespace SOS.Observations.Api.Controllers
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
 
-            if ((filter.Taxon?.TaxonIds?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
+            if ((filter.Taxon?.Ids?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
             {
-                errors.AddRange(filter.Taxon.TaxonIds
+                errors.AddRange(filter.Taxon.Ids
                     .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
                     .Select(tid => $"TaxonId doesn't exist ({tid})"));
             }
@@ -189,7 +189,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         protected Result ValidateTaxonExists(SearchFilterBaseDto filter)
         {
-            var taxonCount = filter?.Taxon?.TaxonIds?.Count() ?? 0;
+            var taxonCount = filter?.Taxon?.Ids?.Count() ?? 0;
             return taxonCount == 0 
                 ? Result.Failure("You must provide taxon id's") 
                 : Result.Success();

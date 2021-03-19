@@ -32,6 +32,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - ArtportalenFilter.ProjectIds => ProjectIds
 - ArtportalenFilter => ExtendedFilter
 - dataProviderIds => dataProvider.ids
+- Taxon.TaxonIds => taxon.Ids
 
 #### Observation
 
@@ -84,6 +85,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - SwedishHistory => Taxon.Attributes.SwedishHistory
 - VernacularNames => Taxon.Attributes.VernacularNames
 - Synonyms => Taxon.Attributes.Synonyms
+- IndividualId => ArtportalenInternal.SightingBarcodeURL
 
 *Location*
 - ParentLocationId => ArtportalenInternal.ParentLocationId
