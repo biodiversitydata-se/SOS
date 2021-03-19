@@ -21,6 +21,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         ///     Taxa to match. Queryable values are available in Dyntaxa.
         /// </summary>
-        public IEnumerable<int> TaxonIds { get; set; }
+        public IEnumerable<int> Ids { get; set; }
     }
 }

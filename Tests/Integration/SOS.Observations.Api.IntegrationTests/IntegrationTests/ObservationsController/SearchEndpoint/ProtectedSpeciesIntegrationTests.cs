@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { TaxonIds = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
                 OnlyValidated = false,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };

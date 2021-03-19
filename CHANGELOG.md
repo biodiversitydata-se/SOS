@@ -32,6 +32,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - ArtportalenFilter.ProjectIds => ProjectIds
 - ArtportalenFilter => ExtendedFilter
 - dataProviderIds => dataProvider.ids
+- Taxon.TaxonIds => taxon.Ids
 
 #### Observation
 

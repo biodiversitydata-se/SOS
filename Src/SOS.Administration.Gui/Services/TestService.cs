@@ -163,7 +163,7 @@ namespace SOS.Administration.Gui.Services
             SearchFilterDto searchFilter = new SearchFilterDto();
             searchFilter.Taxon = new TaxonFilterDto()
             {
-                TaxonIds = new List<int>() { 100077 },
+                Ids = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
             searchFilter.Date = new DateFilterDto()
@@ -212,7 +212,7 @@ namespace SOS.Administration.Gui.Services
             SearchFilterDto searchFilter = new SearchFilterDto();
             searchFilter.Taxon = new TaxonFilterDto()
             {
-                TaxonIds = new List<int>() { 100077 },
+                Ids = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
             searchFilter.Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } };
@@ -258,7 +258,7 @@ namespace SOS.Administration.Gui.Services
             SearchFilterDto searchFilter = new SearchFilterDto();
             searchFilter.Taxon = new TaxonFilterDto()
             {
-                TaxonIds = new List<int>() { 100024 },
+                Ids = new List<int>() { 100024 },
                 IncludeUnderlyingTaxa = true
             };
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
@@ -297,7 +297,7 @@ namespace SOS.Administration.Gui.Services
             SearchFilterDto searchFilter = new SearchFilterDto();
             searchFilter.Taxon = new TaxonFilterDto()
             {
-                TaxonIds = new List<int>() { 4000107 },
+                Ids = new List<int>() { 4000107 },
                 IncludeUnderlyingTaxa = true
             };
             searchFilter.Date = new DateFilterDto()
