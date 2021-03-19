@@ -72,7 +72,7 @@ namespace SOS.Lib.Extensions
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
-                    Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymeNames(),
+                    Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames(),
                     VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames()
                 },
                 TaxonId = sourceTaxon.TaxonID,
@@ -113,29 +113,29 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///     Cast DarwinCoreSynonymeNames to TaxonSynonymeNames.
+        ///     Cast DarwinCoreSynonymNames to TaxonSynonymNames.
         /// </summary>
         /// <param name="synonyms"></param>
         /// <returns></returns>
-        private static IEnumerable<TaxonSynonymeName> ToTaxonSynonymeNames(
-            this IEnumerable<DarwinCoreSynonymeName> synonyms)
+        private static IEnumerable<TaxonSynonymName> ToTaxonSynonymNames(
+            this IEnumerable<DarwinCoreSynonymName> synonyms)
         {
-            return synonyms?.Select(m => m.ToTaxonSynonymeName());
+            return synonyms?.Select(m => m.ToTaxonSynonymName());
         }
 
         /// <summary>
-        ///     Cast DarwinCoreSynonymeName object to TaxonSynonymeName.
+        ///     Cast DarwinCoreSynonymName object to TaxonSynonymName.
         /// </summary>
-        /// <param name="synonyme"></param>
+        /// <param name="synonym"></param>
         /// <returns></returns>
-        private static TaxonSynonymeName ToTaxonSynonymeName(this DarwinCoreSynonymeName synonyme)
+        private static TaxonSynonymName ToTaxonSynonymName(this DarwinCoreSynonymName synonym)
         {
-            return new TaxonSynonymeName()
+            return new TaxonSynonymName()
             {
-                Name = synonyme.ScientificName,
-                Author = synonyme.ScientificNameAuthorship,
-                NomenclaturalStatus = synonyme.NomenclaturalStatus,
-                TaxonomicStatus = synonyme.TaxonomicStatus,
+                Name = synonym.ScientificName,
+                Author = synonym.ScientificNameAuthorship,
+                NomenclaturalStatus = synonym.NomenclaturalStatus,
+                TaxonomicStatus = synonym.TaxonomicStatus,
                 //NameId = synonyme.NameId, // probably not needed
                 //Remarks = synonyme.TaxonRemarks // probably not needed
             };
