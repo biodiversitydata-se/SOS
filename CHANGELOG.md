@@ -85,6 +85,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - SwedishHistory => Taxon.Attributes.SwedishHistory
 - VernacularNames => Taxon.Attributes.VernacularNames
 - Synonyms => Taxon.Attributes.Synonyms
+- IndividualId => ArtportalenInternal.SightingBarcodeURL
 
 *Location*
 - ParentLocationId => ArtportalenInternal.ParentLocationId

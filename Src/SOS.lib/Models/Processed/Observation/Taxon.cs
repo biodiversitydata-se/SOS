@@ -82,11 +82,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public int Id { get; set; }
 
         /// <summary>
-        ///     Individual id.
-        /// </summary>
-        public string IndividualId { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: infraspecificEpithet.
         ///     The name of the lowest or terminal infraspecific epithet
         ///     of the scientificName, excluding any rank designation.
