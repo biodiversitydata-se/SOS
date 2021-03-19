@@ -2,7 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -14,26 +17,25 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessInfoRepository : MongoDbProcessedRepositoryBase<ProcessInfo, string>, IProcessInfoRepository
     {
-        private IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly ElasticSearchConfiguration _elasticConfiguration;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
             IProcessClient client,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessInfoRepository> logger
         ) : base(client, false, logger)
         {
-            _processedPublicObservationRepository = processedPublicObservationRepository ??
-                                                    throw new ArgumentNullException(
-                                                        nameof(processedPublicObservationRepository));
+            _elasticConfiguration =
+                elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
         }
 
-        private string GetProcessInfoId(byte instance) => _processedPublicObservationRepository.GetIndexName(instance);
+        private string GetProcessInfoId(byte instance) => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, instance, false);
 
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)

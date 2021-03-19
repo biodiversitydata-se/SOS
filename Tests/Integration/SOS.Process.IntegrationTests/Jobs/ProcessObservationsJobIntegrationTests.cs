@@ -98,7 +98,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             }
             
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, processedPublicObservationRepository, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var vocabularyRepository =

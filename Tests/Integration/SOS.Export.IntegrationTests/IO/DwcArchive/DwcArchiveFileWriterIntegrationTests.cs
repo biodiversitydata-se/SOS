@@ -82,7 +82,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processedObservationRepository = CreateProcessedObservationRepository(exportClient, elasticConfiguration);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
-                new ProcessInfoRepository(exportClient, processedObservationRepository, new Mock<ILogger<ProcessInfoRepository>>().Object);
+                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
@@ -118,14 +118,13 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processDbConfiguration = GetProcessDbConfiguration();
             var exportClient = CreateExportClient(processDbConfiguration);
             var exportConfiguration = GetExportConfiguration();
+            var elasticConfiguration = GetElasticConfiguration();
             var exportFolderPath = exportConfiguration.FileDestination.Path;
             var processedDarwinCoreRepositoryStub =
                 ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
-            var elasticConfiguration = GetElasticConfiguration();
-            var processedObservationRepository = CreateProcessedObservationRepository(exportClient, elasticConfiguration);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
-                new ProcessInfoRepository(exportClient, processedObservationRepository, new Mock<ILogger<ProcessInfoRepository>>().Object);
+                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_ten_observations");
 

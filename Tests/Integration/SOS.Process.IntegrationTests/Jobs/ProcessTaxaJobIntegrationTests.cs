@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Verbatim;
@@ -28,21 +27,15 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
+            var elasticConfiguration = GetElasticConfiguration();
 
             var taxonProcessor = new TaxonProcessor(null, null, null, null); //Todo
 
-            var elasticClient = new ElasticClient();
-
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
-            var processedPublicObservationRepository = new ProcessedPublicObservationRepository(
-                processClient,
-                elasticClient,
-                GetElasticConfiguration(),
-                new NullLogger<ProcessedPublicObservationRepository>());
 
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, processedPublicObservationRepository, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonProcessor,
                 harvestInfoRepository,
