@@ -35,7 +35,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymeName;
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
 
         private readonly List<string> errors = new List<string>();
@@ -52,7 +52,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            _taxonBySynonymeName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
@@ -60,7 +60,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 {
                     foreach (var synonyme in processedTaxon.Attributes.Synonyms)
                     {
-                        _taxonBySynonymeName.Add(synonyme.Name.ToLower(), processedTaxon);
+                        _taxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
                     }
                 }
             }
@@ -516,7 +516,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 }
             }
 
-            if (_taxonBySynonymeName.TryGetValues(scientificName?.ToLower(), out var synonymeResult))
+            if (_taxonBySynonymName.TryGetValues(scientificName?.ToLower(), out var synonymeResult))
             {
                 if (synonymeResult.Count == 1)
                 {

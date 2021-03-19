@@ -1,17 +1,17 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     Represents a area
+    ///  Area (region) information.
     /// </summary>
     public class Area
     {
         /// <summary>
-        ///     Feature Id of area
+        ///     FeatureId for the area.
         /// </summary>
         public string FeatureId { get; set; }
 
         /// <summary>
-        ///     Name of area
+        ///     Name of the area.
         /// </summary>
         public string Name { get; set; }
     }

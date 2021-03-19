@@ -1,5 +1,8 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
+    /// <summary>
+    /// Measurement or facts for an observation or event.
+    /// </summary>
     public class ExtendedMeasurementOrFact
     {
         /// <summary>

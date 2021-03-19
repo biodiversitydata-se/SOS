@@ -5,10 +5,7 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    ///     This class contains taxon information about a species
-    ///     observation in Darwin Core 1.5 compatible format.
-    ///     Further information about the properties can
-    ///     be found at http://rs.tdwg.org/dwc/terms/
+    ///     This class contains taxon information about a species observation.
     /// </summary>
     public class Taxon : IEntity<int>, IBasicTaxon
     {
@@ -38,7 +35,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string AcceptedNameUsageID { get; set; }
 
         /// <summary>
-        /// Taxon attributes
+        /// Taxon attributes.
         /// </summary>
         public TaxonAttributes Attributes { get; set; }
 
@@ -80,12 +77,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string HigherClassification { get; set; }
 
         /// <summary>
-        ///     Object id
+        ///     Object id.
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        ///     Individual id
+        ///     Individual id.
         /// </summary>
         public string IndividualId { get; set; }
 
@@ -284,6 +281,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonConceptId { get; set; }
 
         /// <summary>
+        ///     Darwin Core term name: taxonID.
         ///     An identifier for the set of taxon information
         ///     (data associated with the Taxon class). May be a global
         ///     unique identifier or an identifier specific to the data set.
