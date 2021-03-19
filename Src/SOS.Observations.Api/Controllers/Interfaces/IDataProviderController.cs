@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GetDataProvidersAsync(string cultureCode = "en-GB");
 
         /// <summary>
-        /// Get latest data modified date for passed provider 
+        /// Get latest modified date for a data provider.
         /// </summary>
         /// <param name="providerId"></param>
         /// <returns></returns>

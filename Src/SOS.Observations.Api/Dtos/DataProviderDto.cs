@@ -7,7 +7,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
-    ///     Data provider DTO.
+    /// Information about a data provider.
     /// </summary>
     public class DataProviderDto
     {
@@ -17,27 +17,27 @@ namespace SOS.Observations.Api.Dtos
         public int Id { get; set; }
 
         /// <summary>
-        ///     A unique identifer that is easier to understand than an Id number.
+        ///     A unique text identifer for the data provider.
         /// </summary>
         public string Identifier { get; set; }
 
         /// <summary>
-        ///     The name of the data provider (in english).
+        ///     The name of the data provider.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        ///     Description of the data provider (in english).
+        ///     Description of the data provider.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        ///     The organization name (in english).
+        ///     The organization name.
         /// </summary>
         public string Organization { get; set; }
 
         /// <summary>
-        /// Paths
+        /// Paths that can be used to group and visualize a data provider as a tree in a GUI.
         /// </summary>
         public IEnumerable<string> Path { get; set; }
 
@@ -72,12 +72,12 @@ namespace SOS.Observations.Api.Dtos
         public DateTime? LatestIncrementalHarvestDate { get; set; }
 
         /// <summary>
-        /// Date time from where next harvest can be run
+        /// Date time from where next harvest can be run.
         /// </summary>
         public DateTime? NextHarvestFrom { get; set; }
 
         /// <summary>
-        /// CRONE expression used to schedule harvest
+        /// Cron expression used to schedule harvest.
         /// </summary>
         public string HarvestSchedule { get; set; }
 
