@@ -129,7 +129,7 @@ namespace SOS.Process.Managers
                 return;
             }
 
-            observation.DiffuseStatus = DiffuseStatus.DiffusedBySystem;
+            observation.DiffusionStatus = DiffusionStatus.DiffusedBySystem;
             observation.DataGeneralizations += " All data related to the exact location of the observation has been diffused or removed. Native data is available with extended privileges.";
 
             // Diffused observations is not protected

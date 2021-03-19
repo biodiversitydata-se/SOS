@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     /// Observation diffuse status.
     /// </summary>
-    public enum DiffuseStatus
+    public enum DiffusionStatus
     {
         /// <summary>
         /// Observation is not diffused.
@@ -37,7 +37,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public Observation()
         {
             Created = DateTime.Now;
-            DiffuseStatus = DiffuseStatus.NotDiffused;
+            DiffusionStatus = DiffusionStatus.NotDiffused;
             Occurrence = new Occurrence();
         }
 
@@ -51,7 +51,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Observation diffuse status.
         /// </summary>
-        public DiffuseStatus DiffuseStatus { get; set; }
+        public DiffusionStatus DiffusionStatus { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to an event (an

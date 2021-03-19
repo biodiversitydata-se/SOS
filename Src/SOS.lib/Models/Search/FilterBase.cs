@@ -98,7 +98,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Filter by diffuse status
         /// </summary>
-        public IEnumerable<DiffuseStatus> DiffuseStatuses { get; set; }
+        public IEnumerable<DiffusionStatus> DiffusionStatuses { get; set; }
 
         /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.

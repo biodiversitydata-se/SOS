@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Filter by diffuse status
         /// </summary>
-        public IEnumerable<DiffuseStatusDto> DiffuseStatuses { get; set; }
+        public IEnumerable<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
         /// <summary>
         /// Taxon filter.
