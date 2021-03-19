@@ -318,7 +318,6 @@ namespace SOS.Observations.Api
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
-            services.AddScoped<IProcessedPublicObservationRepository, ProcessedPublicObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();

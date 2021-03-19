@@ -38,10 +38,6 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var taxonManager = new TaxonManager(new TaxonRepository(exportClient,
-                    new Mock<ILogger<TaxonRepository>>().Object),
-                new MemoryCache(new MemoryCacheOptions()),
-                new Mock<ILogger<TaxonManager>>().Object);
             var vocabularyRepository =
                 new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
@@ -55,6 +51,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>());
 
+            var elasticConfiguration = GetElasticConfiguration();
 
             var filterManager = new Mock<IFilterManager>();
             filterManager
@@ -70,7 +67,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 processedPublicObservationRepository,
-                new ProcessInfoRepository(exportClient, processedPublicObservationRepository, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
