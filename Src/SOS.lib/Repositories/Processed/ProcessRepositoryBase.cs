@@ -4,9 +4,8 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -20,7 +19,6 @@ namespace SOS.Lib.Repositories.Processed
         private readonly IProcessClient _client;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
         private IClassCache<ProcessedConfiguration> _processedConfigurationCache;
-        private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly bool _toggleable;
 
         /// <summary>
@@ -137,17 +135,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="instance"></param>
 
         /// <returns></returns>
-        protected string GetInstanceName(byte instance, bool protectedObservations) 
-        {
-            var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
-            if(protectedObservations)
-            {
-                instanceName += "-protected";
-            }
-
-            instanceName += $"{(_toggleable ? $"-{instance}" : string.Empty)}";
-            return instanceName;
-        }
+        protected string GetInstanceName(byte instance, bool protectedObservations) =>
+            IndexHelper.GetInstanceName<TEntity>(_toggleable, instance, protectedObservations);
 
         /// <summary>
         /// Constructor
@@ -161,13 +150,11 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             bool toggleable,
             ILogger<ProcessRepositoryBase<TEntity>> logger,
-            ElasticSearchConfiguration elasticConfiguration,
             IClassCache<ProcessedConfiguration> processedConfigurationCache = null
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _toggleable = toggleable;
-            _elasticConfiguration = elasticConfiguration;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _processedConfigurationCache = processedConfigurationCache;
 
@@ -200,11 +187,6 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
-
-        /// <summary>
-        /// Name of public index 
-        /// </summary>
-        public string GetIndexName(byte instance, bool protectedObservations = false) => $"{(string.IsNullOrEmpty(_elasticConfiguration?.IndexPrefix) ? "" : $"{_elasticConfiguration.IndexPrefix}-")}{GetInstanceName(instance, protectedObservations)}".ToLower();
 
 
         /// <inheritdoc />

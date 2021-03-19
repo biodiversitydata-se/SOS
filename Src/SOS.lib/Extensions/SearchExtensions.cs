@@ -866,7 +866,7 @@ namespace SOS.Lib.Extensions
             query.TryAddGeometryFilters(filter.Geometries);
             query.AddSightingTypeFilters(filter);
 
-            query.TryAddTermsCriteria("diffuseStatus", filter.DiffuseStatuses?.Select(ds => (int)ds));
+            query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);

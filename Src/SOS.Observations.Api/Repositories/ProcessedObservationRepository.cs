@@ -14,6 +14,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
@@ -51,13 +52,13 @@ namespace SOS.Observations.Api.Repositories
         /// <summary>
         /// Name of public index 
         /// </summary>
-        private string PublicIndex => GetIndexName(ActiveInstance);
+        private string PublicIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, false);
 
         /// <summary>
         /// Name of protected index 
         /// </summary>
-        private string ProtectedIndex => GetIndexName(ActiveInstance, true);
-        
+        private string ProtectedIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, true);
+
         /// <summary>
         /// Get public index name and also protected index name if user is authorized
         /// </summary>
@@ -100,7 +101,7 @@ namespace SOS.Observations.Api.Repositories
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger,
             IClassCache<ProcessedConfiguration> processedConfigurationCache,
-            IHttpContextAccessor httpContextAccessor) : base(client, true, logger, elasticConfiguration, processedConfigurationCache)
+            IHttpContextAccessor httpContextAccessor) : base(client, true, logger, processedConfigurationCache)
         {
             LiveMode = true;
 

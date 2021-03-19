@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                Taxon = new TaxonFilterDto { TaxonIds = new List<int>() { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
+                Taxon = new TaxonFilterDto { Ids = new List<int>() { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),

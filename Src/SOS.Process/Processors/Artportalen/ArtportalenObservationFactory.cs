@@ -246,6 +246,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
+                obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.URL;
 
                 // Set dependent properties
                 var biotope = obs.Occurrence.Biotope?.Value;

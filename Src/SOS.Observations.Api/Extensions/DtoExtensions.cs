@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.Extensions
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
             filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
             filter.Areas = searchFilterBaseDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
-            filter.TaxonIds = searchFilterBaseDto.Taxon?.TaxonIds;
+            filter.TaxonIds = searchFilterBaseDto.Taxon?.Ids;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
@@ -57,7 +57,7 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
-            filter.DiffuseStatuses = searchFilterBaseDto.DiffuseStatuses?.Select(dsd => (DiffuseStatus) dsd);
+            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus) dsd);
 
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {

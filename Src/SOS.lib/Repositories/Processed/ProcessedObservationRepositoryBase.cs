@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -165,7 +166,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClient elasticClient,
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedPublicObservationRepository> logger
-        ) : base(client, true, logger, elasticConfiguration)
+        ) : base(client, true, logger)
         {
             _protected = protectedIndex;
             ElasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
@@ -307,7 +308,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string GetIndexName(byte instance) => $"{(string.IsNullOrEmpty(_indexPrefix) ? string.Empty : $"{_indexPrefix}-")}{GetInstanceName(instance, _protected)}".ToLower();
+        public string GetIndexName(byte instance) => IndexHelper.GetIndexName<Observation>(instance, _protected);
 
         /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
