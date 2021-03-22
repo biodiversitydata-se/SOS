@@ -107,11 +107,11 @@ namespace SOS.Process.Processors
                 }
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var verbatimCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
+                var processCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
 
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
 
-                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
+                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount);
             }
             catch (JobAbortedException)
             {
@@ -125,7 +125,7 @@ namespace SOS.Process.Processors
             }
         }
 
-        protected abstract Task<int> ProcessObservations(
+        protected abstract Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,

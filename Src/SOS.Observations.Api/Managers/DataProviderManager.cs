@@ -57,8 +57,8 @@ namespace SOS.Observations.Api.Managers
                 {
                     dataProviderDtos.Add(DataProviderDto.Create(
                         dataProvider,
-                        providerInfo.ProcessCount.GetValueOrDefault(0),
-                        0,
+                        providerInfo.PublicProcessCount.GetValueOrDefault(0),
+                        providerInfo.ProtectedProcessCount.GetValueOrDefault(0),
                         providerInfo.HarvestEnd,
                         providerInfo.ProcessEnd,
                         providerInfo.LatestIncrementalEnd,

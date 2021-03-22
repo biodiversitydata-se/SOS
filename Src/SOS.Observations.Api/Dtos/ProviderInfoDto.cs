@@ -31,7 +31,12 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// Last incremental process count 
         /// </summary>
-        public int? LatestIncrementalCount { get; set; }
+        public int? LatestIncrementalPublicCount { get; set; }
+
+        /// <summary>
+        /// Last incremental process count 
+        /// </summary>
+        public int? LatestIncrementalProtectedCount { get; set; }
 
         /// <summary>
         /// Last incremental process end 
@@ -51,7 +56,12 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     Number of items processed
         /// </summary>
-        public int? ProcessCount { get; set; }
+        public int? PublicProcessCount { get; set; }
+
+        /// <summary>
+        ///     Number of items processed
+        /// </summary>
+        public int? ProtectedProcessCount { get; set; }
 
         /// <summary>
         ///     Process end date and time

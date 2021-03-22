@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -29,7 +28,7 @@ namespace SOS.Process.Processors.ObservationDatabase
         private readonly IDiffusionManager _diffusionManager;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -114,7 +113,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 Logger.LogDebug($"Observation database public observations processed: {publicProcessedCount}");
             }
 
-            return protectedProcessedCount;
+            return (publicProcessedCount, protectedProcessedCount);
         }
 
         /// <summary>

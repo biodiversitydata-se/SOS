@@ -47,7 +47,7 @@ namespace SOS.Process.Jobs
 
             await SaveProcessInfo(new ProcessInfo(nameof(Taxon), start)
             {
-                Count = taxaCount,
+                PublicCount = taxaCount,
                 End = DateTime.Now,
                 Status = success ? RunStatus.Success : RunStatus.Failed
             });

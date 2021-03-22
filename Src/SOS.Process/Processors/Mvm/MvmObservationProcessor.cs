@@ -53,7 +53,7 @@ namespace SOS.Process.Processors.Mvm
         public override DataProviderType Type => DataProviderType.MvmObservations;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -96,7 +96,7 @@ namespace SOS.Process.Processors.Mvm
                 Logger.LogDebug($"MVM observations processed: {processedCount}");
             }
 
-            return processedCount;
+            return (processedCount, 0);
         }
     }
 }
