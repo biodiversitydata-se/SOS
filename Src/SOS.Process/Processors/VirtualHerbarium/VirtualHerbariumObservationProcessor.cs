@@ -27,7 +27,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             JobRunModes mode,
@@ -79,12 +79,12 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                 }
 
-                return processedCount;
+                return (processedCount, 0);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Failed to process Virtual Herbarium Sightings");
-                return 0;
+                return (0, 0);
             }
         }
 

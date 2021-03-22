@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -100,7 +99,7 @@ namespace SOS.Process.Processors.Artportalen
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             JobRunModes mode,
@@ -113,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
 
             var minId = 1;
             var maxId = await _artportalenVerbatimRepository.GetMaxIdAsync();
-            var processBatchTasks = new List<Task<int>>();
+            var processBatchTasks = new List<Task<(int publicCount, int protectedCount)>>();
 
             while (minId <= maxId)
             {
@@ -127,7 +126,7 @@ namespace SOS.Process.Processors.Artportalen
 
             await Task.WhenAll(processBatchTasks);
 
-            return processBatchTasks.Sum(t => t.Result);
+            return (processBatchTasks.Sum(t => t.Result.publicCount), processBatchTasks.Sum(t => t.Result.protectedCount));
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> ProcessBatchAsync(
+        private async Task<(int publicCount, int protectedCount)> ProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -159,7 +158,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 if (!verbatimObservationsBatch?.Any() ?? true)
                 {
-                    return 0;
+                    return (0,0);
                 }
 
                 Logger.LogDebug($"Start processing Artportalen batch ({startId}-{endId})");
@@ -210,7 +209,9 @@ namespace SOS.Process.Processors.Artportalen
                 await Task.WhenAll(validateAndStoreTasks);
 
                 var publicCount = validateAndStoreTasks[0].Result;
-                return publicCount; // Since public contains protected (diffused) observations, we return public count             // + protectedCount;
+                var protectedCount = validateAndStoreTasks[1].Result;
+
+                return (publicCount, protectedCount); 
             }
             catch (JobAbortedException e)
             {
@@ -226,7 +227,7 @@ namespace SOS.Process.Processors.Artportalen
                 _semaphoreBatch.Release();
             }
 
-            return 0;
+            return (0, 0);
         }
 
         private async Task<int> ValidateAndStoreObservations(

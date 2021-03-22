@@ -11,7 +11,12 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     Item processed
         /// </summary>
-        public int Count { get; set; }
+        public int PublicCount { get; set; }
+
+        /// <summary>
+        /// Protected observations count
+        /// </summary>
+        public int ProtectedCount { get; set; }
 
         /// <summary>
         ///     Harvest end date and time

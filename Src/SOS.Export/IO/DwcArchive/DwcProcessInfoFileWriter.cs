@@ -90,9 +90,13 @@ namespace SOS.Export.IO.DwcArchive
             harvestStatusAttribute.Value = providerInfo.HarvestStatus.ToString();
             providerInfoNode.Attributes.Append(harvestStatusAttribute);
 
-            var processCountAttribute = doc.CreateAttribute("process-count");
-            processCountAttribute.Value = providerInfo.ProcessCount.ToString();
-            providerInfoNode.Attributes.Append(processCountAttribute);
+            var processCountPublicAttribute = doc.CreateAttribute("process-count-public");
+            processCountPublicAttribute.Value = providerInfo.PublicProcessCount.ToString();
+            providerInfoNode.Attributes.Append(processCountPublicAttribute);
+
+            var processCountProtectedAttribute = doc.CreateAttribute("process-count-protected");
+            processCountProtectedAttribute.Value = providerInfo.ProtectedProcessCount.ToString();
+            providerInfoNode.Attributes.Append(processCountProtectedAttribute);
 
             var processStartAttribute = doc.CreateAttribute("process-start");
             processStartAttribute.Value = providerInfo.ProcessStart.ToString("O");
@@ -109,7 +113,7 @@ namespace SOS.Export.IO.DwcArchive
             if (metadataInfo?.Any() ?? false)
             {
                 var processMetadataInfoAttribute = doc.CreateAttribute("metadata");
-                processStatusAttribute.Value = string.Join(';', metadataInfo.Select(md => $"{md.Id}, start: {md.Start}, end: {md.End}, count: {md.Count}"));
+                processStatusAttribute.Value = string.Join(';', metadataInfo.Select(md => $"{md.Id}, start: {md.Start}, end: {md.End}, public-count: {md.PublicCount}, protected-count: {md.ProtectedCount}"));
                 providerInfoNode.Attributes.Append(processMetadataInfoAttribute);
             }
 

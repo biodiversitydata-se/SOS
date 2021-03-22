@@ -139,7 +139,7 @@ namespace SOS.Observations.Api.Dtos
             dataProviderDto.LatestHarvestDate = latestHarvestDate;
             dataProviderDto.LatestProcessDate = latestProcessDate;
             dataProviderDto.LatestIncrementalHarvestDate = latestIncrementalHarvestDate;
-
+            dataProviderDto.NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate);
             return dataProviderDto;
         }
     }

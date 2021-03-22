@@ -65,7 +65,8 @@ namespace SOS.Lib.Repositories.Processed
             // Add provider data from active instance and update db document
             targetProviders.Add(sourceProvider);
             target.ProvidersInfo = targetProviders;
-            target.Count = target.ProvidersInfo.Sum(pi => pi.ProcessCount ?? 0);
+            target.PublicCount = target.ProvidersInfo.Sum(pi => pi.PublicProcessCount ?? 0);
+            target.ProtectedCount = target.ProvidersInfo.Sum(pi => pi.ProtectedProcessCount ?? 0);
             return await AddOrUpdateAsync(target);
         }
 

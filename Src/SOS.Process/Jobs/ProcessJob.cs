@@ -458,10 +458,7 @@ namespace SOS.Process.Jobs
             }
 
             // Try to get process info for current instance
-            var processInfo = (await GetProcessInfoAsync(new[]
-            {
-                _processedPublicObservationRepository.IndexName
-                })).FirstOrDefault();
+            var processInfo = await GetObservationProcessInfoAsync(mode != JobRunModes.Full);
 
             if (processInfo == null || mode == JobRunModes.Full)
             {
@@ -480,7 +477,8 @@ namespace SOS.Process.Jobs
                         HarvestEnd = harvestInfo?.End,
                         HarvestStart = harvestInfo?.Start,
                         HarvestStatus = harvestInfo?.Status,
-                        ProcessCount = processResult.Count,
+                        PublicProcessCount = processResult.PublicCount,
+                        ProtectedProcessCount = processResult.ProtectedCount,
                         ProcessEnd = processResult.End,
                         ProcessStart = processResult.Start,
                         ProcessStatus = processResult.Status
@@ -497,7 +495,8 @@ namespace SOS.Process.Jobs
 
                 processInfo = new ProcessInfo(_processedPublicObservationRepository.IndexName, processStart)
                 {
-                    Count = processTaskByDataProvider.Sum(pi => pi.Value.Result.Count),
+                    PublicCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.PublicCount),
+                    ProtectedCount = processTaskByDataProvider.Sum(pi =>pi.Value.Result.ProtectedCount),
                     End = DateTime.Now,
                     MetadataInfo = metaDataProcessInfo,
                     ProvidersInfo = providersInfo,
@@ -515,7 +514,8 @@ namespace SOS.Process.Jobs
                     var providerInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId == provider.Id);
                     if (providerInfo != null)
                     {
-                        providerInfo.LatestIncrementalCount = processResult.Count;
+                        providerInfo.LatestIncrementalPublicCount = processResult.PublicCount;
+                        providerInfo.LatestIncrementalProtectedCount = processResult.ProtectedCount;
                         providerInfo.LatestIncrementalEnd = processResult.End;
                         providerInfo.LatestIncrementalStart = processResult.Start;
                         providerInfo.LatestIncrementalStatus = processResult.Status;
