@@ -54,7 +54,7 @@ namespace SOS.Process.Processors.Sers
         public override DataProviderType Type => DataProviderType.SersObservations;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -100,7 +100,7 @@ namespace SOS.Process.Processors.Sers
                 Logger.LogDebug($"SERS observations processed: {processedCount}");
             }
 
-            return processedCount;
+            return (processedCount, 0);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace SOS.Process.Processors.Nors
         public override DataProviderType Type => DataProviderType.NorsObservations;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -97,7 +97,7 @@ namespace SOS.Process.Processors.Nors
                 Logger.LogDebug($"NORS observations processed: {processedCount}");
             }
 
-            return processedCount;
+            return (processedCount, 0);
         }
     }
 }

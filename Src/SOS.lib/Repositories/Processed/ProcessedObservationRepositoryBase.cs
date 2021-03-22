@@ -308,7 +308,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string GetIndexName(byte instance) => IndexHelper.GetIndexName<Observation>(instance, _protected);
+        public string GetIndexName(byte instance) => IndexHelper.GetIndexName<Observation>(_indexPrefix, true, instance, _protected);
 
         /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)

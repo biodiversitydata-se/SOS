@@ -30,7 +30,12 @@ namespace SOS.Lib.Models.Processed
         /// <summary>
         ///     Number of items
         /// </summary>
-        public int Count { get; set; }
+        public int ProtectedCount { get; set; }
+
+        /// <summary>
+        ///     Number of items
+        /// </summary>
+        public int PublicCount { get; set; }
 
         /// <summary>
         ///     Data provider identifier
@@ -65,14 +70,16 @@ namespace SOS.Lib.Models.Processed
             DataProviderType type,
             DateTime start,
             DateTime end,
-            int count)
+            int publicCount,
+            int protectedCount)
         {
             return new ProcessingStatus(dataProviderIdentifier, type)
             {
                 Status = RunStatus.Success,
                 Start = start,
                 End = end,
-                Count = count
+                PublicCount = publicCount,
+                ProtectedCount = protectedCount
             };
         }
 

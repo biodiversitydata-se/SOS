@@ -103,13 +103,13 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var verbatimCount = await ProcessObservationsSequential(
+                var processCount = await ProcessObservationsSequential(
                     dataProvider,
                     taxa,
                     cancellationToken);
                 
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
-                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, verbatimCount);
+                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, processCount, 0);
             }
             catch (JobAbortedException)
             {
@@ -124,7 +124,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
