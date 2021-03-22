@@ -69,7 +69,7 @@ namespace SOS.Process.Managers
            
             //transform the point into the same format as Artportalen so that we can use the same diffusion as them
             var geompoint = new NetTopologySuite.Geometries.Point(longitude, latitude);
-            var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+            var transformedPoint = geompoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
             var diffusedUntransformedPoint = new NetTopologySuite.Geometries.Point(
                 transformedPoint.Coordinates[0].X - transformedPoint.Coordinates[0].X % mod +
                 add,
@@ -80,7 +80,7 @@ namespace SOS.Process.Managers
             var coordinateUncertaintyInMeters = location.CoordinateUncertaintyInMeters ?? 0;
             var newCoordinateUncertaintyInMeters = coordinateUncertaintyInMeters > mod ? coordinateUncertaintyInMeters : mod;
             var diffusedPoint =
-                diffusedUntransformedPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
             var diffusedPolygon = ((NetTopologySuite.Geometries.Point) diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
 
             // Set location diffused geographical data
