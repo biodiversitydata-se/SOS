@@ -26,7 +26,12 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         ///     Item processed
         /// </summary>
-        public int Count { get; set; }
+        public int PublicCount { get; set; }
+
+        /// <summary>
+        /// Number of protected observations
+        /// </summary>
+        public int ProtectedCount { get; set; }
 
         /// <summary>
         ///     Harvest end date and time

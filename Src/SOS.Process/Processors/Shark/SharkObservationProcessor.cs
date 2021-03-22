@@ -54,7 +54,7 @@ namespace SOS.Process.Processors.Shark
         public override DataProviderType Type => DataProviderType.SharkObservations;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -97,7 +97,7 @@ namespace SOS.Process.Processors.Shark
                 Logger.LogDebug($"SHARK observations processed: {processedCount}");
             }
 
-            return processedCount;
+            return (processedCount, 0);
         }
     }
 }

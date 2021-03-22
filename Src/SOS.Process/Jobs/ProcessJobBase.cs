@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -74,6 +71,11 @@ namespace SOS.Process.Jobs
             }
 
             return processInfos;
+        }
+
+        protected async Task<ProcessInfo> GetObservationProcessInfoAsync(bool active)
+        {
+            return await _processInfoRepository.GetProcessInfoAsync(active);
         }
     }
 }

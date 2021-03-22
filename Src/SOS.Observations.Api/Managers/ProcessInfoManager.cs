@@ -21,7 +21,8 @@ namespace SOS.Observations.Api.Managers
         {
             return new ProcessInfoDto
             {
-                Count = processInfo.Count,
+                PublicCount = processInfo.PublicCount,
+                ProtectedCount = processInfo.ProtectedCount,
                 End = processInfo.End,
                 Id = processInfo.Id,
                 Start = processInfo.Start,
@@ -41,11 +42,13 @@ namespace SOS.Observations.Api.Managers
                 HarvestEnd = providerInfo.HarvestEnd,
                 HarvestStart = providerInfo.HarvestStart,
                 HarvestStatus = providerInfo.HarvestStatus?.ToString(),
-                LatestIncrementalCount = providerInfo.LatestIncrementalCount,
+                LatestIncrementalPublicCount = providerInfo.LatestIncrementalPublicCount,
+                LatestIncrementalProtectedCount = providerInfo.LatestIncrementalProtectedCount,
                 LatestIncrementalEnd = providerInfo.LatestIncrementalEnd,
                 LatestIncrementalStart = providerInfo.LatestIncrementalStart,
                 LatestIncrementalStatus = providerInfo.LatestIncrementalStatus?.ToString(),
-                ProcessCount = providerInfo.ProcessCount,
+                PublicProcessCount = providerInfo.PublicProcessCount,
+                ProtectedProcessCount = providerInfo.ProtectedProcessCount,
                 ProcessEnd = providerInfo.ProcessEnd,
                 ProcessStart = providerInfo.ProcessStart,
                 ProcessStatus = providerInfo.ProcessStatus?.ToString()
