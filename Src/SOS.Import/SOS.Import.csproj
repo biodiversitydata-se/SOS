@@ -160,6 +160,9 @@
     <None Update="Resources\Vocabularies\SubstrateVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Vocabularies\TaxonProtectionLevelVocabulary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Vocabularies\TypeVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
