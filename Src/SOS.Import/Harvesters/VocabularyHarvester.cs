@@ -47,6 +47,7 @@ namespace SOS.Import.Harvesters
         /// <param name="behaviorVocabularyFactory"></param>
         /// <param name="logger"></param>
         /// <param name="activityVocabularyFactory"></param>
+        /// <param name="taxonProtectionLevelVocabularyFactory"></param>
         /// <param name="biotopeVocabularyFactory"></param>
         /// <param name="substrateVocabularyFactory"></param>
         /// <param name="typeVocabularyFactory"></param>
@@ -76,6 +77,7 @@ namespace SOS.Import.Harvesters
             DeterminationMethodVocabularyFactory determinationMethodVocabularyFactory,
             ReproductiveConditionVocabularyFactory reproductiveConditionVocabularyFactory,
             BehaviorVocabularyFactory behaviorVocabularyFactory,
+            TaxonProtectionLevelVocabularyFactory taxonProtectionLevelVocabularyFactory,
             ILogger<VocabularyHarvester> logger)
         {
             _vocabularyRepository =
@@ -102,7 +104,8 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.DiscoveryMethod, discoveryMethodVocabularyFactory},
                 {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory},
                 {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
-                {VocabularyId.Behavior, behaviorVocabularyFactory}
+                {VocabularyId.Behavior, behaviorVocabularyFactory},
+                {VocabularyId.TaxonProtectionLevel, taxonProtectionLevelVocabularyFactory}
             };
         }
 
@@ -201,6 +204,9 @@ namespace SOS.Import.Harvesters
 
             foreach (var externalSystemMappingField in externalSystemMappingFields)
             {
+                if (externalSystemMappingField.Values == null || externalSystemMappingField.Values.Count == 0)
+                    continue;
+
                 // Check if there exists duplicate synonyms.
                 if (externalSystemMappingField.Values.First().Value is string)
                 {
