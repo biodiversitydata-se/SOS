@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Nest;
 using SOS.Lib.Models.Interfaces;
 
@@ -34,7 +33,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Description { get; set; }
 
         /// <summary>
-        ///     Date when the project ends.
+        ///     Date when the project ends (UTC).
         /// </summary>
         [Date]
         public DateTime? EndDate { get; set; }
@@ -63,7 +62,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ProjectURL { get; set; }
 
         /// <summary>
-        ///     Date when the project starts.
+        ///     Date when the project starts (UTC).
         /// </summary>
         [Date]
         public DateTime? StartDate { get; set; }

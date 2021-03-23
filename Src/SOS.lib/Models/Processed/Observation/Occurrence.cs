@@ -276,7 +276,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ReportedBy { get; set; }
 
         /// <summary>
-        ///     Date and time when the species observation was reported.
+        ///     Date and time when the species observation was reported (UTC).
         /// </summary>
         [Date]
         public DateTime? ReportedDate { get; set; }
