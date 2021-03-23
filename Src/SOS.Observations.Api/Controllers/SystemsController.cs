@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -34,6 +35,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> GetProcessInfoAsync([FromQuery] bool active)
         {
             try
