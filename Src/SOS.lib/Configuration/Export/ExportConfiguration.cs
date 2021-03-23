@@ -1,4 +1,7 @@
 ﻿
+using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Process;
+
 namespace SOS.Lib.Configuration.Export
 {
     /// <summary>
@@ -25,5 +28,15 @@ namespace SOS.Lib.Configuration.Export
         ///     Zend to config
         /// </summary>
         public ZendToConfiguration ZendToConfiguration { get; set; }
+
+        /// <summary>
+        /// Vocabulary Configuration
+        /// </summary>
+        public VocabularyConfiguration VocabularyConfiguration { get; set; }
+
+        /// <summary>
+        /// User service config
+        /// </summary>
+        public UserServiceConfiguration UserServiceConfiguration { get; set; }
     }
 }

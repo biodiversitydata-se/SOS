@@ -25,7 +25,7 @@ namespace SOS.Lib.Repositories.Processed
     public class ProcessedObservationRepositoryBase : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepositoryBase
     {
-        private const string ScrollTimeOut = "45s";
+        private const string ScrollTimeOut = "60s";
         private readonly string _indexPrefix;
         private readonly int _scrollBatchSize;
         private readonly int _numberOfShards;
@@ -56,7 +56,7 @@ namespace SOS.Lib.Repositories.Processed
 
         private Observation CastDynamicToObservation(dynamic dynamicObject)
         {
-            return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject),
+            return dynamicObject == null ? null : JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject),
                 new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
         }
 
@@ -452,6 +452,7 @@ namespace SOS.Lib.Repositories.Processed
                 var query = filter.ToQuery();
                 var projection = new SourceFilterDescriptor<dynamic>()
                     .Excludes(e => e
+                        .Field("ArtportalenInternal")
                         .Field("location.point")
                         .Field("location.pointLocation")
                         .Field("location.pointWithBuffer")
@@ -467,7 +468,7 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                         .Scroll(ScrollTimeOut)
-                        .Size(BatchSize)
+                        .Size(1000)
                     );
 
             }
@@ -481,7 +482,7 @@ namespace SOS.Lib.Repositories.Processed
             {
                 Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d)),
                 ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
+                TotalCount = searchResponse.HitsMetadata?.Total?.Value ?? 0
             };
         }
 

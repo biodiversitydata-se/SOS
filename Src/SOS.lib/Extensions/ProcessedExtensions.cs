@@ -235,7 +235,7 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-
+   
             return new DarwinCore
             {
                 AccessRights = processedObservation.AccessRights?.Value,

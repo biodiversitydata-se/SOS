@@ -50,6 +50,7 @@ namespace SOS.Export.IO.DwcArchive
                 var csvWritingStopwatch = new Stopwatch();
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
+                processedPublicObservationRepository.LiveMode = true;
                 var scrollResult = await processedPublicObservationRepository.TypedScrollObservationsAsync(filter, null);
                 elasticRetrievalStopwatch.Stop();
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
