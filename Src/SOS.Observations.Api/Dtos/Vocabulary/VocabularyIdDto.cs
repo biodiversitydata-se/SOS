@@ -23,6 +23,9 @@
         Type = 18,
         AreaType = 19,
         DiscoveryMethod = 20,
-        DeterminationMethod = 21
+        DeterminationMethod = 21,
+        ReproductiveCondition = 22,
+        Behavior = 23,
+        TaxonProtectionLevel = 24
     }
 }

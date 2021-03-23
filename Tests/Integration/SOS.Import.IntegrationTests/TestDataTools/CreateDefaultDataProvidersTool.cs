@@ -907,8 +907,120 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true,
                     HarvestSchedule = "* * * * *"
+                },
+                new DataProvider
+                {
+                    Identifier = DataProviderIdentifiers.ObservationDatabase,
+                    Names = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "Observation database of Redlisted species"
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "Observationsdatabasen"
+                        }
+                    },
+                    Descriptions = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "A non-public database used mainly for conservation planning. Access to data requires permission. Administered by SLU Swedish Species Information Centre."
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "Observationsdatabasen administreras av SLU Artdatabanken och innehåller både äldre och nyare fynd av främst rödlistade arter. Fynduppgifterna är inte allmänt tillgängliga på grund av att de ofta lämnats till ArtDatabanken under premisserna att de inte får offentliggöras eller spridas vidare annat än till naturvårdsrelaterade ändamål. Arbete pågår med att överföra material från Observationsdatabasen till Artportalen."
+                        }
+                    },
+                    Organizations = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "SLU Swedish Species Information Centre (SLU Artdatabanken)"
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "SLU Artdatabanken"
+                        }
+                    },
+                    ContactPerson = new ContactPerson
+                    {
+                        Email = "Jan.Edelsjo@slu.se",
+                        FirstName = "Jan",
+                        LastName = "Edelsjö"
+                    },
+                    ContactEmail = "Jan.Edelsjo@slu.se",
+                    Url = "http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata",
+                    Type = DataProviderType.ObservationDatabase,
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true,
+                    HarvestSchedule = "* * * * *",
+                    SupportProtectedHarvest = true
+                },
+                new DataProvider
+                {
+                    Identifier = DataProviderIdentifiers.Biologg,
+                    Names = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "Biologg"
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "Biologg"
+                        }
+                    },
+                    Descriptions = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "Biologg is a mobile game that logs observations of species in the wild. In the game you can collect points, level up in different species groups and do challenges. The data collected will later be used for research and nature conservation."
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård."
+                        }
+                    },
+                    Organizations = new []
+                    {
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "en-GB",
+                            Value = "Overstellar Solutions AB"
+                        },
+                        new VocabularyValueTranslation
+                        {
+                            CultureCode = "sv-SE",
+                            Value = "Overstellar Solutions AB"
+                        }
+                    },
+                    ContactPerson = new ContactPerson
+                    {
+                        Email = "info@biologg.se",
+                        FirstName = "Daniel",
+                        LastName = "Eriksson"
+                    },
+                    ContactEmail = "info@biologg.se",
+                    Url = "https://www.biologg.se/",
+                    Type = DataProviderType.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = false,
+                    HarvestSchedule = "* * * * *"
                 }
-
             };
 
             return dataProviders;
@@ -942,7 +1054,9 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 dataProviderByIdentifier[DataProviderIdentifiers.ButterflyMonitoring],
                 dataProviderByIdentifier[DataProviderIdentifiers.SharkZooplankton],
                 dataProviderByIdentifier[DataProviderIdentifiers.FishData],
-                dataProviderByIdentifier[DataProviderIdentifiers.ForestInventory]
+                dataProviderByIdentifier[DataProviderIdentifiers.ForestInventory],
+                dataProviderByIdentifier[DataProviderIdentifiers.ObservationDatabase],
+                dataProviderByIdentifier[DataProviderIdentifiers.Biologg]
             };
 
             for (var i = 0; i < dataProviders.Count; i++)
