@@ -228,6 +228,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 diffusionManager,
                 validationManager,
                 areaHelper,
+                processConfiguration,
                 new NullLogger<ObservationDatabaseProcessor>());
 
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
@@ -256,7 +257,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processTaxaJob,
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
-                new ProcessConfiguration(), 
+                processConfiguration, 
                 new NullLogger<ProcessJob>());
 
             return processJob;

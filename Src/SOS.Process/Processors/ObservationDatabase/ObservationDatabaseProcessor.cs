@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -25,6 +26,7 @@ namespace SOS.Process.Processors.ObservationDatabase
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
+        private readonly bool _enableDiffusion;
         private readonly IDiffusionManager _diffusionManager;
 
         /// <inheritdoc />
@@ -67,7 +69,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                     }
 
                     //If it is a protected sighting, public users should not be possible to find it in the current month 
-                    if ((verbatimObservation.StartDate.Year == DateTime.Now.Year || verbatimObservation.EndDate.Year == DateTime.Now.Year) &&
+                    if (!_enableDiffusion || (verbatimObservation.StartDate.Year == DateTime.Now.Year || verbatimObservation.EndDate.Year == DateTime.Now.Year) &&
                         (verbatimObservation.StartDate.Month == DateTime.Now.Month || verbatimObservation.EndDate.Month == DateTime.Now.Month))
                     {
                         return;
@@ -136,6 +138,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             IDiffusionManager diffusionManager,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
+            ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
                 base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
@@ -143,6 +146,13 @@ namespace SOS.Process.Processors.ObservationDatabase
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));
             _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+
+            if (processConfiguration == null)
+            {
+                throw new ArgumentNullException(nameof(processConfiguration));
+            }
+
+            _enableDiffusion = processConfiguration.Diffusion;
         }
 
         public override DataProviderType Type => DataProviderType.ObservationDatabase;

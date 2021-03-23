@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue DiscoveryMethod { get; set; }
 
         /// <summary>
-        ///     End date/time of the event.
+        ///     End date/time of the event (UTC).
         /// </summary>
         [Date]
         public DateTime? EndDate { get; set; }
@@ -91,7 +91,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string SampleSizeValue { get; set; }
 
         /// <summary>
-        ///     Start date/time of the event.
+        ///     Start date/time of the event (UTC).
         /// </summary>
         [Date]
         public DateTime? StartDate { get; set; }

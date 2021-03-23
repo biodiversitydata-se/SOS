@@ -29,6 +29,7 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly bool _enableDiffusion;
         private readonly IDiffusionManager _diffusionManager;
         private readonly SemaphoreSlim _semaphoreBatch;
 
@@ -93,6 +94,7 @@ namespace SOS.Process.Processors.Artportalen
                 throw new ArgumentNullException(nameof(processConfiguration));
             }
 
+            _enableDiffusion = processConfiguration.Diffusion;
             _semaphoreBatch = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
@@ -183,7 +185,7 @@ namespace SOS.Process.Processors.Artportalen
                         protectedObservations.Add(observation);
 
                         //If it is a protected sighting, public users should not be possible to find it in the current month 
-                        if ((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
+                        if (!_enableDiffusion || (verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
                             (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
                         {
                             continue;

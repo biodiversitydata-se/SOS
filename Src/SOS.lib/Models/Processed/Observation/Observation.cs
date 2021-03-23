@@ -254,11 +254,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string License { get; set; }
 
         /// <summary>
-        ///     The most recent date-time on which the resource was changed.
+        ///     The most recent date-time on which the resource was changed (UTC).
         ///     For Darwin Core, recommended best practice is to use an
         ///     encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
-        
+
         public DateTime? Modified { get; set; }
 
         /// <summary>
@@ -327,9 +327,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
-        /// The date the observation was created.
+        /// The date the observation was created (UTC).
         /// </summary>
         public DateTime Created { get; set; }
-        //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }
 }

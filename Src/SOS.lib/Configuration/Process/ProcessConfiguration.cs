@@ -6,6 +6,11 @@
     public class ProcessConfiguration
     {
         /// <summary>
+        /// True if diffusion should be enabled
+        /// </summary>
+        public bool Diffusion { get; set; }
+
+        /// <summary>
         ///     Decides whether parallell processing should be used.
         /// </summary>
         public bool ParallelProcessing { get; set; }
