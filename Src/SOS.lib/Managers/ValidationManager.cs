@@ -105,6 +105,21 @@ namespace SOS.Lib.Managers
                 observationValidation.Defects.Add($"Sighting outside Swedish economic zone (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})");
             }
 
+            if (observation.Location?.Point == null)
+            {
+                observationValidation.Defects.Add("Location point is missing");
+            }
+
+            if (observation.Location?.PointLocation == null)
+            {
+                observationValidation.Defects.Add("Location point location is missing");
+            }
+
+            if (observation.Location?.PointWithBuffer == null)
+            {
+                observationValidation.Defects.Add("Location point with buffer is missing");
+            }
+
             if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))
             {
                 observationValidation.Defects.Add("CatalogNumber is missing");
