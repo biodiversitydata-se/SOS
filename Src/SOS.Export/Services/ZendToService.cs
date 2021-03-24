@@ -65,19 +65,7 @@ namespace SOS.Export.Services
             using var client = new HttpClient();
             using var response = await client.PostAsync("https://zendto.artdata.slu.se/dropoff.php", form);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var header = response.Headers.FirstOrDefault(h => h.Key == "X-ZendTo-Response");
-
-                if (header.Key != null)
-                {
-                    dynamic responseData = JsonConvert.DeserializeObject(header.Value.FirstOrDefault());
-
-                    return responseData.status.ToString() == "OK";
-                }
-            }
-
-            return false;
+            return response.IsSuccessStatusCode && (response.ReasonPhrase?.Equals("OK", StringComparison.CurrentCultureIgnoreCase) ?? false);
         }
     }
 }
