@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.Extensions.Logging;
@@ -27,34 +26,29 @@ namespace SOS.Export.IO.DwcArchive
         private readonly IDataProviderRepository _dataProviderRepository;
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
 
+        /// <summary>
+        /// Simplified by only returning file size
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private async Task<string> GetFileHashAsync(string path)
         {
-            var stream = new MemoryStream();
             try
             {
-                using (var zip = ZipFile.Read(path))
-                {
-                    var occurenceFile = zip.FirstOrDefault(
-                        f => f.FileName.Contains("occurrence", StringComparison.CurrentCultureIgnoreCase));
-                    
-                    if (occurenceFile == null)
-                    {
-                        return string.Empty;
-                    }
+                using var zip = ZipFile.Read(path);
+                var occurenceFile = zip.FirstOrDefault(
+                    f => f.FileName.Contains("occurrence", StringComparison.CurrentCultureIgnoreCase));
 
-                    occurenceFile.Extract(stream);
+                if (occurenceFile == null)
+                {
+                    return string.Empty;
                 }
 
-                stream.Seek(0, SeekOrigin.Begin);
-
-                using var md5 = new MD5CryptoServiceProvider();
-                await using var bufferedStream = new BufferedStream(stream, 100_000);
-                
-                return BitConverter.ToString(await md5.ComputeHashAsync(bufferedStream)).Replace("-", string.Empty);
+                return occurenceFile.CompressedSize.ToString();
             }
-            finally
+            catch
             {
-                await stream.DisposeAsync();
+                return string.Empty;
             }
         }
 
