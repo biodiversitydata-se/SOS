@@ -217,7 +217,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static Geometry ToCircle(this Point point, int? accuracy, int defaultWhenAccuracyIsUnknown = 5000)
         {
-            if (point?.Coordinate == null || point.Coordinate.X.Equals(0) || point.Coordinate.Y.Equals(0))
+            if (point?.Coordinate == null || point.Coordinate.X <= 0 || point.Coordinate.Y <= 0)
             {
                 return null;
             }
