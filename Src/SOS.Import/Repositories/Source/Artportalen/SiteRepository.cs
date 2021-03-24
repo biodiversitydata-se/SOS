@@ -140,12 +140,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
             try
             {
                 const string query = @"
-                SELECT 
-                    sg.SiteId,
-                    sg.Geometry.STAsText() AS GeometryWKT
-	            FROM 
+                SELECT
+			        sg.SiteId,
+                    MAX(sg.Geometry.STAsText()) AS GeometryWKT -- Ugly workaround to only get one geometry/site. Bad data, duplicates exists
+		        FROM 
 		            SiteGeometry sg 
-                    INNER JOIN @sid s ON sg.SiteId = s.Id";
+                    INNER JOIN @sid s ON sg.SiteId = s.Id
+				GROUP BY 
+					sg.SiteId";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
                     new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
@@ -154,7 +156,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error getting bird validation areas");
+                Logger.LogError(e, "Error getting sites geometry");
                 return null;
             }
         }
