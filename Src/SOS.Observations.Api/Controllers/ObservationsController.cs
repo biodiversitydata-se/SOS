@@ -499,7 +499,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
@@ -1062,7 +1062,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
