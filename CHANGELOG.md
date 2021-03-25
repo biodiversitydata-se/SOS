@@ -34,6 +34,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - ArtportalenFilter => ExtendedFilter
 - dataProviderIds => dataProvider.ids
 - Taxon.TaxonIds => taxon.Ids
+- geometry.usePointAccuracy => geometry.considerObservationAccuracy
 
 #### Observation
 

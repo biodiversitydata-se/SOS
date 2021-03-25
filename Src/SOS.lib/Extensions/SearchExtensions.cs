@@ -469,15 +469,30 @@ namespace SOS.Lib.Extensions
                 switch (geom.Type.ToLower())
                 {
                     case "point":
-                        geometryContainers.Add(q => q
-                            .GeoDistance(gd => gd
-                                .Field("location.pointLocation")
-                                .DistanceType(GeoDistanceType.Arc)
-                                .Location(geom.ToGeoLocation())
-                                .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                            )
-                        );
+                        if (geometryFilter.UsePointAccuracy)
+                        {
+                            geometryContainers.Add(q => q
+                                .GeoDistance(gd => gd
+                                    .Field("location.pointWithBuffer")
+                                    .DistanceType(GeoDistanceType.Arc)
+                                    .Location(geom.ToGeoLocation())
+                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                                )
+                            );
+                        }
+                        else
+                        {
+                            geometryContainers.Add(q => q
+                                .GeoDistance(gd => gd
+                                    .Field("location.point")
+                                    .DistanceType(GeoDistanceType.Arc)
+                                    .Location(geom.ToGeoLocation())
+                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                                )
+                            );
+                        }
 
                         break;
                     case "polygon":

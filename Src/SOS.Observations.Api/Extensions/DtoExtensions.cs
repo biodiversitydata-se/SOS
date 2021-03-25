@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Extensions
                 {
                     Geometries = searchFilterBaseDto.Geometry.Geometries,
                     MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
-                    UsePointAccuracy = searchFilterBaseDto.Geometry.UsePointAccuracy
+                    UsePointAccuracy = searchFilterBaseDto.Geometry.ConsiderObservationAccuracy
                 };
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
