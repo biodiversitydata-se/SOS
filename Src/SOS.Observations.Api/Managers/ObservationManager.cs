@@ -342,6 +342,8 @@ namespace SOS.Observations.Api.Managers
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Activity,
                                 nameof(Observation.Occurrence.Activity), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Behavior,
+                                nameof(Observation.Occurrence.Behavior), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Sex,
                                 nameof(Observation.Occurrence.Sex), cultureCode);
                             TranslateLocalizedValue(occurrenceDictionary, VocabularyId.ReproductiveCondition,
