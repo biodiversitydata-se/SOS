@@ -142,12 +142,17 @@ namespace SOS.Export.IO.DwcArchive
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
                 var createdDwcaFiles = new List<string>();
+                var completeDwcArchiveFilePath = string.Empty;
 
                 foreach (var task in dwcaCreationTasks)
                 {
                     var dataProvider = task.Key;
+                    var filePath = task.Value.Result;
+                    
+                    // Id 0 = complete Dwc archive file
                     if (dataProvider.Id == 0)
                     {
+                        completeDwcArchiveFilePath = filePath;
                         continue;
                     }
 
@@ -159,9 +164,14 @@ namespace SOS.Export.IO.DwcArchive
                     }
 
                     createdDwcaFiles.Add(task.Value.Result);
-
                     dataProvider.LatestUploadedFileHash = hash;
                     await _dataProviderRepository.UpdateAsync(dataProvider.Id, dataProvider);
+                }
+
+                // If any file is changed, add complete file
+                if (!string.IsNullOrEmpty(completeDwcArchiveFilePath) && createdDwcaFiles.Any())
+                {
+                    createdDwcaFiles.Add(completeDwcArchiveFilePath);
                 }
 
                 DeleteTemporaryCreatedCsvFiles();
