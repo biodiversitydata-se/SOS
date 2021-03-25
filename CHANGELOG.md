@@ -18,6 +18,7 @@ All API-endpoints with the suffix Internal have been moved to `/Internal/previou
 
 Ex. `/SearchInternal` -> `/Internal/Search`
 
+`/Observations/TaxonAggregation` has changed from approximate aggregation to always correct aggregation. To get all records you can set take and limit to null. You can also use paging, but only for the first 1000 records.
 
 ##### Dataprovider
 
