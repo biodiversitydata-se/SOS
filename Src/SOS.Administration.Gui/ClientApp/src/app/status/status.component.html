@@ -13,7 +13,7 @@
       </span>
       <span *ngIf="provider.status != 'Success'">
         <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
-      </span>{{provider.id}} {{getActiveInfo(provider.id)}} |
+      </span>{{provider.id}} {{getActiveInfo(provider.id)}} <b>({{formatFrom(provider.start)}} ago)</b> |
     </span>
     <span>
       <span *ngIf="failedTests == 0">
@@ -56,8 +56,8 @@
           <thead>
             <tr>
               <th scope="col">Datasource</th>
-              <th scope="col">Today</th>
-              <th scope="col">Yesterday</th>
+              <th scope="col">Active</th>
+              <th scope="col">Inactive</th>
               <th scope="col">Difference</th>
               <th></th>
             </tr>

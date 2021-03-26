@@ -18,6 +18,8 @@ namespace SOS.Administration.Gui.Models
             public DateTime? ProcessEnd { get; set; }
             public DateTime? ProcessStart { get; set; }
             public string ProcessStatus { get; set; }
+            public int? PublicProcessCount { get; set; }
+            public int? ProtectedProcessCount { get; set; }
             public int? ProcessCount { get; set; }
             public DateTime? HarvestEnd { get; set; }
             public DateTime? HarvestStart { get; set; }
