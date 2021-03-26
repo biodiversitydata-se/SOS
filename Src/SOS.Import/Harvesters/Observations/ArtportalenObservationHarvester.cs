@@ -456,7 +456,7 @@ namespace SOS.Import.Harvesters.Observations
                 };
                 _logger.LogDebug("Finish creating factory");
 
-                _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
+                _artportalenVerbatimRepository.Mode = mode;
 
                 // Make sure we have an empty public collection
                 _logger.LogDebug("Start empty artportalen verbatim collection");

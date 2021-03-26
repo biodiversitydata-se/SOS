@@ -109,7 +109,7 @@ namespace SOS.Process.Processors.Artportalen
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, _processedVocabularyRepository, mode != JobRunModes.Full);
-            _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
+            _artportalenVerbatimRepository.Mode = mode;
 
 
             var minId = 1;
