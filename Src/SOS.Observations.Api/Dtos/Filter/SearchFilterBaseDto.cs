@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public DateFilterDto Date { get; set; }
 
         /// <summary>
-        /// Filter by diffuse status
+        /// Filter by diffusion status.
         /// </summary>
         public IEnumerable<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public GeometryFilterDto Geometry { get; set; }
 
         /// <summary>
-        /// Set to true to return only validated sightings.
+        /// If true, only validated observations will be returned.
         /// </summary>
         public bool? OnlyValidated { get; set; }
 
