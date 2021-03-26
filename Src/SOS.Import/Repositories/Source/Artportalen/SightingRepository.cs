@@ -115,7 +115,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                svr.RegionalSightingStateId as RegionalSightingStateId,
                     (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) AS SightingPublishTypeIds,
-                    (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId group by sft.TaxonId) AS SpeciesFactsIds
+                    (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds
                 FROM
 	                {SightingsFromBasics}
                     {join}
