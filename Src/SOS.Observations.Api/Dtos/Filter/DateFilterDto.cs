@@ -77,7 +77,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public DateFilterTypeDto DateFilterType { get; set; } = DateFilterTypeDto.OverlappingStartDateAndEndDate;
 
         /// <summary>
-        /// Pre defined time ranges
+        /// Predefined time ranges
         /// </summary>
         public IEnumerable<TimeRangeDto> TimeRanges { get; set; }
     }
