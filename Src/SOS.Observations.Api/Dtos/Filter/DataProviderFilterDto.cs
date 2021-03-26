@@ -3,7 +3,7 @@
 namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
-    /// Area filter.
+    /// Data provider filter.
     /// </summary>
     public class DataProviderFilterDto
     {

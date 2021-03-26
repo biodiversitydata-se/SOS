@@ -8,18 +8,19 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class TaxonFilterDto
     {
         /// <summary>
-        ///     Decides whether to search for the exact taxa or
-        ///     for the hierarchical underlying taxa.
+        /// If true, also include the underlying hierarchical taxa in search.
+        /// E.g. If ids=[4000104](Aves) and includeUnderlyingTaxa=true, then you search for all birds.
         /// </summary>
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        ///     Redlist categories to match.
+        /// Redlist categories to match.
+        /// Possible values are: "DD", "EX", "RE", "CR", "EN", "VU", "NT", "LC", "NA", "NE"
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        ///     Taxa to match. Queryable values are available in Dyntaxa.
+        /// Dyntaxa taxon id's to match.
         /// </summary>
         public IEnumerable<int> Ids { get; set; }
     }
