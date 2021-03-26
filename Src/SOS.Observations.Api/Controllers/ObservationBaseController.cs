@@ -135,7 +135,7 @@ namespace SOS.Observations.Api.Controllers
             if (filter.Taxon?.RedListCategories?.Any() ?? false)
             {
                 errors.AddRange(filter.Taxon.RedListCategories
-                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
+                    .Where(rc => !new[] { "DD", "EX", "RE", "CR", "EN", "VU", "NT", "LC", "NA", "NE" }.Contains(rc, StringComparer.CurrentCultureIgnoreCase))
                     .Select(rc => $"Red list category doesn't exist ({rc})"));
             }
             if (filter.Date?.DateFilterType == DateFilterTypeDto.OnlyStartDate && (filter.Date?.StartDate == null || filter.Date?.EndDate == null))
