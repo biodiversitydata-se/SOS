@@ -120,7 +120,7 @@ export class StatusComponent implements OnInit {
       this.http.get<ProcessInfo[]>(this.baseUrl + 'statusinfo/process').subscribe(result => {
         this.processInfo = result;
         this.totalDataDifference = 0;
-        let active = this.processInfo.find(p => p.id == "Observation-" + this.activeInstance);
+        let active = this.processInfo.find(p => p.id.endsWith(this.activeInstance));
         var activeEndDate = parseISO(active.end);       
         var oneDayAgo = subHours(new Date(), 24);
         if (compareAsc(activeEndDate, oneDayAgo) == -1) {
@@ -129,7 +129,7 @@ export class StatusComponent implements OnInit {
         else {
           this.activeInstanceHarvestIsOlderThanOneDay = false;
         }
-        let inactive = this.processInfo.find(p => p.id != "Observation-" + this.activeInstance && p.id.includes("Observation"));
+        let inactive = this.processInfo.find(p => !p.id.endsWith(this.activeInstance) && p.id.includes("observation"));
         for (let provider of active.providersInfo) {
           let compare = new DataCompare();
           compare.source = provider.dataProviderIdentifier;
@@ -221,10 +221,10 @@ export class StatusComponent implements OnInit {
     return '';
   }
   isActiveProvider(providerId: string) {
-    if (this.activeInstance == "0" && providerId == "Observation-0") {
+    if (this.activeInstance == "0" && providerId.endsWith("0")) {
       return true;
     }
-    if (this.activeInstance == "1" && providerId == "Observation-1") {
+    if (this.activeInstance == "1" && providerId.endsWith("1")) {
       return true;
     }
     return false;
