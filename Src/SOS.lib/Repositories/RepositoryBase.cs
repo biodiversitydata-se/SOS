@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
@@ -87,7 +88,7 @@ namespace SOS.Lib.Repositories
         /// <summary>
         /// Name of collection
         /// </summary>
-        protected virtual string CollectionName => $"{_collectionName}{(IncrementalMode ? "_incremental" : "")}";
+        protected virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
 
         protected readonly IMongoClient Client;
 
@@ -524,7 +525,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public bool IncrementalMode { get; set; }
+        public JobRunModes Mode { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)

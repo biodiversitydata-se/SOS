@@ -55,7 +55,9 @@ namespace SOS.Administration.Gui.Controllers
             var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
             var collection = database.GetCollection<ProcessInfoDto>("ProcessInfo");
             var providers = collection.Find(new BsonDocument());
-            return providers.SortByDescending(p=>p.End).ToList();
+            var providerList = providers.SortByDescending(p => p.End).ToList();
+            providerList.Where(g => g.ProvidersInfo != null).ToList().ForEach(p =>p.ProvidersInfo.ToList().ForEach(pp => pp.ProcessCount = pp.ProtectedProcessCount + pp.PublicProcessCount));
+            return providerList;
         }
         [HttpGet]
         [Route("activeinstance")]
