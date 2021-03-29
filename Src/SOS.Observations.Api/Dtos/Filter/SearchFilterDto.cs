@@ -8,10 +8,10 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class SearchFilterDto : SearchFilterBaseDto
     {
         /// <summary>
-        ///     This parameter allows you to create a dynamic view of the collection, or more precisely,
-        ///     to decide what fields should or should not be returned, using a projection. Put another way,
-        ///     your projection is a conditional query where you dictates which fields should be returned by the API.
-        ///     Omit this parameter and you will receive the complete collection of fields.
+        /// This parameter allows you to decide what fields should be returned, using a projection.
+        /// Omit this parameter and you will receive the complete collection of fields.
+        /// For example, to retrieve only basic observation data, specify:
+        /// ["event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus"]. 
         /// </summary>
         public IEnumerable<string> OutputFields { get; set; }
     }
