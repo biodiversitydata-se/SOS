@@ -93,10 +93,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
                     ? new VocabularyValue {Id = (int) BasisOfRecordId.HumanObservation}
                     : new VocabularyValue {Id = (int) BasisOfRecordId.PreservedSpecimen};
-                obs.CollectionCode = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
-                    ? "Artportalen"
-                    : verbatimObservation.SpeciesCollection;
-                obs.CollectionId = verbatimObservation.CollectionID;
+                obs.CollectionCode = "Artportalen";
+                obs.CollectionId = null;
+                obs.SpeciesCollectionLabel = verbatimObservation.CollectionID; // todo - is verbatimObservation.CollectionID always the same as verbatimObservation.SpeciesCollection?;
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
                 obs.InformationWithheld = null;

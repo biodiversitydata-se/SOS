@@ -183,7 +183,7 @@ namespace SOS.Lib.Extensions
                     break;
             }
 
-            query.TryAddTermCriteria("collectionId.keyword", internalFilter.SpeciesCollectionLabel);
+            query.TryAddTermCriteria("speciesCollectionLabel.keyword", internalFilter.SpeciesCollectionLabel);
             query.TryAddTermCriteria("publicCollection.keyword", internalFilter.PublicCollection);
             query.TryAddTermCriteria("privateCollection.keyword", internalFilter.PrivateCollection);
             query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
