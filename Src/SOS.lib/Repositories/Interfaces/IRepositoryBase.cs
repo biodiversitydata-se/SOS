@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Repositories.Interfaces
@@ -243,9 +244,9 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
-        /// Set incremental mode
+        /// Set run mode
         /// </summary>
-        bool IncrementalMode { get; set; }
+        JobRunModes Mode { get; set; }
 
         /// <summary>
         ///     Update entity
