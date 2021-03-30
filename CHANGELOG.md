@@ -44,6 +44,7 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 - ProtectionLevel => Occurrence.ProtectionLevel
 - Media => Occurrence.Media
 - `Validated` value is set to true when `IdentificationVerificationStatus` has value `Reported by expert`.
+- New field `SpeciesCollectionLabel`
 
 *ArtportalenInternal*
 - PrivateCollection => Observation.PrivateCollection
