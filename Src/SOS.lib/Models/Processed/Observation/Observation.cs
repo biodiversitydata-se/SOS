@@ -296,6 +296,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string RightsHolder { get; set; }
 
         /// <summary>
+        ///     Species collection label.
+        /// </summary>
+        public string SpeciesCollectionLabel { get; set; }
+
+        /// <summary>
         ///     The nature or genre of the resource.
         ///     For Darwin Core, recommended best practice is
         ///     to use the name of the class that defines the
