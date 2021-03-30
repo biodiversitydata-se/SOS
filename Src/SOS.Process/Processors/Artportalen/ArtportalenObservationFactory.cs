@@ -102,7 +102,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
-                obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
+                obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
                 obs.PrivateCollection = verbatimObservation.PrivateCollection;
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
