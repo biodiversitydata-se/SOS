@@ -19,6 +19,11 @@ namespace SOS.Lib.Models.Verbatim.Shared
         }
 
         /// <summary>
+        /// Misc notes
+        /// </summary>
+        public string Notes { get; set; }
+
+        /// <summary>
         ///     Number of items
         /// </summary>
         public int Count { get; set; }

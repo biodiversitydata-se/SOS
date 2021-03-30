@@ -8,6 +8,7 @@ export class Provider {
   harvestCount: number;
   harvestStart: Date;
   harvestEnd: Date;
+  harvestNotes: string;
   harvestStatus: string;
   latestIncrementalCount: number;
   latestIncrementalStart: Date;

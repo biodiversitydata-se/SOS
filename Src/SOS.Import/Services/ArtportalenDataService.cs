@@ -32,8 +32,20 @@ namespace SOS.Import.Services
         }
 
         /// <inheritdoc />
+        public string BackUpDatabaseName
+        {
+            get
+            {
+                var builder = new SqlConnectionStringBuilder(Configuration.ConnectionStringBackup);
+
+                return builder.InitialCatalog;
+            }
+        }
+
+        /// <inheritdoc />
         public ArtportalenConfiguration Configuration { get; }
 
+       
         /// <inheritdoc />
         public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null, bool live = false)
         {

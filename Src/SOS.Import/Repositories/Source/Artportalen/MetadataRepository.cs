@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
@@ -348,6 +349,32 @@ namespace SOS.Import.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting determination methods");
+                return null;
+            }
+        }
+
+
+        /// <inheritdoc />
+        public async Task<DateTime?> GetLastBackupDateAsync()
+        {
+            try
+            {
+                string query = @$"
+                    SELECT
+	                    MAX(ISNULL(r.[restore_date], d.create_date))
+                    FROM 
+	                    master.sys.databases d
+	                    LEFT JOIN msdb.dbo.[restorehistory] r ON d.[name] = r.destination_database_name
+                    WHERE
+	                    d.[name] = '{ DataService.BackUpDatabaseName }'
+                    GROUP BY         
+	                    r.destination_database_name";
+
+                return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting latest backup date");
                 return null;
             }
         }
