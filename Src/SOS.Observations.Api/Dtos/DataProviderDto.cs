@@ -77,6 +77,11 @@ namespace SOS.Observations.Api.Dtos
         public DateTime? NextHarvestFrom { get; set; }
 
         /// <summary>
+        /// Note about harvest
+        /// </summary>
+        public string HarvestNotes { get; set; }
+
+        /// <summary>
         /// Cron expression used to schedule harvest.
         /// </summary>
         public string HarvestSchedule { get; set; }
@@ -108,12 +113,13 @@ namespace SOS.Observations.Api.Dtos
         }
 
         /// <summary>
-        /// Creates a new DataProviderDto object.
+        ///  Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="publicObservations"></param>
         /// <param name="protectedObservations"></param>
         /// <param name="latestHarvestDate"></param>
+        /// <param name="harvestNotes"></param>
         /// <param name="latestProcessDate"></param>
         /// <param name="latestIncrementalHarvestDate"></param>
         /// <param name="cultureCode"></param>
@@ -123,6 +129,7 @@ namespace SOS.Observations.Api.Dtos
             int publicObservations,
             int protectedObservations,
             DateTime? latestHarvestDate,
+            string harvestNotes,
             DateTime? latestProcessDate,
             DateTime? latestIncrementalHarvestDate,
             string cultureCode)
@@ -137,6 +144,7 @@ namespace SOS.Observations.Api.Dtos
             dataProviderDto.PublicObservations = publicObservations;
             dataProviderDto.ProtectedObservations = protectedObservations;
             dataProviderDto.LatestHarvestDate = latestHarvestDate;
+            dataProviderDto.HarvestNotes = harvestNotes;
             dataProviderDto.LatestProcessDate = latestProcessDate;
             dataProviderDto.LatestIncrementalHarvestDate = latestIncrementalHarvestDate;
             dataProviderDto.NextHarvestFrom = dataProvider.NextHarvestFrom(latestHarvestDate);

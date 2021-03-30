@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Import.Entities.Artportalen;
 
@@ -74,5 +75,11 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity>> GetDeterminationMethodsAsync();
+
+        /// <summary>
+        /// Get date backup was taken
+        /// </summary>
+        /// <returns></returns>
+        Task<DateTime?> GetLastBackupDateAsync();
     }
 }

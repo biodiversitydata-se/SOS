@@ -60,6 +60,7 @@ namespace SOS.Observations.Api.Managers
                         providerInfo.PublicProcessCount.GetValueOrDefault(0),
                         providerInfo.ProtectedProcessCount.GetValueOrDefault(0),
                         providerInfo.HarvestEnd,
+                        providerInfo.HarvestNotes,
                         providerInfo.ProcessEnd,
                         providerInfo.LatestIncrementalEnd,
                         cultureCode));

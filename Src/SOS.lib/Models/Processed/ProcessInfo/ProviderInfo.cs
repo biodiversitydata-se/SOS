@@ -36,6 +36,11 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         public DateTime? HarvestEnd { get; set; }
 
         /// <summary>
+        ///     Harvest note
+        /// </summary>
+        public string HarvestNotes { get; set; }
+
+        /// <summary>
         ///     Harvest start date and time
         /// </summary>
         public DateTime? HarvestStart { get; set; }
