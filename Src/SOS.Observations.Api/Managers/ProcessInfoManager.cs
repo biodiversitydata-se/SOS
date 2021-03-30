@@ -40,6 +40,7 @@ namespace SOS.Observations.Api.Managers
                 DataProviderIdentifier = providerInfo.DataProviderIdentifier,
                 HarvestCount = providerInfo.HarvestCount,
                 HarvestEnd = providerInfo.HarvestEnd,
+                HarvestNotes = providerInfo.HarvestNotes,
                 HarvestStart = providerInfo.HarvestStart,
                 HarvestStatus = providerInfo.HarvestStatus?.ToString(),
                 LatestIncrementalPublicCount = providerInfo.LatestIncrementalPublicCount,

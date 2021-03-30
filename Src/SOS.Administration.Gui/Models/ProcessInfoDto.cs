@@ -1,9 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace SOS.Administration.Gui.Models
 {
 
@@ -21,6 +18,7 @@ namespace SOS.Administration.Gui.Models
             public int? ProcessCount { get; set; }
             public DateTime? HarvestEnd { get; set; }
             public DateTime? HarvestStart { get; set; }
+            public string HarvestNotes { get; set; }
             public string HarvestStatus { get; set; }
             public int? HarvestCount { get; set; }
             public DateTime? LatestIncrementalEnd { get; set; }
