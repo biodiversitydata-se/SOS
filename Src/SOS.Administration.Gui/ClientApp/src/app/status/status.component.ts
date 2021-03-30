@@ -64,6 +64,7 @@ export class StatusComponent implements OnInit {
     { field: 'harvestCount', sortable: true, filter: true, resizable: true },
     { field: 'harvestStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
     { field: 'harvestEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
+    { field: 'harvestNotes', sortable: false, filter: false, resizable: true },
     {
       field: 'latestIncrementalStatus', sortable: true, filter: true, resizable: true, cellRenderer: function (params) {
         return params.value == "2" ? '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="green" /></svg><span>' + params.value + '</span>' :

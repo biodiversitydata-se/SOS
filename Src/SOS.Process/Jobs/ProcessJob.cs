@@ -458,7 +458,7 @@ namespace SOS.Process.Jobs
             }
 
             // Try to get process info for current instance
-            var processInfo = await GetObservationProcessInfoAsync(mode != JobRunModes.Full);
+            var processInfo = await GetObservationProcessInfoAsync(mode == JobRunModes.IncrementalActiveInstance);
 
             if (processInfo == null || mode == JobRunModes.Full)
             {
@@ -475,6 +475,7 @@ namespace SOS.Process.Jobs
                     {
                         HarvestCount = harvestInfo?.Count,
                         HarvestEnd = harvestInfo?.End,
+                        HarvestNotes = harvestInfo.Notes,
                         HarvestStart = harvestInfo?.Start,
                         HarvestStatus = harvestInfo?.Status,
                         PublicProcessCount = processResult.PublicCount,
@@ -496,7 +497,7 @@ namespace SOS.Process.Jobs
                 processInfo = new ProcessInfo(_processedPublicObservationRepository.IndexName, processStart)
                 {
                     PublicCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.PublicCount),
-                    ProtectedCount = processTaskByDataProvider.Sum(pi =>pi.Value.Result.ProtectedCount),
+                    ProtectedCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.ProtectedCount),
                     End = DateTime.Now,
                     MetadataInfo = metaDataProcessInfo,
                     ProvidersInfo = providersInfo,

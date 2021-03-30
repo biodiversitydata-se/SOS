@@ -10,6 +10,11 @@ namespace SOS.Import.Services.Interfaces
     public interface IArtportalenDataService
     {
         /// <summary>
+        /// Get name of backup database
+        /// </summary>
+        string BackUpDatabaseName { get; }
+
+        /// <summary>
         ///  Service configuration
         /// </summary>
         ArtportalenConfiguration Configuration { get; }
