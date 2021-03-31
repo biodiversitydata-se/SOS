@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Hangfire;
@@ -88,7 +87,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Create")]
+        [HttpPost]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
@@ -123,7 +122,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(null, email, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
