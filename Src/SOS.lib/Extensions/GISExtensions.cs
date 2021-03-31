@@ -181,7 +181,7 @@ namespace SOS.Lib.Extensions
                 return polygon;
             }
 
-            return (Polygon) polygon.Buffer(0);
+            return (Polygon)polygon.Buffer(0);
         }
 
         #endregion Private
@@ -196,6 +196,36 @@ namespace SOS.Lib.Extensions
         public static string EpsgCode(this CoordinateSys coordinateSystem)
         {
             return $"EPSG:{coordinateSystem.Srid()}";
+        }
+
+        /// <summary>
+        /// Make geometry valid
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static bool IsValid(this Geometry geometry)
+        {
+            if (geometry == null)
+            {
+                return false;
+            }
+
+            if (geometry is LinearRing linearRing)
+            {
+                return linearRing.IsValid && linearRing.IsSimple && linearRing.IsClosed;
+            }
+
+            if (geometry is Polygon polygon)
+            {
+                return polygon.Shell.IsValid() && (polygon.Holes?.Count(h => !h.IsValid()) ?? 0) == 0;
+            }
+
+            if (geometry is MultiPolygon multiPolygon)
+            {
+                return multiPolygon.Geometries.Count(g => !((Polygon)g).IsValid()) == 0;
+            }
+
+            return geometry.IsValid;
         }
 
         /// <summary>
@@ -528,7 +558,7 @@ namespace SOS.Lib.Extensions
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon) geometry;
 
-                    return new PolygonGeoShape(polygon.MakeValid().ToGeoShapePolygonCoordinates());
+                    return new PolygonGeoShape(((Polygon)polygon.MakeValid()).ToGeoShapePolygonCoordinates());
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon) geometry;
 
@@ -549,7 +579,9 @@ namespace SOS.Lib.Extensions
         {
             var factory = new GeometryFactory();
             var wktReader = new WKTReader(factory);
-            return wktReader.Read(wkt);
+            var geometry = wktReader.Read(wkt);
+
+            return geometry;
         }
 
         /// <summary>

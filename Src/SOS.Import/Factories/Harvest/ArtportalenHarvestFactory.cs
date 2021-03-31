@@ -389,7 +389,7 @@ namespace SOS.Import.Factories.Harvest
             Geometry siteGeometry = null;
             if (!string.IsNullOrEmpty(geometryWkt))
             {
-                siteGeometry = geometryWkt.ToGeometry().Buffer(0)
+                siteGeometry = geometryWkt.ToGeometry()
                     .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
@@ -401,7 +401,7 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry ?? wgs84Point?.ToCircle(accuracy))?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point?.ToCircle(accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
