@@ -170,20 +170,34 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///     Make polygon valid
+        /// Try to make LinearRing valid
         /// </summary>
-        /// <param name="polygon"></param>
+        /// <param name="linearRing"></param>
         /// <returns></returns>
-        private static Polygon MakeValid(this Polygon polygon)
+        private static LinearRing TryMakeRingValid(this LinearRing linearRing)
         {
-            if (polygon.IsValid)
+            var count = linearRing?.NumPoints ?? 0;
+            if (count < 2)
             {
-                return polygon;
+                return null;
             }
 
-            return (Polygon)polygon.Buffer(0);
-        }
+            // Use hash set, no duplicates will be added
+            var validatedCoordinates = new HashSet<Coordinate>();
 
+            for (var i = 0; i < count; i++)
+            {
+                validatedCoordinates.Add(linearRing.Coordinates[i]);
+            }
+
+            // Make sure last coordinate equals first
+            var newRingCoordinates = new Coordinate[validatedCoordinates.Count + 1];
+
+            validatedCoordinates.CopyTo(newRingCoordinates, 0);
+            new [] { linearRing.IsClosed ? linearRing.EndPoint.Coordinate : new Coordinate(newRingCoordinates[0].X, newRingCoordinates[0].Y) }.CopyTo(newRingCoordinates, validatedCoordinates.Count);
+
+            return Geometry.DefaultFactory.CreateLinearRing(newRingCoordinates);
+        }
         #endregion Private
 
         #region Public
@@ -227,6 +241,37 @@ namespace SOS.Lib.Extensions
 
             return geometry.IsValid;
         }
+
+        /// <summary>
+        ///     Make polygon valid
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static Geometry TryMakeValid(this Geometry geometry)
+        {
+            if (geometry == null)
+            {
+                return null;
+            }
+
+            switch (geometry.OgcGeometryType)
+            {
+                case OgcGeometryType.Polygon:
+                    var polygon = (Polygon) geometry;
+
+                    var shell = polygon.Shell.TryMakeRingValid();
+                    var holes = polygon.Holes?.Select(h => h.TryMakeRingValid());
+                    return Geometry.DefaultFactory.CreatePolygon(shell, holes?.ToArray()).Buffer(0);
+                case OgcGeometryType.MultiPolygon:
+                    var multiPolygon = (MultiPolygon)geometry;
+
+                    var polygons = multiPolygon.Geometries?.Select(g => g.TryMakeValid() as Polygon)?.ToArray();
+                    return Geometry.DefaultFactory.CreateMultiPolygon(polygons);
+            }
+
+            return geometry;
+        }
+
 
         /// <summary>
         ///     Gets the Srid for the specified coordinate system.
@@ -289,7 +334,7 @@ namespace SOS.Lib.Extensions
                     break;
             }
 
-            return circle is Polygon circlePolygon ? circlePolygon.MakeValid() : circle;
+            return circle is Polygon circlePolygon ? circlePolygon.TryMakeValid() : circle;
         }
 
         public static IFeature ToFeature(this IGeoShape geoShape, IDictionary<string, object> attributes = null)
@@ -373,10 +418,10 @@ namespace SOS.Lib.Extensions
                 case "polygon":
                     var polygon = (PolygonGeoShape)geoShape;
                     var linearRings = polygon.Coordinates.Select(lr =>
-                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
+                            new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
                         .ToArray();
 
-                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray()).MakeValid();
+                    return Geometry.DefaultFactory.CreatePolygon(linearRings.First(), linearRings.Skip(1)?.ToArray());
                 case "multipolygon":
                     var multiPolygons = (MultiPolygonGeoShape)geoShape;
                     var polygons = new List<Polygon>();
@@ -384,7 +429,7 @@ namespace SOS.Lib.Extensions
                     foreach (var poly in multiPolygons.Coordinates)
                     {
                         var lr = poly.Select(lr =>
-                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()))
+                                new LinearRing(lr.Select(pnt => new Coordinate(pnt.Longitude, pnt.Latitude)).ToArray()).TryMakeRingValid())
                             .ToArray();
 
                         polygons.Add(new Polygon(lr.First(), lr.Skip(1)?.ToArray()));
@@ -558,12 +603,12 @@ namespace SOS.Lib.Extensions
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon) geometry;
 
-                    return new PolygonGeoShape(((Polygon)polygon.MakeValid()).ToGeoShapePolygonCoordinates());
+                    return new PolygonGeoShape(((Polygon)polygon.TryMakeValid()).ToGeoShapePolygonCoordinates());
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon) geometry;
 
                     return new MultiPolygonGeoShape(multiPolygon.Geometries.Select(p =>
-                        ((Polygon) p).MakeValid().ToGeoShapePolygonCoordinates()));
+                        ((Polygon) p.TryMakeValid()).ToGeoShapePolygonCoordinates()));
                 default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }

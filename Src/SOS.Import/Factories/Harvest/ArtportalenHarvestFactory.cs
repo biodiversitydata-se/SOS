@@ -390,7 +390,7 @@ namespace SOS.Import.Factories.Harvest
             if (!string.IsNullOrEmpty(geometryWkt))
             {
                 siteGeometry = geometryWkt.ToGeometry()
-                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).TryMakeValid();
             }
 
             var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
