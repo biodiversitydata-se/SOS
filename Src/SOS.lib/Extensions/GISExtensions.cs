@@ -120,16 +120,16 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="polygon"></param>
         /// <returns></returns>
-        private static IEnumerable<IEnumerable<GeoCoordinate>> ToGeoShapePolygonCoordinates(this Polygon polygon)
+        private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this Polygon polygon)
         {
-            var coordinates = new List<IEnumerable<GeoCoordinate>>();
-            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X));
-            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+            var coordinates = new List<GeoCoordinate[]>();
+            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray();
+            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray()).ToArray();
 
             coordinates.Add(exteriorRing);
             coordinates.AddRange(holes);
 
-            return coordinates;
+            return coordinates.ToArray();
         }
 
         /// <summary>
@@ -137,19 +137,19 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="coordinates"></param>
         /// <returns></returns>
-        private static IEnumerable<IEnumerable<GeoCoordinate>> ToGeoShapePolygonCoordinates(this ArrayList coordinates)
+        private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this ArrayList coordinates)
         {
             var rings = coordinates.ToArray()
-                .Select(lr => (lr as IEnumerable<double[]>).Select(c => new GeoCoordinate(c[1], c[0])));
+                .Select(lr => (lr as double[][]).Select(c => new GeoCoordinate(c[1], c[0])).ToArray()).ToArray();
             var exteriorRing = rings.First();
-            var holes = rings.Skip(1);
+            var holes = rings.Skip(1)?.ToArray();
 
-            var newCoordinates = new List<IEnumerable<GeoCoordinate>>();
+            var newCoordinates = new List<GeoCoordinate[]>();
 
             newCoordinates.Add(exteriorRing);
             newCoordinates.AddRange(holes);
 
-            return newCoordinates;
+            return newCoordinates.ToArray();
         }
 
         /// <summary>
@@ -159,9 +159,9 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static ArrayList ToGeoJsonPolygonCoordinates(this Polygon polygon)
         {
-            var coordinates = new List<IEnumerable<IEnumerable<double>>>();
+            var coordinates = new List<double[][]>();
             var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new[] {p.X, p.Y}).ToArray();
-            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new[] {p.X, p.Y})).ToArray();
+            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new[] {p.X, p.Y}).ToArray()).ToArray();
 
             coordinates.Add(exteriorRing);
             coordinates.AddRange(holes);
@@ -192,9 +192,8 @@ namespace SOS.Lib.Extensions
 
             // Make sure last coordinate equals first
             var newRingCoordinates = new Coordinate[validatedCoordinates.Count + 1];
-
             validatedCoordinates.CopyTo(newRingCoordinates, 0);
-            new [] { linearRing.IsClosed ? linearRing.EndPoint.Coordinate : new Coordinate(newRingCoordinates[0].X, newRingCoordinates[0].Y) }.CopyTo(newRingCoordinates, validatedCoordinates.Count);
+            new [] { new Coordinate(newRingCoordinates[0].X, newRingCoordinates[0].Y) }.CopyTo(newRingCoordinates, validatedCoordinates.Count);
 
             return Geometry.DefaultFactory.CreateLinearRing(newRingCoordinates);
         }
@@ -555,7 +554,7 @@ namespace SOS.Lib.Extensions
                     var polygonCoordinates = geometry.Coordinates.ToGeoShapePolygonCoordinates();
                     return new PolygonGeoShape(polygonCoordinates);
                 case "multipolygon":
-                    var multiPolygonCoordinates = new List<IEnumerable<IEnumerable<GeoCoordinate>>>();
+                    var multiPolygonCoordinates = new List<GeoCoordinate[][]>();
                     foreach (var polyCoorinates in geometry.Coordinates)
                     {
                         multiPolygonCoordinates.Add(((ArrayList) polyCoorinates).ToGeoShapePolygonCoordinates());
@@ -590,16 +589,16 @@ namespace SOS.Lib.Extensions
                 case OgcGeometryType.LineString:
                     var lineString = (LineString) geometry;
 
-                    return new LineStringGeoShape(lineString.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                    return new LineStringGeoShape(lineString.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray());
                 case OgcGeometryType.MultiLineString:
                     var multiLineString = (MultiLineString) geometry;
 
                     return new MultiLineStringGeoShape(multiLineString.Geometries.Select(mls =>
-                        mls.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X))));
+                        mls.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray()));
                 case OgcGeometryType.MultiPoint:
                     var multiPoint = (MultiPoint) geometry;
 
-                    return new MultiPointGeoShape(multiPoint.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                    return new MultiPointGeoShape(multiPoint.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray());
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon) geometry;
 
