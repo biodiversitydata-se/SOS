@@ -93,6 +93,10 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
             Observation observation)
         {
+            if (observation == null)
+            {
+                return null;
+            }
             IEnumerable<ExtendedMeasurementOrFactRow> occurrenceEmof = null;
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
             if (observation.MeasurementOrFacts != null)

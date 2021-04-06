@@ -395,7 +395,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<SimpleMultimediaRow>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)d).ToSimpleMultimediaRows(),
+                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d))?.ToSimpleMultimediaRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
@@ -434,7 +434,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)d).ToExtendedMeasurementOrFactRows(),
+                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d))?.ToExtendedMeasurementOrFactRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
@@ -452,7 +452,7 @@ namespace SOS.Lib.Repositories.Processed
                 var query = filter.ToQuery();
                 var projection = new SourceFilterDescriptor<dynamic>()
                     .Excludes(e => e
-                        .Field("ArtportalenInternal")
+                        .Field("artportalenInternal")
                         .Field("location.point")
                         .Field("location.pointLocation")
                         .Field("location.pointWithBuffer")

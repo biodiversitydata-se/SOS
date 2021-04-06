@@ -277,15 +277,21 @@ namespace SOS.Lib.Extensions
         }
 
         private static void AddNestedMustExistsCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string path, string field)
         {
             query.Add(q => q
                 .Nested(n => n
-                    .Path(field)
+                    .Path(path)
                     .Query(nq => nq
-                        .Exists(e => e
-                            .Field(field))
-                    ))
+                        .Bool(b => b
+                            .Filter(f => f
+                                .Exists(e => e
+                                    .Field(field)
+                                )
+                            )
+                        )
+                    )
+                )
             );
         }
 
@@ -853,7 +859,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("occurrence.media");
+            query.AddNestedMustExistsCriteria("occurrence.media", "occurrence.media");
             return query;
         }
 
@@ -861,7 +867,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("measurementOrFacts");
+            query.AddNestedMustExistsCriteria("measurementOrFacts", "measurementOrFacts");
             return query;
         }
 
