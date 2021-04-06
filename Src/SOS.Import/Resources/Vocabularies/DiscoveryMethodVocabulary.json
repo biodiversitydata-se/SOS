@@ -875,16 +875,16 @@
     },
     {
       "Id": 58,
-      "Value": "sound recording",
+      "Value": "passive sound recording",
       "Localized": true,
       "Translations": [
         {
           "CultureCode": "sv-SE",
-          "Value": "ljudinspelning"
+          "Value": "passiv ljudinspelning"
         },
         {
           "CultureCode": "en-GB",
-          "Value": "sound recording"
+          "Value": "passive sound recording"
         }
       ]
     },
@@ -1262,6 +1262,36 @@
           "Value": "eDNA"
         }
       ]
+    },
+    {
+      "Id": 88,
+      "Value": "collection of material for DNA analysis",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "insamling av material för DNA-analys"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "collection of material for DNA analysis"
+        }
+      ]
+    },
+    {
+      "Id": 89,
+      "Value": "BatLogger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "BatLogger"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "BatLogger"
+        }
+      ]
     }
   ],
   "ExternalSystemsMapping": [
@@ -1608,6 +1638,14 @@
             {
               "Value": 87,
               "SosId": 87
+            },
+            {
+              "Value": 88,
+              "SosId": 88
+            },
+            {
+              "Value": 89,
+              "SosId": 89
             }
           ]
         }
