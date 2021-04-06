@@ -140,7 +140,8 @@ namespace SOS.Lib.Services
                 {
                     Created = Convert.ToDateTime(blob.Properties.LastModified.ToString()),
                     Name = blob.Name,
-                    Size = blob.Properties.ContentLength ?? 0
+                    Size = blob.Properties.ContentLength ?? 0,
+                    DownloadUrl = GetExportDownloadUrl(blob.Name)
                 });
             }
 

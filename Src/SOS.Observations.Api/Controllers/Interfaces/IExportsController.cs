@@ -10,20 +10,15 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IExportsController
     {
         /// <summary>
-        /// Get list of available export files
+        /// Returns a list of datasets available for download. A DwC-A file is usually created once a day for each dataset.
         /// </summary>
         /// <returns></returns>
         Task<IActionResult> GetExportFilesAsync();
 
         /// <summary>
-        /// Get url to export file
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        IActionResult GetExportFileUrl(string fileName);
-
-        /// <summary>
-        ///     Request of a Darwin Core Archive file with observations based on provided filter
+        /// Starts the process of creating a DwC-A file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
