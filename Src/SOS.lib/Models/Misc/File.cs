@@ -21,5 +21,10 @@ namespace SOS.Lib.Models.Misc
         /// File size in bytes
         /// </summary>
         public long Size { get; set; }
+
+        /// <summary>
+        /// Download URL.
+        /// </summary>
+        public string DownloadUrl { get; set; }
     }
 }

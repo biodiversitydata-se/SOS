@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet]
+        [HttpGet("Datasets")]
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetExportFilesAsync()
@@ -68,26 +68,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("{fileName}/URL")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetExportFileUrl([FromRoute] string fileName)
-        {
-            try
-            {
-                var downloadUrl = _blobStorageManager.GetExportDownloadUrl(fileName);
-
-                return new OkObjectResult(downloadUrl);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting export file URL");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost]
+        [HttpPost("Request")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
