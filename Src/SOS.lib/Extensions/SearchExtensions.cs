@@ -91,10 +91,6 @@ namespace SOS.Lib.Extensions
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            query.TryAddNestedTermsCriteria("projects", "projects.id",
-                internalFilter.ProjectIds);
-           
-
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
             query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
             query.TryAddBoundingBoxCriteria("location.pointLocation", internalFilter.BoundingBox);
@@ -888,6 +884,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
+            query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
 
             if (filter is SearchFilterInternal)
             {
