@@ -434,7 +434,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)d).ToExtendedMeasurementOrFactRows(),
+                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d)).ToExtendedMeasurementOrFactRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
