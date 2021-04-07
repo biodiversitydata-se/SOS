@@ -104,13 +104,26 @@ namespace SOS.Lib.Helpers
                             m => m.CreateValueDictionary(Cultures.sv_SE))
                     }
                 };
+
+            // Add empty dictionary if vocabulary is missing.
+            foreach (VocabularyId vocabularyId in Enum.GetValues(typeof(VocabularyId)))
+            {
+                if (!_valueMappingDictionariesByCultureCode[Cultures.en_GB].ContainsKey(vocabularyId))
+                {
+                    _valueMappingDictionariesByCultureCode[Cultures.en_GB].Add(vocabularyId, null);
+                }
+                if (!_valueMappingDictionariesByCultureCode[Cultures.sv_SE].ContainsKey(vocabularyId))
+                {
+                    _valueMappingDictionariesByCultureCode[Cultures.sv_SE].Add(vocabularyId, null);
+                }
+            }
         }
 
         private void ResolveVocabularyMappedValue(
             VocabularyValue vocabularyValue,
             Dictionary<int, string> valueById)
         {
-            if (vocabularyValue == null) return;
+            if (vocabularyValue == null || valueById == null) return;
             if (vocabularyValue.Id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId
                 && valueById.TryGetValue(vocabularyValue.Id, out var translatedValue))
             {
