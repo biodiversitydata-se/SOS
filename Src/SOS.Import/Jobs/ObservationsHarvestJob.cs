@@ -142,14 +142,17 @@ namespace SOS.Import.Jobs
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
 
-                //---------------------------------------------------------------------------------------------------------
-                // 3. Update harvest info
-                //---------------------------------------------------------------------------------------------------------
-                foreach (var task in harvestTaskByDataProvider)
+                if (mode == JobRunModes.Full)
                 {
-                    var harvestInfo = task.Value.Result;
-                    harvestInfo.Id = task.Key.Identifier;
-                    await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
+                    //---------------------------------------------------------------------------------------------------------
+                    // 3. Update harvest info
+                    //---------------------------------------------------------------------------------------------------------
+                    foreach (var task in harvestTaskByDataProvider)
+                    {
+                        var harvestInfo = task.Value.Result;
+                        harvestInfo.Id = task.Key.Identifier;
+                        await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
+                    }
                 }
 
                 //---------------------------------------------------------------------------------------------------------
