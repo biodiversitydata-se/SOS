@@ -56,5 +56,49 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             result.Records.First().Taxon.VernacularName.Should().Be("utter", "because otter has the swedish vernacular name 'utter'");
             result.Records.First().Location.Municipality.Name.Should().Be("Tranås", "because the Area search is limited to Tranås municipality");
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Search_with_polygon_geometry_filter()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilterDto searchFilter = new SearchFilterDto
+            {
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
+                Geometry = new GeometryFilterDto
+                {
+                    Geometries = new List<IGeoShape>()
+                    {
+                        new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
+                            {
+                                new GeoCoordinate(57.92573, 15.07063),
+                                new GeoCoordinate(58.16108, 15.00510),
+                                new GeoCoordinate(58.10148, 14.58003),
+                                new GeoCoordinate(57.93294, 14.64143),
+                                new GeoCoordinate(57.92573, 15.07063)
+                            }
+                        })
+                    },
+                    ConsiderObservationAccuracy = true
+                },
+                OnlyValidated = false,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 2);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Records.First().Taxon.VernacularName.Should().Be("utter", "because otter has the swedish vernacular name 'utter'");
+            result.Records.First().Location.Municipality.Name.Should().Be("Tranås", "because the polygon is limited to Tranås municipality");
+        }
+
     }
 }
