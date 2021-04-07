@@ -469,13 +469,18 @@ namespace SOS.Process.Jobs
                     var provider = taskProvider.Key;
                     var processResult = taskProvider.Value.Result;
 
+                    if (processResult == null)
+                    {
+                        continue;
+                    }
+
                     // Get harvest info and create a provider info object 
                     var harvestInfo = await GetHarvestInfoAsync(provider.Identifier);
                     var providerInfo = new ProviderInfo(provider)
                     {
                         HarvestCount = harvestInfo?.Count,
                         HarvestEnd = harvestInfo?.End,
-                        HarvestNotes = harvestInfo.Notes,
+                        HarvestNotes = harvestInfo?.Notes,
                         HarvestStart = harvestInfo?.Start,
                         HarvestStatus = harvestInfo?.Status,
                         PublicProcessCount = processResult.PublicCount,
@@ -510,17 +515,24 @@ namespace SOS.Process.Jobs
                 {
                     var provider = taskProvider.Key;
                     var processResult = taskProvider.Value.Result;
-                    
+
+                    if (processResult == null)
+                    {
+                        continue;
+                    }
+
                     // Get provider info and update incremental values
                     var providerInfo = processInfo.ProvidersInfo.FirstOrDefault(pi => pi.DataProviderId == provider.Id);
-                    if (providerInfo != null)
+                    if (providerInfo == null)
                     {
-                        providerInfo.LatestIncrementalPublicCount = processResult.PublicCount;
-                        providerInfo.LatestIncrementalProtectedCount = processResult.ProtectedCount;
-                        providerInfo.LatestIncrementalEnd = processResult.End;
-                        providerInfo.LatestIncrementalStart = processResult.Start;
-                        providerInfo.LatestIncrementalStatus = processResult.Status;
+                        continue;
                     }
+
+                    providerInfo.LatestIncrementalPublicCount = processResult.PublicCount;
+                    providerInfo.LatestIncrementalProtectedCount = processResult.ProtectedCount;
+                    providerInfo.LatestIncrementalEnd = processResult.End;
+                    providerInfo.LatestIncrementalStart = processResult.Start;
+                    providerInfo.LatestIncrementalStatus = processResult.Status;
                 }
             }
 
