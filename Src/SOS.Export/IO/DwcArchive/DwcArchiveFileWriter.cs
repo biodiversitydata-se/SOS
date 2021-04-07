@@ -156,9 +156,13 @@ namespace SOS.Export.IO.DwcArchive
                 }
 
                 // Create processinfo.xml
-                await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
-                DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
-                processInfoFileStream.Close();
+                if (processInfo != null)
+                {
+                    await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
+                    DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
+                    processInfoFileStream.Close();
+                }
+               
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
                 return zipFilePath;

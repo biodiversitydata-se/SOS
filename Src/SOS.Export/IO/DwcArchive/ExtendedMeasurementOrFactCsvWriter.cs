@@ -44,8 +44,7 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 var scrollResult = await processedPublicObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
-                var hasRecords = scrollResult?.Records?.Any() ?? false;
-                if (!hasRecords) return false;
+                if (!scrollResult?.Records?.Any() ?? true) return false;
 
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
@@ -53,7 +52,7 @@ namespace SOS.Export.IO.DwcArchive
                 // Write header row
                 WriteHeaderRow(csvWriter);
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (scrollResult.Records.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
@@ -91,6 +90,11 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
+                if (!emofRows?.Any() ?? true)
+                {
+                    return;
+                }
+
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
 
                 // Write Emof rows to CSV file.
@@ -130,6 +134,11 @@ namespace SOS.Export.IO.DwcArchive
             NReco.Csv.CsvWriter csvWriter,
             ExtendedMeasurementOrFactRow emofRow)
         {
+            if (emofRow == null)
+            {
+                return;
+            }
+
             csvWriter.WriteField(emofRow.OccurrenceID);
             csvWriter.WriteField(emofRow.MeasurementID);
             csvWriter.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
