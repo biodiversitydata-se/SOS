@@ -81,41 +81,37 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 }
 
                 var query = $@"
-                SELECT
-                    SearchableSightings.SightingId							AS SightingId,
-	                Project.Id												AS ProjectId,	                	                
-	                ProjectParameter.Id										AS ProjectParameterId,
-	                ProjectParameter.Name									AS Name,
-	                ProjectParameter.Description							AS Description,
-	                ProjectParameter.Unit									AS Unit,
-	                ProjectParameterValue.Value								AS Value,
-	                CASE
-		                WHEN ProjectParameter.ProjectParameterTypeId = 3
-		                THEN 'double'
-		                ELSE 'string' END									AS DataType	                
-	                FROM SearchableSightings SearchableSightings WITH (NOLOCK)	 
-                    INNER JOIN @tvp t ON SearchableSightings.SightingId = t.Id 
-	                INNER JOIN SightingState AS SightingState ON SightingState.SightingId = SearchableSightings.SightingId
-		                AND SightingState.SightingStateTypeId = 30  -- A sighting that has been made public.
-		                AND SightingState.IsActive = 1				-- if edited several records w/ IsActive = 0
-	                INNER JOIN Taxon AS Taxon ON Taxon.Id = SearchableSightings.TaxonId
-	                INNER JOIN ProjectParameterValue AS ProjectParameterValue ON SearchableSightings.SightingId = ProjectParameterValue.SightingId
-	                INNER JOIN ProjectParameter AS ProjectParameter ON ProjectParameterValue.ProjectParameterId = ProjectParameter.Id
-	                INNER JOIN Project AS Project ON Project.Id = ProjectParameter.ProjectId
-	                WHERE
-                        (SearchableSightings.HiddenByProvider IS NULL OR SearchableSightings.HiddenByProvider < getDate())
-		                AND
-		                (SearchableSightings.SightingTypeId = 0 OR SearchableSightings.SightingTypeId = 3)  
-		                AND
-		                SearchableSightings.ValidationStatusId != 50		                
-		                AND
-		                (Taxon.ProtectionLevelId = 1)		                
-		                AND
-		                ISNULL(ProjectParameterValue.Value, '') <> ''
-		                AND
-		                ProjectParameter.IsDeleted = 0
-		                AND
-		                Project.IsHideAll = 0";
+                SELECT 
+                    ss.SightingId AS SightingId, 
+	                p.Id AS ProjectId, 
+	                pp.Id AS ProjectParameterId, 
+	                pp.Name, 
+	                pp.Description, 
+	                pp.Unit, 
+	                ppv.Value, 
+	                CASE 
+		                WHEN pp.ProjectParameterTypeId = 3 
+		                THEN 'double' 
+		                ELSE 'string' 
+                    END AS DataType               
+	            FROM 
+					SearchableSightings ss WITH (NOLOCK) 
+                    INNER JOIN @tvp tvp ON ss.SightingId = tvp.Id 
+	                INNER JOIN SightingState st ON ss.SightingId = st.SightingId 
+		                AND st.SightingStateTypeId = 30 
+		                AND st.IsActive = 1 
+	                INNER JOIN Taxon t ON ss.TaxonId = t.Id 
+	                INNER JOIN ProjectParameterValue ppv ON ss.SightingId = ppv.SightingId 
+	                INNER JOIN ProjectParameter pp ON  pp.Id = ppv.ProjectParameterId 
+	                INNER JOIN Project p ON p.Id = pp.ProjectId 
+	            WHERE 
+                    (ss.HiddenByProvider IS NULL OR ss.HiddenByProvider < getDate()) 
+		            AND (ss.SightingTypeId = 0 OR ss.SightingTypeId = 3) 
+		            AND ss.ValidationStatusId != 50 
+		            AND t.ProtectionLevelId = 1  
+		            AND ISNULL(ppv.Value, '') <> '' 
+		            AND pp.IsDeleted = 0 
+		            AND p.IsHideAll = 0";
 
                 return await QueryAsync<ProjectParameterEntity>(
                     query, 

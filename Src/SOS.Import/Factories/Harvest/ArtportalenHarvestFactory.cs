@@ -234,11 +234,6 @@ namespace SOS.Import.Factories.Harvest
             {
                 var (sightingId, projectId) = sightingProjectIds[i];
 
-                if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out var project))
-                {
-                    continue;
-                }
-
                 if (!sightingsProjects.TryGetValue(sightingId, out var sightingProjects))
                 {
                     sightingProjects = new Dictionary<int, Project>();
@@ -247,7 +242,11 @@ namespace SOS.Import.Factories.Harvest
 
                 if (!sightingProjects.ContainsKey(projectId))
                 {
-                    
+                    if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out var project))
+                    {
+                        continue;
+                    }
+
                     // Make a copy of project so we can add params to it later
                     sightingProjects.TryAdd(project.Id, project.Clone());
                 }
@@ -260,33 +259,24 @@ namespace SOS.Import.Factories.Harvest
                 for (var i = 0; i < projectParameterEntities.Length; i++)
                 {
                     var projectParameterEntity = projectParameterEntities[i];
-                    Project project = null;
-
+                    
                     // Try to get projects by sighting id
-                    if (sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
+                    if (!sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
                     {
-                        // Try to get sighting project 
-                        sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out project);
-                    }
-                    else
-                    {
-                        // Sighting projects is missing, add it
                         sightingProjects = new Dictionary<int, Project>();
                         sightingsProjects.TryAdd(projectParameterEntity.SightingId, sightingProjects);
                     }
 
-                    if (project == null)
+                    // Try to get sighting project 
+                    if (!sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out var project))
                     {
                         if (!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project))
                         {
                             continue;
                         }
 
-                        // Get project from all projects
-             
                         sightingProjects.TryAdd(project.Id, project.Clone());
                     }
-
                     project.ProjectParameters ??= new List<ProjectParameter>();
                     project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
                 }
