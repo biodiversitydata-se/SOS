@@ -14,6 +14,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>Object with these properties: fileName, jobId</returns>
-        Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilterDto filter);
+        Task<IActionResult> PostCreateDOI([FromBody] ExportFilterDto filter);
     }
 }

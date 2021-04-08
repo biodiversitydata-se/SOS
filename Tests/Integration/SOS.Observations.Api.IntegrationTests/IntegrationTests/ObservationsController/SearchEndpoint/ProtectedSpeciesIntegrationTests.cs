@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.SearchAsync(searchFilter, 0, 10);
+            var response = await _fixture.ObservationsController.ObservationsBySearch(searchFilter, 0, 10);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------

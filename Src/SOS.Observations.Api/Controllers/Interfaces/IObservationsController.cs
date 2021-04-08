@@ -10,23 +10,23 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// </summary>
     public interface IObservationsController
     {
-        Task<IActionResult> CountAsync(
+        Task<IActionResult> Count(
             [FromBody] SearchFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false);
 
-        Task<IActionResult> SearchAsync(SearchFilterDto filter, int skip, int take, string sortBy,
+        Task<IActionResult> ObservationsBySearch(SearchFilterDto filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> CountInternalAsync(
+        Task<IActionResult> CountInternal(
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false);
 
-        Task<IActionResult> SearchInternalAsync(
+        Task<IActionResult> ObservationsBySearchInternal(
             SearchFilterInternalDto filter,
             int skip,
             int take,
@@ -36,7 +36,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> SearchAggregatedInternalAsync(
+        Task<IActionResult> SearchAggregatedInternal(
             SearchFilterAggregationInternalDto filter,
             AggregationType aggregationType,
             int skip,
@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
+        Task<IActionResult> GeogridAggregation(
             SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
@@ -56,7 +56,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
+        Task<IActionResult> GeogridAggregationInternal(
             SearchFilterAggregationInternalDto filter,
             int zoom,
             double? bboxLeft,
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
+        Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
@@ -78,7 +78,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> TaxonAggregationAsync(
+        Task<IActionResult> TaxonAggregation(
             SearchFilterAggregationDto filter,
             int? skip,
             int? take,
@@ -90,7 +90,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> TaxonAggregationInternalAsync(
+        Task<IActionResult> TaxonAggregationInternal(
             SearchFilterAggregationInternalDto filter,
             int? skip,
             int? take,
@@ -102,12 +102,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> GetTaxonExistsIndicationAsync(
+        Task<IActionResult> TaxonExistsIndication(
             SearchFilterDto filter,
             bool validateSearchFilter = false,
             bool protectedObservations = false);
 
-        Task<IActionResult> GetTaxonExistsIndicationInternalAsync(
+        Task<IActionResult> TaxonExistsIndicationInternal(
            SearchFilterInternalDto filter,
            bool validateSearchFilter = false,
            bool protectedObservations = false);

@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("Datasets")]
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetExportFilesAsync()
+        public async Task<IActionResult> GetDatasetsList()
         {
             try
             {
@@ -74,7 +74,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunExportAndSendJob([FromBody] ExportFilterDto filter)
+        public async Task<IActionResult> PostRequest([FromBody] ExportFilterDto filter)
         {
             try
             {
