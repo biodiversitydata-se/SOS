@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public IActionResult ClearAsync(Cache cache)
+        public IActionResult DeleteCache(Cache cache)
         {
             try
             {

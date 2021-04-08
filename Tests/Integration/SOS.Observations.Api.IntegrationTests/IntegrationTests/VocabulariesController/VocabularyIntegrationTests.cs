@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.VocabulariesCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.VocabulariesController.GetVocabularyAsync(VocabularyIdDto.LifeStage);
+            var response = await _fixture.VocabulariesController.GetVocabularyById(VocabularyIdDto.LifeStage);
             var vocabulary = response.GetResult<VocabularyDto>();
 
             //-----------------------------------------------------------------------------------------------------------

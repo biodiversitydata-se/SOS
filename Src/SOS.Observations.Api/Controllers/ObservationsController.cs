@@ -236,7 +236,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> SearchAsync(
+        public async Task<IActionResult> ObservationsBySearch(
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -283,7 +283,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CountAsync(
+        public async Task<IActionResult> Count(
             [FromBody] SearchFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -357,7 +357,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
+        public async Task<IActionResult> GeogridAggregation(
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -513,7 +513,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> TaxonAggregationAsync(
+        public async Task<IActionResult> TaxonAggregation(
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
@@ -577,7 +577,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetTaxonExistsIndicationAsync(
+        public async Task<IActionResult> TaxonExistsIndication(
             [FromBody] SearchFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -627,7 +627,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{occurrenceId}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetObservation([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        public async Task<IActionResult> GetObservationById([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -675,7 +675,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> SearchInternalAsync(
+        public async Task<IActionResult> ObservationsBySearchInternal(
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -724,7 +724,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> CountInternalAsync(
+        public async Task<IActionResult> CountInternal(
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -768,7 +768,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> SearchAggregatedInternalAsync(
+        public async Task<IActionResult> SearchAggregatedInternal(
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
@@ -852,7 +852,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
+        public async Task<IActionResult> GeogridAggregationInternal(
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -916,7 +916,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
+        public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -1013,7 +1013,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> InternalPagedGeogridTaxaAggregationAsync(
+        public async Task<IActionResult> GeogridTaxaAggregationInternal(
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] string geoTilePage = null,
@@ -1077,7 +1077,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> TaxonAggregationInternalAsync(
+        public async Task<IActionResult> TaxonAggregationInternal(
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
@@ -1138,7 +1138,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetTaxonExistsIndicationInternalAsync(
+        public async Task<IActionResult> TaxonExistsIndicationInternal(
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -1190,7 +1190,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetObservationInternal([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        public async Task<IActionResult> GetObservationByIdInternal([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
         {
             try
             {

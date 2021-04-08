@@ -51,6 +51,7 @@ using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
@@ -195,6 +196,15 @@ namespace SOS.Observations.Api
                                 Version = description.ApiVersion.ToString(),
                                 Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
                             });
+
+                        swagger.CustomOperationIds(apiDesc =>
+                        {
+                            apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
+                            string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
+                            string methodName = methodInfo.Name;
+                            return $"{controller}_{methodName}";
+                        });
+
                     }
 
                     // add a custom operation filter which sets default values
@@ -381,6 +391,7 @@ namespace SOS.Observations.Api
                         $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
                         $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}");
 
+                    options.DisplayOperationId();
                     options.DocExpansion(DocExpansion.None);
                 }
             });
