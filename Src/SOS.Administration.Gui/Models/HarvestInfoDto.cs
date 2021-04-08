@@ -1,8 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Models
 {
@@ -17,5 +14,6 @@ namespace SOS.Administration.Gui.Models
         public DateTime End { get; set; }
         public DateTime Start { get; set; }
         public string Status { get; set; }
+        public string Notes { get; set; }
     }
 }
