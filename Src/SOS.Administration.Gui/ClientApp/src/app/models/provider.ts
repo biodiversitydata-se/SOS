@@ -1,16 +1,18 @@
 export class Provider {
   dataProviderId: number;
   dataProviderIdentifier: string
-  processCount: number;
+  publicProcessCount: number;
+  protectedProcessCount: number;
   processStart: Date;
   processEnd: Date;
-  rocessStatus: string;
+  processStatus: string;
   harvestCount: number;
   harvestStart: Date;
   harvestEnd: Date;
   harvestNotes: string;
   harvestStatus: string;
-  latestIncrementalCount: number;
+  latestIncrementalPublicCount: number;
+  latestIncrementalProtectedCount: number;
   latestIncrementalStart: Date;
   latestIncrementalEnd: Date;
   latestIncrementalStatus: string;
