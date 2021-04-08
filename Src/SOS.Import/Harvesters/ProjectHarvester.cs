@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Import.Entities.Artportalen;
-using SOS.Import.Factories.Vocabularies;
-using SOS.Import.Factories.Vocabularies.Interfaces;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
