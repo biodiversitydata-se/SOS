@@ -275,7 +275,8 @@ namespace SOS.Import.Factories.Harvest
                             continue;
                         }
 
-                        sightingProjects.TryAdd(project.Id, project.Clone());
+                        project = project.Clone();
+                        sightingProjects.TryAdd(project.Id, project);
                     }
                     project.ProjectParameters ??= new List<ProjectParameter>();
                     project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));

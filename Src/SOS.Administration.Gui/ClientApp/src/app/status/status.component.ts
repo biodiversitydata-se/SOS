@@ -58,7 +58,8 @@ export class StatusComponent implements OnInit {
       }
     },    
     { field: 'dataProviderIdentifier', sortable: true, filter: true, resizable: true },
-    { field: 'processCount', sortable: true, filter: true, resizable: true },
+    { field: 'publicProcessCount', sortable: true, filter: true, resizable: true },
+    { field: 'protectedProcessCount', sortable: true, filter: true, resizable: true },
     { field: 'processStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
     { field: 'processEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },   
     { field: 'harvestCount', sortable: true, filter: true, resizable: true },
@@ -71,7 +72,8 @@ export class StatusComponent implements OnInit {
           '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="red" /></svg><span>' + params.value + '</span>'
       }
     },    
-    { field: 'latestIncrementalCount', sortable: true, filter: true, resizable: true },
+    { field: 'latestIncrementalPublicCount', sortable: true, filter: true, resizable: true },
+    { field: 'latestIncrementalProtectedCount', sortable: true, filter: true, resizable: true },
     { field: 'latestIncrementalStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
     { field: 'latestIncrementalEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },    
   ];
@@ -134,9 +136,9 @@ export class StatusComponent implements OnInit {
         for (let provider of active.providersInfo) {
           let compare = new DataCompare();
           compare.source = provider.dataProviderIdentifier;
-          compare.today = provider.processCount;
+          compare.today = provider.publicProcessCount + provider.protectedProcessCount;
           let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
-          compare.yesterday = inactiveprovider.processCount;
+          compare.yesterday = inactiveprovider.publicProcessCount + inactiveprovider.protectedProcessCount;
           this.totalDataDifference += compare.today - compare.yesterday;
           this.dataComparison.push(compare);
         }
