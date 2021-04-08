@@ -56,7 +56,7 @@ namespace SOS.Administration.Gui.Controllers
             var collection = database.GetCollection<ProcessInfoDto>("ProcessInfo");
             var providers = collection.Find(new BsonDocument());
             var providerList = providers.SortByDescending(p => p.End).ToList();
-            providerList.Where(g => g.ProvidersInfo != null).ToList().ForEach(p =>p.ProvidersInfo.ToList().ForEach(pp => pp.ProcessCount = pp.ProtectedProcessCount + pp.PublicProcessCount));
+            providerList.Where(g => g.ProvidersInfo != null).ToList();
             return providerList;
         }
         [HttpGet]
