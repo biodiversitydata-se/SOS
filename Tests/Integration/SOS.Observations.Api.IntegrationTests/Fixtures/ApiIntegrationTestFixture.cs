@@ -6,17 +6,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.Managers;
 using SOS.TestHelpers;
+using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
@@ -25,6 +29,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
+        public DataProvidersController DataProvidersController { get; private set; }
+
         public TaxonManager TaxonManager { get; private set; }
 
         public ApiIntegrationTestFixture()
@@ -65,8 +71,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient, memoryCache);
             var vocabularyManger = CreateVocabularyManager(processClient);
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, taxonManager);
+            var processInfoRepository = new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
+            var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
+            var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
+            var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, new NullLogger<DataProviderManager>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, new ObservationApiConfiguration{ TilesLimit = 100000 },  new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
+            DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             TaxonManager = taxonManager;
         }
 
