@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(EnvironmentInformationDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public IActionResult GetEnvironmentInformation()
+        public IActionResult Get()
         {
             try
             {

@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("Projects")]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetProjectsAsync()
+        public async Task<IActionResult> GetProjects()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<VocabularyDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabulariesAsync()
+        public async Task<IActionResult> GetVocabularies()
         {
             try
             {
@@ -87,7 +87,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("ZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabulariesAsZipFileAsync()
+        public async Task<IActionResult> GetVocabulariesAsZipFile()
         {
             try
             {
@@ -110,7 +110,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{vocabularyId}")]
         [ProducesResponseType(typeof(VocabularyDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetVocabularyAsync(
+        public async Task<IActionResult> GetVocabularyById(
             [FromRoute] VocabularyIdDto vocabularyId)
         {
             try

@@ -36,7 +36,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(ProcessInfoDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetProcessInfoAsync([FromQuery] bool active)
+        public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
         {
             try
             {

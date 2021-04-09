@@ -13,14 +13,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="cultureCode"></param>
         /// <returns>List of data providers.</returns>
-        Task<IActionResult> GetDataProvidersAsync(string cultureCode = "en-GB");
+        Task<IActionResult> GetDataProviders(string cultureCode = "en-GB");
 
         /// <summary>
         /// Get latest modified date for a data provider.
         /// </summary>
         /// <param name="providerId"></param>
         /// <returns></returns>
-        Task<IActionResult> GetLatestModifiedDateForProviderAsync(int providerId);
+        Task<IActionResult> GetLastModifiedDateById(int providerId);
 
     }
 }

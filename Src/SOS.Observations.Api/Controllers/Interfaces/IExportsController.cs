@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// Returns a list of datasets available for download. A DwC-A file is usually created once a day for each dataset.
         /// </summary>
         /// <returns></returns>
-        Task<IActionResult> GetExportFilesAsync();
+        Task<IActionResult> GetDatasetsList();
 
         /// <summary>
         /// Starts the process of creating a DwC-A file with observations based on provided filter.
@@ -22,6 +22,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IActionResult> RunExportAndSendJob(ExportFilterDto filter);
+        Task<IActionResult> PostRequest(ExportFilterDto filter);
     }
 }

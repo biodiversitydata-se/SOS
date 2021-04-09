@@ -13,6 +13,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="active">True: get information about last processing, false get information about previous processing</param>
         /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
-        Task<IActionResult> GetProcessInfoAsync(bool active);
+        Task<IActionResult> GetProcessInfo(bool active);
     }
 }

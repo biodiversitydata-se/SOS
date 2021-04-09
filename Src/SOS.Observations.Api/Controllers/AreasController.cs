@@ -36,10 +36,10 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet]
+        [HttpGet()]
         [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
+        public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
             [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
         {
             try
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<IActionResult> ExportAreaAsync([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+        public async Task<IActionResult> GetExport([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
         {
             try
             {
