@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="skip">Start index of returned areas</param>
         /// <param name="take">Number of areas to return</param>
         /// <returns>List of areas</returns>
-        Task<IActionResult> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString, int skip = 0,
+        Task<IActionResult> GetAreas(IEnumerable<AreaTypeDto> areaTypes, string searchString, int skip = 0,
             int take = 100);
 
         /// <summary>
@@ -27,6 +27,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="areaType">The area type.</param>
         /// <param name="featureId">The FeatureId.</param>
         /// <returns></returns>
-        Task<IActionResult> ExportAreaAsync(AreaTypeDto areaType, string featureId);
+        Task<IActionResult> GetExport(AreaTypeDto areaType, string featureId);
     }
 }

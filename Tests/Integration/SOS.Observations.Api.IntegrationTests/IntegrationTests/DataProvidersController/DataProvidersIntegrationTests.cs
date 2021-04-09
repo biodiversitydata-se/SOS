@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersCo
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.DataProvidersController.GetDataProvidersAsync();
+            var response = await _fixture.DataProvidersController.GetDataProviders();
             var dataProviders = response.GetResult<List<DataProviderDto>>();
 
             //-----------------------------------------------------------------------------------------------------------

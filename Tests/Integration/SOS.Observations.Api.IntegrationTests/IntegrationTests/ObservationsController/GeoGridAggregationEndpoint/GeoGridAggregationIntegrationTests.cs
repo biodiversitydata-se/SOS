@@ -46,7 +46,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.GeogridSearchTileBasedAggregationAsync(searchFilter, 10);
+            var response = await _fixture.ObservationsController.GeogridAggregation(searchFilter, 10);
             var result = response.GetResult<GeoGridResultDto>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -82,13 +82,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.InternalPagedGeogridTaxaAggregationAsync(searchFilter, zoom);
+            var response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(searchFilter, zoom);
             var result = response.GetResult<GeoGridTileTaxonPageResultDto>();
             gridCells.AddRange(result.GridCells);
             nrRequests++;
             while (result.HasMorePages)
             {
-                response = await _fixture.ObservationsController.InternalPagedGeogridTaxaAggregationAsync(
+                response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(
                     searchFilter, 
                     zoom, 
                     result.NextGeoTilePage, 

@@ -13,6 +13,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="cache"></param>
         /// <returns></returns>
-        IActionResult ClearAsync(Cache cache);
+        IActionResult DeleteCache(Cache cache);
     }
 }

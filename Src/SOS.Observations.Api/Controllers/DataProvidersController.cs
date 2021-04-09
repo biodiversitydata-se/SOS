@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersAsync([FromQuery] string cultureCode = "en-GB")
+        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "en-GB")
         {
             try
             {
@@ -58,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{providerId}/LastModified")]
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute] int providerId)
+        public async Task<IActionResult> GetLastModifiedDateById([FromRoute] int providerId)
         {
             try
             {
