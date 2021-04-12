@@ -180,9 +180,11 @@ export class StatusComponent implements OnInit {
       let infoCount = 0;
       let debugCount = 0;
       let errorCount = 0;
-      if (agg.terms.filter(p => p.name == "Info").length > 0) { infoCount = agg.terms.filter(p => p.name == "Info")[0].docCount; }
-      if (agg.terms.filter(p => p.name == "Debug").length > 0) { debugCount = agg.terms.filter(p => p.name == "Debug")[0].docCount; }
-      if (agg.terms.filter(p => p.name == "Error").length > 0) { errorCount = agg.terms.filter(p => p.name == "Error")[0].docCount;}
+      if (agg) {
+        if (agg.terms.filter(p => p.name == "Info").length > 0) { infoCount = agg.terms.filter(p => p.name == "Info")[0].docCount; }
+        if (agg.terms.filter(p => p.name == "Debug").length > 0) { debugCount = agg.terms.filter(p => p.name == "Debug")[0].docCount; }
+        if (agg.terms.filter(p => p.name == "Error").length > 0) { errorCount = agg.terms.filter(p => p.name == "Error")[0].docCount; }
+      }
       this.logDescription = "Logs last 24h: Info (" + infoCount + ") Debug (" + debugCount + ") Error (" + errorCount + ")";
     }, error => console.error(error));
     this.runTests();

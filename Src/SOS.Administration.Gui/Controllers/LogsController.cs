@@ -70,13 +70,13 @@ namespace SOS.Administration.Gui.Controllers
     public class LogsController : ControllerBase
     {
 
-        private readonly ElasticClient _testElasticClient;
+        private readonly ElasticClient _elasticClient;
         private readonly string _indexName = "logs-*";
 
 
-        public LogsController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<TestElasticSearchConfiguration> testElasticConfiguration)
+        public LogsController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<ElasticSearchConfiguration> elasticConfiguration)
         {          
-            _testElasticClient = testElasticConfiguration.CurrentValue.GetClient(true);
+            _elasticClient = elasticConfiguration.CurrentValue.GetClient(true);
         }
      
         [HttpGet]
@@ -99,7 +99,7 @@ namespace SOS.Administration.Gui.Controllers
                 queryString = "*" + textFilter + "*";
             }
             var filterAggregationsNames = new List<string>() { "filtered_levels", "filtered_hosts", "filtered_processes" };
-            var result = await _testElasticClient.SearchAsync<LogEntry>(p => p
+            var result = await _elasticClient.SearchAsync<LogEntry>(p => p
                 .Index(_indexName)
                 .Size(take)
                 .Skip(skip)
