@@ -24,7 +24,24 @@ namespace SOS.Observations.Api.ActionFilters
             //var summary = operation.Summary;
             //operation.Summary = operation.OperationId;
             //operation.Description = summary;
-            operation.Description = operation.Summary;
+            string description = null;
+            if (operation.Description != null)
+            {
+                if (operation.Summary != null && operation.Summary.EndsWith("."))
+                {
+                    description = operation.Summary + " " + operation.Description;
+                }
+                else
+                {
+                    description = operation.Summary + ". " + operation.Description;
+                }
+            }
+            else
+            {
+                description = operation.Summary;
+            }
+
+            operation.Description = description;
             operation.Summary = null;
         }
     }
