@@ -221,6 +221,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OrganismQuantity { get; set; }
 
         /// <summary>
+        ///     The quantity of organisms as integer. Necessary because we want to be able to do Range-querys against quantities. 
+        /// </summary>
+        /// <remarks>Not defined in DwC</remarks>
+        public int? OrganismQuantityInt { get; set; }
+
+        /// <summary>
         ///     The type of quantification system used for the quantity of organisms.
         ///     A dwc:organismQuantityType must have a corresponding dwc:organismQuantity.
         /// </summary>
