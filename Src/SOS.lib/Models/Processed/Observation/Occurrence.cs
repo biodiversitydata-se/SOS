@@ -221,7 +221,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OrganismQuantity { get; set; }
 
         /// <summary>
-        ///     The quantity of organisms as integer. Necessary because we want to be able to do Range-querys against quantities. 
+        ///     The quantity of organisms as integer. This field is necessary because we want to be able to do range-querys against quantities. 
         /// </summary>
         /// <remarks>Not defined in DwC</remarks>
         public int? OrganismQuantityInt { get; set; }
