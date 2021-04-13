@@ -72,13 +72,12 @@ export default function main() {
     group("All observations with occurrenceStatus == present", function () {
       let response;
       let body = {
-        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.redlistCategory"],
-        occurrenceStatus: "present",
-        fieldTranslationCultureCode: "sv-SE",
+        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.attributes.redlistCategory"],
+        occurrenceStatus: "Present",
       };
 
       response = http.post(
-        environmentUrl + "/Observations/Search?skip=0&take=1&validateSearchFilter=true",
+        environmentUrl + "/Observations/Search?skip=0&take=1&validateSearchFilter=true&translationCultureCode=sv-SE&protectedObservations=false",
         JSON.stringify(body),
         {
           headers: headers,
@@ -119,7 +118,7 @@ export default function main() {
     group("Wolves", function () {
       let response;
       let body = {
-        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.redlistCategory"],
+        outputFields : ["rightsHolder", "datasetName", "occurrence.recordedBy", "occurrence.catalogNumber", "occurrence.occurrenceStatus", "taxon.id", "taxon.vernacularName", "taxon.attributes.redlistCategory"],
         occurrenceStatus: "present",
         fieldTranslationCultureCode: "sv-SE",
         taxon: { taxonIds: [100024], includeUnderlyingTaxa: true }
@@ -182,18 +181,18 @@ export default function main() {
             "occurrence.activity",
             "event.startDate",
             "event.endDate",
-            "artportalenInternal.projects",
+            "projects",
             "identification.validated",
             "location.locality",
             "location.decimalLongitude",
             "location.decimalLatitude",
             "location.coordinateUncertaintyInMeters",
-            "taxon.dyntaxaTaxonId"
+            "taxon.attributes.dyntaxaTaxonId"
         ],
         "date": {
             "startDate": "2015-01-01T00:00:00+01:00",
             "endDate": "2020-11-24T00:00:00+01:00",
-            "searchOnlyBetweenDates": true
+            "dateFilterType":"BetweenStartDateAndEndDate"
         },
         "taxon": {
             "taxonIds": [
@@ -438,14 +437,14 @@ export default function main() {
       let response;      
 
       response = http.get(
-        environmentUrl + "/areas/8060/export",        
+        environmentUrl + "/areas/CountryRegion/Svealand/export",        
         {
           headers: headers,
           timeout:180000
         }
       );
       check(response, {
-        'is status 200': (r) => r.status === 200,
+        'is status 204': (r) => r.status === 204,
       });
       // Automatically added sleep
       sleep(1);
