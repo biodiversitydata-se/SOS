@@ -121,7 +121,7 @@ namespace SOS.Export.IO.DwcArchive
             NReco.Csv.CsvWriter csvWriter,
             SimpleMultimediaRow multimediaRow)
         {
-            csvWriter.WriteField(multimediaRow.GbifID);
+            csvWriter.WriteField(multimediaRow.OccurrenceId);
             csvWriter.WriteField(multimediaRow.Type);
             csvWriter.WriteField(multimediaRow.Format);
             csvWriter.WriteField(multimediaRow.Identifier);
