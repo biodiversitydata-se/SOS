@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Containers.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -392,7 +393,14 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
 
@@ -472,7 +480,7 @@ namespace SOS.Import.Harvesters.Observations
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
                 harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
-                var lastBackupDate  = await _metadataRepository.GetLastBackupDateAsync();
+                var lastBackupDate = await _metadataRepository.GetLastBackupDateAsync();
                 harvestInfo.Notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -489,6 +497,12 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
         }
     }
 }

@@ -8,8 +8,10 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Harvesters.Observations.Interfaces;
+using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -27,21 +29,43 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IDarwinCoreArchiveEventRepository _dwcArchiveEventRepository;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcArchiveVerbatimRepository;
+        private readonly IFileDownloadService _fileDownloadService;
         private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
+        private async Task HarvestEventData(IIdIdentifierTuple idIdentifierTuple,
+            ArchiveReader archiveReader,
+            IJobCancellationToken cancellationToken)
+        {
+            _logger.LogDebug("Start storing DwC-A events");
+            await _dwcArchiveEventRepository.ClearTempHarvestCollection(idIdentifierTuple);
+            var eventBatches =
+                _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, idIdentifierTuple,
+                    BatchSize);
+            await foreach (var eventBatch in eventBatches)
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                await _dwcArchiveEventRepository.AddManyToTempHarvestAsync(eventBatch, idIdentifierTuple);
+            }
+
+            await _dwcArchiveEventRepository.RenameTempHarvestCollection(idIdentifierTuple);
+            _logger.LogDebug("Finish storing DwC-A events");
+        }
+
         /// <summary>
-        ///     Constructor.
+        /// Constructor
         /// </summary>
         /// <param name="dwcArchiveVerbatimRepository"></param>
         /// <param name="dwcArchiveEventRepository"></param>
         /// <param name="dwcArchiveReader"></param>
+        /// <param name="fileDownloadService"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
         public DwcObservationHarvester(
             IDarwinCoreArchiveVerbatimRepository dwcArchiveVerbatimRepository,
             IDarwinCoreArchiveEventRepository dwcArchiveEventRepository,
             IDwcArchiveReader dwcArchiveReader,
+            IFileDownloadService fileDownloadService,
             DwcaConfiguration dwcaConfiguration,
             ILogger<DwcObservationHarvester> logger)
         {
@@ -50,6 +74,7 @@ namespace SOS.Import.Harvesters.Observations
             _dwcArchiveEventRepository = dwcArchiveEventRepository ??
                                          throw new ArgumentNullException(nameof(dwcArchiveEventRepository));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
+            _fileDownloadService = fileDownloadService ?? throw new ArgumentNullException(nameof(fileDownloadService));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -79,7 +104,7 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                _logger.LogDebug("Start storing DwC-A observations");
+                _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
                 await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(dataProvider);
                 var observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
@@ -88,13 +113,20 @@ namespace SOS.Import.Harvesters.Observations
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
+                        break;
+                    }
+                 
                     observationCount += verbatimObservationsBatch.Count;
                     await _dwcArchiveVerbatimRepository.AddManyToTempHarvestAsync(verbatimObservationsBatch,
                         dataProvider);
                 }
 
                 await _dwcArchiveVerbatimRepository.RenameTempHarvestCollection(dataProvider);
-                _logger.LogDebug("Finish storing DwC-A observations");
+                _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
 
                 // Read and store events
                 //if (archiveReader.IsSamplingEventCore) // todo - Use this when we have functionality to process event data.
@@ -109,12 +141,12 @@ namespace SOS.Import.Harvesters.Observations
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, "Canceled harvest of DwC Archive");
+                _logger.LogError(e, $"Canceled harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed harvest of DwC Archive");
+                _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Failed;
             }
             finally
@@ -208,23 +240,86 @@ namespace SOS.Import.Harvesters.Observations
             return harvestInfo;
         }
 
-        private async Task HarvestEventData(IIdIdentifierTuple idIdentifierTuple,
-            ArchiveReader archiveReader,
-            IJobCancellationToken cancellationToken)
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            _logger.LogDebug("Start storing DwC-A events");
-            await _dwcArchiveEventRepository.ClearTempHarvestCollection(idIdentifierTuple);
-            var eventBatches =
-                _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, idIdentifierTuple,
-                    BatchSize);
-            await foreach (var eventBatch in eventBatches)
+            throw new NotImplementedException("Not implemented for DwcA files");
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for DwcA files");
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider,  IJobCancellationToken cancellationToken)
+        {
+            var harvestInfo = new HarvestInfo(DateTime.Now)
             {
-                cancellationToken?.ThrowIfCancellationRequested();
-                await _dwcArchiveEventRepository.AddManyToTempHarvestAsync(eventBatch, idIdentifierTuple);
+                Status = RunStatus.Failed
+            };
+            XDocument emlDocument = null;
+
+            if (!string.IsNullOrEmpty(provider.DownloadUrlEml))
+            {
+                try
+                {
+                    // Try to get eml document from ipt
+                    emlDocument = await _fileDownloadService.GetXmlFileAsync(provider.DownloadUrlEml);
+
+                    if (emlDocument != null)
+                    {
+                        if (DateTime.TryParse(
+                            emlDocument.Root.Element("dataset").Element("pubDate").Value,
+                            out var pubDate))
+                        {
+                            // If data set not has changed since last harvest, don't harvest again
+                            if (provider.SourceDate == pubDate.ToUniversalTime())
+                            {
+                                harvestInfo.Status = RunStatus.CanceledSuccess;
+                                return harvestInfo;
+                            }
+                            
+                            provider.SourceDate = pubDate;
+                        };
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Error getting EML file for {provider.Identifier}");
+                }
             }
 
-            await _dwcArchiveEventRepository.RenameTempHarvestCollection(idIdentifierTuple);
-            _logger.LogDebug("Finish storing DwC-A events");
+            var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
+
+            // Try to get DwcA file from IPT and store it locally
+            if (!await _fileDownloadService.GetFileAndStoreAsync(provider.DownloadUrl, path))
+            {
+                return harvestInfo;
+            }
+
+            // Harvest file
+            harvestInfo = await HarvestObservationsAsync(path, provider, cancellationToken);
+
+            if (harvestInfo.Status == RunStatus.Success && emlDocument != null)
+            {
+                try
+                {
+                    provider.EmlMetadata = DataProviderManager.GetEmlMetadata(emlDocument);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Error setting eml for {provider.Identifier}");
+                }
+            }
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            return harvestInfo;
         }
     }
 }

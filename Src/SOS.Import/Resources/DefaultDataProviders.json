@@ -41,7 +41,7 @@
                 "CultureCode": "sv-SE",
                 "path": [ "SLU Artdatabanken", "Artportalen" ]
             }
-        ], 
+        ],
         "Url": "https://www.artportalen.se/",
         "ContactPerson": {
             "FirstName": "Stephen",
@@ -58,7 +58,6 @@
         "Identifier": "Artportalen",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": true
     },
     {
@@ -120,7 +119,6 @@
         "Identifier": "ClamGateway",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -182,7 +180,6 @@
         "Identifier": "KUL",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -244,7 +241,6 @@
         "Identifier": "MVM",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -306,7 +302,6 @@
         "Identifier": "NORS",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -368,7 +363,6 @@
         "Identifier": "SERS",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -430,7 +424,6 @@
         "Identifier": "VirtualHerbarium",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -492,7 +485,6 @@
         "Identifier": "SHARK",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -546,6 +538,7 @@
         },
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+        "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds",
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
@@ -554,7 +547,6 @@
         "Identifier": "BirdRingingCentre",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -608,6 +600,7 @@
         },
         "ContactEmail": "-",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+        "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nhrs-nrm",
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
@@ -616,7 +609,6 @@
         "Identifier": "EntomologicalCollection",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -670,6 +662,7 @@
         },
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+        "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=smtp-nrm",
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
@@ -678,7 +671,6 @@
         "Identifier": "MalaiseTrap",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -732,6 +724,7 @@
         },
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+        "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nrm-porpoises",
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
@@ -740,7 +733,6 @@
         "Identifier": "Porpoises",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -790,6 +782,7 @@
         },
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
+        "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=lu_sebms",
         "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
@@ -798,7 +791,6 @@
         "Identifier": "ButterflyMonitoring",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -848,7 +840,6 @@
         "Identifier": "SharkZooplankton",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -910,7 +901,6 @@
         "Identifier": "Fishdata2",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
     },
     {
@@ -972,130 +962,129 @@
         "Identifier": "ForestInventory",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "LastSuccessfulHarvest": null,
         "HarvestFailPreventProcessing": false
-    },   
-	{
-		"Type": "ObservationDatabase",
-		"IsActive": true,
-		"Names": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "Observation database of Redlisted species"
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "Observationsdatabasen"
-			}
-		],
-		"Descriptions": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "A non-public database used mainly for conservation planning. Access to data requires permission. Administered by SLU Swedish Species Information Centre."
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "Observationsdatabasen administreras av SLU Artdatabanken och innehåller både äldre och nyare fynd av främst rödlistade arter. Fynduppgifterna är inte allmänt tillgängliga på grund av att de ofta lämnats till ArtDatabanken under premisserna att de inte får offentliggöras eller spridas vidare annat än till naturvårdsrelaterade ändamål. Arbete pågår med att överföra material från Observationsdatabasen till Artportalen."
-			}
-		],
-		"Organizations": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "SLU Swedish Species Information Centre (SLU Artdatabanken)"
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "SLU Artdatabanken"
-			}
-		],
-		"Paths": [
-			{
-				"CultureCode": "en-GB",
-				"path": [ "SLU Swedish Species Information Centre", "Observation database" ]
-			},
-			{
-				"CultureCode": "sv-SE",
-				"path": [ "SLU Artdatabanken", "Observationsdatabasen" ]
-			}
-		],
-		"Url": "http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata",
-		"ContactPerson": {
-		  "FirstName": "Jan",
-		  "LastName": "Edelsjö",
-		  "Email": "Jan.Edelsjo@slu.se"
-		},
-		"ContactEmail": "Jan.Edelsjo@slu.se",
-		"DownloadUrl": null,
-		"IncludeInScheduledHarvest": true,
-		"SupportIncrementalHarvest": false,
-		"SupportProtectedHarvest": true,
-		"DataQualityIsApproved": true,
-		"Id": 17,
-		"Identifier": "ObservationDatabase",
-		"EmlMetadata": null,
-		"HarvestSchedule": "* * * * *",
-		"HarvestFailPreventProcessing": false	
-	},
-	{
-		"Type": "DwcA",
-		"IsActive": false,
-		"Names": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "Biologg"
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "Biologg"
-			}
-		],
-		"Descriptions": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "Biologg is a mobile game that logs observations of species in the wild. In the game you can collect points, level up in different species groups and do challenges. The data collected will later be used for research and nature conservation."
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård."
-			}
-		],
-		"Organizations": [
-			{
-				"CultureCode": "en-GB",
-				"Value": "Overstellar Solutions AB"
-			},
-			{
-				"CultureCode": "sv-SE",
-				"Value": "Overstellar Solutions AB"
-			}
-		],
-		"Paths": [
-			{
-				"CultureCode": "en-GB",
-				"path": [ "Overstellar Solutions AB", "Biologg" ]
-			},
-			{
-				"CultureCode": "sv-SE",
-				"path": [ "Overstellar Solutions AB", "Biologg" ]
-			}
-		],
-		"Url": "https://www.biologg.se/",
-		"ContactPerson": {
-			"FirstName": "Daniel",
-			"LastName": "Eriksson",
-			"Email": "info@biologg.se"
-		},
-		"ContactEmail": "info@biologg.se",
-		"DownloadUrl": null,
-		"IncludeInScheduledHarvest": false,
-		"SupportIncrementalHarvest": false,
-		"SupportProtectedHarvest": false,
-		"DataQualityIsApproved": false,
-		"Id": 18,
-		"Identifier": "Biologg",
-		"EmlMetadata": null,
-		"HarvestSchedule": "* * * * *",
-		"HarvestFailPreventProcessing": false,
-		"LatestUploadedFileHash": null
-	}
+    },
+    {
+        "Type": "ObservationDatabase",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Observation database of Redlisted species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Observationsdatabasen"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "A non-public database used mainly for conservation planning. Access to data requires permission. Administered by SLU Swedish Species Information Centre."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Observationsdatabasen administreras av SLU Artdatabanken och innehåller både äldre och nyare fynd av främst rödlistade arter. Fynduppgifterna är inte allmänt tillgängliga på grund av att de ofta lämnats till ArtDatabanken under premisserna att de inte får offentliggöras eller spridas vidare annat än till naturvårdsrelaterade ändamål. Arbete pågår med att överföra material från Observationsdatabasen till Artportalen."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "SLU Swedish Species Information Centre (SLU Artdatabanken)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SLU Artdatabanken"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "SLU Swedish Species Information Centre", "Observation database" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "SLU Artdatabanken", "Observationsdatabasen" ]
+            }
+        ],
+        "Url": "http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata",
+        "ContactPerson": {
+            "FirstName": "Jan",
+            "LastName": "Edelsjö",
+            "Email": "Jan.Edelsjo@slu.se"
+        },
+        "ContactEmail": "Jan.Edelsjo@slu.se",
+        "DownloadUrl": null,
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": true,
+        "DataQualityIsApproved": true,
+        "Id": 17,
+        "Identifier": "ObservationDatabase",
+        "EmlMetadata": null,
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": false,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Biologg"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Biologg"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Biologg is a mobile game that logs observations of species in the wild. In the game you can collect points, level up in different species groups and do challenges. The data collected will later be used for research and nature conservation."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Overstellar Solutions AB"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Overstellar Solutions AB"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Overstellar Solutions AB", "Biologg" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Overstellar Solutions AB", "Biologg" ]
+            }
+        ],
+        "Url": "https://www.biologg.se/",
+        "ContactPerson": {
+            "FirstName": "Daniel",
+            "LastName": "Eriksson",
+            "Email": "info@biologg.se"
+        },
+        "ContactEmail": "info@biologg.se",
+        "DownloadUrl": null,
+        "IncludeInScheduledHarvest": false,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "DataQualityIsApproved": false,
+        "Id": 18,
+        "Identifier": "Biologg",
+        "EmlMetadata": null,
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "LatestUploadedFileHash": null
+    }
 ]
