@@ -161,7 +161,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     batchId++;
 
                     processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
-                    ,observations.Clear();
+                    observations.Clear();
                     Logger.LogDebug($"{dataProvider.Names.Translate("en-GB")} observations processed: {processedCount}");
                 }
             });
