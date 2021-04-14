@@ -150,7 +150,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					sg.SiteId";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") })).ToArray();
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
 
                 return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
             }

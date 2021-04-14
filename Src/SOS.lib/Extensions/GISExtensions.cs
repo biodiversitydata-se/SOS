@@ -306,18 +306,18 @@ namespace SOS.Lib.Extensions
             }
 
             Geometry circle = null;
-            switch ((CoordinateSys) point.SRID)
+            switch ((CoordinateSys)point.SRID)
             {
                 // Metric systems, add buffer to create a circle
                 case CoordinateSys.SWEREF99:
                 case CoordinateSys.SWEREF99_TM:
                 case CoordinateSys.Rt90_25_gon_v:
-                    circle = point.Buffer((double) (accuracy == 0 ? 1 : accuracy));
+                    circle = point.Buffer((double)(accuracy == 0 ? 1 : accuracy));
                     break;
-                case CoordinateSys.WebMercator:
-                case CoordinateSys.WGS84:
-                    // Degree systems
-                    var diameterInMeters = (double) (accuracy == 0 ? 1 : accuracy * 2);
+                default: // Degree systems
+                    //  case CoordinateSys.WebMercator:
+                    //  case CoordinateSys.WGS84:
+                    var diameterInMeters = (double)(accuracy == 0 ? 1 : accuracy * 2);
 
                     var shapeFactory = new GeometricShapeFactory();
                     shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
