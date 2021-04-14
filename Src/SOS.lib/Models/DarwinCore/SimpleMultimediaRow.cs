@@ -6,7 +6,7 @@
     /// </summary>
     public class SimpleMultimediaRow
     {
-        public string GbifID { get; set; }
+        public string OccurrenceId { get; set; }
         public string Type { get; set; }
         public string Format { get; set; }
         public string Identifier { get; set; }

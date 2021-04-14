@@ -563,57 +563,57 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
-        /// If protectedObservations is set to false, you must be aware of that the result can include false positives
-        /// since the protected observations coordinates are generalized to a grid depending on the protection level.
-        /// </summary>
-        /// <param name="filter">Search criteria filter used to limit the search.</param>
-        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        /// <returns></returns>
-        [HttpPost("TaxonExistsIndication")]
-        [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> TaxonExistsIndication(
-            [FromBody] SearchFilterDto filter,
-            [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false)
-        {
-            try
-            {
-                var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(), 
-                    ValidateTaxonExists(filter),
-                    ValidateGeographicalAreaExists(filter));
+        ///// <summary>
+        ///// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
+        ///// If protectedObservations is set to false, you must be aware of that the result can include false positives
+        ///// since the protected observations coordinates are generalized to a grid depending on the protection level.
+        ///// </summary>
+        ///// <param name="filter">Search criteria filter used to limit the search.</param>
+        ///// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        ///// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        ///// <returns></returns>
+        //[HttpPost("TaxonExistsIndication")]
+        //[ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
+        //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        //[ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        //[ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        //public async Task<IActionResult> TaxonExistsIndication(
+        //    [FromBody] SearchFilterDto filter,
+        //    [FromQuery] bool validateSearchFilter = false,
+        //    [FromQuery] bool protectedObservations = false)
+        //{
+        //    try
+        //    {
+        //        var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(), 
+        //            ValidateTaxonExists(filter),
+        //            ValidateGeographicalAreaExists(filter));
 
-                if (validationResult.IsFailure)
-                {
-                    return BadRequest(validationResult.Error);
-                }
+        //        if (validationResult.IsFailure)
+        //        {
+        //            return BadRequest(validationResult.Error);
+        //        }
 
-                var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
-               // Force area geometry search in order to use point with buffer
-                searchFilter.AreaGeometrySearchForced = true;
-                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
+        //        var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
+        //       // Force area geometry search in order to use point with buffer
+        //        searchFilter.AreaGeometrySearchForced = true;
+        //        var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
 
-                return new OkObjectResult(taxonFound);
-            }
-            catch (AuthenticationRequiredException e)
-            {
-                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            }
-            catch (TaxonValidationException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Get indication if taxon exists error");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        //        return new OkObjectResult(taxonFound);
+        //    }
+        //    catch (AuthenticationRequiredException e)
+        //    {
+        //        return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+        //    }
+        //    catch (TaxonValidationException e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError(e, "Get indication if taxon exists error");
+        //        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        //    }
+        //}
 
         /// <summary>
         /// Gets a single observation.

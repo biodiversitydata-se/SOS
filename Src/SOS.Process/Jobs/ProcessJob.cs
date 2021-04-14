@@ -230,6 +230,10 @@ namespace SOS.Process.Jobs
                         protectedObservation.Value.Location.DecimalLongitude ==
                         publicObservation.Location.DecimalLongitude)
                     {
+                        var errorString = $"Failed to validate random observation coordinates. Coordinates match between protected and public index for observation with OccurrenceId: {protectedObservation.Value.Occurrence.OccurrenceId},";
+                        errorString += $"Public coords:{publicObservation.Location.DecimalLatitude}, {publicObservation.Location.DecimalLongitude},";
+                        errorString += $"Protected coords:{protectedObservation.Value.Location.DecimalLatitude}, {protectedObservation.Value.Location.DecimalLongitude},";
+                        _logger.LogError(errorString);
                         return false;
                     }
                 }

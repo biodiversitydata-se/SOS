@@ -547,7 +547,10 @@ namespace SOS.Lib.Repositories.Processed
                 {
                     throw new InvalidOperationException(countResponse.DebugInformation);
                 }
-
+                if (!countResponse.Count.Equals(0))
+                {
+                    Logger.LogError($"Failed to validate protection level for Index: {IndexName}, count of observations with protection:{_protected} = {countResponse.Count}, should be 0");
+                }
                 return countResponse.Count.Equals(0);
             }
             catch (Exception e)
