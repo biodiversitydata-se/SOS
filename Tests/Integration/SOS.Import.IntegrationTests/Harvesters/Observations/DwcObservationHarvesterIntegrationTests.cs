@@ -5,11 +5,15 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
+using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
@@ -180,11 +184,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
+
             var dwcObservationHarvester = new DwcObservationHarvester(
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()), 
+                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DwcaConfiguration {ImportPath = @"C:\Temp"},
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;

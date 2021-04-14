@@ -149,6 +149,16 @@ namespace SOS.Lib.Managers
             return parsedDataProviders;
         }
 
+        /// <inheritdoc />
+        public static BsonDocument GetEmlMetadata(XDocument xmlDocument)
+        {
+            if (xmlDocument == null || xmlDocument.Root?.Name.LocalName != "eml")
+            {
+                return null;
+            };
+            var jsonStr = JsonConvert.SerializeXNode(xmlDocument);
+            return BsonDocument.Parse(jsonStr);
+        }
 
         /// <summary>
         /// Set EML metadata for a data provider.
@@ -158,9 +168,7 @@ namespace SOS.Lib.Managers
         /// <returns></returns>
         public async Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument)
         {
-            if (xmlDocument == null || xmlDocument.Root?.Name.LocalName != "eml") return false;
-            string jsonStr = JsonConvert.SerializeXNode(xmlDocument);
-            BsonDocument bsonDoc = BsonDocument.Parse(jsonStr);
+            var bsonDoc = GetEmlMetadata(xmlDocument);
             var dataProvider = await _dataProviderRepository.GetAsync(dataProviderId);
             dataProvider.EmlMetadata = bsonDoc;
             return await _dataProviderRepository.UpdateAsync(dataProviderId, dataProvider);

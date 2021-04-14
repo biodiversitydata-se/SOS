@@ -397,7 +397,10 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             if (string.IsNullOrWhiteSpace(processedLocation.GeodeticDatum)) // Assume WGS84 if GeodeticDatum is empty.
             {
                 wgs84Point = new Point(processedLocation.DecimalLongitude.Value,
-                    processedLocation.DecimalLatitude.Value);
+                    processedLocation.DecimalLatitude.Value)
+                {
+                    SRID = (int)CoordinateSys.WGS84
+                };
             }
             else
             {
