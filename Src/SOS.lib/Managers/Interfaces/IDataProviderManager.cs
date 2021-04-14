@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSharpFunctionalExtensions;
+using MongoDB.Bson;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 

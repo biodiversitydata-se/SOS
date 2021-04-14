@@ -58,7 +58,7 @@ namespace SOS.Import.Jobs
 
                 if (dataProvider.Type != DataProviderType.DwcA)
                 {
-                    throw new Exception($"The data provider \"{dataProvider}\" is not a DwC-A provider");
+                    throw new Exception($"The data provider \"{dataProvider.Identifier}\" is not a DwC-A provider");
                 }
 
                 _logger.LogInformation("Wait for DwC-A file to be ready");
@@ -89,7 +89,7 @@ namespace SOS.Import.Jobs
                 // Save harvest info
                 await _harvestInfoRepository
                     .AddOrUpdateAsync(
-                        harvestInfoResult); // todo - decide whether we should store harvestInfo in two places or not.
+                        harvestInfoResult); 
 
                 return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
                     ? true

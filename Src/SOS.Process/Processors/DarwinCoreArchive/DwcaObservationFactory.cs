@@ -398,6 +398,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 wgs84Point = new Point(processedLocation.DecimalLongitude.Value,
                     processedLocation.DecimalLatitude.Value);
+                wgs84Point.SRID = (int)CoordinateSys.WGS84;
             }
             else
             {
