@@ -10,12 +10,16 @@ using Microsoft.Extensions.Logging.Abstractions;
 using OfficeOpenXml;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
+using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Services;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,11 +57,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
+
             var dwcObservationHarvester = new DwcObservationHarvester(
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DwcaConfiguration { ImportPath = @"C:\Temp" },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;

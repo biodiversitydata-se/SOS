@@ -6,6 +6,7 @@
     public enum RunStatus
     {
         Canceled,
+        CanceledSuccess,
         Failed,
         Success
     }

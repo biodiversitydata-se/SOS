@@ -10,6 +10,7 @@ using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -48,7 +49,8 @@ namespace SOS.Import.Harvesters.Observations
             _mvmObservationVerbatimRepository.TempMode = true;
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
 
@@ -106,7 +108,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Update harvest info
                 harvestInfo.DataLastModified =
-                    dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
+                    dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -123,6 +125,19 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
         }
 
         private string GetMvmHarvestSettingsInfoString()

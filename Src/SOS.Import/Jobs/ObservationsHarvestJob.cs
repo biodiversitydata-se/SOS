@@ -133,7 +133,23 @@ namespace SOS.Import.Jobs
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvestJob = _harvestersByType[dataProvider.Type];
-                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(mode, cancellationToken));
+
+                    if (dataProvider.Type == DataProviderType.DwcA)
+                    {
+                        harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(dataProvider, cancellationToken));
+                    }
+                    else
+                    {
+                        if (dataProvider.SupportIncrementalHarvest)
+                        {
+                            harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(mode, cancellationToken));
+                        }
+                        else
+                        {
+                            harvestTaskByDataProvider.Add(dataProvider, harvestJob.HarvestObservationsAsync(cancellationToken));
+                        }
+                    }
+                    
                     _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} for {mode} harvest");
                 }
                 _logger.LogInformation($"Finish adding harvesters ({mode}).");
@@ -149,9 +165,20 @@ namespace SOS.Import.Jobs
                     //---------------------------------------------------------------------------------------------------------
                     foreach (var task in harvestTaskByDataProvider)
                     {
+                        var provider = task.Key;
                         var harvestInfo = task.Value.Result;
-                        harvestInfo.Id = task.Key.Identifier;
-                        await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
+
+                        // Some properties can be updated for DwcA providers, update provider on success
+                        if (harvestInfo.Status == RunStatus.Success && provider.Type == DataProviderType.DwcA)
+                        {
+                            await _dataProviderManager.UpdateDataProvider(provider.Id, provider);
+                        }
+
+                        if (harvestInfo.Status != RunStatus.CanceledSuccess)
+                        {
+                            harvestInfo.Id = provider.Identifier;
+                            await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
+                        }
                     }
                 }
 
@@ -159,7 +186,7 @@ namespace SOS.Import.Jobs
                 // 4. Make sure mandatory providers where successful
                 //---------------------------------------------------------------------------------------------------------
                 var success = harvestTaskByDataProvider.Where(dp => dp.Key.HarvestFailPreventProcessing)
-                    .All(r => r.Value.Result.Status == RunStatus.Success);
+                    .All(r => r.Value.Result.Status == RunStatus.Success || r.Value.Result.Status == RunStatus.CanceledSuccess);
 
                 _logger.LogInformation($"Finish {mode} observations harvesting. Success: { success }");
 
@@ -182,6 +209,7 @@ namespace SOS.Import.Jobs
         /// </summary>
         /// <param name="artportalenObservationHarvester"></param>
         /// <param name="clamPortalObservationHarvester"></param>
+        /// <param name="dwcObservationHarvester"></param>
         /// <param name="fishDataObservationHarvester"></param>
         /// <param name="kulObservationHarvester"></param>
         /// <param name="mvmObservationHarvester"></param>
@@ -197,6 +225,7 @@ namespace SOS.Import.Jobs
         public ObservationsHarvestJob(
             IArtportalenObservationHarvester artportalenObservationHarvester,
             IClamPortalObservationHarvester clamPortalObservationHarvester,
+            IDwcObservationHarvester dwcObservationHarvester,
             IFishDataObservationHarvester fishDataObservationHarvester,
             IKulObservationHarvester kulObservationHarvester,
             IMvmObservationHarvester mvmObservationHarvester,
@@ -218,6 +247,7 @@ namespace SOS.Import.Jobs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));
             if (clamPortalObservationHarvester == null) throw new ArgumentNullException(nameof(clamPortalObservationHarvester));
+            if (dwcObservationHarvester == null) throw new ArgumentNullException(nameof(dwcObservationHarvester));
             if (fishDataObservationHarvester == null) throw new ArgumentNullException(nameof(fishDataObservationHarvester));
             if (kulObservationHarvester == null) throw new ArgumentNullException(nameof(kulObservationHarvester));
             if (mvmObservationHarvester == null) throw new ArgumentNullException(nameof(mvmObservationHarvester));
@@ -232,6 +262,7 @@ namespace SOS.Import.Jobs
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationHarvester},
                 {DataProviderType.ClamPortalObservations, clamPortalObservationHarvester},
+                {DataProviderType.DwcA, dwcObservationHarvester},
                 {DataProviderType.FishDataObservations, fishDataObservationHarvester},
                 {DataProviderType.KULObservations, kulObservationHarvester},
                 {DataProviderType.MvmObservations, mvmObservationHarvester},
