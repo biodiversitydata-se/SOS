@@ -74,8 +74,8 @@ namespace SOS.Export.IO.DwcArchive
             {
                 var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia",
                     "multimedia.csv");
-                extension.Fields.Add(new ExtensionMetadataField(0, "http://rs.gbif.org/terms/1.0/gbifID",
-                    "gbifID"));
+                extension.Fields.Add(new ExtensionMetadataField(0, "http://rs.tdwg.org/dwc/terms/occurrenceID",
+                    "occurrenceID"));
                 extension.Fields.Add(new ExtensionMetadataField(1, "http://purl.org/dc/terms/type",
                     "type"));
                 extension.Fields.Add(new ExtensionMetadataField(2, "http://purl.org/dc/terms/format",

@@ -65,7 +65,7 @@ namespace SOS.Lib.Extensions
         {
             return new SimpleMultimediaRow
             {
-                GbifID = occurrenceId,
+                OccurrenceId = occurrenceId,
                 Type = multimedia.Type,
                 Format = multimedia.Format,
                 Identifier = multimedia.Identifier,

@@ -102,10 +102,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
-        Task<IActionResult> TaxonExistsIndication(
-            SearchFilterDto filter,
-            bool validateSearchFilter = false,
-            bool protectedObservations = false);
+        //Task<IActionResult> TaxonExistsIndication(
+        //    SearchFilterDto filter,
+        //    bool validateSearchFilter = false,
+        //    bool protectedObservations = false);
 
         Task<IActionResult> TaxonExistsIndicationInternal(
            SearchFilterInternalDto filter,
