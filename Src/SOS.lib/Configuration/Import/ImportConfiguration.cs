@@ -70,5 +70,10 @@ namespace SOS.Lib.Configuration.Import
         ///     Virtual Herbarium service configuration
         /// </summary>
         public VirtualHerbariumServiceConfiguration VirtualHerbariumServiceConfiguration { get; set; }
+
+        /// <summary>
+        ///     iNaturalist Service/repository configuration.
+        /// </summary>
+        public iNaturalistServiceConfiguration iNaturalistServiceConfiguration { get; set; }
     }
 }
