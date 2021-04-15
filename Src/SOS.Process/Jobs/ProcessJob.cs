@@ -178,15 +178,14 @@ namespace SOS.Process.Jobs
             {
                 _processedPublicObservationRepository.ValidateProtectionLevelAsync(),
                 _processedProtectedObservationRepository.ValidateProtectionLevelAsync(),
-                ValidateRandomObservations(protectedCount),
-                ValidateRandomObservations(protectedCount),
-                ValidateRandomObservations(protectedCount),
-                ValidateRandomObservations(protectedCount),
-                ValidateRandomObservations(protectedCount)
+                ValidateRandomObservations(),
+                ValidateRandomObservations(),
+                ValidateRandomObservations(),
+                ValidateRandomObservations(),
+                ValidateRandomObservations()
             };
 
             // Make sure no protected observations exists in public index and vice versa
-            await Task.WhenAll(validationTasks);
             return (await Task.WhenAll(validationTasks)).All(t => t);
         }
 
@@ -195,7 +194,7 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="protectedCount"></param>
         /// <returns></returns>
-        private async Task<bool> ValidateRandomObservations(int protectedCount)
+        private async Task<bool> ValidateRandomObservations()
         {
             var observationsCount = 1000;
 
@@ -225,10 +224,9 @@ namespace SOS.Process.Jobs
                     }
 
                     // If observation coordinates equals, something is wrong. Validation failed
-                    if (protectedObservation.Value.Location.DecimalLatitude ==
-                        publicObservation.Location.DecimalLatitude ||
-                        protectedObservation.Value.Location.DecimalLongitude ==
-                        publicObservation.Location.DecimalLongitude)
+                    if (protectedObservation.Value.Location.DecimalLatitude.Equals(publicObservation.Location.DecimalLatitude)
+                         || protectedObservation.Value.Location.DecimalLongitude.Equals(publicObservation.Location.DecimalLongitude)
+                       )
                     {
                         var errorString = $"Failed to validate random observation coordinates. Coordinates match between protected and public index for observation with OccurrenceId: {protectedObservation.Value.Occurrence.OccurrenceId},";
                         errorString += $"Public coords:{publicObservation.Location.DecimalLatitude}, {publicObservation.Location.DecimalLongitude},";
