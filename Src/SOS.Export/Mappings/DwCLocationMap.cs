@@ -34,7 +34,7 @@ namespace SOS.Export.Mappings
             Map(m => m.MinimumDepthInMeters).Index(18).Name("minimumDepthInMeters");
             Map(m => m.MaximumDepthInMeters).Index(19).Name("maximumDepthInMeters");
             Map(m => m.VerbatimDepth).Index(20).Name("verbatimDepth");
-            Map(m => m.MaximumDistanceAboveSurfaceInMeters).Index(21).Name("minimumDistanceAboveSurfaceInMeters");
+            Map(m => m.MinimumDistanceAboveSurfaceInMeters).Index(21).Name("minimumDistanceAboveSurfaceInMeters");
             Map(m => m.MaximumDistanceAboveSurfaceInMeters).Index(22).Name("maximumDistanceAboveSurfaceInMeters");
             Map(m => m.LocationAccordingTo).Index(23).Name("locationAccordingTo");
             Map(m => m.LocationRemarks).Index(24).Name("locationRemarks");

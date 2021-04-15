@@ -24,7 +24,7 @@ This page provides information about how to use the search filter parameters.
 - [OutputFields](#outputfields)
 
 ## Data provider filter
-This request will return observations only from Artportalen and MVM.
+This filter will return observations only from Artportalen and MVM.
 ```json
 {    
     "dataProvider": {
@@ -45,7 +45,7 @@ This request will return observations only from Artportalen and MVM.
 ## Date filter
 
 ### BetweenStartDateAndEndDate filter type
-This request will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDateDate` is less than or equal to `endDate`.
+This filter will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDateDate` is less than or equal to `endDate`.
 ```json
 {        
   "date": {
@@ -67,7 +67,7 @@ This request will return observations where `observation.event.startDate` is gre
 
 ### OverlappingStartDateAndEndDate filter type
 
-This request will return observations where `observation.event.startDate` is less than or equal to `endDate` and `observation.event.endDateDate` is greater than or equal to `startDate`.
+This filter will return observations where `observation.event.startDate` is less than or equal to `endDate` and `observation.event.endDateDate` is greater than or equal to `startDate`.
 ```json
 {        
   "date": {
@@ -91,7 +91,7 @@ This request will return observations where `observation.event.startDate` is les
 
 ### OnlyStartDate filter type
 
-This request will return observations where `observation.event.startDate`  is between `startDate` and `endDate`.
+This filter will return observations where `observation.event.startDate`  is between `startDate` and `endDate`.
 ```json
 {        
   "date": {
@@ -110,7 +110,7 @@ This request will return observations where `observation.event.startDate`  is be
 
 ### OnlyEndDate filter type
 
-This request will return observations where `observation.event.endDate`  is between `startDate` and `endDate`.
+This filter will return observations where `observation.event.endDate`  is between `startDate` and `endDate`.
 ```json
 {        
   "date": {
@@ -130,7 +130,7 @@ This request will return observations where `observation.event.endDate`  is betw
 
 ### TimeRanges
 
-This request will return observations where the hour part of `observation.event.startDate` is between `04:00` and `13:00`.
+This filter will return observations where the hour part of `observation.event.startDate` is between `04:00` and `13:00`.
 ```json
 {        
   "date": {
@@ -159,7 +159,7 @@ Areas used in samples.
 | Kronoberg county | "County" | "7" |
 
 ### Search for observations in area
-This request will return observations in Tranås municipality.
+This filter will return observations in Tranås municipality.
 ```json
 {        
     "areas" : [
@@ -172,7 +172,7 @@ This request will return observations in Tranås municipality.
 ```
 
 ### Search for observations in multiple areas of same type
-This request will return observations in Jönköping & Kronoberg county. OR operator is used when specifying multiple areas of same type.
+This filter will return observations in Jönköping & Kronoberg county. OR operator is used when specifying multiple areas of same type.
 ```json
 {        
     "areas" : [
@@ -190,7 +190,7 @@ This request will return observations in Jönköping & Kronoberg county. OR oper
 
 
 ### Search for observations in multiple areas of different types
-This request will return zero observations since Tranås municipality is not part of Kronoberg county. AND operator is used when specifying areas of different types.
+This filter will return zero observations since Tranås municipality is not part of Kronoberg county. AND operator is used when specifying areas of different types.
 ```json
 {        
     "areas" : [
@@ -206,7 +206,7 @@ This request will return zero observations since Tranås municipality is not par
 }
 ```
 
-This request will return observations in Tranås municipality since it is part of Jönköping county.
+This filter will return observations in Tranås municipality since it is part of Jönköping county.
 ```json
 {        
     "areas" : [
@@ -226,7 +226,7 @@ This request will return observations in Tranås municipality since it is part o
 ## Geometry filter
 
 ### Search for observations within a polygon
-This request will return observations within the specified polygon.
+This filter will return observations within the specified polygon.
 > If `"considerObservationAccuracy": true`, then observations that are outside the polygon but possibly inside when accuracy (coordinateUncertaintyInMeters) of observation is considered, will be included in the result.
 ```json
 {
@@ -251,7 +251,7 @@ This request will return observations within the specified polygon.
 ```
 
 ### Search for observations within a circle
-This request will return observations within the specified circle with a radius of 500m.
+This filter will return observations within the specified circle with a radius of 500m.
 ```json
 {
     "geometry": {        
@@ -267,7 +267,7 @@ This request will return observations within the specified circle with a radius 
 ## Taxon filter
 
 ### Search for observations of a specific taxon
-This request will return observations where taxon is 100777, otter.
+This filter will return observations where taxon is 100777, otter.
 ```json
 {        
     "taxon" : {
@@ -277,7 +277,7 @@ This request will return observations where taxon is 100777, otter.
 ```
 
 ### Include underlying taxa in search
-This request will return all bird (aves) observations.
+This filter will return all bird (aves) observations.
 ```json
 {        
     "taxon" : {
@@ -288,7 +288,7 @@ This request will return all bird (aves) observations.
 ```
 
 ### Search for observations with red list categories
-This request will return observation of critically endangered (CR), endangered (EN) and vulnerable (VU) species.
+This filter will return observation of critically endangered (CR), endangered (EN) and vulnerable (VU) species.
 ```json
 {        
     "taxon" : {
@@ -312,7 +312,7 @@ This request will return observation of critically endangered (CR), endangered (
 
 
 ## Projects filter
-This request will return observations in the project ArtArken
+This filter will return observations in the project ArtArken
 ```json
 {
     "projectIds": [113]
@@ -321,14 +321,14 @@ This request will return observations in the project ArtArken
 
 
 ## Occurrence status filter
-This request will return observations with occurrenceStatus "present"
+This filter will return observations with occurrenceStatus "present"
 ```json
 {
     "occurrenceStatus": "present"
 }
 ```
 
-This request will return observations with occurrenceStatus "absent"
+This filter will return observations with occurrenceStatus "absent"
 ```json
 {
     "occurrenceStatus": "absent"
