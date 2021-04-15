@@ -437,14 +437,14 @@ export default function main() {
       let response;      
 
       response = http.get(
-        environmentUrl + "/areas/CountryRegion/Svealand/export",        
+        environmentUrl + "/areas/CountryRegion/3/export",        
         {
           headers: headers,
           timeout:180000
         }
       );
       check(response, {
-        'is status 204': (r) => r.status === 204,
+        'is status 200': (r) => r.status === 200,
       });
       // Automatically added sleep
       sleep(1);
