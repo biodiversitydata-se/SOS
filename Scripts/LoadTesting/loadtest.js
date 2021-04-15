@@ -433,22 +433,22 @@ export default function main() {
       sleep(1);
     })
 
-    group("Export Area", function(){
-      let response;      
+    // group("Export Area", function(){
+    //   let response;      
 
-      response = http.get(
-        environmentUrl + "/areas/CountryRegion/Svealand/export",        
-        {
-          headers: headers,
-          timeout:180000
-        }
-      );
-      check(response, {
-        'is status 204': (r) => r.status === 204,
-      });
-      // Automatically added sleep
-      sleep(1);
-    })   
+    //   response = http.get(
+    //     environmentUrl + "/areas/CountryRegion/Svealand/export",        
+    //     {
+    //       headers: headers,
+    //       timeout:180000
+    //     }
+    //   );
+    //   check(response, {
+    //     'is status 204': (r) => r.status === 204,
+    //   });
+    //   // Automatically added sleep
+    //   sleep(1);
+    // })   
   })
   group("DataProviders", function(){
     group("Get DataProviders", function(){
