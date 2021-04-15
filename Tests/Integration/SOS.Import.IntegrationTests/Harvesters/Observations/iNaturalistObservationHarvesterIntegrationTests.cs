@@ -26,7 +26,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
             importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
-            importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
+            importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
             var kulObservationService = new iNaturalistObservationService(
                 new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
@@ -34,7 +34,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new NullLogger<iNaturalistObservationService>());
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var kulObservationVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+            var dwcObservationVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
                 new VerbatimClient(
                     verbatimDbConfiguration.GetMongoDbSettings(),
                     verbatimDbConfiguration.DatabaseName,
@@ -42,16 +42,16 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                     verbatimDbConfiguration.WriteBatchSize),
                 new Mock<ILogger<DarwinCoreArchiveVerbatimRepository>>().Object);
 
-            var kulObservationHarvester = new iNaturalistObservationHarvester(
+            var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
                 kulObservationService,
-                kulObservationVerbatimRepository,
-                importConfiguration.KulServiceConfiguration,
+                dwcObservationVerbatimRepository,
+                importConfiguration.iNaturalistServiceConfiguration,
                 new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -70,19 +70,19 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
-            var kulObservationHarvester = new iNaturalistObservationHarvester(
+            var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
                 new iNaturalistObservationService(
                     new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
                     importConfiguration.iNaturalistServiceConfiguration,
                     new NullLogger<iNaturalistObservationService>()),
                 new Mock<IDarwinCoreArchiveVerbatimRepository>().Object,
-                importConfiguration.KulServiceConfiguration,
+                importConfiguration.iNaturalistServiceConfiguration,
                 new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
+            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

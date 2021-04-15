@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SOS.Lib.Models.Verbatim.DarwinCore;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -11,6 +13,6 @@ namespace SOS.Import.Services.Interfaces
         /// </summary>
         /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<GBIFResult> GetAsync(DateTime fromDate, DateTime toDate);
+        Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate);
     }
 }
