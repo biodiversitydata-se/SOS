@@ -22,11 +22,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
-		Install.md = Install.md
+		Docs\Harvest.md = Docs\Harvest.md
+		Docs\Install.md = Docs\Install.md
 		LICENSE = LICENSE
 		README.md = README.md
-		SearchFilter.md = SearchFilter.md
-		Docs\Vocabularies.md = Docs\Vocabularies.md
+		Docs\SearchFilter.md = Docs\SearchFilter.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{A173A436-C08B-4D4C-8245-09C0A037B6A7}"
@@ -77,6 +77,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndToEnd", "EndToEnd", "{D64F2BE7-6B3C-4393-97FE-B8046FE449BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.EndToEndTests", "Tests\EndToEnd\SOS.Observations.Api.EndToEndTests\SOS.Observations.Api.EndToEndTests.csproj", "{32244B4B-C247-47A9-8865-A22BC62B6AAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev", "Dev", "{B9A973D1-C01B-42AE-AC5B-FA9B2FC64824}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\Dev\Vocabularies.md = Docs\Dev\Vocabularies.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -200,6 +205,7 @@ Global
 		{AAA7366B-2B82-4349-92F5-74BA9F8A38B4} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 		{D64F2BE7-6B3C-4393-97FE-B8046FE449BF} = {7C2C0ABC-542C-47C2-86C0-C3EDE2C0DC90}
 		{32244B4B-C247-47A9-8865-A22BC62B6AAF} = {D64F2BE7-6B3C-4393-97FE-B8046FE449BF}
+		{B9A973D1-C01B-42AE-AC5B-FA9B2FC64824} = {7768AF04-80A0-45EA-A4FD-821937C8DC79}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}
