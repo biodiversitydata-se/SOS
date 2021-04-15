@@ -72,34 +72,47 @@ namespace SOS.Import.Services
         }
 
         /// <inheritdoc />
-        public async Task<GBIFResult> GetAsync(DateTime fromDate, DateTime toDate)
+        public async Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate)
         {
             try
             {
-                var gbifChunk = await _httpClientService.GetFileStreamAsync(
-                    new Uri($"{_iNaturalistServiceConfiguration.BaseAddress}/v1/occurrence/search?" +
-                            $"country=SE" +
-                            $"&datasetKey=50c9509d-22c7-4a22-a47d-8c48425ef4a7" +
-                            $"&eventDate={ fromDate.ToString("yyyy-MM-dd") },{ fromDate.ToString("yyyy-MM-dd") }" +
-                            $"&offset=0" +
-                            $"&limit=100"),
-                    new Dictionary<string, string>(new[]
-                        {
-                            new KeyValuePair<string, string>("Accept", "application/json"),
-                        }
-                        )
-                    );
-                var serializerOptions = new JsonSerializerOptions()
-                {
-                    IgnoreNullValues = true,
-                    PropertyNamingPolicy = null,
-                    WriteIndented = true,
-                    PropertyNameCaseInsensitive = true
-                };
-                serializerOptions.Converters.Add(new StringConverter());
-                var s = new StreamReader(gbifChunk);
-                var json = await s.ReadToEndAsync();
-                return  JsonSerializer.Deserialize<GBIFResult>(json, serializerOptions);
+                var observations = new List<DwcObservationVerbatim>();
+                bool endOfChunk = false;
+                int currentOffset = 0;
+                int chunkSize = 300;
+                while (!endOfChunk) { 
+                    var gbifChunk = await _httpClientService.GetFileStreamAsync(
+                        new Uri($"{_iNaturalistServiceConfiguration.BaseAddress}/v1/occurrence/search?" +
+                                $"country=SE" +
+                                $"&datasetKey=50c9509d-22c7-4a22-a47d-8c48425ef4a7" +
+                                $"&eventDate={ fromDate.ToString("yyyy-MM-dd") },{ toDate.ToString("yyyy-MM-dd") }" +
+                                $"&offset=" + currentOffset +
+                                $"&limit=" + chunkSize),
+                        new Dictionary<string, string>(new[]
+                            {
+                                new KeyValuePair<string, string>("Accept", "application/json"),
+                            }
+                            )
+                        );
+                    var serializerOptions = new JsonSerializerOptions()
+                    {
+                        IgnoreNullValues = true,
+                        PropertyNamingPolicy = null,
+                        WriteIndented = true,
+                        PropertyNameCaseInsensitive = true
+                    };
+                    serializerOptions.Converters.Add(new StringConverter());
+                    var s = new StreamReader(gbifChunk);
+                    var json = await s.ReadToEndAsync();
+                    var results =   JsonSerializer.Deserialize<GBIFResult>(json, serializerOptions);
+                    observations.AddRange(results.Results);
+                    if(results.EndOfRecords)
+                    {
+                        endOfChunk = true;
+                    }
+                    currentOffset += chunkSize;
+                }
+                return observations;
 
             }
             catch (Exception e)
