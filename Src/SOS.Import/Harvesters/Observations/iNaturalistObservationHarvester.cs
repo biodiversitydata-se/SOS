@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,8 +66,10 @@ namespace SOS.Import.Harvesters.Observations
 
                 var nrSightingsHarvested = 0;
                 var currentMonthOffset = 0;
-                var gBIFResult = await _iNaturalistObservationService.GetAsync(DateTime.Now.AddMonths(currentMonthOffset - 1), DateTime.Now.AddMonths(currentMonthOffset));
+                var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
+                var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, startDate.AddMonths(1));
 
+                var monthLoopStop = DateTime.Now - new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 // Loop until all sightings are fetched.
                 do
                 {
@@ -84,11 +87,11 @@ namespace SOS.Import.Harvesters.Observations
                         _logger.LogInformation("Max iNaturalist observations reached");
                         break;
                     }
-                    _logger.LogDebug($"Fetching iNaturalist observations between dates {DateTime.Now.AddMonths(currentMonthOffset - 1).ToString("yyyy-MM-dd")} and {DateTime.Now.AddMonths(currentMonthOffset).ToString("yyyy-MM-dd")}");
+                    _logger.LogDebug($"Fetching iNaturalist observations between dates {startDate.AddMonths(currentMonthOffset).ToString("yyyy-MM-dd")} and {startDate.AddMonths(currentMonthOffset + 1).ToString("yyyy-MM-dd")}");
 
-                    gBIFResult = await _iNaturalistObservationService.GetAsync(DateTime.Now.AddMonths(currentMonthOffset - 1), DateTime.Now.AddMonths(currentMonthOffset));
-                    currentMonthOffset--;
-                } while (gBIFResult != null && currentMonthOffset > -60);
+                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate.AddMonths(currentMonthOffset), startDate.AddMonths(currentMonthOffset + 1));
+                    currentMonthOffset++;
+                } while (gBIFResult != null && startDate.AddMonths(currentMonthOffset) <= DateTime.Now);
 
                     _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
                 await _dwcObservationVerbatimRepository.RenameTempHarvestCollection(dataProvider);

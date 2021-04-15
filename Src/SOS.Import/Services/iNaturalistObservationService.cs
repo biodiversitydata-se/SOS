@@ -79,12 +79,12 @@ namespace SOS.Import.Services
                 var observations = new List<DwcObservationVerbatim>();
                 bool endOfChunk = false;
                 int currentOffset = 0;
-                int chunkSize = 300;
+                int chunkSize = _iNaturalistServiceConfiguration.MaxReturnedChangesInOnePage;
                 while (!endOfChunk) { 
                     var gbifChunk = await _httpClientService.GetFileStreamAsync(
                         new Uri($"{_iNaturalistServiceConfiguration.BaseAddress}/v1/occurrence/search?" +
                                 $"country=SE" +
-                                $"&datasetKey=50c9509d-22c7-4a22-a47d-8c48425ef4a7" +
+                                $"&datasetKey={_iNaturalistServiceConfiguration.DatasetKey}" +
                                 $"&eventDate={ fromDate.ToString("yyyy-MM-dd") },{ toDate.ToString("yyyy-MM-dd") }" +
                                 $"&offset=" + currentOffset +
                                 $"&limit=" + chunkSize),
