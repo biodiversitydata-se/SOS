@@ -36,4 +36,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\TestService\" />
+  </ItemGroup>
+
 </Project>
