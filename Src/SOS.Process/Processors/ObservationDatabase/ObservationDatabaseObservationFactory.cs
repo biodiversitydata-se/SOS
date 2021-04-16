@@ -57,7 +57,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             if (verbatim.CoordinateX > 0 && verbatim.CoordinateY > 0)
             {
                 var webMercatorPoint = new Point(verbatim.CoordinateX, verbatim.CoordinateY);
-                wgs84Point = webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84) as Point;
+                wgs84Point = webMercatorPoint.Transform(CoordinateSys.Rt90_25_gon_v, CoordinateSys.WGS84) as Point;
             }
 
             _taxa.TryGetValue(verbatim.TaxonId, out var taxon);
