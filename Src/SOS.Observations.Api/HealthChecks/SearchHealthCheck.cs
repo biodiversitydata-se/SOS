@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.HealthChecks
         private async Task<HealthStatus> SearchByProviderAsync()
         {
             var providers = (await _dataProviderCache.GetAllAsync())?.
-                Where(p => p.IsActive);
+                Where(p => p.IsActive && p.IncludeInHealthCheck);
 
             if (!providers?.Any() ?? true)
             {
@@ -74,12 +74,17 @@ namespace SOS.Observations.Api.HealthChecks
 
             await Task.WhenAll(providerSearchTasks.Values);
 
-            if (providerSearchTasks.All(t => t.Value.Result.TotalCount > 0))
+            var providerCount = providers.Count();
+            var successfulProviders = providerSearchTasks.Count(t => t.Value.Result.TotalCount > 0);
+
+            // All providers successful
+            if (successfulProviders == providerCount)
             {
                 return HealthStatus.Healthy;
             }
 
-            if (providerSearchTasks.Where(pst => pst.Key.HarvestFailPreventProcessing).All(t => t.Value.Result.TotalCount > 0))
+            // More than 75% successful
+            if (successfulProviders > providerCount * 0.75)
             {
                 return HealthStatus.Degraded;
             }

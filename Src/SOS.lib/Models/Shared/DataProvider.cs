@@ -130,6 +130,11 @@ namespace SOS.Lib.Models.Shared
         public string LatestUploadedFileHash { get; set; }
 
         /// <summary>
+        /// Use this provider in healthy check
+        /// </summary>
+        public bool IncludeInHealthCheck { get; set; }
+
+        /// <summary>
         ///  Indicates that provider is ready to harvest
         /// </summary>
         /// <param name="lastSuccessfulHarvest"></param>
