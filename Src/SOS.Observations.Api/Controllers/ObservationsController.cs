@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Controllers
             ref double? bboxRight,
             ref double? bboxBottom)
         {
-            if (geoShape == null)
+            if (geoShape == null || geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
             {
                 return;
             }
