@@ -58,7 +58,8 @@
         "Identifier": "Artportalen",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": true
+        "HarvestFailPreventProcessing": true,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "ClamPortalObservations",
@@ -119,7 +120,8 @@
         "Identifier": "ClamGateway",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "KULObservations",
@@ -180,7 +182,8 @@
         "Identifier": "KUL",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "MvmObservations",
@@ -241,7 +244,8 @@
         "Identifier": "MVM",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "NorsObservations",
@@ -302,7 +306,8 @@
         "Identifier": "NORS",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "SersObservations",
@@ -363,7 +368,8 @@
         "Identifier": "SERS",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "VirtualHerbariumObservations",
@@ -424,7 +430,8 @@
         "Identifier": "VirtualHerbarium",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "SharkObservations",
@@ -485,7 +492,8 @@
         "Identifier": "SHARK",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -547,7 +555,8 @@
         "Identifier": "BirdRingingCentre",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -609,7 +618,8 @@
         "Identifier": "EntomologicalCollection",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -671,7 +681,8 @@
         "Identifier": "MalaiseTrap",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -733,7 +744,8 @@
         "Identifier": "Porpoises",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -791,7 +803,8 @@
         "Identifier": "ButterflyMonitoring",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -840,7 +853,8 @@
         "Identifier": "SharkZooplankton",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "FishDataObservations",
@@ -901,7 +915,8 @@
         "Identifier": "Fishdata2",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "DwcA",
@@ -962,7 +977,8 @@
         "Identifier": "ForestInventory",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     },
     {
         "Type": "ObservationDatabase",
@@ -1023,7 +1039,8 @@
         "Identifier": "ObservationDatabase",
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": false
     },
     {
         "Type": "DwcA",
@@ -1085,6 +1102,7 @@
         "EmlMetadata": null,
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true,
         "LatestUploadedFileHash": null
     }
 ]
