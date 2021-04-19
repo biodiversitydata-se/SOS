@@ -60,7 +60,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
                             batchId++;
 
-                            processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                            processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
                             observations.Clear();
                             Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                         }
@@ -74,7 +74,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
                 }
