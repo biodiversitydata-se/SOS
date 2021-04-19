@@ -26,5 +26,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// of observation is considered, will be included in the result.
         /// </summary>
         public bool ConsiderObservationAccuracy { get; set; }
+
+        /// <summary>
+        /// Limit observation accuracy. Only observations with accuracy less than this will be returned
+        /// </summary>
+        public int? MaxAccuracy { get; set; }
     }
 }

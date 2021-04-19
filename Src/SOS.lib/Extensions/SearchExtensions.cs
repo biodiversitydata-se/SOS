@@ -111,8 +111,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
-            query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", internalFilter.MaxAccuracy, RangeTypes.LessThanOrEquals);
-
+            
             if (internalFilter.Months?.Any() ?? false)
             {
                 query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
@@ -891,6 +890,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
             query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
+            query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
 
             if (filter is SearchFilterInternal)
             {

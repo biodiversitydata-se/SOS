@@ -29,6 +29,7 @@ namespace SOS.Observations.Api.Extensions
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
+            filter.MaxAccuracy = searchFilterBaseDto.Geometry?.MaxAccuracy;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
@@ -64,6 +65,7 @@ namespace SOS.Observations.Api.Extensions
                 filter.OutputFields = searchFilterDto.OutputFields;
             }
 
+
             if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
             {
                 var filterInternal = (SearchFilterInternal)filter;
@@ -93,7 +95,6 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.ReportedDateFrom = searchFilterInternalDto.ExtendedFilter.ReportedDateFrom;
                 internalFilter.ReportedDateTo = searchFilterInternalDto.ExtendedFilter.ReportedDateTo;
                 internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ExtendedFilter.TypeFilter;
-                internalFilter.MaxAccuracy = searchFilterInternalDto.ExtendedFilter.MaxAccuracy;
                 internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ExtendedFilter.UsePeriodForAllYears;
                 internalFilter.Months = searchFilterInternalDto.ExtendedFilter.Months;
                 internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
