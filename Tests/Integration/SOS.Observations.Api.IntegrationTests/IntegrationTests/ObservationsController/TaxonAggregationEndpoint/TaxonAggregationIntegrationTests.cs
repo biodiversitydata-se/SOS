@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Nest;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
@@ -21,6 +22,37 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
         public TaxonAggregationIntegrationTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregation_with_circle()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationDto()
+            {
+                Geometry = new GeometryFilterDto
+                {
+                    Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01563, 14.99047)) },
+                    MaxDistanceFromPoint = 5000
+                },
+                OnlyValidated = false
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregation(searchFilter, 0, 100);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().BeGreaterThan(100, "There are observations on more than 100 taxa");
+            result.Records.First().ObservationCount.Should().BeGreaterThan(100,
+                "The taxon with most observations has more than 100 observations");
         }
 
         [Fact]
