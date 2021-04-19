@@ -5,6 +5,20 @@
 
 **Prod**: 
 
+## [1.0.2]
+
+### Releases
+
+**Test**: 
+
+**Prod**: 
+
+### `Changed`
+
+#### API
+
+#### Sökfilter
+- extendedFilter.maxAccuracy => geometry.maxAccuracy
 
 ## [1.0.1]
 

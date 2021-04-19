@@ -135,6 +135,11 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
+        /// Limit observation accuracy. Only observations with accuracy less than this will be returned
+        /// </summary>
+        public int? MaxAccuracy { get; set; }
+
+        /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }

@@ -70,7 +70,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
         public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
-        public int? MaxAccuracy { get; set; }
+        
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
 

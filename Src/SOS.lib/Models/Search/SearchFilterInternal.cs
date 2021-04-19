@@ -60,8 +60,7 @@ namespace SOS.Lib.Models.Search
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-       
-        public int? MaxAccuracy { get; set; }
+        
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
 
