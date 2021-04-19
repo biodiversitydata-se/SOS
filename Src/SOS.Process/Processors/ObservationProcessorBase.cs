@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -18,12 +20,90 @@ namespace SOS.Process.Processors
 {
     public abstract class ObservationProcessorBase<TEntity>
     {
+        private async Task<int> CommitBatchAsync(
+            DataProvider dataProvider,
+            bool protectedData,
+            ICollection<Observation> processedObservations,
+            string batchId)
+        {
+            try
+            {
+                if (vocabularyValueResolver.Configuration.ResolveValues)
+                {
+                    // used for testing purpose for easier debugging of vocabulary mapped data.
+                    vocabularyValueResolver
+                        .ResolveVocabularyMappedValues(
+                            processedObservations);
+                }
+
+                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
+                var processedCount = protectedData
+                    ? await ProtectedRepository.AddManyAsync(processedObservations)
+                    : await PublicRepository.AddManyAsync(processedObservations);
+                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+
+                return processedCount;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to commit batch for {dataProvider}");
+                return 0;
+            }
+
+        }
+
+        /// <summary>
+        /// Delete batch
+        /// </summary>
+        /// <param name="occurrenceIds"></param>
+        /// <returns></returns>
+        private async Task<bool> DeleteBatchAsync(
+            bool protectedObservations,
+            ICollection<string> occurrenceIds)
+        {
+            try
+            {
+                return protectedObservations ?
+                    await ProtectedRepository.DeleteByOccurrenceIdAsync(occurrenceIds) :
+                    await PublicRepository.DeleteByOccurrenceIdAsync(occurrenceIds);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to delete batch by occurrence id's");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Resolve vocabulary mapped values and then write the observations to DwC-A CSV files.
+        /// </summary>
+        /// <param name="processedObservations"></param>
+        /// <param name="dataProvider"></param>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
+        private async Task<bool> WriteObservationsToDwcaCsvFiles(
+            IEnumerable<Observation> processedObservations,
+            DataProvider dataProvider,
+            string batchId = "")
+        {
+
+            Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
+            vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
+            var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
+
+            Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
+
+            return success;
+        }
+
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IProcessedPublicObservationRepository PublicRepository;
         protected readonly IProcessedProtectedObservationRepository ProtectedRepository;
         protected readonly IValidationManager ValidationManager;
+
+        protected bool EnableDiffusion { get; }
 
         /// <summary>
         /// Constructor for public only 
@@ -37,7 +117,7 @@ namespace SOS.Process.Processors
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ILogger<TEntity> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+            ILogger<TEntity> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, new ProcessConfiguration(),  logger)
         {
         }
 
@@ -49,12 +129,14 @@ namespace SOS.Process.Processors
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
+            ProcessConfiguration processConfiguration,
             ILogger<TEntity> logger)
         {
             PublicRepository = processedPublicObservationRepository ??
@@ -66,8 +148,72 @@ namespace SOS.Process.Processors
                                            throw new ArgumentNullException(nameof(vocabularyValueResolver));
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
             ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
+            EnableDiffusion = processConfiguration?.Diffusion ?? false;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        protected abstract Task<(int publicCount, int protectedCount)> ProcessObservations(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken);
+
+        protected async Task<int> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool protectedObservations, ICollection<Observation> observations, string batchId)
+        {
+            if (!observations?.Any() ?? true)
+            {
+                return 0;
+            }
+
+            observations =
+                await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
+
+            if (mode != JobRunModes.Full)
+            {
+                Logger.LogDebug($"Start deleting {dataProvider.Identifier} live data {batchId}");
+                var occurrenceIds = observations.Select(o => o.Occurrence.OccurrenceId).ToArray();
+                var success = await DeleteBatchAsync(protectedObservations, occurrenceIds);
+
+                // If provider supports protected observations and diffusion is disabled,
+                // make sure the observation don't exists in both public and protected index
+                if (dataProvider.SupportProtectedHarvest && !EnableDiffusion)
+                {
+                    success = await DeleteBatchAsync(!protectedObservations, occurrenceIds);
+                }
+
+                Logger.LogDebug($"Finish deleting {dataProvider.Identifier} live data {batchId}: {success}");
+            }
+
+            var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
+
+            if (mode == JobRunModes.Full && !protectedObservations)
+            {
+                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+            }
+            observations.Clear();
+
+            return processedCount;
+        }
+
+        protected async Task<ICollection<Observation>> ValidateAndRemoveInvalidObservations(
+            DataProvider dataProvider,
+            ICollection<Observation> observations,
+            string batchId)
+        {
+            Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
+            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+            Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
+
+            return observations;
+        }
+
+        protected bool IsBatchFilledToLimit(int count)
+        {
+            return count % PublicRepository.BatchSize == 0;
+        }
+
+        protected int WriteBatchSize => PublicRepository.WriteBatchSize;
 
         public abstract DataProviderType Type { get; }
 
@@ -87,7 +233,7 @@ namespace SOS.Process.Processors
         {
             Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
             var startTime = DateTime.Now;
-            
+
             try
             {
                 if (mode == JobRunModes.Full)
@@ -124,97 +270,5 @@ namespace SOS.Process.Processors
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
         }
-
-        protected abstract Task<(int publicCount, int protectedCount)> ProcessObservations(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken);
-
-        protected async Task<int> CommitBatchAsync(
-            DataProvider dataProvider,
-            bool protectedData,
-            ICollection<Observation> processedObservations,
-            string batchId)
-        {
-            try
-            {
-                if (vocabularyValueResolver.Configuration.ResolveValues)
-                {
-                    // used for testing purpose for easier debugging of vocabulary mapped data.
-                    vocabularyValueResolver
-                        .ResolveVocabularyMappedValues(
-                            processedObservations); 
-                }
-
-                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
-                var processedCount = protectedData
-                    ? await ProtectedRepository.AddManyAsync(processedObservations)
-                    : await PublicRepository.AddManyAsync(processedObservations);
-                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
-
-                return processedCount;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Failed to commit batch for {dataProvider}");
-                return 0;
-            }
-           
-        }
-
-        protected async Task<int> ValidateAndStoreObservation(DataProvider dataProvider, bool protectedData, ICollection<Observation> observations, string batchId)
-        {
-            observations =
-                await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
-
-            var processedCount = await CommitBatchAsync(dataProvider, protectedData, observations, batchId);
-
-            await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
-
-            return processedCount;
-        }
-
-        protected async Task<ICollection<Observation>> ValidateAndRemoveInvalidObservations(
-            DataProvider dataProvider,
-            ICollection<Observation> observations,
-            string batchId)
-        {
-            Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
-            var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-            Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
-
-            return observations;
-        }
-
-        /// <summary>
-        /// Resolve vocabulary mapped values and then write the observations to DwC-A CSV files.
-        /// </summary>
-        /// <param name="processedObservations"></param>
-        /// <param name="dataProvider"></param>
-        /// <param name="batchId"></param>
-        /// <returns></returns>
-        protected async Task<bool> WriteObservationsToDwcaCsvFiles(
-            IEnumerable<Observation> processedObservations,
-            DataProvider dataProvider,
-            string batchId = "")
-        {
-
-            Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
-            vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
-            var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
-
-            Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
-
-            return success;
-        }
-
-        protected bool IsBatchFilledToLimit(int count)
-        {
-            return count % PublicRepository.BatchSize == 0;
-        }
-
-        protected int WriteBatchSize => PublicRepository.WriteBatchSize;
     }
 }

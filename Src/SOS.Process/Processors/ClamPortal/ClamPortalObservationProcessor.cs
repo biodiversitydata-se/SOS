@@ -78,7 +78,7 @@ namespace SOS.Process.Processors.ClamPortal
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
                 }
@@ -90,7 +90,7 @@ namespace SOS.Process.Processors.ClamPortal
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 batchId++;
-                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
 
                 Logger.LogDebug($"Clam Portal observations processed: {processedCount}");
             }
