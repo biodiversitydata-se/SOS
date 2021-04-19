@@ -26,7 +26,6 @@ namespace SOS.Process.Processors.ObservationDatabase
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        private readonly bool _enableDiffusion;
         private readonly IDiffusionManager _diffusionManager;
 
         /// <inheritdoc />
@@ -63,13 +62,13 @@ namespace SOS.Process.Processors.ObservationDatabase
                     {
                         protectedBatchId++;
 
-                        protectedProcessedCount += await ValidateAndStoreObservation(dataProvider, true, protectedObservations, protectedBatchId.ToString());
+                        protectedProcessedCount += await ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, protectedBatchId.ToString());
                         protectedObservations.Clear();
                         Logger.LogDebug($"Observation database protected observations processed: {protectedProcessedCount}");
                     }
 
                     //If it is a protected sighting, public users should not be possible to find it in the current month 
-                    if (!_enableDiffusion || (verbatimObservation.StartDate.Year == DateTime.Now.Year || verbatimObservation.EndDate.Year == DateTime.Now.Year) &&
+                    if (!EnableDiffusion || (verbatimObservation.StartDate.Year == DateTime.Now.Year || verbatimObservation.EndDate.Year == DateTime.Now.Year) &&
                         (verbatimObservation.StartDate.Month == DateTime.Now.Month || verbatimObservation.EndDate.Month == DateTime.Now.Month))
                     {
                         return;
@@ -88,7 +87,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 {
                     publicBatchId++;
 
-                    publicProcessedCount += await ValidateAndStoreObservation(dataProvider, false, publicObservations, publicBatchId.ToString());
+                    publicProcessedCount += await ValidateAndStoreObservations(dataProvider, mode,false, publicObservations, publicBatchId.ToString());
                     publicObservations.Clear();
                     Logger.LogDebug($"Observation database public observations processed: {publicProcessedCount}");
                 }
@@ -101,7 +100,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             {
                 protectedBatchId++;
 
-                protectedProcessedCount += await ValidateAndStoreObservation(dataProvider, true, protectedObservations, protectedBatchId.ToString());
+                protectedProcessedCount += await ValidateAndStoreObservations(dataProvider, mode,true, protectedObservations, protectedBatchId.ToString());
                 protectedObservations.Clear();
                 Logger.LogDebug($"Observation database protected observations processed: {protectedProcessedCount}");
             }
@@ -110,7 +109,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             {
                 publicBatchId++;
 
-                publicProcessedCount += await ValidateAndStoreObservation(dataProvider, false, publicObservations, publicBatchId.ToString());
+                publicProcessedCount += await ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, publicBatchId.ToString());
                 publicObservations.Clear();
                 Logger.LogDebug($"Observation database public observations processed: {publicProcessedCount}");
             }
@@ -140,19 +139,12 @@ namespace SOS.Process.Processors.ObservationDatabase
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));
             _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-
-            if (processConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(processConfiguration));
-            }
-
-            _enableDiffusion = processConfiguration.Diffusion;
         }
 
         public override DataProviderType Type => DataProviderType.ObservationDatabase;

@@ -39,13 +39,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteProviderDataAsync(DataProvider dataProvider);
 
         /// <summary>
-        /// Delete artportalen batch
-        /// </summary>
-        /// <param name="sightingIds"></param>
-        /// <returns></returns>
-        Task<bool> DeleteArtportalenBatchAsync(ICollection<int> sightingIds);
-
-        /// <summary>
         /// Delete observations by occurence id
         /// </summary>
         /// <param name="occurenceIds"></param>
