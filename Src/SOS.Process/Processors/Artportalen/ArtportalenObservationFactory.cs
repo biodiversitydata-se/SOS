@@ -86,8 +86,7 @@ namespace SOS.Process.Processors.Artportalen
                 // Record level
 
                 obs.DataProviderId = _dataProvider.Id;
-                obs.AccessRights = verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.HasValue ||
-                                   verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
+                obs.AccessRights = verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now
                     ? new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage } 
                     : new VocabularyValue {Id = (int) AccessRightsId.FreeUsage};
                 obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
