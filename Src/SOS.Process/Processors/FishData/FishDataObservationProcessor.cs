@@ -79,7 +79,7 @@ namespace SOS.Process.Processors.FishData
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservations(dataProvider, mode,false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"Fish Data observations processed: {processedCount}");
                 }
@@ -91,7 +91,7 @@ namespace SOS.Process.Processors.FishData
                 cancellationToken?.ThrowIfCancellationRequested();
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservations(dataProvider, mode,false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"Fish Data observations processed: {processedCount}");
             }

@@ -266,31 +266,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteArtportalenBatchAsync(ICollection<int> sightingIds)
-        {
-            try
-            {
-                // Create the collection
-                var res = await ElasticClient.DeleteByQueryAsync<Observation>(q => q
-                    .Index(IndexName)
-                    .Query(q => q
-                        .Terms(t => t
-                            .Field(f => f.ArtportalenInternal.SightingId)
-                            .Terms(sightingIds)
-                        )
-                    )
-                );
-
-                return res.IsValid;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
-        /// <inheritdoc />
         public async Task<bool> DisableIndexingAsync()
         {
             var updateSettingsResponse =
