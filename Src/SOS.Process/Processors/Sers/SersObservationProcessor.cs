@@ -82,7 +82,7 @@ namespace SOS.Process.Processors.Sers
 
                     batchId++;
 
-                    processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                    processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
                     observations.Clear();
                     Logger.LogDebug($"SERS observations processed: {processedCount}");
                 }
@@ -95,7 +95,7 @@ namespace SOS.Process.Processors.Sers
 
                 batchId++;
 
-                processedCount += await ValidateAndStoreObservation(dataProvider, false, observations, batchId.ToString());
+                processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
                 observations.Clear();
                 Logger.LogDebug($"SERS observations processed: {processedCount}");
             }
