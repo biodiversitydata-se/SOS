@@ -497,7 +497,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -547,7 +547,7 @@
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
         "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds",
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
         "DataQualityIsApproved": true,
@@ -560,7 +560,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -610,7 +610,7 @@
         "ContactEmail": "-",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
         "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nhrs-nrm",
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
         "DataQualityIsApproved": true,
@@ -623,7 +623,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -673,7 +673,7 @@
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
         "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=smtp-nrm",
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
         "DataQualityIsApproved": true,
@@ -686,7 +686,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -736,7 +736,7 @@
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
         "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=nrm-porpoises",
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
         "DataQualityIsApproved": true,
@@ -749,7 +749,7 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -795,7 +795,7 @@
         "ContactEmail": "",
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
         "DownloadUrlEml": "http://www.gbif.se/ipt/eml.do?r=lu_sebms",
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportProtectedHarvest": false,
         "DataQualityIsApproved": true,
