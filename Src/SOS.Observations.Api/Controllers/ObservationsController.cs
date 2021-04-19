@@ -138,22 +138,21 @@ namespace SOS.Observations.Api.Controllers
 
             // Try to intersect sweden and user defined bb
             boundingBox = swedenBoundingBox.Intersection(boundingBox);
-            
+
             // If user bb outside of sweden, use sweden
             if (boundingBox.IsNull)
             {
                 boundingBox = swedenBoundingBox;
             }
-            
+
             return boundingBox;
         }
-
         private async Task<Result<Envelope>> ValidateBoundingBoxAsync(
-            double? left, 
-            double? top, 
-            double? right, 
-            double? bottom, 
-            int zoom, 
+            double? left,
+            double? top,
+            double? right,
+            double? bottom,
+            int zoom,
             SearchFilterBaseDto filter,
             bool checkNrTilesLimit = true)
         {
