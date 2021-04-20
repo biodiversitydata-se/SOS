@@ -18,9 +18,9 @@
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
         <PackageReference Include="CSharpFunctionalExtensions" Version="2.15.1" />
-        <PackageReference Include="HangFire" Version="1.7.19" />
+        <PackageReference Include="HangFire" Version="1.7.22" />
         <PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-        <PackageReference Include="HangFire.Mongo" Version="0.7.19" />
+        <PackageReference Include="HangFire.Mongo" Version="0.7.20" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
