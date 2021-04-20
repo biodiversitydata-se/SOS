@@ -52,6 +52,11 @@ namespace SOS.Import.Harvesters.Observations
 
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
+            throw new NotImplementedException("Not implemented for this provider");
+        }
+
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        {
             var harvestInfo = new HarvestInfo(DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
             try
@@ -93,7 +98,7 @@ namespace SOS.Import.Harvesters.Observations
                     currentMonthOffset++;
                 } while (gBIFResult != null && startDate.AddMonths(currentMonthOffset) <= DateTime.Now);
 
-                    _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
+                _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
                 await _dwcObservationVerbatimRepository.RenameTempHarvestCollection(dataProvider);
                 _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
 
@@ -116,6 +121,11 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        public Task<HarvestInfo> HarvestObservationsAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
         }
 
         private string GetKulHarvestSettingsInfoString()
