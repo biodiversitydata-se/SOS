@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Entities.ObservationsDatabase;
 using SOS.Import.Repositories.Source.ObservationsDatabase.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -157,7 +158,7 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
             try
@@ -234,6 +235,19 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
+        }
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Not implemented for this provider");
         }
     }
 }

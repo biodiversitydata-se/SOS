@@ -234,6 +234,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationService>().As<IFishDataObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<FileDownloadService>().As<IFileDownloadService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<iNaturalistObservationService>().As<IiNaturalistObservationService>().InstancePerLifetimeScope();

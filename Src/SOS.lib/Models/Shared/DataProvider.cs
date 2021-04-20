@@ -54,6 +54,11 @@ namespace SOS.Lib.Models.Shared
         public string Url { get; set; }
 
         /// <summary>
+        ///    URL to data provider EML file
+        /// </summary>
+        public string DownloadUrlEml { get; set; }
+
+        /// <summary>
         ///     Contact person.
         /// </summary>
         public ContactPerson ContactPerson { get; set; }
@@ -97,6 +102,11 @@ namespace SOS.Lib.Models.Shared
         ///     A unique identifer that is easier to understand than an Id number.
         /// </summary>
         public string Identifier { get; set; }
+
+        /// <summary>
+        /// Time stamp according to data source, used to see if data set has changed
+        /// </summary>
+        public DateTime? SourceDate { get; set; }
 
         /// <summary>
         /// EML metadata.

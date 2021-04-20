@@ -48,6 +48,7 @@ using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.ActionFilters;
 using SOS.Observations.Api.ApplicationInsights;
+using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
@@ -290,6 +291,10 @@ namespace SOS.Observations.Api
                         })
             );
 
+            services.AddHealthChecks();
+            services.AddHealthChecks()
+                .AddCheck<SearchHealthCheck>("search_health_check");
+
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
             services.AddScoped<IElasticClient, ElasticClient>(p=>elasticConfiguration.GetClient());
@@ -408,7 +413,11 @@ namespace SOS.Observations.Api
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
+            });
         }
 
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
