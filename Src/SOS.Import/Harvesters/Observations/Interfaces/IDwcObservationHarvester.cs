@@ -6,7 +6,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations.Interfaces
 {
-    public interface IDwcObservationHarvester
+    public interface IDwcObservationHarvester : IObservationHarvester
     {
         /// <summary>
         ///     Harvest observations.

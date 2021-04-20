@@ -314,9 +314,9 @@ namespace SOS.Lib.Extensions
                 case CoordinateSys.Rt90_25_gon_v:
                     circle = point.Buffer((double) (accuracy == 0 ? 1 : accuracy));
                     break;
-                case CoordinateSys.WebMercator:
-                case CoordinateSys.WGS84:
-                    // Degree systems
+                default: // Degree systems
+                         //  case CoordinateSys.WebMercator:
+                         //  case CoordinateSys.WGS84:
                     var diameterInMeters = (double) (accuracy == 0 ? 1 : accuracy * 2);
 
                     var shapeFactory = new GeometricShapeFactory();

@@ -109,17 +109,6 @@ namespace SOS.Observations.Api.Controllers
                 }
             }
 
-            // Create a bound box using user passed values
-            var boundingBox = Geometry.DefaultFactory.CreatePolygon(new LinearRing(new[]
-            {
-                new Coordinate(bboxLeft ?? 0, bboxTop ?? 0),
-                new Coordinate(bboxLeft ?? 0, bboxBottom ?? 0),
-                new Coordinate(bboxRight ?? 0, bboxBottom ?? 0),
-                new Coordinate(bboxRight ?? 0, bboxTop ?? 0),
-                new Coordinate(bboxLeft ?? 0, bboxTop ?? 0),
-            })).EnvelopeInternal;
-
-
             // Get geometry of sweden economic zone
             var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
 
@@ -131,6 +120,21 @@ namespace SOS.Observations.Api.Controllers
 
             // Get bounding box of swedish economic zone
             var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
+
+            if (!(bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue))
+            {
+                return swedenBoundingBox;
+            }
+
+            // Create a bound box using user passed values
+            var boundingBox = Geometry.DefaultFactory.CreatePolygon(new LinearRing(new[]
+            {
+                new Coordinate(bboxLeft.Value, bboxTop.Value),
+                new Coordinate(bboxLeft.Value, bboxBottom.Value),
+                new Coordinate(bboxRight.Value, bboxBottom.Value),
+                new Coordinate(bboxRight.Value, bboxTop.Value),
+                new Coordinate(bboxLeft.Value, bboxTop.Value),
+            })).EnvelopeInternal;
 
             // Try to intersect sweden and user defined bb
             boundingBox = swedenBoundingBox.Intersection(boundingBox);
@@ -153,20 +157,17 @@ namespace SOS.Observations.Api.Controllers
             SearchFilterBaseDto filter,
             bool checkNrTilesLimit = true)
         {
-            if (left.HasValue && top.HasValue && right.HasValue && bottom.HasValue)
-            {
-                if (left >= right)
-                {
-                    return Result.Failure<Envelope>("Bbox left value is >= right value.");
-                }
+            var boundingBox = await GetBoundingBox(left, top, right, bottom, filter);
 
-                if (bottom >= top)
-                {
-                    return Result.Failure<Envelope>("Bbox bottom value is >= top value.");
-                }
+            if (boundingBox.MinX >= boundingBox.MaxX)
+            {
+                return Result.Failure<Envelope>("Bbox left value is >= right value.");
             }
 
-            var boundingBox = await GetBoundingBox(left, top, right, bottom, filter);
+            if (boundingBox.MinY >= boundingBox.MaxY)
+            {
+                return Result.Failure<Envelope>("Bbox bottom value is >= top value.");
+            }
 
             var tileWidthInDegrees = 360 / Math.Pow(2, zoom);
             var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(boundingBox.Centre.Y.ToRadians());
