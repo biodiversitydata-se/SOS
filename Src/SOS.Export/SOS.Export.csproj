@@ -9,7 +9,7 @@
         <PackageReference Include="Azure.Storage.Blobs" Version="12.8.1" />
         <PackageReference Include="CsvHelper" Version="26.1.0" />
         <PackageReference Include="DotNetZip" Version="1.15.0" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.22" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.19" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
