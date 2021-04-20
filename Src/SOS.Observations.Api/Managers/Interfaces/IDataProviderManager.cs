@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using SOS.Observations.Api.Dtos;
 
@@ -16,5 +17,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode);
+
+        /// <summary>
+        /// Get provider EML file
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<byte[]> GetEmlFileAsync(int providerId);
     }
 }

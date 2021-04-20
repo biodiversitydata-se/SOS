@@ -11,28 +11,13 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
-namespace SOS.Export.IO.DwcArchive
+namespace SOS.Lib.Factories
 {
     /// <summary>
     ///     This class creates EML files.
     /// </summary>
     public static class DwCArchiveEmlFileFactory
     {
-        /// <summary>
-        ///     Creates an EML XML file.
-        /// </summary>
-        public static async Task CreateEmlXmlFileAsync(Stream outstream, DataProvider dataProvider)
-        {
-            if (dataProvider.EmlMetadata == null)
-            {
-                await CreateEmlXmlFileByTemplate(outstream, dataProvider);
-            }
-            else
-            {
-                await CreateEmlXmlFileByEmlMetadata(outstream, dataProvider.EmlMetadata);
-            }
-        }
-
         private static async Task CreateEmlXmlFileByEmlMetadata(Stream outStream, BsonDocument emlMetadata)
         {
             var jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.CanonicalExtendedJson }; // key part
@@ -97,6 +82,21 @@ namespace SOS.Export.IO.DwcArchive
         private static void SetTitle(XElement dataset, string title)
         {
             dataset.XPathSelectElement("title").SetValue(title ?? String.Empty);
+        }
+
+        /// <summary>
+        ///     Creates an EML XML file.
+        /// </summary>
+        public static async Task CreateEmlXmlFileAsync(Stream outstream, DataProvider dataProvider)
+        {
+            if (dataProvider.EmlMetadata == null)
+            {
+                await CreateEmlXmlFileByTemplate(outstream, dataProvider);
+            }
+            else
+            {
+                await CreateEmlXmlFileByEmlMetadata(outstream, dataProvider.EmlMetadata);
+            }
         }
     }
 }

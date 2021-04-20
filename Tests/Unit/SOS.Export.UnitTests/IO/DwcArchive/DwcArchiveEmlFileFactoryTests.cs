@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
-using SOS.Export.IO.DwcArchive;
+using SOS.Lib.Factories;
 using SOS.Lib.Models.Shared;
 using Xunit;
 
