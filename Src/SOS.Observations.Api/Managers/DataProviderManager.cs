@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Factories;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
@@ -72,6 +74,21 @@ namespace SOS.Observations.Api.Managers
             }
 
             return dataProviderDtos;
+        }
+
+        public async Task<byte[]> GetEmlFileAsync(int providerId)
+        {
+            var provider = await _dataProviderCache.GetAsync(providerId);
+
+            if (provider == null)
+            {
+                return null;
+            }
+
+            await using var stream = new MemoryStream();
+            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(stream, provider);
+
+            return stream.ToArray();
         }
     }
 }

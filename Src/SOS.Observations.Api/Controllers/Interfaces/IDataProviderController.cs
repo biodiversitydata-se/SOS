@@ -22,5 +22,11 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> GetLastModifiedDateById(int providerId);
 
+        /// <summary>
+        /// Get provider EML file
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetEML([FromRoute] int providerId);
     }
 }

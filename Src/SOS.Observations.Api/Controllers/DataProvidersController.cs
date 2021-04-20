@@ -70,5 +70,23 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc/>
+        [HttpGet("{providerId}/EML")]
+        [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetEML([FromRoute] int providerId)
+        {
+            try
+            {
+                var fileData = await _dataProviderManager.GetEmlFileAsync(providerId);
+                return File(fileData, "application/xml", $"Provider-{providerId}.xml");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting EML date for provider {providerId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
