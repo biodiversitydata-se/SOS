@@ -480,7 +480,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatimObservation.ScientificNameAuthorship,
                 verbatimObservation.VernacularName,
                 verbatimObservation.Kingdom,
-                verbatimObservation.TaxonRank);
+                verbatimObservation.TaxonRank,
+                verbatimObservation.Species);
 
             return processedTaxon;
         }
@@ -491,7 +492,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             string scientificNameAuthorship,
             string vernacularName,
             string kingdom,
-            string taxonRank)
+            string taxonRank,
+            string species)
         {
             Lib.Models.Processed.Observation.Taxon taxon = null;
 
@@ -506,13 +508,20 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 
                 if (taxon != null) return taxon;
             }
-            
 
             if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out var result))
             {
                 if (result.Count == 1)
                 {
                     taxon = result.First();
+                }
+            }
+
+            if (_taxonByScientificName.TryGetValues(species?.ToLower(), out var speciesResult))
+            {
+                if (speciesResult.Count == 1)
+                {
+                    taxon = speciesResult.First();
                 }
             }
 
@@ -523,7 +532,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     taxon = synonymeResult.First();
                 }
             }
-
             return taxon;
         }
 
