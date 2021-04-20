@@ -44,7 +44,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
 
-            stub.SetupSequence(pdcr => pdcr.TypedScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
+            stub.SetupSequence(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<Observation>
                 {
                     Records = new[] {observation} // return the observation the first call.

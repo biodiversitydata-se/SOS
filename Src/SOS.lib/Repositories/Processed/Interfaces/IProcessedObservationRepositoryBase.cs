@@ -77,21 +77,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<long> IndexCount();
 
         /// <summary>
-        ///     Get observation by scroll
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="scrollId"></param>
-        /// <returns></returns>
-        Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter, string scrollId);
-
-        /// <summary>
         ///     Get observation by scroll. 
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
-        /// <remarks>To improve performance this method doesn't use the dynamic type.</remarks>
         /// <returns></returns>
-        Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
+        Task<ScrollResult<Observation>> ScrollObservationsAsync(
             FilterBase filter,
             string scrollId);
 
