@@ -234,6 +234,7 @@ namespace SOS.Import.Jobs
             ISersObservationHarvester sersObservationHarvester,
             ISharkObservationHarvester sharkObservationHarvester,
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
+            IiNaturalistObservationHarvester iNaturalistObservationHarvester,
             IProjectHarvester projectHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
@@ -256,6 +257,7 @@ namespace SOS.Import.Jobs
             if (sersObservationHarvester == null) throw new ArgumentNullException(nameof(sersObservationHarvester));
             if (sharkObservationHarvester == null) throw new ArgumentNullException(nameof(sharkObservationHarvester));
             if (virtualHerbariumObservationHarvester == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationHarvester));
+            if (iNaturalistObservationHarvester == null) throw new ArgumentNullException(nameof(iNaturalistObservationHarvester));
 
 
             _harvestersByType = new Dictionary<DataProviderType, IObservationHarvester>
@@ -270,7 +272,8 @@ namespace SOS.Import.Jobs
                 {DataProviderType.ObservationDatabase, observationDatabaseHarvester},
                 {DataProviderType.SersObservations, sersObservationHarvester},
                 {DataProviderType.SharkObservations, sharkObservationHarvester},
-                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationHarvester}
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationHarvester},
+                {DataProviderType.iNaturalistObservations, iNaturalistObservationHarvester}
             };
         }
 
