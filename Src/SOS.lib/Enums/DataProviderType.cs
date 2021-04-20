@@ -19,6 +19,7 @@
         SharkObservations,
         VirtualHerbariumObservations,
         FishDataObservations,
-        ObservationDatabase
+        ObservationDatabase,
+        iNaturalistObservations
     }
 }

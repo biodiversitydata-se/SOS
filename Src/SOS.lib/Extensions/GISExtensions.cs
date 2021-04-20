@@ -642,6 +642,7 @@ namespace SOS.Lib.Extensions
         {
             if (fromCoordinateSystem == toCoordinateSystem)
             {
+                geometry.SRID = (int)toCoordinateSystem;
                 return geometry;
             }
 

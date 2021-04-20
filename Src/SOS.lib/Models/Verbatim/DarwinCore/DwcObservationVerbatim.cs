@@ -1696,6 +1696,11 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public string VernacularName { get; set; }
 
+        /// <summary>
+        /// Used only by GBIF api
+        /// </summary>
+        public string Species { get; set; }
+
         #endregion
 
         #region UseWithIRI
