@@ -16,7 +16,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Lib.Services
 {
-    public static class JsonSerialaztionHelper
+    public static class JsonSerializationHelper
     {
         /// <summary>
         /// Serialization options
@@ -142,7 +142,7 @@ namespace SOS.Lib.Services
                 responsePhrase = httpResponseMessage.ReasonPhrase;
                 httpResponseMessage.EnsureSuccessStatusCode();
  
-                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
@@ -187,7 +187,7 @@ namespace SOS.Lib.Services
                 var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model, contentType));
                 httpResponseMessage.EnsureSuccessStatusCode();
 
-                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
@@ -222,7 +222,7 @@ namespace SOS.Lib.Services
                 var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model, contentType));
                 httpResponseMessage.EnsureSuccessStatusCode();
                
-                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
@@ -272,7 +272,7 @@ namespace SOS.Lib.Services
         /// <param name="obj"></param>
         /// <param name="contentType"></param>
         public JsonContent(object obj, string contentType) :
-            base(JsonSerializer.Serialize(obj, JsonSerialaztionHelper.SerializerOptions), Encoding.UTF8, contentType)
+            base(JsonSerializer.Serialize(obj, JsonSerializationHelper.SerializerOptions), Encoding.UTF8, contentType)
         {
   
         }

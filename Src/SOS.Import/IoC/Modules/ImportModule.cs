@@ -71,6 +71,9 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.KulServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.KulServiceConfiguration).As<KulServiceConfiguration>()
                     .SingleInstance();
+            if (Configurations.ImportConfiguration.iNaturalistServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.iNaturalistServiceConfiguration).As<iNaturalistServiceConfiguration>()
+                    .SingleInstance();
             if (Configurations.ImportConfiguration.MvmServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.MvmServiceConfiguration).As<MvmServiceConfiguration>()
                     .SingleInstance();
@@ -185,6 +188,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ProjectHarvester>().As<IProjectHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationHarvester>().As<IFishDataObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<iNaturalistObservationHarvester>().As<IiNaturalistObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationHarvester>().As<INorsObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseHarvester>().As<IObservationDatabaseHarvester>().InstancePerLifetimeScope();
@@ -233,6 +237,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<FileDownloadService>().As<IFileDownloadService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<iNaturalistObservationService>().As<IiNaturalistObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationService>().As<IMvmObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationService>().As<INorsObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseDataService>().As<IObservationDatabaseDataService>().InstancePerLifetimeScope();

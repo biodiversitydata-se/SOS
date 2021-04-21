@@ -635,7 +635,8 @@ namespace SOS.Process.Jobs
                 {DataProviderType.ObservationDatabase, observationDatabaseProcessor},
                 {DataProviderType.SersObservations, sersObservationProcessor},
                 {DataProviderType.SharkObservations, sharkObservationProcessor},
-                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor}
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
+                {DataProviderType.iNaturalistObservations, dwcaObservationProcessor}
             };
 
             _exportContainer = processConfiguration?.Export_Container ??
