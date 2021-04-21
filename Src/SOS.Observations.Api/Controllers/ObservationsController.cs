@@ -780,7 +780,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var paramsValidationResult = Result.Combine(
-                    ValidateAggregationPagingArguments(skip, take),
+                    ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode));
 

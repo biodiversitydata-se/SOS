@@ -69,9 +69,15 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success(zoom);
         }
 
-        protected Result ValidateAggregationPagingArguments(int skip, int? take)
+        protected Result ValidateAggregationPagingArguments(int skip, int? take, bool handleInfinityTake = false)
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
+
+            if (handleInfinityTake && take == 0)
+            {
+                return Result.Success();
+            }
+
             if (take <= 0) return Result.Failure("Take must be greater than 0");
             if (take != null && skip + take > ObservationManager.MaxNrElasticSearchAggregationBuckets)
                 return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {ObservationManager.MaxNrElasticSearchAggregationBuckets}.");
