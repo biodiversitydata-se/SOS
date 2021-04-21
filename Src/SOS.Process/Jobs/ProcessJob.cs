@@ -287,18 +287,19 @@ namespace SOS.Process.Jobs
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
+                // Init indexes
+                await InitializeElasticSearchAsync(mode);
+
                 if (mode == JobRunModes.Full)
                 {
                     //------------------------------------------------------------------------
                     // 4. Start DWC file writing
                     //------------------------------------------------------------------------
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-                }
 
-                // Init indexes
-                await InitializeElasticSearchAsync(mode);
-                // Disable indexing for public and protected index
-                await DisableIndexingAsync();
+                    // Disable indexing for public and protected index
+                    await DisableIndexingAsync();
+                }
 
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
@@ -310,8 +311,11 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    // Enable indexing for public and protected index
-                    await EnableIndexingAsync();
+                    if (mode == JobRunModes.Full)
+                    {
+                        // Enable indexing for public and protected index
+                        await EnableIndexingAsync();
+                    }
 
                     _logger.LogInformation($"Start validate indexes");
                     if (!await ValidateIndexesAsync())
