@@ -296,10 +296,10 @@ namespace SOS.Process.Jobs
                     // 4. Start DWC file writing
                     //------------------------------------------------------------------------
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-
-                    // Disable indexing for public and protected index
-                    await DisableIndexingAsync();
                 }
+
+                // Disable indexing for public and protected index
+                await DisableIndexingAsync();
 
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
@@ -311,12 +311,10 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    if (mode == JobRunModes.Full)
-                    {
-                        // Enable indexing for public and protected index
-                        await EnableIndexingAsync();
-                    }
-
+                  
+                    // Enable indexing for public and protected index
+                    await EnableIndexingAsync();
+                    
                     _logger.LogInformation($"Start validate indexes");
                     if (!await ValidateIndexesAsync())
                     {
