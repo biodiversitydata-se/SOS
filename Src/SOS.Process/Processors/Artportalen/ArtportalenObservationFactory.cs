@@ -187,6 +187,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
                 obs.Occurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered;
                 obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
+                obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
