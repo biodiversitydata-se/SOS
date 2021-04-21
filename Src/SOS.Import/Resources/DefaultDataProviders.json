@@ -1284,5 +1284,72 @@
         "HarvestFailPreventProcessing": false,
         "IncludeInHealthCheck": true,
         "LatestUploadedFileHash": null
+    },
+    {
+        "Type": "iNaturalistObservations",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "iNaturalist"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "iNaturalist"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "iNaturalist placeholder description."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "iNaturalist placeholder description."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "iNaturalist placeholder org"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "iNaturalist placeholder org"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Department of Aquatic Resources, Institute of Coastal Research", "The database for coastal fish" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Kustlaboratoriet, Institutionen för akvatiska resurser", "Kustfiskdatabasen" ]
+            }
+        ],
+        "Url": "https://https://www.inaturalist.se/",
+        "ContactPerson": {
+            "FirstName": "Placeholder",
+            "LastName": "Placeholder",
+            "Email": "Placeholder@slu.se"
+        },
+        "ContactEmail": "Placeholder@slu.se",
+        "DownloadUrl": null,
+        "ResourceType": "Ocurrence data",
+        "MetadataLanguage": "English",
+        "Language": "",
+        "LicenseName": "",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "DataQualityIsApproved": false,
+        "Id": 19,
+        "Identifier": "iNaturalist",
+        "EmlMetadata": null,
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true,
+        "LatestUploadedFileHash": null
     }
 ]
