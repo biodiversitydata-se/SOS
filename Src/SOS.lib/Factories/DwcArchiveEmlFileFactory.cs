@@ -31,22 +31,26 @@ namespace SOS.Lib.Factories
 
         private static async Task CreateEmlXmlFileByTemplate(Stream outStream, DataProvider dataProvider)
         {
+            if (dataProvider == null)
+            {
+                return;
+            }
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var emlTemplatePath = Path.Combine(assemblyPath, @"Resources\DarwinCore\eml.xml");
             var xDoc = XDocument.Load(emlTemplatePath);
             var dataset = xDoc.Root.Element("dataset");
+           
             SetPubDateToCurrentDate(dataset);
-            dataset.XPathSelectElement("title").SetValue(dataProvider.Names.Translate("en-GB") ?? string.Empty);
-            dataset.XPathSelectElement("resourceType").SetValue(dataProvider.ResourceType ?? string.Empty);
-            dataset.XPathSelectElement("metadataLanguage").SetValue(dataProvider.MetadataLanguage ?? string.Empty);
-            dataset.XPathSelectElement("language").SetValue(dataProvider.Language ?? string.Empty);
-            dataset.XPathSelectElement("licenseName").SetValue(dataProvider.LicenseName ?? string.Empty);
+            dataset.XPathSelectElement("title").SetValue(dataProvider.Names.Translate("en-GB") ?? "N/A");
+            dataset.XPathSelectElement("abstract/para").SetValue(dataProvider.Descriptions?.Translate("en-GB") ?? "N/A");
+            dataset.XPathSelectElement("resourceType").SetValue(dataProvider.ResourceType ?? "N/A");
             SetContact(dataset, dataProvider);
-            dataset.XPathSelectElement("distribution/online/url").SetValue(dataProvider.Url ?? String.Empty);
-            dataset.XPathSelectElement("abstract/para").SetValue(dataProvider.Descriptions.Translate("en-GB") ?? string.Empty);
             SetGeographicCoverage(dataset, dataProvider);
-            SetTemporalCoverage(dataset, dataProvider);
-
+            dataset.XPathSelectElement("metadataLanguage").SetValue(dataProvider.MetadataLanguage ?? "N/A");
+            dataset.XPathSelectElement("language").SetValue(dataProvider.Language ?? "N/A");
+            dataset.XPathSelectElement("licenseName").SetValue(dataProvider.LicenseName ?? "N/A");
+            dataset.XPathSelectElement("distribution/online/url").SetValue(dataProvider.Url ?? "N/A");
+            
             var emlString = xDoc.ToString();
             var emlBytes = Encoding.UTF8.GetBytes(emlString);
             await outStream.WriteAsync(emlBytes, 0, emlBytes.Length);
@@ -56,10 +60,10 @@ namespace SOS.Lib.Factories
         private static void SetContact(XElement dataset, DataProvider dataProvider)
         {
             var contact = dataset.Element("contact");//metadataProvider
-            contact.XPathSelectElement("individualName/givenName").SetValue(dataProvider.ContactPerson?.FirstName ?? string.Empty);
-            contact.XPathSelectElement("individualName/surName").SetValue(dataProvider.ContactPerson?.LastName ?? string.Empty);
-            contact.XPathSelectElement("organizationName").SetValue(dataProvider.Organizations?.Translate("en-GB") ?? string.Empty);
-            contact.XPathSelectElement("electronicMailAddress").SetValue(dataProvider.ContactPerson?.Email ?? string.Empty);
+            contact.XPathSelectElement("individualName/givenName").SetValue(dataProvider.ContactPerson?.FirstName ?? "N/A");
+            contact.XPathSelectElement("individualName/surName").SetValue(dataProvider.ContactPerson?.LastName ?? "N/A");
+            contact.XPathSelectElement("organizationName").SetValue(dataProvider.Organizations?.Translate("en-GB") ?? "N/A");
+            contact.XPathSelectElement("electronicMailAddress").SetValue(dataProvider.ContactPerson?.Email ?? "N/A");
         }
 
         private static void SetGeographicCoverage(XElement dataset, DataProvider dataProvider)
@@ -97,7 +101,7 @@ namespace SOS.Lib.Factories
         private static void SetTaxonomicCoverage(XElement dataset, DataProvider dataProvider)
         {
             var taxonomicCoverage = dataset.Element("taxonomicCoverage");
-            taxonomicCoverage.XPathSelectElement("generalTaxonomicCoverage").SetValue(dataProvider.TaxonomicCoverage ?? string.Empty);
+            taxonomicCoverage.XPathSelectElement("generalTaxonomicCoverage").SetValue(dataProvider.TaxonomicCoverage ?? "N/A");
         }
 
         
