@@ -7,61 +7,67 @@
          system="http://gbif.org" scope="system"
          xml:lang="eng">
     <dataset>
-      <title xml:lang="eng"></title>
-      <creator>
-        <individualName>
-          <givenName></givenName>
-          <surName></surName>
-        </individualName>
-        <organizationName></organizationName>
-        <electronicMailAddress></electronicMailAddress>
-        <!--<positionName></positionName>-->
-        <!--<address>
+        <title xml:lang="eng"></title>
+        <abstract>
+            <para>
+            </para>
+        </abstract>
+        <resourceType></resourceType>
+       
+        <contact>
+            <individualName>
+                <givenName></givenName>
+                <surName></surName>
+            </individualName>
+            <organizationName></organizationName>
+            <electronicMailAddress></electronicMailAddress>
+            <!--<positionName></positionName>-->
+            <!--<address>
           <city></city>
           <country></country>
         </address>-->
-      </creator>
-      <pubDate></pubDate>
-      <language>eng</language>
-      <abstract>
-          <para>
-          </para>
-      </abstract>
-      <keywordSet>
-          <keyword>Occurrence</keyword>
-          <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
-      </keywordSet>
-      <keywordSet>
-          <keyword>Observation</keyword>
-          <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
-      </keywordSet>
-      <intellectualRights>
-          <para>
-              To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
-              <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
-                  <citetitle>Public Domain (CC0 1.0)</citetitle>
-              </ulink>
-              . Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
-          </para>
-      </intellectualRights>
-      <distribution scope="document">
-        <online>
-          <url function="information"></url>
-        </online>
-      </distribution>
-      <coverage>
-          <geographicCoverage>
-              <geographicDescription>This resource covers Sweden.</geographicDescription>
-              <boundingCoordinates>
-                  <westBoundingCoordinate>10.13</westBoundingCoordinate>
-                  <eastBoundingCoordinate>24.59</eastBoundingCoordinate>
-                  <northBoundingCoordinate>69.3</northBoundingCoordinate>
-                  <southBoundingCoordinate>55.11</southBoundingCoordinate>
-              </boundingCoordinates>
-          </geographicCoverage>
-      </coverage>
-      <maintenance>
-        <maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
-      </maintenance>
+        </contact>
+        <pubDate></pubDate>
+
+        <coverage>
+            <geographicCoverage>
+                <geographicDescription>This resource covers Sweden.</geographicDescription>
+                <boundingCoordinates>
+                    <westBoundingCoordinate>10.13</westBoundingCoordinate>
+                    <eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+                    <northBoundingCoordinate>69.3</northBoundingCoordinate>
+                    <southBoundingCoordinate>55.11</southBoundingCoordinate>
+                </boundingCoordinates>
+            </geographicCoverage>
+        </coverage>
+        <metadataLanguage></metadataLanguage>
+        <language>eng</language>
+        <licenseName></licenseName>
+
+        <keywordSet>
+            <keyword>Occurrence</keyword>
+            <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+        </keywordSet>
+        <keywordSet>
+            <keyword>Observation</keyword>
+            <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+        </keywordSet>
+        <intellectualRights>
+            <para>
+                To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+                <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+                    <citetitle>Public Domain (CC0 1.0)</citetitle>
+                </ulink>
+                . Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+            </para>
+        </intellectualRights>
+        <distribution scope="document">
+            <online>
+                <url function="information"></url>
+            </online>
+        </distribution>
+        <maintenance>
+            <maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
+        </maintenance>
     </dataset>
 </eml:eml>
