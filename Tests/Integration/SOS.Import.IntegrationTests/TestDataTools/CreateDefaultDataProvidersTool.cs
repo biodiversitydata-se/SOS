@@ -64,7 +64,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Stephen",
                         LastName = "Coulson"
                     },
-                    ContactEmail = "stephen.coulson@slu.se",
                     Url = "https://www.artportalen.se/",
                     Type = DataProviderType.ArtportalenObservations,
                     IsActive = true,
@@ -122,7 +121,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Eddie",
                         LastName = "Von Wachenfeldt"
                     },
-                    ContactEmail = "eddie.vonwachenfeldt@slu.se",
                     Url = "http://musselportalen.se/",
                     Type = DataProviderType.ClamPortalObservations,
                     IsActive = true,
@@ -178,7 +176,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Peter",
                         LastName = "Ljungberg"
                     },
-                    ContactEmail = "peter.ljungberg@slu.se",
                     Url = "https://www.slu.se/kul/",
                     Type = DataProviderType.KULObservations,
                     IsActive = true,
@@ -234,7 +231,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Lars",
                         LastName = "Sonesten"
                     },
-                    ContactEmail = "Lars.Sonesten@slu.se",
                     Url = "http://miljodata.slu.se/mvm/",
                     Type = DataProviderType.MvmObservations,
                     IsActive = true,
@@ -290,7 +286,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Anders",
                         LastName = "Kinnerbäck"
                     },
-                    ContactEmail = "anders.kinnerback@slu.se",
                     Url =
                         "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
                     Type = DataProviderType.NorsObservations,
@@ -347,7 +342,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Berit",
                         LastName = "Sers"
                     },
-                    ContactEmail = "berit.sers@slu.se",
                     Url =
                         "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
                     Type = DataProviderType.SersObservations,
@@ -404,7 +398,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Nils",
                         LastName = "Ericson"
                     },
-                    ContactEmail = "mossnisse@hotmail.com",
                     Url = "http://herbarium.emg.umu.se",
                     Type = DataProviderType.VirtualHerbariumObservations,
                     IsActive = true,
@@ -460,7 +453,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Patrik",
                         LastName = "Strömberg"
                     },
-                    ContactEmail = "patrik.stromberg@smhi.se",
                     Url = "http://sharkweb.smhi.se/",
                     Type = DataProviderType.SharkObservations,
                     IsActive = false,
@@ -516,7 +508,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "",
                         LastName = ""
                     },
-                    ContactEmail = "",
                     Url =
                         "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
@@ -574,7 +565,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "",
                         LastName = ""
                     },
-                    ContactEmail = "-",
                     Url = "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
                     Type = DataProviderType.DwcA,
@@ -631,7 +621,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "",
                         LastName = ""
                     },
-                    ContactEmail = "",
                     Url = "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
                     Type = DataProviderType.DwcA,
@@ -688,7 +677,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "",
                         LastName = ""
                     },
-                    ContactEmail = "",
                     Url = "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
                     Type = DataProviderType.DwcA,
@@ -740,7 +728,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "",
                         LastName = ""
                     },
-                    ContactEmail = "",
                     Url = "https://www.dagfjarilar.lu.se/",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
                     Type = DataProviderType.DwcA,
@@ -787,7 +774,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Lisa",
                         LastName = "Sundqvist"
                     },
-                    ContactEmail = "shark@smhi.se",
                     Url = "http://sharkdata.se/",
                     DownloadUrl = "",
                     Type = DataProviderType.DwcA,
@@ -844,7 +830,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Malin",
                         LastName = "Werner"
                     },
-                    ContactEmail = "Malin.Werner@slu.se",
                     Url = "https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/",
                     Type = DataProviderType.FishDataObservations,
                     IsActive = true,
@@ -900,7 +885,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Jonas",
                         LastName = "Dahlgren"
                     },
-                    ContactEmail = "riksskogstaxeringen@slu.se",
                     Url = "https://www.slu.se/riksskogstaxeringen",
                     Type = DataProviderType.DwcA,
                     IsActive = false,
@@ -956,7 +940,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Jan",
                         LastName = "Edelsjö"
                     },
-                    ContactEmail = "Jan.Edelsjo@slu.se",
                     Url = "http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata",
                     Type = DataProviderType.ObservationDatabase,
                     IsActive = true,
@@ -1013,7 +996,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         FirstName = "Daniel",
                         LastName = "Eriksson"
                     },
-                    ContactEmail = "info@biologg.se",
                     Url = "https://www.biologg.se/",
                     Type = DataProviderType.DwcA,
                     IsActive = false,

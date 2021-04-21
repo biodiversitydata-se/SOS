@@ -36,34 +36,71 @@ namespace SOS.Lib.Factories
             var xDoc = XDocument.Load(emlTemplatePath);
             var dataset = xDoc.Root.Element("dataset");
             SetPubDateToCurrentDate(dataset);
-            SetTitle(dataset, dataProvider.Names.Translate("en-GB"));
-            SetCreator(dataset, dataProvider.ContactPerson, dataProvider.Organizations.Translate("en-GB"));
-            SetUrl(dataset, dataProvider.Url);
-            SetAbstract(dataset, dataProvider.Descriptions.Translate("en-GB"));
+            dataset.XPathSelectElement("title").SetValue(dataProvider.Names.Translate("en-GB") ?? string.Empty);
+            dataset.XPathSelectElement("resourceType").SetValue(dataProvider.ResourceType ?? string.Empty);
+            dataset.XPathSelectElement("metadataLanguage").SetValue(dataProvider.MetadataLanguage ?? string.Empty);
+            dataset.XPathSelectElement("language").SetValue(dataProvider.Language ?? string.Empty);
+            dataset.XPathSelectElement("licenseName").SetValue(dataProvider.LicenseName ?? string.Empty);
+            SetContact(dataset, dataProvider);
+            dataset.XPathSelectElement("distribution/online/url").SetValue(dataProvider.Url ?? String.Empty);
+            dataset.XPathSelectElement("abstract/para").SetValue(dataProvider.Descriptions.Translate("en-GB") ?? string.Empty);
+            SetGeographicCoverage(dataset, dataProvider);
+            SetTemporalCoverage(dataset, dataProvider);
+
             var emlString = xDoc.ToString();
             var emlBytes = Encoding.UTF8.GetBytes(emlString);
             await outStream.WriteAsync(emlBytes, 0, emlBytes.Length);
         }
 
-        private static void SetUrl(XElement dataset, string url)
+
+        private static void SetContact(XElement dataset, DataProvider dataProvider)
         {
-            dataset.XPathSelectElement("distribution/online/url").SetValue(url ?? String.Empty);
+            var contact = dataset.Element("contact");//metadataProvider
+            contact.XPathSelectElement("individualName/givenName").SetValue(dataProvider.ContactPerson?.FirstName ?? string.Empty);
+            contact.XPathSelectElement("individualName/surName").SetValue(dataProvider.ContactPerson?.LastName ?? string.Empty);
+            contact.XPathSelectElement("organizationName").SetValue(dataProvider.Organizations?.Translate("en-GB") ?? string.Empty);
+            contact.XPathSelectElement("electronicMailAddress").SetValue(dataProvider.ContactPerson?.Email ?? string.Empty);
         }
 
-        private static void SetAbstract(XElement dataset, string description)
+        private static void SetGeographicCoverage(XElement dataset, DataProvider dataProvider)
         {
-            dataset.XPathSelectElement("abstract/para").SetValue(description ?? String.Empty);
+            var coverage = dataset.Element("coverage");
+            var geographicCoverage = coverage.Element("geographicCoverage");
+            geographicCoverage.XPathSelectElement("geographicDescription").SetValue("All data is collected within Sweden.");
+            geographicCoverage.XPathSelectElement("boundingCoordinates/westBoundingCoordinate").SetValue(dataProvider.BoundingBox?.Left ?? 0.0);
+            geographicCoverage.XPathSelectElement("boundingCoordinates/eastBoundingCoordinate").SetValue(dataProvider.BoundingBox?.Right ?? 0.0);
+            geographicCoverage.XPathSelectElement("boundingCoordinates/northBoundingCoordinate").SetValue(dataProvider.BoundingBox?.Top ?? 0.0);
+            geographicCoverage.XPathSelectElement("boundingCoordinates/southBoundingCoordinate").SetValue(dataProvider.BoundingBox?.Bottom ?? 0.0);
         }
 
-        private static void SetCreator(XElement dataset, ContactPerson contactPerson, string organization)
+        private static void SetTemporalCoverage(XElement dataset, DataProvider dataProvider)
         {
-            var creator = dataset.Element("creator");
-            creator.XPathSelectElement("individualName/givenName").SetValue(contactPerson?.FirstName ?? String.Empty);
-            creator.XPathSelectElement("individualName/surName").SetValue(contactPerson?.LastName ?? String.Empty);
-            creator.XPathSelectElement("organizationName").SetValue(organization ?? String.Empty);
-            creator.XPathSelectElement("electronicMailAddress").SetValue(contactPerson?.Email ?? String.Empty);
+            if (!(dataProvider.StartDate.HasValue || dataProvider.EndDate.HasValue))
+            {
+                return;
+            }
+
+            var temporalCoverage = dataset.Element("temporalCoverage");
+            var rangeOfDates = temporalCoverage.Element("rangeOfDates");
+           
+            if (dataProvider.StartDate.HasValue)
+            {
+                rangeOfDates.XPathSelectElement("beginDate/calendarDate").SetValue(dataProvider.StartDate);
+            }
+
+            if (dataProvider.EndDate.HasValue)
+            {
+                rangeOfDates.XPathSelectElement("endDate/calendarDate").SetValue(dataProvider.EndDate);
+            }
         }
 
+        private static void SetTaxonomicCoverage(XElement dataset, DataProvider dataProvider)
+        {
+            var taxonomicCoverage = dataset.Element("taxonomicCoverage");
+            taxonomicCoverage.XPathSelectElement("generalTaxonomicCoverage").SetValue(dataProvider.TaxonomicCoverage ?? string.Empty);
+        }
+
+        
         /// <summary>
         ///     Set pubDate to today's date
         /// </summary>
@@ -77,11 +114,6 @@ namespace SOS.Lib.Factories
                 dataset.Add(pubDate);
             }
             pubDate.SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
-        }
-
-        private static void SetTitle(XElement dataset, string title)
-        {
-            dataset.XPathSelectElement("title").SetValue(title ?? String.Empty);
         }
 
         /// <summary>

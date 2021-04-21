@@ -16,47 +16,9 @@ namespace SOS.Lib.Models.Shared
     public class DataProvider : IEntity<int>, IIdIdentifierTuple
     {
         /// <summary>
-        ///     The harvest data format.
+        /// Coordinates of the boundig box
         /// </summary>
-        [BsonRepresentation(BsonType.String)]
-        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-        public DataProviderType Type { get; set; }
-
-        /// <summary>
-        ///     Decides whether the data provider should be included in processing of observations and available for the search
-        ///     API.
-        /// </summary>
-        public bool IsActive { get; set; }
-
-        /// <summary>
-        ///     The names of the data provider 
-        /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Names { get; set; }
-
-        /// <summary>
-        ///     Descriptions of the data provider 
-        /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
-
-        /// <summary>
-        ///     The organizations 
-        /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Organizations { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<DataProviderPath> Paths { get; set; }
-
-        /// <summary>
-        ///     URL to the data provider source.
-        /// </summary>
-        public string Url { get; set; }
-
-        /// <summary>
-        ///    URL to data provider EML file
-        /// </summary>
-        public string DownloadUrlEml { get; set; }
+        public BoundingBox BoundingBox { get; set; }
 
         /// <summary>
         ///     Contact person.
@@ -64,9 +26,9 @@ namespace SOS.Lib.Models.Shared
         public ContactPerson ContactPerson { get; set; }
 
         /// <summary>
-        ///     Contact person E-mail.
+        ///     Decides whether the data quality is approved.
         /// </summary>
-        public string ContactEmail { get; set; }
+        public bool DataQualityIsApproved { get; set; }
 
         /// <summary>
         ///     Download URL (for DwC-A files).
@@ -74,24 +36,35 @@ namespace SOS.Lib.Models.Shared
         public string DownloadUrl { get; set; }
 
         /// <summary>
-        ///     Decides whether the data provider should be included in scheduled harvest.
+        ///     Descriptions of the data provider 
         /// </summary>
-        public bool IncludeInScheduledHarvest { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
 
         /// <summary>
-        /// True if provider support incremental harvest
+        ///    URL to data provider EML file
         /// </summary>
-        public bool SupportIncrementalHarvest { get; set; }
+        public string DownloadUrlEml { get; set; }
 
         /// <summary>
-        /// True if provider support protected observation harvest
+        /// Time stamp when last observation was made
         /// </summary>
-        public bool SupportProtectedHarvest { get; set; }
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
-        ///     Decides whether the data quality is approved.
+        /// EML metadata.
         /// </summary>
-        public bool DataQualityIsApproved { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
+        public BsonDocument EmlMetadata { get; set; }
+
+        /// <summary>
+        /// Indicates that failure in harvest for this provider will stop job from processing
+        /// </summary>
+        public bool HarvestFailPreventProcessing { get; set; }
+
+        /// <summary>
+        /// Cron expression to calculate next run
+        /// </summary>
+        public string HarvestSchedule { get; set; }
 
         /// <summary>
         ///     Id.
@@ -104,25 +77,25 @@ namespace SOS.Lib.Models.Shared
         public string Identifier { get; set; }
 
         /// <summary>
-        /// Time stamp according to data source, used to see if data set has changed
+        /// Use this provider in healthy check
         /// </summary>
-        public DateTime? SourceDate { get; set; }
+        public bool IncludeInHealthCheck { get; set; }
 
         /// <summary>
-        /// EML metadata.
+        ///     Decides whether the data provider should be included in scheduled harvest.
         /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
-        public BsonDocument EmlMetadata { get; set; }
+        public bool IncludeInScheduledHarvest { get; set; }
 
         /// <summary>
-        /// Cron expression to calculate next run
+        ///     Decides whether the data provider should be included in processing of observations and available for the search
+        ///     API.
         /// </summary>
-        public string HarvestSchedule { get; set; }
+        public bool IsActive { get; set; }
 
         /// <summary>
-        /// Indicates that failure in harvest for this provider will stop job from processing
+        /// The language in which the data for the resource are written. This can be a well-known language name, or one of the ISO language codes to be more precise.
         /// </summary>
-        public bool HarvestFailPreventProcessing { get; set; }
+        public string Language { get; set; }
 
         /// <summary>
         /// Hash of latest uploaded file
@@ -130,9 +103,71 @@ namespace SOS.Lib.Models.Shared
         public string LatestUploadedFileHash { get; set; }
 
         /// <summary>
-        /// Use this provider in healthy check
+        /// The licence that applies to the resource, of a well-known license type: a CC0, CC-BY, or similar license for both the data and metadata.
         /// </summary>
-        public bool IncludeInHealthCheck { get; set; }
+        public string LicenseName { get; set; }
+
+        /// <summary>
+        /// Meta data language
+        /// </summary>
+        public string MetadataLanguage { get; set; }
+
+        /// <summary>
+        ///     The names of the data provider 
+        /// </summary>
+        public IEnumerable<VocabularyValueTranslation> Names { get; set; }
+
+        /// <summary>
+        ///     The organizations 
+        /// </summary>
+        public IEnumerable<VocabularyValueTranslation> Organizations { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<DataProviderPath> Paths { get; set; }
+
+        /// <summary>
+        /// Type of resource: occurrence data (list of occurrences, sampling-event data (occurrence data linked to data describing the sampling events, typically data from structured surveys).
+        /// </summary>
+        public string ResourceType { get; set; }
+
+        /// <summary>
+        /// Time stamp according to data source, used to see if data set has changed
+        /// </summary>
+        public DateTime? SourceDate { get; set; }
+
+        /// <summary>
+        /// Time stamp when first observation was made
+        /// </summary>
+        public DateTime? StartDate { get; set; }
+
+        /// <summary>
+        /// True if provider support incremental harvest
+        /// </summary>
+        public bool SupportIncrementalHarvest { get; set; }
+
+        /// <summary>
+        /// True if provider support protected observation harvest
+        /// </summary>
+        public bool SupportProtectedHarvest { get; set; }
+
+        /// <summary>
+        /// Range of taxa covered by the resource. Example: Mammalia (for class Mammalia: all mammals)
+        /// </summary>
+        public string TaxonomicCoverage { get; set; }
+
+        /// <summary>
+        ///     The harvest data format.
+        /// </summary>
+        [BsonRepresentation(BsonType.String)]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        public DataProviderType Type { get; set; }
+
+        /// <summary>
+        ///     URL to the data provider source.
+        /// </summary>
+        public string Url { get; set; }
 
         /// <summary>
         ///  Indicates that provider is ready to harvest
