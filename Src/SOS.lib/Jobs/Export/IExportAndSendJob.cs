@@ -14,8 +14,10 @@ namespace SOS.Lib.Jobs.Export
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="email"></param>
+        /// <param name="description"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(SearchFilter filter, string email, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(SearchFilter filter, string email, string description,
+            IJobCancellationToken cancellationToken);
     }
 }

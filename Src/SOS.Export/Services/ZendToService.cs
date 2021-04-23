@@ -27,14 +27,17 @@ namespace SOS.Export.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> SendFile(string emailAddress, string note, string filePath)
+        public async Task<bool> SendFile(string emailAddress, string description, string filePath)
         {
             using var form = new MultipartFormDataContent();
             //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             DateTime fileCreationDate = File.GetCreationTime(filePath);
             string message = GetMessage(_configuration.Message, fileCreationDate);
-            string description = "DwC-A file";
-
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                description = "DwC-A file";
+            }
+            
             var formData = new[]
             {
                 new KeyValuePair<string, string>("Action", "dropoff"),
