@@ -72,7 +72,7 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock = new Mock<ILogger<ProcessJob>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
-            _dataProviderCache = new Mock<ICache<int, DataProvider>>();
+            _dataProviderCache = new Mock<IDataProviderCache>();
             _processConfigurationMock = new Mock<ProcessConfiguration>();
         }
 
@@ -94,7 +94,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<ICache<int, Taxon>> _taxonCache;
         private readonly Mock<IValidationManager> _validationManager;
         private readonly Mock<IInstanceManager> _instanceManager;
-        private readonly Mock<ICache<int, DataProvider>> _dataProviderCache;
+        private readonly Mock<IDataProviderCache> _dataProviderCache;
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;

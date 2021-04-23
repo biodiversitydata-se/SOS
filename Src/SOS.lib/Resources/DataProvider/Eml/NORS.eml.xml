@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="33f2c3d3-aac3-f4d3-347b-baba45536879"  system="http://gbif.org" scope="system"
+  xml:lang="en">
+	<dataset>
+		<alternateIdentifier>33f2c3d3-aac3-f4d3-347b-baba45536879</alternateIdentifier>
+        <title>The National Register of Survey test-fishing (NORS)</title>
+		<creator>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<address>
+				<city>Lysekil</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>Email</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<address>
+				<city>Lysekil</city>
+				<country>SE</country>
+			</address>
+		</metadataProvider>		
+		<pubDate>      
+		</pubDate>
+		<language>ENGLISH</language>
+		<abstract>
+			<para>The database called NORS contains data from netfishing in Swedish lakes.</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>0.0</westBoundingCoordinate>
+					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
+					<northBoundingCoordinate>0.0</northBoundingCoordinate>
+					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+            <individualName>
+                <givenName>Anders</givenName>
+                <surName>Kinnerbäck</surName>
+            </individualName>
+            <electronicMailAddress>anders.kinnerback@slu.se</electronicMailAddress>
+            <organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<address>
+				<city>Lysekil</city>
+				<country>SE</country>
+			</address>
+		</contact>
+	</dataset>
+</eml:eml>

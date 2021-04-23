@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Controllers
     public class CachesController : ControllerBase, ICachesController
     {
         private readonly IAreaCache _areaCache;
-        private readonly ICache<int, DataProvider> _dataProvidersCache;
+        private readonly IDataProviderCache _dataProvidersCache;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private readonly ICache<int, ProjectInfo> _projectsCache;
         private readonly ILogger<CachesController> _logger;
@@ -34,7 +34,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="logger"></param>
         public CachesController(
             IAreaCache areaCache,
-            ICache<int, DataProvider> dataProvidersCache,
+            IDataProviderCache dataProvidersCache,
             ICache<VocabularyId, Vocabulary> vocabularyCache,
             ICache<int, ProjectInfo> projectsCache,
             ILogger<CachesController> logger)

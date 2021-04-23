@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using Newtonsoft.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Enums;
@@ -20,6 +19,59 @@ namespace SOS.Lib.Managers
     {
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DataProviderManager> _logger;
+
+        /// <summary>
+        /// Add EML data from the ~/Resources/EmlMetadata/ folder.
+        /// </summary>
+        /// <param name="dataProviders"></param>
+        private async Task AddEmlMetadataAsync(IEnumerable<DataProvider> dataProviders)
+        {
+            await _dataProviderRepository.ClearEml();
+
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml\");
+            var filePaths = Directory.GetFiles(emlDirectory, "*.xml");
+            foreach (var filePath in filePaths)
+            {
+                var fileName = Path.GetFileName(filePath);
+                var identifier = fileName.Substring(0, fileName.IndexOf('.'));
+                var dataProvider =
+                    dataProviders.FirstOrDefault(m => m.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+                if (dataProvider == null)
+                {
+                    continue;
+                }
+
+                var eml = GetEmlDocument(filePath);
+                if (eml == null)
+                {
+                    continue;
+                }
+
+                if (!await _dataProviderRepository.StoreEmlAsync(dataProvider.Id, eml))
+                {
+                    _logger.LogWarning($"Failed to store eml for provider: {dataProvider.Identifier}");
+                }
+            }
+        }
+
+
+        private XDocument GetEmlDocument(string filePath)
+        {
+            return XDocument.Load(filePath);
+        }
+
+        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
+            List<DataProvider> allDataProviders)
+        {
+            if (int.TryParse(dataProviderIdOrIdentifier, out var id))
+            {
+                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+            }
+
+            return allDataProviders.FirstOrDefault(provider =>
+                provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
+        }
 
         public DataProviderManager(
             IDataProviderRepository dataProviderRepository,
@@ -55,43 +107,23 @@ namespace SOS.Lib.Managers
             }
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, @"Resources\DefaultDataProviders.json");
+            var filePath = Path.Combine(assemblyPath, @"Resources\DataProvider\DefaultDataProviders.json");
             var dataProviders =
                 JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
-            AddEmlMetadata(dataProviders);
+            
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);
+
+            await AddEmlMetadataAsync(dataProviders);
+
             var returnDescription = collectionExists
                 ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
                 : "DataProvider collection was created and initialized with default data providers.";
             return Result.Success(returnDescription);
         }
 
-        /// <summary>
-        /// Add EML data from the ~/Resources/EmlMetadata/ folder.
-        /// </summary>
-        /// <param name="dataProviders"></param>
-        private void AddEmlMetadata(List<DataProvider> dataProviders)
-        {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var emlDirectory = Path.Combine(assemblyPath, @"Resources\EmlMetadata\");
-            var filePaths = Directory.GetFiles(emlDirectory, "*.xml");
-            foreach (var filePath in filePaths)
-            {
-                var fileName = Path.GetFileName(filePath)
-                    .Replace(".eml","", StringComparison.OrdinalIgnoreCase)
-                    .Replace(".xml","", StringComparison.OrdinalIgnoreCase);
-                var dataProvider =
-                    dataProviders.FirstOrDefault(m => m.Identifier.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-                if (dataProvider != null)
-                {
-                    var bsonDoc = GetEmlBsonDocument(filePath);
-                    dataProvider.EmlMetadata = bsonDoc;
-                }
-            }
-        }
-
+       
         public async Task<DataProvider> GetDataProviderByIdAsync(int id)
         {
             var dataProviders = await _dataProviderRepository.GetAllAsync();
@@ -150,48 +182,15 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public static BsonDocument GetEmlMetadata(XDocument xmlDocument)
+        public async Task<XDocument> GetEmlMetadataAsync(int dataProviderId)
         {
-            if (xmlDocument == null || xmlDocument.Root?.Name.LocalName != "eml")
-            {
-                return null;
-            };
-            var jsonStr = JsonConvert.SerializeXNode(xmlDocument);
-            return BsonDocument.Parse(jsonStr);
+            return await _dataProviderRepository.GetEmlAsync(dataProviderId);
         }
 
-        /// <summary>
-        /// Set EML metadata for a data provider.
-        /// </summary>
-        /// <param name="dataProviderId"></param>
-        /// <param name="xmlDocument"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument)
         {
-            var bsonDoc = GetEmlMetadata(xmlDocument);
-            var dataProvider = await _dataProviderRepository.GetAsync(dataProviderId);
-            dataProvider.EmlMetadata = bsonDoc;
-            return await _dataProviderRepository.UpdateAsync(dataProviderId, dataProvider);
-        }
-
-        private BsonDocument GetEmlBsonDocument(string filePath)
-        {
-            XDocument xmlDocument = XDocument.Load(filePath);
-            string jsonStr = JsonConvert.SerializeXNode(xmlDocument);
-            BsonDocument bsonDoc = BsonDocument.Parse(jsonStr);
-            return bsonDoc;
-        }
-
-        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
-            List<DataProvider> allDataProviders)
-        {
-            if (int.TryParse(dataProviderIdOrIdentifier, out var id))
-            {
-                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
-            }
-
-            return allDataProviders.FirstOrDefault(provider =>
-                provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
+            return await _dataProviderRepository.StoreEmlAsync(dataProviderId, xmlDocument);
         }
     }
 }

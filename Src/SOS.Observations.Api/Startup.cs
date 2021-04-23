@@ -319,7 +319,7 @@ namespace SOS.Observations.Api
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
-            services.AddSingleton<ICache<int, DataProvider>, DataProviderCache>();
+            services.AddSingleton<IDataProviderCache, DataProviderCache>();
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();

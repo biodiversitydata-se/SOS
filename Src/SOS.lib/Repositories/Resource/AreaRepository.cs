@@ -149,13 +149,10 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc />
         public async Task<bool> StoreGeometriesAsync(IDictionary<string, Geometry> areaGeometries)
         {
-            var serializeOptions = new JsonSerializerOptions();
-            serializeOptions.Converters.Add(new GeometryConverter());
-
             foreach (var geometry in areaGeometries)
             {
                 var fileName = geometry.Key;
-                var geometryString = JsonSerializer.Serialize(geometry.Value, serializeOptions);
+                var geometryString = JsonSerializer.Serialize(geometry.Value, _jsonSerializerOptions);
                 var byteArray = Encoding.UTF8.GetBytes(geometryString);
 
                 await _gridFSBucket.UploadFromBytesAsync(fileName, byteArray);

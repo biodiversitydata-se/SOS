@@ -42,6 +42,20 @@ namespace SOS.Lib.Cache
         }
 
         /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity entity)
+        {
+            if (!await Repository.AddOrUpdateAsync(entity))
+            {
+                return false;
+            }
+
+            Cache.TryRemove(entity.Id, out var deletedEntity);
+            Cache.TryAdd(entity.Id, entity);
+
+            return true;
+        }
+
+        /// <inheritdoc />
         public void Clear()
         {
             Cache.Clear();

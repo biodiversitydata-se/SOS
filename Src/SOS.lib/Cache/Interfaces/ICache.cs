@@ -25,5 +25,12 @@ namespace SOS.Lib.Cache.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<TEntity>> GetAllAsync();
+
+        /// <summary>
+        ///  Add or update entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<bool> AddOrUpdateAsync(TEntity entity);
     }
 }

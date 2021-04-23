@@ -48,7 +48,15 @@ namespace SOS.Lib.Managers.Interfaces
         Task<DataProvider> GetDataProviderByIdentifier(string identifier);
 
         Task<DataProvider> GetDataProviderByType(DataProviderType type);
+
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
+
+        /// <summary>
+        /// Get EML metadata from a data provider.
+        /// </summary>
+        /// <param name="dataProviderId"></param>
+        /// <returns></returns>
+        Task<XDocument> GetEmlMetadataAsync(int dataProviderId);
 
         /// <summary>
         /// Set EML metadata for a data provider.

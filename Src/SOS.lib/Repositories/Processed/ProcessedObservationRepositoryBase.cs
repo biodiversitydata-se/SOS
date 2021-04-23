@@ -313,6 +313,45 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        /// <inheritdoc /> 
+        public async Task<(DateTime? firstSpotted, DateTime? lastSpotted, GeoBounds geographicCoverage)> GetProviderMetaDataAsync(int providerId)
+        {
+            var res = await ElasticClient.SearchAsync<Observation>(s => s
+                .Index(IndexName)
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.DataProviderId)
+                        .Value(providerId)))
+                .Aggregations(a => a
+                    .Min("firstSpotted", m => m
+                        .Field(f => f.Event.StartDate)
+                    )
+                    .Max("lastSpotted", m => m
+                        .Field(f => f.Event.EndDate)
+                    )
+                    .GeoBounds("geographicCoverage", g => g
+                        .Field(f => f.Location.PointLocation)
+                        .WrapLongitude()
+                    )
+                )
+            );
+
+            var defaultGeoBounds = new GeoBounds
+                {BottomRight = new LatLon() {Lat = 0.0, Lon = 0.0}, TopLeft = new LatLon() {Lat = 0.0, Lon = 0.0}};
+            if (!res.IsValid)
+            {
+                return (null, null, defaultGeoBounds);
+            }
+
+            var firstSpotted = res.Aggregations?.Min("firstSpotted")?.Value;
+            var lastSpotted = res.Aggregations?.Max("lastSpotted")?.Value;
+            var geographicCoverage = res.Aggregations?.GeoBounds("geographicCoverage")?.Bounds;
+
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+
+            return (epoch.AddMilliseconds(firstSpotted ?? 0).ToUniversalTime(), epoch.AddMilliseconds(lastSpotted ?? 0).ToUniversalTime(), geographicCoverage.BottomRight != null ? geographicCoverage : defaultGeoBounds);
+        }
+
         /// <inheritdoc />
         public async Task<long> IndexCount()
         {
