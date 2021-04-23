@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Ionic.Zip;
@@ -20,6 +22,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -29,20 +32,23 @@ namespace SOS.Export.IO.DwcArchive
         private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
         private readonly ISimpleMultimediaCsvWriter _simpleMultimediaCsvWriter;
         private readonly IFileService _fileService;
+        private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
         /// <summary>
-        ///     Constructor.
+        /// Constructor.
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
         /// <param name="simpleMultimediaCsvWriter"></param>
         /// <param name="fileService"></param>
+        /// <param name="dataProviderRepository"></param>
         /// <param name="logger"></param>
         public DwcArchiveFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
             IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
             IFileService fileService,
+            IDataProviderRepository dataProviderRepository,
             ILogger<DwcArchiveFileWriter> logger)
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
@@ -52,6 +58,8 @@ namespace SOS.Export.IO.DwcArchive
                                                       nameof(extendedMeasurementOrFactCsvWriter));
             _simpleMultimediaCsvWriter = simpleMultimediaCsvWriter ?? throw new ArgumentNullException(nameof(simpleMultimediaCsvWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _dataProviderRepository =
+                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -150,10 +158,15 @@ namespace SOS.Export.IO.DwcArchive
                     DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList(), dwcExtensions);
                 }
 
-                // Create eml.xml
-                using (var fileStream = File.Create(emlXmlFilePath))
+                var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
+                if (emlFile == null)
                 {
-                    await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(fileStream, dataProvider);
+                    _logger.LogWarning($"No eml found for provider: {dataProvider.Identifier}");
+                }
+                else
+                {
+                    await using var fileStream = File.Create(emlXmlFilePath);
+                    await emlFile.SaveAsync(fileStream, SaveOptions.None, CancellationToken.None);
                 }
 
                 // Create processinfo.xml
@@ -342,9 +355,17 @@ namespace SOS.Export.IO.DwcArchive
             compressedFileStream.PutNextEntry("meta.xml");
             DwcArchiveMetaFileWriter.CreateMetaXmlFile(compressedFileStream, fieldDescriptions.ToList(), dwcExtensions);
 
-            // Create eml.xml
-            compressedFileStream.PutNextEntry("eml.xml");
-            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(compressedFileStream, dataProvider);
+            var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
+            if (emlFile == null)
+            {
+                _logger.LogWarning($"No eml found for provider: {dataProvider.Identifier}");
+            }
+            else
+            {
+                // Create eml.xml
+                compressedFileStream.PutNextEntry("eml.xml");
+                await emlFile.SaveAsync(compressedFileStream, SaveOptions.None, CancellationToken.None);
+            }
         }
 
         private ICollection<string> GetFilePaths(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string searchPattern)

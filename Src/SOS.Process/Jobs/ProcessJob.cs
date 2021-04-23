@@ -556,15 +556,8 @@ namespace SOS.Process.Jobs
 
                 if (eml == null)
                 {
-                    await using var stream = new MemoryStream();
-                    await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(stream, provider);
-
-                    eml = await stream?.ToXmlAsync();
-
-                    if (eml == null)
-                    {
-                        continue;
-                    }
+                    _logger.LogWarning($"No eml file found for provider: {provider.Identifier}");
+                    continue;
                 }
 
                 // Get public meta data
@@ -606,7 +599,7 @@ namespace SOS.Process.Jobs
                         metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
                     }
                 }
-
+                DwCArchiveEmlFileFactory.UpdateDynamicMetaData(eml, metadata.firstSpotted, metadata.lastSpotted, metadata.geographicCoverage);
                 await _dataProviderCache.StoreEmlAsync(provider.Id, eml);
             }
         }

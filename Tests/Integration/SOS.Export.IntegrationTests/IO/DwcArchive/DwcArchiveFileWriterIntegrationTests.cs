@@ -35,6 +35,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(ProcessClient exportClient)
         {
             var processDbConfiguration = GetProcessDbConfiguration();
+            var processClient = CreateExportClient(processDbConfiguration);
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     CreateVocabularyValueResolver(CreateExportClient(processDbConfiguration)),
@@ -42,6 +43,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             return dwcArchiveFileWriter;
         }

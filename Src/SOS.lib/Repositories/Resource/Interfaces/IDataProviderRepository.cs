@@ -14,7 +14,7 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         /// Clear all Eml files
         /// </summary>
         /// <returns></returns>
-        Task<bool> ClearEml();
+        Task<bool> ClearEmlAsync();
 
         /// <summary>
         /// Get EML

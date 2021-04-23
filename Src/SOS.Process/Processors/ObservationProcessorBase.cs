@@ -188,7 +188,7 @@ namespace SOS.Process.Processors
 
             if (mode == JobRunModes.Full && !protectedObservations)
             {
-                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
+                await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }
             observations.Clear();
 
