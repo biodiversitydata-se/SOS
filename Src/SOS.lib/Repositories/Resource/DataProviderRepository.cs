@@ -44,7 +44,7 @@ namespace SOS.Lib.Repositories.Resource
             return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 
-        public async Task<bool> ClearEml()
+        public async Task<bool> ClearEmlAsync()
         {
             try
             {

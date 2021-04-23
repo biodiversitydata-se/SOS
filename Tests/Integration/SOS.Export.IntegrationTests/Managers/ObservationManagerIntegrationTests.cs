@@ -49,6 +49,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
                 new FileService(),
+                new DataProviderRepository(exportClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
 
             var elasticConfiguration = GetElasticConfiguration();

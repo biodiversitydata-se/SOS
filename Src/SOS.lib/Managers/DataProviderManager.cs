@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.Core.Authentication;
 using Newtonsoft.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Factories;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -19,47 +21,6 @@ namespace SOS.Lib.Managers
     {
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DataProviderManager> _logger;
-
-        /// <summary>
-        /// Add EML data from the ~/Resources/EmlMetadata/ folder.
-        /// </summary>
-        /// <param name="dataProviders"></param>
-        private async Task AddEmlMetadataAsync(IEnumerable<DataProvider> dataProviders)
-        {
-            await _dataProviderRepository.ClearEml();
-
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml\");
-            var filePaths = Directory.GetFiles(emlDirectory, "*.xml");
-            foreach (var filePath in filePaths)
-            {
-                var fileName = Path.GetFileName(filePath);
-                var identifier = fileName.Substring(0, fileName.IndexOf('.'));
-                var dataProvider =
-                    dataProviders.FirstOrDefault(m => m.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
-                if (dataProvider == null)
-                {
-                    continue;
-                }
-
-                var eml = GetEmlDocument(filePath);
-                if (eml == null)
-                {
-                    continue;
-                }
-
-                if (!await _dataProviderRepository.StoreEmlAsync(dataProvider.Id, eml))
-                {
-                    _logger.LogWarning($"Failed to store eml for provider: {dataProvider.Identifier}");
-                }
-            }
-        }
-
-
-        private XDocument GetEmlDocument(string filePath)
-        {
-            return XDocument.Load(filePath);
-        }
 
         private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
             List<DataProvider> allDataProviders)
@@ -97,6 +58,7 @@ namespace SOS.Lib.Managers
             return await _dataProviderRepository.UpdateAsync(id, dataProvider);
         }
 
+        /// <inheritdoc />
         public async Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist)
         {
             var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
@@ -115,15 +77,59 @@ namespace SOS.Lib.Managers
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);
 
-            await AddEmlMetadataAsync(dataProviders);
-
             var returnDescription = collectionExists
                 ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
                 : "DataProvider collection was created and initialized with default data providers.";
             return Result.Success(returnDescription);
         }
 
-       
+        /// <inheritdoc />
+        public async Task<Result<string>> InitDefaultEml()
+        {
+            var message = string.Empty;
+            await _dataProviderRepository.ClearEmlAsync();
+            var providers = await _dataProviderRepository.GetAllAsync();
+
+            if (!providers?.Any() ?? true)
+            {
+                message = "No providers found";
+                _logger.LogWarning(message);
+                return Result.Failure<string>(message);
+            }
+
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml");
+
+            foreach (var provider in providers)
+            {
+                var filePath = Path.Combine(emlDirectory, $"{provider.Identifier}.eml.xml");
+                XDocument emlFile;
+                try
+                {
+                    emlFile = XDocument.Load(filePath);
+                }
+                catch
+                {
+                    emlFile = await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(provider);
+                }
+
+                if (emlFile == null)
+                {
+                    message = $"Failed to initialize default eml for provider: {provider.Identifier}";
+                    _logger.LogWarning(message);
+                    return Result.Failure<string>(message);
+                }
+
+                if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlFile))
+                {
+                    message = $"Failed to store eml for provider: {provider.Identifier}";
+                    _logger.LogWarning(message);
+                    return Result.Failure<string>(message);
+                }
+            }
+
+            return Result.Success("Default eml initialized");
+        }
         public async Task<DataProvider> GetDataProviderByIdAsync(int id)
         {
             var dataProviders = await _dataProviderRepository.GetAllAsync();

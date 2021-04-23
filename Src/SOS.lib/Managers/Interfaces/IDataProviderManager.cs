@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSharpFunctionalExtensions;
-using MongoDB.Bson;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -23,6 +22,13 @@ namespace SOS.Lib.Managers.Interfaces
         /// </param>
         /// <returns></returns>
         Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist);
+
+        /// <summary>
+        /// Reset eml to default
+        /// </summary>
+        /// <returns></returns>
+        Task<Result<string>> InitDefaultEml();
+
 
         Task<List<DataProvider>> GetAllDataProvidersAsync();
         
