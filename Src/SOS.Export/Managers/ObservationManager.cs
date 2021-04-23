@@ -71,7 +71,9 @@ namespace SOS.Export.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<bool> ExportAndSendAsync(SearchFilter filter, string emailAddress,
+        public async Task<bool> ExportAndSendAsync(SearchFilter filter, 
+            string emailAddress,
+            string description,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -81,7 +83,7 @@ namespace SOS.Export.Managers
                 zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
 
                 // zend file to user
-                return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
+                return await _zendToService.SendFile(emailAddress, description, zipFilePath);
             }
             catch (Exception e)
             {
@@ -95,14 +97,21 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
+        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, 
+            string blobStorageContainer, 
+            string fileName,
+            string description,
             IJobCancellationToken cancellationToken)
         {
-            return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, cancellationToken);
+            return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, description, cancellationToken);
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName, string emailAddress,
+        public async Task<bool> ExportAndStoreAsync(SearchFilter filter, 
+            string blobStorageContainer, 
+            string fileName,
+            string emailAddress,
+            string description,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -126,7 +135,7 @@ namespace SOS.Export.Managers
                 if (!string.IsNullOrEmpty(emailAddress))
                 {
                     // Send file to user
-                    tasks.Add(_zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath));
+                    tasks.Add(_zendToService.SendFile(emailAddress, description, zipFilePath));
                 }
 
                 await Task.WhenAll(tasks);
