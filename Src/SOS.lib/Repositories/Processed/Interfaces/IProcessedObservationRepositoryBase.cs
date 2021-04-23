@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Nest;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -69,6 +70,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
+
+        /// <summary>
+        /// Get provider meta data
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<(DateTime? firstSpotted, DateTime? lastSpotted, GeoBounds geographicCoverage)> GetProviderMetaDataAsync(
+            int providerId);
 
         /// <summary>
         /// Count documents in index

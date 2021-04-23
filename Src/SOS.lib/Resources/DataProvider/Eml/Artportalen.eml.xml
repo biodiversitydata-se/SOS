@@ -60,7 +60,12 @@ Artportalen is developed and operated by the Swedish Species Information Centre 
 			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
-			<organizationName>SLU Swedish Species Information Centre</organizationName>
+            <individualName>
+                <givenName>Stephen</givenName>
+                <surName>Coulson</surName>
+            </individualName>
+            <electronicMailAddress>stephen.coulson@slu.se</electronicMailAddress>
+            <organizationName>SLU Swedish Species Information Centre</organizationName>
 			<address>
 				<city>Uppsala</city>
 				<country>SE</country>

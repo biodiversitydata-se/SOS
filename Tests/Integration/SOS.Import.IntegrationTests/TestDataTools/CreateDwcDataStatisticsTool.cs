@@ -58,12 +58,20 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
 
+            var processConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient(
+                processConfiguration.GetMongoDbSettings(),
+                processConfiguration.DatabaseName,
+                processConfiguration.ReadBatchSize,
+                processConfiguration.WriteBatchSize
+                );
             var dwcObservationHarvester = new DwcObservationHarvester(
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
                 new DwcaConfiguration { ImportPath = @"C:\Temp" },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;

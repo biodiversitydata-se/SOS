@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Factories;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Extensions;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class DataProviderManager : IDataProviderManager
     {
-        private readonly ICache<int, DataProvider> _dataProviderCache;
+        private readonly IDataProviderCache _dataProviderCache;
         private readonly ILogger<DataProviderManager> _logger;
         private readonly IProcessInfoManager _processInfoManager;
 
@@ -28,7 +28,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="processInfoManager"></param>
         /// <param name="logger"></param>
         public DataProviderManager(
-            ICache<int, DataProvider> dataProviderCache,
+            IDataProviderCache dataProviderCache,
             IProcessInfoManager processInfoManager,
             ILogger<DataProviderManager> logger)
         {
@@ -78,17 +78,9 @@ namespace SOS.Observations.Api.Managers
 
         public async Task<byte[]> GetEmlFileAsync(int providerId)
         {
-            var provider = await _dataProviderCache.GetAsync(providerId);
+            var eml = await _dataProviderCache.GetEmlAsync(providerId);
 
-            if (provider == null)
-            {
-                return null;
-            }
-
-            await using var stream = new MemoryStream();
-            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(stream, provider);
-
-            return stream.ToArray();
+            return await eml?.ToBytesAsync();
         }
     }
 }

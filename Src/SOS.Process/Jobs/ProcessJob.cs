@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -11,6 +12,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
@@ -43,7 +46,7 @@ namespace SOS.Process.Jobs
     {
         private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
-        private readonly ICache<int, DataProvider> _dataProviderCache;
+        private readonly IDataProviderCache _dataProviderCache;
         private readonly IInstanceManager _instanceManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
@@ -311,6 +314,9 @@ namespace SOS.Process.Jobs
                     // Enable indexing for public and protected index
                     await EnableIndexingAsync();
 
+                    // Update dynamic provider data
+                    await UpdateProvidersMetadataAsync(dataProvidersToProcess);
+
                     _logger.LogInformation($"Start validate indexes");
                     if (!await ValidateIndexesAsync())
                     {
@@ -435,7 +441,6 @@ namespace SOS.Process.Jobs
             }
 
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
-
             return success;
         }
 
@@ -543,8 +548,71 @@ namespace SOS.Process.Jobs
             _logger.LogInformation("Finish updating process info for observations");
         }
 
+        private async Task UpdateProvidersMetadataAsync(IEnumerable<DataProvider> providers)
+        {
+            foreach (var provider in providers.Where(p => p.SupportDynamicEml))
+            {
+                var eml = await _dataProviderCache.GetEmlAsync(provider.Id);
+
+                if (eml == null)
+                {
+                    await using var stream = new MemoryStream();
+                    await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(stream, provider);
+
+                    eml = await stream?.ToXmlAsync();
+
+                    if (eml == null)
+                    {
+                        continue;
+                    }
+                }
+
+                // Get public meta data
+                var metadata = await _processedPublicObservationRepository.GetProviderMetaDataAsync(provider.Id);
+
+                if (provider.SupportProtectedHarvest)
+                {
+                    // Get protected meta data
+                    var protctedMetadata = await _processedProtectedObservationRepository.GetProviderMetaDataAsync(provider.Id);
+
+                    // Copmare public and protected and store peek values
+                    if ((protctedMetadata.firstSpotted ?? metadata.firstSpotted) < metadata.firstSpotted)
+                    {
+                        metadata.firstSpotted = protctedMetadata.firstSpotted;
+                    }
+
+                    if ((protctedMetadata.lastSpotted ?? metadata.lastSpotted) < metadata.lastSpotted)
+                    {
+                        metadata.lastSpotted = protctedMetadata.lastSpotted;
+                    }
+
+                    if (protctedMetadata.geographicCoverage.BottomRight.Lon > metadata.geographicCoverage.BottomRight.Lon)
+                    {
+                        metadata.geographicCoverage.BottomRight.Lon = protctedMetadata.geographicCoverage.BottomRight.Lon;
+                    }
+
+                    if (protctedMetadata.geographicCoverage.BottomRight.Lat < metadata.geographicCoverage.BottomRight.Lat)
+                    {
+                        metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
+                    }
+
+                    if (protctedMetadata.geographicCoverage.TopLeft.Lon < metadata.geographicCoverage.TopLeft.Lon)
+                    {
+                        metadata.geographicCoverage.TopLeft.Lon = protctedMetadata.geographicCoverage.TopLeft.Lon;
+                    }
+
+                    if (protctedMetadata.geographicCoverage.TopLeft.Lat > metadata.geographicCoverage.TopLeft.Lat)
+                    {
+                        metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
+                    }
+                }
+
+                await _dataProviderCache.StoreEmlAsync(provider.Id, eml);
+            }
+        }
+
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processedProtectedObservationRepository"></param>
@@ -586,7 +654,7 @@ namespace SOS.Process.Jobs
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
             IDwcaObservationProcessor dwcaObservationProcessor,
             ICache<int, Taxon> taxonCache,
-            ICache<int, DataProvider> dataProviderCache,
+            IDataProviderCache dataProviderCache,
             IInstanceManager instanceManager,
             IValidationManager validationManager,
             IProcessTaxaJob processTaxaJob,

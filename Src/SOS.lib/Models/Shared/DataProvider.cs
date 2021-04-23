@@ -16,11 +16,6 @@ namespace SOS.Lib.Models.Shared
     public class DataProvider : IEntity<int>, IIdIdentifierTuple
     {
         /// <summary>
-        /// Coordinates of the boundig box
-        /// </summary>
-        public BoundingBox BoundingBox { get; set; }
-
-        /// <summary>
         ///     Contact person.
         /// </summary>
         public ContactPerson ContactPerson { get; set; }
@@ -44,17 +39,6 @@ namespace SOS.Lib.Models.Shared
         ///    URL to data provider EML file
         /// </summary>
         public string DownloadUrlEml { get; set; }
-
-        /// <summary>
-        /// Time stamp when last observation was made
-        /// </summary>
-        public DateTime? EndDate { get; set; }
-
-        /// <summary>
-        /// EML metadata.
-        /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
-        public BsonDocument EmlMetadata { get; set; }
 
         /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
@@ -93,24 +77,9 @@ namespace SOS.Lib.Models.Shared
         public bool IsActive { get; set; }
 
         /// <summary>
-        /// The language in which the data for the resource are written. This can be a well-known language name, or one of the ISO language codes to be more precise.
-        /// </summary>
-        public string Language { get; set; }
-
-        /// <summary>
         /// Hash of latest uploaded file
         /// </summary>
         public string LatestUploadedFileHash { get; set; }
-
-        /// <summary>
-        /// The licence that applies to the resource, of a well-known license type: a CC0, CC-BY, or similar license for both the data and metadata.
-        /// </summary>
-        public string LicenseName { get; set; }
-
-        /// <summary>
-        /// Meta data language
-        /// </summary>
-        public string MetadataLanguage { get; set; }
 
         /// <summary>
         ///     The names of the data provider 
@@ -128,19 +97,14 @@ namespace SOS.Lib.Models.Shared
         public IEnumerable<DataProviderPath> Paths { get; set; }
 
         /// <summary>
-        /// Type of resource: occurrence data (list of occurrences, sampling-event data (occurrence data linked to data describing the sampling events, typically data from structured surveys).
-        /// </summary>
-        public string ResourceType { get; set; }
-
-        /// <summary>
         /// Time stamp according to data source, used to see if data set has changed
         /// </summary>
         public DateTime? SourceDate { get; set; }
 
         /// <summary>
-        /// Time stamp when first observation was made
+        /// Support dynamic update of eml meta data
         /// </summary>
-        public DateTime? StartDate { get; set; }
+        public bool SupportDynamicEml { get; set; }
 
         /// <summary>
         /// True if provider support incremental harvest
@@ -151,11 +115,6 @@ namespace SOS.Lib.Models.Shared
         /// True if provider support protected observation harvest
         /// </summary>
         public bool SupportProtectedHarvest { get; set; }
-
-        /// <summary>
-        /// Range of taxa covered by the resource. Example: Mammalia (for class Mammalia: all mammals)
-        /// </summary>
-        public string TaxonomicCoverage { get; set; }
 
         /// <summary>
         ///     The harvest data format.

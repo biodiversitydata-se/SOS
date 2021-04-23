@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.HealthChecks
     public class SearchHealthCheck : IHealthCheck
     {
         private readonly IObservationManager _observationManager;
-        private readonly ICache<int, DataProvider> _dataProviderCache;
+        private readonly IDataProviderCache _dataProviderCache;
 
         /// <summary>
         /// Search for otters
@@ -98,7 +98,7 @@ namespace SOS.Observations.Api.HealthChecks
         /// <param name="observationManager"></param>
         /// <param name="dataProviderCache"></param>
         public SearchHealthCheck(IObservationManager observationManager,
-            ICache<int, DataProvider> dataProviderCache)
+            IDataProviderCache dataProviderCache)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));

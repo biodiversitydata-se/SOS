@@ -16,6 +16,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -30,6 +31,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcArchiveVerbatimRepository;
         private readonly IFileDownloadService _fileDownloadService;
+        private readonly IDataProviderRepository _dataProviderRepository;
         private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
@@ -59,6 +61,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="dwcArchiveEventRepository"></param>
         /// <param name="dwcArchiveReader"></param>
         /// <param name="fileDownloadService"></param>
+        /// <param name="dataProviderRepository"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
         public DwcObservationHarvester(
@@ -66,6 +69,7 @@ namespace SOS.Import.Harvesters.Observations
             IDarwinCoreArchiveEventRepository dwcArchiveEventRepository,
             IDwcArchiveReader dwcArchiveReader,
             IFileDownloadService fileDownloadService,
+            IDataProviderRepository dataProviderRepository,
             DwcaConfiguration dwcaConfiguration,
             ILogger<DwcObservationHarvester> logger)
         {
@@ -75,6 +79,8 @@ namespace SOS.Import.Harvesters.Observations
                                          throw new ArgumentNullException(nameof(dwcArchiveEventRepository));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _fileDownloadService = fileDownloadService ?? throw new ArgumentNullException(nameof(fileDownloadService));
+            _dataProviderRepository =
+                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -304,13 +310,9 @@ namespace SOS.Import.Harvesters.Observations
 
             if (harvestInfo.Status == RunStatus.Success && emlDocument != null)
             {
-                try
+                if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlDocument))
                 {
-                    provider.EmlMetadata = DataProviderManager.GetEmlMetadata(emlDocument);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, $"Error setting eml for {provider.Identifier}");
+                    _logger.LogWarning( $"Error updating EML for {provider.Identifier}");
                 }
             }
 
