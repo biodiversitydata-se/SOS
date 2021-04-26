@@ -101,7 +101,7 @@ namespace SOS.Observations.Api.Controllers
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
 
-            if (handleInfinityTake && take == 0)
+            if (handleInfinityTake && take == -1)
             {
                 return Result.Success();
             }
