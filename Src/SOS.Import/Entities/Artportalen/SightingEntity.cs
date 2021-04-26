@@ -126,6 +126,10 @@ namespace SOS.Import.Entities.Artportalen
         ///     Note of Interest
         /// </summary>
         public bool NoteOfInterest { get; set; }
+        /// <summary>
+        ///     HasUserComments
+        /// </summary>
+        public bool HasUserComments { get; internal set; }
 
         /// <summary>
         ///     Not present flag
@@ -285,5 +289,6 @@ namespace SOS.Import.Entities.Artportalen
         public string SightingPublishTypeIds { get; set; }
 
         public string SpeciesFactsIds { get; set; }
+
     }
 }

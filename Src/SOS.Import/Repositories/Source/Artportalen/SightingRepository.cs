@@ -86,7 +86,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
 						WHEN p.Id IS NULL THEN null
 						ELSE p.FirstName + ' ' + p.LastName 
 					END AS RightsHolder,
-	                si.SiteId,
+                    si.SiteId,
+                    CASE 
+                        WHEN (SELECT TOP 1 Id FROM  SightingComment sic WHERE s.SightingId = sic.SightingId ) IS NULL THEN 0 
+                        ELSE 1 
+                    END AS HasUserComments,
 	                s.StageId,
 	                s.StartDate,
 	                s.StartTime,
@@ -121,6 +125,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
+                    
 	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
