@@ -43,7 +43,8 @@ namespace SOS.Import.Managers
                 {DataProviderType.SersObservations, sersDataValidationReportFactory},
                 {DataProviderType.NorsObservations, norsDataValidationReportFactory},
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory},
-                {DataProviderType.DwcA, dwcaDataValidationReportFactory}
+                {DataProviderType.DwcA, dwcaDataValidationReportFactory},
+                {DataProviderType.iNaturalistObservations, dwcaDataValidationReportFactory}
             };
         }
 
