@@ -29,6 +29,7 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpGet("{jobId}/Status")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult GetStatus([FromRoute] string jobId)
         {
@@ -36,6 +37,11 @@ namespace SOS.Observations.Api.Controllers
             {
                 var connection = JobStorage.Current.GetConnection();
                 var jobData = connection.GetJobData(jobId);
+
+                if (jobData == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
 
                 return new OkObjectResult(jobData.State);
             }

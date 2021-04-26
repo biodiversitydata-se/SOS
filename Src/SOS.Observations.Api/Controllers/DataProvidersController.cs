@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -40,12 +41,19 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpGet]
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "en-GB")
         {
             try
             {
                 var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode);
+
+                if (!dataProviders?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 return Ok(dataProviders);
             }
             catch (Exception e)
@@ -57,12 +65,18 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc/>
         [HttpGet("{providerId}/LastModified")]
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetLastModifiedDateById([FromRoute] int providerId)
         {
             try
             {
-                return new OkObjectResult(await _observationManager.GetLatestModifiedDateForProviderAsync(providerId));
+                var modifiedDate = await _observationManager.GetLatestModifiedDateForProviderAsync(providerId);
+                if (modifiedDate == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+                return new OkObjectResult(modifiedDate);
             }
             catch (Exception e)
             {
@@ -74,12 +88,18 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc/>
         [HttpGet("{providerId}/EML")]
         [ProducesResponseType(typeof(IEnumerable<DateTime>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetEML([FromRoute] int providerId)
         {
             try
             {
                 var fileData = await _dataProviderManager.GetEmlFileAsync(providerId);
+
+                if (!fileData?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
                 return File(fileData, "application/xml", $"Provider-{providerId}.xml");
             }
             catch (Exception e)
