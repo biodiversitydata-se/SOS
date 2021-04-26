@@ -68,18 +68,19 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
-        /// Initialize the MongoDB DataProvider eml collection with default eml files.
+        ///  Initialize the MongoDB DataProvider eml collection with default eml files for passed providers (No id's passed = all)
         /// </summary>
+        /// <param name="datproviderIds"></param>
         /// <returns></returns>
         [HttpPost("ImportDefaultEml")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> ImportDefaultEmlAsync()
+        public async Task<IActionResult> ImportDefaultEmlAsync([FromBody] IEnumerable<int> datproviderIds)
         {
             try
             {
-                var result = await _dataProviderManager.InitDefaultEml();
+                var result = await _dataProviderManager.InitDefaultEml(datproviderIds);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);
             }

@@ -84,11 +84,16 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<string>> InitDefaultEml()
+        public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
         {
             var message = string.Empty;
             await _dataProviderRepository.ClearEmlAsync();
             var providers = await _dataProviderRepository.GetAllAsync();
+
+            if (datproviderIds?.Any() ?? false)
+            {
+                providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
+            }
 
             if (!providers?.Any() ?? true)
             {

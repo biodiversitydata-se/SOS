@@ -42,12 +42,19 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("Projects")]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetProjects()
         {
             try
             {
                 var projects = await _vocabularyManager.GetProjectsAsync();
+
+                if (!projects?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 var dtos = projects.ToProjectDtos();
                 return new OkObjectResult(dtos);
             }
@@ -64,12 +71,19 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("")]
         [ProducesResponseType(typeof(IEnumerable<VocabularyDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabularies()
         {
             try
             {
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
+
+                if (!vocabularies?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 var dtos = vocabularies.ToVocabularyDtos();
                 return new OkObjectResult(dtos);
             }
@@ -86,6 +100,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("ZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabulariesAsZipFile()
         {
@@ -93,6 +108,11 @@ namespace SOS.Observations.Api.Controllers
             {
                 var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
                 var zipBytes = await _vocabularyManager.GetVocabulariesZipFileAsync(vocabularyIds);
+                if (!zipBytes?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 return File(zipBytes, "application/zip", "Vocabularies.zip");
             }
             catch (Exception e)
@@ -109,6 +129,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("{vocabularyId}")]
         [ProducesResponseType(typeof(VocabularyDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetVocabularyById(
             [FromRoute] VocabularyIdDto vocabularyId)
@@ -116,7 +137,13 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
-                var vocabulary = vocabularies.Single(f => f.Id == (VocabularyId)vocabularyId);
+                var vocabulary = vocabularies.FirstOrDefault(f => f.Id == (VocabularyId)vocabularyId);
+
+                if (vocabulary == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 var dto = vocabulary.ToVocabularyDto();
                 return new OkObjectResult(dto);
             }

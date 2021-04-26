@@ -366,7 +366,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
+        public async Task<DateTime?> GetLatestModifiedDateForProviderAsync(int providerId)
         {
             var indexNames = GetCurrentIndex(null);
           
@@ -384,6 +384,11 @@ namespace SOS.Observations.Api.Repositories
                         )
                     )
                 );
+
+                if (!res.IsValid || (res.Aggregations?.Max("latestModified")?.Value ?? 0) == 0)
+                {
+                    return null;
+                }
 
                 var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0).ToUniversalTime();

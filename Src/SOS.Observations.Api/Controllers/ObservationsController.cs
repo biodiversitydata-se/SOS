@@ -626,12 +626,21 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("{occurrenceId}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationById([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                return new OkObjectResult(await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations, includeInternalFields: false));
+                var observation = await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations,
+                    includeInternalFields: false);
+
+                if (observation == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1188,13 +1197,21 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         [HttpGet("Internal/{occurrenceId}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetObservationByIdInternal([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                return new OkObjectResult(await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations, includeInternalFields:true));
+                var observation = await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations,
+                    includeInternalFields: true);
+                if (observation == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
             {

@@ -198,7 +198,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
+        public async Task<DateTime?> GetLatestModifiedDateForProviderAsync(int providerId)
         {
             return await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(providerId);
         }
