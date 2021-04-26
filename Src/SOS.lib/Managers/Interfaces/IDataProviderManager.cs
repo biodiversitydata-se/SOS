@@ -26,8 +26,9 @@ namespace SOS.Lib.Managers.Interfaces
         /// <summary>
         /// Reset eml to default
         /// </summary>
+        /// <param name="datproviderIds"></param>
         /// <returns></returns>
-        Task<Result<string>> InitDefaultEml();
+        Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds);
 
 
         Task<List<DataProvider>> GetAllDataProvidersAsync();
