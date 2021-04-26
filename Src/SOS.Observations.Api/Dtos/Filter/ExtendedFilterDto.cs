@@ -44,6 +44,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         public bool OnlyWithNotes { get; set; }
 
         public bool OnlyWithNotesOfInterest { get; set; }
+        /// <summary>
+        /// Only include hits that have user comments on them
+        /// </summary>
+        public bool OnlyWithUserComments { get; set; } = false;
 
         public bool OnlyWithBarcode { get; set; }
 
@@ -98,5 +102,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<int> SiteIds { get; set; }
 
         public List<int> SpeciesFactsIds { get; set; }
+
     }
 }

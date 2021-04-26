@@ -97,6 +97,7 @@ namespace SOS.Import.Factories.Harvest
                 MinDepth = entity.MinDepth,
                 MinHeight = entity.MinHeight,
                 NoteOfInterest = entity.NoteOfInterest,
+                HasUserComments = entity.HasUserComments,
                 NotPresent = entity.NotPresent,
                 NotRecovered = entity.NotRecovered,
                 ProtectedBySystem = entity.ProtectedBySystem,

@@ -244,6 +244,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
                 obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
                 obs.ArtportalenInternal.NoteOfInterest = verbatimObservation.NoteOfInterest;
+                obs.ArtportalenInternal.HasUserComments = verbatimObservation.HasUserComments;
                 obs.ArtportalenInternal.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
                 obs.ArtportalenInternal.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
                 obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;

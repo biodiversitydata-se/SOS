@@ -132,6 +132,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public bool NoteOfInterest { get; set; }
 
         /// <summary>
+        ///    HasUserComments
+        /// </summary>
+        public bool HasUserComments { get; set; }
+
+        /// <summary>
         ///     Not present flag
         /// </summary>
         public bool NotPresent { get; set; }

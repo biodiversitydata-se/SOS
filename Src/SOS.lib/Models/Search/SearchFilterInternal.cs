@@ -53,6 +53,8 @@ namespace SOS.Lib.Models.Search
         public bool OnlyWithNotes { get; set; }
 
         public bool OnlyWithNotesOfInterest { get; set; }
+        public bool OnlyWithUserComments { get; set; }
+
 
         public bool OnlyWithBarcode { get; set; }
 
