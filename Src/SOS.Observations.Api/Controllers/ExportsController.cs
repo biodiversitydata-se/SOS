@@ -51,12 +51,18 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpGet("Datasets")]
         [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDatasetsList()
         {
             try
             {
                 var files = await _blobStorageManager.GetExportFilesAsync();
+
+                if (!files?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
 
                 return new OkObjectResult(files);
             }
