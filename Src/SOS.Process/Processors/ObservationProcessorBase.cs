@@ -20,11 +20,21 @@ namespace SOS.Process.Processors
 {
     public abstract class ObservationProcessorBase<TEntity>
     {
+        /// <summary>
+        /// Commit batch
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="protectedData"></param>
+        /// <param name="processedObservations"></param>
+        /// <param name="batchId"></param>
+        /// <param name="attempt"></param>
+        /// <returns></returns>
         private async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
             bool protectedData,
             ICollection<Observation> processedObservations,
-            string batchId)
+            string batchId,
+            byte attempt = 1)
         {
             try
             {
@@ -46,8 +56,16 @@ namespace SOS.Process.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to commit batch for {dataProvider}");
-                return 0;
+                if (attempt < 3)
+                {
+                    Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
+                    System.Threading.Thread.Sleep(attempt * 200);
+                    attempt++;
+                    return await CommitBatchAsync(dataProvider, protectedData, processedObservations, batchId, attempt);
+                }
+
+                Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}");
+                throw;
             }
 
         }
