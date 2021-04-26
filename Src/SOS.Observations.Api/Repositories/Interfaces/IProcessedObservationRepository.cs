@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// </summary>
         /// <param name="providerId"></param>
         /// <returns></returns>
-        Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
+        Task<DateTime?> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
         /// Get number of matches for query
