@@ -509,17 +509,24 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
             if (!string.IsNullOrEmpty(taxonId))
             {
-                if (taxonId.StartsWith("urn:lsid:dyntaxa"))
+               
+                var parsedTaxonId = -1;
+                if (!int.TryParse(taxonId, out parsedTaxonId))
                 {
-                    Lib.Models.Processed.Observation.Taxon taxon = null;
-                    string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
-                    //string firstInteger = Regex.Match(taxonId, @"\d+").Value;
-                    if (int.TryParse(lastInteger, out int parsedTaxonId))
+                    if (taxonId.StartsWith("urn:lsid:dyntaxa"))
                     {
-                        _taxonByTaxonId.TryGetValue(parsedTaxonId, out taxon);
-                    }
+                        var lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
+                        if(!int.TryParse(lastInteger, out parsedTaxonId))
+                        {
+                            parsedTaxonId = -1;
+                        }
 
-                    if (taxon != null) return taxon;
+                    }
+                }
+
+                if (parsedTaxonId != -1 &&_taxonByTaxonId.TryGetValue(parsedTaxonId, out var taxon))
+                {
+                    return taxon;
                 }
             }
 
