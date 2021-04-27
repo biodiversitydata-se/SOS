@@ -9,15 +9,34 @@ namespace SOS.Lib.Jobs.Import
     public interface IObservationsHarvestJob
     {
         /// <summary>
-        ///     Harvest multiple sources and start processing when done
+        ///     Full harvest of multiple sources, start processing when done
         /// </summary>
-        /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Harvest Observations [Mode={0}]")]
-        Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
+        [DisplayName("Full Harvest Observations")]
+        Task<bool> RunFullAsync(IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Incremental harvest of multiple sources, start processing when done
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [DisableConcurrentExecution(45)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [DisplayName("Incremental Harvest Observations, active instance")]
+        Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        ///     Incremental harvest of multiple sources, start processing when done
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [DisableConcurrentExecution(45)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [DisplayName("Incremental Harvest Observations, inactive instance")]
+        Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
         ///     Harvest multiple sources and start processing when done

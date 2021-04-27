@@ -45,7 +45,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
-                    job => job.RunAsync(JobRunModes.Full, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    job => job.RunFullAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Observations harvest and process job added");
             }
             catch (Exception e)
@@ -63,7 +63,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.Full, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunFullAsync(JobCancellationToken.Null));
                 return new OkObjectResult("Observations harvest and process job was enqueued to Hangfire.");
             }
             catch (Exception e)
@@ -133,9 +133,8 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(
-                  JobRunModes.IncrementalActiveInstance,
-                        JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalActiveAsync(
+                  JobCancellationToken.Null));
 
                 
 
@@ -164,8 +163,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
-                    $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunAsync(JobRunModes.IncrementalActiveInstance,
-                        JobCancellationToken.Null),
+                    $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunIncrementalActiveAsync(JobCancellationToken.Null),
                     $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
 
                 return new OkObjectResult("Incremental observation Harvest and process job scheduled");
