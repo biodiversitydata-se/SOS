@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -12,7 +11,6 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Jobs.Import;
@@ -338,8 +336,7 @@ namespace SOS.Process.Jobs
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
 
-                            var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.IncrementalInactiveInstance,
-                                cancellationToken));
+                            var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
                         }

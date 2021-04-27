@@ -31,6 +31,32 @@ namespace SOS.Import.Jobs
         private readonly IProjectHarvester _projectHarvester;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
+        private  async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        {
+            var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
+                dp.IsActive
+            ).ToArray();
+
+            var harvestInfos = await _harvestInfoRepository.GetAllAsync();
+
+            var harvestProviders = activeProviders.Where(p =>
+                p.IsReadyToHarvest(harvestInfos.FirstOrDefault(hi =>
+                    hi.Id == p.Identifier && hi.Status == RunStatus.Success)?.End
+                ) &&
+                p.IncludeInScheduledHarvest &&
+                (
+                    mode.Equals(JobRunModes.Full) ||
+                    p.SupportIncrementalHarvest
+                )
+            );
+
+            return await RunAsync(mode,
+                harvestProviders,
+                activeProviders,
+                true,
+                cancellationToken);
+        }
+
         /// <summary>
         /// Run harvest and start processing on success if requested
         /// </summary>
@@ -278,31 +304,22 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest Observations [Mode={0}]")]
-        public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
+        [DisplayName("Full Observations Harvest")]
+        public async Task<bool> RunFullAsync(IJobCancellationToken cancellationToken)
         {
-            var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
-                dp.IsActive 
-            ).ToArray();
+            return await RunAsync(JobRunModes.Full, cancellationToken);
+        }
 
-            var harvestInfos = await _harvestInfoRepository.GetAllAsync();
-            
-            var harvestProviders = activeProviders.Where(p => 
-                p.IsReadyToHarvest(harvestInfos.FirstOrDefault(hi => 
-                    hi.Id == p.Identifier && hi.Status == RunStatus.Success)?.End
-                ) &&
-                p.IncludeInScheduledHarvest &&
-                (
-                      mode.Equals(JobRunModes.Full) ||
-                      p.SupportIncrementalHarvest
-                )
-            );
-            
-            return await RunAsync(mode,
-                harvestProviders, 
-                activeProviders, 
-                true, 
-                cancellationToken);
+        [DisplayName("Incremental Harvest Observations, active instance")]
+        public async Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken)
+        {
+            return await RunAsync(JobRunModes.IncrementalActiveInstance, cancellationToken);
+        }
+
+        [DisplayName("Incremental Harvest Observations, active instance")]
+        public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
+        {
+            return await RunAsync(JobRunModes.IncrementalInactiveInstance, cancellationToken);
         }
 
         /// <inheritdoc />
