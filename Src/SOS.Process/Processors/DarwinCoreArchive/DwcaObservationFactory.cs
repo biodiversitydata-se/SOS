@@ -35,7 +35,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
 
         private readonly List<string> errors = new List<string>();
@@ -52,15 +54,19 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonBySynonymNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
+                _taxonByScientificNameAuthor.Add(processedTaxon.ScientificName.ToLower() + " " + processedTaxon.ScientificNameAuthorship.ToLower(), processedTaxon);
                 if (processedTaxon.Attributes?.Synonyms != null)
                 {
                     foreach (var synonyme in processedTaxon.Attributes.Synonyms)
                     {
                         _taxonBySynonymName.Add(synonyme.Name.ToLower(), processedTaxon);
+                        _taxonBySynonymNameAuthor.Add(synonyme.Name.ToLower() + " " + synonyme.Author.ToLower(), processedTaxon);
                     }
                 }
             }
@@ -498,44 +504,81 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             string taxonRank,
             string species)
         {
-            Lib.Models.Processed.Observation.Taxon taxon = null;
-
+            List<Lib.Models.Processed.Observation.Taxon> result;
+            
+            // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
             if (!string.IsNullOrEmpty(taxonId))
             {
-                string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
-                //string firstInteger = Regex.Match(taxonId, @"\d+").Value;
-                if (int.TryParse(lastInteger, out int parsedTaxonId))
+                if (taxonId.StartsWith("urn:lsid:dyntaxa"))
                 {
-                    _taxonByTaxonId.TryGetValue(parsedTaxonId, out taxon);
+                    Lib.Models.Processed.Observation.Taxon taxon = null;
+                    string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
+                    //string firstInteger = Regex.Match(taxonId, @"\d+").Value;
+                    if (int.TryParse(lastInteger, out int parsedTaxonId))
+                    {
+                        _taxonByTaxonId.TryGetValue(parsedTaxonId, out taxon);
+                    }
+
+                    if (taxon != null) return taxon;
                 }
-                
-                if (taxon != null) return taxon;
             }
 
-            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out var result))
+            // Get by scientific name
+            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out result))
             {
                 if (result.Count == 1)
                 {
-                    taxon = result.First();
+                    return result.First();
                 }
             }
 
-            if (_taxonByScientificName.TryGetValues(species?.ToLower(), out var speciesResult))
+            // Get by scientific name + author
+            if (_taxonByScientificNameAuthor.TryGetValues(scientificName?.ToLower(), out result))
             {
-                if (speciesResult.Count == 1)
+                if (result.Count == 1)
                 {
-                    taxon = speciesResult.First();
+                    return result.First();
                 }
             }
 
-            if (_taxonBySynonymName.TryGetValues(scientificName?.ToLower(), out var synonymeResult))
+            // Get by species
+            if (_taxonByScientificName.TryGetValues(species?.ToLower(), out result))
             {
-                if (synonymeResult.Count == 1)
+                if (result.Count == 1)
                 {
-                    taxon = synonymeResult.First();
+                    return result.First();
                 }
             }
-            return taxon;
+
+            // Get by synonyme
+            if (_taxonBySynonymName.TryGetValues(scientificName?.ToLower(), out result))
+            {
+                if (result.Count == 1)
+                {
+                    return result.First();
+                }
+            }
+
+            // Get by synonyme + author
+            if (_taxonBySynonymNameAuthor.TryGetValues(scientificName?.ToLower(), out result))
+            {
+                if (result.Count == 1)
+                {
+                    return result.First();
+                }
+            }
+
+            // Get by species (synonyme)
+            if (_taxonBySynonymName.TryGetValues(species?.ToLower(), out result))
+            {
+                if (result.Count == 1)
+                {
+                    return result.First();
+                }
+            }
+
+            // If not match, return null.
+            return null;
         }
 
         private VocabularyValue GetSosId(string val,
