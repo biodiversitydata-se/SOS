@@ -214,29 +214,70 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
             {
+                var selector = "";
+                if (internalFilter.StartDate.Value.Month == internalFilter.EndDate.Value.Month) 
+                {
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay && endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay)";
+                    }
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                    {
+                        selector = "(endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay) || (endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                }
+                else
+                {
+                    if(filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate) 
+                    {
+                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay) ||
+                                     (endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                    {
+                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay)";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                    {
+                        selector = @"(endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    {
+                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay) &&
+                                     (endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                }
                 query.AddScript($@"
-                    int startYear = doc['event.startDate'].value.getYear();
-                    int startMonth = doc['event.startDate'].value.getMonthValue();
-                    int startDay = doc['event.startDate'].value.getDayOfMonth();
+                            int startMonth = doc['event.startDate'].value.getMonthValue();
+                            int startDay = doc['event.startDate'].value.getDayOfMonth();
 
-                    int fromMonth = {internalFilter.StartDate.Value.Month};
-                    int fromDay = {internalFilter.StartDate.Value.Day};
-                    int toMonth = {internalFilter.EndDate.Value.Month};
-                    int toDay = {internalFilter.EndDate.Value.Day};
+                            int endMonth = doc['event.endDate'].value.getMonthValue();
+                            int endDay = doc['event.endDate'].value.getDayOfMonth();
 
-                    if(
-                        (startMonth == fromMonth && startDay >= fromDay)
-                        || (startMonth > fromMonth && startMonth < toMonth)
-                        || (startMonth == toMonth && startDay <= toDay)
-                    )
-                    {{ 
-                        return true;
-                    }} 
-                    else 
-                    {{
-                        return false;
-                    }}
-                ");
+                            int fromMonth = {internalFilter.StartDate.Value.Month};
+                            int fromDay = {internalFilter.StartDate.Value.Day};
+                            int toMonth = {internalFilter.EndDate.Value.Month};
+                            int toDay = {internalFilter.EndDate.Value.Day};
+
+                            if(
+                               {selector}
+                            )
+                            {{ 
+                                return true;
+                            }} 
+                            else 
+                            {{
+                                return false;
+                            }}
+                        ");
             }
         }
 
