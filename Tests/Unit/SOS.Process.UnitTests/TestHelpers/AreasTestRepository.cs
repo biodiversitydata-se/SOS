@@ -67,7 +67,7 @@ namespace SOS.Process.UnitTests.TestHelpers
         {
             return new AreaWithGeometry(areaType, feature.Attributes["nativeId"].ToString())
             {
-                Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoShape(),
+                Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84),
                 Name = feature.Attributes["name"].ToString()
             };
         }

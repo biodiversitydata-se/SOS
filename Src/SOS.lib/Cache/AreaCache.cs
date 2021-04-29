@@ -87,7 +87,7 @@ namespace SOS.Lib.Cache
                 return geometry;
             }
 
-            geometry = await _areaRepository.GetGeometryAsync(areaType, featureId);
+            geometry = (await _areaRepository.GetGeometryAsync(areaType, featureId))?.ToGeoShape();
 
             if (geometry != null)
             {

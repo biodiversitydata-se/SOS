@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
-    public class DwcObservationVerbatim : IEntity<ObjectId>
+    public class DwcObservationVerbatim : IEntity<int>
     {
         /// <summary>
         ///     The Record Id used in the DwC-A CSV file.
@@ -83,7 +82,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// <summary>
         ///     MongoDb Id. // todo - should we use Id, RecordId or occurrenceID as Id field?
         /// </summary>
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
 
         #region RecordLevel
 

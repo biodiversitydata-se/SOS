@@ -73,8 +73,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(true))
                 .Returns(Task.FromResult(false));
+            var verbatimClient = new Mock<VerbatimClient>();
+           
             var dwcaVerbatimRepository = new Mock<DarwinCoreArchiveVerbatimRepository>();
-            dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync(It.IsAny<int>(), It.IsAny<string>()))
+            dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
@@ -108,7 +110,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return new DwcaObservationProcessor(
-                dwcaVerbatimRepository.Object,
+                verbatimClient.Object,
                 processedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),

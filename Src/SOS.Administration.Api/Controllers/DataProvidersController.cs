@@ -104,13 +104,21 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var dataProvider =
-                    await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
-                if (dataProvider == null)
+                int.TryParse(model.DataProviderIdOrIdentifier, out var providerId);
+
+                if (providerId != -1)
                 {
-                    return new BadRequestObjectResult(
-                        $"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
+                    var dataProvider =
+                        await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
+                    if (dataProvider == null)
+                    {
+                        return new BadRequestObjectResult(
+                            $"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
+                    }
+
+                    providerId = dataProvider.Id;
                 }
+               
 
                 if (model.File == null || model.File.Length == 0)
                 {
@@ -137,13 +145,13 @@ namespace SOS.Administration.Api.Controllers
                         $"The file doesn't seem to be an EML XML file. The root should be eml, but is {xmlDocument.Root.Name.LocalName}");
                 }
 
-                var res = await _dataProviderManager.SetEmlMetadataAsync(dataProvider.Id, xmlDocument);
+                var res = await _dataProviderManager.SetEmlMetadataAsync(providerId, xmlDocument);
                 if (res == false)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
                 }
 
-                return Ok($"Ok. The EML was updated for {dataProvider}");
+                return Ok($"Ok. The EML was updated for provider id: {providerId}");
             }
             catch (Exception e)
             {

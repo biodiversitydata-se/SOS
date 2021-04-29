@@ -20,11 +20,10 @@ namespace SOS.Lib.Repositories.Verbatim
         /// Constructor
         /// </summary>
         /// <param name="importClient"></param>
-        /// <param name="tempMode"></param>
         /// <param name="logger"></param>
         protected VerbatimRepositoryBase(
             IVerbatimClient importClient,
-            ILogger<VerbatimRepositoryBase<TEntity, TKey>> logger) : base(importClient, logger)
+            ILogger logger) : base(importClient, logger)
         {
         }
 

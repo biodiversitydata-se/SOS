@@ -18,18 +18,6 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        ///     Harvest multiple DwC-A files.
-        /// </summary>
-        /// <param name="filePaths"></param>
-        /// <param name="emptyCollectionsBeforeHarvest"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<HarvestInfo> HarvestMultipleDwcaFilesAsync(
-            string[] filePaths,
-            bool emptyCollectionsBeforeHarvest,
-            IJobCancellationToken cancellationToken);
-
-        /// <summary>
         /// Get EML XML document.
         /// </summary>
         /// <param name="archivePath"></param>

@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Interfaces;
 
@@ -28,15 +28,129 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor>,
         IDwcaObservationProcessor
     {
+        private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
-        private readonly IDarwinCoreArchiveVerbatimRepository _dwcaVerbatimRepository;
-        private readonly ProcessConfiguration _processConfiguration;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly SemaphoreSlim _semaphoreBatch;
+
+        private async Task<int> ProcessBatchAsync(
+            DataProvider dataProvider,
+            int startId,
+            int endId,
+            IDarwinCoreArchiveVerbatimRepository dwcaVerbatimRepository, 
+            DwcaObservationFactory observationFactory,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                var verbatimObservationsBatch = await dwcaVerbatimRepository.GetBatchAsync(startId, endId);
+                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+
+                if (!verbatimObservationsBatch?.Any() ?? true)
+                {
+                    return 0;
+                }
+
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+
+                var observations = new List<Observation>();
+
+                foreach (var verbatimObservation in verbatimObservationsBatch)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                    
+                    if (processedObservation == null)
+                    {
+                        continue;
+                    }
+
+                    processedObservation.DataProviderId = dataProvider.Id;
+                    _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+                    observations.Add(processedObservation);
+                }
+
+                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+
+                return await ValidateAndStoreObservations(dataProvider, JobRunModes.Full, false, observations, $"{startId}-{endId}");
+            }
+            catch (JobAbortedException e)
+            {
+                // Throw cancelation again to let function above handle it
+                throw;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Process {dataProvider.Identifier} sightings from id: {startId} to id: {endId} failed");
+                throw;
+            }
+            finally
+            {
+                _semaphoreBatch.Release();
+            }
+        }
+
+        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
+            DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
+            try
+            {
+                using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                        dataProvider,
+                        _verbatimClient,
+                        Logger);
+
+                var observationFactory = await DwcaObservationFactory.CreateAsync(
+                    dataProvider,
+                    taxa,
+                    _processedVocabularyRepository,
+                    _areaHelper);
+
+                var minId = 1;
+                var maxId = await dwcArchiveVerbatimRepository.GetMaxIdAsync();
+                var processBatchTasks = new List<Task<int>>();
+
+                while (minId <= maxId)
+                {
+                    await _semaphoreBatch.WaitAsync();
+
+                    var batchEndId = minId + WriteBatchSize - 1;
+                    processBatchTasks.Add(ProcessBatchAsync(dataProvider, 
+                        minId, 
+                        batchEndId,
+                        dwcArchiveVerbatimRepository,
+                        observationFactory,
+                        cancellationToken));
+                    minId = batchEndId + 1;
+                }
+
+                await Task.WhenAll(processBatchTasks);
+
+                return (processBatchTasks.Sum(t => t.Result), 0);
+            }
+            catch (JobAbortedException)
+            {
+                Logger.LogInformation($"{dataProvider} observation processing was canceled.");
+                return (0, 0);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to process {dataProvider} sightings");
+                return (0, 0);
+            }
+        }
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
-        /// <param name="dwcaVerbatimRepository"></param>
+        /// <param name="verbatimClient"></param>
         /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
@@ -45,7 +159,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
-        public DwcaObservationProcessor(IDarwinCoreArchiveVerbatimRepository dwcaVerbatimRepository,
+        public DwcaObservationProcessor(
+            IVerbatimClient verbatimClient,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
@@ -53,132 +168,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ILogger<DwcaObservationProcessor> logger) : 
+            ILogger<DwcaObservationProcessor> logger) :
                 base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
-            _dwcaVerbatimRepository =
-                dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _processConfiguration =
-                processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
-
-            if (processConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(processConfiguration));
-            }
+            _semaphoreBatch = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
         }
 
         public override DataProviderType Type => DataProviderType.DwcA;
-
-        public async Task<bool> DoesVerbatimDataExist()
-        {
-            var collectionExist = await _dwcaVerbatimRepository.CheckIfCollectionExistsAsync();
-            return collectionExist;
-        }
-
-        public override async Task<ProcessingStatus> ProcessAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            Logger.LogInformation($"Start Processing {dataProvider.Identifier} verbatim observations");
-            var startTime = DateTime.Now;
-            try
-            {
-                var dataExists = await _dwcaVerbatimRepository.CheckIfCollectionExistsAsync(dataProvider.Id, dataProvider.Identifier);
-                if (!dataExists)
-                {
-                    Logger.LogInformation($"Processing {dataProvider} failed because no harvested data existed.");
-                    return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
-                }
-
-                Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
-                if (!await PublicRepository.DeleteProviderDataAsync(dataProvider))
-                {
-                    Logger.LogError($"Failed to delete {dataProvider.Identifier} data");
-                }
-                Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
-
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservationsSequential(
-                    dataProvider,
-                    taxa,
-                    cancellationToken);
-                
-                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
-                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, processCount, 0);
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation($"{dataProvider} observation processing was canceled.");
-                return ProcessingStatus.Cancelled(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Failed to process {dataProvider} sightings");
-                return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
-            }
-        }
-
-        /// <inheritdoc />
-        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<int> ProcessObservationsSequential(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IJobCancellationToken cancellationToken)
-        {
-            var batchId = 0;
-            var processedCount = 0;
-            var observationFactory = await DwcaObservationFactory.CreateAsync(
-                dataProvider,
-                taxa,
-                _processedVocabularyRepository,
-                _areaHelper);
-            ICollection<Observation> observations = new List<Observation>();
-            using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
-            int counter = 0;
-            // Process and commit in batches.
-            await cursor.ForEachAsync(async verbatimObservation =>
-            {
-                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
-                processedObservation.DataProviderId = dataProvider.Id;
-                observations.Add(processedObservation);
-                if (IsBatchFilledToLimit(observations.Count))
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    batchId++;
-
-                    processedCount += await ValidateAndStoreObservations(dataProvider, JobRunModes.Full, false, observations, batchId.ToString());
-                    observations.Clear();
-                    Logger.LogDebug($"{dataProvider.Names.Translate("en-GB")} observations processed: {processedCount}");
-                }
-            });
-
-            // Commit remaining batch (not filled to limit).
-            if (observations.Any())
-            {
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                batchId++;
-
-                processedCount += await ValidateAndStoreObservations(dataProvider, JobRunModes.Full, false, observations, batchId.ToString());
-                observations.Clear();
-                Logger.LogDebug($"{dataProvider.Names.Translate("en-GB")} observations processed: {processedCount}");
-            }
-
-            return processedCount;
-        }
     }
 }
