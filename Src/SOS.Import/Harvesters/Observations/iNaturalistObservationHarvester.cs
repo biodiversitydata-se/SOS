@@ -10,8 +10,6 @@ using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim;
 
@@ -27,8 +25,8 @@ namespace SOS.Import.Harvesters.Observations
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="kulObservationService"></param>
-        /// <param name="dwcObservationVerbatimRepository"></param>
+        /// <param name="verbatimClient"></param>
+        /// <param name="iNaturalistObservationService"></param>
         /// <param name="iNaturalistServiceConfiguration"></param>
         /// <param name="logger"></param>
         public iNaturalistObservationHarvester(
@@ -77,7 +75,7 @@ namespace SOS.Import.Harvesters.Observations
                 var currentMonthOffset = 0;
                 var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, startDate.AddMonths(1));
-                AddValidationStatus(gBIFResult, ValidationStatusId.Verified);
+
                 var monthLoopStop = DateTime.Now - new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 // Loop until all sightings are fetched.
                 do
@@ -125,14 +123,6 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
-        }
-
-        private void AddValidationStatus(IEnumerable<DwcObservationVerbatim> gBifResult, ValidationStatusId validationStatusId)
-        {
-            foreach (var dwcObservationVerbatim in gBifResult)
-            {
-                dwcObservationVerbatim.IdentificationVerificationStatus = validationStatusId.ToString();
-            }
         }
 
         public Task<HarvestInfo> HarvestObservationsAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
