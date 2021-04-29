@@ -31,7 +31,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _processedVocabularyRepository;
-        private readonly SemaphoreSlim _semaphoreBatch;
 
         private async Task<int> ProcessBatchAsync(
             DataProvider dataProvider,
@@ -89,7 +88,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
             finally
             {
-                _semaphoreBatch.Release();
+                SemaphoreBatch.Release();
             }
         }
 
@@ -119,7 +118,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
                 while (minId <= maxId)
                 {
-                    await _semaphoreBatch.WaitAsync();
+                    await SemaphoreBatch.WaitAsync();
 
                     var batchEndId = minId + WriteBatchSize - 1;
                     processBatchTasks.Add(ProcessBatchAsync(dataProvider, 
@@ -169,13 +168,12 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             ILogger<DwcaObservationProcessor> logger) :
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _semaphoreBatch = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
         }
 
         public override DataProviderType Type => DataProviderType.DwcA;
