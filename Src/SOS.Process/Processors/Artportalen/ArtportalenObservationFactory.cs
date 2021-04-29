@@ -185,7 +185,7 @@ namespace SOS.Process.Processors.Artportalen
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
-                    ? $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}#SightingDetailImages"
+                    ? $"http://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
