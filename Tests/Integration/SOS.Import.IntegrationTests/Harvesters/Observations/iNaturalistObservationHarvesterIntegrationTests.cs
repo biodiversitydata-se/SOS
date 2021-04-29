@@ -8,9 +8,6 @@ using SOS.Import.Harvesters.Observations;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using Xunit;
 
@@ -29,7 +26,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
-            var kulObservationService = new iNaturalistObservationService(
+            var iNaturalistObservationService = new iNaturalistObservationService(
                 new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
                 importConfiguration.iNaturalistServiceConfiguration,
                 new NullLogger<iNaturalistObservationService>());
@@ -39,16 +36,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
-           
-            var dwcObservationVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                new DataProvider { Id = 0, Identifier = "test" },
-                verbatimClient,
-                new Mock<ILogger<DarwinCoreArchiveVerbatimRepository>>().Object);
 
             var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
                 verbatimClient,
-                kulObservationService,
-                dwcObservationVerbatimRepository,
+                iNaturalistObservationService,
                 importConfiguration.iNaturalistServiceConfiguration,
                 new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
@@ -86,7 +77,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                     new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
                     importConfiguration.iNaturalistServiceConfiguration,
                     new NullLogger<iNaturalistObservationService>()),
-                new Mock<IDarwinCoreArchiveVerbatimRepository>().Object,
                 importConfiguration.iNaturalistServiceConfiguration,
                 new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
