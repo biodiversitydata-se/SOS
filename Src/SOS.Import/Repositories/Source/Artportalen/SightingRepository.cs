@@ -82,6 +82,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.Quantity,
 					s.QuantityOfSubstrate,
                     s.RegisterDate,
+                    CASE
+                        WHEN s.HasImages = 1 THEN (SELECT TOP 1 Id FROM MediaFile mf WHERE s.SightingId = mf.SightingId )
+                        ELSE 0
+                    END AS FirstImageId,
 	                CASE 
 						WHEN p.Id IS NULL THEN null
 						ELSE p.FirstName + ' ' + p.LastName 

@@ -78,6 +78,7 @@ namespace SOS.Import.Factories.Harvest
                     ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
                     : null,
                 HasImages = entity.HasImages,
+                FirstImageId = entity.FirstImageId,
                 HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
                 HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
                 HiddenByProvider = entity.HiddenByProvider,
