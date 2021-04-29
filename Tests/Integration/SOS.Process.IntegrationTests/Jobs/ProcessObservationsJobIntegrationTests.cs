@@ -124,6 +124,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
+                processConfiguration,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
@@ -133,6 +134,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
+                processConfiguration,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
@@ -142,6 +144,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
@@ -151,6 +154,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
@@ -160,6 +164,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
@@ -169,6 +174,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
@@ -178,6 +184,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,

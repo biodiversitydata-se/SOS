@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -20,6 +21,8 @@ namespace SOS.Process.Processors
 {
     public abstract class ObservationProcessorBase<TEntity>
     {
+        protected readonly SemaphoreSlim SemaphoreBatch;
+
         /// <summary>
         /// Commit batch
         /// </summary>
@@ -130,12 +133,14 @@ namespace SOS.Process.Processors
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ILogger<TEntity> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, new ProcessConfiguration(),  logger)
+            ProcessConfiguration processConfiguration,
+            ILogger<TEntity> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
         }
 
@@ -167,6 +172,8 @@ namespace SOS.Process.Processors
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
             ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
+            SemaphoreBatch = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
+
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

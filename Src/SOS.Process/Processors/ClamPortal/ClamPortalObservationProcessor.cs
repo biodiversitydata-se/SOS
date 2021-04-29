@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -27,7 +28,7 @@ namespace SOS.Process.Processors.ClamPortal
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -35,6 +36,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public ClamPortalObservationProcessor(IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
@@ -42,8 +44,9 @@ namespace SOS.Process.Processors.ClamPortal
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
+            ProcessConfiguration processConfiguration,
             ILogger<ClamPortalObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

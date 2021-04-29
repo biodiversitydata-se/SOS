@@ -3,7 +3,7 @@ using System;
 
 namespace SOS.Lib.Models.Verbatim.Kul
 {
-    public class KulObservationVerbatim : IEntity<string>
+    public class KulObservationVerbatim : IEntity<int>
     {
         public string OccurrenceId { get; set; }
         public int DyntaxaTaxonId { get; set; }
@@ -22,10 +22,7 @@ namespace SOS.Lib.Models.Verbatim.Kul
         public string CountryCode { get; set; }
         public string AssociatedOccurrences { get; set; }
 
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
+        public int Id { get; set; }
+
     }
 }

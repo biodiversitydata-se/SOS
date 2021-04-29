@@ -11,7 +11,6 @@ using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -19,10 +18,10 @@ namespace SOS.Import.Harvesters.Observations
 {
     public class MvmObservationHarvester : IMvmObservationHarvester
     {
-        private readonly ILogger<MvmObservationHarvester> _logger;
         private readonly IMvmObservationService _mvmObservationService;
         private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
         private readonly MvmServiceConfiguration _mvmServiceConfiguration;
+        private readonly ILogger<MvmObservationHarvester> _logger;
 
         /// <summary>
         ///     Constructor

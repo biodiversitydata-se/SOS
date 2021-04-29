@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -27,8 +26,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private readonly SemaphoreSlim _semaphoreBatch;
-
+        
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
@@ -44,7 +42,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
             while (minId <= maxId)
             {
-                await _semaphoreBatch.WaitAsync();
+                await SemaphoreBatch.WaitAsync();
 
                 var batchEndId = minId + WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, minId, batchEndId, mode, observationFactory,
@@ -123,7 +121,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             }
             finally
             {
-                _semaphoreBatch.Release();
+                SemaphoreBatch.Release();
             }
 
             return 0;
@@ -149,14 +147,12 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IValidationManager validationManager,
             ProcessConfiguration processConfiguration,
             ILogger<VirtualHerbariumObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(
                                                                  nameof(virtualHerbariumObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-
-            _semaphoreBatch = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
         public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;

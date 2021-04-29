@@ -5,7 +5,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
-    public class FishDataObservationVerbatimRepository : VerbatimRepositoryBase<FishDataObservationVerbatim, string>,
+    public class FishDataObservationVerbatimRepository : VerbatimRepositoryBase<FishDataObservationVerbatim, int>,
         IFishDataObservationVerbatimRepository
     {
         public FishDataObservationVerbatimRepository(

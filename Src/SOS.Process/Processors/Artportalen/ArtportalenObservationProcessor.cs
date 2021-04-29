@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -30,9 +29,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IDiffusionManager _diffusionManager;
-        private readonly SemaphoreSlim _semaphoreBatch;
 
-        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -69,8 +66,6 @@ namespace SOS.Process.Processors.Artportalen
             {
                 throw new ArgumentNullException(nameof(processConfiguration));
             }
-
-            _semaphoreBatch = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
@@ -92,7 +87,7 @@ namespace SOS.Process.Processors.Artportalen
 
             while (minId <= maxId)
             {
-                await _semaphoreBatch.WaitAsync();
+                await SemaphoreBatch.WaitAsync();
 
                 var batchEndId = minId + WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, minId, batchEndId, mode, observationFactory,
@@ -200,7 +195,7 @@ namespace SOS.Process.Processors.Artportalen
             }
             finally
             {
-                _semaphoreBatch.Release();
+                SemaphoreBatch.Release();
             }
 
             return (0, 0);

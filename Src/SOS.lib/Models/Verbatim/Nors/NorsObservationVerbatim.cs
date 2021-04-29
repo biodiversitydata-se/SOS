@@ -3,7 +3,7 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Nors
 {
-    public class NorsObservationVerbatim : IEntity<string>
+    public class NorsObservationVerbatim : IEntity<int>
     {
         public int? CoordinateUncertaintyInMeters { get; set; }
 
@@ -38,10 +38,6 @@ namespace SOS.Lib.Models.Verbatim.Nors
 
         public DateTime Start { get; set; }
 
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
+        public int Id { get; set; }
     }
 }
