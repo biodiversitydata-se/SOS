@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Shared
@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Geometry.
         /// </summary>
-        public IGeoShape Geometry { get; set; }
+        public Geometry Geometry { get; set; }
 
         /// <summary>
         /// Constructor.

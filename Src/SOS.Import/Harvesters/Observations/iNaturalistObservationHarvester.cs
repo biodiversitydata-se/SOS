@@ -1,52 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 
 namespace SOS.Import.Harvesters.Observations
 {
     public class iNaturalistObservationHarvester : IiNaturalistObservationHarvester
     {
+        private readonly IVerbatimClient _verbatimClient;
         private readonly IiNaturalistObservationService _iNaturalistObservationService;
-        private readonly IDarwinCoreArchiveVerbatimRepository _dwcObservationVerbatimRepository;
         private readonly iNaturalistServiceConfiguration _iNaturalistServiceConfiguration;
         private readonly ILogger<iNaturalistObservationHarvester> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
+        /// <param name="verbatimClient"></param>
         /// <param name="kulObservationService"></param>
         /// <param name="dwcObservationVerbatimRepository"></param>
         /// <param name="kulServiceConfiguration"></param>
         /// <param name="logger"></param>
         public iNaturalistObservationHarvester(
+            IVerbatimClient verbatimClient,
             IiNaturalistObservationService kulObservationService,
-            IDarwinCoreArchiveVerbatimRepository dwcObservationVerbatimRepository,
             iNaturalistServiceConfiguration kulServiceConfiguration,
             ILogger<iNaturalistObservationHarvester> logger)
         {
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _iNaturalistObservationService =
                 kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
-            _dwcObservationVerbatimRepository = dwcObservationVerbatimRepository ??
-                                                throw new ArgumentNullException(
-                                                    nameof(dwcObservationVerbatimRepository));
             _iNaturalistServiceConfiguration = kulServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(kulServiceConfiguration));
+                                               throw new ArgumentNullException(nameof(kulServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -61,12 +55,20 @@ namespace SOS.Import.Harvesters.Observations
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
             try
             {
+                using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                    dataProvider,
+                    _verbatimClient,
+                    _logger)
+                {
+                    TempMode = true
+                };
+
                 _logger.LogInformation("Start harvesting sightings for iNaturalist data provider");
                 _logger.LogInformation(GetKulHarvestSettingsInfoString());
 
                 // Make sure we have an empty collection.
                 _logger.LogInformation("Start empty collection for iNaturalist verbatim collection");
-                await _dwcObservationVerbatimRepository.ClearTempHarvestCollection(dataProvider);
+                await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 _logger.LogInformation("Finish empty collection for iNaturalist verbatim collection");
 
                 var nrSightingsHarvested = 0;
@@ -79,7 +81,7 @@ namespace SOS.Import.Harvesters.Observations
                 do
                 {
                     // Add sightings to MongoDb
-                    await _dwcObservationVerbatimRepository.AddManyToTempHarvestAsync(gBIFResult, dataProvider);
+                    await dwcArchiveVerbatimRepository.AddManyAsync(gBIFResult);
 
                     nrSightingsHarvested += gBIFResult.Count();
 
@@ -99,7 +101,7 @@ namespace SOS.Import.Harvesters.Observations
                 } while (gBIFResult != null && startDate.AddMonths(currentMonthOffset) <= DateTime.Now);
 
                 _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
-                await _dwcObservationVerbatimRepository.RenameTempHarvestCollection(dataProvider);
+                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
                 _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for iNaturalist data provider");

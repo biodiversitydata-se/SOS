@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using OfficeOpenXml;
 using SOS.Import.DarwinCore;
@@ -13,8 +10,7 @@ using SOS.Import.Harvesters.Observations;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
-using SOS.Lib.Enums;
-using SOS.Lib.Managers;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource;
@@ -43,7 +39,9 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
             var repository =
-                new DarwinCoreArchiveVerbatimRepository(importClient,
+                new DarwinCoreArchiveVerbatimRepository(
+                    new DataProvider { Id = 0, Identifier = "test" },
+                    importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>());
 
             return repository;
@@ -66,8 +64,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 processConfiguration.WriteBatchSize
                 );
             var dwcObservationHarvester = new DwcObservationHarvester(
-                new DarwinCoreArchiveVerbatimRepository(importClient,
-                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                importClient,
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
@@ -511,7 +508,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 try
                 {
                     var valueCountList =
-                        dwcRepository.GetDistinctValuesCount(collectionName, pair.Value, maxNrOfValues);
+                        dwcRepository.GetDistinctValuesCount(pair.Value, maxNrOfValues);
                     var containValues = valueCountList.Any(m => !string.IsNullOrWhiteSpace(m.Value));
                     if (!containValues)
                     {
@@ -558,30 +555,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             package.Save();
         }
 
-        [Fact(Skip = "Not working")]
-        public async Task Harvest_all_dwca_files_in_specified_folder()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const string folderPath = @"C:\DwC-A\NRM IPT\";
-            //const string folderPath = @"C:\DwC-A\NRM IPT\Fixed problematic files\";
-            var filePaths = Directory.GetFiles(folderPath, "*.zip");
-            var dwcObservationHarvester = CreateDwcObservationHarvester();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var harvestInfo = await dwcObservationHarvester.HarvestMultipleDwcaFilesAsync(
-                filePaths,
-                true,
-                JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            harvestInfo.Status.Should().Be(RunStatus.Success);
-        }
+        
 
         //[Fact]
         //public void CreateProperties()

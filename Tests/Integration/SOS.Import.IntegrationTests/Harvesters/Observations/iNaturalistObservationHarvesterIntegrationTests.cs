@@ -8,6 +8,7 @@ using SOS.Import.Harvesters.Observations;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
@@ -32,17 +33,20 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
                 importConfiguration.iNaturalistServiceConfiguration,
                 new NullLogger<iNaturalistObservationService>());
-
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var verbatimClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+           
             var dwcObservationVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                new VerbatimClient(
-                    verbatimDbConfiguration.GetMongoDbSettings(),
-                    verbatimDbConfiguration.DatabaseName,
-                    verbatimDbConfiguration.ReadBatchSize,
-                    verbatimDbConfiguration.WriteBatchSize),
+                new DataProvider { Id = 0, Identifier = "test" },
+                verbatimClient,
                 new Mock<ILogger<DarwinCoreArchiveVerbatimRepository>>().Object);
 
             var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
+                verbatimClient,
                 kulObservationService,
                 dwcObservationVerbatimRepository,
                 importConfiguration.iNaturalistServiceConfiguration,
@@ -69,8 +73,15 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var importConfiguration = GetImportConfiguration();
             importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var verbatimClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize); ;
 
             var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
+                verbatimClient,
                 new iNaturalistObservationService(
                     new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
                     importConfiguration.iNaturalistServiceConfiguration,

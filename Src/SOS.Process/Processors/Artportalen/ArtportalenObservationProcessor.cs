@@ -86,7 +86,6 @@ namespace SOS.Process.Processors.Artportalen
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, _processedVocabularyRepository, mode != JobRunModes.Full);
             _artportalenVerbatimRepository.Mode = mode;
 
-
             var minId = 1;
             var maxId = await _artportalenVerbatimRepository.GetMaxIdAsync();
             var processBatchTasks = new List<Task<(int publicCount, int protectedCount)>>();

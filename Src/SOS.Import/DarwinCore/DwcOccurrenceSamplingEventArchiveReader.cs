@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DwC_A;
 using DwC_A.Terms;
@@ -18,10 +19,13 @@ namespace SOS.Import.DarwinCore
     public class DwcOccurrenceSamplingEventArchiveReader : IDwcArchiveReaderAsDwcObservation
     {
         private readonly ILogger<DwcArchiveReader> _logger;
+        private int _idCounter;
+        protected int NextId => Interlocked.Increment(ref _idCounter);
 
         public DwcOccurrenceSamplingEventArchiveReader(ILogger<DwcArchiveReader> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _idCounter = 0;
         }
 
         /// <summary>
@@ -43,7 +47,7 @@ namespace SOS.Import.DarwinCore
 
             await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, idIdentifierTuple, idIndex);
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, idIdentifierTuple, idIndex);
                 occurrenceRecords.Add(occurrenceRecord);
 
                 if (occurrenceRecords.Count % batchSize == 0)
