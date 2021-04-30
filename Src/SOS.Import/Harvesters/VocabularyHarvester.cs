@@ -45,6 +45,7 @@ namespace SOS.Import.Harvesters
         /// <param name="determinationMethodVocabularyFactory"></param>
         /// <param name="reproductiveConditionVocabularyFactory"></param>
         /// <param name="behaviorVocabularyFactory"></param>
+        /// <param name="birdNestActivityVocabularyFactory"></param>
         /// <param name="logger"></param>
         /// <param name="activityVocabularyFactory"></param>
         /// <param name="taxonProtectionLevelVocabularyFactory"></param>
@@ -78,6 +79,7 @@ namespace SOS.Import.Harvesters
             ReproductiveConditionVocabularyFactory reproductiveConditionVocabularyFactory,
             BehaviorVocabularyFactory behaviorVocabularyFactory,
             TaxonProtectionLevelVocabularyFactory taxonProtectionLevelVocabularyFactory,
+            BirdNestActivityVocabularyFactory birdNestActivityVocabularyFactory,
             ILogger<VocabularyHarvester> logger)
         {
             _vocabularyRepository =
@@ -105,7 +107,8 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory},
                 {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
                 {VocabularyId.Behavior, behaviorVocabularyFactory},
-                {VocabularyId.TaxonProtectionLevel, taxonProtectionLevelVocabularyFactory}
+                {VocabularyId.TaxonProtectionLevel, taxonProtectionLevelVocabularyFactory},
+                {VocabularyId.BirdNestActivity, birdNestActivityVocabularyFactory}
             };
         }
 
