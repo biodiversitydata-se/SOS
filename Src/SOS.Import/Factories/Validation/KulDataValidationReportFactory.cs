@@ -85,7 +85,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _kulObservationFactory = new KulObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById, 
+                    _areaHelper);
             }
 
             return _kulObservationFactory;

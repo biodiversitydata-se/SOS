@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using MongoDB.Bson;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 
@@ -9,7 +8,7 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
     /// <summary>
     ///     Clams verbatim model
     /// </summary>
-    public class ClamObservationVerbatim : IEntity<ObjectId>
+    public class ClamObservationVerbatim : IEntity<int>
     {
         public string AccessRights { get; set; }
         public string BasisOfRecord { get; set; }
@@ -80,6 +79,6 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
         public string VerbatimScientificName { get; set; }
         public string WaterBody { get; set; }
         public string SmallestLivingClam { get; set; }
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
     }
 }

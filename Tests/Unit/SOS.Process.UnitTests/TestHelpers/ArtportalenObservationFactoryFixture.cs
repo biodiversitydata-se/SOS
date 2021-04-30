@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.UnitTests.TestHelpers.Factories;
-using SOS.TestHelpers.Helpers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.TestHelpers
@@ -34,6 +34,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
+                new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
                 false).Result;
             return factory;

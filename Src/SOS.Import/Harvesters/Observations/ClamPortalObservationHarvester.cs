@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -50,12 +51,23 @@ namespace SOS.Import.Harvesters.Observations
             try
             {
                 _logger.LogInformation("Start harvesting sightings for clams data provider");
-                var items = await _clamObservationService.GetClamObservationsAsync();
 
+                // Make sure we have an empty collection.
+                _logger.LogInformation("Start empty collection for clams verbatim collection");
                 await _clamObservationVerbatimRepository.DeleteCollectionAsync();
                 await _clamObservationVerbatimRepository.AddCollectionAsync();
-                await _clamObservationVerbatimRepository.AddManyAsync(items);
+                _logger.LogInformation("Finish empty collection for clams verbatim collection");
 
+                var verbatims = await _clamObservationService.GetClamObservationsAsync();
+
+                if (verbatims?.Any() ?? false)
+                {
+                    var verbatimFactory = new ClamPortalHarvestFactory();
+                    verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(verbatims);
+
+                    await _clamObservationVerbatimRepository.AddManyAsync(verbatims);
+                }
+                
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 _logger.LogInformation("Start permanentize temp collection for clams verbatim");
@@ -65,10 +77,10 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finished harvesting sightings for clams data provider");
 
                 // Update harvest info
-                harvestInfo.DataLastModified = items?.Select(o => o.Modified).Max();
+                harvestInfo.DataLastModified = verbatims?.Select(o => o.Modified).Max();
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
-                harvestInfo.Count = items?.Count() ?? 0;
+                harvestInfo.Count = verbatims?.Count() ?? 0;
             }
             catch (JobAbortedException e)
             {

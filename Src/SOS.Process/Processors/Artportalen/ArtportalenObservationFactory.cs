@@ -14,6 +14,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using DateTime = System.DateTime;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
@@ -21,9 +22,10 @@ using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
+
 namespace SOS.Process.Processors.Artportalen
 {
-    public class ArtportalenObservationFactory
+    public class ArtportalenObservationFactory : IObservationFactory<ArtportalenObservationVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
@@ -34,28 +36,41 @@ namespace SOS.Process.Processors.Artportalen
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
-        /// <param name="areaHelper"></param>
         /// <param name="incrementalMode"></param>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-
             bool incrementalMode)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
             bool incrementalMode)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, processedVocabularies, incrementalMode);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
+        }
+
+        /// <summary>
+        ///     Cast multiple clam observations to ProcessedObservation
+        /// </summary>
+        /// <param name="verbatims"></param>
+        /// <returns></returns>
+        public IEnumerable<Observation> CreateProcessedObservations(
+            IEnumerable<ArtportalenObservationVerbatim> verbatims)
+        {
+            return verbatims.Select(CreateProcessedObservation);
         }
 
         /// <summary>
@@ -63,7 +78,7 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
         {
             try
             {
@@ -80,6 +95,9 @@ namespace SOS.Process.Processors.Artportalen
                 var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
+
+                var taxonId = verbatimObservation.TaxonId ?? -1;
+                _taxa.TryGetValue(taxonId, out var taxon);
 
                 var obs = new Observation();
 

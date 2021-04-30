@@ -85,7 +85,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _norsObservationFactory = new NorsObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById,
+                    _areaHelper);
             }
 
             return _norsObservationFactory;
