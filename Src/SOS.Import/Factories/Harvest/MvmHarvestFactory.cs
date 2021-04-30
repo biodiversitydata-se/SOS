@@ -9,7 +9,7 @@ using SOS.Lib.Models.Verbatim.Mvm;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class MvmHarvestFactory : IHarvestFactory<IEnumerable<WebSpeciesObservation>, MvmObservationVerbatim>
+    public class MvmHarvestFactory : HarvestBaseFactory, IHarvestFactory<IEnumerable<WebSpeciesObservation>, MvmObservationVerbatim>
     {
         /// <inheritdoc />
         public async Task<IEnumerable<MvmObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities)
@@ -29,7 +29,10 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private MvmObservationVerbatim CastEntityToVerbatim(WebSpeciesObservation entity)
         {
-            var observation = new MvmObservationVerbatim();
+            var observation = new MvmObservationVerbatim
+            {
+                Id = NextId
+            };
             observation.ReportedBy = entity.Fields
                 .FirstOrDefault(p => p.Property.Id == SpeciesObservationPropertyId.ReportedBy)?.Value;
             DateTime.TryParse(

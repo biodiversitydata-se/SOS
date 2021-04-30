@@ -130,9 +130,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var dwcaVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                verbatimClient,
-                new NullLogger<DarwinCoreArchiveVerbatimRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
@@ -151,7 +148,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
             return new DwcaObservationProcessor(
-                dwcaVerbatimRepository,
+                verbatimClient,
                 processedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),

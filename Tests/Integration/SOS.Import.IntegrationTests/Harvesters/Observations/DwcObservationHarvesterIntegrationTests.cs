@@ -194,8 +194,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             );
 
             var dwcObservationHarvester = new DwcObservationHarvester(
-                new DarwinCoreArchiveVerbatimRepository(importClient,
-                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                importClient,
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),

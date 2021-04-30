@@ -3,7 +3,7 @@ using System;
 
 namespace SOS.Lib.Models.Verbatim.FishData
 {
-    public class FishDataObservationVerbatim : IEntity<string>
+    public class FishDataObservationVerbatim : IEntity<int>
     {
         public int? CoordinateUncertaintyInMeters { get; set; }
 
@@ -17,12 +17,7 @@ namespace SOS.Lib.Models.Verbatim.FishData
 
         public DateTime End { get; set; }
 
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
-
+        public int Id { get; set; }
         public int? IndividualId { get; set; }
 
         public int? LocationId { get; set; }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -54,6 +55,7 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _validationManagerMock.Object,
+            new ProcessConfiguration(),
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()

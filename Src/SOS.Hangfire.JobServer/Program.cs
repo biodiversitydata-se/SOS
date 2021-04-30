@@ -60,7 +60,7 @@ namespace SOS.Hangfire.JobServer
             Console.WriteLine("Starting up in environment:"  + _env);
            
 
-            if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
+            if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
                 var host = CreateHostBuilder(args).Build();
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());

@@ -66,10 +66,10 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult(parsedDataProvidersCombinedResult.Error);
                 }
 
-                if (parsedDataProvidersResult.Any(providerResult => providerResult.Value.Type == DataProviderType.DwcA))
+                if (parsedDataProvidersResult.Any(providerResult => providerResult.Value.Type == DataProviderType.DwcA && string.IsNullOrEmpty(providerResult.Value.DownloadUrl)))
                 {
                     return new BadRequestObjectResult(
-                        "A DwC-A data provider was included in the list. Currently DwC-A harvesting is only supported by providing a file using the Administration API.");
+                        "One or more DwC-A data provider/s with missing download url was included in the list. Harvesting of these providers is only supported by providing a file using the Administration API.");
                 }
 
                 BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunHarvestObservationsAsync(

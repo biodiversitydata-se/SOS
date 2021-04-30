@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
@@ -31,7 +30,7 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
+        Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
 
         /// <summary>
         ///     Get all the areas, paged

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
@@ -36,7 +35,7 @@ namespace SOS.Lib.Repositories.Resource
             ILogger<AreaRepository> logger) : base(processClient, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();
-            _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+            _jsonSerializerOptions.Converters.Add(new GeometryConverter());
 
             if (Database != null)
             {
@@ -71,14 +70,14 @@ namespace SOS.Lib.Repositories.Resource
         }
 
         /// <inheritdoc />
-        public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
+        public async Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId)
         {
             try
             {
                 var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaType.ToAreaId(featureId));
                 var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
-                return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
+                return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);
             }
             catch
             {

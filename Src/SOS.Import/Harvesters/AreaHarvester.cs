@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Import.Factories.Harvest;
@@ -65,10 +66,8 @@ namespace SOS.Import.Harvesters
             {
                 return await HarvestAreasWithGeoRegionApiAsync();
             }
-            else
-            {
-                return await HarvestAreasFromArtportalenAsync();
-            }
+
+            return await HarvestAreasFromArtportalenAsync();
         }
 
         private async Task<HarvestInfo> HarvestAreasWithGeoRegionApiAsync()
@@ -158,7 +157,7 @@ namespace SOS.Import.Harvesters
                         _logger.LogDebug("Start casting geometries");
                         var geometries = areaEntities.ToDictionary(a => ((AreaType)a.AreaDatasetId).ToAreaId(a.FeatureId), a => a
                             .PolygonWKT?
-                            .ToGeometry()
+                            .ToGeometry()?
                             .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
                         _logger.LogDebug("Finish casting geometries");
 

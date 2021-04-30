@@ -10,10 +10,10 @@ using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class VirtualHerbariumHarvestFactory : IHarvestFactory<XDocument, VirtualHerbariumObservationVerbatim>
+    public class VirtualHerbariumHarvestFactory : HarvestBaseFactory, IHarvestFactory<XDocument, VirtualHerbariumObservationVerbatim>
     {
         private IDictionary<string, double[]> _localities;
-
+        
         /// <summary>
         ///     Create virtual herbarium verbatim from one row of data
         /// </summary>
@@ -23,7 +23,10 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private VirtualHerbariumObservationVerbatim CastEntitiesToVerbatims(XElement rowData, IDictionary<int, string> propertyMapping)
         {
-            var observation = new VirtualHerbariumObservationVerbatim();
+            var observation = new VirtualHerbariumObservationVerbatim
+            {
+                Id = NextId
+            };
             var index = 0;
 
             foreach (var cell in rowData.Elements())
@@ -133,7 +136,7 @@ namespace SOS.Import.Factories.Harvest
         /// Constructor
         /// </summary>
         public VirtualHerbariumHarvestFactory(
-            XDocument xDocument)
+            XDocument xDocument): base()
         {
             InitializeLocalities(xDocument);
         }

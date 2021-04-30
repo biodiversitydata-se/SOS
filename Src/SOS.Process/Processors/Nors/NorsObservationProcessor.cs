@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -27,31 +28,75 @@ namespace SOS.Process.Processors.Nors
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
 
         /// <summary>
-        ///     Constructor
+        /// Process batch
         /// </summary>
-        /// <param name="norsObservationVerbatimRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="logger"></param>
-        public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
-            IAreaHelper areaHelper,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IVocabularyValueResolver vocabularyValueResolver,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IValidationManager validationManager,
-            ILogger<NorsObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+        /// <param name="dataProvider"></param>
+        /// <param name="startId"></param>
+        /// <param name="endId"></param>
+        /// <param name="mode"></param>
+        /// <param name="observationFactory"></param>
+        /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> ProcessBatchAsync(
+            DataProvider dataProvider,
+            int startId,
+            int endId,
+            JobRunModes mode,
+            NorsObservationFactory observationFactory,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
-            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
-                                                 throw new ArgumentNullException(
-                                                     nameof(norsObservationVerbatimRepository));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
+            try
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                var verbatimObservationsBatch = await _norsObservationVerbatimRepository.GetBatchAsync(startId, endId);
+                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
 
-        public override DataProviderType Type => DataProviderType.NorsObservations;
+                if (!verbatimObservationsBatch?.Any() ?? true)
+                {
+                    return 0;
+                }
+
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+
+                var observations = new List<Observation>();
+
+                foreach (var verbatimObservation in verbatimObservationsBatch)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                    if (processedObservation == null)
+                    {
+                        continue;
+                    }
+
+                    _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+                    observations.Add(processedObservation);
+                }
+
+                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+
+                return await ValidateAndStoreObservations(dataProvider, mode, false, observations, $"{startId}-{endId}");
+            }
+            catch (JobAbortedException e)
+            {
+                // Throw cancelation again to let function above handle it
+                throw;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Process {dataProvider.Identifier} sightings from id: {startId} to id: {endId} failed");
+            }
+            finally
+            {
+                SemaphoreBatch.Release();
+            }
+
+            return 0;
+        }
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -60,44 +105,54 @@ namespace SOS.Process.Processors.Nors
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var batchId = 0;
-            var processedCount = 0;
-            ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new NorsObservationFactory(dataProvider, taxa);
 
-            using var cursor = await _norsObservationVerbatimRepository.GetAllByCursorAsync();
+            var minId = 1;
+            var maxId = await _norsObservationVerbatimRepository.GetMaxIdAsync();
+            var processBatchTasks = new List<Task<int>>();
 
-            // Process and commit in batches.
-            await cursor.ForEachAsync(async verbatimObservation =>
+            while (minId <= maxId)
             {
-                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
-                _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
-                observations.Add(processedObservation);
-                if (IsBatchFilledToLimit(observations.Count))
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                await SemaphoreBatch.WaitAsync();
 
-                    batchId++;
-
-                    processedCount += await ValidateAndStoreObservations(dataProvider, mode,false, observations, batchId.ToString());
-                    observations.Clear();
-                    Logger.LogDebug($"NORS observations processed: {processedCount}");
-                }
-            });
-
-            // Commit remaining batch (not filled to limit).
-            if (observations.Any())
-            {
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                batchId++;
-
-                processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
-                observations.Clear();
-                Logger.LogDebug($"NORS observations processed: {processedCount}");
+                var batchEndId = minId + WriteBatchSize - 1;
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, minId, batchEndId, mode, observationFactory,
+                    taxa, cancellationToken));
+                minId = batchEndId + 1;
             }
 
-            return (processedCount, 0);
+            await Task.WhenAll(processBatchTasks);
+
+            return (processBatchTasks.Sum(t => t.Result), 0);
         }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="norsObservationVerbatimRepository"></param>
+        /// <param name="areaHelper"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
+        /// <param name="processConfiguration"></param>
+        /// <param name="logger"></param>
+        public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
+            IAreaHelper areaHelper,
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IVocabularyValueResolver vocabularyValueResolver,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IValidationManager validationManager,
+            ProcessConfiguration processConfiguration,
+            ILogger<NorsObservationProcessor> logger) :
+            base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
+        {
+            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(norsObservationVerbatimRepository));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+        }
+
+        public override DataProviderType Type => DataProviderType.NorsObservations;
     }
 }

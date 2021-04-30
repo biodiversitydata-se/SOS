@@ -1,49 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IDarwinCoreArchiveVerbatimRepository : IRepositoryBase<DwcObservationVerbatim, ObjectId>
+    public interface IDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcObservationVerbatim, int>
     {
-        Task<bool> AddCollectionAsync(IIdIdentifierTuple idIdentifierTuple);
-        Task<bool> AddManyAsync(IEnumerable<DwcObservationVerbatim> items, IIdIdentifierTuple idIdentifierTuple);
-        Task<bool> AddManyAsync(IEnumerable<DwcObservationVerbatim> items, string collectionName);
-
-        Task<bool> CheckIfCollectionExistsAsync(
-            int dataProviderId,
-            string dataProviderIdentifier);
-
-        Task<bool> DeleteCollectionAsync(IIdIdentifierTuple idIdentifierTuple);
-
-        Task<IAsyncCursor<DwcObservationVerbatim>> GetAllByCursorAsync(
-            int dataProviderId,
-            string dataProviderIdentifier);
-
-        Task<long> CountAllDocumentsAsync(
-            int dataProviderId,
-            string dataProviderIdentifier);
-
-        List<DistinictValueCount<string>> GetDistinctValuesCount(
-            string collectionName,
+        /// <summary>
+        /// Count distinct values
+        /// </summary>
+        /// <param name="collectionName"></param>
+        /// <param name="expression"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
             Expression<Func<DwcObservationVerbatim, DistinctValueObject<string>>> expression,
             int limit);
-
-        Task<bool> ClearTempHarvestCollection(IIdIdentifierTuple idIdentifierTuple);
-
-        Task<bool> AddManyToTempHarvestAsync(IEnumerable<DwcObservationVerbatim> items,
-            IIdIdentifierTuple idIdentifierTuple);
-
-        Task<bool> RenameTempHarvestCollection(IIdIdentifierTuple idIdentifierTuple);
-        Task DeleteTempHarvestCollectionIfExists(IIdIdentifierTuple idIdentifierTuple);
     }
 }

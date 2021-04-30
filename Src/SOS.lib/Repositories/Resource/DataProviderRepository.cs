@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
@@ -44,6 +44,7 @@ namespace SOS.Lib.Repositories.Resource
             return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 
+        /// <inheritdoc />
         public async Task<bool> ClearEmlAsync()
         {
             try
@@ -52,7 +53,28 @@ namespace SOS.Lib.Repositories.Resource
 
                 return true;
             }
-            catch (Exception e)
+            catch 
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteEmlAsync(int providerId)
+        {
+            try
+            {
+                var fileInfos = await _gridFSBucket.FindAsync(
+                    new ExpressionFilterDefinition<GridFSFileInfo>(f => f.Filename.Equals(GetKey(providerId))));
+
+                await fileInfos.ForEachAsync(c =>
+                {
+                    _gridFSBucket.DeleteAsync(c.Id, CancellationToken.None);
+                });
+                
+                return true;
+            }
+            catch
             {
                 return false;
             }
@@ -67,7 +89,7 @@ namespace SOS.Lib.Repositories.Resource
 
                 return await bytes?.ToXmlAsync();
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -83,11 +105,14 @@ namespace SOS.Lib.Repositories.Resource
 
             try
             {
+                // Make sure no other file for this provider exists
+                await DeleteEmlAsync(providerId);
+
                 await _gridFSBucket.UploadFromBytesAsync(GetKey(providerId), await eml.ToBytesAsync());
 
                 return true;
             }
-            catch(Exception e)
+            catch
             {
                 return false;
             }

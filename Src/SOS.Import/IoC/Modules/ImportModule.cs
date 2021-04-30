@@ -140,8 +140,6 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>()
-                .InstancePerLifetimeScope();
             builder.RegisterType<DarwinCoreArchiveEventRepository>().As<IDarwinCoreArchiveEventRepository>()
                 .InstancePerLifetimeScope();
 

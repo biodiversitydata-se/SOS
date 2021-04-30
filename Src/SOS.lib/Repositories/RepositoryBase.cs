@@ -100,7 +100,7 @@ namespace SOS.Lib.Repositories
         /// <summary>
         ///     Logger
         /// </summary>
-        protected readonly ILogger<RepositoryBase<TEntity, TKey>> Logger;
+        protected readonly ILogger Logger;
 
         protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
         {
@@ -133,7 +133,7 @@ namespace SOS.Lib.Repositories
         /// <param name="logger"></param>
         protected RepositoryBase(
             IMongoDbClient client,
-            ILogger<RepositoryBase<TEntity, TKey>> logger
+            ILogger logger
         )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
