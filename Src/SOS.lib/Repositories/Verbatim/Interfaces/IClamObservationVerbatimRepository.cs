@@ -5,7 +5,7 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IClamObservationVerbatimRepository : IVerbatimRepositoryBase<ClamObservationVerbatim, ObjectId>
+    public interface IClamObservationVerbatimRepository : IVerbatimRepositoryBase<ClamObservationVerbatim, int>
     {
     }
 }

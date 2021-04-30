@@ -8,25 +8,34 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Process.Constants;
-using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Shark
 {
-    public class SharkObservationFactory
+    public class SharkObservationFactory : IObservationFactory<SharkObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
+        private readonly IAreaHelper _areaHelper;
 
-        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="areaHelper"></param>
+        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
@@ -110,6 +119,8 @@ namespace SOS.Process.Processors.Shark
                 OwnerInstitutionCode = verbatim.ReportingInstituteNameSv,
                 Taxon = taxon
             };
+
+            _areaHelper.AddAreaDataToProcessedObservation(obs);
 
             /*
             DataType

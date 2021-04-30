@@ -85,7 +85,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _sersObservationFactory = new SersObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById,
+                    _areaHelper);
             }
 
             return _sersObservationFactory;
