@@ -132,6 +132,7 @@ namespace SOS.Lib.Helpers
             foreach (var area in areas)
             {
                 var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+
                 var attributes = new Dictionary<string, object>();
                 attributes.Add("name", area.Name);
                 attributes.Add("areaType", area.AreaType);

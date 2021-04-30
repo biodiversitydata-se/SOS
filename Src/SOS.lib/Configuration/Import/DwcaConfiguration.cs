@@ -7,6 +7,11 @@ namespace SOS.Lib.Configuration.Import
     public class DwcaConfiguration
     {
         /// <summary>
+        /// How many observations to read/batch
+        /// </summary>
+        public int BatchSize { get; set; }
+
+        /// <summary>
         /// The path to temporarily store DwC-A files when importing them.
         /// </summary>
         public string ImportPath { get; set; }

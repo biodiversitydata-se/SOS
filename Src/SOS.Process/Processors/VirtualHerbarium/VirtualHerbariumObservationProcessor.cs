@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -25,7 +26,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-
+        
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
@@ -33,63 +34,101 @@ namespace SOS.Process.Processors.VirtualHerbarium
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            try
+            var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
+
+            var minId = 1;
+            var maxId = await _virtualHerbariumObservationVerbatimRepository.GetMaxIdAsync();
+            var processBatchTasks = new List<Task<int>>();
+
+            while (minId <= maxId)
             {
-                var batchId = 0;
-                var processedCount = 0;
-                ICollection<Observation> observations = new List<Observation>();
-                var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
-                
-                using var cursor = await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
+                await SemaphoreBatch.WaitAsync();
 
-                // Process and commit in batches.
-                await cursor.ForEachAsync(async verbatimObservation =>
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    
-                    var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
-
-                    if (processedObservation != null)
-                    {
-                        _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
-                        observations.Add(processedObservation);
-
-                        if (IsBatchFilledToLimit(observations.Count))
-                        {
-                            cancellationToken?.ThrowIfCancellationRequested();
-
-                            batchId++;
-
-                            processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
-                            observations.Clear();
-                            Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
-                        }
-                    }
-                });
-
-                // Commit remaining batch (not filled to limit).
-                if (observations.Any())
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    batchId++;
-
-                    processedCount += await ValidateAndStoreObservations(dataProvider, mode, false, observations, batchId.ToString());
-                    observations.Clear();
-                    Logger.LogDebug($"Virtual Herbarium observations processed: {processedCount}");
-                }
-
-                return (processedCount, 0);
+                var batchEndId = minId + WriteBatchSize - 1;
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, minId, batchEndId, mode, observationFactory,
+                    taxa, cancellationToken));
+                minId = batchEndId + 1;
             }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to process Virtual Herbarium Sightings");
-                return (0, 0);
-            }
+
+            await Task.WhenAll(processBatchTasks);
+
+            return (processBatchTasks.Sum(t => t.Result), 0);
         }
 
         /// <summary>
-        ///     Constructor
+        /// Process batch
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="startId"></param>
+        /// <param name="endId"></param>
+        /// <param name="mode"></param>
+        /// <param name="observationFactory"></param>
+        /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> ProcessBatchAsync(
+            DataProvider dataProvider,
+            int startId,
+            int endId,
+            JobRunModes mode,
+            VirtualHerbariumObservationFactory observationFactory,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogDebug($"Start fetching Virtual Herbarium batch ({startId}-{endId})");
+                var verbatimObservationsBatch = await _virtualHerbariumObservationVerbatimRepository.GetBatchAsync(startId, endId);
+                Logger.LogDebug($"Finish fetching Virtual Herbarium batch ({startId}-{endId})");
+
+                if (!verbatimObservationsBatch?.Any() ?? true)
+                {
+                    return 0;
+                }
+
+                Logger.LogDebug($"Start processing Virtual Herbarium batch ({startId}-{endId})");
+
+                var observations = new List<Observation>();
+                
+                foreach (var verbatimObservation in verbatimObservationsBatch)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+
+                    if (processedObservation == null)
+                    {
+                        continue;
+                    }
+
+                    _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+                    observations.Add(processedObservation);
+                }
+
+                Logger.LogDebug($"Finish processing Virtual Herbarium batch ({startId}-{endId})");
+
+                return await ValidateAndStoreObservations(dataProvider, mode, false, observations, $"{startId}-{endId}");
+            }
+            catch (JobAbortedException e)
+            {
+                // Throw cancelation again to let function above handle it
+                throw;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Process Virtual Herbarium sightings from id: {startId} to id: {endId} failed");
+            }
+            finally
+            {
+                SemaphoreBatch.Release();
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        ///  Constructor
         /// </summary>
         /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -97,6 +136,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public VirtualHerbariumObservationProcessor(
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
@@ -105,8 +145,9 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
+            ProcessConfiguration processConfiguration,
             ILogger<VirtualHerbariumObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(
@@ -115,6 +156,5 @@ namespace SOS.Process.Processors.VirtualHerbarium
         }
 
         public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
-
     }
 }

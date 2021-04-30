@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
-    public interface IMvmObservationVerbatimRepository : IVerbatimRepositoryBase<MvmObservationVerbatim, string>
+    public interface IMvmObservationVerbatimRepository : IVerbatimRepositoryBase<MvmObservationVerbatim, int>
     {
     }
 }

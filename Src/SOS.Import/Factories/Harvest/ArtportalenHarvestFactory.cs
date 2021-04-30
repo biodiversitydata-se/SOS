@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using SOS.Import.Containers.Interfaces;
@@ -15,7 +14,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    internal class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
+    internal class ArtportalenHarvestFactory : HarvestBaseFactory, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
 
@@ -25,10 +24,6 @@ namespace SOS.Import.Factories.Harvest
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IAreaHelper _areaHelper;
-
-        private int _idCounter;
-        private int NextId => Interlocked.Increment(ref _idCounter);
-        
         private readonly ConcurrentDictionary<int, Site> _sites;
 
         /// <summary>
@@ -514,7 +509,7 @@ namespace SOS.Import.Factories.Harvest
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper) : base()
         {
             _projectRepository = projectRepository;
             _sightingRepository = sightingRepository;

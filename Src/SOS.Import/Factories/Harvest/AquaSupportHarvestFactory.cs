@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class AquaSupportHarvestFactory<T> : IHarvestFactory<XDocument, T>
+    public class AquaSupportHarvestFactory<T> : HarvestBaseFactory, IHarvestFactory<XDocument, T> where T : IEntity<int>
     {
         /// <inheritdoc />
         public async Task<IEnumerable<T>> CastEntitiesToVerbatimsAsync(XDocument xmlDocument)
@@ -21,7 +22,14 @@ namespace SOS.Import.Factories.Harvest
                     .Element(ns + "CreatedSpeciesObservations")
                     .Elements(ns + "WebSpeciesObservation"))
                 {
-                    var verbatim = Activator.CreateInstance(typeof(T));
+                    var verbatim = (IEntity<int>)Activator.CreateInstance(typeof(T));
+
+                    if (verbatim == null)
+                    {
+                        throw new NullReferenceException(nameof(verbatim));
+                    }
+
+                    verbatim.Id = NextId;
                     foreach (var fieldElement in observatioElement
                         .Elements(ns + "Fields")
                         .Elements(ns + "WebSpeciesObservationField"))

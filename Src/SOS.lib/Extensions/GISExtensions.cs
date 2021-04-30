@@ -336,14 +336,26 @@ namespace SOS.Lib.Extensions
             return circle is Polygon circlePolygon ? circlePolygon.TryMakeValid() : circle;
         }
 
+        /// <summary>
+        /// Cast IGeoShape to feature
+        /// </summary>
+        /// <param name="geoShape"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
         public static IFeature ToFeature(this IGeoShape geoShape, IDictionary<string, object> attributes = null)
         {
-            if (geoShape == null)
-            {
-                return null;
-            }
+            return geoShape?.ToFeature(attributes);
+        }
 
-            return new Feature {Geometry = geoShape.ToGeometry(), Attributes = attributes == null ? null : new AttributesTable(attributes)};
+        /// <summary>
+        /// Cast geometry to feature
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public static IFeature ToFeature(this Geometry geometry, IDictionary<string, object> attributes = null)
+        {
+            return geometry == null ? null : new Feature { Geometry = geometry, Attributes = attributes == null ? null : new AttributesTable(attributes) };
         }
 
         /// <summary>

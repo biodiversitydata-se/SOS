@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
-    public interface IFishDataObservationVerbatimRepository : IVerbatimRepositoryBase<FishDataObservationVerbatim, string>
+    public interface IFishDataObservationVerbatimRepository : IVerbatimRepositoryBase<FishDataObservationVerbatim, int>
     {
     }
 }

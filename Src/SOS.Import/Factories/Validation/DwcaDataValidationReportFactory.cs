@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -9,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
@@ -20,29 +24,42 @@ namespace SOS.Import.Factories.Validation
     /// </summary>
     public class DwcaDataValidationReportFactory : DataValidationReportFactoryBase<DwcObservationVerbatim>
     {
-        private readonly IDarwinCoreArchiveVerbatimRepository _dwcaVerbatimRepository;
         private DwcaObservationFactory _dwcaObservationFactory;
+        private readonly IVerbatimClient _verbatimClient;
+        private readonly ILoggerFactory _loggerFactory;
 
         public DwcaDataValidationReportFactory(
+            IVerbatimClient verbatimClient,
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IDarwinCoreArchiveVerbatimRepository dwcaVerbatimRepository)
+            ILoggerFactory loggerFactory)
             : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
-            _dwcaVerbatimRepository = dwcaVerbatimRepository;
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         protected override async Task<IAsyncCursor<DwcObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
         {
-            return await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                    dataProvider,
+                    _verbatimClient,
+                    new Logger<DarwinCoreArchiveVerbatimRepository>(_loggerFactory));
+           
+            return await dwcArchiveVerbatimRepository.GetAllByCursorAsync();
         }
 
         protected override async Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider)
         {
-            return await _dwcaVerbatimRepository.CountAllDocumentsAsync(dataProvider.Id, dataProvider.Identifier);
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                dataProvider,
+                _verbatimClient,
+                new Logger<DarwinCoreArchiveVerbatimRepository>(_loggerFactory));
+
+            return await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
         }
 
         protected override Observation CreateProcessedObservation(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)

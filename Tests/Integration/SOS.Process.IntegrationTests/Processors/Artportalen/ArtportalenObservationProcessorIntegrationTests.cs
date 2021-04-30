@@ -94,6 +94,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var dwcaVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                new DataProvider { Id = 1, Identifier = "test" },
                 verbatimClient,
                 new NullLogger<DarwinCoreArchiveVerbatimRepository>());
             var invalidObservationRepository =

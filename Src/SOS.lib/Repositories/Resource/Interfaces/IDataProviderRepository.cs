@@ -17,6 +17,13 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         Task<bool> ClearEmlAsync();
 
         /// <summary>
+        /// Delete EML file for provider
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<bool> DeleteEmlAsync(int providerId);
+
+        /// <summary>
         /// Get EML
         /// </summary>
         /// <param name="providerId"></param>

@@ -18,6 +18,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -123,6 +124,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
+                processConfiguration,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
@@ -132,6 +134,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
+                processConfiguration,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
@@ -141,6 +144,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
@@ -150,6 +154,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
@@ -159,6 +164,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
@@ -168,6 +174,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
@@ -177,6 +184,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                processConfiguration,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
@@ -186,6 +194,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
+                new ProcessConfiguration(), 
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
@@ -209,7 +218,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var processTaxaJob = new ProcessTaxaJob(null, // todo
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
-                new DarwinCoreArchiveVerbatimRepository(verbatimClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                verbatimClient,
                 processedPublicObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),

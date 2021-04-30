@@ -5,7 +5,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
-    public class NorsObservationVerbatimRepository : VerbatimRepositoryBase<NorsObservationVerbatim, string>,
+    public class NorsObservationVerbatimRepository : VerbatimRepositoryBase<NorsObservationVerbatim, int>,
         INorsObservationVerbatimRepository
     {
         public NorsObservationVerbatimRepository(

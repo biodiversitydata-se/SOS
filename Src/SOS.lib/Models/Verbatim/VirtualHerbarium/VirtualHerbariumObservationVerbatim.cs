@@ -1,13 +1,11 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.VirtualHerbarium
 {
     /// <summary>
     ///     Verbatim from Virtual Herbarium
     /// </summary>
-    public class VirtualHerbariumObservationVerbatim : IEntity<ObjectId>
+    public class VirtualHerbariumObservationVerbatim : IEntity<int>
     {
         /// <summary>
         ///     Accession No
@@ -102,7 +100,6 @@ namespace SOS.Lib.Models.Verbatim.VirtualHerbarium
         /// <summary>
         ///     Unique id
         /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
     }
 }
