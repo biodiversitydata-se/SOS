@@ -1,6 +1,4 @@
 ﻿using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Shark
@@ -8,7 +6,7 @@ namespace SOS.Lib.Models.Verbatim.Shark
     /// <summary>
     ///     Verbatim from Shark
     /// </summary>
-    public class SharkObservationVerbatim : IEntity<ObjectId>
+    public class SharkObservationVerbatim : IEntity<int>
     {
         /// <summary>
         ///     Additional sampling
@@ -538,7 +536,6 @@ namespace SOS.Lib.Models.Verbatim.Shark
         /// <summary>
         ///     Unique id
         /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
     }
 }

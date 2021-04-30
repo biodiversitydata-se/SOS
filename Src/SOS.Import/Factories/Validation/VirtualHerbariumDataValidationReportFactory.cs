@@ -83,7 +83,7 @@ namespace SOS.Import.Factories.Validation
         {
             if (_virtualHerbariumObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById);
+                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper);
             }
 
             return _virtualHerbariumObservationFactory;

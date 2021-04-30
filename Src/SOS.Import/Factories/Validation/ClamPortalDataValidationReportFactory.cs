@@ -88,7 +88,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _clamPortalObservationFactory = new ClamPortalObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById,
+                    _areaHelper);
             }
 
             return _clamPortalObservationFactory;

@@ -85,7 +85,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _mvmObservationFactory = new MvmObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById,
+                    _areaHelper);
             }
 
             return _mvmObservationFactory;

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Lib.Extensions;
@@ -11,7 +8,7 @@ using SOS.Lib.Models.Verbatim.Shark;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class SharkHarvestFactory : IHarvestFactory<SharkJsonFile, SharkObservationVerbatim>
+    public class SharkHarvestFactory : HarvestBaseFactory, IHarvestFactory<SharkJsonFile, SharkObservationVerbatim>
     {
         /// <inheritdoc />
         public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
@@ -58,7 +55,10 @@ namespace SOS.Import.Factories.Harvest
                     return null;
                 }
 
-                var observation = new SharkObservationVerbatim();
+                var observation = new SharkObservationVerbatim
+                {
+                    Id = NextId
+                };
                 foreach (var propertyName in propertyMapping)
                 {
                     if (string.IsNullOrEmpty(rowData[propertyName.Value]))

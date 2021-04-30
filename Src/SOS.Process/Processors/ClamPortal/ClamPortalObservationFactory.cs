@@ -10,24 +10,34 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
+using SOS.Process.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.ClamPortal
 {
-    public class ClamPortalObservationFactory
+    public class ClamPortalObservationFactory : IObservationFactory<ClamObservationVerbatim>
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
+        private readonly IAreaHelper _areaHelper;
 
-        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="areaHelper"></param>
+        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
@@ -57,7 +67,7 @@ namespace SOS.Process.Processors.ClamPortal
 
             _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new Observation
+            var obs = new Observation
             {
                 DataProviderId = _dataProvider.Id,
                 AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
@@ -129,6 +139,10 @@ namespace SOS.Process.Processors.ClamPortal
                 RightsHolder = verbatimObservation.RightsHolder,
                 Taxon = taxon
             };
+
+            _areaHelper.AddAreaDataToProcessedObservation(obs);
+
+            return obs;
         }
 
         private VocabularyValue GetBasisOfRecordIdFromString(string basisOfRecord)
