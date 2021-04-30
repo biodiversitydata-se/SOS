@@ -582,11 +582,11 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
+        public int GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {
-                return null;
+                return 0;
             }
 
             if (taxon.Attributes?.OrganismGroup?.StartsWith("fåg", StringComparison.CurrentCultureIgnoreCase) ?? false)
