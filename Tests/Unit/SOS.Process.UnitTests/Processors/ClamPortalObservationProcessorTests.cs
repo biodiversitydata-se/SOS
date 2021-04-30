@@ -101,7 +101,7 @@ namespace SOS.Process.UnitTests.Processors
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataProvider = CreateDataProvider();
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(It.IsAny<int>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(It.IsAny<int>()))
                 .ReturnsAsync(new[]
                 {
                     new ClamObservationVerbatim

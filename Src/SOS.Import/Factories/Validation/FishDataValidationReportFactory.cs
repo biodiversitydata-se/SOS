@@ -85,7 +85,8 @@ namespace SOS.Import.Factories.Validation
             {
                 _fishdataObservationFactory = new FishDataObservationFactory(
                     dataProvider,
-                    _taxonById);
+                    _taxonById,
+                    _areaHelper);
             }
 
             return _fishdataObservationFactory;

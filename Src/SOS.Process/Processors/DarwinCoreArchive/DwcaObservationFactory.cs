@@ -1,9 +1,6 @@
 ﻿using System;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Nest;
@@ -18,9 +15,9 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
@@ -28,7 +25,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation factory.
     /// </summary>
-    public class DwcaObservationFactory
+    public class DwcaObservationFactory : IObservationFactory<DwcObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
