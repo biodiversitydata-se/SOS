@@ -75,6 +75,7 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e,
                     $"Harvest observation database sightings ({batchIndex})");
+                throw;
             }
             finally
             {

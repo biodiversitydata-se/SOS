@@ -118,7 +118,7 @@ namespace SOS.Import.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get data from iNaturalist", e);
-                return null;
+               throw ;
             }
         }
     }

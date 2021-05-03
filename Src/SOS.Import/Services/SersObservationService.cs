@@ -63,7 +63,7 @@ namespace SOS.Import.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get data from SERS", e);
-                return null;
+                throw;
             }
         }
     }
