@@ -10,6 +10,10 @@ namespace SOS.Process.Managers
     {
         private readonly SemaphoreSlim _threadHandler;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="processConfiguration"></param>
         public ProcessManager(ProcessConfiguration processConfiguration)
         {
             _threadHandler = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
@@ -18,7 +22,7 @@ namespace SOS.Process.Managers
         /// <inheritdoc />
         public int Release()
         {
-            return _threadHandler.Release();
+            return _threadHandler.Release(); ;
         }
 
         /// <inheritdoc />

@@ -255,14 +255,13 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e,
                     $"Harvest Artportalen sightings ({batchIndex})");
+                throw new Exception("Harvest Artportalen batch failed");
             }
             finally
             {
                 // Release semaphore in order to let next thread start getting data from source db 
                 _semaphore.Release();
             }
-
-            throw new Exception("Harvest Artportalen batch failed");
         }
 
         /// <summary>

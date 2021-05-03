@@ -106,7 +106,7 @@ namespace SOS.Import.Repositories.Source.ObservationsDatabase
             {
                 _logger.LogError(e, "Error getting observations");
 
-                return null;
+                throw;
             }
         }
 

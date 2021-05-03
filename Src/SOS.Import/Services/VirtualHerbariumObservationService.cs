@@ -45,7 +45,7 @@ namespace SOS.Import.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get data from Virtual Herbarium", e);
-                return null;
+               throw;
             }
         }
 
@@ -59,7 +59,7 @@ namespace SOS.Import.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get localities from Virtual Herbarium", e);
-                return null;
+                throw;
             }
         }
 
