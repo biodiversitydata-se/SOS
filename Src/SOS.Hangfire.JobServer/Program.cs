@@ -243,6 +243,9 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine($"[VirtualHerbariumServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.VirtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine("");
 
+            sb.AppendLine($"[TaxonListServiceConfiguration].[BaseAddress]: {_importConfiguration.TaxonListServiceConfiguration.BaseAddress}");
+            sb.AppendLine("");
+
             sb.AppendLine(
                 $"[MongoDb].[Servers]: {string.Join(", ", _verbatimDbConfiguration.Hosts.Select(x => x.Name))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_verbatimDbConfiguration.DatabaseName}");

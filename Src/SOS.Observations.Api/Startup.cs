@@ -322,6 +322,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IDataProviderCache, DataProviderCache>();
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
+            services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
 
             // Add managers
@@ -329,6 +330,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
+            services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
@@ -342,6 +344,7 @@ namespace SOS.Observations.Api
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
+            services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
