@@ -81,7 +81,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Bird nest activity.
         /// </summary>
-        public int? BirdNestActivityId { get; set; }
+        public int BirdNestActivityId { get; set; }
 
         /// <summary>
         ///     An identifier (preferably unique) for the record

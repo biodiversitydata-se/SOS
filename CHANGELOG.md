@@ -13,6 +13,10 @@
 
 **Prod**: 
 
+### `Added`
+- New search filter: `BirdNestActivityLimit`
+- New vocabulary: `BirdNestActivity`
+
 ### `Changed`
 
 #### API

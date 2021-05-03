@@ -891,6 +891,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
             query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
+            query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);
 
             if (filter is SearchFilterInternal)
             {

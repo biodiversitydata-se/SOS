@@ -33,6 +33,7 @@ namespace SOS.Observations.Api.Extensions
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
+            filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
             filter.Geometries = searchFilterBaseDto.Geometry?.Geometries == null
                 ? null
                 : new GeometryFilter
