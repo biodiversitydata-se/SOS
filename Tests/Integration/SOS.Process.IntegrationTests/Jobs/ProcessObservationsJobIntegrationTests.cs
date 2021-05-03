@@ -82,6 +82,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
+            var processManager = new ProcessManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedPublicObservationRepository processedPublicObservationRepository;
             IProcessedProtectedObservationRepository processedProtectedObservationRepository;
@@ -123,8 +124,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
@@ -132,9 +133,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 areaHelper,
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
-                dwcArchiveFileWriterCoordinator, 
+                dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
@@ -143,8 +144,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
@@ -153,8 +154,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
@@ -163,8 +164,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
@@ -173,8 +174,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
@@ -183,8 +184,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                processConfiguration,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
@@ -193,8 +194,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
-                new ProcessConfiguration(), 
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
@@ -205,6 +206,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,
+                processManager,
                 validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
@@ -223,8 +225,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 areaHelper,
-                processConfiguration,
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
                 new NullLogger<DwcaObservationProcessor>());
 
@@ -236,6 +238,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,
+                processManager,
                 validationManager,
                 areaHelper,
                 processConfiguration,

@@ -17,6 +17,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium;
 using Xunit;
 
@@ -39,6 +40,7 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _processManagerMock = new Mock<IProcessManager>();
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationProcessor>>();
         }
 
@@ -49,6 +51,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+        private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<VirtualHerbariumObservationProcessor>> _loggerMock;
 
@@ -58,8 +61,8 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock.Object,
             _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _processManagerMock.Object,
             _validationManagerMock.Object,
-            new ProcessConfiguration(),
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()
