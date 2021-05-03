@@ -11,6 +11,7 @@ namespace SOS.Observations.Api.IntegrationTests
             public static readonly int Otter = 100077;
             public static readonly int Mammalia = 4000107;
             public static readonly int Wolf = 100024;
+            public static readonly int Aves = 4000104;
         }
 
         public static class Areas

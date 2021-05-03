@@ -183,6 +183,15 @@ namespace SOS.Lib.Models.Search
 
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
 
+        /// <summary>
+        /// Limit returned observations based on bird nest activity level.
+        /// Only bird observations in Artportalen are affected
+        /// by this search criteria.
+        /// Observation of other organism groups (not birds) are
+        /// not affected by this search criteria. 
+        /// </summary>
+        public int? BirdNestActivityLimit { get; set; }
+
         public FilterBase Clone()
         {
             var searchFilter = (FilterBase) MemberwiseClone();
