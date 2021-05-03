@@ -1,0 +1,92 @@
+﻿[
+    {
+        "Id": 1,
+        "TaxonListServiceId": 34,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Protected species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fridlysta arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 2,
+        "TaxonListServiceId": 33,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Signalarter"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Signalarter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 3,
+        "TaxonListServiceId": 35,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Invasive species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Främmande arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 4,
+        "TaxonListServiceId": 227,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Redlisted species"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Rödlistade arter"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 5,
+        "TaxonListServiceId": 8,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Habitatdirektivet"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Habitatdirektivet"
+            }
+        ],
+        "TaxonIds": []
+    },
+    {
+        "Id": 6,
+        "TaxonListServiceId": 13,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Åtgärdsprogram"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Åtgärdsprogram"
+            }
+        ],
+        "TaxonIds": []
+    }
+]

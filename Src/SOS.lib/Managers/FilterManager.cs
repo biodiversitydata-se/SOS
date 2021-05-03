@@ -74,7 +74,7 @@ namespace SOS.Lib.Managers
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
                 extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, false);
-                extendedAuthorizationFilter.TaxonIds = PopulateTaxonFilter(authority.TaxonIds, true);
+                extendedAuthorizationFilter.TaxonIds = PopulateTaxonFilter(authority.TaxonIds, true, null);
 
                 // To get extended authorization, taxon id's and some area must be set 
                 if (
@@ -106,7 +106,46 @@ namespace SOS.Lib.Managers
         /// <param name="taxonIds"></param>
         /// <param name="includeUnderlyingTaxa"></param>
         /// <returns></returns>
-        private IEnumerable<int> PopulateTaxonFilter(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa)
+        private IEnumerable<int> PopulateTaxonFilter(
+            IEnumerable<int> taxonIds, 
+            bool includeUnderlyingTaxa,
+            IEnumerable<int> taxonListIds,
+            FilterBase.TaxonListOp taxonListOperator = FilterBase.TaxonListOp.Merge
+            )
+        {
+            var taxa = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
+            if (taxonListIds == null || !taxonListIds.Any()) return taxa;
+            var taxonListIdsSet = new HashSet<int>();
+            foreach (var taxonListId in taxonListIds)
+            {
+                if (_taxonManager.TaxonListSetById.TryGetValue(taxonListId, out var taxonListSet))
+                {
+                    taxonListIdsSet.UnionWith(taxonListSet);
+                }
+            }
+
+            if (taxonListIdsSet.Count == 0) return taxa;
+            if (taxa == null) return taxonListIdsSet;
+            if (taxonListOperator == FilterBase.TaxonListOp.Merge)
+            {
+                taxonListIdsSet.UnionWith(taxa);
+                return taxonListIdsSet;
+            }
+            else if (taxonListOperator == FilterBase.TaxonListOp.Filter)
+            {
+                HashSet<int> taxaSet = new HashSet<int>();
+                taxaSet.UnionWith(taxa);
+                taxaSet.IntersectWith(taxonListIdsSet);
+                return taxaSet;
+            }
+
+            return null;
+        }
+
+        private IEnumerable<int> GetTaxonFilterIds(
+            IEnumerable<int> taxonIds,
+            bool includeUnderlyingTaxa
+        )
         {
             if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
             {
@@ -115,6 +154,8 @@ namespace SOS.Lib.Managers
 
             return taxonIds.Contains(BiotaTaxonId) ? null : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
         }
+
+
 
         /// <summary>
         /// Populate geographical filter
@@ -214,7 +255,7 @@ namespace SOS.Lib.Managers
             }
             
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, filter.AreaGeometrySearchForced);
-            filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa);
+            filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa, filter.TaxonListIds, filter.TaxonListOperator);
         }
     }
 }

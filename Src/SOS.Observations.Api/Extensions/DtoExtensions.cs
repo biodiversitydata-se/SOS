@@ -27,6 +27,8 @@ namespace SOS.Observations.Api.Extensions
             filter.TaxonIds = searchFilterBaseDto.Taxon?.Ids;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
+            filter.TaxonListIds = searchFilterBaseDto.Taxon?.TaxonListIds;
+            filter.TaxonListOperator = (FilterBase.TaxonListOp)(searchFilterBaseDto.Taxon?.TaxonListOperator).GetValueOrDefault();
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.MaxAccuracy = searchFilterBaseDto.Geometry?.MaxAccuracy;
@@ -358,6 +360,17 @@ namespace SOS.Observations.Api.Extensions
                                 SosId = vocabularyExternalSystemsMappingMappingValue.SosId
                             }).ToList()
                     }).ToList()
+            };
+        }
+
+        public static TaxonListTaxonInformationDto ToTaxonListTaxonInformationDto(
+            this TaxonListTaxonInformation taxonInformation)
+        {
+            return new TaxonListTaxonInformationDto
+            {
+                Id = taxonInformation.Id,
+                ScientificName = taxonInformation.ScientificName,
+                SwedishName = taxonInformation.SwedishName
             };
         }
     }

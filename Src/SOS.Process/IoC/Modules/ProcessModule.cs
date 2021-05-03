@@ -88,6 +88,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<DataProviderCache>().As<IDataProviderCache>().SingleInstance();
             builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
             builder.RegisterType<TaxonCache>().As<ICache<int, Taxon>>().SingleInstance();
+            builder.RegisterType<TaxonListCache>().As<ICache<int, TaxonList>>().SingleInstance();
 
             // Helpers, single instance since static data
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
