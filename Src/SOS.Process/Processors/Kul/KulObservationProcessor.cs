@@ -12,6 +12,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 
 namespace SOS.Process.Processors.Kul
@@ -44,26 +45,26 @@ namespace SOS.Process.Processors.Kul
                 cancellationToken);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="kulObservationVerbatimRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="logger"></param>
+       /// <summary>
+       /// Constructor
+       /// </summary>
+       /// <param name="kulObservationVerbatimRepository"></param>
+       /// <param name="areaHelper"></param>
+       /// <param name="processedPublicObservationRepository"></param>
+       /// <param name="vocabularyValueResolver"></param>
+       /// <param name="dwcArchiveFileWriterCoordinator"></param>
+       /// <param name="processManager"></param>
+       /// <param name="validationManager"></param>
+       /// <param name="logger"></param>
         public KulObservationProcessor(IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IProcessManager processManager,
             IValidationManager validationManager,
-            ProcessConfiguration processConfiguration,
             ILogger<KulObservationProcessor> logger) :
-            base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
+            base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(

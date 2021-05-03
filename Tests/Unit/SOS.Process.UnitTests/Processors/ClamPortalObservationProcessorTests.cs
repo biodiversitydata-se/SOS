@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -16,6 +14,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.ClamPortal;
 using Xunit;
 
@@ -36,6 +35,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+            _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ClamPortalObservationProcessor>>();
         }
@@ -45,6 +45,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+        private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ClamPortalObservationProcessor>> _loggerMock;
 
@@ -54,8 +55,8 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock.Object,
             _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _processManagerMock.Object,
             _validationManagerMock.Object,
-            new ProcessConfiguration(),
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()

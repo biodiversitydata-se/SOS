@@ -48,7 +48,7 @@ namespace SOS.Import.Services
                     return await GetAsync(getFromId, ++attempt);
                 }
 
-                return new Tuple<long, IEnumerable<WebSpeciesObservation>>(0L, null);
+                throw;
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -52,12 +53,12 @@ namespace SOS.Process.UnitTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync(0);
+            Func<Task> act = async () => { await TestObject.GetAsync(0); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>

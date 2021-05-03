@@ -28,7 +28,7 @@ namespace SOS.Process.Processors
         where TFactory : IObservationFactory<TVerbatim> 
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
-        protected readonly SemaphoreSlim SemaphoreBatch;
+        private readonly IProcessManager _processManager;
         private readonly IDiffusionManager _diffusionManager;
         private readonly bool _handleProtected;
 
@@ -207,7 +207,7 @@ namespace SOS.Process.Processors
             }
             finally
             {
-                SemaphoreBatch.Release();
+                _processManager.Release();
             }
 
             return (0, 0);
@@ -276,7 +276,7 @@ namespace SOS.Process.Processors
             }
             finally
             {
-                SemaphoreBatch.Release();
+                _processManager.Release();
             }
 
             return 0;
@@ -320,14 +320,14 @@ namespace SOS.Process.Processors
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
-        /// <param name="processConfiguration"></param>
+        /// <param name="processManager"></param>
         /// <param name="logger"></param>
         protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<TClass> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager,null, processConfiguration, logger)
+            IProcessManager processManager,
+            ILogger<TClass> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager,null, processManager, new ProcessConfiguration{Diffusion = false}, logger)
         {
         }
 
@@ -348,6 +348,7 @@ namespace SOS.Process.Processors
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessManager processManager,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger)
         {
@@ -368,7 +369,7 @@ namespace SOS.Process.Processors
             }
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
-            SemaphoreBatch = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
+            _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -395,7 +396,7 @@ namespace SOS.Process.Processors
 
             while (startId <= maxId)
             {
-                await SemaphoreBatch.WaitAsync();
+                await _processManager.WaitAsync();
 
                 var batchEndId = startId + WriteBatchSize - 1;
                 processBatchTasks.Add(ProcessBatchAsync(
