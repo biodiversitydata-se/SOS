@@ -29,7 +29,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processDbConfiguration.WriteBatchSize);
             var elasticConfiguration = GetElasticConfiguration();
 
-            var taxonProcessor = new TaxonProcessor(null, null, null, null); //Todo
+            var taxonProcessor = new TaxonProcessor(null, null, null, null, null); //Todo
 
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.DarwinCore;
@@ -185,6 +186,7 @@ namespace SOS.Process.Processors.Taxon
             ITaxonService taxonService,
             ITaxonAttributeService taxonAttributeService,
             ITaxonRepository processedTaxonRepository,
+            ProcessConfiguration processConfiguration,
             ILogger<TaxonProcessor> logger)
         {
            
@@ -194,10 +196,12 @@ namespace SOS.Process.Processors.Taxon
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(8);
+            if (processConfiguration == null)
+            {
+                throw new ArgumentException(nameof(processConfiguration));
+            }
+            _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
-
-       
 
         /// <inheritdoc />
         public async Task<int> ProcessTaxaAsync()

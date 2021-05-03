@@ -64,7 +64,7 @@ namespace SOS.Import.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get data from KUL", e);
-                return null;
+               throw;
             }
         }
     }

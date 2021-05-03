@@ -124,6 +124,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var areaHelper = new AreaHelper(
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
+            var processManager = new ProcessManager(processConfiguration);
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
                 processedPublicObservationRepository,
@@ -132,7 +133,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
-                diffusionManager, 
+                diffusionManager,
+                processManager,
                 validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
         }

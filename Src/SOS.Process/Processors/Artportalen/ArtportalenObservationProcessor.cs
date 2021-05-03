@@ -38,6 +38,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
@@ -48,9 +49,10 @@ namespace SOS.Process.Processors.Artportalen
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IDiffusionManager diffusionManager,
+            IProcessManager processManager,
             IValidationManager validationManager,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processManager, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
