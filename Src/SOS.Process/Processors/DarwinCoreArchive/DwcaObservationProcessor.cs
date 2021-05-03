@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -15,6 +14,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
@@ -62,8 +62,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public DwcaObservationProcessor(
@@ -72,11 +72,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,
-            ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IProcessManager processManager,
             IValidationManager validationManager,
             ILogger<DwcaObservationProcessor> logger) :
-                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processConfiguration, logger)
+                base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??

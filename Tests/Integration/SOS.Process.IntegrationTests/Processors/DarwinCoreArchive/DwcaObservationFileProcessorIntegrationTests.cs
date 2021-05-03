@@ -28,6 +28,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
@@ -80,6 +81,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .ReturnsAsync(mockCursor.Object);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var processManager = new ProcessManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedPublicObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
@@ -115,8 +117,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>())),
-                processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
+                processManager,
                 validationManager,
                 new NullLogger<DwcaObservationProcessor>());
         }
