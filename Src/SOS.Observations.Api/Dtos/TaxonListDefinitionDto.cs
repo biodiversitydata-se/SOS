@@ -14,6 +14,11 @@ namespace SOS.Observations.Api.Dtos
         public int Id { get; set; }
 
         /// <summary>
+        /// The parent Id of the taxon list.
+        /// </summary>
+        public int? ParentId { get; set; }
+
+        /// <summary>
         ///     The name of the taxon list.
         /// </summary>
         public string Name { get; set; }
@@ -33,6 +38,7 @@ namespace SOS.Observations.Api.Dtos
             return new TaxonListDefinitionDto
             {
                 Id = taxonList.Id,
+                ParentId = taxonList.ParentId,
                 Name = taxonList.Names?.Translate(cultureCode)
             };
         }

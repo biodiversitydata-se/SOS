@@ -16,6 +16,11 @@ namespace SOS.Lib.Models.Shared
         public int Id { get; set; }
 
         /// <summary>
+        /// The Parent Id of the taxon list.
+        /// </summary>
+        public int? ParentId { get; set; }
+
+        /// <summary>
         /// The Id in Taxon list service.
         /// </summary>
         public int TaxonListServiceId { get; set; }
