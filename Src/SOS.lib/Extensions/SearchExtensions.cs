@@ -256,11 +256,15 @@ namespace SOS.Lib.Extensions
                     }
                 }
                 query.AddScript($@"
-                            int startMonth = doc['event.startDate'].value.getMonthValue();
-                            int startDay = doc['event.startDate'].value.getDayOfMonth();
-
-                            int endMonth = doc['event.endDate'].value.getMonthValue();
-                            int endDay = doc['event.endDate'].value.getDayOfMonth();
+                            ZonedDateTime zStartDate = doc['event.startDate'].value;  
+                            ZonedDateTime convertedStartDate = zStartDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                            int startMonth = convertedStartDate.getMonthValue();
+                            int startDay = convertedStartDate.getDayOfMonth();
+                            
+                            ZonedDateTime zEndDate = doc['event.endDate'].value;  
+                            ZonedDateTime convertedEndDate = zEndDate.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                            int endMonth = convertedEndDate.getMonthValue();
+                            int endDay = convertedEndDate.getDayOfMonth();
 
                             int fromMonth = {internalFilter.StartDate.Value.Month};
                             int fromDay = {internalFilter.StartDate.Value.Day};
