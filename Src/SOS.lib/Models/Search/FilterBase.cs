@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Search
@@ -210,6 +211,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<TimeRange> TimeRanges { get; set; }
 
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+
+        /// <summary>
+        /// Filter by uncertain determination
+        /// </summary>
+        public SightingDeterminationFilter DeterminationFilter { get; set; }
 
         /// <summary>
         /// Limit returned observations based on bird nest activity level.
