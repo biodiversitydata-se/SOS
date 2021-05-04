@@ -23,7 +23,7 @@
 
 #### Sökfilter
 - extendedFilter.maxAccuracy => geometry.maxAccuracy
-
+- extendedFilter.determinationFilter => determinationFilter
 ## [1.0.1]
 
 ### Releases
