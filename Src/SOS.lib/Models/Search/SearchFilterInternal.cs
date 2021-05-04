@@ -84,8 +84,6 @@ namespace SOS.Lib.Models.Search
         public List<int> ValidationStatusIds { get; set; }
         public List<int> ExcludeValidationStatusIds { get; set; }
 
-        public SightingDeterminationFilter DeterminationFilter { get; set; }
-
         public SightingUnspontaneousFilter UnspontaneousFilter { get; set; }
 
         public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }

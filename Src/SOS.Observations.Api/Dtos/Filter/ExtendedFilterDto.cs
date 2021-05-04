@@ -13,13 +13,6 @@ namespace SOS.Observations.Api.Dtos.Filter
             DoNotShowSightingsInMerged
         }
 
-        public enum SightingDeterminationFilterDto
-        {
-            NoFilter,
-            NotUnsureDetermination,
-            OnlyUnsureDetermination
-        }
-
         public enum SightingUnspontaneousFilterDto
         {
             NoFilter,
@@ -93,8 +86,6 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public List<int> ValidationStatusIds { get; set; }
         public List<int> ExcludeValidationStatusIds { get; set; }
-
-        public SightingDeterminationFilterDto DeterminationFilter { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
 

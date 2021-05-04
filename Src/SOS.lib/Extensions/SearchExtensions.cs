@@ -148,16 +148,6 @@ namespace SOS.Lib.Extensions
                 // query.AddWildcardCriteria("taxon.individualId", "?*");
             }
 
-            switch (internalFilter.DeterminationFilter)
-            {
-                case SightingDeterminationFilter.NotUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainIdentification", false);
-                    break;
-                case SightingDeterminationFilter.OnlyUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainIdentification", true);
-                    break;
-            }
-
             switch (internalFilter.UnspontaneousFilter)
             {
                 case SightingUnspontaneousFilter.NotUnspontaneous:
@@ -451,10 +441,28 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Add geometry filter to query
+        /// Add determination filters
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
+        private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            switch (filter.DeterminationFilter)
+            {
+                case SightingDeterminationFilter.NotUnsureDetermination:
+                    query.TryAddTermCriteria("identification.uncertainIdentification", false);
+                    break;
+                case SightingDeterminationFilter.OnlyUnsureDetermination:
+                    query.TryAddTermCriteria("identification.uncertainIdentification", true);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Add geometry filter to query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="geometryFilter"></param>
         private static void TryAddGeometryFilters(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             GeometryFilter geometryFilter)
@@ -877,6 +885,7 @@ namespace SOS.Lib.Extensions
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
             query.AddAuthorizationFilters(filter);
             query.TryAddDateRangeFilters(filter);
+            query.TryAddDeterminationFilters(filter);
             query.TryAddTimeRangeFilters(filter);
             query.TryAddGeographicFilter(filter.AreaGeographic);
             query.TryAddGeometryFilters(filter.Geometries);
