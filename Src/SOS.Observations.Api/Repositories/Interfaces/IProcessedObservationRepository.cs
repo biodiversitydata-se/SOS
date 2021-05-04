@@ -31,6 +31,13 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
+        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take,
+            string sortBy,
+            SearchSortOrder sortOrder,
+            string scrollId);
+
         /// <summary>
         /// 
         /// </summary>
