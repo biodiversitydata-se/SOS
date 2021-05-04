@@ -92,8 +92,9 @@ namespace SOS.Import.Harvesters.Observations
 
                 var verbatimFactory = new SharkHarvestFactory();
 
-
-                foreach (var row in dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray()))
+                var rows = dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray());
+                
+                foreach (var row in rows)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_sharkServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
