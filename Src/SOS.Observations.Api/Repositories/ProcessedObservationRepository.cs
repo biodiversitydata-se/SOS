@@ -33,6 +33,7 @@ namespace SOS.Observations.Api.Repositories
     public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
     {
+        private const string ScrollTimeOut = "120s";
         private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClient _elasticClient;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
@@ -175,6 +176,61 @@ namespace SOS.Observations.Api.Repositories
                 Skip = skip,
                 Take = take,
                 TotalCount = totalCount
+            };
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take, 
+            string sortBy,
+            SearchSortOrder sortOrder,
+            string scrollId)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
+
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+            ISearchResponse<dynamic> searchResponse;
+
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(indexNames)
+                    .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                    .Size(take)
+                    .Scroll(ScrollTimeOut)
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                    .Sort(sort => sortDescriptor)
+                );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            operation.Telemetry.Properties["SpeciesObservationCount"] = searchResponse.Documents.Count.ToString();
+
+            // Optional: explicitly send telemetry item:
+            _telemetry.StopOperation(operation);
+
+            return new ScrollResult<dynamic>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.Documents.Count < take ? null : searchResponse.ScrollId,
+                Take = take,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
             };
 
             // When operation is disposed, telemetry item is sent.

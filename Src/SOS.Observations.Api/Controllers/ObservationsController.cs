@@ -719,6 +719,79 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        ///     Get observations matching the provided search filter. This endpoint allows to retrieve up to 100 000 observations by using Elasticsearch scroll API.
+        ///     Timeout between calls are two minutes.
+        /// </summary>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="scrollId">The scroll id to use to get next batch. In first request scrollId should be empty.</param>
+        /// <param name="take">Max number of observations to return. Max is 10 000 observations in each request.</param>
+        /// <param name="sortBy">Field to sort by.</param>
+        /// <param name="sortOrder">Sort order (Asc, Desc).</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <returns>List of observations matching the provided search filter.</returns>
+        /// <example>
+        ///     Get all observations within 100m of provided point
+        ///     "geometryFilter": {
+        ///     "maxDistanceFromPoint": 100,
+        ///     "geometry": {
+        ///     "coordinates": [ 12.3456(lon), 78.9101112(lat) ],
+        ///     "type": "Point"
+        ///     },
+        ///     "usePointAccuracy": false
+        ///     }
+        /// </example>
+        [HttpPost("Internal/SearchScroll")]
+        [ProducesResponseType(typeof(ScrollResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> ObservationsScroll(
+            [FromBody] SearchFilterDto filter,
+            [FromQuery] string scrollId,
+            [FromQuery] int take = 5000,
+            [FromQuery] string sortBy = "",
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool protectedObservations = false)
+        {
+            try
+            {
+                const int maxTotalCount = 100000;
+                var takeValidation = take <= 10000
+                    ? Result.Success()
+                    : Result.Failure("You can't take more than 10 000 at a time.");
+                
+                var validationResult = Result.Combine(
+                    takeValidation,
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidatePropertyExists(nameof(sortBy), sortBy),
+                    ValidateTranslationCultureCode(translationCultureCode));
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
+                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                var result = await ObservationManager.GetObservationsByScrollAsync(searchFilter, take, sortBy, sortOrder, scrollId);
+                if (result.TotalCount > maxTotalCount)
+                {
+                    return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
+                }
+                ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
+                return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Search error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
 
         /// <summary>
         /// Count matching observations using internal filter

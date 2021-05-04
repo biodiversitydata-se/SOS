@@ -235,6 +235,18 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
+        public static ScrollResultDto<TRecordDto> ToScrollResultDto<TRecord, TRecordDto>(this ScrollResult<TRecord> scrollResult, IEnumerable<TRecordDto> records)
+        {
+            return new ScrollResultDto<TRecordDto>
+            {
+                Records = records,
+                ScrollId = scrollResult.ScrollId,
+                HasMorePages = scrollResult.ScrollId != null,
+                Take = scrollResult.Take,
+                TotalCount = scrollResult.TotalCount
+            };
+        }
+
         public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
             return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);

@@ -5,7 +5,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Protected species"
+                "Value": "Protected by law species"
             },
             {
                 "CultureCode": "sv-SE",
@@ -20,7 +20,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Signalarter"
+                "Value": "Signal species"
             },
             {
                 "CultureCode": "sv-SE",
@@ -65,7 +65,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitatdirektivet"
+                "Value": "Habitats directive"
             },
             {
                 "CultureCode": "sv-SE",
@@ -80,7 +80,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Åtgärdsprogram"
+                "Value": "Action plan"
             },
             {
                 "CultureCode": "sv-SE",

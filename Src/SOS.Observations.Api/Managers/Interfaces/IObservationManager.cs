@@ -33,6 +33,22 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchSortOrder sortOrder);
 
         /// <summary>
+        /// Get observations by scroll
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="take"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take,
+            string sortBy,
+            SearchSortOrder sortOrder,
+            string scrollId);
+
+        /// <summary>
         ///     Get aggregated data
         /// </summary>
         /// <param name="filter"></param>
