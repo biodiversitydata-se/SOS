@@ -76,6 +76,34 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take, 
+            string sortBy,
+            SearchSortOrder sortOrder,
+            string scrollId)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter);
+                var processedObservations =
+                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
+                ResolveLocalizedVocabularyFields(filter.FieldTranslationCultureCode, processedObservations.Records);
+                ResolveNonLocalizedVocabularyFields(processedObservations.Records);
+                return processedObservations;
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get observations by scroll");
+                return null;
+            }
+        }
+
+
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
