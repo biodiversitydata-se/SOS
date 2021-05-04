@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Lib.Extensions;
@@ -10,6 +11,49 @@ namespace SOS.Import.Factories.Harvest
 {
     public class SharkHarvestFactory : HarvestBaseFactory, IHarvestFactory<SharkJsonFile, SharkObservationVerbatim>
     {
+        private static readonly Encoding Utf8Encoder = Encoding.GetEncoding(
+            "UTF-8",
+            new EncoderReplacementFallback(string.Empty),
+            new DecoderExceptionFallback()
+        );
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rowData"></param>
+        /// <param name="propertyMapping"></param>
+        /// <returns></returns>
+        private SharkObservationVerbatim CastEntityToVerbatim(IReadOnlyList<string> rowData,
+            IDictionary<string, int> propertyMapping)
+        {
+            if (propertyMapping.TryGetValue("value", out var valueIndex))
+            {
+                if (!double.TryParse(rowData[valueIndex], NumberStyles.Number, CultureInfo.InvariantCulture, out var value) || value == 0)
+                {
+                    return null;
+                }
+
+                var observation = new SharkObservationVerbatim
+                {
+                    Id = NextId
+                };
+                foreach (var propertyName in propertyMapping)
+                {
+                    var propertyValue = Utf8Encoder.GetString(Utf8Encoder.GetBytes(rowData[propertyName.Value]));
+
+                    if (string.IsNullOrEmpty(propertyValue))
+                    {
+                        continue;
+                    }
+
+                    observation.SetProperty(propertyName.Key, propertyValue);
+                }
+
+                return observation;
+            }
+
+            return null;
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
         {
@@ -38,41 +82,6 @@ namespace SOS.Import.Factories.Harvest
 
                 return from v in verbatims where v != null select v;
             });
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="rowData"></param>
-        /// <param name="propertyMapping"></param>
-        /// <returns></returns>
-        private SharkObservationVerbatim CastEntityToVerbatim(IReadOnlyList<string> rowData,
-            IDictionary<string, int> propertyMapping)
-        {
-            if (propertyMapping.TryGetValue("value", out var valueIndex))
-            {
-                if (!double.TryParse(rowData[valueIndex], NumberStyles.Number, CultureInfo.InvariantCulture, out var value) || value == 0)
-                {
-                    return null;
-                }
-
-                var observation = new SharkObservationVerbatim
-                {
-                    Id = NextId
-                };
-                foreach (var propertyName in propertyMapping)
-                {
-                    if (string.IsNullOrEmpty(rowData[propertyName.Value]))
-                    {
-                        continue;
-                    }
-
-                    observation.SetProperty(propertyName.Key, rowData[propertyName.Value]);
-                }
-
-                return observation;
-            }
-
-            return null;
         }
     }
 }
