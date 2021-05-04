@@ -6,14 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.Lib.Cache;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services.Interfaces;
@@ -105,8 +103,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
+            var dataproviderRepsoitory = new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
+            var dataproviderCache = new DataProviderCache(dataproviderRepsoitory);
             var userServiceMock = new Moq.Mock<IUserService>();
-            var filterManager = new FilterManager(taxonManager, userServiceMock.Object, areaCache);
+            var filterManager = new FilterManager(taxonManager, userServiceMock.Object, areaCache, dataproviderCache);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
                 filterManager,  new NullLogger<ObservationManager>());
 
