@@ -71,6 +71,24 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
+        /// Operator to use when TaxonListIds is specified.
+        /// </summary>
+        public enum TaxonListOp
+        {
+            /// <summary>
+            /// The taxon ids in the specified taxon lists is merged with the taxa
+            /// specified in the taxon filter.
+            /// </summary>
+            Merge,
+
+            /// <summary>
+            /// The specified taxa in the taxon filter is filtered to include only
+            /// those who exists in the specified taxon lists.
+            /// </summary>
+            Filter
+        }
+
+        /// <summary>
         /// Area geometry will be used for all types of areas if true
         /// </summary>
         public bool AreaGeometrySearchForced { get; set; }
@@ -175,6 +193,16 @@ namespace SOS.Lib.Models.Search
         ///     Taxa to match. Queryable values are available in Dyntaxa.
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
+
+        /// <summary>
+        /// Add (merge) or filter taxa by using taxon lists.
+        /// </summary>
+        public IEnumerable<int> TaxonListIds { get; set; }
+
+        /// <summary>
+        /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
+        /// </summary>
+        public TaxonListOp TaxonListOperator { get; set; } = TaxonListOp.Merge;
 
         /// <summary>
         /// Predefined time ranges.

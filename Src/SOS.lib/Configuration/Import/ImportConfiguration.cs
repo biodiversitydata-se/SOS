@@ -75,5 +75,10 @@ namespace SOS.Lib.Configuration.Import
         ///     iNaturalist Service/repository configuration.
         /// </summary>
         public iNaturalistServiceConfiguration iNaturalistServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// Taxon list service configuration.
+        /// </summary>
+        public TaxonListServiceConfiguration TaxonListServiceConfiguration { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

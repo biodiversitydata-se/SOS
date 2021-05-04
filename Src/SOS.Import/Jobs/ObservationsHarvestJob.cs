@@ -29,6 +29,7 @@ namespace SOS.Import.Jobs
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDictionary<DataProviderType, IObservationHarvester> _harvestersByType;
         private readonly IProjectHarvester _projectHarvester;
+        private readonly ITaxonListHarvester _taxonListHarvester;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
         private  async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
@@ -108,6 +109,7 @@ namespace SOS.Import.Jobs
                 if (mode == JobRunModes.Full)
                 {
                     await _projectHarvester.HarvestProjectsAsync();
+                    await _taxonListHarvester.HarvestTaxonListsAsync();
                 }
 
                 _logger.LogInformation($"Finish {mode} resources harvest jobs");
@@ -244,7 +246,9 @@ namespace SOS.Import.Jobs
         /// <param name="sersObservationHarvester"></param>
         /// <param name="sharkObservationHarvester"></param>
         /// <param name="virtualHerbariumObservationHarvester"></param>
+        /// <param name="iNaturalistObservationHarvester"></param>
         /// <param name="projectHarvester"></param>
+        /// <param name="taxonListHarvester"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
@@ -262,6 +266,7 @@ namespace SOS.Import.Jobs
             IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
             IiNaturalistObservationHarvester iNaturalistObservationHarvester,
             IProjectHarvester projectHarvester,
+            ITaxonListHarvester taxonListHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<ObservationsHarvestJob> logger)
@@ -270,7 +275,7 @@ namespace SOS.Import.Jobs
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _projectHarvester = projectHarvester ?? throw new ArgumentNullException(nameof(projectHarvester));
-
+            _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));
             if (clamPortalObservationHarvester == null) throw new ArgumentNullException(nameof(clamPortalObservationHarvester));
