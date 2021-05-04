@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Interfaces;
+﻿using System.Collections.Generic;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 
 namespace SOS.Lib.Managers.Interfaces
@@ -12,5 +13,10 @@ namespace SOS.Lib.Managers.Interfaces
         ///     Taxon Tree
         /// </summary>
         TaxonTree<IBasicTaxon> TaxonTree { get; }
+
+        /// <summary>
+        /// Taxon lists taxon ids.
+        /// </summary>
+        public Dictionary<int, HashSet<int>> TaxonListSetById { get; }
     }
 }

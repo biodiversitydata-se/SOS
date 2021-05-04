@@ -5,6 +5,7 @@
         Area,
         DataProviders,
         Vocabulary,
-        Projects
+        Projects,
+        TaxonLists
     }
 }

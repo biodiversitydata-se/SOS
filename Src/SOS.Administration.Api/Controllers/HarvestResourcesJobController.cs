@@ -69,5 +69,21 @@ namespace SOS.Administration.Api.Controllers
 
         #endregion Geo
 
+        [HttpPost("HarvestTaxonLists/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunHarvestTaxonListsJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ITaxonListsHarvestJob>(job => job.RunHarvestTaxonListsAsync());
+                return new OkObjectResult("Taxon lists harvest job was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing taxon lists harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

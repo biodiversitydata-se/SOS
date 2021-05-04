@@ -92,7 +92,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         private TaxonManager CreateTaxonManager(ProcessClient processClient, IMemoryCache memoryCache)
         {
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
-            var taxonManager = new TaxonManager(taxonRepository, memoryCache, new NullLogger<TaxonManager>());
+            var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
+            var taxonManager = new TaxonManager(taxonRepository, taxonListRepository, memoryCache, new NullLogger<TaxonManager>());
             return taxonManager;
         }
 

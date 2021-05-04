@@ -21,16 +21,21 @@ namespace SOS.Export.UnitTests.Managers
         public TaxonManagerTests()
         {
             _processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
+            _taxonListRepositoryMock = new Mock<ITaxonListRepository>();
             _loggerMock = new Mock<ILogger<TaxonManager>>();
         }
 
         private readonly Mock<ITaxonRepository> _processedTaxonRepositoryMock;
+        private readonly Mock<ITaxonListRepository> _taxonListRepositoryMock;
         private readonly Mock<ILogger<TaxonManager>> _loggerMock;
 
         /// <summary>
         ///     Return object to be tested
         /// </summary>
-        private TaxonManager TestObject => new TaxonManager(_processedTaxonRepositoryMock.Object, new MemoryCache(new MemoryCacheOptions()),
+        private TaxonManager TestObject => new TaxonManager(
+            _processedTaxonRepositoryMock.Object, 
+            _taxonListRepositoryMock.Object,
+            new MemoryCache(new MemoryCacheOptions()),
             _loggerMock.Object);
 
         /// <summary>
