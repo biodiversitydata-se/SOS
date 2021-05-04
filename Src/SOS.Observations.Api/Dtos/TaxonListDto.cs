@@ -17,6 +17,11 @@ namespace SOS.Observations.Api.Dtos
         public int Id { get; set; }
 
         /// <summary>
+        /// The parent Id of the taxon list.
+        /// </summary>
+        public int? ParentId { get; set; }
+
+        /// <summary>
         /// The Id in Taxon list service.
         /// </summary>
         public int TaxonListServiceId { get; set; }
@@ -46,6 +51,7 @@ namespace SOS.Observations.Api.Dtos
             return new TaxonListDto
             {
                 Id = taxonList.Id,
+                ParentId = taxonList.ParentId,
                 TaxonListServiceId = taxonList.TaxonListServiceId,
                 Name = taxonList.Names?.Translate(cultureCode),
                 Taxa = taxonList.Taxa.Select(m => m.ToTaxonListTaxonInformationDto())
