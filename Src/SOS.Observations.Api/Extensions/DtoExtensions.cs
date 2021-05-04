@@ -63,11 +63,12 @@ namespace SOS.Observations.Api.Extensions
 
             filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus) dsd);
 
+            filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
+
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
                 filter.OutputFields = searchFilterDto.OutputFields;
             }
-
 
             if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
             {
@@ -114,9 +115,6 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.QuantityOperator = searchFilterInternalDto.ExtendedFilter.QuantityOperator;
                 internalFilter.ValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds;
                 internalFilter.ExcludeValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds;
-                internalFilter.DeterminationFilter =
-                    (SightingDeterminationFilter)searchFilterInternalDto.ExtendedFilter
-                        .DeterminationFilter;
                 internalFilter.UnspontaneousFilter =
                     (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
                         .UnspontaneousFilter;

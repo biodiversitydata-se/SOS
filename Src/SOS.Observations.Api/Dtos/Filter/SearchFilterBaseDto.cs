@@ -8,6 +8,13 @@ namespace SOS.Observations.Api.Dtos.Filter
     /// </summary>
     public class SearchFilterBaseDto
     {
+        public enum SightingDeterminationFilterDto
+        {
+            NoFilter,
+            NotUnsureDetermination,
+            OnlyUnsureDetermination
+        }
+
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
@@ -62,5 +69,10 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// not affected by this search criteria. 
         /// </summary>
         public int? BirdNestActivityLimit { get; set; }
+
+        /// <summary>
+        /// Filter by uncertain determination
+        /// </summary>
+        public SightingDeterminationFilterDto DeterminationFilter { get; set; }
     }
 }
