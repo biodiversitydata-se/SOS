@@ -76,12 +76,12 @@ namespace SOS.Lib.Repositories
 
                 Logger.LogError(e.ToString());
 
-                return false;
+                throw;
             }
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                return false;
+                throw ;
             }
         }
 

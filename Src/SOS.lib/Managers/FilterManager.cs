@@ -20,6 +20,7 @@ namespace SOS.Lib.Managers
         private readonly ITaxonManager _taxonManager;
         private readonly IUserService _userService;
         private readonly IAreaCache _areaCache;
+        private readonly IDataProviderCache _dataProviderCache;
 
         /// <summary>
         /// Add extended authorization if any
@@ -98,6 +99,19 @@ namespace SOS.Lib.Managers
             }
 
             return extendedAuthorizationFilters;
+        }
+
+        private async Task<IEnumerable<int>> PopulateDataProviderFilterAsync(IEnumerable<int> dataproviderIds)
+        {
+            
+            // If no data provider is passed, get them with data quality is approved
+            if (!dataproviderIds?.Any() ?? true)
+            {
+                var allProviders = await _dataProviderCache.GetAllAsync();
+                return allProviders?.Where(p => p.IsActive && p.DataQualityIsApproved).Select(p => p.Id);
+            }
+
+            return dataproviderIds;
         }
 
         /// <summary>
@@ -239,11 +253,13 @@ namespace SOS.Lib.Managers
         /// <param name="taxonManager"></param>
         /// <param name="userService"></param>
         /// <param name="areaCache"></param>
-        public FilterManager(ITaxonManager taxonManager, IUserService userService, IAreaCache areaCache)
+        /// <param name="dataProviderCache"></param>
+        public FilterManager(ITaxonManager taxonManager, IUserService userService, IAreaCache areaCache, IDataProviderCache dataProviderCache)
         {
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
         }
 
         /// <inheritdoc />
@@ -253,7 +269,8 @@ namespace SOS.Lib.Managers
             {
                 filter.ExtendedAuthorizations = await AddAuthorizationAsync();
             }
-            
+
+            filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, filter.AreaGeometrySearchForced);
             filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa, filter.TaxonListIds, filter.TaxonListOperator);
         }
