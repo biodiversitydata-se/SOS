@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -214,75 +213,6 @@ namespace SOS.Process.Processors
         }
 
         /// <summary>
-        /// Process batch
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="startId"></param>
-        /// <param name="endId"></param>
-        /// <param name="mode"></param>
-        /// <param name="observationFactory"></param>
-        /// <param name="observationVerbatimRepository"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<int> ProcessBatchAsyncOld(
-            DataProvider dataProvider,
-            int startId,
-            int endId,
-            JobRunModes mode,
-            TFactory observationFactory,
-            TVerbatimRepository observationVerbatimRepository,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
-                var verbatimObservationsBatch = await observationVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Finish fetching Fish data batch ({startId}-{endId})");
-
-                if (!verbatimObservationsBatch?.Any() ?? true)
-                {
-                    return 0;
-                }
-
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} data batch ({startId}-{endId})");
-
-                var observations = new List<Observation>();
-
-                foreach (var verbatimObservation in verbatimObservationsBatch)
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
-                    if (processedObservation == null)
-                    {
-                        continue;
-                    }
-                    observations.Add(processedObservation);
-                }
-
-                Logger.LogDebug($"Finish processing {dataProvider.Identifier} data batch ({startId}-{endId})");
-
-                return await ValidateAndStoreObservations(dataProvider, mode, false, observations, $"{startId}-{endId}");
-            }
-            catch (JobAbortedException e)
-            {
-                // Throw cancelation again to let function above handle it
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Process {dataProvider.Identifier} sightings from id: {startId} to id: {endId} failed");
-            }
-            finally
-            {
-                _processManager.Release();
-            }
-
-            return 0;
-        }
-
-        /// <summary>
         /// Resolve vocabulary mapped values and then write the observations to DwC-A CSV files.
         /// </summary>
         /// <param name="processedObservations"></param>
@@ -463,11 +393,6 @@ namespace SOS.Process.Processors
             Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
 
             return observations;
-        }
-
-        protected bool IsBatchFilledToLimit(int count)
-        {
-            return count % PublicRepository.BatchSize == 0;
         }
 
         protected int WriteBatchSize => PublicRepository.WriteBatchSize;

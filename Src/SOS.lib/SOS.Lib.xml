@@ -224,11 +224,6 @@
                 Root config
             </summary>
         </member>
-        <member name="P:SOS.Lib.Configuration.Process.ProcessConfiguration.ParallelProcessing">
-            <summary>
-                Decides whether parallell processing should be used.
-            </summary>
-        </member>
         <member name="P:SOS.Lib.Configuration.Process.ProcessConfiguration.NoOfThreads">
             <summary>
                 No of threads to run in parallel

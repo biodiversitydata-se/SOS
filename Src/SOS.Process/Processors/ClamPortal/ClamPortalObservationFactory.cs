@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Nest;
-using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -58,13 +53,6 @@ namespace SOS.Process.Processors.ClamPortal
         /// <returns></returns>
         public Observation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation)
         {
-            Point wgs84Point = null;
-            if (verbatimObservation.DecimalLongitude > 0 && verbatimObservation.DecimalLatitude > 0)
-            {
-                wgs84Point = new Point(verbatimObservation.DecimalLongitude, verbatimObservation.DecimalLatitude)
-                    {SRID = (int) CoordinateSys.WGS84};
-            }
-
             _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
 
             var obs = new Observation
@@ -91,24 +79,13 @@ namespace SOS.Process.Processors.ClamPortal
                 },
                 InstitutionCode = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
                 Language = verbatimObservation.Language,
-                Location = new Lib.Models.Processed.Observation.Location
+                Location = new Location(verbatimObservation.DecimalLongitude, verbatimObservation.DecimalLatitude, CoordinateSys.WGS84, verbatimObservation.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
                 {
-                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
-                    CoordinatePrecision = verbatimObservation.CoordinateUncertaintyInMeters,
                     CountryCode = verbatimObservation.CountryCode,
-                    DecimalLatitude = verbatimObservation.DecimalLatitude,
-                    DecimalLongitude = verbatimObservation.DecimalLongitude,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
                     LocationId = verbatimObservation.LocationId,
                     Locality = verbatimObservation.Locality,
-                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
-                    PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape) wgs84Point
-                        ?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     LocationRemarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
-                    VerbatimLatitude = verbatimObservation.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
-                    VerbatimLongitude = verbatimObservation.DecimalLongitude.ToString(CultureInfo.InvariantCulture),
                     VerbatimCoordinateSystem = "EPSG:4326",
                     WaterBody = verbatimObservation.WaterBody
                 },
