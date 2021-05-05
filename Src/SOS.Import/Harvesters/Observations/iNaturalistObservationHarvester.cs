@@ -76,10 +76,14 @@ namespace SOS.Import.Harvesters.Observations
                 var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, startDate.AddMonths(1));
 
-                var monthLoopStop = DateTime.Now - new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
+                var id = 0;
                 // Loop until all sightings are fetched.
                 do
                 {
+                    foreach (var observation in gBIFResult)
+                    {
+                        observation.Id = ++id;
+                    }
                     // Add sightings to MongoDb
                     await dwcArchiveVerbatimRepository.AddManyAsync(gBIFResult);
 
