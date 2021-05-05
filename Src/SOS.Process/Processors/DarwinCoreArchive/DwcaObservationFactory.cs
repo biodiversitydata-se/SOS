@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
@@ -149,8 +148,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // Identification
             obs.Identification = CreateProcessedIdentification(verbatimObservation);
 
+            // Taxon
+            obs.Taxon = CreateProcessedTaxon(verbatimObservation);
+
             // Location
-            obs.Location = CreateProcessedLocation(verbatimObservation);
+            obs.Location = CreateProcessedLocation(verbatimObservation, obs.Taxon?.Attributes?.DisturbanceRadius);
 
             // MaterialSample
             obs.MaterialSample = CreateProcessedMaterialSample(verbatimObservation);
@@ -161,8 +163,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // Organism
             obs.Organism = CreateProcessedOrganism(verbatimObservation);
 
-            // Taxon
-            obs.Taxon = CreateProcessedTaxon(verbatimObservation);
+           
 
             // Temporarily remove
             //obs.IsInEconomicZoneOfSweden = true;
@@ -325,9 +326,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return false;
         }
 
-        private Lib.Models.Processed.Observation.Location CreateProcessedLocation(DwcObservationVerbatim verbatimObservation)
+        private Location CreateProcessedLocation(DwcObservationVerbatim verbatimObservation, int? disturbanceRadius)
         {
-            var processedLocation = new Lib.Models.Processed.Observation.Location();
+            if (!GISExtensions.TryParseCoordinateSystem(verbatimObservation.GeodeticDatum, out var coordinateSystem))
+            {
+                coordinateSystem = CoordinateSys.WGS84;
+            }
+           
+            var processedLocation = new Location(verbatimObservation.DecimalLongitude.ParseDouble(), verbatimObservation.DecimalLatitude.ParseDouble(), coordinateSystem, verbatimObservation.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, disturbanceRadius);
             processedLocation.Continent = GetSosId(
                 verbatimObservation.Continent,
                 _vocabularyById[VocabularyId.Continent],
@@ -342,12 +348,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 (int) CountryId.Sweden,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CountryCode = verbatimObservation.CountryCode;
-            processedLocation.DecimalLatitude = verbatimObservation.DecimalLatitude.ParseDouble();
-            processedLocation.DecimalLongitude = verbatimObservation.DecimalLongitude.ParseDouble();
             processedLocation.FootprintSpatialFit = verbatimObservation.FootprintSpatialFit;
             processedLocation.FootprintSRS = verbatimObservation.FootprintSRS;
             processedLocation.FootprintWKT = verbatimObservation.FootprintWKT;
-            processedLocation.GeodeticDatum = verbatimObservation.GeodeticDatum;
             processedLocation.GeoreferencedBy = verbatimObservation.GeoreferencedBy;
             processedLocation.GeoreferencedDate = verbatimObservation.GeoreferencedDate;
             processedLocation.GeoreferenceProtocol = verbatimObservation.GeoreferenceProtocol;
@@ -376,52 +379,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.VerbatimCoordinateSystem = verbatimObservation.VerbatimCoordinateSystem;
             processedLocation.VerbatimDepth = verbatimObservation.VerbatimDepth;
             processedLocation.VerbatimElevation = verbatimObservation.VerbatimElevation;
-            processedLocation.VerbatimLatitude = verbatimObservation.VerbatimLatitude;
-            processedLocation.VerbatimLocality = verbatimObservation.VerbatimLocality;
-            processedLocation.VerbatimLongitude = verbatimObservation.VerbatimLongitude;
-            processedLocation.VerbatimSRS = verbatimObservation.VerbatimSRS;
             processedLocation.WaterBody = verbatimObservation.WaterBody;
 
-            if (string.IsNullOrWhiteSpace(processedLocation.VerbatimLatitude) &&
-                string.IsNullOrWhiteSpace(processedLocation.VerbatimLongitude) &&
-                string.IsNullOrWhiteSpace(processedLocation.VerbatimSRS))
-            {
-                processedLocation.VerbatimLatitude = verbatimObservation.DecimalLatitude;
-                processedLocation.VerbatimLongitude = verbatimObservation.DecimalLongitude;
-                processedLocation.VerbatimSRS = verbatimObservation.GeodeticDatum;
-            }
-
-            if (!processedLocation.DecimalLongitude.HasValue || !processedLocation.DecimalLatitude.HasValue)
-            {
-                return processedLocation; // No coordinates provided
-            }
-
-            Point wgs84Point = null;
-            if (string.IsNullOrWhiteSpace(processedLocation.GeodeticDatum)) // Assume WGS84 if GeodeticDatum is empty.
-            {
-                wgs84Point = new Point(processedLocation.DecimalLongitude.Value,
-                    processedLocation.DecimalLatitude.Value)
-                {
-                    SRID = (int)CoordinateSys.WGS84
-                };
-            }
-            else
-            {
-                var originalPoint = new Point(processedLocation.DecimalLongitude.Value,
-                    processedLocation.DecimalLatitude.Value);
-                if (GISExtensions.TryParseCoordinateSystem(processedLocation.GeodeticDatum, out var coordinateSystem))
-                {
-                    wgs84Point = (Point) originalPoint.Transform(coordinateSystem, CoordinateSys.WGS84);
-                    processedLocation.DecimalLongitude = wgs84Point.X;
-                    processedLocation.DecimalLatitude = wgs84Point.Y;
-                }
-            }
-
-            processedLocation.GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
-            processedLocation.Point = (PointGeoShape) wgs84Point?.ToGeoShape();
-            processedLocation.PointLocation = wgs84Point?.ToGeoLocation();
-            processedLocation.PointWithBuffer =
-                (PolygonGeoShape) wgs84Point?.ToCircle(processedLocation.CoordinateUncertaintyInMeters)?.ToGeoShape();
             return processedLocation;
         }
 

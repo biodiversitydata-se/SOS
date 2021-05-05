@@ -1,4 +1,9 @@
-﻿using Nest;
+﻿using System.Globalization;
+using Nest;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -9,11 +14,104 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Location
     {
         /// <summary>
+        /// Init class
+        /// </summary>
+        /// <param name="verbatimLongitude"></param>
+        /// <param name="verbatimLatitude"></param>
+        /// <param name="verbatimCoordinateSystem"></param>
+        /// <param name="point"></param>
+        /// <param name="pointWithBuffer"></param>
+        /// <param name="pointWithDisturbanceBuffer"></param>
+        /// <param name="coordinateUncertaintyInMeters"></param>
+        private void Initialize(double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, PointGeoShape point, PolygonGeoShape pointWithBuffer, PolygonGeoShape pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        {
+            Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
+            CoordinatePrecision = coordinateUncertaintyInMeters;
+            Country = new VocabularyValue { Id = (int)CountryId.Sweden };
+            CountryCode = DarwinCore.Vocabulary.CountryCode.Sweden;
+            GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
+            if (point == null)
+            {
+                return;
+            }
+
+            DecimalLongitude = point.Coordinates.Longitude;
+            DecimalLatitude = point.Coordinates.Latitude;
+            Point = point;
+            PointLocation = point.ToGeoLocation();
+            PointWithBuffer = pointWithBuffer;
+            PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
+
+            VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
+            
+            if (!verbatimLatitude.HasValue || ! verbatimLongitude.HasValue)
+            {
+                return;
+            }
+
+            VerbatimLatitude = verbatimLatitude.Value.ToString(CultureInfo.InvariantCulture);
+            VerbatimLongitude = verbatimLongitude.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         public Location()
         {
             Attributes = new LocationAttributes();
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="verbatimLongitude"></param>
+        /// <param name="verbatimLatitude"></param>
+        /// <param name="verbatimCoordinateSystem"></param>
+        /// <param name="coordinateUncertaintyInMeters"></param>
+        /// <param name="taxonDisturbanceRadius"></param>
+        public Location(double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius) : this()
+        {
+            Point point = null;
+            if (verbatimLongitude.HasValue && verbatimLongitude.Value > 0 && verbatimLatitude.HasValue && verbatimLatitude > 0)
+            {
+                point = new Point(verbatimLongitude.Value, verbatimLatitude.Value);
+
+                if (verbatimCoordinateSystem != CoordinateSys.WGS84)
+                {
+                    point = point.Transform(verbatimCoordinateSystem, CoordinateSys.WGS84) as Point;
+                }
+            }
+
+            var pointWithBuffer = (PolygonGeoShape) point?.ToCircle(coordinateUncertaintyInMeters)?.ToGeoShape();
+            var pointWithDisturbanceBuffer = pointWithBuffer;
+
+            if (taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0)
+            {
+                pointWithDisturbanceBuffer = (PolygonGeoShape)point?.ToCircle(taxonDisturbanceRadius)?.ToGeoShape();
+            }
+
+            Initialize(verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem,(PointGeoShape)point?.ToGeoShape(), pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="verbatimLongitude"></param>
+        /// <param name="verbatimLatitude"></param>
+        /// <param name="verbatimCoordinateSystem"></param>
+        /// <param name="point"></param>
+        /// <param name="pointWithBuffer"></param>
+        /// <param name="coordinateUncertaintyInMeters"></param>
+        /// <param name="taxonDisturbanceRadius"></param>
+        public Location(double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, PointGeoShape point, PolygonGeoShape pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius) : this()
+        {
+            var pointWithDisturbanceBuffer = pointWithBuffer;
+            if (taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0)
+            {
+                pointWithDisturbanceBuffer = (PolygonGeoShape) ((Point)point?.ToGeometry())?.ToCircle(taxonDisturbanceRadius)?.ToGeoShape();
+            }
+
+            Initialize(verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }
 
         /// <summary>
@@ -346,6 +444,12 @@ namespace SOS.Lib.Models.Processed.Observation
         [GeoShape, SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
+        /// <summary>
+        /// Point with disturbance buffer
+        /// </summary>
+        [GeoShape, SwaggerExclude]
+        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
+        
         /// <summary>
         ///     The ratio of the area of the point-radius
         ///     (decimalLatitude, decimalLongitude,

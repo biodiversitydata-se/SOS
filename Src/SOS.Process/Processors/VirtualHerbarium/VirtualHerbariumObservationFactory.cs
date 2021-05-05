@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
@@ -61,13 +57,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 return null;
             }
 
-            Point wgs84Point = null;
-            if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
-            {
-                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude)
-                    { SRID = (int)CoordinateSys.WGS84 };
-            }
-
             _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);
 
             var defects = new Dictionary<string, string>();
@@ -101,22 +90,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Lib.Models.Processed.Observation.Location
-                {
-                    CoordinateUncertaintyInMeters = verbatim.CoordinatePrecision,
-                    CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = verbatim.DecimalLatitude,
-                    DecimalLongitude = verbatim.DecimalLongitude,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
-                    Country = new VocabularyValue { Id = (int)CountryId.Sweden},
-                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
-                    PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer =
-                        (PolygonGeoShape) wgs84Point?.ToCircle(verbatim.CoordinatePrecision)?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
-                    VerbatimLongitude = verbatim.DecimalLongitude.ToString(CultureInfo.InvariantCulture)
-                },
+                Location = new Location(verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius),
                 Occurrence = new Occurrence
                 {
                     CatalogNumber = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}",
