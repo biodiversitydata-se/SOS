@@ -221,39 +221,57 @@ namespace SOS.Lib.Extensions
                     {
                         selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay && endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
                     }
-                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
                     {
                         selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay)";
                     }
-                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
                     {
                         selector = "(endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
                     }
-                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
                     {
                         selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay) || (endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
                     }
                 }
                 else
                 {
-                    if(filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate) 
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                     {
-                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay) ||
-                                     (endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                        selector = @"( (startMonth >= fromMonth && startMonth <= toMonth) && (endMonth >= fromMonth && endMonth <= toMonth) &&
+                                        ((startMonth > fromMonth) || (startMonth == fromMonth && startDay >= fromDay)) &&
+                                        ((endMonth < toMonth) || (endMonth == toMonth && endDay <= toDay)) )";
                     }
                     else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
                     {
-                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay)";
+                        selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
+                                     (startMonth == toMonth && startDay <= toDay)";
+                        for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (startMonth == {month})";
+                        }
                     }
                     else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
                     {
-                        selector = @"(endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                        selector = @"(endMonth == fromMonth && endDay >= fromDay) ||
+                                     (endMonth == toMonth && endDay <= toDay)";
+                        for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (endMonth == {month})";
+                        }
                     }
-                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
                     {
-                        selector = @"(startMonth >= fromMonth && startMonth <= toMonth && startDay >= fromDay && startDay <= toDay) &&
-                                     (endMonth >= fromMonth && endMonth <= toMonth && endDay >= fromDay && endDay <= toDay)";
+                        selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
+                                     (endMonth == fromMonth && endDay >= fromDay) ||
+                                     (startMonth == toMonth && startDay <= toDay) || 
+                                     (endMonth == toMonth && endDay <= toDay)";
+                        for(int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (startMonth == {month}) || (endMonth == {month})";
+                        }
                     }
+
                 }
                 query.AddScript($@"
                             ZonedDateTime zStartDate = doc['event.startDate'].value;  
