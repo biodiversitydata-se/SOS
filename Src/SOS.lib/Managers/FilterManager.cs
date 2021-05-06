@@ -242,6 +242,7 @@ namespace SOS.Lib.Managers
                 (geographicFilter.GeometryFilter ??= new GeometryFilter
                 {
                     MaxDistanceFromPoint = 0,
+                    UseDisturbanceRadius = false,
                     UsePointAccuracy = usePointAccuracy
                 }).Geometries.Add(geometry);
             }

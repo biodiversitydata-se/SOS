@@ -55,8 +55,13 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        ///     If true, use Point accuracy when searching
+        /// If true, use Point accuracy when searching
         /// </summary>
         public bool UsePointAccuracy { get; set; }
+
+        /// <summary>
+        /// If true use disturbance radius when searching
+        /// </summary>
+        public bool UseDisturbanceRadius { get; set; }
     }
 }

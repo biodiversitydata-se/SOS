@@ -22,6 +22,13 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         /// <summary>
         /// If true, observations that are outside Geometries polygons
+        /// but possibly inside when observation taxon disturbance radius
+        /// is considered, will be included in the result.
+        /// </summary>
+        public bool ConsiderDisturbanceRadius { get; set; }
+
+        /// <summary>
+        /// If true, observations that are outside Geometries polygons
         /// but possibly inside when accuracy (coordinateUncertaintyInMeters)
         /// of observation is considered, will be included in the result.
         /// </summary>
