@@ -46,7 +46,7 @@ namespace SOS.Lib.Models.Search
         public int? ReportedByUserId { get; set; }
         public int? ObservedByUserId { get; set; }
         public bool IncludeRealCount { get; set; }
-        public List<double> BoundingBox { get; set; }
+        
         /// <summary>
         /// Only include hits with media associated
         /// </summary>

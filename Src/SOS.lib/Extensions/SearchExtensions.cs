@@ -106,9 +106,7 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
             query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
-            query.TryAddBoundingBoxCriteria("location.pointLocation", internalFilter.BoundingBox);
 
-           
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
@@ -883,6 +881,7 @@ namespace SOS.Lib.Extensions
             query.TryAddGeometryFilters(filter.Geometries);
             query.AddSightingTypeFilters(filter);
 
+            query.TryAddBoundingBoxCriteria("location.pointLocation", filter.Geometries.BoundingBox);
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
