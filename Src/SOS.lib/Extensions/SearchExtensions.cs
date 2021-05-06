@@ -955,6 +955,7 @@ namespace SOS.Lib.Extensions
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
+                    .Field("location.pointWithDisturbanceBuffer")
                     .Field("isInEconomicZoneOfSweden"));
             }
             else
@@ -967,6 +968,7 @@ namespace SOS.Lib.Extensions
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
+                    .Field("location.pointWithDisturbanceBuffer")
                     .Field("isInEconomicZoneOfSweden")
                 );
             }
