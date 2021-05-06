@@ -62,6 +62,19 @@ namespace SOS.Lib.Extensions
             );
         }
 
+        private static void AddGeoDistanceCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance)
+        {
+            query.Add(q => q
+                .GeoDistance(gd => gd
+                    .Field(field)
+                    .DistanceType(distanceType)
+                    .Location(geometry.ToGeoLocation())
+                    .Distance(distance, DistanceUnit.Meters)
+                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                )
+            );
+        }
+
         /// <summary>
         /// Add geo shape criteria
         /// </summary>
@@ -478,43 +491,22 @@ namespace SOS.Lib.Extensions
                 switch (geom.Type.ToLower())
                 {
                     case "point":
-                        if (geometryFilter.UsePointAccuracy)
-                        {
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.pointWithBuffer")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-                        }
-                        else
-                        {
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.point")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-                        }
+                        geometryContainers.AddGeoDistanceCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoDistanceType.Arc, geometryFilter.MaxDistanceFromPoint ?? 0);
 
+                        if (!geometryFilter.UseDisturbanceRadius)
+                        {
+                            continue;
+                        }
+                        geometryContainers.AddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom, GeoDistanceType.Arc, geometryFilter.MaxDistanceFromPoint ?? 0);
                         break;
                     case "polygon":
                     case "multipolygon":
-                        if (geometryFilter.UsePointAccuracy)
+                        geometryContainers.AddGeoShapeCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, geometryFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
+                        if (!geometryFilter.UseDisturbanceRadius)
                         {
-                            geometryContainers.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
+                            continue;
                         }
-                        else
-                        {
-                            geometryContainers.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
-                        }
-
+                        geometryContainers.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
                         break;
                 }
             }
@@ -926,14 +918,12 @@ namespace SOS.Lib.Extensions
                     switch (geom.Type.ToLower())
                     {
                         case "holepolygon":
-                            if (filter.AreaGeographic.GeometryFilter.UsePointAccuracy)
+                            query.AddGeoShapeCriteria($"location.{(filter.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
+                            if (!filter.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
                             {
-                                query.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
+                                continue;
                             }
-                            else
-                            {
-                                query.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
-                            }
+                            query.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
 
                             break;
                     }

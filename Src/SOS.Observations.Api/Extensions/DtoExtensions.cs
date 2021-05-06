@@ -42,6 +42,7 @@ namespace SOS.Observations.Api.Extensions
                 {
                     Geometries = searchFilterBaseDto.Geometry.Geometries,
                     MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
+                    UseDisturbanceRadius = searchFilterBaseDto.Geometry.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geometry.ConsiderObservationAccuracy
                 };
 
