@@ -24,6 +24,7 @@
 #### Sökfilter
 - extendedFilter.maxAccuracy => geometry.maxAccuracy
 - extendedFilter.determinationFilter => determinationFilter
+- extendedFilter.BoundingBox => geometry.BoundingBox
 ## [1.0.1]
 
 ### Releases

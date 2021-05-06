@@ -36,10 +36,11 @@ namespace SOS.Observations.Api.Extensions
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
-            filter.Geometries = searchFilterBaseDto.Geometry?.Geometries == null
+            filter.Geometries = searchFilterBaseDto.Geometry == null
                 ? null
                 : new GeometryFilter
                 {
+                    BoundingBox = searchFilterBaseDto.Geometry.BoundingBox,
                     Geometries = searchFilterBaseDto.Geometry.Geometries,
                     MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
                     UseDisturbanceRadius = searchFilterBaseDto.Geometry.ConsiderDisturbanceRadius,
@@ -92,7 +93,6 @@ namespace SOS.Observations.Api.Extensions
             {
                 internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
                 internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
-                internalFilter.BoundingBox = searchFilterInternalDto.ExtendedFilter.BoundingBox;
                 internalFilter.OnlyWithMedia = searchFilterInternalDto.ExtendedFilter.OnlyWithMedia;
                 internalFilter.OnlyWithNotes = searchFilterInternalDto.ExtendedFilter.OnlyWithNotes;
                 internalFilter.OnlyWithNotesOfInterest = searchFilterInternalDto.ExtendedFilter.OnlyWithNotesOfInterest;

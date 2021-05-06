@@ -9,6 +9,12 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class GeometryFilterDto
     {
         /// <summary>
+        /// Limit the search by a bounding box.
+        /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
+        /// </summary>
+        public List<double> BoundingBox { get; set; }
+
+        /// <summary>
         /// If Geometries is of point type, this property must be set to a value greater than 0.
         /// Observations inside circle (center=point, radius=MaxDistanceFromPoint) will be returned.
         /// </summary>
