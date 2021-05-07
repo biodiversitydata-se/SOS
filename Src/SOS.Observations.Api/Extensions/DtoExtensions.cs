@@ -32,6 +32,7 @@ namespace SOS.Observations.Api.Extensions
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.MaxAccuracy = searchFilterBaseDto.Geometry?.MaxAccuracy;
+            filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
@@ -119,9 +120,6 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.UnspontaneousFilter =
                     (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
                         .UnspontaneousFilter;
-                internalFilter.NotRecoveredFilter =
-                    (SightingNotRecoveredFilter)searchFilterInternalDto.ExtendedFilter
-                        .NotRecoveredFilter;
                 internalFilter.SpeciesCollectionLabel = searchFilterInternalDto.ExtendedFilter.SpeciesCollectionLabel;
                 internalFilter.PublicCollection = searchFilterInternalDto.ExtendedFilter.PublicCollection;
                 internalFilter.PrivateCollection = searchFilterInternalDto.ExtendedFilter.PrivateCollection;

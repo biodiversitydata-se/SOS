@@ -19,14 +19,6 @@ namespace SOS.Observations.Api.Dtos.Filter
             NotUnspontaneous,
             Unspontaneous
         }
-
-        public enum SightingNotRecoveredFilterDto
-        {
-            NoFilter,
-            OnlyNotRecovered,
-            DontIncludeNotRecovered
-        }
-
         public enum SightingNotPresentFilterDto
         {
             DontIncludeNotPresent,
@@ -83,8 +75,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<int> ExcludeValidationStatusIds { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
-
-        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
 
         public string SpeciesCollectionLabel { get; set; }
 

@@ -159,6 +159,11 @@ namespace SOS.Lib.Models.Search
         public int? MaxAccuracy { get; set; }
 
         /// <summary>
+        /// Filter for observation not recovered
+        /// </summary>
+        public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
+
+        /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
