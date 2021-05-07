@@ -122,7 +122,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
-            
+
             if (internalFilter.Months?.Any() ?? false)
             {
                 query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
@@ -166,16 +166,6 @@ namespace SOS.Lib.Extensions
                     break;
                 case SightingUnspontaneousFilter.Unspontaneous:
                     query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
-                    break;
-            }
-
-            switch (internalFilter.NotRecoveredFilter)
-            {
-                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
-                    break;
-                case SightingNotRecoveredFilter.OnlyNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
                     break;
             }
 
@@ -311,7 +301,7 @@ namespace SOS.Lib.Extensions
         }
 
         // Get observations from other than Artportalen too
-        
+
         /// <summary>
         /// Add numeric filter with relation operator
         /// </summary>
@@ -698,6 +688,11 @@ namespace SOS.Lib.Extensions
         }
 
 
+        /// <summary>
+        /// Try to add geographic filter
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="geographicFilter"></param>
         private static void TryAddGeographicFilter(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             GeographicFilter geographicFilter)
@@ -717,6 +712,25 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Try to add not recovered filter
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
+        private static void TryAddNotRecoveredFilter(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            switch (filter.NotRecoveredFilter)
+            {
+                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
+                    break;
+                case SightingNotRecoveredFilter.OnlyNotRecovered:
+                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Try to add query criteria
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -724,7 +738,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="terms"></param>
         public static void TryAddTermsCriteria<T>(
-                this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
+                    this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
         {
             if (terms?.Any() ?? false)
             {
@@ -879,9 +893,10 @@ namespace SOS.Lib.Extensions
             query.TryAddTimeRangeFilters(filter);
             query.TryAddGeographicFilter(filter.AreaGeographic);
             query.TryAddGeometryFilters(filter.Geometries);
+            query.TryAddNotRecoveredFilter(filter);
             query.AddSightingTypeFilters(filter);
 
-            query.TryAddBoundingBoxCriteria("location.pointLocation", filter.Geometries.BoundingBox);
+            query.TryAddBoundingBoxCriteria("location.pointLocation", filter.Geometries?.BoundingBox);
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
