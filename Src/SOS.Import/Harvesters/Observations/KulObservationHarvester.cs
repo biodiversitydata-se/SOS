@@ -66,7 +66,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _kulObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for KUL verbatim collection");
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var changeId = 0L;
                 var nrSightingsHarvested = 0;
                 var xmlDocument = await _kulObservationService.GetAsync(changeId);
@@ -88,7 +88,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
-                    _logger.LogDebug($"{ nrSightingsHarvested } KUL observations harvested");
+                    _logger.LogDebug($"{nrSightingsHarvested} KUL observations harvested");
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
@@ -100,10 +100,6 @@ namespace SOS.Import.Harvesters.Observations
 
                     xmlDocument = await _kulObservationService.GetAsync(changeId + 1);
                 }
-
-                _logger.LogInformation("Start permanentize temp collection for KUL verbatim");
-                await _kulObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for KUL verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
 
@@ -121,6 +117,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest KUL");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for KUL verbatim");
+                await _kulObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for KUL verbatim");
             }
 
             return harvestInfo;

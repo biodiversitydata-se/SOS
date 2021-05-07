@@ -66,7 +66,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _fishDataObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for Fish Data verbatim collection");
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var changeId = 0L;
                 var nrSightingsHarvested = 0;
                 var xmlDocument = await _fishDataObservationService.GetAsync(changeId);
@@ -88,7 +88,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
-                    _logger.LogDebug($"{ nrSightingsHarvested } Fish Data observations harvested");
+                    _logger.LogDebug($"{nrSightingsHarvested} Fish Data observations harvested");
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
@@ -100,10 +100,6 @@ namespace SOS.Import.Harvesters.Observations
 
                     xmlDocument = await _fishDataObservationService.GetAsync(changeId + 1);
                 }
-
-                _logger.LogInformation("Start permanentize temp collection for Fish Data verbatim");
-                await _fishDataObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for Fish Data verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for Fish Data data provider");
 
@@ -121,6 +117,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest Fish Data");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for Fish Data verbatim");
+                await _fishDataObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for Fish Data verbatim");
             }
 
             return harvestInfo;

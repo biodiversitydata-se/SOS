@@ -67,12 +67,8 @@ namespace SOS.Import.Harvesters.Observations
 
                     await _clamObservationVerbatimRepository.AddManyAsync(verbatims);
                 }
-                
-                cancellationToken?.ThrowIfCancellationRequested();
 
-                _logger.LogInformation("Start permanentize temp collection for clams verbatim");
-                await _clamObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for clams verbatim");
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 _logger.LogInformation("Finished harvesting sightings for clams data provider");
 
@@ -91,6 +87,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed harvest of clams");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for clams verbatim");
+                await _clamObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for clams verbatim");
             }
 
             return harvestInfo;
