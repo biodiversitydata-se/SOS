@@ -4,10 +4,6 @@
     {
         Sex = 0,
         Activity = 1,
-        County = 2,
-        Parish = 3,
-        Municipality = 4,
-        Province = 5,
         LifeStage = 6,
         Biotope = 7,
         Substrate = 8,
