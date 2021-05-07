@@ -104,10 +104,6 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug($"Finish getting observations page: {pageIndex}");
                 }
 
-                _logger.LogInformation("Start permanentize temp collection for Virtual Herbarium verbatim");
-                await _virtualHerbariumObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for Virtual Herbarium verbatim");
-
                 _logger.LogInformation("Finished harvesting sightings for Virtual Herbarium data provider");
 
                 // Update harvest info
@@ -126,6 +122,12 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed to harvest Virtual Herbarium");
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for Virtual Herbarium verbatim");
+                await _virtualHerbariumObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for Virtual Herbarium verbatim");
             }
 
             return harvestInfo;
