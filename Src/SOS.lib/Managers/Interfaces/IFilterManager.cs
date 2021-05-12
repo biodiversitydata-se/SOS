@@ -12,7 +12,9 @@ namespace SOS.Lib.Managers.Interfaces
         /// Creates a with additional information if necessary. E.g. adding underlying taxon ids.
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="authorizationUsePointAccuracy"></param>
+        /// <param name="authorizationUseDisturbanceRadius"></param>
         /// <returns></returns>
-        Task PrepareFilter(FilterBase filter);
+        Task PrepareFilter(FilterBase filter, bool? authorizationUsePointAccuracy = false, bool? authorizationUseDisturbanceRadius = false);
     }
 }

@@ -1066,6 +1066,37 @@ namespace SOS.Observations.Api.Repositories
                 .Select(b => new TaxonAggregationItem{ TaxonId = int.Parse(b.Key), ObservationCount = (int)(b.DocCount ?? 0) });
         }
 
+        /// <inheritdoc />
+        public async Task<bool> SignalSearchInternalAsync(
+            SearchFilter filter,
+            bool onlyAboveMyClearance)
+        {
+            // Save user extended authorization to use later
+            var extendedAuthorizations = filter?.ExtendedAuthorizations?.Clone();
+            // Reset extended authorization so it not will affect query
+            filter.ExtendedAuthorizations = null;
+           
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
+            
+            var searchResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                .Index(ProtectedIndex)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse.Count > 0;
+        }
+
         public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);

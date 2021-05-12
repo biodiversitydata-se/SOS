@@ -13,6 +13,11 @@ namespace SOS.Lib.Models.Search
         public GeographicFilter GeographicAreas { get; set; }
 
         /// <summary>
+        /// Authorization identity
+        /// </summary>
+        public string Identity { get; set; }
+
+        /// <summary>
         /// User can see observations of taxa with protection level equal or below this  
         /// </summary>
         public int MaxProtectionLevel { get; set; }

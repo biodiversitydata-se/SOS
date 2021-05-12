@@ -1221,7 +1221,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonExistsIndicationInternal(
-            [FromBody] SearchFilterInternalDto filter,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {
@@ -1238,8 +1238,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
-                // Force area geometry search in order to use point with buffer
-                searchFilter.AreaGeometrySearchForced = true;
                 var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
 
                 return new OkObjectResult(taxonFound);
@@ -1293,6 +1291,45 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("Internal/SignalSearch")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> SignalSearchInternalAsync(
+            SearchFilterAggregationInternalDto filter,
+            bool validateSearchFilter = false,
+            bool onlyAboveMyClearance = true)
+        {
+            try
+            {
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateGeographicalAreaExists(filter),
+                    ValidateSignalSearchDate(filter.Date));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var taxonFound = await ObservationManager.SignalSearchInternalAsync(searchFilter, onlyAboveMyClearance);
+
+                return new OkObjectResult(taxonFound);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Signal search Internal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

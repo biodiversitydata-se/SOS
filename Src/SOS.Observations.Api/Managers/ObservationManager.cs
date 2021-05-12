@@ -263,7 +263,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(filter, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.TaxonIds?.Count() > 10000)
                 {
@@ -276,6 +276,31 @@ namespace SOS.Observations.Api.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get taxon exists indication");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SignalSearchInternalAsync(
+            SearchFilter filter,
+            bool onlyAboveMyClearance)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(filter, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+
+                if (!filter.ExtendedAuthorizations?.Any(ea =>
+                    ea.Identity?.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase) ?? false) ?? true)
+                {
+                    throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
+                }
+
+                var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Signal search failed");
                 throw;
             }
         }

@@ -57,7 +57,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilter(new SearchFilter())
+                    .PrepareFilter(new SearchFilter(), false, false)
                 );
 
             var processedPublicObservationRepository = new ProcessedPublicObservationRepository(

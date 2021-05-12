@@ -90,11 +90,6 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        /// Area geometry will be used for all types of areas if true
-        /// </summary>
-        public bool AreaGeometrySearchForced { get; set; }
-
-        /// <summary>
         /// Filter on area geometries 
         /// </summary>
         public GeographicFilter AreaGeographic { get; set; }
