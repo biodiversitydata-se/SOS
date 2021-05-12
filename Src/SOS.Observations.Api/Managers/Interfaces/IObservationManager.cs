@@ -119,5 +119,15 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
             SearchFilter filter);
         Task<dynamic> GetObservationAsync(string occurrenceId, bool protectedObservations, bool includeInternalFields);
+
+        /// <summary>
+        /// Signal search
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="onlyAboveMyClearance"></param>
+        /// <returns></returns>
+        Task<bool> SignalSearchInternalAsync(
+            SearchFilter filter,
+            bool onlyAboveMyClearance = true);
     }
 }

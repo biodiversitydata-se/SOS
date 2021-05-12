@@ -108,8 +108,20 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         //    bool protectedObservations = false);
 
         Task<IActionResult> TaxonExistsIndicationInternal(
-           SearchFilterInternalDto filter,
+            SearchFilterAggregationInternalDto filter,
            bool validateSearchFilter = false,
            bool protectedObservations = false);
+
+        /// <summary>
+        /// Signal search
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="onlyAboveMyClearance"></param>
+        /// <returns></returns>
+        Task<IActionResult> SignalSearchInternalAsync(
+            SearchFilterAggregationInternalDto filter,
+            bool validateSearchFilter = false,
+            bool onlyAboveMyClearance = true);
     }
 }
