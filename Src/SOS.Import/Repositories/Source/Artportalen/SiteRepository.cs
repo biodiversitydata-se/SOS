@@ -71,7 +71,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds)
+        public async Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds, bool live = false)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -94,7 +94,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     a.AreaDatasetId IN (1, 16, 18, 19, 21)";
 
                 var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
 
                 var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
                 if (siteAreaEntities?.Any() ?? false)
@@ -130,7 +130,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds)
+        public async Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -150,7 +150,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					sg.SiteId";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
+                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
 
                 return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
             }

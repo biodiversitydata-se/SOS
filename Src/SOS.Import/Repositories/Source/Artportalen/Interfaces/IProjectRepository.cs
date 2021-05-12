@@ -13,13 +13,13 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         ///     Get all projects
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<ProjectEntity>> GetProjectsAsync();
+        Task<IEnumerable<ProjectEntity>> GetProjectsAsync(bool live = false);
 
         /// <summary>
         /// Get all project parameters for passed sightings
         /// </summary>
         /// <param name="sightingIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds, bool live = false);
     }
 }
