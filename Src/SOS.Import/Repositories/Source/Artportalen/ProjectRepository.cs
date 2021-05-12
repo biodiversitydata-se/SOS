@@ -27,7 +27,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync()
+        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync(bool live = false)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
 	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
 
-                return await QueryAsync<ProjectEntity>(query);
+                return await QueryAsync<ProjectEntity>(query, null, live);
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds, bool live = false)
         {
             try
             {
@@ -115,7 +115,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return await QueryAsync<ProjectParameterEntity>(
                     query, 
-                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
+                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {

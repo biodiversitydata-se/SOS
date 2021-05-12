@@ -20,7 +20,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
         }
 
-        public async Task<IEnumerable<SpeciesCollectionItemEntity>> GetBySightingAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<SpeciesCollectionItemEntity>> GetBySightingAsync(IEnumerable<int> sightingIds, bool live = false)
         {
             if (!sightingIds?.Any() ?? true)
             {
@@ -42,7 +42,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 FROM [SightingSpeciesCollectionItem] ssci
                 INNER JOIN @tvp t ON ssci.SightingId = t.Id";
 
-                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
+                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {

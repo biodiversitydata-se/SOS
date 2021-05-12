@@ -249,7 +249,7 @@ namespace SOS.Import.Factories.Harvest
                 }
             }
 
-            var projectParameterEntities = (await _projectRepository.GetSightingProjectParametersAsync(sightingIds))?.ToArray();
+            var projectParameterEntities = (await _projectRepository.GetSightingProjectParametersAsync(sightingIds, IncrementalMode))?.ToArray();
 
             if (projectParameterEntities?.Any() ?? false)
             {
@@ -298,8 +298,8 @@ namespace SOS.Import.Factories.Harvest
             }
 
             var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var siteAreas = await _siteRepository.GetSitesAreas(siteIds);
-            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds); // It's faster to get geometries in separate query than join it in site query
+            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
+            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
 
             var sites = CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
 
@@ -489,7 +489,7 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private async Task<IList<SpeciesCollectionItem>> GetSpeciesCollections(IEnumerable<int> sightingIds)
         {
-            return CastSpeciesCollectionsToVerbatim(await _speciesCollectionRepository.GetBySightingAsync(sightingIds))?.ToList();
+            return CastSpeciesCollectionsToVerbatim(await _speciesCollectionRepository.GetBySightingAsync(sightingIds, IncrementalMode))?.ToList();
         }
         #endregion SpeciesCollections
 
@@ -556,7 +556,7 @@ namespace SOS.Import.Factories.Harvest
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
-                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds))?.ToArray();
+                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds, IncrementalMode))?.ToArray();
 
             var speciesCollections = await GetSpeciesCollections(sightingIds);
 
