@@ -11,22 +11,27 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IObservationsController
     {
         Task<IActionResult> Count(
-            [FromBody] SearchFilterDto filter,
-            [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false);
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter,
+            bool validateSearchFilter = false,
+            bool protectedObservations = false);
 
-        Task<IActionResult> ObservationsBySearch(SearchFilterDto filter, int skip, int take, string sortBy,
+        Task<IActionResult> ObservationsBySearch(
+            string authorizationApplicationIdentifier,
+            SearchFilterDto filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
 
         Task<IActionResult> CountInternal(
-            [FromBody] SearchFilterInternalDto filter,
-            [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false);
+            string authorizationApplicationIdentifier,
+            SearchFilterInternalDto filter,
+            bool validateSearchFilter = false,
+            bool protectedObservations = false);
 
         Task<IActionResult> ObservationsBySearchInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
             int skip,
             int take,
@@ -37,6 +42,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> SearchAggregatedInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
             AggregationType aggregationType,
             int skip,
@@ -46,6 +52,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> GeogridAggregation(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
@@ -57,6 +64,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> GeogridAggregationInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
             int zoom,
             double? bboxLeft,
@@ -68,6 +76,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationDto filter,
             int zoom,
             double? bboxLeft,
@@ -79,6 +88,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> TaxonAggregation(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationDto filter,
             int? skip,
             int? take,
@@ -91,6 +101,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool protectedObservations = false);
 
         Task<IActionResult> TaxonAggregationInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
             int? skip,
             int? take,
@@ -108,6 +119,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         //    bool protectedObservations = false);
 
         Task<IActionResult> TaxonExistsIndicationInternal(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
            bool validateSearchFilter = false,
            bool protectedObservations = false);
@@ -121,6 +133,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
         Task<IActionResult> SignalSearchInternalAsync(
+            string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
             bool validateSearchFilter = false,
             int areaBuffer = 0,

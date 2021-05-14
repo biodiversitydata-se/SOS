@@ -16,17 +16,19 @@ namespace SOS.Lib.Services.Interfaces
         Task<UserModel> GetUserAsync();
 
         /// <summary>
-        /// Get authorities for user
+        ///  Get authorities for user
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <returns></returns>
-        Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId);
+        Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null);
 
         /// <summary>
         /// Get user roles
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <returns></returns>
-        Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId);
+        Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null);
     }
 }

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
 
@@ -21,20 +20,22 @@ namespace SOS.Observations.Api.Managers.Interfaces
         int MaxNrElasticSearchAggregationBuckets { get; }
 
         /// <summary>
-        ///     Get chunk of sightings
+        /// Get chunk of sightings
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+        Task<PagedResult<dynamic>> GetChunkAsync(string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
         /// <summary>
         /// Get observations by scroll
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="take"></param>
         /// <param name="sortBy"></param>
@@ -42,6 +43,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take,
             string sortBy,
@@ -49,34 +51,62 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string scrollId);
 
         /// <summary>
-        ///     Get aggregated data
+        /// Get aggregated data
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationType"></param>
-        /// <param name="take"></param>
-        /// <param name="sortBy"></param>
         /// <param name="skip"></param>
-        /// <param name="sortOrder"></param>
+        /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take);
+        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
 
         /// <summary>
         /// Get aggregated grid cells data.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="precision"></param>
         /// <param name="bbox"></param>
         /// <returns></returns>
-        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
+        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox);
 
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
+        /// <summary>
+        /// Geo grid tile aggregation
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox);
 
+        /// <summary>
+        /// A compleate geo tile taxa aggregation
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="zoom"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
         Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter, 
             int zoom,
             LatLonBoundingBox bbox);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="zoom"></param>
+        /// <param name="bbox"></param>
+        /// <param name="geoTilePage"></param>
+        /// <param name="taxonIdPage"></param>
+        /// <returns></returns>
         Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int zoom,
             LatLonBoundingBox bbox,
@@ -93,19 +123,22 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get number of matching observations
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<long> GetMatchCountAsync(FilterBase filter);
+        Task<long> GetMatchCountAsync(string authorizationApplicationIdentifier, FilterBase filter);
 
         /// <summary>
         /// Aggregate observations by taxon.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="bbox"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             LatLonBoundingBox bbox,
             int? skip,
@@ -114,20 +147,33 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get a indication if taxon exist in specified area
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter);
-        Task<dynamic> GetObservationAsync(string occurrenceId, bool protectedObservations, bool includeInternalFields);
+
+        /// <summary>
+        /// Get single observation
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="occurrenceId"></param>
+        /// <param name="protectedObservations"></param>
+        /// <param name="includeInternalFields"></param>
+        /// <returns></returns>
+        Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, bool protectedObservations, bool includeInternalFields);
 
         /// <summary>
         /// Signal search
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="areaBuffer"></param>
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
         Task<bool> SignalSearchInternalAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter, 
             int areaBuffer,
             bool onlyAboveMyClearance = true);

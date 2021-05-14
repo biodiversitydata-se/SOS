@@ -53,12 +53,14 @@ namespace SOS.Observations.Api.Managers
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+        public async Task<PagedResult<dynamic>> GetChunkAsync(
+            string authorizationApplicationIdentifier,
+            SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
                 ResolveLocalizedVocabularyFields(filter.FieldTranslationCultureCode, processedObservations.Records);
@@ -76,7 +78,9 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <inheritdoc />
         public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take, 
             string sortBy,
@@ -85,7 +89,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
                 ResolveLocalizedVocabularyFields(filter.FieldTranslationCultureCode, processedObservations.Records);
@@ -105,11 +109,11 @@ namespace SOS.Observations.Api.Managers
 
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
 
                 if(aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
@@ -130,19 +134,13 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        
-        /// <summary>
-        /// Get aggregated grid cells data.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="precision"></param>
-        /// <param name="bbox"></param>
-        /// <returns></returns>
-        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox)
+
+        /// <inheritdoc />
+        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision, bbox);
             }
             catch (Exception e)
@@ -152,18 +150,12 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        /// <summary>
-        /// Get aggregated grid cells data.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="precision"></param>
-        /// <param name="bbox"></param>
-        /// <returns></returns>
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        /// <inheritdoc />
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, bbox);
             }
             catch (Exception e)
@@ -173,21 +165,16 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        /// <summary>
-        /// Aggregate observations by GeoTile and Taxa. This method handles all paging and returns the complete result.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
-        /// <param name="bbox"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter, 
             int zoom, 
             LatLonBoundingBox bbox)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom, bbox);
             }
             catch (Exception e)
@@ -197,16 +184,9 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        /// <summary>
-        /// Aggregate observations by GeoTile and Taxa. This method uses paging.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
-        /// <param name="bbox"></param>
-        /// <param name="geoTilePage">The GeoTile key. Should be null in the first request.</param>
-        /// <param name="taxonIdPage">The TaxonId key. Should be null in the first request.</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int zoom,
             LatLonBoundingBox bbox,
@@ -215,7 +195,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, bbox, geoTilePage, taxonIdPage);
             }
             catch (Exception e)
@@ -232,14 +212,15 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(FilterBase filter)
+        public async Task<long> GetMatchCountAsync(string authorizationApplicationIdentifier, FilterBase filter)
         {
-            await _filterManager.PrepareFilter(filter);
+            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             LatLonBoundingBox bbox,
             int? skip,
@@ -247,7 +228,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, bbox, skip, take);
             }
             catch (Exception e)
@@ -259,11 +240,12 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter, 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.TaxonIds?.Count() > 10000)
                 {
@@ -282,13 +264,14 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<bool> SignalSearchInternalAsync(
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int areaBuffer,
             bool onlyAboveMyClearance)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter, areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorizations?.Any(ea =>
                     ea.Identity?.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase) ?? false) ?? true)
@@ -506,7 +489,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<dynamic> GetObservationAsync(string occurrenceId, bool protectedObservations, bool includeInternalFields)
+        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, bool protectedObservations, bool includeInternalFields)
         {
             SearchFilter filter = new SearchFilter();
             if (includeInternalFields)
@@ -514,7 +497,7 @@ namespace SOS.Observations.Api.Managers
                 filter = new SearchFilterInternal();
             }
             filter.ProtectedObservations = protectedObservations;
-            await _filterManager.PrepareFilter(filter);
+            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
             var obs = new List<dynamic>() { processedObservation };
             ResolveLocalizedVocabularyFields("", obs);

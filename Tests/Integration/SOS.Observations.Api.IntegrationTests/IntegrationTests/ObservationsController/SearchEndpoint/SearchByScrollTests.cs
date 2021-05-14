@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             do
             {
                 IActionResult response = await _fixture.ObservationsController.ObservationsScroll(
-                    searchFilter, scrollId, 1000);
+                    null, searchFilter, scrollId, 1000);
                 ScrollResultDto<Observation> result = response.GetResult<ScrollResultDto<Observation>>();
                 observations.AddRange(result.Records);
                 scrollId = result.ScrollId;
