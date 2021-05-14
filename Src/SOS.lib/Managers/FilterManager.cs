@@ -27,7 +27,7 @@ namespace SOS.Lib.Managers
         /// Add extended authorization if any
         /// </summary>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(string authorizationApplicationIdentifier, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -38,7 +38,7 @@ namespace SOS.Lib.Managers
             }
             
             // Get user authorities
-            var authorities = await _userService.GetUserAuthoritiesAsync(user.Id);
+            var authorities = await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier);
 
             if (authorities == null)
             {
@@ -49,9 +49,8 @@ namespace SOS.Lib.Managers
 
             foreach (var authority in authorities)
             {
-                // taxonid's and area are mandatory to get extended authorization
-                if ((!authority?.TaxonIds?.Any() ?? true) || 
-                    (!authority?.Areas?.Any() ?? true))
+                // area are mandatory to get extended authorization
+                if (!authority?.Areas?.Any() ?? true)
                 {
                     continue;
                 }
@@ -81,20 +80,14 @@ namespace SOS.Lib.Managers
 
                 // To get extended authorization, taxon id's and some area must be set 
                 if (
-                        (
-                            (extendedAuthorizationFilter.TaxonIds?.Any() ?? false) ||
-                            (authority.TaxonIds?.Contains(BiotaTaxonId) ?? false)
-                        ) &&
-                        (
-                            authorizedToSweden ||
-                            (extendedAuthorizationFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
-                            (extendedAuthorizationFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
-                        )
-                    )
+                        authorizedToSweden ||
+                        (extendedAuthorizationFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
+                        (extendedAuthorizationFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
+                        (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
+                        (extendedAuthorizationFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
+                        (extendedAuthorizationFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
+                        (extendedAuthorizationFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
+                )
                 {
                     extendedAuthorizationFilters.Add(extendedAuthorizationFilter);
                 }
@@ -276,11 +269,11 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(FilterBase filter, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
+        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
         {
             if (filter.ProtectedObservations)
             {
-                filter.ExtendedAuthorizations = await AddAuthorizationAsync(areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorizations = await AddAuthorizationAsync(authorizationApplicationIdentifier, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
             }
 
             filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);
