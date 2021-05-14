@@ -124,10 +124,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// Signal search
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="areaBuffer"></param>
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
         Task<bool> SignalSearchInternalAsync(
-            SearchFilter filter,
+            SearchFilter filter, 
+            int areaBuffer,
             bool onlyAboveMyClearance = true);
     }
 }

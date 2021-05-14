@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
@@ -26,7 +27,7 @@ namespace SOS.Lib.Managers
         /// Add extended authorization if any
         /// </summary>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -75,7 +76,7 @@ namespace SOS.Lib.Managers
 
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
-                extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, usePointAccuracy, useDisturbanceRadius);
+                extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                 extendedAuthorizationFilter.TaxonIds = PopulateTaxonFilter(authority.TaxonIds, true, null);
 
                 // To get extended authorization, taxon id's and some area must be set 
@@ -176,10 +177,11 @@ namespace SOS.Lib.Managers
         /// Populate geographical filter
         /// </summary>
         /// <param name="areas"></param>
+        /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<GeographicFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<GeographicFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (!areas?.Any() ?? true)
             {
@@ -189,9 +191,9 @@ namespace SOS.Lib.Managers
             var geographicFilter = new GeographicFilter();
             foreach (var areaFilter in areas)
             {
-                if (usePointAccuracy || useDisturbanceRadius)
+                if (areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
                 {
-                    await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, usePointAccuracy, useDisturbanceRadius);
+                    await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                     continue;
                 }
 
@@ -219,7 +221,7 @@ namespace SOS.Lib.Managers
                         (geographicFilter.BirdValidationAreaIds ??= new List<string>()).Add(areaFilter.FeatureId);
                         break;
                     default:
-                        await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, usePointAccuracy, useDisturbanceRadius);
+                        await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                         break;
                 }
             }
@@ -233,21 +235,28 @@ namespace SOS.Lib.Managers
         /// <param name="geographicFilter"></param>
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
+        /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task AddGeometryAsync(GeographicFilter geographicFilter, AreaType areaType, string featureId, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task AddGeometryAsync(GeographicFilter geographicFilter, AreaType areaType, string featureId, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
-            var geometry = await _areaCache.GetGeometryAsync(areaType, featureId);
+            var geoShape = await _areaCache.GetGeometryAsync(areaType, featureId);
 
-            if (geometry != null)
+            if (geoShape != null)
             {
+                // If area buffer is set. Extend area with buffer in order to hit outside original area
+                if (areaBuffer != 0)
+                {
+                    geoShape = geoShape.ToGeometry().Buffer(areaBuffer).ToGeoShape();
+                }
+
                 (geographicFilter.GeometryFilter ??= new GeometryFilter
                 {
                     MaxDistanceFromPoint = 0,
                     UseDisturbanceRadius = useDisturbanceRadius,
                     UsePointAccuracy = usePointAccuracy
-                }).Geometries.Add(geometry);
+                }).Geometries.Add(geoShape);
             }
         }
 
@@ -267,15 +276,15 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(FilterBase filter, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
+        public async Task PrepareFilter(FilterBase filter, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
         {
             if (filter.ProtectedObservations)
             {
-                filter.ExtendedAuthorizations = await AddAuthorizationAsync(authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorizations = await AddAuthorizationAsync(areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
             }
 
             filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);
-            filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
+            filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
             filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa, filter.TaxonListIds, filter.TaxonListOperator);
         }
     }

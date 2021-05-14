@@ -117,11 +117,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter"></param>
+        /// <param name="areaBuffer"></param>
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
         Task<IActionResult> SignalSearchInternalAsync(
             SearchFilterAggregationInternalDto filter,
             bool validateSearchFilter = false,
+            int areaBuffer = 0,
             bool onlyAboveMyClearance = true);
     }
 }
