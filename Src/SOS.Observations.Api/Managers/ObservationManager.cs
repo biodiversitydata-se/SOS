@@ -263,7 +263,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(filter, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(filter, 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.TaxonIds?.Count() > 10000)
                 {
@@ -283,11 +283,12 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,
+            int areaBuffer,
             bool onlyAboveMyClearance)
         {
             try
             {
-                await _filterManager.PrepareFilter(filter, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(filter, areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorizations?.Any(ea =>
                     ea.Identity?.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase) ?? false) ?? true)

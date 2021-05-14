@@ -1295,6 +1295,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <inheritdoc />
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -1303,15 +1304,17 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> SignalSearchInternalAsync(
             SearchFilterAggregationInternalDto filter,
-            bool validateSearchFilter = false,
-            bool onlyAboveMyClearance = true)
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] int areaBuffer = 0,
+            [FromQuery] bool onlyAboveMyClearance = true)
         {
             try
             {
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateGeographicalAreaExists(filter),
-                    ValidateSignalSearchDate(filter.Date));
+                    ValidateSignalSearchDate(filter.Date),
+                    areaBuffer < 0 || areaBuffer > 100 ? Result.Failure("areaBuffer must be between 0 and 100") : Result.Success());
 
                 if (validationResult.IsFailure)
                 {
@@ -1319,7 +1322,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
-                var taxonFound = await ObservationManager.SignalSearchInternalAsync(searchFilter, onlyAboveMyClearance);
+                var taxonFound = await ObservationManager.SignalSearchInternalAsync(searchFilter, areaBuffer, onlyAboveMyClearance);
 
                 return new OkObjectResult(taxonFound);
             }
