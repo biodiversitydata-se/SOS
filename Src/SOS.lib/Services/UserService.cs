@@ -69,6 +69,30 @@ namespace SOS.Lib.Services
             return null;
         }
 
+        /// <summary>
+        /// Get user by id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<UserModel> GetUserByIdAsync(int userId)
+        {
+            try
+            {
+                var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{userId}"));
+
+                return response.Success
+                    ? response.Result
+                    : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to get user", e);
+            }
+
+            return null;
+        }
+
         /// <inheritdoc />
         public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId)
         {
