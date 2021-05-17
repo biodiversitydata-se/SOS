@@ -138,7 +138,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 .ReturnsAsync(new[]
                     {new MetadataEntity {Id = 1, Translation = "ValidationStatus", CultureCode = Cultures.en_GB}});
 
-            _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync())
+            _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync(false))
                 .ReturnsAsync(new[] {new ProjectEntity {Id = 1, Name = "Project"}});
 
             _sightingRepositoryMock.Setup(sr => sr.GetIdSpanAsync())
