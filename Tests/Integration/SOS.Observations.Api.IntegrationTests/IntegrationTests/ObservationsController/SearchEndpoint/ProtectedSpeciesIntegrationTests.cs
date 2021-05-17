@@ -45,5 +45,35 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             result.Records.Should().BeEmpty("because Wolf is protected");
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Search_for_Wolf()
+        {
+            // To test with a specific user, change SOS.Lib.Managers.FilterManager.AddAuthorizationAsync() to use
+            // Remove: var user = await _userService.GetUserAsync();
+            // Add:    var user = await _userService.GetUserByIdAsync([userId]);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SearchFilterDto searchFilter = new SearchFilterDto
+            {
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
+                OnlyValidated = false,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearch(null, searchFilter, 0, 10);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Records.Should().BeEmpty("because Wolf is protected");
+        }
     }
 }
