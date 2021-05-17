@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var countResponse = await _fixture.ObservationsController.Count(searchFilter);
+            var countResponse = await _fixture.ObservationsController.Count(null, searchFilter);
             int count = countResponse.GetResult<int>();
             string scrollId = null; // no scroll in first request
             bool hasMorePages;
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             do
             {
                 IActionResult response = await _fixture.ObservationsController.ObservationsScroll(
-                    searchFilter, scrollId, 10000);
+                    null, searchFilter, scrollId, 10000);
                 ScrollResultDto<Observation> result = response.GetResult<ScrollResultDto<Observation>>();
                 observations.AddRange(result.Records);
                 ids.UnionWith(result.Records.Select(m => m.Occurrence.OccurrenceId));
