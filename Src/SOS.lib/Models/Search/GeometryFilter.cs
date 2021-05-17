@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
+using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Models.Search
 {
@@ -22,7 +23,7 @@ namespace SOS.Lib.Models.Search
         /// Limit the search by a bounding box.
         /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
         /// </summary>
-        public List<double> BoundingBox { get; set; }
+        public LatLonBoundingBox BoundingBox { get; set; }
 
         /// <summary>
         ///     Add buffer to geometry
