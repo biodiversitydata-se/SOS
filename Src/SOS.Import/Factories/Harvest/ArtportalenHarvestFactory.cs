@@ -210,7 +210,7 @@ namespace SOS.Import.Factories.Harvest
             };
         }
 
-        private async Task<IDictionary<int, Project[]>> GetSightingsProjects(IEnumerable<int> sightingIds)
+        private async Task<IDictionary<int, Project[]>> GetSightingsProjects(IEnumerable<int> sightingIds, bool live = false)
         {
             if (!_artportalenMetadataContainer?.Projects?.Any() ?? true)
             {
@@ -223,6 +223,8 @@ namespace SOS.Import.Factories.Harvest
             {
                 return null;
             }
+            var projectEntities = (await _projectRepository.GetProjectsAsync(live))?.ToArray();
+            _artportalenMetadataContainer.UpdateProjects(projectEntities);
 
             // Cast a projects to verbatim
             var sightingsProjects = new Dictionary<int, IDictionary<int, Project>>();
@@ -552,7 +554,7 @@ namespace SOS.Import.Factories.Harvest
             }
             
             await AddMissingSitesAsync(newSiteIds);
-            var sightingsProjects = await GetSightingsProjects(sightingIds);
+            var sightingsProjects = await GetSightingsProjects(sightingIds, IncrementalMode);
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
