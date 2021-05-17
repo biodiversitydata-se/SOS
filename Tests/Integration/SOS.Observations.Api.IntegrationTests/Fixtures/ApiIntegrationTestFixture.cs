@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
@@ -14,6 +15,8 @@ using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Security.Interfaces;
+using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.Managers;
@@ -106,7 +109,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var dataproviderRepsoitory = new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
             var dataproviderCache = new DataProviderCache(dataproviderRepsoitory);
             var userServiceMock = new Moq.Mock<IUserService>();
-            var filterManager = new FilterManager(taxonManager, userServiceMock.Object, areaCache, dataproviderCache);
+            var userServiceConfiguration = new UserServiceConfiguration();
+            userServiceConfiguration.BaseAddress = "https://artdatauser-st.artdata.slu.se/api";
+            userServiceConfiguration.AcceptHeaderContentType = "application/json";
+            var userService = new UserService(new Mock<IAuthorizationProvider>().Object,
+                new HttpClientService(new NullLogger<HttpClientService>()), userServiceConfiguration, new NullLogger<UserService>());
+            var filterManager = new FilterManager(taxonManager, userService, areaCache, dataproviderCache);
+            //var filterManager = new FilterManager(taxonManager, userServiceMock.Object, areaCache, dataproviderCache);
             var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
                 filterManager,  new NullLogger<ObservationManager>());
 
