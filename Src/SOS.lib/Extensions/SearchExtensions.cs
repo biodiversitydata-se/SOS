@@ -109,7 +109,11 @@ namespace SOS.Lib.Extensions
             var internalFilter = filter as SearchFilterInternal;
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
-            query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
+            query.Add(q => q
+                .Nested(n => n
+                    .Path("artportalenInternal.occurrenceRecordedByInternal")
+                    .Query(qq=>qq
+                        .Term(new Field("artportalenInternal.occurrenceRecordedByInternal.id"),  internalFilter.ObservedByUserId))));
 
             if (internalFilter.OnlyWithMedia)
             {
@@ -202,6 +206,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
 
             //search by locationId, but include child-locations observations aswell
+
             var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
             if (siteTerms?.Any() ?? false)
             {
