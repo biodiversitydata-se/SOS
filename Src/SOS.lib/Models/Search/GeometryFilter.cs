@@ -19,6 +19,12 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
+        /// Limit the search by a bounding box.
+        /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
+        /// </summary>
+        public List<double> BoundingBox { get; set; }
+
+        /// <summary>
         ///     Add buffer to geometry
         /// </summary>
         public double? MaxDistanceFromPoint { get; set; }
@@ -38,6 +44,10 @@ namespace SOS.Lib.Models.Search
         {
             get
             {
+                if (!Geometries?.Any() ?? true)
+                {
+                    return false;
+                }
                 foreach (var geom in Geometries)
                 {
                     var valid = geom != null &&
@@ -55,8 +65,13 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        ///     If true, use Point accuracy when searching
+        /// If true, use Point accuracy when searching
         /// </summary>
         public bool UsePointAccuracy { get; set; }
+
+        /// <summary>
+        /// If true use disturbance radius when searching
+        /// </summary>
+        public bool UseDisturbanceRadius { get; set; }
     }
 }

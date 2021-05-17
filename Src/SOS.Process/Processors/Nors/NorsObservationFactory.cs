@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
@@ -56,13 +52,6 @@ namespace SOS.Process.Processors.Nors
         /// <returns></returns>
         public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim)
         {
-            Point wgs84Point = null;
-            if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
-            {
-                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude)
-                    {SRID = (int) CoordinateSys.WGS84};
-            }
-
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
             var obs = new Observation
@@ -84,23 +73,9 @@ namespace SOS.Process.Processors.Nors
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Lib.Models.Processed.Observation.Location
+                Location = new Location(verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
                 {
-                    CoordinateUncertaintyInMeters =
-                        verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
-                    CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = verbatim.DecimalLatitude,
-                    DecimalLongitude = verbatim.DecimalLongitude,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
-                    Country = new VocabularyValue { Id = (int)CountryId.Sweden},
-                    Locality = verbatim.Locality,
-                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
-                    PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer =
-                        (PolygonGeoShape) wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
-                    VerbatimLongitude = verbatim.DecimalLongitude.ToString(CultureInfo.InvariantCulture)
+                    Locality = verbatim.Locality
                 },
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence

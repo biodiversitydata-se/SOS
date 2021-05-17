@@ -123,5 +123,15 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="occurrenceId"></param>
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter);
+
+        /// <summary>
+        /// Signal search
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="onlyAboveMyClearance"></param>
+        /// <returns></returns>
+        Task<bool> SignalSearchInternalAsync(
+            SearchFilter filter,
+            bool onlyAboveMyClearance);
     }
 }

@@ -62,6 +62,19 @@ namespace SOS.Lib.Extensions
             );
         }
 
+        private static void AddGeoDistanceCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance)
+        {
+            query.Add(q => q
+                .GeoDistance(gd => gd
+                    .Field(field)
+                    .DistanceType(distanceType)
+                    .Location(geometry.ToGeoLocation())
+                    .Distance(distance, DistanceUnit.Meters)
+                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                )
+            );
+        }
+
         /// <summary>
         /// Add geo shape criteria
         /// </summary>
@@ -93,9 +106,7 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
             query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
-            query.TryAddBoundingBoxCriteria("location.pointLocation", internalFilter.BoundingBox);
 
-           
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
@@ -111,7 +122,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
-            
+
             if (internalFilter.Months?.Any() ?? false)
             {
                 query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
@@ -155,16 +166,6 @@ namespace SOS.Lib.Extensions
                     break;
                 case SightingUnspontaneousFilter.Unspontaneous:
                     query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
-                    break;
-            }
-
-            switch (internalFilter.NotRecoveredFilter)
-            {
-                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
-                    break;
-                case SightingNotRecoveredFilter.OnlyNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
                     break;
             }
 
@@ -300,7 +301,7 @@ namespace SOS.Lib.Extensions
         }
 
         // Get observations from other than Artportalen too
-        
+
         /// <summary>
         /// Add numeric filter with relation operator
         /// </summary>
@@ -418,7 +419,6 @@ namespace SOS.Lib.Extensions
             )));
         }
 
-
         /// <summary>
         /// Try to add bounding box criteria
         /// </summary>
@@ -428,16 +428,21 @@ namespace SOS.Lib.Extensions
         private static void TryAddBoundingBoxCriteria(this
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IReadOnlyList<double> coordinates)
         {
-            if ((coordinates?.Count ?? 0) > 3)
+            if ((coordinates?.Count ?? 0) != 4)
             {
-                query.Add(q => q
-                    .GeoBoundingBox(g => g
-                        .Field(new Field(field))
-                        .BoundingBox(coordinates[1],
-                            coordinates[0],
-                            coordinates[3],
-                            coordinates[2])));
+                return;
             }
+
+            query.Add(q => q
+                .GeoBoundingBox(g => g
+                    .Field(new Field(field))
+                    .BoundingBox(
+                        coordinates[1],
+                        coordinates[0],
+                        coordinates[3],
+                        coordinates[2])
+                )
+            );
         }
 
         /// <summary>
@@ -467,55 +472,49 @@ namespace SOS.Lib.Extensions
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             GeometryFilter geometryFilter)
         {
-            if (!geometryFilter?.IsValid ?? true)
+            if (geometryFilter == null)
             {
                 return;
             }
 
             var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-            foreach (var geom in geometryFilter.Geometries)
+
+            geometryContainers.TryAddBoundingBoxCriteria(
+                $"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
+                geometryFilter?.BoundingBox);
+
+            if (geometryFilter.UseDisturbanceRadius)
             {
-                switch (geom.Type.ToLower())
+                geometryContainers.TryAddBoundingBoxCriteria(
+                    "location.pointWithDisturbanceBuffer",
+                    geometryFilter?.BoundingBox);
+            }
+
+            if (geometryFilter?.IsValid ?? false)
+            {
+                foreach (var geom in geometryFilter.Geometries)
                 {
-                    case "point":
-                        if (geometryFilter.UsePointAccuracy)
-                        {
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.pointWithBuffer")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-                        }
-                        else
-                        {
-                            geometryContainers.Add(q => q
-                                .GeoDistance(gd => gd
-                                    .Field("location.point")
-                                    .DistanceType(GeoDistanceType.Arc)
-                                    .Location(geom.ToGeoLocation())
-                                    .Distance(geometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                                )
-                            );
-                        }
+                    switch (geom.Type.ToLower())
+                    {
+                        case "point":
+                            geometryContainers.AddGeoDistanceCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoDistanceType.Arc, geometryFilter.MaxDistanceFromPoint ?? 0);
 
-                        break;
-                    case "polygon":
-                    case "multipolygon":
-                        if (geometryFilter.UsePointAccuracy)
-                        {
-                            geometryContainers.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
-                        }
-                        else
-                        {
-                            geometryContainers.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
-                        }
-
-                        break;
+                            if (!geometryFilter.UseDisturbanceRadius)
+                            {
+                                continue;
+                            }
+                            geometryContainers.AddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom, GeoDistanceType.Arc, geometryFilter.MaxDistanceFromPoint ?? 0);
+                            break;
+                        case "polygon":
+                        case "multipolygon":
+                            geometryContainers.AddGeoShapeCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, geometryFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
+                            if (!geometryFilter.UseDisturbanceRadius)
+                            {
+                                continue;
+                            }
+                            geometryContainers.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
+                            break;
+                    }
                 }
             }
 
@@ -708,6 +707,11 @@ namespace SOS.Lib.Extensions
         }
 
 
+        /// <summary>
+        /// Try to add geographic filter
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="geographicFilter"></param>
         private static void TryAddGeographicFilter(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             GeographicFilter geographicFilter)
@@ -727,6 +731,25 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Try to add not recovered filter
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
+        private static void TryAddNotRecoveredFilter(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            switch (filter.NotRecoveredFilter)
+            {
+                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
+                    break;
+                case SightingNotRecoveredFilter.OnlyNotRecovered:
+                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Try to add query criteria
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -734,7 +757,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="terms"></param>
         public static void TryAddTermsCriteria<T>(
-                this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
+                    this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IEnumerable<T> terms)
         {
             if (terms?.Any() ?? false)
             {
@@ -875,6 +898,47 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add signal search specific arguments
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="extendedAuthorizations"></param>
+        /// <param name="onlyAboveMyClearance"></param>
+        public static void AddSignalSearchCriteria(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationFilter> extendedAuthorizations, bool onlyAboveMyClearance)
+        {
+            if (!extendedAuthorizations?.Any() ?? true)
+            {
+                return;
+            }
+
+            var protectedQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            // Allow protected observations matching user extended authorization
+            foreach (var extendedAuthorization in extendedAuthorizations)
+            {
+                var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                if (onlyAboveMyClearance)
+                {
+                    protectedQuery.TryAddNumericRangeCriteria("occurrence.protectionLevel", extendedAuthorization.MaxProtectionLevel, RangeTypes.GreaterThan);
+                }
+
+                TryAddGeographicFilter(protectedQuery, extendedAuthorization.GeographicAreas);
+
+                protectedQuerys.Add(q => q
+                    .Bool(b => b
+                        .Filter(protectedQuery)
+                    )
+                );
+            }
+            
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(protectedQuerys)
+                )
+            );
+        }
+        
+        /// <summary>
         ///     Create search filter
         /// </summary>
         /// <param name="filter"></param>
@@ -889,6 +953,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTimeRangeFilters(filter);
             query.TryAddGeographicFilter(filter.AreaGeographic);
             query.TryAddGeometryFilters(filter.Geometries);
+            query.TryAddNotRecoveredFilter(filter);
             query.AddSightingTypeFilters(filter);
 
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
@@ -926,14 +991,12 @@ namespace SOS.Lib.Extensions
                     switch (geom.Type.ToLower())
                     {
                         case "holepolygon":
-                            if (filter.AreaGeographic.GeometryFilter.UsePointAccuracy)
+                            query.AddGeoShapeCriteria($"location.{(filter.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
+                            if (!filter.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
                             {
-                                query.AddGeoShapeCriteria("location.pointWithBuffer", geom, GeoShapeRelation.Intersects);
+                                continue;
                             }
-                            else
-                            {
-                                query.AddGeoShapeCriteria("location.point", geom, GeoShapeRelation.Within);
-                            }
+                            query.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
 
                             break;
                     }
@@ -965,6 +1028,7 @@ namespace SOS.Lib.Extensions
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
+                    .Field("location.pointWithDisturbanceBuffer")
                     .Field("isInEconomicZoneOfSweden"));
             }
             else
@@ -977,6 +1041,7 @@ namespace SOS.Lib.Extensions
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
+                    .Field("location.pointWithDisturbanceBuffer")
                     .Field("isInEconomicZoneOfSweden")
                 );
             }

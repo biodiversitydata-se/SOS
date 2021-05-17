@@ -157,21 +157,21 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
 
                 // Location
-                obs.Location = new Location();
+                obs.Location = new Location(
+                    verbatimObservation.Site?.XCoord, 
+                    verbatimObservation.Site?.YCoord, 
+                    CoordinateSys.WebMercator, 
+                    point, 
+                    (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer?.ToGeoShape(),
+                    verbatimObservation.Site?.Accuracy, 
+                    taxon?.Attributes?.DisturbanceRadius);
                 obs.Location.Attributes = new LocationAttributes
                 {
                     CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate,
                     ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate
 
                 };
-                obs.Location.Continent = new VocabularyValue {Id = (int) ContinentId.Europe};
-                obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
-                obs.Location.Country = new VocabularyValue {Id = (int) CountryId.Sweden};
-                obs.Location.CountryCode = CountryCode.Sweden;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
-                obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
-                obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
-                obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
                 obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
@@ -180,13 +180,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
                 obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
-                obs.Location.Point = point;
-                obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
-                obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer?.ToGeoShape();
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
-                obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;
-                obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord.ToString() : null;
-                obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
 
                 // Occurrence
                 obs.Occurrence = new Occurrence();

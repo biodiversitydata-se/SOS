@@ -53,16 +53,15 @@ namespace SOS.Import.Harvesters.Observations
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                dataProvider,
+                _verbatimClient,
+                _logger)
+            {
+                TempMode = true
+            };
             try
             {
-                using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                    dataProvider,
-                    _verbatimClient,
-                    _logger)
-                {
-                    TempMode = true
-                };
-
                 _logger.LogInformation("Start harvesting sightings for iNaturalist data provider");
                 _logger.LogInformation(GetINatHarvestSettingsInfoString());
 
@@ -76,16 +75,21 @@ namespace SOS.Import.Harvesters.Observations
                 var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
                 var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, startDate.AddMonths(1));
 
-                var monthLoopStop = DateTime.Now - new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
+                var id = 0;
                 // Loop until all sightings are fetched.
                 do
                 {
+                    foreach (var observation in gBIFResult)
+                    {
+                        observation.Id = ++id;
+                    }
+
                     // Add sightings to MongoDb
                     await dwcArchiveVerbatimRepository.AddManyAsync(gBIFResult);
 
                     nrSightingsHarvested += gBIFResult.Count();
 
-                    _logger.LogDebug($"{ nrSightingsHarvested } iNaturalist observations harvested");
+                    _logger.LogDebug($"{nrSightingsHarvested} iNaturalist observations harvested");
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
@@ -94,15 +98,14 @@ namespace SOS.Import.Harvesters.Observations
                         _logger.LogInformation("Max iNaturalist observations reached");
                         break;
                     }
-                    _logger.LogDebug($"Fetching iNaturalist observations between dates {startDate.AddMonths(currentMonthOffset).ToString("yyyy-MM-dd")} and {startDate.AddMonths(currentMonthOffset + 1).ToString("yyyy-MM-dd")}");
 
-                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate.AddMonths(currentMonthOffset), startDate.AddMonths(currentMonthOffset + 1));
+                    _logger.LogDebug(
+                        $"Fetching iNaturalist observations between dates {startDate.AddMonths(currentMonthOffset).ToString("yyyy-MM-dd")} and {startDate.AddMonths(currentMonthOffset + 1).ToString("yyyy-MM-dd")}");
+
+                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate.AddMonths(currentMonthOffset),
+                        startDate.AddMonths(currentMonthOffset + 1));
                     currentMonthOffset++;
                 } while (gBIFResult != null && startDate.AddMonths(currentMonthOffset) <= DateTime.Now);
-
-                _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
-                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
 
                 _logger.LogInformation("Finished harvesting sightings for iNaturalist data provider");
 
@@ -120,6 +123,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest iNaturalist");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
+                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
             }
 
             return harvestInfo;

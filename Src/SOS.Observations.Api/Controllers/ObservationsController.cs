@@ -211,6 +211,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Application identifier making the request, used to get proper authorization</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="skip">Start index of returned observations.</param>
         /// <param name="take">Max number of observations to return. Max is 1000 observations in each request.</param>
@@ -237,6 +238,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ObservationsBySearch(
+            [FromHeader(Name= "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -256,7 +258,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
-                var result = await ObservationManager.GetChunkAsync(searchFilter, skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -284,6 +286,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Count(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -295,7 +298,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
-                var matchCount = await ObservationManager.GetMatchCountAsync(searchFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
             }
@@ -358,6 +361,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridAggregation(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -382,7 +386,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoom, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilter(translationCultureCode, protectedObservations), zoom, bbox);
 
                 if (result.IsFailure)
                 {
@@ -514,6 +518,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregation(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
@@ -540,6 +545,7 @@ namespace SOS.Observations.Api.Controllers
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(
+                    authorizationApplicationIdentifier,
                     filter.ToSearchFilter(translationCultureCode, protectedObservations), 
                     bbox, 
                     skip, 
@@ -563,58 +569,6 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        ///// <summary>
-        ///// Get an indication of how many observations exist for the taxa specified in the search criteria filter.
-        ///// If protectedObservations is set to false, you must be aware of that the result can include false positives
-        ///// since the protected observations coordinates are generalized to a grid depending on the protection level.
-        ///// </summary>
-        ///// <param name="filter">Search criteria filter used to limit the search.</param>
-        ///// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        ///// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        ///// <returns></returns>
-        //[HttpPost("TaxonExistsIndication")]
-        //[ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        //[ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        //[ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        //public async Task<IActionResult> TaxonExistsIndication(
-        //    [FromBody] SearchFilterDto filter,
-        //    [FromQuery] bool validateSearchFilter = false,
-        //    [FromQuery] bool protectedObservations = false)
-        //{
-        //    try
-        //    {
-        //        var validationResult = Result.Combine(validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(), 
-        //            ValidateTaxonExists(filter),
-        //            ValidateGeographicalAreaExists(filter));
-
-        //        if (validationResult.IsFailure)
-        //        {
-        //            return BadRequest(validationResult.Error);
-        //        }
-
-        //        var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
-        //       // Force area geometry search in order to use point with buffer
-        //        searchFilter.AreaGeometrySearchForced = true;
-        //        var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
-
-        //        return new OkObjectResult(taxonFound);
-        //    }
-        //    catch (AuthenticationRequiredException e)
-        //    {
-        //        return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-        //    }
-        //    catch (TaxonValidationException e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        _logger.LogError(e, "Get indication if taxon exists error");
-        //        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-        //    }
-        //}
-
         /// <summary>
         /// Gets a single observation.
         /// </summary>
@@ -628,11 +582,14 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetObservationById([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        public async Task<IActionResult> GetObservationById(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromRoute] string occurrenceId, [FromQuery] 
+            bool protectedObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, protectedObservations,
                     includeInternalFields: false);
 
                 if (observation == null)
@@ -685,6 +642,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsBySearchInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -704,7 +662,7 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var result = await ObservationManager.GetChunkAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -750,6 +708,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsScroll(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] string scrollId,
             [FromQuery] int take = 5000,
@@ -774,7 +733,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
-                var result = await ObservationManager.GetObservationsByScrollAsync(searchFilter, take, sortBy, sortOrder, scrollId);
+                var result = await ObservationManager.GetObservationsByScrollAsync(authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
@@ -807,6 +766,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> CountInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
@@ -818,7 +778,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
-                var matchCount = await ObservationManager.GetMatchCountAsync(searchFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
             }
@@ -851,6 +811,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchAggregatedInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
@@ -871,7 +832,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await ObservationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
+                var result = await ObservationManager.GetAggregatedChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
             }
@@ -935,6 +896,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -959,7 +921,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), zoom, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), zoom, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -999,6 +961,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
@@ -1023,7 +986,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1096,6 +1059,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridTaxaAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] string geoTilePage = null,
@@ -1120,7 +1084,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, false), zoom, bbox, geoTilePage, taxonIdPage);
+                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, bbox, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1160,6 +1124,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
@@ -1185,7 +1150,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), bbox, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1221,7 +1186,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonExistsIndicationInternal(
-            [FromBody] SearchFilterInternalDto filter,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {
@@ -1238,9 +1204,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
-                // Force area geometry search in order to use point with buffer
-                searchFilter.AreaGeometrySearchForced = true;
-                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(searchFilter);
+                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(taxonFound);
             }
@@ -1273,11 +1237,14 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetObservationByIdInternal([FromRoute] string occurrenceId, [FromQuery] bool protectedObservations = false)
+        public async Task<IActionResult> GetObservationByIdInternal(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromRoute] string occurrenceId, 
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(occurrenceId, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, protectedObservations,
                     includeInternalFields: true);
                 if (observation == null)
                 {
@@ -1293,6 +1260,49 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Internal/SignalSearch")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> SignalSearchInternalAsync(
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] int areaBuffer = 0,
+            [FromQuery] bool onlyAboveMyClearance = true)
+        {
+            try
+            {
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateGeographicalAreaExists(filter),
+                    ValidateSignalSearchDate(filter.Date),
+                    areaBuffer < 0 || areaBuffer > 100 ? Result.Failure("areaBuffer must be between 0 and 100") : Result.Success());
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var taxonFound = await ObservationManager.SignalSearchInternalAsync(authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
+
+                return new OkObjectResult(taxonFound);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Signal search Internal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

@@ -202,9 +202,24 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         protected Result ValidateGeographicalAreaExists(SearchFilterBaseDto filter)
         {
-            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries.Any() ?? true))
+            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries?.Any() ?? true) && (filter?.Geometry?.BoundingBox?.Count() ?? 0) != 4)
             {
-                Result.Failure("You must provide area/s or geometry");
+                return Result.Failure("You must provide area/s, geometry or bounding box");
+            }
+
+            return Result.Success();
+        }
+
+        /// <summary>
+        /// Validate start date 
+        /// </summary>
+        /// <param name="dateFilter"></param>
+        /// <returns></returns>
+        protected Result ValidateSignalSearchDate(DateFilterDto dateFilter)
+        {
+            if (dateFilter?.StartDate > DateTime.Now.AddYears(-1))
+            {
+                return Result.Failure("Start date must be at least one year back in time");
             }
 
             return Result.Success();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MvmService;
@@ -45,6 +46,7 @@ namespace SOS.Import.Services
                 // Give it up to tree attempts to get the data
                 if (attempt < 3)
                 {
+                    Thread.Sleep(attempt * 1000);
                     return await GetAsync(getFromId, ++attempt);
                 }
 

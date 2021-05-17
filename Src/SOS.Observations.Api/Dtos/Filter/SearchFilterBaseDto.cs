@@ -15,6 +15,14 @@ namespace SOS.Observations.Api.Dtos.Filter
             OnlyUnsureDetermination
         }
 
+        public enum SightingNotRecoveredFilterDto
+        {
+            NoFilter,
+            OnlyNotRecovered,
+            DontIncludeNotRecovered
+        }
+
+
         /// <summary>
         ///     Only get data from these providers.
         /// </summary>
@@ -44,6 +52,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Geometry filter 
         /// </summary>
         public GeometryFilterDto Geometry { get; set; }
+
+        /// <summary>
+        /// Filter for observation not recovered
+        /// </summary>
+        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
 
         /// <summary>
         /// If true, only validated observations will be returned.

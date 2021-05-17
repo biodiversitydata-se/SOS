@@ -90,11 +90,6 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        /// Area geometry will be used for all types of areas if true
-        /// </summary>
-        public bool AreaGeometrySearchForced { get; set; }
-
-        /// <summary>
         /// Filter on area geometries 
         /// </summary>
         public GeographicFilter AreaGeographic { get; set; }
@@ -157,6 +152,11 @@ namespace SOS.Lib.Models.Search
         /// Limit observation accuracy. Only observations with accuracy less than this will be returned
         /// </summary>
         public int? MaxAccuracy { get; set; }
+
+        /// <summary>
+        /// Filter for observation not recovered
+        /// </summary>
+        public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
 
         /// <summary>
         ///     True to return only validated sightings.
