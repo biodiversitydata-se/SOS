@@ -16,6 +16,13 @@ namespace SOS.Lib.Services.Interfaces
         Task<UserModel> GetUserAsync();
 
         /// <summary>
+        /// Get user by id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<UserModel> GetUserByIdAsync(int userId);
+
+        /// <summary>
         /// Get authorities for user
         /// </summary>
         /// <param name="userId"></param>

@@ -39,29 +39,35 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     Ids = new List<int> { TestData.TaxonIds.Mammalia }, 
                     IncludeUnderlyingTaxa = true
                 },
-                Areas = new[]
-                {
-                    TestData.Areas.JonkopingCounty // Jönköping County
-                },
-                OutputFields = new List<string> { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
+                //Areas = new[]
+                //{
+                //    TestData.Areas.JonkopingCounty // Jönköping County
+                //},
+                OutputFields = new List<string> { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
             };
             var observations = new List<Observation>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
+            var countResponse = await _fixture.ObservationsController.Count(searchFilter);
+            int count = countResponse.GetResult<int>();
             string scrollId = null; // no scroll in first request
             bool hasMorePages;
+            HashSet<string> ids = new HashSet<string>();
+            Stopwatch sp = Stopwatch.StartNew();
             do
             {
                 IActionResult response = await _fixture.ObservationsController.ObservationsScroll(
-                    searchFilter, scrollId, 1000);
+                    searchFilter, scrollId, 10000);
                 ScrollResultDto<Observation> result = response.GetResult<ScrollResultDto<Observation>>();
                 observations.AddRange(result.Records);
+                ids.UnionWith(result.Records.Select(m => m.Occurrence.OccurrenceId));
                 scrollId = result.ScrollId;
                 hasMorePages = result.HasMorePages;
-            } while (hasMorePages);
-            
+            } while (hasMorePages && observations.Count < 100000);
+            sp.Stop();
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
