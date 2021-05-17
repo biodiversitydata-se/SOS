@@ -106,12 +106,15 @@ namespace SOS.Import.Harvesters.Observations
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
 
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                    dataProvider,
+                    _verbatimClient,
+                    _logger)
+                { TempMode = true };
+
             try
             {
-                using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
-                    dataProvider, 
-                    _verbatimClient, 
-                    _logger){ TempMode = true };
+               
 
                 _logger.LogDebug($"Start clearing DwC-A observations for {dataProvider.Identifier}");
                 await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
@@ -121,7 +124,8 @@ namespace SOS.Import.Harvesters.Observations
                 var observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
                 var observationBatches =
-                    _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider, _dwcaConfiguration.BatchSize);
+                    _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider,
+                        _dwcaConfiguration.BatchSize);
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -131,12 +135,12 @@ namespace SOS.Import.Harvesters.Observations
                         _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
                         break;
                     }
-                    
+
                     observationCount += verbatimObservationsBatch.Count;
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }
 
-                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
+                
                 _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
 
                 // Update harvest info
@@ -153,6 +157,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation($"Start permanentize temp collection for {dataProvider.Identifier}");
+                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation($"Finish permanentize temp collection for {dataProvider.Identifier}");
             }
             
             return harvestInfo;

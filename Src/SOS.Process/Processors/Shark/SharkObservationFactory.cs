@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
@@ -56,13 +53,6 @@ namespace SOS.Process.Processors.Shark
         /// <returns></returns>
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
-            Point wgs84Point = null;
-            if (verbatim.SampleLatitudeDd.HasValue && verbatim.SampleLongitudeDd.HasValue)
-            {
-                wgs84Point = new Point(verbatim.SampleLongitudeDd.Value, verbatim.SampleLatitudeDd.Value)
-                    {SRID = (int) CoordinateSys.WGS84};
-            }
-
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
             var sharkSampleId = verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId;
             var obs = new Observation
@@ -85,23 +75,10 @@ namespace SOS.Process.Processors.Shark
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Lib.Models.Processed.Observation.Location
+                Location = new Location(verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius)
                 {
-                    CoordinateUncertaintyInMeters = DefaultCoordinateUncertaintyInMeters,
-                    CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = verbatim.SampleLatitudeDd,
-                    DecimalLongitude = verbatim.SampleLongitudeDd,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
-                    Country = new VocabularyValue { Id = (int)CountryId.Sweden},
                     MaximumDepthInMeters = verbatim.WaterDepthM,
-                    MinimumDepthInMeters = verbatim.WaterDepthM,
-                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
-                    PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)
-                        ?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.SampleLatitudeDd?.ToString(),
-                    VerbatimLongitude = verbatim.SampleLongitudeDd?.ToString()
+                    MinimumDepthInMeters = verbatim.WaterDepthM
                 },
                 Occurrence = new Occurrence
                 {

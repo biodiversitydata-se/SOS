@@ -685,6 +685,13 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static bool TryParseCoordinateSystem(string strCoordinateSystem, out CoordinateSys coordinateSystem)
         {
+            coordinateSystem = default;
+
+            if (string.IsNullOrEmpty(strCoordinateSystem))
+            {
+                return false;
+            }
+
             strCoordinateSystem = strCoordinateSystem.Trim();
 
             if (strCoordinateSystem.Equals("epsg:3006", StringComparison.OrdinalIgnoreCase))
@@ -741,7 +748,6 @@ namespace SOS.Lib.Extensions
                 return true;
             }
 
-            coordinateSystem = default;
             return false;
         }
 

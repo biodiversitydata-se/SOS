@@ -94,12 +94,12 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId)
+        public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null)
         {
             try
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/authorities?applicationIdentifier=artportalen&lang=sv-SE"));
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/authorities?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&lang=sv-SE"));
 
                 return response.Success
                     ? response.Result
@@ -114,12 +114,12 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId)
+        public async Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null)
         {
             try
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier=artportalen&localeId=175"));
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&localeId=175"));
 
                 return response.Success
                     ? response.Result

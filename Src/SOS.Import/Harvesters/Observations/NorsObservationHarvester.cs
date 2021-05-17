@@ -66,7 +66,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _norsObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for NORS verbatim collection");
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
                 var changeId = 0L;
                 var nrSightingsHarvested = 0;
                 var xmlDocument = await _norsObservationService.GetAsync(changeId);
@@ -89,7 +89,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
-                    _logger.LogDebug($"{ nrSightingsHarvested } NORS observations harvested");
+                    _logger.LogDebug($"{nrSightingsHarvested} NORS observations harvested");
 
                     var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
@@ -109,15 +109,11 @@ namespace SOS.Import.Harvesters.Observations
                     xmlDocument = await _norsObservationService.GetAsync(changeId + 1);
                 }
 
-                _logger.LogInformation("Start permanentize temp collection for NORS verbatim");
-                await _norsObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for NORS verbatim");
-
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
 
                 // Update harvest info
                 harvestInfo.DataLastModified =
-                    dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
+                    dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -131,6 +127,12 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest NORS");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for NORS verbatim");
+                await _norsObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for NORS verbatim");
             }
 
             return harvestInfo;

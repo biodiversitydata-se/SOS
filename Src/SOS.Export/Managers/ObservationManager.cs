@@ -77,7 +77,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(null, filter);
                 zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
 
                 // zend file to user
@@ -108,7 +108,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                await _filterManager.PrepareFilter(filter);
+                await _filterManager.PrepareFilter(null, filter);
                 zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case

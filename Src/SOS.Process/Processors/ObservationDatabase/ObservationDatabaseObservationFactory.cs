@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
@@ -57,13 +53,6 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// <returns></returns>
         public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim)
         {
-            Point wgs84Point = null;
-            if (verbatim.CoordinateX > 0 && verbatim.CoordinateY > 0)
-            {
-                var webMercatorPoint = new Point(verbatim.CoordinateX, verbatim.CoordinateY);
-                wgs84Point = webMercatorPoint.Transform(CoordinateSys.Rt90_25_gon_v, CoordinateSys.WGS84) as Point;
-            }
-
             _taxa.TryGetValue(verbatim.TaxonId, out var taxon);
 
             var obs = new Observation
@@ -91,27 +80,14 @@ namespace SOS.Process.Processors.ObservationDatabase
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 InstitutionId = verbatim.SCI_code,
-                Location = new Lib.Models.Processed.Observation.Location
+                Location = new Location(verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
                 {
                     Attributes = new LocationAttributes
                     {
                         VerbatimMunicipality = verbatim.Municipality,
                         VerbatimProvince = verbatim.Province
                     },
-                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe },
-                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters,
-                    Country = new VocabularyValue { Id = (int)CountryId.Sweden },
-                    CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = wgs84Point?.Y ?? 0,
-                    DecimalLongitude = wgs84Point?.X ?? 0,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatim.Locality,
-                    Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
-                    PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer =
-                        (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.CoordinateY.ToString(CultureInfo.InvariantCulture),
-                    VerbatimLongitude = verbatim.CoordinateX.ToString(CultureInfo.InvariantCulture),
                     VerbatimCoordinateSystem = "EPSG:3857"
                 },
                 Modified = verbatim.EditDate,

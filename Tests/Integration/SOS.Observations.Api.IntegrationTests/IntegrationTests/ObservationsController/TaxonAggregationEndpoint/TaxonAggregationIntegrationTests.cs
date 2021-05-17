@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.TaxonAggregation(searchFilter, 0, 100);
+            var response = await _fixture.ObservationsController.TaxonAggregation(null, searchFilter, 0, 100);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.TaxonAggregation(searchFilter, 0, 100);
+            var response = await _fixture.ObservationsController.TaxonAggregation(null, searchFilter, 0, 100);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -109,6 +109,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.TaxonAggregation(
+                null,
                 searchFilter,
                 0,
                 500,
@@ -149,7 +150,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Warmup for benchmark result.
             //-----------------------------------------------------------------------------------------------------------
-            await _fixture.ObservationsController.TaxonAggregation(searchFilter, 0, 10);
+            await _fixture.ObservationsController.TaxonAggregation(null, searchFilter, 0, 10);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act - Paging. Get 100 in each page.
@@ -161,7 +162,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             var duplicateKeysTakeSize100 = new List<int>();
             do
             {
-                var response = await _fixture.ObservationsController.TaxonAggregation(searchFilter, skip, take);
+                var response = await _fixture.ObservationsController.TaxonAggregation(null, searchFilter, skip, take);
                 var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
                 foreach (var record in result.Records)
                 {
@@ -179,7 +180,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act - Get all records in one request.
             //-----------------------------------------------------------------------------------------------------------
             var spGetAll = Stopwatch.StartNew();
-            var getAllResponse = await _fixture.ObservationsController.TaxonAggregation(searchFilter, null, null);
+            var getAllResponse = await _fixture.ObservationsController.TaxonAggregation(null, searchFilter, null, null);
             var getAllResult = getAllResponse.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
             var dictionaryTake1000FromAll = new Dictionary<int, int>();
             var duplicateKeysTake1000FromAll = new List<int>();

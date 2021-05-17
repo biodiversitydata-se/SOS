@@ -19,14 +19,6 @@ namespace SOS.Observations.Api.Dtos.Filter
             NotUnspontaneous,
             Unspontaneous
         }
-
-        public enum SightingNotRecoveredFilterDto
-        {
-            NoFilter,
-            OnlyNotRecovered,
-            DontIncludeNotRecovered
-        }
-
         public enum SightingNotPresentFilterDto
         {
             DontIncludeNotPresent,
@@ -36,11 +28,6 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public int? ReportedByUserId { get; set; }
         public int? ObservedByUserId { get; set; }
-        /// <summary>
-        /// Limit the search by a bounding box.
-        /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
-        /// </summary>
-        public List<double> BoundingBox { get; set; }
 
         /// <summary>
         /// Id of sex to match
@@ -88,8 +75,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<int> ExcludeValidationStatusIds { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
-
-        public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
 
         public string SpeciesCollectionLabel { get; set; }
 

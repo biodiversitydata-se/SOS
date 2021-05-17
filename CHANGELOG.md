@@ -22,8 +22,11 @@
 #### API
 
 #### Sökfilter
-- extendedFilter.maxAccuracy => geometry.maxAccuracy
-- extendedFilter.determinationFilter => determinationFilter
+- ExtendedFilter.MaxAccuracy => Geometry.MaxAccuracy
+- ExtendedFilter.DeterminationFilter => DeterminationFilter
+- ExtendedFilter.BoundingBox => Geometry.BoundingBox
+. ExtendedFilter.NotRecoveredFilter => NotRecoveredFilter
+
 ## [1.0.1]
 
 ### Releases

@@ -93,7 +93,7 @@ namespace SOS.Import.Harvesters.Observations
                 var verbatimFactory = new SharkHarvestFactory();
 
                 var rows = dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray());
-                
+
                 foreach (var row in rows)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -129,10 +129,6 @@ namespace SOS.Import.Harvesters.Observations
                     await _sharkObservationVerbatimRepository.AddManyAsync(verbatims);
                 }
 
-                _logger.LogInformation("Start permanentize temp collection for SHARK verbatim");
-                await _sharkObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for SHARK verbatim");
-
                 _logger.LogInformation("Finished harvesting sightings for SHARK data provider");
 
                 // Update harvest info
@@ -151,6 +147,12 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed to harvest SHARK");
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _logger.LogInformation("Start permanentize temp collection for SHARK verbatim");
+                await _sharkObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for SHARK verbatim");
             }
 
             return harvestInfo;
