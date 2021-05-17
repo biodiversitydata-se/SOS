@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -424,11 +425,11 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="field"></param>
-        /// <param name="coordinates"></param>
+        /// <param name="boundingBox"></param>
         private static void TryAddBoundingBoxCriteria(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IReadOnlyList<double> coordinates)
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, LatLonBoundingBox boundingBox)
         {
-            if ((coordinates?.Count ?? 0) != 4)
+            if (boundingBox?.BottomRight == null || boundingBox?.TopLeft == null)
             {
                 return;
             }
@@ -437,10 +438,10 @@ namespace SOS.Lib.Extensions
                 .GeoBoundingBox(g => g
                     .Field(new Field(field))
                     .BoundingBox(
-                        coordinates[1],
-                        coordinates[0],
-                        coordinates[3],
-                        coordinates[2])
+                        boundingBox.TopLeft.Latitude,
+                        boundingBox.TopLeft.Longitude,
+                        boundingBox.BottomRight.Latitude,
+                        boundingBox.BottomRight.Longitude)
                 )
             );
         }

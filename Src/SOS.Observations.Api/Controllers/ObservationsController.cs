@@ -76,18 +76,16 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Get bounding box
         /// </summary>
-        /// <param name="bboxLeft"></param>
-        /// <param name="bboxTop"></param>
-        /// <param name="bboxRight"></param>
-        /// <param name="bboxBottom"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private async Task<Envelope> GetBoundingBox(double? bboxLeft = null,
-            double? bboxTop = null,
-            double? bboxRight = null,
-            double? bboxBottom = null,
+        private async Task<Envelope> GetBoundingBox(
             SearchFilterBaseDto filter = null)
         {
+            var bboxLeft = filter?.Geometry?.BoundingBox?.TopLeft?.Longitude;
+            var bboxTop = filter?.Geometry?.BoundingBox?.TopLeft?.Latitude;
+            var bboxRight = filter?.Geometry?.BoundingBox?.BottomRight?.Longitude;
+            var bboxBottom = filter?.Geometry?.BoundingBox?.BottomRight?.Latitude;
+
             // If areas passed, adjust bounding box to them
             if (filter.Areas?.Any() ?? false)
             {
@@ -111,12 +109,6 @@ namespace SOS.Observations.Api.Controllers
 
             // Get geometry of sweden economic zone
             var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
-
-            // Todo remove. Only used when area source was AP
-            if (swedenGeometry == null)
-            {
-                swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "100");
-            }
 
             // Get bounding box of swedish economic zone
             var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
@@ -148,15 +140,11 @@ namespace SOS.Observations.Api.Controllers
             return boundingBox;
         }
         private async Task<Result<Envelope>> ValidateBoundingBoxAsync(
-            double? left,
-            double? top,
-            double? right,
-            double? bottom,
             int zoom,
             SearchFilterBaseDto filter,
             bool checkNrTilesLimit = true)
         {
-            var boundingBox = await GetBoundingBox(left, top, right, bottom, filter);
+            var boundingBox = await GetBoundingBox(filter);
 
             if (boundingBox.MinX >= boundingBox.MaxX)
             {
@@ -347,10 +335,6 @@ namespace SOS.Observations.Api.Controllers
         /// </remarks>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -364,17 +348,13 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
+                var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
 
@@ -385,8 +365,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilter(translationCultureCode, protectedObservations), zoom, bbox);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
+               
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoom);
 
                 if (result.IsFailure)
                 {
@@ -504,10 +486,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -522,17 +500,13 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
+                var bboxValidation = await ValidateBoundingBoxAsync(1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
@@ -542,12 +516,12 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(
                     authorizationApplicationIdentifier,
-                    filter.ToSearchFilter(translationCultureCode, protectedObservations), 
-                    bbox, 
+                    searchFilter,
                     skip, 
                     take);
                 if (result.IsFailure)
@@ -881,10 +855,6 @@ namespace SOS.Observations.Api.Controllers
         /// </remarks>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -899,17 +869,13 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
+                var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
 
@@ -920,8 +886,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), zoom, bbox);
+                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
+
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoom);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -946,10 +914,6 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -964,17 +928,13 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter);
+                var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
 
@@ -985,8 +945,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilter(translationCultureCode, protectedObservations), zoomOrError.Value, bbox);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
+
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoomOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1046,10 +1008,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="geoTilePage">The GeoTile key used to retrieve the next next page of data. Should be null in the first request.</param>
         /// <param name="taxonIdPage">The TaxonId key used to retrieve the next page of data. Should be null in the first request.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <returns></returns>
@@ -1064,16 +1022,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] string geoTilePage = null,
             [FromQuery] int? taxonIdPage = null,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, zoom, filter, false);
+                var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter, false);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, zoomOrError,
@@ -1083,8 +1037,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
-                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, bbox, geoTilePage, taxonIdPage);
+                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, false);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
+
+                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1109,10 +1065,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -1128,17 +1080,13 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = 0,
             [FromQuery] int? take = 100,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var bboxValidation = await ValidateBoundingBoxAsync(bboxLeft, bboxTop, bboxRight, bboxBottom, 1, filter);
+                var bboxValidation = await ValidateBoundingBoxAsync(1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
                 var paramsValidationResult = Result.Combine(bboxValidation, filterValidation, pagingArgumentsValidation,
@@ -1148,9 +1096,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var bbox = LatLonBoundingBox.Create(bboxValidation.Value);
+                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), bbox, skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);

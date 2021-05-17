@@ -136,12 +136,12 @@ namespace SOS.Observations.Api.Managers
 
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision, bbox);
+                return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision);
             }
             catch (Exception e)
             {
@@ -151,12 +151,12 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, bbox);
+                return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
             }
             catch (Exception e)
             {
@@ -169,13 +169,12 @@ namespace SOS.Observations.Api.Managers
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
-            int zoom, 
-            LatLonBoundingBox bbox)
+            int zoom)
         {
             try
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom, bbox);
+                return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
             }
             catch (Exception e)
             {
@@ -189,14 +188,13 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int zoom,
-            LatLonBoundingBox bbox,
             string geoTilePage,
             int? taxonIdPage)
         {
             try
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, bbox, geoTilePage, taxonIdPage);
+                return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
             }
             catch (Exception e)
             {
@@ -222,14 +220,13 @@ namespace SOS.Observations.Api.Managers
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             string authorizationApplicationIdentifier,
             SearchFilter filter,
-            LatLonBoundingBox bbox,
             int? skip,
             int? take)
         {
             try
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, bbox, skip, take);
+                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, skip, take);
             }
             catch (Exception e)
             {
