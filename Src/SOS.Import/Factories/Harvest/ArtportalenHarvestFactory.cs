@@ -223,9 +223,12 @@ namespace SOS.Import.Factories.Harvest
             {
                 return null;
             }
-            var projectEntities = (await _projectRepository.GetProjectsAsync(live))?.ToArray();
-            _artportalenMetadataContainer.UpdateProjects(projectEntities);
-
+            //if we are doing incremental harvesting then we need to make sure to fetch any new projects that may have been created
+            if (live)
+            {
+                var projectEntities = (await _projectRepository.GetProjectsAsync(live))?.ToArray();
+                _artportalenMetadataContainer.UpdateProjects(projectEntities);
+            }
             // Cast a projects to verbatim
             var sightingsProjects = new Dictionary<int, IDictionary<int, Project>>();
 
