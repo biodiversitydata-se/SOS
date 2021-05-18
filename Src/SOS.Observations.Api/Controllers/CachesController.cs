@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpDelete]
+        [HttpDelete("{cache}")]
         [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
