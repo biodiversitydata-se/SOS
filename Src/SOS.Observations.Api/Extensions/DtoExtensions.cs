@@ -41,13 +41,13 @@ namespace SOS.Observations.Api.Extensions
                 ? null
                 : new GeometryFilter
                 {
-                    BoundingBox = searchFilterBaseDto.Geometry.BoundingBox,
+                    BoundingBox = searchFilterBaseDto.Geometry.BoundingBox?.ToLatLonBoundingBox(),
                     Geometries = searchFilterBaseDto.Geometry.Geometries,
                     MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
                     UseDisturbanceRadius = searchFilterBaseDto.Geometry.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geometry.ConsiderObservationAccuracy
                 };
-
+            
             if (searchFilterBaseDto.OccurrenceStatus != null)
             {
                 switch (searchFilterBaseDto.OccurrenceStatus)
@@ -139,6 +139,14 @@ namespace SOS.Observations.Api.Extensions
 
         }
 
+        public static void OverrideBoundingBox(this SearchFilter filter, LatLonBoundingBox boundingbox)
+        {
+            filter = filter ?? new SearchFilter();
+            filter.Geometries = filter.Geometries ?? new GeometryFilter();
+            filter.Geometries.BoundingBox = boundingbox;
+
+        }
+
         public static GeoGridTileTaxonPageResultDto ToGeoGridTileTaxonPageResultDto(this GeoGridTileTaxonPageResult pageResult)
         {
             return new GeoGridTileTaxonPageResultDto
@@ -176,6 +184,40 @@ namespace SOS.Observations.Api.Extensions
                 BoundingBox = geoGridTileResult.BoundingBox.ToLatLonBoundingBoxDto(),
                 GridCells = geoGridTileResult.GridCellTiles.Select(cell => cell.ToGeoGridCellDto())
             };
+        }
+
+        /// <summary>
+        /// Cast lat lon bounding box dto 
+        /// </summary>
+        /// <param name="latLonBoundingBox"></param>
+        /// <returns></returns>
+        public static LatLonBoundingBox ToLatLonBoundingBox(this LatLonBoundingBoxDto latLonBoundingBox)
+        {
+            if (latLonBoundingBox?.TopLeft == null || latLonBoundingBox?.BottomRight == null)
+            {
+                return null;
+            }
+
+            return new LatLonBoundingBox
+            {
+                TopLeft = latLonBoundingBox.TopLeft.ToLatLonCoordinate(),
+                BottomRight = latLonBoundingBox.BottomRight.ToLatLonCoordinate()
+            };
+        }
+
+        /// <summary>
+        /// Cast dto Coordinate
+        /// </summary>
+        /// <param name="latLonCoordinate"></param>
+        /// <returns></returns>
+        public static LatLonCoordinate ToLatLonCoordinate(this LatLonCoordinateDto latLonCoordinate)
+        {
+            if (latLonCoordinate == null)
+            {
+                return null;
+            } 
+
+            return new LatLonCoordinate(latLonCoordinate.Latitude, latLonCoordinate.Longitude);
         }
 
         public static LatLonBoundingBoxDto ToLatLonBoundingBoxDto(this LatLonBoundingBox latLonBoundingBox)

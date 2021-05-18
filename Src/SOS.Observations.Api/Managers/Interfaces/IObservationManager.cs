@@ -67,9 +67,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="precision"></param>
-        /// <param name="bbox"></param>
         /// <returns></returns>
-        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox);
+        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision);
 
         /// <summary>
         /// Geo grid tile aggregation
@@ -77,9 +76,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="precision"></param>
-        /// <param name="bbox"></param>
         /// <returns></returns>
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision, LatLonBoundingBox bbox);
+        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision);
 
         /// <summary>
         /// A compleate geo tile taxa aggregation
@@ -87,13 +85,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
-        /// <param name="bbox"></param>
         /// <returns></returns>
         Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
-            int zoom,
-            LatLonBoundingBox bbox);
+            int zoom);
 
         /// <summary>
         /// 
@@ -101,7 +97,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="zoom"></param>
-        /// <param name="bbox"></param>
         /// <param name="geoTilePage"></param>
         /// <param name="taxonIdPage"></param>
         /// <returns></returns>
@@ -109,7 +104,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int zoom,
-            LatLonBoundingBox bbox,
             string geoTilePage,
             int? taxonIdPage);
 
@@ -133,14 +127,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
-        /// <param name="bbox"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             string authorizationApplicationIdentifier,
             SearchFilter filter,
-            LatLonBoundingBox bbox,
             int? skip,
             int? take);
 

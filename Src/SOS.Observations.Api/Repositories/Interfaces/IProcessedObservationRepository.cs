@@ -53,8 +53,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="aggregationType"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take);
 
@@ -63,21 +61,18 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="precision"></param>
-        /// <param name="bbox"></param>
         /// <returns></returns>
-        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
+        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision);
 
-        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom, LatLonBoundingBox bbox);
+        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
 
         Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             SearchFilter filter,
-            int zoom,
-            LatLonBoundingBox bbox);
+            int zoom);
 
         public Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
             SearchFilter filter,
             int zoom,
-            LatLonBoundingBox bbox,
             string geoTilePage,
             int? taxonIdPage);
 
@@ -105,7 +100,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
-            LatLonBoundingBox bbox,
             int? skip,
             int? take);
 

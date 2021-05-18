@@ -478,8 +478,7 @@ namespace SOS.Observations.Api.Repositories
 
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
-            SearchFilter filter, 
-            LatLonBoundingBox bbox,
+            SearchFilter filter,
             int? skip,
             int? take)
         {
@@ -488,7 +487,7 @@ namespace SOS.Observations.Api.Repositories
             query.Add(q => q.GeoBoundingBox(bb => bb
                 .Field("location.pointLocation")
                 .BoundingBox(b =>
-                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
+                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
 
             Dictionary<int,int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
                 indexName,
@@ -536,8 +535,7 @@ namespace SOS.Observations.Api.Repositories
 
         public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(
                 SearchFilter filter,
-                int precision,
-                LatLonBoundingBox bbox)
+                int precision)
         {
             const int maxNrReturnedBuckets = 10000;
             var indexNames = GetCurrentIndex(filter);
@@ -553,7 +551,7 @@ namespace SOS.Observations.Api.Repositories
                     .Field("location.pointLocation")
                     .Size(maxNrReturnedBuckets + 1)
                     .GeoHashPrecision((GeoHashPrecision)precision)
-                    .Bounds(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))
+                    .Bounds(b => b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
                     .Aggregations(b => b
                         .Cardinality("taxa_count", t => t
                             .Field("taxon.id")))
@@ -600,7 +598,7 @@ namespace SOS.Observations.Api.Repositories
 
             var gridResult = new GeoGridResult()
             {
-                BoundingBox = bbox,
+                BoundingBox = filter.Geometries.BoundingBox,
                 Precision = precision,
                 GridCellCount = nrOfGridCells,
                 GridCells = georesult
@@ -612,8 +610,7 @@ namespace SOS.Observations.Api.Repositories
 
         public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(
                 SearchFilter filter,
-                int zoom,
-                LatLonBoundingBox bbox)
+                int zoom)
         {
             const int maxNrReturnedBuckets = 10000;
             var indexNames = GetCurrentIndex(filter);
@@ -628,7 +625,7 @@ namespace SOS.Observations.Api.Repositories
                 .Aggregations(a => a.Filter("geotile_filter", g => g
                     .Filter(f => f.GeoBoundingBox(bb => bb
                         .Field("location.pointLocation")
-                        .BoundingBox(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))
+                        .BoundingBox(b => b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
                    ))
                     .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
                         .Field("location.pointLocation")
@@ -676,7 +673,7 @@ namespace SOS.Observations.Api.Repositories
 
             var gridResult = new GeoGridTileResult()
             {
-                BoundingBox = bbox,
+                BoundingBox = filter.Geometries.BoundingBox,
                 Zoom = zoom,
                 GridCellTileCount = nrOfGridCells,
                 GridCellTiles = georesult
@@ -691,14 +688,12 @@ namespace SOS.Observations.Api.Repositories
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
-        /// <param name="bbox"></param>
         /// <param name="geoTilePage">The GeoTile key. Should be null in the first request.</param>
         /// <param name="taxonIdPage">The TaxonId key. Should be null in the first request.</param>
         /// <returns></returns>
         public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
                 SearchFilter filter,
                 int zoom,
-                LatLonBoundingBox bbox,
                 string geoTilePage,
                 int? taxonIdPage)
         {
@@ -707,7 +702,7 @@ namespace SOS.Observations.Api.Repositories
             query.Add(q => q.GeoBoundingBox(bb => bb
                 .Field("location.pointLocation")
                 .BoundingBox(b =>
-                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
+                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
 
             int nrAdded = 0;
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
@@ -750,18 +745,16 @@ namespace SOS.Observations.Api.Repositories
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="zoom">The precision to use in the GeoTileGrid aggregation.</param>
-        /// <param name="bbox"></param>
         /// <returns></returns>
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
                 SearchFilter filter,
-                int zoom,
-                LatLonBoundingBox bbox)
+                int zoom)
         {
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.Add(q => q.GeoBoundingBox(bb => bb
                 .Field("location.pointLocation")
                 .BoundingBox(b =>
-                    b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))));
+                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
             
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
             CompositeKey nextPageKey = null;

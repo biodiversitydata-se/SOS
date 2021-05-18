@@ -102,7 +102,23 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
                 OnlyValidated = false,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                Geometry = new GeometryFilterDto
+                {
+                    BoundingBox = new LatLonBoundingBoxDto
+                    {
+                        BottomRight = new LatLonCoordinateDto
+                        {
+                            Latitude = 59.17592824927137,
+                            Longitude = 18.28125
+                        },
+                        TopLeft = new LatLonCoordinateDto
+                        {
+                            Latitude = 59.355596110016315,
+                            Longitude = 17.9296875
+                        }
+                    }
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -112,11 +128,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 null,
                 searchFilter,
                 0,
-                500,
-                17.9296875,
-                59.355596110016315,
-                18.28125,
-                59.17592824927137);
+                500);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
