@@ -8,7 +8,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and to the [Species Observation System](https://api-portal.artdatabanken.se/products/sos) product.
 There you can download Open API 3 Specification for the API.
 
-![Open API 3](images/api-definition-download.png "Open API 3")
+![Open API 3](Images/api-definition-download.png "Open API 3")
 
 ### How do I pass my API subscription key in a request?
 Subscription key can be passed either in the header or in the URL query parameter. Header is checked first. Query parameter is checked only if the header is not present. Header name should be `ocp-apim-subscription-key`. Query parameter name should be `subscription-key`.
@@ -21,7 +21,7 @@ To retrieve up to 2 000 000 records, you should use the asynchronous `Exports_Po
 - Use the `Observations_GeogridAggregation` or `Observations_TaxonAggregation` endpoints to aggregate by grid cells and taxa. The [Observation maps application](https://fyndkartor.artfakta.se/) is a great example that uses this strategy when the number of observations exceeds 10 000.
 
 ##### Geogrid aggregation
-![GeoGrid aggregation](images/observation-maps-grid-info.png "GeoGrid aggregation")
+![GeoGrid aggregation](Images/observation-maps-grid-info.png "GeoGrid aggregation")
 
 ##### Taxon aggregation
-![Taxon aggregation](images/observation-maps-taxon-aggregation-grid.png "Taxon aggregation")
+![Taxon aggregation](Images/observation-maps-taxon-aggregation-grid.png "Taxon aggregation")
