@@ -13,7 +13,7 @@ If your application need access to protected species, you need to login with you
 | Login URL 	| https://ids.artdatabanken.se/account/login 	|
 
 
-![GeoGrid aggregation](images/ids-login2.png "GeoGrid aggregation")
+![Login page](Images/ids-login2.png "Login page")
 
 ## Client
 Every client that needs login functionality, must be added to Artdatabanken identity server. Contact support if needed.
