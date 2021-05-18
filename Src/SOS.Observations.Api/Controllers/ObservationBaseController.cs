@@ -202,7 +202,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         protected Result ValidateGeographicalAreaExists(SearchFilterBaseDto filter)
         {
-            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries?.Any() ?? true) && (filter?.Geometry?.BoundingBox?.Count() ?? 0) != 4)
+            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries?.Any() ?? true) && filter?.Geometry?.BoundingBox?.TopLeft == null && filter?.Geometry?.BoundingBox?.BottomRight == null)
             {
                 return Result.Failure("You must provide area/s, geometry or bounding box");
             }
