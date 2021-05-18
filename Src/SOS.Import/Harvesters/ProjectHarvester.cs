@@ -98,15 +98,19 @@ namespace SOS.Import.Harvesters
             try
             {
                 var client = new HttpClient();
-                string requestUri = $"{_sosApiConfiguration.ObservationsApiAddress}Caches?cache={nameof(Cache.Projects)}";
-                var response = await client.DeleteAsync(requestUri);
-                if (response.IsSuccessStatusCode)
+
+                foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
                 {
-                    _logger.LogInformation("Projects cache cleared");
-                }
-                else
-                {
-                    _logger.LogInformation("Failed to clear projects cache");
+                    var requestUri = $"{observationsApiAddress}Caches?cache={nameof(Cache.Projects)}";
+                    var response = await client.DeleteAsync(requestUri);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _logger.LogInformation($"Projects cache cleared ({observationsApiAddress})");
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Failed to clear projects cache ({observationsApiAddress})");
+                    }
                 }
             }
             catch (Exception e)

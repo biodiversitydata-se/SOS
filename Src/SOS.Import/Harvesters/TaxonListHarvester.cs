@@ -7,13 +7,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -55,15 +52,18 @@ namespace SOS.Import.Harvesters
             try
             {
                 var client = new HttpClient();
-                string requestUri = $"{_sosApiConfiguration.ObservationsApiAddress}Caches?cache={nameof(Cache.TaxonLists)}";
-                var response = await client.DeleteAsync(requestUri);
-                if (response.IsSuccessStatusCode)
+                foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
                 {
-                    _logger.LogInformation("Taxon lists cache cleared");
-                }
-                else
-                {
-                    _logger.LogInformation("Failed to clear taxon lists cache");
+                    var requestUri = $"{observationsApiAddress}Caches?cache={nameof(Cache.TaxonLists)}";
+                    var response = await client.DeleteAsync(requestUri);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _logger.LogInformation($"Taxon lists cache cleared ({observationsApiAddress})");
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Failed to clear taxon lists cache ({observationsApiAddress})");
+                    }
                 }
             }
             catch (Exception e)

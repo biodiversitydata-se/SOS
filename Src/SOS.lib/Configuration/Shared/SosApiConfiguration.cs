@@ -1,10 +1,12 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Configuration.Shared
 {
     public class SosApiConfiguration
     {
         /// <summary>
         /// Observations API address.
         /// </summary>
-        public string ObservationsApiAddress { get; set; }
+        public IEnumerable<string> ObservationsApiAddresses { get; set; }
     }
 }
