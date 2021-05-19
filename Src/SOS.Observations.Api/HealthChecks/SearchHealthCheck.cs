@@ -27,8 +27,11 @@ namespace SOS.Observations.Api.HealthChecks
         {
             var serachFilter = new SearchFilter()
             {
-                TaxonIds = new []{ 103032 },
-                IncludeUnderlyingTaxa = true,
+                Taxa = new TaxonFilter
+                {
+                    Ids = new[] { 103032 },
+                    IncludeUnderlyingTaxa = true
+                },
                 OnlyValidated = false,
                 PositiveSightings = false,
                 OutputFields = new []

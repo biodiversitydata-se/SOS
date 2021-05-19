@@ -76,7 +76,7 @@ namespace SOS.Lib.Managers
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
                 extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                extendedAuthorizationFilter.TaxonIds = PopulateTaxonFilter(authority.TaxonIds, true, null);
+                extendedAuthorizationFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
 
                 // To get extended authorization, taxon id's and some area must be set 
                 if (
@@ -112,20 +112,29 @@ namespace SOS.Lib.Managers
         /// <summary>
         ///  Handle taxon filtering
         /// </summary>
-        /// <param name="taxonIds"></param>
-        /// <param name="includeUnderlyingTaxa"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        private IEnumerable<int> PopulateTaxonFilter(
-            IEnumerable<int> taxonIds, 
-            bool includeUnderlyingTaxa,
-            IEnumerable<int> taxonListIds,
-            FilterBase.TaxonListOp taxonListOperator = FilterBase.TaxonListOp.Merge
-            )
+        private void PopulateTaxonFilter(TaxonFilter filter)
         {
-            var taxa = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
-            if (taxonListIds == null || !taxonListIds.Any()) return taxa;
+            if (filter == null)
+            {
+                return;
+            }
+
+            filter.Ids = GetTaxonIds(filter.Ids, filter.IncludeUnderlyingTaxa, filter.ListIds,
+                filter.TaxonListOperator);
+        }
+
+        private IEnumerable<int> GetTaxonIds(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge)
+        {
+            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
+            if (!listIds?.Any() ?? true)
+            {
+                return taxaIds;
+            }
+
             var taxonListIdsSet = new HashSet<int>();
-            foreach (var taxonListId in taxonListIds)
+            foreach (var taxonListId in listIds)
             {
                 if (_taxonManager.TaxonListSetById.TryGetValue(taxonListId, out var taxonListSet))
                 {
@@ -133,22 +142,26 @@ namespace SOS.Lib.Managers
                 }
             }
 
-            if (taxonListIdsSet.Count == 0) return taxa;
-            if (taxa == null) return taxonListIdsSet;
-            if (taxonListOperator == FilterBase.TaxonListOp.Merge)
+            if (taxonListIdsSet.Count == 0)
             {
-                taxonListIdsSet.UnionWith(taxa);
-                return taxonListIdsSet;
-            }
-            else if (taxonListOperator == FilterBase.TaxonListOp.Filter)
-            {
-                HashSet<int> taxaSet = new HashSet<int>();
-                taxaSet.UnionWith(taxa);
-                taxaSet.IntersectWith(taxonListIdsSet);
-                return taxaSet;
+                return taxaIds;
             }
 
-            return null;
+            if (!taxaIds?.Any() ?? true)
+            {
+                return taxonListIdsSet;
+            }
+
+            if (listOperator == TaxonFilter.TaxonListOp.Merge)
+            {
+                taxonListIdsSet.UnionWith(taxaIds);
+                return taxonListIdsSet;
+            }
+
+            var taxaSet = new HashSet<int>();
+            taxaSet.UnionWith(taxaIds);
+            taxaSet.IntersectWith(taxonListIdsSet);
+            return taxaSet;
         }
 
         private IEnumerable<int> GetTaxonFilterIds(
@@ -174,14 +187,14 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<GeographicFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<GeographicAreasFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (!areas?.Any() ?? true)
             {
                 return null;
             }
 
-            var geographicFilter = new GeographicFilter();
+            var geographicFilter = new GeographicAreasFilter();
             foreach (var areaFilter in areas)
             {
                 if (areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
@@ -232,7 +245,7 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task AddGeometryAsync(GeographicFilter geographicFilter, AreaType areaType, string featureId, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task AddGeometryAsync(GeographicAreasFilter geographicFilter, AreaType areaType, string featureId, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             var geoShape = await _areaCache.GetGeometryAsync(areaType, featureId);
 
@@ -244,7 +257,7 @@ namespace SOS.Lib.Managers
                     geoShape = geoShape.ToGeometry().Buffer(areaBuffer).ToGeoShape();
                 }
 
-                (geographicFilter.GeometryFilter ??= new GeometryFilter
+                (geographicFilter.GeometryFilter ??= new GeographicsFilter
                 {
                     MaxDistanceFromPoint = 0,
                     UseDisturbanceRadius = useDisturbanceRadius,
@@ -278,7 +291,7 @@ namespace SOS.Lib.Managers
 
             filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
-            filter.TaxonIds = PopulateTaxonFilter(filter.TaxonIds, filter.IncludeUnderlyingTaxa, filter.TaxonListIds, filter.TaxonListOperator);
+            PopulateTaxonFilter(filter.Taxa);
         }
     }
 }

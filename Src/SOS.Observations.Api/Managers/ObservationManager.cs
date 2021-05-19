@@ -244,7 +244,7 @@ namespace SOS.Observations.Api.Managers
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
-                if (filter?.TaxonIds?.Count() > 10000)
+                if (filter?.Taxa?.Ids?.Count() > 10000)
                 {
                     throw new TaxonValidationException("Your filter exceeds 10000 taxon id's");
                 }

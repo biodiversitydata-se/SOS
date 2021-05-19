@@ -20,10 +20,10 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                AreaGeographic = new GeographicFilter
+                AreaGeographic = new GeographicAreasFilter
                 {
                     CountyIds = new[] { "5", "24", "14" },
-                    GeometryFilter = new GeometryFilter
+                    GeometryFilter = new GeographicsFilter
                     {
                         MaxDistanceFromPoint = 50,
                         UsePointAccuracy = true,
@@ -64,10 +64,10 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                AreaGeographic = new GeographicFilter
+                AreaGeographic = new GeographicAreasFilter
                 {
                     CountyIds = new[] { "14", "5", "24" },
-                    GeometryFilter = new GeometryFilter
+                    GeometryFilter = new GeographicsFilter
                     {
                         MaxDistanceFromPoint = 50,
                         UsePointAccuracy = true,
@@ -91,7 +91,10 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var clonedFilter = filter.Clone();
-            clonedFilter.TaxonIds = new[] {4000107};
+            clonedFilter.Taxa = new TaxonFilter
+            {
+                Ids = new[] { 4000107 }
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

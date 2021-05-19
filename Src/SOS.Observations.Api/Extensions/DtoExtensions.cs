@@ -19,16 +19,13 @@ namespace SOS.Observations.Api.Extensions
 
             var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ? new SearchFilterInternal() : new SearchFilter();
 
+            filter.Taxa = PopulateTaxa(searchFilterBaseDto.Taxon);
+
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
             filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
             filter.Areas = searchFilterBaseDto.Geographics.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
-            filter.TaxonIds = searchFilterBaseDto.Taxon?.Ids;
-            filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
-            filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
-            filter.TaxonListIds = searchFilterBaseDto.Taxon?.TaxonListIds;
-            filter.TaxonListOperator = (FilterBase.TaxonListOp)(searchFilterBaseDto.Taxon?.TaxonListOperator).GetValueOrDefault();
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
@@ -39,7 +36,7 @@ namespace SOS.Observations.Api.Extensions
             filter.MaxAccuracy = searchFilterBaseDto.Geographics?.MaxAccuracy;
             filter.Geometries = searchFilterBaseDto.Geographics == null
                 ? null
-                : new GeometryFilter
+                : new GeographicsFilter
                 {
                     BoundingBox = searchFilterBaseDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
                     Geometries = searchFilterBaseDto.Geographics.Geometries,
@@ -139,10 +136,35 @@ namespace SOS.Observations.Api.Extensions
 
         }
 
+        private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)
+        {
+            if (filterDto == null)
+            {
+                return null;
+            }
+
+
+            var filter = new TaxonFilter
+            {
+                Ids = filterDto.Ids,
+                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa,
+                ListIds = filterDto.TaxonListIds,
+                
+                TaxonListOperator = (TaxonFilter.TaxonListOp)(filterDto?.TaxonListOperator).GetValueOrDefault()
+            };
+
+            if (filterDto is TaxonFilterDto taxonFilterDto)
+            {
+                filter.RedListCategories = taxonFilterDto.RedListCategories;
+            }
+
+            return filter;
+        }
+
         public static void OverrideBoundingBox(this SearchFilter filter, LatLonBoundingBox boundingbox)
         {
             filter = filter ?? new SearchFilter();
-            filter.Geometries = filter.Geometries ?? new GeometryFilter();
+            filter.Geometries = filter.Geometries ?? new GeographicsFilter();
             filter.Geometries.BoundingBox = boundingbox;
 
         }
@@ -328,7 +350,7 @@ namespace SOS.Observations.Api.Extensions
                 DataProviderIds = searchFilterDto.DataProvider?.Ids,
                 Geometries = searchFilterDto.Geographics == null
                 ? null
-                : new GeometryFilter
+                : new GeographicsFilter
                 {
                     BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
                     Geometries = searchFilterDto.Geographics.Geometries,
@@ -336,12 +358,14 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy
                 },
-                IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault(),
+                
+                NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
+                NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
+                PositiveSightings = true,
                 ProtectedObservations = true,
                 StartDate = searchFilterDto.StartDate,
-                TaxonIds = searchFilterDto.Taxon?.Ids,
-                TaxonListIds = searchFilterDto.Taxon?.TaxonListIds,
-                TaxonListOperator = (FilterBase.TaxonListOp)(searchFilterDto.Taxon?.TaxonListOperator).GetValueOrDefault()
+                Taxa = PopulateTaxa(searchFilterDto.Taxon),
+                UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
             };
 
             return searchFilter;
