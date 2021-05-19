@@ -1065,7 +1065,8 @@ namespace SOS.Observations.Api.Repositories
             bool onlyAboveMyClearance)
         {
             // Save user extended authorization to use later
-            var extendedAuthorizations = filter?.ExtendedAuthorizations?.Clone();
+            var extendedAuthorizations = filter.ExtendedAuthorizations;
+
             // Reset extended authorization so it not will affect query
             filter.ExtendedAuthorizations = null;
            

@@ -81,15 +81,15 @@ namespace SOS.Observations.Api.Controllers
         private async Task<Envelope> GetBoundingBox(
             SearchFilterBaseDto filter = null)
         {
-            var bboxLeft = filter?.Geometry?.BoundingBox?.TopLeft?.Longitude;
-            var bboxTop = filter?.Geometry?.BoundingBox?.TopLeft?.Latitude;
-            var bboxRight = filter?.Geometry?.BoundingBox?.BottomRight?.Longitude;
-            var bboxBottom = filter?.Geometry?.BoundingBox?.BottomRight?.Latitude;
+            var bboxLeft = filter?.Geographics?.BoundingBox?.TopLeft?.Longitude;
+            var bboxTop = filter?.Geographics?.BoundingBox?.TopLeft?.Latitude;
+            var bboxRight = filter?.Geographics?.BoundingBox?.BottomRight?.Longitude;
+            var bboxBottom = filter?.Geographics?.BoundingBox?.BottomRight?.Latitude;
 
             // If areas passed, adjust bounding box to them
-            if (filter.Areas?.Any() ?? false)
+            if (filter.Geographics.Areas?.Any() ?? false)
             {
-                var areas = await _areaManager.GetAreasAsync(filter.Areas.Select(a => (a.AreaType, a.FeatureId)));
+                var areas = await _areaManager.GetAreasAsync(filter.Geographics.Areas.Select(a => (a.AreaType, a.FeatureId)));
                 var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
                 //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
                 foreach (var areaGeometry in areaGeometries)
@@ -99,9 +99,9 @@ namespace SOS.Observations.Api.Controllers
             }
 
             // If geometries passed, adjust bounding box to them
-            if (filter.Geometry?.Geometries?.Any() ?? false)
+            if (filter.Geographics?.Geometries?.Any() ?? false)
             {
-                foreach (var areaGeometry in filter.Geometry.Geometries)
+                foreach (var areaGeometry in filter.Geographics.Geometries)
                 {
                     AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
                 }
@@ -1145,7 +1145,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTaxonExists(filter),
-                    ValidateGeographicalAreaExists(filter));
+                    ValidateGeographicalAreaExists(filter?.Geographics));
 
                 if (validationResult.IsFailure)
                 {
@@ -1222,25 +1222,20 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> SignalSearchInternalAsync(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromBody] SignalFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true)
         {
             try
             {
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateGeographicalAreaExists(filter),
-                    ValidateSignalSearchDate(filter.Date),
-                    areaBuffer < 0 || areaBuffer > 100 ? Result.Failure("areaBuffer must be between 0 and 100") : Result.Success());
-
+                var validationResult = ValidateSignalSearch(filter, validateSearchFilter, areaBuffer);
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var searchFilter = filter.ToSearchFilterInternal();
                 var taxonFound = await ObservationManager.SignalSearchInternalAsync(authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
 
                 return new OkObjectResult(taxonFound);

@@ -60,10 +60,13 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
-                Areas = new[]
+                Geographics = new GeographicsFilterDto
                 {
-                    TestData.Areas.TranasMunicipality, // Tranås Municipality
-                    TestData.Areas.JonkopingCounty // Jönköping County
+                    Areas = new[]
+                    {
+                        TestData.Areas.TranasMunicipality, // Tranås Municipality
+                        TestData.Areas.JonkopingCounty // Jönköping County
+                    }
                 },
                 Date = new DateFilterDto()
                 {

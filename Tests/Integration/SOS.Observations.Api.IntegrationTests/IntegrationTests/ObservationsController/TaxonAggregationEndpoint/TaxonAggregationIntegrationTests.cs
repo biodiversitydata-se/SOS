@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationDto()
             {
-                Geometry = new GeometryFilterDto
+                Geographics = new GeographicsFilterDto
                 {
                     Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01563, 14.99047)) },
                     MaxDistanceFromPoint = 5000
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 },
                 OnlyValidated = false,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                Geometry = new GeometryFilterDto
+                Geographics = new GeographicsFilterDto
                 {
                     BoundingBox = new LatLonBoundingBoxDto
                     {
@@ -152,9 +152,12 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationDto()
             {
-                Areas = new[]
+                Geographics = new GeographicsFilterDto
                 {
-                    new AreaFilterDto { AreaType = AreaTypeDto.BirdValidationArea, FeatureId = "1" }
+                    Areas = new[]
+                    {
+                        new AreaFilterDto { AreaType = AreaTypeDto.BirdValidationArea, FeatureId = "1" }
+                    }
                 },
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
             };

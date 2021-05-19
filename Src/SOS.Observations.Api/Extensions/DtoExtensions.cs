@@ -23,7 +23,7 @@ namespace SOS.Observations.Api.Extensions
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
             filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
-            filter.Areas = searchFilterBaseDto.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
+            filter.Areas = searchFilterBaseDto.Geographics.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
             filter.TaxonIds = searchFilterBaseDto.Taxon?.Ids;
             filter.IncludeUnderlyingTaxa = (searchFilterBaseDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterBaseDto.Taxon?.RedListCategories;
@@ -31,21 +31,21 @@ namespace SOS.Observations.Api.Extensions
             filter.TaxonListOperator = (FilterBase.TaxonListOp)(searchFilterBaseDto.Taxon?.TaxonListOperator).GetValueOrDefault();
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
-            filter.MaxAccuracy = searchFilterBaseDto.Geometry?.MaxAccuracy;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
             filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
-            filter.Geometries = searchFilterBaseDto.Geometry == null
+            filter.MaxAccuracy = searchFilterBaseDto.Geographics?.MaxAccuracy;
+            filter.Geometries = searchFilterBaseDto.Geographics == null
                 ? null
                 : new GeometryFilter
                 {
-                    BoundingBox = searchFilterBaseDto.Geometry.BoundingBox?.ToLatLonBoundingBox(),
-                    Geometries = searchFilterBaseDto.Geometry.Geometries,
-                    MaxDistanceFromPoint = searchFilterBaseDto.Geometry.MaxDistanceFromPoint,
-                    UseDisturbanceRadius = searchFilterBaseDto.Geometry.ConsiderDisturbanceRadius,
-                    UsePointAccuracy = searchFilterBaseDto.Geometry.ConsiderObservationAccuracy
+                    BoundingBox = searchFilterBaseDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
+                    Geometries = searchFilterBaseDto.Geographics.Geometries,
+                    MaxDistanceFromPoint = searchFilterBaseDto.Geographics.MaxDistanceFromPoint,
+                    UseDisturbanceRadius = searchFilterBaseDto.Geographics.ConsiderDisturbanceRadius,
+                    UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
                 };
             
             if (searchFilterBaseDto.OccurrenceStatus != null)
@@ -312,6 +312,39 @@ namespace SOS.Observations.Api.Extensions
         public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+        }
+
+        public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto)
+        {
+            if (searchFilterDto == null)
+            {
+                return null;
+            }
+
+            var searchFilter = new SearchFilterInternal
+            {
+                Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }),
+                BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
+                DataProviderIds = searchFilterDto.DataProvider?.Ids,
+                Geometries = searchFilterDto.Geographics == null
+                ? null
+                : new GeometryFilter
+                {
+                    BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
+                    Geometries = searchFilterDto.Geographics.Geometries,
+                    MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
+                    UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
+                    UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy
+                },
+                IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault(),
+                ProtectedObservations = true,
+                StartDate = searchFilterDto.StartDate,
+                TaxonIds = searchFilterDto.Taxon?.Ids,
+                TaxonListIds = searchFilterDto.Taxon?.TaxonListIds,
+                TaxonListOperator = (FilterBase.TaxonListOp)(searchFilterDto.Taxon?.TaxonListOperator).GetValueOrDefault()
+            };
+
+            return searchFilter;
         }
 
         public static IEnumerable<ProjectDto> ToProjectDtos(this IEnumerable<ProjectInfo> projectInfos)

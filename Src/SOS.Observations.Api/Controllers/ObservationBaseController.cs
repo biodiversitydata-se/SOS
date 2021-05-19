@@ -125,11 +125,10 @@ namespace SOS.Observations.Api.Controllers
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
 
-            if ((filter.Taxon?.Ids?.Any() ?? false) && (_taxonManager.TaxonTree?.TreeNodeById?.Any() ?? false))
+            var taxaValidationResult = ValidateTaxa(filter.Taxon?.Ids);
+            if (taxaValidationResult.IsFailure)
             {
-                errors.AddRange(filter.Taxon.Ids
-                    .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
-                    .Select(tid => $"TaxonId doesn't exist ({tid})"));
+                errors.Add(taxaValidationResult.Error);
             }
 
             if (filter.Taxon?.RedListCategories?.Any() ?? false)
@@ -181,6 +180,18 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        protected Result ValidateTaxa(IEnumerable<int> taxonIds)
+        {
+            var missingTaxa = taxonIds?
+                .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
+                .Select(tid => $"TaxonId doesn't exist ({tid})");
+
+            return missingTaxa?.Any() ?? false ? 
+                Result.Failure(string.Join(". ", missingTaxa))
+                :
+                Result.Success();
+        }
+
         /// <summary>
         /// Make sure filter contains taxa
         /// </summary>
@@ -200,9 +211,9 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        protected Result ValidateGeographicalAreaExists(SearchFilterBaseDto filter)
+        protected Result ValidateGeographicalAreaExists(GeographicsFilterDto filter)
         {
-            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometry?.Geometries?.Any() ?? true) && filter?.Geometry?.BoundingBox?.TopLeft == null && filter?.Geometry?.BoundingBox?.BottomRight == null)
+            if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometries?.Any() ?? true) && filter?.BoundingBox?.TopLeft == null && filter?.BoundingBox?.BottomRight == null)
             {
                 return Result.Failure("You must provide area/s, geometry or bounding box");
             }
@@ -211,18 +222,22 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Validate start date 
+        ///  Validate signal search filter
         /// </summary>
-        /// <param name="dateFilter"></param>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="areaBuffer"></param>
         /// <returns></returns>
-        protected Result ValidateSignalSearchDate(DateFilterDto dateFilter)
+        protected Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
         {
-            if (dateFilter?.StartDate > DateTime.Now.AddYears(-1))
-            {
-                return Result.Failure("Start date must be at least one year back in time");
-            }
-
-            return Result.Success();
+           return Result.Combine(
+                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
+                ValidateGeographicalAreaExists(filter?.Geographics),
+                areaBuffer < 0 || areaBuffer > 100
+                    ? Result.Failure("areaBuffer must be between 0 and 100")
+                    : Result.Success(),
+                filter?.StartDate > DateTime.Now.AddYears(-1) ? Result.Failure("Start date must be at least one year back in time") : Result.Success()
+                );
         }
 
         protected Result ValidateTranslationCultureCode(string translationCultureCode)

@@ -44,14 +44,9 @@ namespace SOS.Observations.Api.Dtos.Filter
         public TaxonFilterDto Taxon { get; set; }
 
         /// <summary>
-        /// Area filter
+        /// Geographics filter 
         /// </summary>
-        public IEnumerable<AreaFilterDto> Areas { get; set; }
-
-        /// <summary>
-        /// Geometry filter 
-        /// </summary>
-        public GeometryFilterDto Geometry { get; set; }
+        public GeographicsFilterDto Geographics { get; set; }
 
         /// <summary>
         /// Filter for observation not recovered

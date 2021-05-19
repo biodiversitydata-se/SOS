@@ -25,7 +25,9 @@
 - ExtendedFilter.MaxAccuracy => Geometry.MaxAccuracy
 - ExtendedFilter.DeterminationFilter => DeterminationFilter
 - ExtendedFilter.BoundingBox => Geometry.BoundingBox
-. ExtendedFilter.NotRecoveredFilter => NotRecoveredFilter
+- ExtendedFilter.NotRecoveredFilter => NotRecoveredFilter
+- Geometry => Geographics
+- Areas => Geographics.Areas
 
 ## [1.0.1]
 

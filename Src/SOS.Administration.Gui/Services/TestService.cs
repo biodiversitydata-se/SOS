@@ -215,7 +215,7 @@ namespace SOS.Administration.Gui.Services
                 Ids = new List<int>() { 100077 },
                 IncludeUnderlyingTaxa = true
             };
-            searchFilter.Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } };
+            searchFilter.Geographics = new GeographicsFilterDto{Areas = new[] { new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "687" } } };
             searchFilter.Date = new DateFilterDto()
             {
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
