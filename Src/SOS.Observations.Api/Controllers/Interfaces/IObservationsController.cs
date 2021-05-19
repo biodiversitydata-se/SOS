@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> SignalSearchInternalAsync(
             string authorizationApplicationIdentifier,
-            SearchFilterAggregationInternalDto filter,
+            SignalFilterDto filter,
             bool validateSearchFilter = false,
             int areaBuffer = 0,
             bool onlyAboveMyClearance = true);

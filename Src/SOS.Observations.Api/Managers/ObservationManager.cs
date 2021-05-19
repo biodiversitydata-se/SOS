@@ -276,6 +276,8 @@ namespace SOS.Observations.Api.Managers
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
 
+                filter.ExtendedAuthorizations = filter.ExtendedAuthorizations.Where(ea =>
+                    ea.Identity.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase));
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result;
             }

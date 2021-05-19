@@ -6,8 +6,13 @@ namespace SOS.Observations.Api.Dtos.Filter
     /// <summary>
     /// Geometry filter.
     /// </summary>
-    public class GeometryFilterDto
+    public class GeographicsFilterDto
     {
+        /// <summary>
+        /// Area filter
+        /// </summary>
+        public IEnumerable<AreaFilterDto> Areas { get; set; }
+
         /// <summary>
         /// Limit the search by a bounding box.
         /// </summary>

@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
-                Geometry = new GeometryFilterDto
+                Geographics = new GeographicsFilterDto
                 {
                     Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01221, 14.96721)) },
                     MaxDistanceFromPoint = 5000,
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
-                Geometry = new GeometryFilterDto
+                Geographics = new GeographicsFilterDto
                 {
                     Geometries = new List<IGeoShape>()
                     {

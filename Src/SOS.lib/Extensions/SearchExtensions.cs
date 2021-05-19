@@ -56,11 +56,14 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            query.Add(q => q
-                .Bool(b => b
-                    .Should(protectedQuerys)
-                )
-            );
+            if (protectedQuerys.Any())
+            {
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(protectedQuerys)
+                    )
+                );
+            }
         }
 
         private static void AddGeoDistanceCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance)
