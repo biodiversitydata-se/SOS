@@ -5,7 +5,7 @@ namespace SOS.Lib.Models.Search
     /// <summary>
     /// Filter for extended authorization
     /// </summary>
-    public class GeographicFilter
+    public class GeographicAreasFilter
     {
         /// <summary>
         /// Bird validation area id's where user has extended authorization
@@ -20,7 +20,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Other geometries where user has extended authorization
         /// </summary>
-        public GeometryFilter GeometryFilter { get; set; }
+        public GeographicsFilter GeometryFilter { get; set; }
 
         /// <summary>
         /// Municipality id's where user has extended authorization

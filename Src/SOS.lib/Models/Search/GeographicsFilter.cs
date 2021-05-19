@@ -9,12 +9,12 @@ namespace SOS.Lib.Models.Search
     /// <summary>
     ///     Class used for geometry searches
     /// </summary>
-    public class GeometryFilter
+    public class GeographicsFilter
     {
         /// <summary>
         ///     Constructor
         /// </summary>
-        public GeometryFilter()
+        public GeographicsFilter()
         {
             Geometries = new List<IGeoShape>();
         }

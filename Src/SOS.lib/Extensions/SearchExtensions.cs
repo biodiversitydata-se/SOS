@@ -474,7 +474,7 @@ namespace SOS.Lib.Extensions
         /// <param name="geometryFilter"></param>
         private static void TryAddGeometryFilters(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            GeometryFilter geometryFilter)
+            GeographicsFilter geometryFilter)
         {
             if (geometryFilter == null)
             {
@@ -718,7 +718,7 @@ namespace SOS.Lib.Extensions
         /// <param name="geographicFilter"></param>
         private static void TryAddGeographicFilter(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            GeographicFilter geographicFilter)
+            GeographicAreasFilter geographicFilter)
         {
             if (geographicFilter == null)
             {
@@ -965,8 +965,8 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
-            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
-            query.TryAddTermsCriteria("taxon.id", filter.TaxonIds);
+            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.Taxa?.RedListCategories?.Select(m => m.ToLower()));
+            query.TryAddTermsCriteria("taxon.id", filter.Taxa?.Ids);
             query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);

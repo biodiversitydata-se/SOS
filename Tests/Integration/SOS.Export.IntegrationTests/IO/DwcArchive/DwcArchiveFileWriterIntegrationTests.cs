@@ -88,7 +88,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
-            var filter = new SearchFilter {TaxonIds = new[] {102951}};
+            var filter = new SearchFilter { Taxa = new TaxonFilter{ Ids = new[] { 102951 } } };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

@@ -35,12 +35,10 @@ namespace SOS.Lib.Models.Search
             EndDate = searchFilter.EndDate;
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             Geometries = searchFilter.Geometries;
-            IncludeUnderlyingTaxa = searchFilter.IncludeUnderlyingTaxa;
+            Taxa = searchFilter.Taxa;
             OnlyValidated = searchFilter.OnlyValidated;
             PositiveSightings = searchFilter.PositiveSightings;
-            RedListCategories = searchFilter.RedListCategories;
             StartDate = searchFilter.StartDate;
-            TaxonIds = searchFilter.TaxonIds;
         }
 
         public int? ReportedByUserId { get; set; }

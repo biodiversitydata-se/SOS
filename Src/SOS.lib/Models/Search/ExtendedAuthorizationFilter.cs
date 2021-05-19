@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Parish id's where user has extended authorization
         /// </summary>
-        public GeographicFilter GeographicAreas { get; set; }
+        public GeographicAreasFilter GeographicAreas { get; set; }
 
         /// <summary>
         /// Authorization identity

@@ -1045,7 +1045,7 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
                     .Terms("taxon_group", t => t
-                        .Size(filter.TaxonIds?.Count()) // Size can never be grater than number of taxon id's
+                        .Size(filter.Taxa?.Ids?.Count()) // Size can never be grater than number of taxon id's
                         .Field("taxon.id")
                     )
                 )

@@ -72,27 +72,9 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        /// Operator to use when TaxonListIds is specified.
-        /// </summary>
-        public enum TaxonListOp
-        {
-            /// <summary>
-            /// The taxon ids in the specified taxon lists is merged with the taxa
-            /// specified in the taxon filter.
-            /// </summary>
-            Merge,
-
-            /// <summary>
-            /// The specified taxa in the taxon filter is filtered to include only
-            /// those who exists in the specified taxon lists.
-            /// </summary>
-            Filter
-        }
-
-        /// <summary>
         /// Filter on area geometries 
         /// </summary>
-        public GeographicFilter AreaGeographic { get; set; }
+        public GeographicAreasFilter AreaGeographic { get; set; }
 
         /// <summary>
         /// Geographical areas to filter by
@@ -140,13 +122,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Geometry filter
         /// </summary>
-        public GeometryFilter Geometries { get; set; }
-
-        /// <summary>
-        ///     Decides whether to search for the exact taxa or
-        ///     for the hierarchical underlying taxa.
-        /// </summary>
-        public bool IncludeUnderlyingTaxa { get; set; }
+        public GeographicsFilter Geometries { get; set; }
 
         /// <summary>
         /// Limit observation accuracy. Only observations with accuracy less than this will be returned
@@ -176,11 +152,6 @@ namespace SOS.Lib.Models.Search
         public bool? PositiveSightings { get; set; }
 
         /// <summary>
-        ///     Redlist categories to match.
-        /// </summary>
-        public IEnumerable<string> RedListCategories { get; set; }
-
-        /// <summary>
         ///     Sex id's to match. Queryable values are available in sex vocabulary.
         /// </summary>
         public IEnumerable<int> SexIds { get; set; }
@@ -191,19 +162,9 @@ namespace SOS.Lib.Models.Search
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        ///     Taxa to match. Queryable values are available in Dyntaxa.
+        ///    Taxon related filter
         /// </summary>
-        public IEnumerable<int> TaxonIds { get; set; }
-
-        /// <summary>
-        /// Add (merge) or filter taxa by using taxon lists.
-        /// </summary>
-        public IEnumerable<int> TaxonListIds { get; set; }
-
-        /// <summary>
-        /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
-        /// </summary>
-        public TaxonListOp TaxonListOperator { get; set; } = TaxonListOp.Merge;
+        public TaxonFilter Taxa { get; set; }
 
         /// <summary>
         /// Predefined time ranges.
