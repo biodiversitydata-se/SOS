@@ -113,12 +113,13 @@ namespace SOS.Import.Containers
 
         #region Project
         /// <summary>
-        /// Updates the metadata for projects
+        /// Add a project
         /// </summary>
         /// <param name="entities"></param>
-        public void UpdateProjects(IEnumerable<ProjectEntity> entities)
+        public void AddProject(ProjectEntity entity)
         {
-            Projects = CastProjectEntitiesToVerbatim(entities).ToConcurrentDictionary(p => p.Id, p => p);
+            var project = CastProjectEntityToVerbatim(entity);
+            Projects.TryAdd(project.Id, project);
         }
         /// <summary>
         ///     Cast multiple projects entities to models

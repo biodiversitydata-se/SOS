@@ -13,10 +13,10 @@ namespace SOS.Import.Containers.Interfaces
     {
         bool IsInitialized { get; }
         /// <summary>
-        /// Updates the metadata for projects
+        /// Add a project
         /// </summary>
         /// <param name="entities"></param>
-        void UpdateProjects(IEnumerable<ProjectEntity> projects);
+        void AddProject(ProjectEntity project);
 
         ConcurrentDictionary<int, MetadataWithCategory> Activities { get; }
         ConcurrentDictionary<int, Metadata> Biotopes { get; }
