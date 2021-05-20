@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     //ConsiderObservationAccuracy = true
                     ConsiderObservationAccuracy = false
                 },
-                OnlyValidated = false,
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -83,7 +83,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     },
                     ConsiderObservationAccuracy = true
                 },
-                OnlyValidated = false,
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 

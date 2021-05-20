@@ -36,7 +36,7 @@ namespace SOS.Lib.Cache
             lock (InitLock)
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
             }
         }

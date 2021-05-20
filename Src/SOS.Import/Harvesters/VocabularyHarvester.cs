@@ -15,6 +15,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Harvesters
@@ -25,37 +26,38 @@ namespace SOS.Import.Harvesters
     public class VocabularyHarvester : IVocabularyHarvester
     {
         private readonly Dictionary<VocabularyId, IVocabularyFactory> _vocabularyFactoryById;
-
         private readonly IVocabularyRepository _vocabularyRepository;
+        private readonly ICacheManager _cacheManager;
         private readonly ILogger<VocabularyHarvester> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="vocabularyRepository"></param>
+        /// <param name="activityVocabularyFactory"></param>
         /// <param name="sexVocabularyFactory"></param>
         /// <param name="lifeStageVocabularyFactory"></param>
+        /// <param name="biotopeVocabularyFactory"></param>
+        /// <param name="substrateVocabularyFactory"></param>
         /// <param name="validationStatusVocabularyFactory"></param>
         /// <param name="institutionVocabularyFactory"></param>
         /// <param name="unitVocabularyFactory"></param>
         /// <param name="basisOfRecordVocabularyFactory"></param>
         /// <param name="continentVocabularyFactory"></param>
-        /// <param name="establishmentMeansVocabularyFactory"></param>
-        /// <param name="discoveryMethodVocabularyFactory"></param>
-        /// <param name="determinationMethodVocabularyFactory"></param>
-        /// <param name="reproductiveConditionVocabularyFactory"></param>
-        /// <param name="behaviorVocabularyFactory"></param>
-        /// <param name="birdNestActivityVocabularyFactory"></param>
-        /// <param name="logger"></param>
-        /// <param name="activityVocabularyFactory"></param>
-        /// <param name="taxonProtectionLevelVocabularyFactory"></param>
-        /// <param name="biotopeVocabularyFactory"></param>
-        /// <param name="substrateVocabularyFactory"></param>
         /// <param name="typeVocabularyFactory"></param>
         /// <param name="countryVocabularyFactory"></param>
         /// <param name="accessRightsVocabularyFactory"></param>
         /// <param name="occurrenceStatusVocabularyFactory"></param>
+        /// <param name="establishmentMeansVocabularyFactory"></param>
         /// <param name="areaTypeVocabularyFactory"></param>
+        /// <param name="discoveryMethodVocabularyFactory"></param>
+        /// <param name="determinationMethodVocabularyFactory"></param>
+        /// <param name="reproductiveConditionVocabularyFactory"></param>
+        /// <param name="behaviorVocabularyFactory"></param>
+        /// <param name="taxonProtectionLevelVocabularyFactory"></param>
+        /// <param name="birdNestActivityVocabularyFactory"></param>
+        /// <param name="cacheManager"></param>
+        /// <param name="logger"></param>
         public VocabularyHarvester(
             IVocabularyRepository vocabularyRepository,
             ActivityVocabularyFactory activityVocabularyFactory,
@@ -80,10 +82,12 @@ namespace SOS.Import.Harvesters
             BehaviorVocabularyFactory behaviorVocabularyFactory,
             TaxonProtectionLevelVocabularyFactory taxonProtectionLevelVocabularyFactory,
             BirdNestActivityVocabularyFactory birdNestActivityVocabularyFactory,
+            ICacheManager cacheManager,
             ILogger<VocabularyHarvester> logger)
         {
             _vocabularyRepository =
                 vocabularyRepository ?? throw new ArgumentNullException(nameof(vocabularyRepository));
+            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _vocabularyFactoryById = new Dictionary<VocabularyId, IVocabularyFactory>
             {
@@ -136,6 +140,10 @@ namespace SOS.Import.Harvesters
                 await _vocabularyRepository.AddCollectionAsync();
                 await _vocabularyRepository.AddManyAsync(vocabularies);
                 _logger.LogDebug("Finish storing vocabularies");
+
+                // Clear observation api cache
+                await _cacheManager.ClearAsync(Cache.Vocabulary);
+
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = vocabularies.Count;
             }

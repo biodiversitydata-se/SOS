@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.TaxonListService;
 
 namespace SOS.Lib.Managers
 {
@@ -22,27 +23,30 @@ namespace SOS.Lib.Managers
         private readonly ILogger<TaxonManager> _logger;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ITaxonListRepository _taxonListRepository;
-        private readonly IMemoryCache _memoryCache;
-        private const string TaxonTreeCacheKey = "TaxonTree";
-        private const string TaxonListCacheKey = "TaxonList";
+        private readonly IClassCache<TaxonTree<IBasicTaxon>> _taxonTreeCache;
+        private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="taxonListRepository"></param>
-        /// <param name="memoryCache"></param>
+        /// <param name="taxonTreeCache"></param>
+        /// <param name="taxonListSetsByIdCache"></param>
         /// <param name="logger"></param>
         public TaxonManager(ITaxonRepository processedTaxonRepository,
             ITaxonListRepository taxonListRepository,
-            IMemoryCache memoryCache,
+            IClassCache<TaxonTree<IBasicTaxon>> taxonTreeCache,
+            IClassCache<TaxonListSetsById> taxonListSetsByIdCache,
             ILogger<TaxonManager> logger)
         {
-            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            
             _processedTaxonRepository = processedTaxonRepository ??
                                         throw new ArgumentNullException(nameof(processedTaxonRepository));
             _taxonListRepository = taxonListRepository ??
                                    throw new ArgumentNullException(nameof(taxonListRepository));
+            _taxonTreeCache = taxonTreeCache ?? throw new ArgumentNullException(nameof(taxonTreeCache));
+            _taxonListSetsByIdCache = taxonListSetsByIdCache ?? throw new ArgumentNullException(nameof(taxonListSetsByIdCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -52,18 +56,13 @@ namespace SOS.Lib.Managers
         {
             get
             {
-                TaxonTree<IBasicTaxon> taxonTree;
-                if (!_memoryCache.TryGetValue(TaxonTreeCacheKey, out taxonTree))
+                var taxonTree = _taxonTreeCache.Get();
+                if (taxonTree == null)
                 {
                     lock (InitLock)
                     {
-                        if (!_memoryCache.TryGetValue(TaxonTreeCacheKey, out taxonTree))
-                        {
-                            taxonTree = GetTaxonTreeAsync().Result;
-                            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
-                            _memoryCache.Set(TaxonTreeCacheKey, taxonTree, cacheEntryOptions);
-                        }
+                        taxonTree = GetTaxonTreeAsync().Result;
+                        _taxonTreeCache.Set(taxonTree);
                     }
                 }
 
@@ -75,18 +74,13 @@ namespace SOS.Lib.Managers
         {
             get
             {
-                Dictionary<int, HashSet<int>> taxonListSetsById;
-                if (!_memoryCache.TryGetValue(TaxonListCacheKey, out taxonListSetsById))
+                var taxonListSetsById = _taxonListSetsByIdCache.Get();
+                if (taxonListSetsById == null)
                 {
                     lock (InitLock)
                     {
-                        if (!_memoryCache.TryGetValue(TaxonListCacheKey, out taxonListSetsById))
-                        {
-                            taxonListSetsById = GetTaxonListSetsAsync().Result;
-                            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
-                            _memoryCache.Set(TaxonListCacheKey, taxonListSetsById, cacheEntryOptions);
-                        }
+                        taxonListSetsById = GetTaxonListSetsAsync().Result;
+                        _taxonListSetsByIdCache.Set(taxonListSetsById);
                     }
                 }
 
@@ -94,9 +88,9 @@ namespace SOS.Lib.Managers
             }
         }
 
-        private async Task<Dictionary<int, HashSet<int>>> GetTaxonListSetsAsync()
+        private async Task<TaxonListSetsById> GetTaxonListSetsAsync()
         {
-            var taxonListSetById = new Dictionary<int, HashSet<int>>();
+            var taxonListSetById = new TaxonListSetsById();
             var taxonLists = await _taxonListRepository.GetAllAsync();
             foreach (var taxonList in taxonLists)
             {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -21,7 +20,7 @@ namespace SOS.Import.Harvesters
     {
         private readonly IProjectRepository _artportalenProjectRepository;
         private readonly IProjectInfoRepository _projectInfoRepository;
-        private readonly SosApiConfiguration _sosApiConfiguration;
+        private readonly ICacheManager _cacheManager;
         private readonly ILogger<ProjectHarvester> _logger;
 
         /// <summary>
@@ -29,17 +28,17 @@ namespace SOS.Import.Harvesters
         /// </summary>
         /// <param name="artportalenProjectRepository"></param>
         /// <param name="projectInfoRepository"></param>
-        /// <param name="sosApiConfiguration"></param>
+        /// <param name="cacheManager"></param>
         /// <param name="logger"></param>
         public ProjectHarvester(
             IProjectRepository artportalenProjectRepository,
             IProjectInfoRepository projectInfoRepository,
-            SosApiConfiguration sosApiConfiguration,
+            ICacheManager cacheManager,
             ILogger<ProjectHarvester> logger)
         {
             _artportalenProjectRepository = artportalenProjectRepository ?? throw new ArgumentNullException(nameof(artportalenProjectRepository));
             _projectInfoRepository = projectInfoRepository ?? throw new ArgumentNullException(nameof(projectInfoRepository));
-            _sosApiConfiguration = sosApiConfiguration ?? throw new ArgumentNullException(nameof(sosApiConfiguration));
+            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -69,7 +68,8 @@ namespace SOS.Import.Harvesters
                     if (await _projectInfoRepository.AddCollectionAsync())
                     {
                         await _projectInfoRepository.AddManyAsync(projects);
-                        await ClearProjectsCache();
+                        // Clear observation api cache
+                        await _cacheManager.ClearAsync(Cache.Projects);
 
                         // Update harvest info
                         harvestInfo.End = DateTime.Now;
@@ -93,31 +93,6 @@ namespace SOS.Import.Harvesters
             return harvestInfo;
         }
 
-        private async Task ClearProjectsCache()
-        {
-            try
-            {
-                var client = new HttpClient();
-
-                foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
-                {
-                    var requestUri = $"{observationsApiAddress}Caches?cache={nameof(Cache.Projects)}";
-                    var response = await client.DeleteAsync(requestUri);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        _logger.LogInformation($"Projects cache cleared ({observationsApiAddress})");
-                    }
-                    else
-                    {
-                        _logger.LogInformation($"Failed to clear projects cache ({observationsApiAddress})");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to clear projects cache");
-            }
-        }
 
         private ProjectInfo CastToProjectInfo(ProjectEntity projectEntity)
         {
