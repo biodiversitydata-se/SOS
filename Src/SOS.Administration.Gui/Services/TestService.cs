@@ -171,7 +171,7 @@ namespace SOS.Administration.Gui.Services
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                 EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
             };
-            searchFilter.OnlyValidated = false;
+            searchFilter.ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
             PagedResult<SOSObservation> result;
             Stopwatch sw = new Stopwatch();
@@ -221,7 +221,7 @@ namespace SOS.Administration.Gui.Services
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                 EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
             };
-            searchFilter.OnlyValidated = false;
+            searchFilter.ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
             PagedResult<SOSObservation> result;
             Stopwatch sw = new Stopwatch();
@@ -305,7 +305,7 @@ namespace SOS.Administration.Gui.Services
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                 EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
             };
-            searchFilter.OnlyValidated = false;
+            searchFilter.ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
 
             GeoGridResultDto result;
@@ -347,7 +347,7 @@ namespace SOS.Administration.Gui.Services
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                 EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
             };
-            searchFilter.OnlyValidated = false;
+            searchFilter.ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
 
             PagedResult<TaxonAggregationItemDto> result;
@@ -389,7 +389,7 @@ namespace SOS.Administration.Gui.Services
                 StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                 EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
             };
-            searchFilter.OnlyValidated = false;
+            searchFilter.ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated;
             searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present;
 
             PagedResult<TaxonAggregationItemDto> result;

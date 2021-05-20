@@ -35,9 +35,12 @@ using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -324,6 +327,8 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
+            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

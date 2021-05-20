@@ -3,8 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Cache;
 using SOS.Lib.Managers;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
 
@@ -35,7 +39,8 @@ namespace SOS.Export.UnitTests.Managers
         private TaxonManager TestObject => new TaxonManager(
             _processedTaxonRepositoryMock.Object, 
             _taxonListRepositoryMock.Object,
-            new MemoryCache(new MemoryCacheOptions()),
+            new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions())), 
+            new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions())), 
             _loggerMock.Object);
 
         /// <summary>

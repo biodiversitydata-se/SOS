@@ -11,6 +11,7 @@ using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
@@ -31,6 +32,7 @@ namespace SOS.Import.UnitTests.Harvesters
             _areaProcessedRepository = new Mock<IAreaRepository>();
             _areaHelperMock = new Mock<IAreaHelper>();
             _geoRegionApiServiceMock = new Mock<IGeoRegionApiService>();
+            _cacheManagerMock = new Mock<ICacheManager>();
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
@@ -39,13 +41,15 @@ namespace SOS.Import.UnitTests.Harvesters
         private readonly Mock<IAreaHelper> _areaHelperMock;
         private readonly Mock<IGeoRegionApiService> _geoRegionApiServiceMock;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
-
+        private readonly Mock<ICacheManager> _cacheManagerMock;
+        
         private AreaHarvester TestObject => new AreaHarvester(
             _areaRepositoryMock.Object,
             _areaProcessedRepository.Object,
             _areaHelperMock.Object,
             _geoRegionApiServiceMock.Object,
             new AreaHarvestConfiguration(), 
+            _cacheManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -58,7 +62,6 @@ namespace SOS.Import.UnitTests.Harvesters
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -92,7 +95,7 @@ namespace SOS.Import.UnitTests.Harvesters
                 .ReturnsAsync(true);
             _areaProcessedRepository.Setup(tr => tr.StoreGeometriesAsync(It.IsAny<IDictionary<string, Geometry>>()))
                 .ReturnsAsync(true);
-
+            _cacheManagerMock.Setup(cm => cm.ClearAsync(Cache.Area)).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

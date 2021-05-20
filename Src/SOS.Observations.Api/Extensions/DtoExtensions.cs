@@ -25,11 +25,11 @@ namespace SOS.Observations.Api.Extensions
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
             filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
-            filter.Areas = searchFilterBaseDto.Geographics.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
+            filter.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
-            filter.OnlyValidated = searchFilterBaseDto.OnlyValidated;
+            filter.ValidationStatus = (FilterBase.StatusValidation) searchFilterBaseDto.ValidationStatus;
             filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
@@ -143,19 +143,19 @@ namespace SOS.Observations.Api.Extensions
                 return null;
             }
 
-
             var filter = new TaxonFilter
             {
                 Ids = filterDto.Ids,
                 IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa,
                 ListIds = filterDto.TaxonListIds,
-                
-                TaxonListOperator = (TaxonFilter.TaxonListOp)(filterDto?.TaxonListOperator).GetValueOrDefault()
+                TaxonListOperator = TaxonFilter.TaxonListOp.Merge
             };
 
             if (filterDto is TaxonFilterDto taxonFilterDto)
             {
                 filter.RedListCategories = taxonFilterDto.RedListCategories;
+                filter.TaxonListOperator =
+                    (TaxonFilter.TaxonListOp) (taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
             }
 
             return filter;
@@ -166,7 +166,6 @@ namespace SOS.Observations.Api.Extensions
             filter = filter ?? new SearchFilter();
             filter.Geometries = filter.Geometries ?? new GeographicsFilter();
             filter.Geometries.BoundingBox = boundingbox;
-
         }
 
         public static GeoGridTileTaxonPageResultDto ToGeoGridTileTaxonPageResultDto(this GeoGridTileTaxonPageResult pageResult)

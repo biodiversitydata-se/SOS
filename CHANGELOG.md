@@ -28,6 +28,7 @@
 - ExtendedFilter.NotRecoveredFilter => NotRecoveredFilter
 - Geometry => Geographics
 - Areas => Geographics.Areas
+- OnlyValidated => ValidationStatus (enum)
 
 ## [1.0.1]
 

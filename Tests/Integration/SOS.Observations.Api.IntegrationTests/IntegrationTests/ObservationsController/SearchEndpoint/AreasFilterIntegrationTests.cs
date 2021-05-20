@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                OnlyValidated = false,
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
