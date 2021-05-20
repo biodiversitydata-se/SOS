@@ -20,6 +20,8 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api
 {
@@ -156,6 +158,11 @@ namespace SOS.Administration.Api
                             CheckConnection = true
                         })
             );
+
+            var sosApiConfiguration = Configuration.GetSection("SosApiConfiguration").Get<SosApiConfiguration>();
+            services.AddSingleton<SosApiConfiguration>(sosApiConfiguration);
+
+            services.AddScoped<ICacheManager, CacheManager>();
         }
 
         /// <summary>

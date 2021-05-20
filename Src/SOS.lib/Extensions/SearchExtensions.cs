@@ -483,15 +483,18 @@ namespace SOS.Lib.Extensions
 
             var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            geometryContainers.TryAddBoundingBoxCriteria(
-                $"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
-                geometryFilter?.BoundingBox);
-
+            if (!(!geometryFilter.UsePointAccuracy && geometryFilter.UseDisturbanceRadius))
+            {
+                geometryContainers.TryAddBoundingBoxCriteria(
+                    $"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
+                    geometryFilter.BoundingBox);
+            }
+            
             if (geometryFilter.UseDisturbanceRadius)
             {
                 geometryContainers.TryAddBoundingBoxCriteria(
                     "location.pointWithDisturbanceBuffer",
-                    geometryFilter?.BoundingBox);
+                    geometryFilter.BoundingBox);
             }
 
             if (geometryFilter?.IsValid ?? false)
@@ -962,7 +965,17 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-            query.TryAddTermCriteria("identification.validated", filter.OnlyValidated, true);
+
+            switch (filter?.ValidationStatus)
+            {
+                case FilterBase.StatusValidation.Validated:
+                    query.TryAddTermCriteria("identification.validated", true, true);
+                    break;
+                case FilterBase.StatusValidation.NotValidated:
+                    query.TryAddTermCriteria("identification.validated", false, false);
+                    break;
+            }
+            
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.Taxa?.RedListCategories?.Select(m => m.ToLower()));

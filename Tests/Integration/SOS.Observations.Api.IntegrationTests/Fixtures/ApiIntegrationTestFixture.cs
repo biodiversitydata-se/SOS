@@ -12,7 +12,10 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Security.Interfaces;
@@ -94,7 +97,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
-            var taxonManager = new TaxonManager(taxonRepository, taxonListRepository, memoryCache, new NullLogger<TaxonManager>());
+            var taxonManager = new TaxonManager(taxonRepository, taxonListRepository, 
+                new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
+                new ClassCache<TaxonListSetsById>(memoryCache), 
+                new NullLogger<TaxonManager>());
             return taxonManager;
         }
 

@@ -40,10 +40,5 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Add (merge) or filter taxa by using taxon lists.
         /// </summary>
         public IEnumerable<int> TaxonListIds { get; set; }
-
-        /// <summary>
-        /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
-        /// </summary>
-        public TaxonListOperatorDto TaxonListOperator { get; set; } = TaxonListOperatorDto.Merge;
     }
 }
