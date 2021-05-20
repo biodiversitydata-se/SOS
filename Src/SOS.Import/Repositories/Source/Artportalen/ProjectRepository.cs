@@ -71,6 +71,52 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
+        public async Task<ProjectEntity> GetProjectAsync(int projectId, bool live = false)
+        {
+            try
+            {
+                const string query = @"
+                SELECT 
+	                p.Id,
+                    p.IsPublic,
+                    p.IsHideall,
+	                p.ProjectName AS Name,
+                    p.ProjectDescription AS Description,
+                    p.StartDate,
+                    p.EndDate,
+	                ten.Value AS Category,
+	                t.Value AS CategorySwedish,
+                    CONCAT('https://www.artportalen.se/Project/View/',p.Id) AS ProjectURL,
+	                sm.Name AS SurveyMethod,
+                    sm.Url AS SurveyMethodUrl,
+	                CASE 
+		                WHEN o.Id IS NOT NULL THEN o.Name
+		                WHEN pn.Id IS NOT NULL THEN pn.FirstName + ' ' + pn.LastName 
+	                END AS Owner
+                FROM 
+	                Project p 
+	                INNER JOIN ProjectCategory pc ON p.ProjectCategoryId = pc.Id
+                    INNER JOIN [Resource] cr ON pc.Name = cr.Label
+                    INNER JOIN Translation t ON cr.Id = t.ResourceId AND t.GlobalizationCultureId = 175
+	                INNER JOIN [Resource] cren ON pc.Name = cren.Label
+                    INNER JOIN Translation ten ON cren.Id = ten.ResourceId AND ten.GlobalizationCultureId = 49
+	                LEFT JOIN SurveyMethod sm ON p.SurveyMethodId = sm.Id 
+	                LEFT JOIN Organization o ON p.ControlingOrganisationId = o.Id
+	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
+	                LEFT JOIN Person pn ON u.PersonId = pn.Id
+                WHERE
+                     p.Id = @ProjectId";
+
+                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }, live)).First();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting projects");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds, bool live = false)
         {
             try
