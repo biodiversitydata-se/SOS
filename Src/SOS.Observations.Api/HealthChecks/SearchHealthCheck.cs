@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.HealthChecks
                     Ids = new[] { 103032 },
                     IncludeUnderlyingTaxa = true
                 },
-                OnlyValidated = false,
+                ValidationStatus = FilterBase.StatusValidation.BothValidatedAndNotValidated,
                 PositiveSightings = false,
                 OutputFields = new []
                 {

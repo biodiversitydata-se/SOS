@@ -22,6 +22,12 @@ namespace SOS.Observations.Api.Dtos.Filter
             DontIncludeNotRecovered
         }
 
+        public enum StatusValidationDto
+        {
+            Validated,
+            NotValidated,
+            BothValidatedAndNotValidated
+        }
 
         /// <summary>
         ///     Only get data from these providers.
@@ -54,11 +60,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public SightingNotRecoveredFilterDto NotRecoveredFilter { get; set; }
 
         /// <summary>
-        /// If true, only validated observations will be returned.
-        /// </summary>
-        public bool? OnlyValidated { get; set; }
-
-        /// <summary>
         /// This property indicates whether to search for present observations and/or absent observations.
         /// If no value is set, this will be set to include only present observations.
         /// </summary>
@@ -68,6 +69,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Project id's to match.
         /// </summary>
         public List<int> ProjectIds { get; set; }
+
+        /// <summary>
+        /// Requested validation status
+        /// </summary>
+        public StatusValidationDto ValidationStatus { get; set; }
 
         /// <summary>
         /// Limit returned observations based on bird nest activity level.

@@ -119,6 +119,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
 
             // Managers
+            builder.RegisterType<CacheManager>().As<ICacheManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsManager>().As<IApiUsageStatisticsManager>().InstancePerLifetimeScope();

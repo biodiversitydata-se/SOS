@@ -71,6 +71,13 @@ namespace SOS.Lib.Models.Search
             Night
         }
 
+        public enum StatusValidation
+        {
+            Validated,
+            NotValidated,
+            BothValidatedAndNotValidated
+        }
+
         /// <summary>
         /// Filter on area geometries 
         /// </summary>
@@ -135,11 +142,6 @@ namespace SOS.Lib.Models.Search
         public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
 
         /// <summary>
-        ///     True to return only validated sightings.
-        /// </summary>
-        public bool? OnlyValidated { get; set; }
-
-        /// <summary>
         /// Project id's to match.
         /// </summary>
         public List<int> ProjectIds { get; set; }
@@ -172,6 +174,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<TimeRange> TimeRanges { get; set; }
 
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+
+        /// <summary>
+        ///     True to return only validated sightings.
+        /// </summary>
+        public StatusValidation ValidationStatus { get; set; }
 
         /// <summary>
         /// Filter by uncertain determination

@@ -20,10 +20,15 @@ using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
 using SOS.Import.IoC.Modules;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.JobServer
@@ -98,7 +103,10 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    // Add cache
                     services.AddMemoryCache();
+                    services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+                    services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
 
                     _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 

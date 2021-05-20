@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Import.Factories.Harvest;
@@ -13,6 +12,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -31,23 +31,26 @@ namespace SOS.Import.Harvesters
         private readonly IAreaRepository _areaProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly AreaHarvestConfiguration _areaHarvestConfiguration;
+        private readonly ICacheManager _cacheManager;
         private readonly ILogger<AreaHarvester> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="areaRepository"></param>
-        /// <param name="areaHarvestConfiguration"></param>
-        /// <param name="logger"></param>
         /// <param name="areaProcessedRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="geoRegionApiService"></param>
+        /// <param name="areaHarvestConfiguration"></param>
+        /// <param name="cacheManager"></param>
+        /// <param name="logger"></param>
         public AreaHarvester(
             Repositories.Source.Artportalen.Interfaces.IAreaRepository areaRepository,
             IAreaRepository areaProcessedRepository,
             IAreaHelper areaHelper,
             IGeoRegionApiService geoRegionApiService,
             AreaHarvestConfiguration areaHarvestConfiguration,
+            ICacheManager cacheManager,
             ILogger<AreaHarvester> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
@@ -56,6 +59,7 @@ namespace SOS.Import.Harvesters
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _geoRegionApiService = geoRegionApiService ?? throw new ArgumentNullException(nameof(geoRegionApiService));
             _areaHarvestConfiguration = areaHarvestConfiguration ?? throw new ArgumentNullException(nameof(areaHarvestConfiguration));
+            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -110,6 +114,9 @@ namespace SOS.Import.Harvesters
                                 await _areaProcessedRepository.CreateIndexAsync();
                                 _areaHelper.ClearCache();
                                 _logger.LogDebug("Adding areas succeeded");
+
+                                // Clear observation api cache
+                                await _cacheManager.ClearAsync(Cache.Area);
 
                                 // Update harvest info
                                 harvestInfo.End = DateTime.Now;

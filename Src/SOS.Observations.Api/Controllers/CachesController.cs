@@ -2,6 +2,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -22,27 +23,31 @@ namespace SOS.Observations.Api.Controllers
         private readonly IDataProviderCache _dataProvidersCache;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private readonly ICache<int, ProjectInfo> _projectsCache;
+        private readonly ICache<int, TaxonList> _taxonListCache;
         private readonly ILogger<CachesController> _logger;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="areaCache"></param>
         /// <param name="dataProvidersCache"></param>
         /// <param name="vocabularyCache"></param>
         /// <param name="projectsCache"></param>
+        /// <param name="taxonListCache"></param>
         /// <param name="logger"></param>
         public CachesController(
             IAreaCache areaCache,
             IDataProviderCache dataProvidersCache,
             ICache<VocabularyId, Vocabulary> vocabularyCache,
             ICache<int, ProjectInfo> projectsCache,
+            ICache<int, TaxonList> taxonListCache,
             ILogger<CachesController> logger)
         {
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _dataProvidersCache = dataProvidersCache ?? throw new ArgumentNullException(nameof(dataProvidersCache));
             _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             _projectsCache = projectsCache ?? throw new ArgumentNullException(nameof(projectsCache));
+            _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -51,7 +56,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(bool), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public IActionResult DeleteCache(Cache cache)
+        public IActionResult DeleteCache([FromRoute] Cache cache)
         {
             try
             {
@@ -68,6 +73,9 @@ namespace SOS.Observations.Api.Controllers
                         break;
                     case Cache.Projects:
                         _projectsCache.Clear();
+                        break;
+                    case Cache.TaxonLists:
+                        _taxonListCache.Clear();
                         break;
                 }
 

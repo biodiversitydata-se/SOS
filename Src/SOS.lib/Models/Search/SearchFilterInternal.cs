@@ -36,7 +36,7 @@ namespace SOS.Lib.Models.Search
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             Geometries = searchFilter.Geometries;
             Taxa = searchFilter.Taxa;
-            OnlyValidated = searchFilter.OnlyValidated;
+            ValidationStatus = searchFilter.ValidationStatus;
             PositiveSightings = searchFilter.PositiveSightings;
             StartDate = searchFilter.StartDate;
         }
