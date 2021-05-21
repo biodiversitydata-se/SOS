@@ -222,43 +222,6 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
-        /// <summary>
-        ///  Validate signal search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="areaBuffer"></param>
-        /// <returns></returns>
-        protected Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
-        {
-            Result validateTaxonLists(TaxonFilterBaseDto filter)
-            {
-                if (!filter?.TaxonListIds?.Any() ?? true)
-                {
-                    return Result.Failure("You have to provide at least one taxon list id");
-                }
-
-                var allowedListIds = new[] {1, 2, 7, 8, 17};
-                var errors = filter.TaxonListIds.Where(tlid => !allowedListIds.Contains(tlid))
-                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this serach");
-                if (errors?.Any() ?? false)
-                {
-                    return Result.Failure(string.Join(",", errors));
-                }
-                return Result.Success();
-            };
-
-            return Result.Combine(
-                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
-                ValidateGeographicalAreaExists(filter?.Geographics),
-                areaBuffer < 0 || areaBuffer > 100
-                    ? Result.Failure("areaBuffer must be between 0 and 100")
-                    : Result.Success(),
-                filter?.StartDate > DateTime.Now.AddYears(-1) ? Result.Failure("Start date must be at least one year back in time") : Result.Success(),
-                validateTaxonLists(filter?.Taxon)
-            );
-        }
-
         protected Result ValidateTranslationCultureCode(string translationCultureCode)
         {
             // No culture code, set default
