@@ -22,6 +22,7 @@
         PriorityBirds = 14,
         BirdsDirectiveAnnex1 = 15,
         BirdsDirectiveAnnex2 = 16,
-        ActionPlan = 17
+        ActionPlan = 17,
+        SwedishForestAgencyNatureConservationSpecies = 18
     }
 }
