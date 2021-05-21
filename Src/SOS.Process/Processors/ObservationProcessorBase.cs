@@ -355,6 +355,11 @@ namespace SOS.Process.Processors
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
 
+            if (!observations?.Any() ?? true)
+            {
+                return 0;
+            }
+
             if (mode != JobRunModes.Full)
             {
                 Logger.LogDebug($"Start deleting {dataProvider.Identifier} live data {batchId}");

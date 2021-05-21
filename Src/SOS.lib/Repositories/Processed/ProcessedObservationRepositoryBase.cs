@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace SOS.Lib.Repositories.Processed
     public class ProcessedObservationRepositoryBase : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepositoryBase
     {
-        private const string ScrollTimeOut = "60s";
+        private const string ScrollTimeOut = "90s";
         private readonly string _indexPrefix;
         private readonly int _scrollBatchSize;
         private readonly int _numberOfShards;
@@ -58,6 +59,14 @@ namespace SOS.Lib.Repositories.Processed
         {
             return dynamicObject == null ? null : JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject),
                 new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+        }
+
+        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
+        {
+            if (dynamicObjects == null) return null;
+
+            return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         /// <summary>
@@ -122,7 +131,7 @@ namespace SOS.Lib.Repositories.Processed
                     next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
         }
 
-        private async Task<ScrollResult<Observation>> ScrollObservationsAsync(int dataProviderId,
+        private async Task<ScrollResult<Observation>> ScrollObservationsWithCompleteObjectAsync(int dataProviderId,
             string scrollId)
         {
             ISearchResponse<Observation> searchResponse;
@@ -204,7 +213,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
-            var scrollResult = await ScrollObservationsAsync(dataProvider.Id, null);
+            var scrollResult = await ScrollObservationsWithCompleteObjectAsync(dataProvider.Id, null);
             var success = true;
 
             while (scrollResult?.Records?.Any() ?? false)
@@ -212,7 +221,7 @@ namespace SOS.Lib.Repositories.Processed
                 var processedObservations = scrollResult.Records;
                 var indexResult = WriteToElastic(processedObservations);
                 if (indexResult.TotalNumberOfFailedBuffers != 0) success = false;
-                scrollResult = await ScrollObservationsAsync(dataProvider.Id, scrollResult.ScrollId);
+                scrollResult = await ScrollObservationsWithCompleteObjectAsync(dataProvider.Id, scrollResult.ScrollId);
             }
 
             return success;
@@ -409,7 +418,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<SimpleMultimediaRow>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d))?.ToSimpleMultimediaRows(),
+                Records = CastDynamicsToObservations(searchResponse.Documents)?.ToSimpleMultimediaRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
@@ -448,14 +457,14 @@ namespace SOS.Lib.Repositories.Processed
 
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d))?.ToExtendedMeasurementOrFactRows(),
+                Records = CastDynamicsToObservations(searchResponse.Documents)?.ToExtendedMeasurementOrFactRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
+        public async Task<ScrollResult<Observation>> ScrollObservationsAsync(
             FilterBase filter,
             string scrollId)
         {
@@ -492,56 +501,13 @@ namespace SOS.Lib.Repositories.Processed
                     .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
             return new ScrollResult<Observation>
             {
-                Records = searchResponse.Documents.Select(d => (Observation)CastDynamicToObservation(d)),
+                Records = CastDynamicsToObservations(searchResponse.Documents),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata?.Total?.Value ?? 0
-            };
-        }
-
-
-        /// <inheritdoc />
-        public async Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter,
-            string scrollId)
-        {
-            ISearchResponse<dynamic> searchResponse;
-            if (string.IsNullOrEmpty(scrollId))
-            {
-                var projection = new SourceFilterDescriptor<dynamic>()
-                    .Excludes(e => e
-                        .Field("location.point")
-                        .Field("location.pointLocation")
-                        .Field("location.pointWithBuffer")
-                    );
-
-                searchResponse = await ElasticClient
-                    .SearchAsync<dynamic>(s => s
-                        .Index(IndexName)
-                        .Source(p => projection)
-                        /* .Query(q => q
-                             .Bool(b => b
-                                 .Filter(filter.ToQuery())
-                             )
-                         )*/
-                        .Scroll(ScrollTimeOut)
-                        .Size(BatchSize)
-                    );
-            }
-            else
-            {
-                searchResponse = await ElasticClient
-                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
-            }
-
-            return new ScrollResult<Observation>
-            {
-                Records = searchResponse.Documents
-                    .Select(po =>
-                        (Observation)JsonConvert.DeserializeObject<Observation>(
-                            JsonConvert.SerializeObject(po))),
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
 

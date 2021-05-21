@@ -51,7 +51,7 @@ namespace SOS.Export.IO.DwcArchive
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
                 processedPublicObservationRepository.LiveMode = true;
-                var scrollResult = await processedPublicObservationRepository.TypedScrollObservationsAsync(filter, null);
+                var scrollResult = await processedPublicObservationRepository.ScrollObservationsAsync(filter, null);
                 elasticRetrievalStopwatch.Stop();
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter,"\t");
@@ -83,7 +83,7 @@ namespace SOS.Export.IO.DwcArchive
                     
                     // Get next batch of observations.
                     elasticRetrievalStopwatch.Start();
-                    scrollResult = await processedPublicObservationRepository.TypedScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                     elasticRetrievalStopwatch.Stop();
                 }
 
