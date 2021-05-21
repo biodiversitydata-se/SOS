@@ -115,7 +115,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Size(1000)
                     .DroppedDocumentCallback((r, o) =>
                     {
-                        Logger.LogError(r.Error.Reason);
+                        Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, Error: {r.Error.Reason}");
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),

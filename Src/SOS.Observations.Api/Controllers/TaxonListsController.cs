@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization.Serializers;
-using SOS.Lib.Enums;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Vocabulary;
-using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
@@ -23,18 +19,23 @@ namespace SOS.Observations.Api.Controllers
     public class TaxonListsController : ControllerBase
     {
         private readonly ITaxonListManager _taxonListManager;
+        private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<TaxonListsController> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="taxonListManager"></param>
+        /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         public TaxonListsController(
             ITaxonListManager taxonListManager,
+            ObservationApiConfiguration observationApiConfiguration,
             ILogger<TaxonListsController> logger)
         {
             _taxonListManager = taxonListManager ?? throw new ArgumentNullException(nameof(taxonListManager));
+            _signalSearchTaxonListIds = observationApiConfiguration?.SignalSearchTaxonListIds ??
+                                        throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -57,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                var dtos = taxonLists.Select(m => TaxonListDefinitionDto.Create(m, cultureCode));
+                var dtos = taxonLists.Select(m => TaxonListDefinitionDto.Create(m, cultureCode, _signalSearchTaxonListIds));
                 return new OkObjectResult(dtos);
             }
             catch (Exception e)
