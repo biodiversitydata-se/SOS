@@ -88,7 +88,7 @@ namespace SOS.Observations.Api.Controllers
             var bboxBottom = filter?.Geographics?.BoundingBox?.BottomRight?.Latitude;
 
             // If areas passed, adjust bounding box to them
-            if (filter.Geographics.Areas?.Any() ?? false)
+            if (filter?.Geographics?.Areas?.Any() ?? false)
             {
                 var areas = await _areaManager.GetAreasAsync(filter.Geographics.Areas.Select(a => (a.AreaType, a.FeatureId)));
                 var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             // If geometries passed, adjust bounding box to them
-            if (filter.Geographics?.Geometries?.Any() ?? false)
+            if (filter?.Geographics?.Geometries?.Any() ?? false)
             {
                 foreach (var areaGeometry in filter.Geographics.Geometries)
                 {
