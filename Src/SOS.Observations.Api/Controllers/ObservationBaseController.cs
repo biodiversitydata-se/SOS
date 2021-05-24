@@ -22,6 +22,7 @@ namespace SOS.Observations.Api.Controllers
 
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
+        private const int ElasticSearchMaxRecordsInternal = 100000;
 
         protected readonly IObservationManager ObservationManager;
 
@@ -178,9 +179,9 @@ namespace SOS.Observations.Api.Controllers
         {
             var errors = new List<string>();
 
-            if (skip + take > ElasticSearchMaxRecords)
+            if (skip + take > ElasticSearchMaxRecordsInternal)
             {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecordsInternal }");
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
