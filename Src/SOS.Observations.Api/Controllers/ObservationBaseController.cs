@@ -22,6 +22,7 @@ namespace SOS.Observations.Api.Controllers
 
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
+        private const int ElasticSearchMaxRecordsInternal = 100000;
 
         protected readonly IObservationManager ObservationManager;
 
@@ -70,9 +71,15 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success(zoom);
         }
 
-        protected Result ValidateAggregationPagingArguments(int skip, int? take)
+        protected Result ValidateAggregationPagingArguments(int skip, int? take, bool handleInfinityTake = false)
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
+
+            if (handleInfinityTake && take == 0)
+            {
+                return Result.Success();
+            }
+
             if (take <= 0) return Result.Failure("Take must be greater than 0");
             if (take != null && skip + take > ObservationManager.MaxNrElasticSearchAggregationBuckets)
                 return Result.Failure($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {ObservationManager.MaxNrElasticSearchAggregationBuckets}.");
@@ -172,9 +179,9 @@ namespace SOS.Observations.Api.Controllers
         {
             var errors = new List<string>();
 
-            if (skip + take > ElasticSearchMaxRecords)
+            if (skip + take > ElasticSearchMaxRecordsInternal)
             {
-                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecordsInternal }");
             }
 
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
@@ -220,43 +227,6 @@ namespace SOS.Observations.Api.Controllers
             }
 
             return Result.Success();
-        }
-
-        /// <summary>
-        ///  Validate signal search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="areaBuffer"></param>
-        /// <returns></returns>
-        protected Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
-        {
-            Result validateTaxonLists(TaxonFilterBaseDto filter)
-            {
-                if (!filter?.TaxonListIds?.Any() ?? true)
-                {
-                    return Result.Failure("You have to provide at least one taxon list id");
-                }
-
-                var allowedListIds = new[] {1, 2, 7, 8, 17};
-                var errors = filter.TaxonListIds.Where(tlid => !allowedListIds.Contains(tlid))
-                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this serach");
-                if (errors?.Any() ?? false)
-                {
-                    return Result.Failure(string.Join(",", errors));
-                }
-                return Result.Success();
-            };
-
-            return Result.Combine(
-                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
-                ValidateGeographicalAreaExists(filter?.Geographics),
-                areaBuffer < 0 || areaBuffer > 100
-                    ? Result.Failure("areaBuffer must be between 0 and 100")
-                    : Result.Success(),
-                filter?.StartDate > DateTime.Now.AddYears(-1) ? Result.Failure("Start date must be at least one year back in time") : Result.Success(),
-                validateTaxonLists(filter?.Taxon)
-            );
         }
 
         protected Result ValidateTranslationCultureCode(string translationCultureCode)

@@ -36,6 +36,7 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly IAreaManager _areaManager;
         private readonly int _tilesLimit;
+        private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
 
         private void AdjustEnvelopeByShape(IGeoShape geoShape, ref double? bboxLeft,
@@ -87,7 +88,7 @@ namespace SOS.Observations.Api.Controllers
             var bboxBottom = filter?.Geographics?.BoundingBox?.BottomRight?.Latitude;
 
             // If areas passed, adjust bounding box to them
-            if (filter.Geographics.Areas?.Any() ?? false)
+            if (filter?.Geographics?.Areas?.Any() ?? false)
             {
                 var areas = await _areaManager.GetAreasAsync(filter.Geographics.Areas.Select(a => (a.AreaType, a.FeatureId)));
                 var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
@@ -99,7 +100,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             // If geometries passed, adjust bounding box to them
-            if (filter.Geographics?.Geometries?.Any() ?? false)
+            if (filter?.Geographics?.Geometries?.Any() ?? false)
             {
                 foreach (var areaGeometry in filter.Geographics.Geometries)
                 {
@@ -174,6 +175,42 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        ///  Validate signal search filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="areaBuffer"></param>
+        /// <returns></returns>
+        private Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
+        {
+            Result validateTaxonLists(TaxonFilterBaseDto filter)
+            {
+                if (!filter?.TaxonListIds?.Any() ?? true)
+                {
+                    return Result.Failure("You have to provide at least one taxon list id");
+                }
+
+                var errors = filter.TaxonListIds.Where(tlid => !_signalSearchTaxonListIds.Contains(tlid))
+                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this serach");
+                if (errors?.Any() ?? false)
+                {
+                    return Result.Failure(string.Join(",", errors));
+                }
+                return Result.Success();
+            };
+
+            return Result.Combine(
+                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
+                ValidateGeographicalAreaExists(filter?.Geographics),
+                areaBuffer < 0 || areaBuffer > 100
+                    ? Result.Failure("areaBuffer must be between 0 and 100")
+                    : Result.Success(),
+                filter?.StartDate > DateTime.Now.AddYears(-1) ? Result.Failure("Start date must be at least one year back in time") : Result.Success(),
+                validateTaxonLists(filter?.Taxon)
+            );
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
@@ -191,6 +228,8 @@ namespace SOS.Observations.Api.Controllers
             _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _tilesLimit = observationApiConfiguration?.TilesLimit ??
                           throw new ArgumentNullException(nameof(observationApiConfiguration));
+
+            _signalSearchTaxonListIds = observationApiConfiguration.SignalSearchTaxonListIds;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -834,7 +873,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var paramsValidationResult = Result.Combine(
-                    ValidateAggregationPagingArguments(skip, take),
+                    ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode));
 

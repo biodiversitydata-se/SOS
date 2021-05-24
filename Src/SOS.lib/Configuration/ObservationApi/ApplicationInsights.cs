@@ -6,6 +6,11 @@
     public class ApplicationInsights
     {
         /// <summary>
+        /// Key to application insights
+        /// </summary>
+        public string InstrumentationKey { get; set; }
+
+        /// <summary>
         /// Log request body 
         /// </summary>
         public bool EnableRequestBodyLogging { get; set; }
