@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Observations.Api.Dtos
@@ -8,6 +10,11 @@ namespace SOS.Observations.Api.Dtos
     /// </summary>
     public class TaxonListDefinitionDto
     {
+        /// <summary>
+        /// Is the list allowed in signal search?
+        /// </summary>
+        public bool CanBeUsedInSignalSearch { get; set; }
+
         /// <summary>
         /// The Id of the taxon list.
         /// </summary>
@@ -28,8 +35,9 @@ namespace SOS.Observations.Api.Dtos
         /// </summary>
         /// <param name="taxonList"></param>
         /// <param name="cultureCode"></param>
+        /// <param name="signalSearchTaxonListIds"></param>
         /// <returns></returns>
-        public static TaxonListDefinitionDto Create(TaxonList taxonList, string cultureCode)
+        public static TaxonListDefinitionDto Create(TaxonList taxonList, string cultureCode, IEnumerable<int> signalSearchTaxonListIds)
         {
             if (taxonList == null)
             {
@@ -37,6 +45,7 @@ namespace SOS.Observations.Api.Dtos
             }
             return new TaxonListDefinitionDto
             {
+                CanBeUsedInSignalSearch = signalSearchTaxonListIds.Contains(taxonList.Id),
                 Id = taxonList.Id,
                 ParentId = taxonList.ParentId,
                 Name = taxonList.Names?.Translate(cultureCode)

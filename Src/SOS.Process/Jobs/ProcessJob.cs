@@ -286,6 +286,9 @@ namespace SOS.Process.Jobs
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
+                // Init indexes
+                await InitializeElasticSearchAsync(mode);
+
                 if (mode == JobRunModes.Full)
                 {
                     //------------------------------------------------------------------------
@@ -294,8 +297,6 @@ namespace SOS.Process.Jobs
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
                 }
 
-                // Init indexes
-                await InitializeElasticSearchAsync(mode);
                 // Disable indexing for public and protected index
                 await DisableIndexingAsync();
 
@@ -309,6 +310,7 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
+                  
                     // Enable indexing for public and protected index
                     await EnableIndexingAsync();
 
