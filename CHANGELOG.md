@@ -21,10 +21,13 @@
 
 #### API
 
+#### Sök
+- Bbox parametrar som skickats i "query-string" har ersatts av Geographics.BoundingBox
+
 #### Sökfilter
-- ExtendedFilter.MaxAccuracy => Geometry.MaxAccuracy
+- ExtendedFilter.MaxAccuracy => Geographics.MaxAccuracy
 - ExtendedFilter.DeterminationFilter => DeterminationFilter
-- ExtendedFilter.BoundingBox => Geometry.BoundingBox
+- ExtendedFilter.BoundingBox => Geographics.BoundingBox
 - ExtendedFilter.NotRecoveredFilter => NotRecoveredFilter
 - Geometry => Geographics
 - Areas => Geographics.Areas
