@@ -16,6 +16,7 @@
 ### `Added`
 - New search filter: `BirdNestActivityLimit`
 - New vocabulary: `BirdNestActivity`
+- Possibility to get result as GeoJSON in the following endpoints: `/Observations/Search`, `/Observations/Internal/Search`
 
 ### `Changed`
 
