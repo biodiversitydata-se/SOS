@@ -73,9 +73,9 @@ namespace SOS.Lib.Models.Search
 
         public enum StatusValidation
         {
+            BothValidatedAndNotValidated,
             Validated,
-            NotValidated,
-            BothValidatedAndNotValidated
+            NotValidated
         }
 
         /// <summary>
