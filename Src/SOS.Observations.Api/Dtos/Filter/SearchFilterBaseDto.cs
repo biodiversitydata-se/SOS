@@ -24,9 +24,9 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public enum StatusValidationDto
         {
+            BothValidatedAndNotValidated,
             Validated,
-            NotValidated,
-            BothValidatedAndNotValidated
+            NotValidated
         }
 
         /// <summary>
