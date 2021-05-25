@@ -261,7 +261,7 @@ namespace SOS.Observations.Api.Controllers
         ///     }
         /// </example>
         [HttpPost("Search")]
-        [ProducesResponseType(typeof(GeoPagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -274,8 +274,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false,
-            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
+            [FromQuery] bool protectedObservations = false)
         {
             try
             {
@@ -285,13 +284,9 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
-                {
-                    filter.OutputFields = EnsureCoordinatesIsRetrievedFromDb(filter?.OutputFields);
-                }
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
                 var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
-                GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records);
+                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)

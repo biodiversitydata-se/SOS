@@ -23,8 +23,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false,
-            OutputFormatDto outputFormat = OutputFormatDto.Json);
+            bool protectedObservations = false);
 
         Task<IActionResult> CountInternal(
             string authorizationApplicationIdentifier,
