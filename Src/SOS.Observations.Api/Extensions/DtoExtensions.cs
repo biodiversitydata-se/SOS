@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -286,14 +287,44 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(this PagedResult<TRecord> pagedResult, IEnumerable<TRecordDto> records)
+        public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(
+            this PagedResult<TRecord> pagedResult, 
+            IEnumerable<TRecordDto> records)
         {
             return new PagedResultDto<TRecordDto>
             {
                 Records = records,
                 Skip = pagedResult.Skip,
                 Take = pagedResult.Take,
-                TotalCount = pagedResult.TotalCount
+                TotalCount = pagedResult.TotalCount,
+            };
+        }
+
+        public static GeoPagedResultDto<TRecordDto> ToGeoPagedResultDto<TRecord, TRecordDto>(
+            this PagedResult<TRecord> pagedResult,
+            IEnumerable<TRecordDto> records,
+            OutputFormatDto outputFormat = OutputFormatDto.Json)
+        {
+            if (outputFormat == OutputFormatDto.Json)
+            {
+                return new GeoPagedResultDto<TRecordDto>
+                {
+                    Records = records,
+                    Skip = pagedResult.Skip,
+                    Take = pagedResult.Take,
+                    TotalCount = pagedResult.TotalCount,
+                };
+            }
+
+            var dictionaryRecords = records.Cast<IDictionary<string, object>>();
+            bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
+            string geoJson = GeoJsonHelper.GetFeatureCollectionString(dictionaryRecords, flattenProperties);
+            return new GeoPagedResultDto<TRecordDto>
+            {
+                Skip = pagedResult.Skip,
+                Take = pagedResult.Take,
+                TotalCount = pagedResult.TotalCount,
+                GeoJson = geoJson
             };
         }
 
