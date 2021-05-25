@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
@@ -39,7 +40,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool protectedObservations = false,
+            OutputFormatDto outputFormat = OutputFormatDto.Json);
 
         Task<IActionResult> SearchAggregatedInternal(
             string authorizationApplicationIdentifier,
