@@ -26,7 +26,7 @@ namespace SOS.Lib.Models.Processed.Observation
         private void Initialize(double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, PointGeoShape point, PolygonGeoShape pointWithBuffer, PolygonGeoShape pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
-            CoordinatePrecision = coordinateUncertaintyInMeters;
+            CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
             Country = new VocabularyValue { Id = (int)CountryId.Sweden };
             CountryCode = DarwinCore.Vocabulary.CountryCode.Sweden;
             GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
