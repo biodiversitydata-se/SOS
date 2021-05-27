@@ -34,7 +34,6 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class ObservationsController : ObservationBaseController, IObservationsController
     {
-        private readonly IAreaManager _areaManager;
         private readonly int _tilesLimit;
         private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
@@ -90,7 +89,7 @@ namespace SOS.Observations.Api.Controllers
             // If areas passed, adjust bounding box to them
             if (filter?.Geographics?.Areas?.Any() ?? false)
             {
-                var areas = await _areaManager.GetAreasAsync(filter.Geographics.Areas.Select(a => (a.AreaType, a.FeatureId)));
+                var areas = await AreaManager.GetAreasAsync(filter.Geographics.Areas.Select(a => (a.AreaType, a.FeatureId)));
                 var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
                 //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
                 foreach (var areaGeometry in areaGeometries)
@@ -109,7 +108,7 @@ namespace SOS.Observations.Api.Controllers
             }
 
             // Get geometry of sweden economic zone
-            var swedenGeometry = await _areaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
+            var swedenGeometry = await AreaManager.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
 
             // Get bounding box of swedish economic zone
             var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
@@ -223,9 +222,8 @@ namespace SOS.Observations.Api.Controllers
             ITaxonManager taxonManager,
             IAreaManager areaManager,
             ObservationApiConfiguration observationApiConfiguration,
-            ILogger<ObservationsController> logger) : base(observationManager, taxonManager)
+            ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager)
         {
-            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _tilesLimit = observationApiConfiguration?.TilesLimit ??
                           throw new ArgumentNullException(nameof(observationApiConfiguration));
 
