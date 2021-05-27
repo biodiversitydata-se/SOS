@@ -388,9 +388,9 @@ namespace SOS.Observations.Api.Extensions
                     Geometries = searchFilterDto.Geographics.Geometries,
                     MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
                     UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
-                    UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy
+                    UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
                 },
-                
+                MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy,
                 NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
                 NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
                 PositiveSightings = true,
