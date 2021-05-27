@@ -6,6 +6,6 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
 {
     public interface ISightingRelationRepository
     {
-        Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds, bool live = false);
     }
 }

@@ -32,12 +32,15 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
+        /// <param name="areaManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
         public DOIsController(IObservationManager observationManager,
+            IAreaManager areaManager,
             ITaxonManager taxonManager,
             ObservationApiConfiguration observationApiConfiguration,
-            ILogger<ExportsController> logger) : base(observationManager, taxonManager)
+            ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager)
         {
             _exportObservationsLimit = observationApiConfiguration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

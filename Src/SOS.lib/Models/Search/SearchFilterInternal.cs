@@ -53,6 +53,8 @@ namespace SOS.Lib.Models.Search
         public bool OnlyWithNotes { get; set; }
 
         public bool OnlyWithNotesOfInterest { get; set; }
+        public bool OnlyWithUserComments { get; set; }
+
 
         public bool OnlyWithBarcode { get; set; }
 
@@ -106,5 +108,6 @@ namespace SOS.Lib.Models.Search
         public List<int> SiteIds { get; set; }
 
         public List<int> SpeciesFactsIds { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

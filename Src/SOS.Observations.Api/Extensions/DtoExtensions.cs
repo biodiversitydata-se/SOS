@@ -95,6 +95,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.OnlyWithMedia = searchFilterInternalDto.ExtendedFilter.OnlyWithMedia;
                 internalFilter.OnlyWithNotes = searchFilterInternalDto.ExtendedFilter.OnlyWithNotes;
                 internalFilter.OnlyWithNotesOfInterest = searchFilterInternalDto.ExtendedFilter.OnlyWithNotesOfInterest;
+                internalFilter.OnlyWithUserComments = searchFilterInternalDto.ExtendedFilter.OnlyWithUserComments;
                 internalFilter.OnlyWithBarcode = searchFilterInternalDto.ExtendedFilter.OnlyWithBarcode;
                 internalFilter.ReportedDateFrom = searchFilterInternalDto.ExtendedFilter.ReportedDateFrom;
                 internalFilter.ReportedDateTo = searchFilterInternalDto.ExtendedFilter.ReportedDateTo;
@@ -133,6 +134,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
                 internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
+                internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
             }
 
         }

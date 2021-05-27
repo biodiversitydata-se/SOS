@@ -20,8 +20,9 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// When the file is ready, you will receive an email containing a download link.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
-        /// <param name="filter"></param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <returns></returns>
-        Task<IActionResult> PostRequest(ExportFilterDto filter);
+        Task<IActionResult> PostRequest(ExportFilterDto filter, string description);
     }
 }
