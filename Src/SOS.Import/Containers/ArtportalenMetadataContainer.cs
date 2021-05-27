@@ -113,6 +113,15 @@ namespace SOS.Import.Containers
 
         #region Project
         /// <summary>
+        /// Add a project
+        /// </summary>
+        /// <param name="entities"></param>
+        public void AddProject(ProjectEntity entity)
+        {
+            var project = CastProjectEntityToVerbatim(entity);
+            Projects.TryAdd(project.Id, project);
+        }
+        /// <summary>
         ///     Cast multiple projects entities to models
         /// </summary>
         /// <param name="entities"></param>

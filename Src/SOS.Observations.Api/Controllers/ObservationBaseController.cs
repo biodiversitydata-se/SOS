@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -24,6 +24,7 @@ namespace SOS.Observations.Api.Controllers
         private const int ElasticSearchMaxRecords = 10000;
         private const int ElasticSearchMaxRecordsInternal = 100000;
 
+        protected readonly IAreaManager AreaManager;
         protected readonly IObservationManager ObservationManager;
 
         protected string ReplaceDomain(string str, string domain, string path)
@@ -36,6 +37,31 @@ namespace SOS.Observations.Api.Controllers
         /// Current user id
         /// </summary>
         protected int CurrentUserId => int.Parse(User?.Claims?.FirstOrDefault(c => c?.Type == "sub")?.Value ?? "0");
+
+        /// <summary>
+        /// Check if passed areas exists
+        /// </summary>
+        /// <param name="areaIds"></param>
+        /// <returns></returns>
+        protected async Task<Result> ValidateAreasAsync(IEnumerable<AreaFilterDto> areaIds)
+        {
+            if (!areaIds?.Any() ?? true)
+            {
+                return Result.Success();
+            }
+            
+            var existingAreaIds = (await AreaManager.GetAreasAsync(areaIds.Select(a => (a.AreaType, a.FeatureId))))
+                .Select(a => new AreaFilterDto { AreaType = a.AreaType, FeatureId = a.FeatureId });
+
+            var missingAreas = areaIds?
+                .Where(aid => !existingAreaIds.Any(a => a.AreaType.Equals(aid.AreaType) && a.FeatureId.Equals(aid.FeatureId, StringComparison.CurrentCultureIgnoreCase)))
+                .Select(aid => $"Area doesn't exist (AreaType: { aid.AreaType }, FeatureId: {aid.FeatureId})");
+
+            return missingAreas?.Any() ?? false ?
+                Result.Failure(string.Join(". ", missingAreas))
+                :
+                Result.Success();
+        }
 
         protected Result ValidateEmail(string email)
         {
@@ -75,7 +101,7 @@ namespace SOS.Observations.Api.Controllers
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
 
-            if (handleInfinityTake && take == 0)
+            if (handleInfinityTake && take == -1)
             {
                 return Result.Success();
             }
@@ -118,6 +144,13 @@ namespace SOS.Observations.Api.Controllers
             var errors = new List<string>();
 
             var searchFilter = filter as SearchFilterDto;
+
+            var areaValidationResult = ValidateAreasAsync(filter?.Geographics?.Areas).Result;
+            if (areaValidationResult.IsFailure)
+            {
+                errors.Add(areaValidationResult.Error);
+            }
+
             if (searchFilter?.OutputFields?.Any() ?? false)
             {
                 errors.AddRange(searchFilter.OutputFields
@@ -246,10 +279,17 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="observationManager"></param>
+        /// <param name="areaManager"></param>
+        /// <param name="taxonManager"></param>
         protected ObservationBaseController(IObservationManager observationManager,
-            ITaxonManager taxonManager)
+            IAreaManager areaManager, ITaxonManager taxonManager)
         {
             ObservationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+            AreaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
     }

@@ -57,7 +57,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilter(null, new SearchFilter(), "Sighting",0, false, false)
+                    .PrepareFilter(null, new SearchFilter(), "Sighting", 0, false, false)
                 );
 
             var processedPublicObservationRepository = new ProcessedPublicObservationRepository(
@@ -93,7 +93,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", JobCancellationToken.Null);
+                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", "", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

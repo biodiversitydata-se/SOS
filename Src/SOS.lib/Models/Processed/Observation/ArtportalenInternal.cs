@@ -56,6 +56,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool NoteOfInterest { get; set; }
 
         /// <summary>
+        ///     HasUserComments
+        /// </summary>
+        public bool HasUserComments { get; set; }
+
+        /// <summary>
         /// Sighting Id.
         /// </summary>
         public int SightingId { get; set; }

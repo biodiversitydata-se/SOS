@@ -34,14 +34,16 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="blobStorageManager"></param>
+        /// <param name="areaManager"></param>
         /// <param name="taxonManager"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         public ExportsController(IObservationManager observationManager, 
             IBlobStorageManager blobStorageManager, 
+            IAreaManager areaManager,
             ITaxonManager taxonManager, 
             ObservationApiConfiguration configuration, 
-            ILogger<ExportsController> logger) :base(observationManager, taxonManager)
+            ILogger<ExportsController> logger) :base(observationManager, areaManager, taxonManager)
         {
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportObservationsLimit = configuration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(configuration));
@@ -80,7 +82,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PostRequest([FromBody] ExportFilterDto filter)
+        public async Task<IActionResult> PostRequest([FromBody] ExportFilterDto filter, [FromQuery] string description)
         {
             try
             {
@@ -109,7 +111,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

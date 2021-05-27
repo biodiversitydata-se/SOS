@@ -6,6 +6,6 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
 {
     public interface ISpeciesCollectionItemRepository
     {
-        Task<IEnumerable<SpeciesCollectionItemEntity>> GetBySightingAsync(IEnumerable<int> sightingIds);
+        Task<IEnumerable<SpeciesCollectionItemEntity>> GetBySightingAsync(IEnumerable<int> sightingIds, bool live = false);
     }
 }

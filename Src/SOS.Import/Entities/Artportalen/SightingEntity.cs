@@ -71,7 +71,10 @@ namespace SOS.Import.Entities.Artportalen
         ///     Has sighting images
         /// </summary>
         public bool HasImages { get; set; }
-
+        /// <summary>
+        /// First image Id
+        /// </summary>
+        public int FirstImageId { get; set; }
         /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
@@ -126,6 +129,10 @@ namespace SOS.Import.Entities.Artportalen
         ///     Note of Interest
         /// </summary>
         public bool NoteOfInterest { get; set; }
+        /// <summary>
+        ///     HasUserComments
+        /// </summary>
+        public bool HasUserComments { get; internal set; }
 
         /// <summary>
         ///     Not present flag
@@ -285,5 +292,6 @@ namespace SOS.Import.Entities.Artportalen
         public string SightingPublishTypeIds { get; set; }
 
         public string SpeciesFactsIds { get; set; }
+
     }
 }

@@ -456,7 +456,8 @@ namespace SOS.Import.Harvesters.Observations
                     _sightingRelationRepository,
                     _speciesCollectionRepository,
                     _artportalenMetadataContainer,
-                    _areaHelper
+                    _areaHelper,
+                    _logger
                 )
                 {
                     IncrementalMode = mode != JobRunModes.Full
