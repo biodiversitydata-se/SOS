@@ -102,6 +102,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<int> SiteIds { get; set; }
 
         public List<int> SpeciesFactsIds { get; set; }
-
+        public string InstitutionId { get; set; }
     }
 }
