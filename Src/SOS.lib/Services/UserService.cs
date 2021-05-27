@@ -57,7 +57,7 @@ namespace SOS.Lib.Services
                     new Uri($"{ _userServiceConfiguration.BaseAddress }/User/Current"),
                    new Dictionary<string, string> { { "Authorization", authorizationHeader } });
 
-                return response.Success
+                return response?.Success ?? false
                     ? response.Result
                     : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
             }

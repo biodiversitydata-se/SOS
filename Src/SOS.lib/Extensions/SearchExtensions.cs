@@ -37,7 +37,7 @@ namespace SOS.Lib.Extensions
             var protectedQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             // Allow protected observations matching user extended authorization
-            if (filter?.ExtendedAuthorizations?.Any() ?? false)
+            if (filter.ExtendedAuthorizations?.Any() ?? false)
             {
                 foreach (var extendedAuthorization in filter.ExtendedAuthorizations)
                 {
@@ -481,21 +481,29 @@ namespace SOS.Lib.Extensions
                 return;
             }
 
-            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var boundingBoxContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (!(!geometryFilter.UsePointAccuracy && geometryFilter.UseDisturbanceRadius))
             {
-                geometryContainers.TryAddBoundingBoxCriteria(
+                boundingBoxContainers.TryAddBoundingBoxCriteria(
                     $"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
                     geometryFilter.BoundingBox);
             }
             
             if (geometryFilter.UseDisturbanceRadius)
             {
-                geometryContainers.TryAddBoundingBoxCriteria(
+                boundingBoxContainers.TryAddBoundingBoxCriteria(
                     "location.pointWithDisturbanceBuffer",
                     geometryFilter.BoundingBox);
             }
+
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(boundingBoxContainers)
+                )
+            );
+
+            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (geometryFilter?.IsValid ?? false)
             {
@@ -854,6 +862,19 @@ namespace SOS.Lib.Extensions
             );
         }
 
+        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        {
+            switch (filter.ValidationStatus)
+            {
+                case FilterBase.StatusValidation.Validated:
+                    query.TryAddTermCriteria("identification.validated", true, true);
+                    break;
+                case FilterBase.StatusValidation.NotValidated:
+                    query.TryAddTermCriteria("identification.validated", false, false);
+                    break;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -954,6 +975,12 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            if (filter == null)
+            {
+                return query;
+            }
+
             query.AddAuthorizationFilters(filter);
             query.TryAddDateRangeFilters(filter);
             query.TryAddDeterminationFilters(filter);
@@ -962,20 +989,11 @@ namespace SOS.Lib.Extensions
             query.TryAddGeometryFilters(filter.Geometries);
             query.TryAddNotRecoveredFilter(filter);
             query.AddSightingTypeFilters(filter);
+            query.TryAddValidationStatusFilter(filter);
 
             query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
 
-            switch (filter?.ValidationStatus)
-            {
-                case FilterBase.StatusValidation.Validated:
-                    query.TryAddTermCriteria("identification.validated", true, true);
-                    break;
-                case FilterBase.StatusValidation.NotValidated:
-                    query.TryAddTermCriteria("identification.validated", false, false);
-                    break;
-            }
-            
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.Taxa?.RedListCategories?.Select(m => m.ToLower()));

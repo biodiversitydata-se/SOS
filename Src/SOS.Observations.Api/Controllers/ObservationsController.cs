@@ -197,7 +197,7 @@ namespace SOS.Observations.Api.Controllers
                     return Result.Failure(string.Join(",", errors));
                 }
                 return Result.Success();
-            };
+            }
 
             return Result.Combine(
                 validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
@@ -229,7 +229,8 @@ namespace SOS.Observations.Api.Controllers
             _tilesLimit = observationApiConfiguration?.TilesLimit ??
                           throw new ArgumentNullException(nameof(observationApiConfiguration));
 
-            _signalSearchTaxonListIds = observationApiConfiguration.SignalSearchTaxonListIds;
+            _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -247,7 +248,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>
         /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -286,7 +286,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
                 var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
-                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
+                PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
