@@ -108,5 +108,6 @@ namespace SOS.Lib.Models.Search
         public List<int> SiteIds { get; set; }
 
         public List<int> SpeciesFactsIds { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

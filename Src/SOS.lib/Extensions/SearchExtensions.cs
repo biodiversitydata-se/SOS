@@ -115,6 +115,8 @@ namespace SOS.Lib.Extensions
                     .Query(qq=>qq
                         .Term(new Field("artportalenInternal.occurrenceRecordedByInternal.id"),  internalFilter.ObservedByUserId))));
 
+            query.TryAddTermCriteria("institutionId.keyword", internalFilter.InstitutionId);
+
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
