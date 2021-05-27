@@ -26,8 +26,13 @@ namespace SOS.Lib.Managers
         /// <summary>
         /// Add extended authorization if any
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="authorityIdentity"></param>
+        /// <param name="areaBuffer"></param>
+        /// <param name="usePointAccuracy"></param>
+        /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(string authorizationApplicationIdentifier, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -38,7 +43,7 @@ namespace SOS.Lib.Managers
             }
             
             // Get user authorities
-            var authorities = await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier);
+            var authorities = (await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
 
             if (authorities == null)
             {
@@ -282,11 +287,11 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
+        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
         {
             if (filter.ProtectedObservations)
             {
-                filter.ExtendedAuthorizations = await AddAuthorizationAsync(authorizationApplicationIdentifier, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorizations = await AddAuthorizationAsync(authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
             }
 
             filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);

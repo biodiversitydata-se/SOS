@@ -481,21 +481,29 @@ namespace SOS.Lib.Extensions
                 return;
             }
 
-            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var boundingBoxContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (!(!geometryFilter.UsePointAccuracy && geometryFilter.UseDisturbanceRadius))
             {
-                geometryContainers.TryAddBoundingBoxCriteria(
+                boundingBoxContainers.TryAddBoundingBoxCriteria(
                     $"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
                     geometryFilter.BoundingBox);
             }
             
             if (geometryFilter.UseDisturbanceRadius)
             {
-                geometryContainers.TryAddBoundingBoxCriteria(
+                boundingBoxContainers.TryAddBoundingBoxCriteria(
                     "location.pointWithDisturbanceBuffer",
                     geometryFilter.BoundingBox);
             }
+
+            query.Add(q => q
+                .Bool(b => b
+                    .Should(boundingBoxContainers)
+                )
+            );
+
+            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (geometryFilter?.IsValid ?? false)
             {

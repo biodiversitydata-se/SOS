@@ -242,7 +242,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.Taxa?.Ids?.Count() > 10000)
                 {
@@ -268,16 +268,13 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
-                if (!filter.ExtendedAuthorizations?.Any(ea =>
-                    ea.Identity?.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase) ?? false) ?? true)
+                if (!filter.ExtendedAuthorizations?.Any() ?? true)
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
 
-                filter.ExtendedAuthorizations = filter.ExtendedAuthorizations.Where(ea =>
-                    ea.Identity.Equals("SightingIndication", StringComparison.CurrentCultureIgnoreCase));
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result;
             }
