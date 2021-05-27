@@ -13,10 +13,11 @@ namespace SOS.Lib.Managers.Interfaces
         /// </summary>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
+        /// <param name="authorityIdentity"></param>
         /// <param name="areaBuffer"></param>
         /// <param name="authorizationUsePointAccuracy"></param>
         /// <param name="authorizationUseDisturbanceRadius"></param>
         /// <returns></returns>
-        Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, int? areaBuffer = 0, bool? authorizationUsePointAccuracy = false, bool? authorizationUseDisturbanceRadius = false);
+        Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity = "Sighting", int? areaBuffer = 0, bool? authorizationUsePointAccuracy = false, bool? authorizationUseDisturbanceRadius = false);
     }
 }
