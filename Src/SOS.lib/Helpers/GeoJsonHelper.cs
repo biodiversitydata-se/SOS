@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Processed.Observation;
@@ -12,6 +9,15 @@ namespace SOS.Lib.Helpers
 {
     public static class GeoJsonHelper
     {
+        public enum GeoJsonGeometryType
+        {
+            Point = 0,
+            PointWithBuffer = 1,
+            PointWithDisturbanceBuffer = 2,
+        }
+
+        private static readonly NetTopologySuite.IO.GeoJsonReader GeoJsonReader = new NetTopologySuite.IO.GeoJsonReader();
+
         public static string GetFeatureCollectionString(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
         {
             var featureCollection = GetFeatureCollection(records, flattenProperties);
@@ -26,25 +32,38 @@ namespace SOS.Lib.Helpers
 
             foreach (var observation in records)
             {
-                var feature = GetFeature(observation, flattenProperties);
+                var feature = GetFeature(observation, flattenProperties, GeoJsonGeometryType.Point);
                 featureCollection.Add(feature);
             }
 
             return featureCollection;
         }
 
-        public static Feature GetFeature(IDictionary<string, object> record, bool flattenProperties)
+        public static Feature GetFeature(IDictionary<string, object> record, bool flattenProperties, GeoJsonGeometryType geometryType = GeoJsonGeometryType.Point)
         {
-            Point geometry = null;
+            Geometry geometry = null;
             var attributesDictionary = flattenProperties ? FlattenDictionary(record) : record;
-
+            
             if (record.TryGetValue(nameof(Observation.Location).ToLower(),
                 out var locationObject))
             {
                 var locationDictionary = locationObject as IDictionary<string, object>;
-                var decimalLatitude = (double)locationDictionary["decimalLatitude"];
-                var decimalLongitude = (double)locationDictionary["decimalLongitude"];
-                geometry = new Point(decimalLongitude, decimalLatitude);
+                if (geometryType == GeoJsonGeometryType.Point)
+                {
+                    var decimalLatitude = (double)locationDictionary["decimalLatitude"];
+                    var decimalLongitude = (double)locationDictionary["decimalLongitude"];
+                    geometry = new Point(decimalLongitude, decimalLatitude);
+                }
+                else if (geometryType == GeoJsonGeometryType.PointWithBuffer)
+                {
+                    var str = JsonSerializer.Serialize(locationDictionary["pointWithBuffer"]);
+                    geometry = GeoJsonReader.Read<Polygon>(str);
+                }
+                else if (geometryType == GeoJsonGeometryType.PointWithDisturbanceBuffer)
+                {
+                    var str = JsonSerializer.Serialize(locationDictionary["pointWithDisturbanceBuffer"]);
+                    geometry = GeoJsonReader.Read<Polygon>(str);
+                }
             }
 
             var feature = new Feature(geometry, new AttributesTable(attributesDictionary));
