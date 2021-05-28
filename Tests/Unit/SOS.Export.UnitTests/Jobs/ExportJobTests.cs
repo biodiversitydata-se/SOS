@@ -48,7 +48,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", JobCancellationToken.Null)
                 )
                 .ReturnsAsync(false);
 
@@ -59,7 +59,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), null, "", JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", JobCancellationToken.Null)
                 )
                 .ReturnsAsync(true);
 
@@ -90,7 +90,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            var result = await observationManager.RunAsync(new SearchFilter(), null, JobCancellationToken.Null);
+            var result = await observationManager.RunAsync(new SearchFilter(), null, "", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -107,7 +107,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", JobCancellationToken.Null)
                 )
                 .Throws(new Exception());
 
@@ -118,7 +118,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), null, "", JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------

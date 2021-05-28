@@ -112,7 +112,7 @@ namespace SOS.Export.Jobs
                 {
                     _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
                     success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
-                        emailAddress, cancellationToken);
+                        emailAddress, "DwC-A file", cancellationToken);
                     _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
 
                     if (success)

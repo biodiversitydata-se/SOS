@@ -14,7 +14,7 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds);
+        Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds, bool live = false);
 
         /// <summary>
         /// Get sites by id
@@ -29,6 +29,6 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds);
+        Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false);
     }
 }

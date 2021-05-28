@@ -1136,7 +1136,6 @@
             "LastName": "Placeholder",
             "Email": "Placeholder@slu.se"
         },
-        "ContactEmail": "Placeholder@slu.se",
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,

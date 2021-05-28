@@ -185,7 +185,7 @@ namespace SOS.Process.Processors.Artportalen
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
-                    ? $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}#SightingDetailImages"
+                    ? $"http://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
@@ -244,6 +244,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
                 obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
                 obs.ArtportalenInternal.NoteOfInterest = verbatimObservation.NoteOfInterest;
+                obs.ArtportalenInternal.HasUserComments = verbatimObservation.HasUserComments;
                 obs.ArtportalenInternal.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
                 obs.ArtportalenInternal.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
                 obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;

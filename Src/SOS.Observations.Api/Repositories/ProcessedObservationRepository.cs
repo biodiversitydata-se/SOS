@@ -358,7 +358,7 @@ namespace SOS.Observations.Api.Repositories
             // Calculate size to fetch. If zero, get all
             var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
             var size = skip + take < maxResult ? skip + take : maxResult == 0 ? 1 : maxResult;
-            if (skip == 0 && take == 0)
+            if (skip == 0 && take == -1)
             {
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;

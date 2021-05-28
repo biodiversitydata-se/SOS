@@ -61,9 +61,18 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return elasticConfiguration;
         }
 
+        protected ObservationApiConfiguration GetObservationApiConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var observationApiConfiguration = config.GetSection($"{configPrefix}:ObservationApiConfiguration").Get<ObservationApiConfiguration>();
+            return observationApiConfiguration;
+        }
+
         private void Initialize()
         {
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
+            var observationApiConfiguration = GetObservationApiConfiguration();
             var elasticClient = elasticConfiguration.GetClient(true);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
@@ -79,7 +88,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, new NullLogger<DataProviderManager>());
-            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, new ObservationApiConfiguration{ TilesLimit = 100000 },  new NullLogger<ObservationsController>());
+            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration,  new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             TaxonManager = taxonManager;

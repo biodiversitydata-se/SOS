@@ -32,7 +32,7 @@ namespace SOS.Lib.Helpers
 
             foreach (var observation in records)
             {
-                var feature = GetFeature(observation, flattenProperties, GeoJsonGeometryType.Point);
+                var feature = GetFeature(observation, flattenProperties);
                 featureCollection.Add(feature);
             }
 
@@ -42,8 +42,7 @@ namespace SOS.Lib.Helpers
         public static Feature GetFeature(IDictionary<string, object> record, bool flattenProperties, GeoJsonGeometryType geometryType = GeoJsonGeometryType.Point)
         {
             Geometry geometry = null;
-            var attributesDictionary = flattenProperties ? FlattenDictionary(record) : record;
-            
+
             if (record.TryGetValue(nameof(Observation.Location).ToLower(),
                 out var locationObject))
             {
@@ -58,14 +57,17 @@ namespace SOS.Lib.Helpers
                 {
                     var str = JsonSerializer.Serialize(locationDictionary["pointWithBuffer"]);
                     geometry = GeoJsonReader.Read<Polygon>(str);
+                    locationDictionary.Remove("pointWithBuffer"); // Remove from properties. Just need this for geometry.
                 }
                 else if (geometryType == GeoJsonGeometryType.PointWithDisturbanceBuffer)
                 {
                     var str = JsonSerializer.Serialize(locationDictionary["pointWithDisturbanceBuffer"]);
                     geometry = GeoJsonReader.Read<Polygon>(str);
+                    locationDictionary.Remove("pointWithDisturbanceBuffer"); // Remove from properties. Just need this for geometry.
                 }
             }
 
+            var attributesDictionary = flattenProperties ? FlattenDictionary(record) : record;
             var feature = new Feature(geometry, new AttributesTable(attributesDictionary));
             return feature;
         }

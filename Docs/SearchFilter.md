@@ -8,20 +8,29 @@ This page provides information about how to use the search filter parameters.
   * [OnlyStartDate filter type](#onlystartdate-filter-type)
   * [OnlyEndDate filter type](#onlyenddate-filter-type)
   * [TimeRanges](#timeranges)
-- [Area filter](#area-filter)
+- [Geographics filter](#geographics-filter)
   * [Search for observations in area](#search-for-observations-in-area)
   * [Search for observations in multiple areas of same type](#search-for-observations-in-multiple-areas-of-same-type)
   * [Search for observations in multiple areas of different types](#search-for-observations-in-multiple-areas-of-different-types)
-- [Geometry filter](#geometry-filter)
   * [Search for observations within a polygon](#search-for-observations-within-a-polygon)
   * [Search for observations within a circle](#search-for-observations-within-a-circle)
+  * [Search for observations within a bounding box](#search-for-observations-within-a-bounding-box)
+  * [Observation accuracy](#observation-accuracy)
 - [Taxon filter](#taxon-filter)
   * [Search for observations of a specific taxon](#search-for-observations-of-a-specific-taxon)
   * [Include underlying taxa in search](#include-underlying-taxa-in-search)
   * [Search for observations with red list categories](#search-for-observations-with-red-list-categories)
+  * [Taxon lists](#taxon-lists)
+  * [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
+  * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
 - [Projects filter](#projects-filter)
 - [Occurrence status filter](#occurrence-status-filter)
+- [Validation status filter](#validation-status-filter)
+- [Determination filter](#determination-filter)
+- [NotRecovered filter](#notrecovered-filter)
+- [BirdNestActivityLimit filter](#birdnestactivitylimit-filter)
 - [OutputFields](#outputfields)
+
 
 ## Data provider filter
 This filter will return observations only from Artportalen and MVM.
@@ -147,8 +156,7 @@ This filter will return observations where the hour part of `observation.event.s
 | Evening | 23:00-04:00 |
 
 
-
-## Area filter
+## Geographics filter
 
 Areas used in samples.
 
@@ -161,30 +169,34 @@ Areas used in samples.
 ### Search for observations in area
 This filter will return observations in Tranås municipality.
 ```json
-{        
-    "areas" : [
-        {
-            "areaType": "Municipality",
-            "featureId": "687"
-        }
-    ]
+{   
+    "geographics" : {     
+        "areas" : [
+            {
+                "areaType": "Municipality",
+                "featureId": "687"
+            }
+        ]
+    }
 }
 ```
 
 ### Search for observations in multiple areas of same type
 This filter will return observations in Jönköping & Kronoberg county. OR operator is used when specifying multiple areas of same type.
 ```json
-{        
-    "areas" : [
-        {
-            "areaType": "County",
-            "featureId": "6"
-        },
-        {
-            "areaType": "County",
-            "featureId": "7"
-        }
-    ]
+{
+    "geographics" : {
+        "areas" : [
+            {
+                "areaType": "County",
+                "featureId": "6"
+            },
+            {
+                "areaType": "County",
+                "featureId": "7"
+            }
+        ]
+    }
 }
 ```
 
@@ -192,45 +204,47 @@ This filter will return observations in Jönköping & Kronoberg county. OR opera
 ### Search for observations in multiple areas of different types
 This filter will return zero observations since Tranås municipality is not part of Kronoberg county. AND operator is used when specifying areas of different types.
 ```json
-{        
-    "areas" : [
-        {
-            "areaType": "County",
-            "featureId": "7"
-        },
-        {
-            "areaType": "Municipality",
-            "featureId": "687"
-        }
-    ]
+{
+    "geographics" : {
+        "areas" : [
+            {
+                "areaType": "County",
+                "featureId": "7"
+            },
+            {
+                "areaType": "Municipality",
+                "featureId": "687"
+            }
+        ]
+    }
 }
 ```
 
 This filter will return observations in Tranås municipality since it is part of Jönköping county.
 ```json
-{        
-    "areas" : [
-        {
-            "areaType": "County",
-            "featureId": "6"
-        },
-        {
-            "areaType": "Municipality",
-            "featureId": "687"
-        }
-    ]
+{
+    "geographics" : {
+        "areas" : [
+            {
+                "areaType": "County",
+                "featureId": "6"
+            },
+            {
+                "areaType": "Municipality",
+                "featureId": "687"
+            }
+        ]
+    }
 }
 ```
 
-
-## Geometry filter
 
 ### Search for observations within a polygon
 This filter will return observations within the specified polygon.
 > If `"considerObservationAccuracy": true`, then observations that are outside the polygon but possibly inside when accuracy (coordinateUncertaintyInMeters) of observation is considered, will be included in the result.
 ```json
 {
-    "geometry": {
+    "geographics": {
         "geometries": [
             {
                 "type": "polygon",
@@ -254,11 +268,64 @@ This filter will return observations within the specified polygon.
 This filter will return observations within the specified circle with a radius of 500m.
 ```json
 {
-    "geometry": {        
+    "geographics": {        
         "geometries": [
             {"type":"point", "coordinates": [14.99047, 58.01563]}
         ], 
         "maxDistanceFromPoint": 500
+    }
+}
+```
+
+### Search for observations within a bounding box
+This filter will return observations within the specified bounding box.
+```json
+{
+    "geographics": {        
+        "boundingBox": {
+            "bottomRight": {
+                "latitude": 59.17592,
+                "longitude": 18.28125
+            },
+            "topLeft": {
+                "latitude": 59.35559,
+                "longitude": 17.92968
+            }
+        }
+    }
+}
+```
+
+### Observation accuracy
+
+| Parameter 	| Description 	|
+|-	|-	|
+| considerObservationAccuracy 	| If `true`, then observations that are outside the polygon but possibly inside when accuracy (coordinateUncertaintyInMeters) of observation is considered, will be included in the result. 	|
+| considerDisturbanceRadius 	| If `true`, then observations that are outside Geometries polygons but close enough when disturbance sensitivity of species are considered, will be included in the result. 	|
+| maxAccuracy 	| If set, only observations with less than or equal accuracy (coordinateUncertaintyInMeters) will be included in the result. 	|
+
+
+This filter will return observations within the specified polygon and observations outside the polygon that is possibly inside when the accuracy is considered. Only observations with accuracy <= 1000m will be included.
+```json
+{
+    "geographics": {
+        "geometries": [
+            {
+                "type": "polygon",
+                "coordinates": [
+                    [
+                        [15.07063, 57.92573],
+                        [15.0051, 58.16108],
+                        [14.58003, 58.10148],
+                        [14.64143, 57.93294],
+                        [15.07063, 57.92573]
+                    ]
+                ]
+            }
+        ],        
+        "considerObservationAccuracy": true,
+        "considerDisturbanceRadius": true,
+        "maxAccuracy": 1000
     }
 }
 ```
@@ -311,6 +378,59 @@ This filter will return observation of critically endangered (CR), endangered (E
 | NE | Not evaluated |
 
 
+### Taxon lists
+
+The following taxon lists exists:
+
+| Id 	| ParentId 	| Title (en) 	| Title (sv) 	|
+|-	|-	|-	|-	|
+| 1 	|  	| Protected by law species 	| Fridlysta arter 	|
+| 2 	|  	| Signal species 	| Signalarter 	|
+| 3 	|  	| Invasive species 	| Främmande arter 	|
+| 4 	| 3 	| Invasive species in Sweden 	| Främmande arter i Sverige 	|
+| 5 	| 3 	| EU regulation 1143/2014 	| EU-förordning 1143/2014 	|
+| 6 	| 3 	| Risk assessment 	| Risklista 	|
+| 7 	|  	| Redlisted species 	| Rödlistade arter 	|
+| 8 	|  	| Habitats directive species 	| Habitatdirektivet 	|
+| 9 	| 8 	| Habitats directive Annex 2 	| Habitatdirektivets bilaga 2 	|
+| 10 	| 8 	| Habitats directive Annex 2, priority species 	| Habitatdirektivets bilaga 2 (prioriterad art) 	|
+| 11 	| 8 	| Habitats directive Annex 4 	| Habitatdirektivets bilaga 4 	|
+| 12 	| 8 	| Habitats directive Annex 5 	| Habitatdirektivets bilaga 5 	|
+| 13 	|  	| Birds 	| Fåglar 	|
+| 14 	| 13 	| Priority birds 	| Prioriterade fåglar 	|
+| 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	|
+| 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|
+| 17 	|  	| Action plan 	| Åtgärdsprogram 	|
+| 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|
+
+### Search for observations with taxon lists - merge
+
+This filter will return observations for all mammal species (TaxonId=4000107) and all Habitats directive species.
+```json
+{        
+    "taxon" : {
+        "ids" [4000107],
+        "includeUnderlyingTaxa": true,
+        "taxonListIds": [ 8 ],
+        "taxonListOperator": "Merge"
+    }
+}
+```
+
+### Search for observations with taxon lists - filter
+
+This filter will return observations for mammal (TaxonId=4000107) species that are part of the Habitats directive species taxon list.
+```json
+{        
+    "taxon" : {
+        "ids" [4000107],
+        "includeUnderlyingTaxa": true,
+        "taxonListIds": [ 8 ],
+        "taxonListOperator": "Filter"
+    }
+}
+```
+
 ## Projects filter
 This filter will return observations in the project ArtArken
 ```json
@@ -332,6 +452,59 @@ This filter will return observations with occurrenceStatus "absent"
 ```json
 {
     "occurrenceStatus": "absent"
+}
+```
+
+## Validation status filter
+This filter will return only validated observations.
+```json
+{
+    "validationStatus": "Validated"
+}
+```
+
+This filter will return only non validated observations.
+```json
+{
+    "validationStatus": "NotValidated"
+}
+```
+
+## Determination filter
+This filter will only return observations where `observation.identification.uncertainIdentification=false`.
+```json
+{
+    "determinationFilter": "NotUnsureDetermination"
+}
+```
+
+This filter will only return observations where `observation.identification.uncertainIdentification=true`.
+```json
+{
+    "determinationFilter": "OnlyUnsureDetermination"
+}
+```
+
+## NotRecovered filter
+This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=false`.
+```json
+{
+    "notRecoveredFilter": "DontIncludeNotRecovered"
+}
+```
+
+This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=true`.
+```json
+{
+    "notRecoveredFilter": "OnlyNotRecovered"
+}
+```
+
+## BirdNestActivityLimit filter
+This filter will only return observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.
+```json
+{
+    "birdNestActivityLimit": 10
 }
 ```
 

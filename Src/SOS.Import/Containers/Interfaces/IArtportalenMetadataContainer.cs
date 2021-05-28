@@ -12,6 +12,11 @@ namespace SOS.Import.Containers.Interfaces
     public interface IArtportalenMetadataContainer
     {
         bool IsInitialized { get; }
+        /// <summary>
+        /// Add a project
+        /// </summary>
+        /// <param name="entities"></param>
+        void AddProject(ProjectEntity project);
 
         ConcurrentDictionary<int, MetadataWithCategory> Activities { get; }
         ConcurrentDictionary<int, Metadata> Biotopes { get; }
