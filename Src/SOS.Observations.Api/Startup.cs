@@ -113,6 +113,7 @@ namespace SOS.Observations.Api
             services.AddMemoryCache();
 
             services.AddControllers()
+                .AddXmlSerializerFormatters()
                 .AddJsonOptions(options => { options
                     .JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
                 });
