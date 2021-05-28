@@ -38,17 +38,40 @@ namespace SOS.Observations.Api.Controllers
         private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
 
-        private void AdjustEnvelopeByShape(IGeoShape geoShape, ref double? bboxLeft,
+        private void AdjustEnvelopeByShape(
+            IGeoShape geoShape, 
+            ref double? bboxLeft,
             ref double? bboxTop,
             ref double? bboxRight,
-            ref double? bboxBottom)
+            ref double? bboxBottom,
+            double? maxDistanceFromPoint)
         {
-            if (geoShape == null || geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
+            if (geoShape == null)
             {
                 return;
             }
 
-            var envelope = geoShape.ToGeometry().EnvelopeInternal;
+            Envelope envelope;
+            if (geoShape.Type.Equals("point", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (maxDistanceFromPoint.HasValue)
+                {
+                    var geom = geoShape.ToGeometry();
+                    var sweref99TmGeom = geom.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+                    var bufferedGeomSweref99Tm = sweref99TmGeom.Buffer(maxDistanceFromPoint.Value);
+                    var bufferedGeomWgs84 = bufferedGeomSweref99Tm.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+                    envelope = bufferedGeomWgs84.EnvelopeInternal;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                envelope = geoShape.ToGeometry().EnvelopeInternal;
+            }
+
 
             if (envelope.IsNull)
             {
@@ -94,7 +117,7 @@ namespace SOS.Observations.Api.Controllers
                 //await _areaManager.GetGeometriesAsync(filter.Areas.Select(a => ((AreaType) a.AreaType, a.FeatureId)));
                 foreach (var areaGeometry in areaGeometries)
                 {
-                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
+                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.Geographics.MaxDistanceFromPoint);
                 }
             }
 
@@ -103,7 +126,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 foreach (var areaGeometry in filter.Geographics.Geometries)
                 {
-                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom);
+                    AdjustEnvelopeByShape(areaGeometry, ref bboxLeft, ref bboxTop, ref bboxRight, ref bboxBottom, filter.Geographics.MaxDistanceFromPoint);
                 }
             }
 

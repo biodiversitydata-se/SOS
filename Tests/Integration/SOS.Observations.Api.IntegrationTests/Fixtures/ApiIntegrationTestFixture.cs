@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using MongoDB.Bson.Serialization.Conventions;
 using Moq;
 using Nest;
 using SOS.Lib.Cache;
@@ -39,6 +40,16 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         public ApiIntegrationTestFixture()
         {
+            // MongoDB conventions.
+            ConventionRegistry.Register(
+                "MongoDB Solution Conventions",
+                new ConventionPack
+                {
+                    new IgnoreExtraElementsConvention(true),
+                    new IgnoreIfNullConvention(true)
+                },
+                t => true);
+
             InstallationEnvironment = GetEnvironmentFromAppSettings();
             Initialize();
         }
