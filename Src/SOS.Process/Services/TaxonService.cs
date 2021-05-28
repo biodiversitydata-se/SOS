@@ -66,8 +66,13 @@ namespace SOS.Process.Services
         {
             try
             {
-                await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);
-                if (zipFileContentStream == null) return null;
+                _logger.LogDebug("Start fetching dwca file from taxonservice:" + _taxonDwcUrl);
+                await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);         
+                if (zipFileContentStream == null)
+                {
+                    _logger.LogError("Failed to fetch dwca file from taxon service:" + _taxonDwcUrl);
+                    return null;
+                }
                 using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
@@ -104,15 +109,19 @@ namespace SOS.Process.Services
             return csvFieldDelimiter;
         }
 
-        private static Dictionary<string, DarwinCoreTaxon> GetTaxonCoreData(ZipArchive zipArchive,
+        private Dictionary<string, DarwinCoreTaxon> GetTaxonCoreData(ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
+            _logger.LogDebug("Start adding taxon core data");
             // Try to get the taxon data file
             var taxonFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("Taxon.csv", StringComparison.CurrentCultureIgnoreCase));
 
-            if (taxonFile == null) return null; // If no taxon data file found, we can't do anything more
-
+            if (taxonFile == null)
+            {
+                _logger.LogError("Failed to open Taxon.csv");
+                return null; // If no taxon data file found, we can't do anything more
+            }
             // Read taxon data
             using var taxonReader = new StreamReader(taxonFile.Open(), Encoding.UTF8);
             using var taxonCsv = new CsvReader(taxonReader, GetCsvConfiguration(csvFieldDelimiter));
@@ -151,7 +160,7 @@ namespace SOS.Process.Services
                 taxon.DynamicProperties = new TaxonDynamicProperties();
                 taxon.Id = taxon.DynamicProperties.DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(taxon.TaxonID);
             }
-
+            _logger.LogDebug("Finish adding taxon core data");
             return taxonByTaxonId;
         }
 
@@ -185,11 +194,15 @@ namespace SOS.Process.Services
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
+            _logger.LogDebug("Start adding taxon relations");
             // Try to get TaxonRealtions.csv
             var taxonRelationsFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonRelations.csv", StringComparison.CurrentCultureIgnoreCase));
-            if (taxonRelationsFile == null) return; // If no taxon relations file found, we can't do anything more
-
+            if (taxonRelationsFile == null)
+            {
+                _logger.LogError("Failed to open TaxonRelations.csv");
+                return; // If no taxon relations file found, we can't do anything more
+            }
             // Read taxon relations data
             using var taxonRelationsReader = new StreamReader(taxonRelationsFile.Open(), Encoding.UTF8);
             using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, GetCsvConfiguration(csvFieldDelimiter));
@@ -224,6 +237,7 @@ namespace SOS.Process.Services
                     }
                 }
             }
+            _logger.LogDebug("Finish adding taxon relations");
         }
 
         /// <summary>
@@ -237,11 +251,16 @@ namespace SOS.Process.Services
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
+            _logger.LogDebug("Start adding sort orders to taxon");
             // Try to get TaxonSortOrders.csv
             var taxonSortOrdersFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonSortOrders.csv", StringComparison.CurrentCultureIgnoreCase));
-            if (taxonSortOrdersFile == null) return; // If no taxon sort orders file found, we can't do anything more
-
+            
+            if (taxonSortOrdersFile == null)
+            {
+                _logger.LogError("Failed to open TaxonSortOrders.csv, sort order will be set to 0");
+                return; // If no taxon sort orders file found, we can't do anything more
+            }
             // Read taxon sort order data
             using var taxonSortOrdersReader = new StreamReader(taxonSortOrdersFile.Open(), Encoding.UTF8);
             using var taxonSortOrdersCsv = new CsvReader(taxonSortOrdersReader, GetCsvConfiguration(csvFieldDelimiter));
@@ -265,6 +284,7 @@ namespace SOS.Process.Services
                     taxon.SortOrder = sortOrder.HasValue ? sortOrder.Value : 0;                    
                 }
             }
+            _logger.LogDebug("Finish adding sort orders to taxon");
         }
 
 
@@ -279,11 +299,15 @@ namespace SOS.Process.Services
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
+            _logger.LogDebug("Start adding vernacular names to taxon");
             // Try to get VernacularName.csv
             var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("VernacularName.csv", StringComparison.CurrentCultureIgnoreCase));
-            if (vernacularNameFile == null) return; // If no vernacular name file found, we can't do anything more
-
+            if (vernacularNameFile == null)
+            {
+                _logger.LogError("Failed to open VernacularName.csv");
+                return; // If no vernacular name file found, we can't do anything more
+            }
             // Read vernacular name data
             using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
             using var vernacularNameCsv = new CsvReader(vernacularNameReader, GetCsvConfiguration(csvFieldDelimiter));
@@ -303,6 +327,7 @@ namespace SOS.Process.Services
                         .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.VernacularName;
                 }
             }
+            _logger.LogDebug("Finish adding vernacular names to taxon");
         }
 
         private class TaxonInfo

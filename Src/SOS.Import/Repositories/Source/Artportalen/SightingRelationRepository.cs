@@ -18,7 +18,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
         }
 
-        public async Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds, bool live = false)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     AND sr.IsPublic = 1";
 
                 return await QueryAsync<SightingRelationEntity>(query,
-                    new {tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable")});
+                    new {tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable")}, live);
             }
             catch (Exception e)
             {

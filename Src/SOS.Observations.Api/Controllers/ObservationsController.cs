@@ -190,7 +190,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var errors = filter.TaxonListIds.Where(tlid => !_signalSearchTaxonListIds.Contains(tlid))
-                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this serach");
+                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this search");
                 if (errors?.Any() ?? false)
                 {
                     return Result.Failure(string.Join(",", errors));

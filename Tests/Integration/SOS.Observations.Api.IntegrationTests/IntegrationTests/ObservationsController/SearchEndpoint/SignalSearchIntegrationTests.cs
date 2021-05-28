@@ -39,34 +39,26 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             {
                 Geographics = new GeographicsFilterDto()
                 {
-                    //BoundingBox = new LatLonBoundingBoxDto
-                    //{
-                    //    TopLeft = new LatLonCoordinateDto {Latitude = 90, Longitude = -180},
-                    //    BottomRight = new LatLonCoordinateDto {Latitude = -90, Longitude = 180},
-                    //},
-                    Geometries = new List<IGeoShape>()
+                    Areas = new List<AreaFilterDto>
                     {
-                        new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
-                            {
-                                new GeoCoordinate(57.92573, 15.07063),
-                                new GeoCoordinate(58.16108, 15.00510),
-                                new GeoCoordinate(58.10148, 14.58003),
-                                new GeoCoordinate(57.93294, 14.64143),
-                                new GeoCoordinate(57.92573, 15.07063)
-                            }
-                        })
+                        TestData.Areas.TranasMunicipality
                     },
-                    ConsiderObservationAccuracy = false,
-                    ConsiderDisturbanceRadius = false
+                    ConsiderObservationAccuracy = true,
+                    ConsiderDisturbanceRadius = true,
+                    MaxAccuracy = 5000
                 },
                 Taxon = new TaxonFilterBaseDto()
                 {
-                    Ids = new List<int> { TestData.TaxonIds.Wolf },
-                    IncludeUnderlyingTaxa = true,
-                    TaxonListIds = new []{ (int)TaxonListId.RedlistedSpecies }
+                    TaxonListIds = new[]
+                    {
+                        (int)TaxonListId.RedlistedSpecies, 
+                        (int)TaxonListId.HabitatsDirective, 
+                        (int)TaxonListId.ProtectedByLaw, 
+                        (int)TaxonListId.ActionPlan, 
+                        (int)TaxonListId.SwedishForestAgencyNatureConservationSpecies
+                    }
                 },
-                BirdNestActivityLimit = 10,
-                StartDate = new DateTime(2010,1,1)
+                StartDate = new DateTime(1950, 1, 1)
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -86,5 +78,4 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             result.Should().BeTrue();
         }
     }
-
 }

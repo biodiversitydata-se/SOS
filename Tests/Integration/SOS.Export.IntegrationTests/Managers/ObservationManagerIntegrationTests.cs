@@ -93,7 +93,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", JobCancellationToken.Null);
+                await observationManager.ExportAndStoreAsync(new SearchFilter(), "Test", "all", "", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
