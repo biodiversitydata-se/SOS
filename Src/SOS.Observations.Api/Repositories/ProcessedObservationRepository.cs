@@ -699,10 +699,6 @@ namespace SOS.Observations.Api.Repositories
         {
             int maxNrBucketsInPageResult = MaxNrElasticSearchAggregationBuckets * 3;
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.Add(q => q.GeoBoundingBox(bb => bb
-                .Field("location.pointLocation")
-                .BoundingBox(b =>
-                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
 
             int nrAdded = 0;
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
