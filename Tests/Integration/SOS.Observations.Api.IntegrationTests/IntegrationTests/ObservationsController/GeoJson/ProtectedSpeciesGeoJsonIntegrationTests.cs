@@ -7,6 +7,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
+using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.GeoJson
@@ -23,15 +24,18 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Get_GeoJson_with_Point_as_geometry()
+        public async Task Get_protected_species_in_jonkoping_county_and_outputformat_as_GeoJson_with_point_as_geometry()
         {
-            // Do the following changes to the code to export observations as GeoJSON with the point as geometry:
-            // 1. Change SOS.Lib.Managers.FilterManager.AddAuthorizationAsync() to use:
-            //   var user = await _userService.GetUserByIdAsync([userId]);
-
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var authorityBuilder = new UserAuthorizationTestBuilder();
+            var authority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(3)
+                .WithAreaAccess(TestData.AreaAuthority.JonkopingCounty)
+                .Build();
+            _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
                 ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
@@ -61,7 +65,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 OutputFormatDto.GeoJsonFlat);
             var result = response.GetResult<GeoPagedResultDto<Observation>>();
 
-            await System.IO.File.WriteAllTextAsync(@"c:\gis\protected-observations-point.geojson", result.GeoJson);
+            //await System.IO.File.WriteAllTextAsync(@"c:\gis\protected-observations-point.geojson", result.GeoJson);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -71,18 +75,23 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Get_GeoJson_with_PointWithBuffer_as_geometry()
+        public async Task Get_protected_species_in_jonkoping_county_and_outputformat_as_GeoJson_with_pointWithBuffer_as_geometry()
         {
             // Do the following changes to the code to export observations as GeoJSON with the pointWithBuffer as geometry:
-            // 1. Change SOS.Lib.Managers.FilterManager.AddAuthorizationAsync() to use:
-            //   var user = await _userService.GetUserByIdAsync([userId]);
-            // 2. Change SOS.Lib.Extensions.SearchExtensions.ToProjection(). Comment out the exclude row:
+            // 1. Change SOS.Lib.Extensions.SearchExtensions.ToProjection(). Comment out the exclude row:
             //    .Field("location.pointWithBuffer")
-            // 3. Change SOS.Lib.Helpers.GeoJsonHelper.GetFeature() to use GeoJsonGeometryType.PointWithBuffer
-            
+            // 2. Change SOS.Lib.Helpers.GeoJsonHelper.GetFeature() to use GeoJsonGeometryType.PointWithBuffer
+
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var authorityBuilder = new UserAuthorizationTestBuilder();
+            var authority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(3)
+                .WithAreaAccess(TestData.AreaAuthority.JonkopingCounty)
+                .Build();
+            _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
                 ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
@@ -112,7 +121,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 OutputFormatDto.GeoJsonFlat);
             var result = response.GetResult<GeoPagedResultDto<Observation>>();
 
-            await System.IO.File.WriteAllTextAsync(@"c:\gis\protected-observations-pointWithBuffer.geojson", result.GeoJson);
+            //await System.IO.File.WriteAllTextAsync(@"c:\gis\protected-observations-pointWithBuffer.geojson", result.GeoJson);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
