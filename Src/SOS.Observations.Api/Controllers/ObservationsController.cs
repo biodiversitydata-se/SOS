@@ -1312,7 +1312,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> SignalSearchInternalAsync(
+        public async Task<IActionResult> SignalSearchInternal(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SignalFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,

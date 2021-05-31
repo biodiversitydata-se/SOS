@@ -64,7 +64,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.SignalSearchInternalAsync(
+            var response = await _fixture.ObservationsController.SignalSearchInternal(
                 "CountyAdministrationObservation",
                 searchFilter,
                 false,
