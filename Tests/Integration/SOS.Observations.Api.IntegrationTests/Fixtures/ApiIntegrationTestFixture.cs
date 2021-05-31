@@ -13,10 +13,12 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Security.Interfaces;
@@ -35,6 +37,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public ObservationsController ObservationsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
+        private IFilterManager _filterManager { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
 
@@ -134,18 +137,21 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var areaCache = new AreaCache(areaRepository);
             var dataproviderRepsoitory = new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
             var dataproviderCache = new DataProviderCache(dataproviderRepsoitory);
-            var userServiceMock = new Moq.Mock<IUserService>();
+            _filterManager = new FilterManager(taxonManager, CreateUserService(), areaCache, dataproviderCache);
+            var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
+                _filterManager,  new NullLogger<ObservationManager>());
+
+            return observationsManager;
+        }
+
+        protected virtual IUserService CreateUserService()
+        {
             var userServiceConfiguration = new UserServiceConfiguration();
             userServiceConfiguration.BaseAddress = "https://artdatauser-st.artdata.slu.se/api";
             userServiceConfiguration.AcceptHeaderContentType = "application/json";
             var userService = new UserService(new Mock<IAuthorizationProvider>().Object,
                 new HttpClientService(new NullLogger<HttpClientService>()), userServiceConfiguration, new NullLogger<UserService>());
-            var filterManager = new FilterManager(taxonManager, userService, areaCache, dataproviderCache);
-            //var filterManager = new FilterManager(taxonManager, userServiceMock.Object, areaCache, dataproviderCache);
-            var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
-                filterManager,  new NullLogger<ObservationManager>());
-
-            return observationsManager;
+            return userService;
         }
 
         private VocabularyManager CreateVocabularyManager(ProcessClient processClient)
@@ -174,6 +180,18 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processedConfigurationCache,
                 new HttpContextAccessor());
             return processedObservationRepository;
+        }
+
+        public void UseMockUserService(params AuthorityModel[] authorities)
+        {
+            UserModel user = new UserModel();
+            var userServiceMock = new Moq.Mock<IUserService>();
+            userServiceMock.Setup(userService => userService.GetUserAsync())
+                .ReturnsAsync(user);
+            userServiceMock.Setup(userService =>
+                    userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(authorities);
+            _filterManager.UserService = userServiceMock.Object;
         }
     }
 }
