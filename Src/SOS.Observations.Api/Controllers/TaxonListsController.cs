@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get all Taxon list definitions.
+        /// Get all taxa in a taxon list.
         /// </summary>
         /// <returns></returns>
         [HttpGet("{taxonListId}/Taxa")]
