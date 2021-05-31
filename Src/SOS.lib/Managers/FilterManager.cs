@@ -19,9 +19,15 @@ namespace SOS.Lib.Managers
         private const int BiotaTaxonId = 0;
         
         private readonly ITaxonManager _taxonManager;
-        private readonly IUserService _userService;
+        private IUserService _userService;
         private readonly IAreaCache _areaCache;
         private readonly IDataProviderCache _dataProviderCache;
+
+        public IUserService UserService
+        {
+            get => _userService;
+            set => _userService = value;
+        }
 
         /// <summary>
         /// Add extended authorization if any
