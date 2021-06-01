@@ -47,4 +47,11 @@ namespace SOS.Lib.Enums
         OnlyNotPresent,
         IncludeNotPresent
     }
+
+    public enum MonthsFilterComparison
+    {
+        StartDate,
+        EndDate,
+        BothStartDateAndEndDate
+    }
 }

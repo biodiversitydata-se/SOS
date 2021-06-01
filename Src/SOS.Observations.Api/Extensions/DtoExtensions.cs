@@ -102,6 +102,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ExtendedFilter.TypeFilter;
                 internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ExtendedFilter.UsePeriodForAllYears;
                 internalFilter.Months = searchFilterInternalDto.ExtendedFilter.Months;
+                internalFilter.MonthsComparison = (MonthsFilterComparison)searchFilterInternalDto.ExtendedFilter.MonthsComparison;
                 internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
                 internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
                 internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;

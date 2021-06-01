@@ -63,7 +63,7 @@ namespace SOS.Lib.Models.Search
         
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
-
+        public MonthsFilterComparison MonthsComparison { get; set; } = MonthsFilterComparison.StartDate;
         public List<int> DiscoveryMethodIds { get; set; }
 
         public List<int> LifeStageIds { get; set; }
