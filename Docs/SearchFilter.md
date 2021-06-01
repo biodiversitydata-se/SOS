@@ -54,7 +54,7 @@ This filter will return observations only from Artportalen and MVM.
 ## Date filter
 
 ### BetweenStartDateAndEndDate filter type
-This filter will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDateDate` is less than or equal to `endDate`.
+This filter will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDate` is less than or equal to `endDate`.
 ```json
 {        
   "date": {
