@@ -584,6 +584,7 @@ namespace SOS.Observations.Api.Controllers
         /// Gets a single observation.
         /// </summary>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">
         /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is protected, then diffused data will be returned.
@@ -595,12 +596,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationById(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string occurrenceId, [FromQuery] 
-            bool protectedObservations = false)
+            [FromRoute] string occurrenceId, [FromQuery] string translationCultureCode = "sv-SE", [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, translationCultureCode, protectedObservations,
                     includeInternalFields: false);
 
                 if (observation == null)
@@ -608,7 +608,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return new OkObjectResult(observation);
+                return new OkObjectResult(observation[0]);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1245,6 +1245,7 @@ namespace SOS.Observations.Api.Controllers
         /// Gets a single observation, including internal fields.
         /// </summary>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">
         /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is protected, then diffused data will be returned.
@@ -1258,18 +1259,19 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GetObservationByIdInternal(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string occurrenceId, 
+            [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, translationCultureCode, protectedObservations,
                     includeInternalFields: true);
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return new OkObjectResult(observation);
+                return new OkObjectResult(observation[0]);
             }
             catch (AuthenticationRequiredException e)
             {

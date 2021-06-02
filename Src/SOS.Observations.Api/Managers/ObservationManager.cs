@@ -485,7 +485,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, bool protectedObservations, bool includeInternalFields)
+        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
         {
             SearchFilter filter = new SearchFilter();
             if (includeInternalFields)
@@ -496,7 +496,7 @@ namespace SOS.Observations.Api.Managers
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
             var obs = new List<dynamic>() { processedObservation };
-            ResolveLocalizedVocabularyFields("", obs);
+            ResolveLocalizedVocabularyFields(translationCultureCode, obs);
             ResolveNonLocalizedVocabularyFields(obs);
             return obs.First();
         }
