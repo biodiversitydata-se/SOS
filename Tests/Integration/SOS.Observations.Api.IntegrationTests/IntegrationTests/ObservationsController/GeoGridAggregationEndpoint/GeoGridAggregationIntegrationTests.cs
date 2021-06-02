@@ -4,8 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Search;
+using Nest;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Extensions;
@@ -54,6 +53,43 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             result.GridCellCount.Should().BeGreaterThan(1000);
             result.GridCells.First().ObservationsCount.Should().BeGreaterThan(1000);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task GeoGridAggregation_with_circle()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationDto
+            {
+                Taxon = new TaxonFilterDto { Ids = new List<int>() { 4000107 }, IncludeUnderlyingTaxa = true },
+                Date = new DateFilterDto
+                {
+                    StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
+                    EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+                },
+                Geographics = new GeographicsFilterDto
+                {
+                    Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01563, 14.99047)) },
+                    MaxDistanceFromPoint = 5000
+                },
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.GeogridAggregation(null, searchFilter, 18);
+            var result = response.GetResult<GeoGridResultDto>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.GridCellCount.Should().BeGreaterThan(20);
+            result.GridCells.First().ObservationsCount.Should().BeGreaterThan(10);
         }
 
         [Fact]

@@ -97,7 +97,6 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.First().Taxon.VernacularName.Should().Be("utter", "because otter has the swedish vernacular name 'utter'");
-            result.Records.First().Location.Municipality.Name.Should().Be("Tranås", "because the polygon is limited to Tranås municipality");
         }
 
     }

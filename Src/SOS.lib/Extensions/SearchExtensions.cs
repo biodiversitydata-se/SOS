@@ -136,7 +136,21 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.Months?.Any() ?? false)
             {
-                query.AddScript($@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());");
+                string monthStartDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());";
+                string monthEndDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.endDate'].value.getMonthValue());";
+                if (internalFilter.MonthsComparison == MonthsFilterComparison.StartDate)
+                {
+                    query.AddScript(monthStartDateScript);
+                }
+                else if (internalFilter.MonthsComparison == MonthsFilterComparison.EndDate)
+                {
+                    query.AddScript(monthEndDateScript);
+                }
+                else if (internalFilter.MonthsComparison == MonthsFilterComparison.BothStartDateAndEndDate)
+                {
+                    query.AddScript(monthStartDateScript);
+                    query.AddScript(monthEndDateScript);
+                }
             }
 
             query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);

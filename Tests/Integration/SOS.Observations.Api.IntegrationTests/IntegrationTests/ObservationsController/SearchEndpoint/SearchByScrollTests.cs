@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_for_mammalia_observations()
+        public async Task Search_for_mammalia_observations_by_using_the_scroll_endpoint()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -39,10 +39,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     Ids = new List<int> { TestData.TaxonIds.Mammalia }, 
                     IncludeUnderlyingTaxa = true
                 },
-                //Areas = new[]
-                //{
-                //    TestData.Areas.JonkopingCounty // Jönköping County
-                //},
+                Geographics = new GeographicsFilterDto()
+                {
+                    Areas = new[]
+                    {
+                        TestData.Areas.JonkopingCounty // Jönköping County
+                    },
+                },
                 OutputFields = new List<string> { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
             };
             var observations = new List<Observation>();
@@ -52,6 +55,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var countResponse = await _fixture.ObservationsController.Count(null, searchFilter);
             int count = countResponse.GetResult<int>();
+            count.Should().BeLessOrEqualTo(100000,"because our limit for the scroll endpoint is 100000");
             string scrollId = null; // no scroll in first request
             bool hasMorePages;
             HashSet<string> ids = new HashSet<string>();
@@ -71,7 +75,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observations.Count().Should().BeGreaterThan(10000);
+            observations.Count().Should().BeGreaterThan(0);
         }
     }
 }

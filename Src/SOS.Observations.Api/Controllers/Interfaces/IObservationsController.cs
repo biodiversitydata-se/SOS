@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="areaBuffer"></param>
         /// <param name="onlyAboveMyClearance"></param>
         /// <returns></returns>
-        Task<IActionResult> SignalSearchInternalAsync(
+        Task<IActionResult> SignalSearchInternal(
             string authorizationApplicationIdentifier,
             SignalFilterDto filter,
             bool validateSearchFilter = false,
