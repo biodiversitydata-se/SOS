@@ -631,7 +631,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return new OkObjectResult(observation[0]);
+                return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1294,7 +1294,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return new OkObjectResult(observation[0]);
+                return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
             {

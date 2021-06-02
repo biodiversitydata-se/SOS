@@ -495,10 +495,11 @@ namespace SOS.Observations.Api.Managers
             filter.ProtectedObservations = protectedObservations;
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
-            var obs = new List<dynamic>() { processedObservation };
-            ResolveLocalizedVocabularyFields(translationCultureCode, obs);
-            ResolveNonLocalizedVocabularyFields(obs);
-            return obs.First();
+
+            var obs = new [] { processedObservation };
+            ResolveLocalizedVocabularyFields(translationCultureCode, processedObservation);
+            ResolveNonLocalizedVocabularyFields(processedObservation);
+            return processedObservation == null ? null: processedObservation[0];
         }
     }
 }
