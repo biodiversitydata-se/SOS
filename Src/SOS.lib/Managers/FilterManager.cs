@@ -114,7 +114,7 @@ namespace SOS.Lib.Managers
             if (!dataproviderIds?.Any() ?? true)
             {
                 var allProviders = await _dataProviderCache.GetAllAsync();
-                return allProviders?.Where(p => p.IsActive && p.DataQualityIsApproved).Select(p => p.Id);
+                return allProviders?.Where(p => p.IsActive && p.IncludeInSearchByDefault).Select(p => p.Id);
             }
 
             return dataproviderIds;
