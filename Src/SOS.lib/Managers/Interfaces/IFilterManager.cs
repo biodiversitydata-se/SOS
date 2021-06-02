@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Managers.Interfaces
 {
@@ -8,6 +9,11 @@ namespace SOS.Lib.Managers.Interfaces
     /// </summary>
     public interface IFilterManager
     {
+        /// <summary>
+        /// The user service to use when getting authorities.
+        /// </summary>
+        public IUserService UserService { get; set; }
+
         /// <summary>
         /// Creates a with additional information if necessary. E.g. adding underlying taxon ids.
         /// </summary>

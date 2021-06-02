@@ -26,6 +26,13 @@ namespace SOS.Observations.Api.Dtos.Filter
             IncludeNotPresent
         }
 
+        public enum MonthsFilterComparisonDto
+        {
+            StartDate,
+            EndDate,
+            BothStartDateAndEndDate
+        }
+
         public int? ReportedByUserId { get; set; }
         public int? ObservedByUserId { get; set; }
 
@@ -57,7 +64,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
-
+        public MonthsFilterComparisonDto MonthsComparison { get; set; } = MonthsFilterComparisonDto.StartDate;
         public List<int> DiscoveryMethodIds { get; set; }
 
         public List<int> LifeStageIds { get; set; }

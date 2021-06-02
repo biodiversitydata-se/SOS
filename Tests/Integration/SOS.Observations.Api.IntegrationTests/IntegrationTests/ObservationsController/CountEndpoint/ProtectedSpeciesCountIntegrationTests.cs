@@ -11,21 +11,21 @@ using SOS.Observations.Api.IntegrationTests.Fixtures;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.CountEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
-    public class ProtectedSpeciesIntegrationTests
+    public class ProtectedSpeciesCountIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;
 
-        public ProtectedSpeciesIntegrationTests(ApiIntegrationTestFixture fixture)
+        public ProtectedSpeciesCountIntegrationTests(ApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_for_wolf_in_public_observations_should_return_0_observations()
+        public async Task Count_wolf_in_public_observations_should_return_0()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -39,18 +39,18 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(null, searchFilter, 0, 10);
-            var result = response.GetResult<PagedResultDto<Observation>>();
+            var response = await _fixture.ObservationsController.Count(null, searchFilter);
+            var result = response.GetResult<long>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Records.Should().BeEmpty("because Wolf is protected");
+            result.Should().Be(0, "because Wolf is protected");
         }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_for_wolf_without_permissions()
+        public async Task Count_wolf_without_permissions()
         {
             // To test with a specific user, change SOS.Lib.Managers.FilterManager.AddAuthorizationAsync() to use:
             // Remove: var user = await _userService.GetUserAsync();
@@ -76,28 +76,23 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(
+            var response = await _fixture.ObservationsController.Count(
                 null,
                 searchFilter,
-                0,
-                1000,
-                "",
-                SearchSortOrder.Asc,
                 false,
-                "sv-SE",
                 true);
 
-            var result = response.GetResult<PagedResultDto<Observation>>();
+            var result = response.GetResult<long>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Records.Should().BeEmpty("because wolf is protected and you have no permissions.");
+            result.Should().Be(0,"because wolf is protected and you have no permissions.");
         }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Search_for_wolf_with_permissions()
+        public async Task Count_wolf_with_permissions()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -119,29 +114,24 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(
+            var response = await _fixture.ObservationsController.Count(
                 null,
                 searchFilter,
-                0,
-                1000,
-                "",
-                SearchSortOrder.Asc,
                 false,
-                "sv-SE",
                 true);
 
-            var result = response.GetResult<PagedResultDto<Observation>>();
+            var result = response.GetResult<long>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Records.Should().NotBeEmpty("because the search is executed with permissions.");
+            result.Should().BeGreaterThan(0, "because the search is executed with permissions.");
         }
 
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Get_protected_species_in_Jonkoping_county()
+        public async Task Count_protected_species_in_Jonkoping_county()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -169,24 +159,17 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+            var response = await _fixture.ObservationsController.CountInternal(
                 "CountyAdministrationObservation",
                 searchFilter,
-                0,
-                10000,
-                "",
-                SearchSortOrder.Asc,
                 false,
-                "sv-SE",
                 true);
-            var result = response.GetResult<GeoPagedResultDto<Observation>>();
+            var result = response.GetResult<long>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().BeGreaterThan(0);
-            result.Records.All(m => m.Location.County.FeatureId == TestData.Areas.JonkopingCounty.FeatureId).Should()
-                .BeTrue("Search is done with permission to Jönköping county");
+            result.Should().BeGreaterThan(0);
         }
     }
 }

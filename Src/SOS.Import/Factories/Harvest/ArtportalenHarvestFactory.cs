@@ -62,96 +62,93 @@ namespace SOS.Import.Factories.Harvest
                     }
                 }
 
-                var observation = new ArtportalenObservationVerbatim
-                {
-                    Activity = entity.ActivityId.HasValue && _artportalenMetadataContainer.Activities.ContainsKey(entity.ActivityId.Value)
-                        ? _artportalenMetadataContainer.Activities[entity.ActivityId.Value]
-                        : null,
-                    Biotope = entity.BiotopeId.HasValue && _artportalenMetadataContainer.Biotopes.ContainsKey(entity.BiotopeId.Value)
-                        ? _artportalenMetadataContainer.Biotopes[entity.BiotopeId.Value]
-                        : null,
-                    BiotopeDescription = entity.BiotopeDescription,
-                    CollectionID = entity.CollectionID,
-                    Comment = entity.Comment,
-                    DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _artportalenMetadataContainer.DiscoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
-                        ? _artportalenMetadataContainer.DiscoveryMethods[entity.DiscoveryMethodId.Value]
-                        : null,
-                    DeterminationMethod = entity.DeterminationMethodId.HasValue && _artportalenMetadataContainer.DeterminationMethods.ContainsKey(entity.DeterminationMethodId.Value)
-                        ? _artportalenMetadataContainer.DeterminationMethods[entity.DeterminationMethodId.Value]
-                        : null,
-                    EditDate = entity.EditDate,
-                    EndDate = entity.EndDate,
-                    EndTime = entity.EndTime,
-                    Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
-                        ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
-                        : null,
-                    HasImages = entity.HasImages,
-                    FirstImageId = entity.FirstImageId,
-                    HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
-                    HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
-                    HiddenByProvider = entity.HiddenByProvider,
-                    Id = NextId,
-                    SightingId = entity.Id,
-                    OwnerOrganization =
-                        entity.OwnerOrganizationId.HasValue &&
-                        _artportalenMetadataContainer.Organizations.ContainsKey(entity.OwnerOrganizationId.Value)
-                            ? _artportalenMetadataContainer.Organizations[entity.OwnerOrganizationId.Value]
-                            : null,
-                    Label = entity.Label,
-                    Length = entity.Length,
-                    MaxDepth = entity.MaxDepth,
-                    MaxHeight = entity.MaxHeight,
-                    MigrateSightingObsId = entity.MigrateSightingObsId,
-                    MigrateSightingPortalId = entity.MigrateSightingPortalId,
-                    MinDepth = entity.MinDepth,
-                    MinHeight = entity.MinHeight,
-                    NoteOfInterest = entity.NoteOfInterest,
-                    HasUserComments = entity.HasUserComments,
-                    NotPresent = entity.NotPresent,
-                    NotRecovered = entity.NotRecovered,
-                    ProtectedBySystem = entity.ProtectedBySystem,
-                    Quantity = entity.Quantity,
-                    QuantityOfSubstrate = entity.QuantityOfSubstrate,
-                    ReportedDate = entity.RegisterDate,
-                    RightsHolder = entity.RightsHolder,
-                    Site = site,
-                    SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
-                    Stage = entity.StageId.HasValue && _artportalenMetadataContainer.Stages.ContainsKey(entity.StageId.Value)
-                        ? _artportalenMetadataContainer.Stages[entity.StageId.Value]
-                        : null,
-                    StartDate = entity.StartDate,
-                    StartTime = entity.StartTime,
-                    Substrate = entity.SubstrateId.HasValue && _artportalenMetadataContainer.Substrates.ContainsKey(entity.SubstrateId.Value)
-                        ? _artportalenMetadataContainer.Substrates[entity.SubstrateId.Value]
-                        : null,
-                    SubstrateDescription = entity.SubstrateDescription,
-                    SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription,
-                    SubstrateSpeciesId = entity.SubstrateSpeciesId,
-                    TaxonId = entity.TaxonId,
-                    Unit = entity.UnitId.HasValue && _artportalenMetadataContainer.Units.ContainsKey(entity.UnitId.Value)
-                        ? _artportalenMetadataContainer.Units[entity.UnitId.Value]
-                        : null,
-                    Unspontaneous = entity.Unspontaneous,
-                    UnsureDetermination = entity.UnsureDetermination,
-                    URL = entity.URL,
-                    ValidationStatus = _artportalenMetadataContainer.ValidationStatus.ContainsKey(entity.ValidationStatusId)
-                        ? _artportalenMetadataContainer.ValidationStatus[entity.ValidationStatusId]
-                        : null,
-                    Weight = entity.Weight,
-                    Projects = sightingsProjects?.ContainsKey(entity.Id) ?? false ? sightingsProjects[entity.Id] : null,
-                    SightingTypeId = entity.SightingTypeId,
-                    SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
-                    PublicCollection = entity.OrganizationCollectorId.HasValue && _artportalenMetadataContainer.Organizations.ContainsKey(entity.OrganizationCollectorId.Value)
-                        ? _artportalenMetadataContainer.Organizations[entity.OrganizationCollectorId.Value]
-                        : null,
-                    PrivateCollection = entity.UserCollectorId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.UserCollectorId.Value)
-                        ? _artportalenMetadataContainer.PersonByUserId[entity.UserCollectorId.Value].FullName
-                        : null,
-                    DeterminedBy = entity.DeterminerUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.DeterminerUserId.Value].FullName : null,
-                    DeterminationYear = entity.DeterminationYear,
-                    ConfirmedBy = entity.ConfirmatorUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.ConfirmatorUserId.Value].FullName : null,
-                    ConfirmationYear = entity.ConfirmationYear
-                };
+                var observation = new ArtportalenObservationVerbatim();
+                observation.Activity = entity.ActivityId.HasValue && _artportalenMetadataContainer.Activities.ContainsKey(entity.ActivityId.Value)
+                    ? _artportalenMetadataContainer.Activities[entity.ActivityId.Value]
+                    : null;
+                observation.Biotope = entity.BiotopeId.HasValue && _artportalenMetadataContainer.Biotopes.ContainsKey(entity.BiotopeId.Value)
+                    ? _artportalenMetadataContainer.Biotopes[entity.BiotopeId.Value]
+                    : null;
+                observation.BiotopeDescription = entity.BiotopeDescription;
+                observation.CollectionID = entity.CollectionID;
+                observation.Comment = entity.Comment;
+                observation.DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _artportalenMetadataContainer.DiscoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
+                    ? _artportalenMetadataContainer.DiscoveryMethods[entity.DiscoveryMethodId.Value]
+                    : null;
+                observation.DeterminationMethod = entity.DeterminationMethodId.HasValue && _artportalenMetadataContainer.DeterminationMethods.ContainsKey(entity.DeterminationMethodId.Value)
+                    ? _artportalenMetadataContainer.DeterminationMethods[entity.DeterminationMethodId.Value]
+                    : null;
+                observation.EditDate = entity.EditDate;
+                observation.EndDate = entity.EndDate;
+                observation.EndTime = entity.EndTime;
+                observation.Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
+                    ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
+                    : null;
+                observation.HasImages = entity.HasImages;
+                observation.FirstImageId = entity.FirstImageId;
+                observation.HasTriggeredValidationRules = entity.HasTriggeredValidationRules;
+                observation.HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning;
+                observation.HiddenByProvider = entity.HiddenByProvider;
+                observation.Id = NextId;
+                observation.SightingId = entity.Id;
+                observation.OwnerOrganization = entity.OwnerOrganizationId.HasValue &&
+                                                _artportalenMetadataContainer.Organizations.ContainsKey(entity.OwnerOrganizationId.Value)
+                    ? _artportalenMetadataContainer.Organizations[entity.OwnerOrganizationId.Value]
+                    : null;
+                observation.Label = entity.Label;
+                observation.Length = entity.Length;
+                observation.MaxDepth = entity.MaxDepth;
+                observation.MaxHeight = entity.MaxHeight;
+                observation.MigrateSightingObsId = entity.MigrateSightingObsId;
+                observation.MigrateSightingPortalId = entity.MigrateSightingPortalId;
+                observation.MinDepth = entity.MinDepth;
+                observation.MinHeight = entity.MinHeight;
+                observation.NoteOfInterest = entity.NoteOfInterest;
+                observation.HasUserComments = entity.HasUserComments;
+                observation.NotPresent = entity.NotPresent;
+                observation.NotRecovered = entity.NotRecovered;
+                observation.ProtectedBySystem = entity.ProtectedBySystem;
+                observation.Quantity = entity.Quantity;
+                observation.QuantityOfSubstrate = entity.QuantityOfSubstrate;
+                observation.ReportedDate = entity.RegisterDate;
+                observation.RightsHolder = entity.RightsHolder;
+                observation.Site = site;
+                observation.SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId;
+                observation.Stage = entity.StageId.HasValue && _artportalenMetadataContainer.Stages.ContainsKey(entity.StageId.Value)
+                    ? _artportalenMetadataContainer.Stages[entity.StageId.Value]
+                    : null;
+                observation.StartDate = entity.StartDate;
+                observation.StartTime = entity.StartTime;
+                observation.Substrate = entity.SubstrateId.HasValue && _artportalenMetadataContainer.Substrates.ContainsKey(entity.SubstrateId.Value)
+                    ? _artportalenMetadataContainer.Substrates[entity.SubstrateId.Value]
+                    : null;
+                observation.SubstrateDescription = entity.SubstrateDescription;
+                observation.SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription;
+                observation.SubstrateSpeciesId = entity.SubstrateSpeciesId;
+                observation.TaxonId = entity.TaxonId;
+                observation.Unit = entity.UnitId.HasValue && _artportalenMetadataContainer.Units.ContainsKey(entity.UnitId.Value)
+                    ? _artportalenMetadataContainer.Units[entity.UnitId.Value]
+                    : null;
+                observation.Unspontaneous = entity.Unspontaneous;
+                observation.UnsureDetermination = entity.UnsureDetermination;
+                observation.URL = entity.URL;
+                observation.ValidationStatus = _artportalenMetadataContainer.ValidationStatus.ContainsKey(entity.ValidationStatusId)
+                    ? _artportalenMetadataContainer.ValidationStatus[entity.ValidationStatusId]
+                    : null;
+                observation.Weight = entity.Weight;
+                observation.Projects = sightingsProjects?.ContainsKey(entity.Id) ?? false ? sightingsProjects[entity.Id] : null;
+                observation.SightingTypeId = entity.SightingTypeId;
+                observation.SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId;
+                observation.PublicCollection = entity.OrganizationCollectorId.HasValue && _artportalenMetadataContainer.Organizations.ContainsKey(entity.OrganizationCollectorId.Value)
+                    ? _artportalenMetadataContainer.Organizations[entity.OrganizationCollectorId.Value]
+                    : null;
+                observation.PrivateCollection = entity.UserCollectorId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.UserCollectorId.Value)
+                    ? _artportalenMetadataContainer.PersonByUserId[entity.UserCollectorId.Value].FullName
+                    : null;
+                observation.DeterminedBy = entity.DeterminerUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.DeterminerUserId.Value].FullName : null;
+                observation.DeterminationYear = entity.DeterminationYear;
+                observation.ConfirmedBy = entity.ConfirmatorUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.ConfirmatorUserId.Value].FullName : null;
+                observation.ConfirmationYear = entity.ConfirmationYear;
 
                 observation.RegionalSightingStateId = entity.RegionalSightingStateId;
                 observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
