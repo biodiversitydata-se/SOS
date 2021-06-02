@@ -9,9 +9,11 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
+using NetTopologySuite.Features;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
@@ -43,7 +45,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        private async Task<byte[]> GetZipppedAreaAsync(Area area)
+        private async Task<byte[]> GetZippedAreaAsync(Area area)
         {
             try
             {
@@ -135,10 +137,43 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<byte[]> GetZipppedAreaAsync(AreaTypeDto areaType, string featureId)
+        public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId)
         {
             var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
-            return await GetZipppedAreaAsync(area);
+            return await GetZippedAreaAsync(area);
+        }
+
+        public async Task<byte[]> GetZippedAreaGeoJsonAsync(AreaTypeDto areaType, string featureId)
+        {
+            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
+            return await GetZippedAreaGeoJsonAsync(area);
+        }
+
+        private async Task<byte[]> GetZippedAreaGeoJsonAsync(Area area)
+        {
+            try
+            {
+                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
+                {
+                    return null;
+                }
+
+                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
+                var attributesTable = new AttributesTable
+                {
+                    { "AreaType", area.AreaType.ToString() },
+                    { "FeatureId", area.FeatureId },
+                    { "Name", area.Name },
+                    { "BoundingBox", area.BoundingBox }
+                };
+                var areaString = GeoJsonHelper.GetFeatureAsGeoJsonString(geometry, attributesTable);
+                return CreateZipFile($"area{area.Id}.geojson", Encoding.UTF8.GetBytes(areaString));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area");
+                return null;
+            }
         }
 
         /// <inheritdoc />

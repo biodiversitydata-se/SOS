@@ -28,5 +28,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="featureId">The FeatureId.</param>
         /// <returns></returns>
         Task<IActionResult> GetExport(AreaTypeDto areaType, string featureId);
+
+        /// <summary>
+        ///     Get an area as a zipped GeoJSON file.
+        /// </summary>
+        /// <param name="areaType">The area type.</param>
+        /// <param name="featureId">The FeatureId.</param>
+        /// <returns></returns>
+        Task<IActionResult> GetExportGeoJson(AreaTypeDto areaType, string featureId);
     }
 }

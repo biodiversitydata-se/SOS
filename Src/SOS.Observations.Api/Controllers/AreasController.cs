@@ -63,7 +63,32 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var zipBytes = await _areaManager.GetZipppedAreaAsync(areaType, featureId);
+                var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId);
+
+                if (zipBytes == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return File(zipBytes, "application/zip", $"Area{areaType:G}:{featureId}.zip");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting areas");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpGet("{areaType}/{featureId}/ExportGeoJson")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public async Task<IActionResult> GetExportGeoJson([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+        {
+            try
+            {
+                var zipBytes = await _areaManager.GetZippedAreaGeoJsonAsync(areaType, featureId);
 
                 if (zipBytes == null)
                 {
