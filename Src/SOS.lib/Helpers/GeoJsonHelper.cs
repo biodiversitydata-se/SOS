@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Helpers
@@ -17,6 +19,7 @@ namespace SOS.Lib.Helpers
         }
 
         private static readonly NetTopologySuite.IO.GeoJsonReader GeoJsonReader = new NetTopologySuite.IO.GeoJsonReader();
+        private static readonly NetTopologySuite.IO.GeoJsonWriter GeoJsonWriter = new NetTopologySuite.IO.GeoJsonWriter();
 
         public static string GetFeatureCollectionString(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
         {
@@ -113,6 +116,20 @@ namespace SOS.Lib.Helpers
                     resultDictionary.Add(prefix + pair.Key, pair.Value);
                 }
             }
+        }
+
+        public static Feature GetFeature(IGeoShape geometry, AttributesTable attributesTable)
+        {
+            var geom = geometry.ToGeometry();
+            var feature = new Feature(geom, attributesTable);
+            return feature;
+        }
+
+        public static string GetFeatureAsGeoJsonString(IGeoShape geometry, AttributesTable attributesTable)
+        {
+            var feature = GetFeature(geometry, attributesTable);
+            string strGeoJson = GeoJsonWriter.Write(feature);
+            return strGeoJson;
         }
     }
 }
