@@ -37,7 +37,15 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<byte[]> GetZipppedAreaAsync(AreaTypeDto areaType, string featureId);
+        Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId);
+
+        /// <summary>
+        /// Get area as zipped GeoJSON.
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<byte[]> GetZippedAreaGeoJsonAsync(AreaTypeDto areaType, string featureId);
 
         /// <summary>
         /// Get a area geometry
