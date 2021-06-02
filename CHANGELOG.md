@@ -19,7 +19,7 @@
 - Possibility to get result as GeoJSON in the following endpoint: `/Observations/Internal/Search`
 
 ### `Changed`
-
+- Geting a single observation by occurrence id (both external and internal) return one observation and not an array with one observation
 #### API
 
 #### Sök

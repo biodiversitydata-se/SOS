@@ -120,5 +120,31 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool validateSearchFilter = false,
             int areaBuffer = 0,
             bool onlyAboveMyClearance = true);
+
+        /// <summary>
+        /// Get observation by occurrence id
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="occurrenceId"></param>
+        /// <param name="translationCultureCode"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetObservationById(
+            string authorizationApplicationIdentifier,
+            string occurrenceId, string translationCultureCode = "sv-SE", bool protectedObservations = false);
+
+        /// <summary>
+        /// Get observation by occurrence id, include internal data
+        /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="occurrenceId"></param>
+        /// <param name="translationCultureCode"></param>
+        /// <param name="protectedObservations"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetObservationByIdInternal(
+            string authorizationApplicationIdentifier,
+            string occurrenceId,
+            string translationCultureCode = "sv-SE",
+            bool protectedObservations = false);
     }
 }
