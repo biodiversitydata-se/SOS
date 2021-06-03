@@ -90,9 +90,17 @@ namespace SOS.Lib.Managers
 
         private async Task ProcessUsageStatisticsForOneDay(DateTime date)
         {
+            _logger.LogInformation($"Start processing Application Insights statistics for date:{date.ToShortDateString()}");
+            int nrRows = 0;
             var usageStatisticsRows = await _applicationInsightsService.GetUsageStatisticsForSpecificDayAsync(date);
-            var usageStatisticsEntities = usageStatisticsRows.Select(m => m.ToApiUsageStatistics());
-            await _apiUsageStatisticsRepository.AddManyAsync(usageStatisticsEntities);
+            if (usageStatisticsRows != null)
+            {
+                nrRows = usageStatisticsRows.Count();
+                var usageStatisticsEntities = usageStatisticsRows.Select(m => m.ToApiUsageStatistics());
+                await _apiUsageStatisticsRepository.AddManyAsync(usageStatisticsEntities);
+            }
+
+            _logger.LogInformation($"End processing Application Insights statistics for date:{date.ToShortDateString()}. Number of rows added: {nrRows}");
         }
 
         /// <summary>

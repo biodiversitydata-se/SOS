@@ -165,7 +165,7 @@ namespace SOS.Observations.Api.Repositories
                 totalCount = countResponse.Count;
             }
 
-            operation.Telemetry.Properties["SpeciesObservationCount"] = searchResponse.Documents.Count.ToString();
+            operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
@@ -220,7 +220,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-            operation.Telemetry.Properties["SpeciesObservationCount"] = searchResponse.Documents.Count.ToString();
+            operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);

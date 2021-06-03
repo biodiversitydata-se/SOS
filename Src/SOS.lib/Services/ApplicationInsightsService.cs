@@ -66,7 +66,7 @@ namespace SOS.Lib.Services
                     | project 
                         timestamp, 
                         method = substring(name, 0, indexof(name, ' ' )), 
-                        endpoint = substring(tostring(parseurl(url).Path), 1),  
+                        endpoint = substring(name, indexof(name, ' ')+1, strlen(name)-indexof(name, ' ' )-1),  
                         user_AccountId,
                         user_AuthenticatedId, 
                         duration, 
