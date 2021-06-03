@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export", "Src\SOS.Expor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
 	ProjectSection(SolutionItems) = preProject
-		Docs\_config.yml = Docs\_config.yml
+		_config.yml = _config.yml
 		Docs\Authentication.md = Docs\Authentication.md
 		CHANGELOG.md = CHANGELOG.md
 		Docs\Endpoints.md = Docs\Endpoints.md
