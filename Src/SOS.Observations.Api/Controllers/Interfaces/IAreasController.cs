@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
@@ -26,15 +27,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="areaType">The area type.</param>
         /// <param name="featureId">The FeatureId.</param>
+        /// <param name="format"></param>
         /// <returns></returns>
-        Task<IActionResult> GetExport(AreaTypeDto areaType, string featureId);
-
-        /// <summary>
-        ///     Get an area as a zipped GeoJSON file.
-        /// </summary>
-        /// <param name="areaType">The area type.</param>
-        /// <param name="featureId">The FeatureId.</param>
-        /// <returns></returns>
-        Task<IActionResult> GetExportGeoJson(AreaTypeDto areaType, string featureId);
+        Task<IActionResult> GetExport(AreaTypeDto areaType, string featureId, AreaExportFormatDto format);
     }
 }
