@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 
@@ -32,20 +33,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
             int skip, int take);
 
         /// <summary>
-        /// Get zipped json bytes with an area json file
+        /// Get area as zip file in specified format.
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
+        /// <param name="format"></param>
         /// <returns></returns>
-        Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId);
-
-        /// <summary>
-        /// Get area as zipped GeoJSON.
-        /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <returns></returns>
-        Task<byte[]> GetZippedAreaGeoJsonAsync(AreaTypeDto areaType, string featureId);
+        Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format);
 
         /// <summary>
         /// Get a area geometry

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
 using NetTopologySuite.Features;
+using NetTopologySuite.IO;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -20,6 +22,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
+using ArgumentException = System.ArgumentException;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -30,6 +33,7 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IAreaCache _areaCache;
         private readonly ILogger<AreaManager> _logger;
+        private readonly WKTWriter _wktWriter = new WKTWriter();
 
         private byte[] CreateZipFile(string filename, byte[] bytes)
         {
@@ -137,16 +141,38 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId)
+        public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format)
+        {
+            switch (format)
+            {
+                case AreaExportFormat.Json:
+                    return await GetZippedAreaAsJsonAsync(areaType, featureId);
+                case AreaExportFormat.GeoJson:
+                    return await GetZippedAreaAsGeoJsonAsync(areaType, featureId);
+                case AreaExportFormat.Wkt:
+                    return await GetZippedAreaAsWktAsync(areaType, featureId);
+                default:
+                    throw new ArgumentException(
+                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {areaType}", nameof(areaType));
+            }
+        }
+
+        private async Task<byte[]> GetZippedAreaAsJsonAsync(AreaTypeDto areaType, string featureId)
         {
             var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
             return await GetZippedAreaAsync(area);
         }
 
-        public async Task<byte[]> GetZippedAreaGeoJsonAsync(AreaTypeDto areaType, string featureId)
+        private async Task<byte[]> GetZippedAreaAsGeoJsonAsync(AreaTypeDto areaType, string featureId)
         {
             var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
             return await GetZippedAreaGeoJsonAsync(area);
+        }
+
+        private async Task<byte[]> GetZippedAreaAsWktAsync(AreaTypeDto areaType, string featureId)
+        {
+            var area = await _areaCache.GetAsync(((AreaType)areaType).ToAreaId(featureId));
+            return await GetZippedAreaWktAsync(area);
         }
 
         private async Task<byte[]> GetZippedAreaGeoJsonAsync(Area area)
@@ -159,6 +185,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
+
                 var attributesTable = new AttributesTable
                 {
                     { "AreaType", area.AreaType.ToString() },
@@ -168,6 +195,27 @@ namespace SOS.Observations.Api.Managers
                 };
                 var areaString = GeoJsonHelper.GetFeatureAsGeoJsonString(geometry, attributesTable);
                 return CreateZipFile($"area{area.Id}.geojson", Encoding.UTF8.GetBytes(areaString));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area");
+                return null;
+            }
+        }
+
+        private async Task<byte[]> GetZippedAreaWktAsync(Area area)
+        {
+            try
+            {
+                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
+                {
+                    return null;
+                }
+
+                var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
+                var geom = geometry.ToGeometry();
+                var areaString = _wktWriter.Write(geom);
+                return CreateZipFile($"area{area.Id}.wkt", Encoding.UTF8.GetBytes(areaString));
             }
             catch (Exception e)
             {
