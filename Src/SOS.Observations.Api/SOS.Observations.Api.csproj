@@ -12,6 +12,7 @@
         <DocumentationFile>bin\Release\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.8.4" />
         <PackageReference Include="Elastic.Apm.NLog" Version="1.5.1" />
         <PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.1" />
