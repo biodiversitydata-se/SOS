@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -15,16 +13,15 @@ namespace SOS.Observations.Api
     /// </summary>
     public class Program
     {
-        private static string _env;
         /// <summary>
         ///     Main
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            var logger = NLogBuilder.ConfigureNLog($"NLog.{_env}.config").GetCurrentClassLogger();
+            var logger = NLogBuilder.ConfigureNLog($"NLog.{env}.config").GetCurrentClassLogger();
 
             logger.Debug("Starting Service");
             try
