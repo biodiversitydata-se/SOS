@@ -53,18 +53,6 @@ namespace SOS.Observations.Api
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-                 .ConfigureAppConfiguration((hostingContext, configuration) =>
-                 {
-                     configuration.SetBasePath(Directory.GetCurrentDirectory())
-                         .AddJsonFile("appsettings.json", false, true)
-                         .AddJsonFile($"appsettings.{_env}.json", false, true)
-                         .AddEnvironmentVariables();
-
-                     // If Development mode, add secrets stored on developer machine 
-                     // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-                     // In production you should store the secret values as environment variables.
-                     configuration.AddUserSecrets<Program>();
-                 })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();

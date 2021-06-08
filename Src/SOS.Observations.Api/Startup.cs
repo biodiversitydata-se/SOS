@@ -92,7 +92,9 @@ namespace SOS.Observations.Api
             _isDevelopment = _environment.Equals("local");
             if (_isDevelopment)
             {
-                //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+                // If Development mode, add secrets stored on developer machine 
+                // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+                // In production you should store the secret values as environment variables.
                 builder.AddUserSecrets<Startup>();
             }
 
