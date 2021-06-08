@@ -68,7 +68,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.ArtportalenObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     SupportIncrementalHarvest = true,
                     HarvestFailPreventProcessing = true,
                     HarvestSchedule = "* * * * *"
@@ -125,7 +125,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.ClamPortalObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -180,7 +180,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.KULObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -235,7 +235,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.MvmObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -291,7 +291,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.NorsObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -347,7 +347,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.SersObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -402,7 +402,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.VirtualHerbariumObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -457,7 +457,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.SharkObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -514,7 +514,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -570,7 +570,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -626,7 +626,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -682,7 +682,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -733,7 +733,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -779,7 +779,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -834,7 +834,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.FishDataObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -889,7 +889,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
@@ -944,7 +944,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.ObservationDatabase,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
-                    DataQualityIsApproved = true,
+                    IncludeInSearchByDefault = true,
                     HarvestSchedule = "* * * * *",
                     SupportProtectedHarvest = true
                 },
@@ -1000,7 +1000,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
-                    DataQualityIsApproved = false,
+                    IncludeInSearchByDefault = false,
                     HarvestSchedule = "* * * * *"
                 }
             };

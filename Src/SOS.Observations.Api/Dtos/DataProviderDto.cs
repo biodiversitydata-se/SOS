@@ -87,6 +87,11 @@ namespace SOS.Observations.Api.Dtos
         public string HarvestSchedule { get; set; }
 
         /// <summary>
+        /// Decides whether the data provider should be included in search when no data provider filter is set.
+        /// </summary>
+        public bool IncludeInSearchByDefault { get; set; }
+
+        /// <summary>
         /// Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
@@ -108,7 +113,8 @@ namespace SOS.Observations.Api.Dtos
                 Path = dataProvider.Paths?.Where(p => p.CultureCode?.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase) ?? false)?.SelectMany(p => p.Path),
                 Url = dataProvider.Url,
                 NextHarvestFrom = dataProvider.NextHarvestFrom(null),
-                HarvestSchedule = dataProvider.HarvestSchedule
+                HarvestSchedule = dataProvider.HarvestSchedule,
+                IncludeInSearchByDefault = dataProvider.IncludeInSearchByDefault
             };
         }
 

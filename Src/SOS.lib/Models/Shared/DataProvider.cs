@@ -21,9 +21,9 @@ namespace SOS.Lib.Models.Shared
         public ContactPerson ContactPerson { get; set; }
 
         /// <summary>
-        ///     Decides whether the data quality is approved.
+        ///     Decides whether the data provider should be included in search when no data provider filter is set.
         /// </summary>
-        public bool DataQualityIsApproved { get; set; }
+        public bool IncludeInSearchByDefault { get; set; }
 
         /// <summary>
         ///     Download URL (for DwC-A files).
