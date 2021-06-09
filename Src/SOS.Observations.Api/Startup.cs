@@ -75,7 +75,7 @@ namespace SOS.Observations.Api
         private const string InternalApiName = "InternalSosObservations";
         private const string PublicApiName = "PublicSosObservations";
         private const string InternalApiPrefix = "Internal";
-        private readonly string _environment;
+
         private bool _isDevelopment;
         /// <summary>
         ///     Start up
@@ -83,15 +83,15 @@ namespace SOS.Observations.Api
         /// <param name="env"></param>
         public Startup(IWebHostEnvironment env)
         {
-            _environment = env.EnvironmentName.ToLower();
+            var environment = env.EnvironmentName.ToLower();
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{_environment}.json", true)
+                .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
-            _isDevelopment = _environment.Equals("local");
+            _isDevelopment = environment.Equals("local");
             if (_isDevelopment)
             {
                 // If Development mode, add secrets stored on developer machine 
