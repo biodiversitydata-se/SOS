@@ -10,7 +10,6 @@ using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using System.Text;
 using System.Text.Json.Serialization;
-using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
