@@ -252,7 +252,12 @@ namespace SOS.Import.Factories.Harvest
                 {
                     if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out var project))
                     {
-                        var projectEntity = (await _projectRepository.GetProjectAsync(projectId, live));
+                        var projectEntity = await _projectRepository.GetProjectAsync(projectId, live);
+
+                        if (projectEntity == null)
+                        {
+                            continue;
+                        }
                         _artportalenMetadataContainer.AddProject(projectEntity);
                         if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out project))
                         {
@@ -285,7 +290,12 @@ namespace SOS.Import.Factories.Harvest
                     {
                         if (!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project))
                         {
-                            var projectEntity = (await _projectRepository.GetProjectAsync(projectParameterEntity.ProjectId, live));
+                            var projectEntity = await _projectRepository.GetProjectAsync(projectParameterEntity.ProjectId, live);
+
+                            if (projectEntity == null)
+                            {
+                                continue;
+                            }
                             _artportalenMetadataContainer.AddProject(projectEntity);
                             if(!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project)) 
                             { 
