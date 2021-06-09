@@ -111,7 +111,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error getting projects");
+                Logger.LogError(e, $"Error getting project: {projectId}");
                 return null;
             }
         }
