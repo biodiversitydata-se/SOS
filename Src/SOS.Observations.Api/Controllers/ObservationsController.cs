@@ -558,8 +558,8 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> TaxonAggregation(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
-            [FromQuery] int? skip = 0,
-            [FromQuery] int? take = 100,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
@@ -1170,8 +1170,8 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> TaxonAggregationInternal(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
-            [FromQuery] int? skip = 0,
-            [FromQuery] int? take = 100,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false)
