@@ -24,6 +24,7 @@ namespace SOS.Process.Processors.Sers
     {
         private readonly IAreaHelper _areaHelper;
         private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
+        private readonly IGeometryManager _geometryManager;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -32,7 +33,7 @@ namespace SOS.Process.Processors.Sers
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new SersObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new SersObservationFactory(dataProvider, taxa, _areaHelper, _geometryManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -52,6 +53,7 @@ namespace SOS.Process.Processors.Sers
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public SersObservationProcessor(ISersObservationVerbatimRepository sersObservationVerbatimRepository,
             IAreaHelper areaHelper,
@@ -60,6 +62,7 @@ namespace SOS.Process.Processors.Sers
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IGeometryManager geometryManager,
             ILogger<SersObservationProcessor> logger) :
             base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
@@ -67,6 +70,7 @@ namespace SOS.Process.Processors.Sers
                                                  throw new ArgumentNullException(
                                                      nameof(sersObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.SersObservations;

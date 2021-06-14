@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -21,7 +22,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
 
 
         [Fact]
-        public void Assume_Wgs84_coordinate_system_when_GeodeticDatum_is_omitted()
+        public async Task Assume_Wgs84_coordinate_system_when_GeodeticDatum_is_omitted()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -36,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -47,7 +48,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Etrs89_coordinates_are_converted_to_WGS84()
+        public async Task Etrs89_coordinates_are_converted_to_WGS84()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -62,7 +63,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -76,7 +77,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void RT90_coordinates_are_converted_to_WGS84()
+        public async Task RT90_coordinates_are_converted_to_WGS84()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -91,7 +92,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -105,7 +106,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void SWEREF99TM_coordinates_are_converted_to_WGS84()
+        public async Task SWEREF99TM_coordinates_are_converted_to_WGS84()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -120,7 +121,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -134,7 +135,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void WebMercator_coordinates_are_converted_to_WGS84()
+        public async Task WebMercator_coordinates_are_converted_to_WGS84()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -149,7 +150,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -163,7 +164,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Wgs84_coordinates_is_parsed_to_double_data_type()
+        public async Task Wgs84_coordinates_is_parsed_to_double_data_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -178,7 +179,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -189,7 +190,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Wgs84_coordinates_with_GeodeticDatum_wgs84_is_parsed_to_double_data_type()
+        public async Task Wgs84_coordinates_with_GeodeticDatum_wgs84_is_parsed_to_double_data_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -204,7 +205,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -219,7 +220,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [InlineData(null, 5000)]
         [InlineData("4.699999809265137", 5)]
         [InlineData("11.28600025177002", 11)]
-        public void Succeeds_to_parse_coordinateUncertaintyInMeters(
+        public async Task Succeeds_to_parse_coordinateUncertaintyInMeters(
             string input,
             int? expectedValue)
         {
@@ -235,7 +236,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
             
             //-----------------------------------------------------------------------------------------------------------
             // Assert

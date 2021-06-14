@@ -29,8 +29,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            INorsObservationVerbatimRepository norsObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            INorsObservationVerbatimRepository norsObservationVerbatimRepository,
+            IGeometryManager geometryManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository;
         }
@@ -45,9 +46,9 @@ namespace SOS.Import.Factories.Validation
             return await _norsObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(NorsObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(NorsObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = await GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -86,7 +87,8 @@ namespace SOS.Import.Factories.Validation
                 _norsObservationFactory = new NorsObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _geometryManager);
             }
 
             return _norsObservationFactory;

@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Containers.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -41,6 +42,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IAreaHelper _areaHelper;
+        private readonly IGeometryManager _geometryManager;
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
 
@@ -348,6 +350,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
@@ -364,6 +367,7 @@ namespace SOS.Import.Harvesters.Observations
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
+            IGeometryManager geometryManager,
             ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
@@ -385,7 +389,7 @@ namespace SOS.Import.Harvesters.Observations
             _processedProtectedObservationRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
@@ -457,6 +461,7 @@ namespace SOS.Import.Harvesters.Observations
                     _speciesCollectionRepository,
                     _artportalenMetadataContainer,
                     _areaHelper,
+                    _geometryManager,
                     _logger
                 )
                 {

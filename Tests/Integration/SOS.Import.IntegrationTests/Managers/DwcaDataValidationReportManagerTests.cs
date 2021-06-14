@@ -4,6 +4,7 @@ using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using SOS.Import.DarwinCore;
 using SOS.Import.Managers;
@@ -13,6 +14,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
@@ -162,6 +164,10 @@ namespace SOS.Import.IntegrationTests.Managers
             var processedTaxonRepository = new TaxonRepository(
                 processClient,
                 new NullLogger<TaxonRepository>());
+            var geometryManagerMock = new Mock<IGeometryManager>();
+            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
+                .ReturnsAsync(null as Geometry);
+
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 vocabularyRepository,
@@ -169,6 +175,7 @@ namespace SOS.Import.IntegrationTests.Managers
                 areaHelper,
                 vocabularyValueResolver,
                 processedTaxonRepository,
+                geometryManagerMock.Object,
                 new NullLogger<DwcaDataValidationReportManager>()
             );
 

@@ -29,8 +29,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IKulObservationVerbatimRepository kulObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IKulObservationVerbatimRepository kulObservationVerbatimRepository,
+            IGeometryManager geometryManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
         }
@@ -45,9 +46,9 @@ namespace SOS.Import.Factories.Validation
             return await _kulObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(KulObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(KulObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = await GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -86,7 +87,8 @@ namespace SOS.Import.Factories.Validation
                 _kulObservationFactory = new KulObservationFactory(
                     dataProvider,
                     _taxonById, 
-                    _areaHelper);
+                    _areaHelper,
+                    _geometryManager);
             }
 
             return _kulObservationFactory;

@@ -29,8 +29,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
+            IGeometryManager geometryManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository;
         }
@@ -45,9 +46,9 @@ namespace SOS.Import.Factories.Validation
             return await _fishDataObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(FishDataObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(FishDataObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = await GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -86,7 +87,8 @@ namespace SOS.Import.Factories.Validation
                 _fishdataObservationFactory = new FishDataObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _geometryManager);
             }
 
             return _fishdataObservationFactory;

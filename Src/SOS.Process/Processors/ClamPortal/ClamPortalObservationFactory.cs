@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -15,7 +17,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.ClamPortal
 {
-    public class ClamPortalObservationFactory : IObservationFactory<ClamObservationVerbatim>
+    public class ClamPortalObservationFactory : ObservationfactoryBase, IObservationFactory<ClamObservationVerbatim>
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly DataProvider _dataProvider;
@@ -28,7 +30,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -38,84 +40,87 @@ namespace SOS.Process.Processors.ClamPortal
         /// <summary>
         ///     Cast multiple clam observations to processed observations
         /// </summary>
-        /// <param name="verbatimObservations"></param>
+        /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
-            IEnumerable<ClamObservationVerbatim> verbatimObservations)
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+            IEnumerable<ClamObservationVerbatim> verbatims)
         {
-            return verbatimObservations.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
         ///     Cast clam observation verbatim to processed observation
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation)
+        public async Task<Observation> CreateProcessedObservationAsync(ClamObservationVerbatim verbatim)
         {
-            _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
+            _taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
             var obs = new Observation
             {
                 DataProviderId = _dataProvider.Id,
-                AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
-                BasisOfRecord = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
+                AccessRights = GetAccessRightsIdFromString(verbatim.AccessRights),
+                BasisOfRecord = GetBasisOfRecordIdFromString(verbatim.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",
                 DatasetName = "Träd och musselportalen",
                 Event = new Event
                 {
-                    EndDate = verbatimObservation.ObservationDate.ToUniversalTime(),
-                    SamplingProtocol = verbatimObservation.SurveyMethod,
-                    StartDate = verbatimObservation.ObservationDate.ToUniversalTime(),
-                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatimObservation.ObservationDate)
+                    EndDate = verbatim.ObservationDate.ToUniversalTime(),
+                    SamplingProtocol = verbatim.SurveyMethod,
+                    StartDate = verbatim.ObservationDate.ToUniversalTime(),
+                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.ObservationDate)
                 },
                 Identification = new Identification
                 {
-                    Validated = verbatimObservation.IdentificationVerificationStatus.Equals(
+                    Validated = verbatim.IdentificationVerificationStatus.Equals(
                         ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
                     ValidationStatus =
-                        GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
-                    UncertainIdentification = verbatimObservation.UncertainDetermination != 0
+                        GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
+                    UncertainIdentification = verbatim.UncertainDetermination != 0
                 },
-                InstitutionCode = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
-                Language = verbatimObservation.Language,
-                Location = new Location(verbatimObservation.DecimalLongitude, verbatimObservation.DecimalLatitude, CoordinateSys.WGS84, verbatimObservation.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
+                InstitutionCode = GetOrganizationIdFromString(verbatim.InstitutionCode),
+                Language = verbatim.Language,
+                Location = new Location()
                 {
-                    CountryCode = verbatimObservation.CountryCode,
-                    LocationId = verbatimObservation.LocationId,
-                    Locality = verbatimObservation.Locality,
-                    LocationRemarks = verbatimObservation.LocationRemarks,
-                    MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
+                    CountryCode = verbatim.CountryCode,
+                    LocationId = verbatim.LocationId,
+                    Locality = verbatim.Locality,
+                    LocationRemarks = verbatim.LocationRemarks,
+                    MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimCoordinateSystem = "EPSG:4326",
-                    WaterBody = verbatimObservation.WaterBody
+                    WaterBody = verbatim.WaterBody
                 },
-                Modified = verbatimObservation.Modified?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
+                Modified = verbatim.Modified?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
                 Occurrence = new Occurrence
                 {
-                    CatalogNumber = verbatimObservation.CatalogNumber.ToString(),
-                    OccurrenceId = verbatimObservation.OccurrenceId?.Trim(),
-                    IndividualCount = verbatimObservation.IndividualCount,
-                    IsNaturalOccurrence = verbatimObservation.IsNaturalOccurrence,
-                    IsNeverFoundObservation = verbatimObservation.IsNeverFoundObservation,
-                    IsNotRediscoveredObservation = verbatimObservation.IsNotRediscoveredObservation,
-                    IsPositiveObservation = verbatimObservation.IsPositiveObservation,
-                    LifeStage = GetLifeStageIdFromString(verbatimObservation.LifeStage),
-                    OrganismQuantityInt = verbatimObservation.Quantity,
-                    OrganismQuantity = verbatimObservation.Quantity.ToString(),
-                    OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
+                    CatalogNumber = verbatim.CatalogNumber.ToString(),
+                    OccurrenceId = verbatim.OccurrenceId?.Trim(),
+                    IndividualCount = verbatim.IndividualCount,
+                    IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
+                    IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
+                    IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
+                    IsPositiveObservation = verbatim.IsPositiveObservation,
+                    LifeStage = GetLifeStageIdFromString(verbatim.LifeStage),
+                    OrganismQuantityInt = verbatim.Quantity,
+                    OrganismQuantity = verbatim.Quantity.ToString(),
+                    OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
                     ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
-                    RecordedBy = verbatimObservation.RecordedBy,
-                    ReportedBy = verbatimObservation.ReportedBy,
-                    ReportedDate = verbatimObservation.ReportedDate.ToUniversalTime(),
-                    OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
-                    OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
+                    RecordedBy = verbatim.RecordedBy,
+                    ReportedBy = verbatim.ReportedBy,
+                    ReportedDate = verbatim.ReportedDate.ToUniversalTime(),
+                    OccurrenceRemarks = verbatim.OccurrenceRemarks,
+                    OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatim.OccurrenceStatus)
                 },
-                DynamicProperties = string.IsNullOrEmpty(verbatimObservation.ProjectName)
+                DynamicProperties = string.IsNullOrEmpty(verbatim.ProjectName)
                     ? null
-                    : JsonConvert.SerializeObject(new {ProjectName = verbatimObservation.ProjectName}),
-                RightsHolder = verbatimObservation.RightsHolder,
+                    : JsonConvert.SerializeObject(new {ProjectName = verbatim.ProjectName}),
+                RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
             };
+
+            await AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
+                CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 

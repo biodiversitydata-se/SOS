@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
@@ -18,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact (Skip="Behavior mapping not completed yet")]
-        public void Behavior_field_with_value_foraging_is_mapped_to_Activity_vocabulary()
+        public async Task Behavior_field_with_value_foraging_is_mapped_to_Activity_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -32,7 +33,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -49,7 +50,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [InlineData("egg", LifeStageId.Egg)]
         [InlineData("eggs", LifeStageId.Egg)]
         [InlineData("juvenile", LifeStageId.Juvenile)]
-        public void LifeStage_field_with_valid_value_is_mapped_to_LifeStage_vocabulary(
+        public async Task LifeStage_field_with_valid_value_is_mapped_to_LifeStage_vocabulary(
             string lifeStageValue,
             LifeStageId expectedLifeStageId)
         {
@@ -65,7 +66,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -74,7 +75,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void OccurrenceStatus_field_with_value_absent_is_mapped_to_OccurrenceStatus_vocabulary()
+        public async Task OccurrenceStatus_field_with_value_absent_is_mapped_to_OccurrenceStatus_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -88,7 +89,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -101,7 +102,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void OccurrenceStatus_field_with_value_present_is_mapped_to_OccurrenceStatus_vocabulary()
+        public async Task OccurrenceStatus_field_with_value_present_is_mapped_to_OccurrenceStatus_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -115,7 +116,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -128,7 +129,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact(Skip = "ReproductiveCondition mapping not completed yet")]
-        public void ReproductiveCondition_field_with_value_fruitbearing_is_mapped_to_LifeStage_vocabulary()
+        public async Task ReproductiveCondition_field_with_value_fruitbearing_is_mapped_to_LifeStage_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -142,7 +143,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -151,7 +152,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact(Skip = "ReproductiveCondition mapping not completed yet")]
-        public void ReproductiveCondition_field_with_value_pregnant_is_mapped_to_Activity_vocabulary()
+        public async Task ReproductiveCondition_field_with_value_pregnant_is_mapped_to_Activity_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -165,7 +166,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -176,7 +177,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [Theory]
         [InlineData("female", SexId.Female)]
         [InlineData("Male", SexId.Male)]
-        public void Sex_field_with_valid_value_is_mapped_to_gender_vocabulary(
+        public async Task Sex_field_with_valid_value_is_mapped_to_gender_vocabulary(
             string sexFieldValue,
             SexId expectedGenderId)
         {
@@ -191,7 +192,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -200,7 +201,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Sex_field_with_misspelled_value_is_mapped_to_custom_value()
+        public async Task Sex_field_with_misspelled_value_is_mapped_to_custom_value()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -214,7 +215,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -224,7 +225,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Sex_field_with_null_value_is_not_mapped_to_gender_vocabulary()
+        public async Task Sex_field_with_null_value_is_not_mapped_to_gender_vocabulary()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -238,7 +239,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts

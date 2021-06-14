@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -18,6 +18,7 @@ using SOS.Process.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using DateTime = System.DateTime;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
@@ -25,7 +26,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.Artportalen
 {
-    public class ArtportalenObservationFactory : IObservationFactory<ArtportalenObservationVerbatim>
+    public class ArtportalenObservationFactory : ObservationfactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
@@ -38,12 +39,14 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="incrementalMode"></param>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            bool incrementalMode)
+            IGeometryManager geometryManager,
+            bool incrementalMode) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -55,11 +58,12 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
+            IGeometryManager geometryManager,
             bool incrementalMode)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
-            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
+            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, geometryManager, incrementalMode);
         }
 
         /// <summary>
@@ -67,10 +71,10 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
             IEnumerable<ArtportalenObservationVerbatim> verbatims)
         {
-            return verbatims.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
@@ -78,13 +82,13 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
+        public async Task<Observation> CreateProcessedObservationAsync(ArtportalenObservationVerbatim verbatimObservation)
         {
             try
             {
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
-                var point = (PointGeoShape) verbatimObservation.Site?.Point?.ToGeoShape();                                              
+                var point = (Point)verbatimObservation.Site?.Point?.ToGeometry();
 
                 // Add time to start date if it exists
                 var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue
@@ -157,20 +161,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
 
                 // Location
-                obs.Location = new Location(
-                    verbatimObservation.Site?.XCoord, 
-                    verbatimObservation.Site?.YCoord, 
-                    CoordinateSys.WebMercator, 
-                    point, 
-                    (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer?.ToGeoShape(),
-                    verbatimObservation.Site?.Accuracy, 
-                    taxon?.Attributes?.DisturbanceRadius);
-                obs.Location.Attributes = new LocationAttributes
-                {
-                    CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate,
-                    ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate
-
-                };
+                obs.Location = new Location();
+                obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
+                obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
@@ -181,7 +174,13 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
-
+                await AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
+                    verbatimObservation.Site?.YCoord,
+                    CoordinateSys.WebMercator,
+                    point,
+                    verbatimObservation.Site?.PointWithBuffer?.ToGeometry(),
+                    verbatimObservation.Site?.Accuracy,
+                    taxon?.Attributes?.DisturbanceRadius);
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
@@ -665,6 +664,11 @@ namespace SOS.Process.Processors.Artportalen
             ICollection<Vocabulary> allVocabularies)
         {
             var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
+
+            if (allVocabularies == null)
+            {
+                return dic;
+            }
 
             foreach (var vocabulary in allVocabularies)
             {

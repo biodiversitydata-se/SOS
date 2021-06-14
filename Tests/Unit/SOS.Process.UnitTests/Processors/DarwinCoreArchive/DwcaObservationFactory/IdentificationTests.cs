@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
@@ -18,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
-        public void DateIdentified_is_parsed_to_DateTime_type()
+        public async Task DateIdentified_is_parsed_to_DateTime_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -32,7 +33,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -41,7 +42,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void DateIdentified_specified_as_DateTime_type_is_parsed_to_same_DateTime()
+        public async Task DateIdentified_specified_as_DateTime_type_is_parsed_to_same_DateTime()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -56,7 +57,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -67,7 +68,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [Theory]
         [InlineData("verified", ValidationStatusId.Verified, true)]
         [InlineData("unverified", ValidationStatusId.Unvalidated, false)]
-        public void IdentificationVerificationStatus_field_with_valid_value_is_mapped_to_ValidationStatus_vocabulary(
+        public async Task IdentificationVerificationStatus_field_with_valid_value_is_mapped_to_ValidationStatus_vocabulary(
             string identificationVerificationStatusValue,
             ValidationStatusId expectedValidationStatusId,
             bool expectedValidatedValue)
@@ -84,7 +85,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

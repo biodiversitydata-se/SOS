@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Constants;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
@@ -20,7 +20,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
-        public void EventMeasurementOrFacts_with_value_is_mapped_successfully()
+        public async Task EventMeasurementOrFacts_with_value_is_mapped_successfully()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -40,7 +40,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -52,7 +52,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void EventExtendedMeasurementOrFacts_with_value_is_mapped_successfully()
+        public async Task EventExtendedMeasurementOrFacts_with_value_is_mapped_successfully()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -72,7 +72,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -85,7 +85,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
 
 
         [Fact]
-        public void EventMeasurementOrFacts_with_null_value_is_set_to_null()
+        public async Task EventMeasurementOrFacts_with_null_value_is_set_to_null()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -99,7 +99,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -108,7 +108,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void EventMeasurementOrFacts_with_zero_item_collection_is_set_to_null()
+        public async Task EventMeasurementOrFacts_with_zero_item_collection_is_set_to_null()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -122,7 +122,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -131,7 +131,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ObservationMeasurementOrFacts_with_value_is_mapped_successfully()
+        public async Task ObservationMeasurementOrFacts_with_value_is_mapped_successfully()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -151,7 +151,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -163,7 +163,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ObservationExtendedMeasurementOrFacts_with_value_is_mapped_successfully()
+        public async Task ObservationExtendedMeasurementOrFacts_with_value_is_mapped_successfully()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -183,7 +183,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -195,7 +195,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ObservationMeasurementOrFacts_with_null_value_is_set_to_null()
+        public async Task ObservationMeasurementOrFacts_with_null_value_is_set_to_null()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -209,7 +209,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -218,7 +218,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void ObservationMeasurementOrFacts_with_zero_item_collection_is_set_to_null()
+        public async Task ObservationMeasurementOrFacts_with_zero_item_collection_is_set_to_null()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -232,7 +232,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts

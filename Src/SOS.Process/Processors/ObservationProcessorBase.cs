@@ -143,7 +143,7 @@ namespace SOS.Process.Processors
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                    var observation = await observationFactory.CreateProcessedObservationAsync(verbatimObservation);
 
                     if (observation == null)
                     {
@@ -164,7 +164,7 @@ namespace SOS.Process.Processors
                         }
 
                         // Recreate observation to make a new object
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                        observation = await observationFactory.CreateProcessedObservationAsync(verbatimObservation);
                         // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
                         _diffusionManager.DiffuseObservation(observation);
                     }
@@ -252,7 +252,8 @@ namespace SOS.Process.Processors
         /// <param name="validationManager"></param>
         /// <param name="processManager"></param>
         /// <param name="logger"></param>
-        protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
+        protected ObservationProcessorBase(
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IValidationManager validationManager,
@@ -272,7 +273,8 @@ namespace SOS.Process.Processors
         /// <param name="diffusionManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        protected ObservationProcessorBase(IProcessedPublicObservationRepository processedPublicObservationRepository,
+        protected ObservationProcessorBase(
+            IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
@@ -302,8 +304,6 @@ namespace SOS.Process.Processors
             _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-           
         }
 
         protected abstract Task<(int publicCount, int protectedCount)> ProcessObservations(

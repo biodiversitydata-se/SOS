@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Moq;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Processors.Artportalen;
@@ -30,12 +33,17 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private ArtportalenObservationFactory CreateArtportalenObservationFactory()
         {
+           var geometryManagerMock = new Mock<IGeometryManager>();
+           geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
+               .ReturnsAsync(null as Polygon);
+
             var dataProviderDummy = new DataProvider();
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
             var factory = ArtportalenObservationFactory.CreateAsync(
                 dataProviderDummy,
                 new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
+                geometryManagerMock.Object,
                 false).Result;
             return factory;
         }
