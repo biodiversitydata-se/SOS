@@ -89,6 +89,39 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {
+                Date = new DateFilterDto()
+                {
+                    StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
+                    EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+                },
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, searchFilter, 0, 100);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().BeGreaterThan(30000, "There are observations on more than 30 000 taxa");
+            result.Records.First().ObservationCount.Should().BeGreaterThan(100000,
+                "The taxon with most observations has more than 100 000 observations");
+        }
+
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task TaxonAggregation_with_boundingbox()
         {
             //-----------------------------------------------------------------------------------------------------------
