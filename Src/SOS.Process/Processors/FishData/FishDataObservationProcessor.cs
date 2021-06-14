@@ -24,6 +24,7 @@ namespace SOS.Process.Processors.FishData
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IFishDataObservationVerbatimRepository _fishDataObservationVerbatimRepository;
+        private readonly IGeometryManager _geometryManager;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -32,7 +33,7 @@ namespace SOS.Process.Processors.FishData
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new FishDataObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new FishDataObservationFactory(dataProvider, taxa, _areaHelper, _geometryManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -52,6 +53,7 @@ namespace SOS.Process.Processors.FishData
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public FishDataObservationProcessor(
             IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
@@ -61,6 +63,7 @@ namespace SOS.Process.Processors.FishData
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IGeometryManager geometryManager,
             ILogger<FishDataObservationProcessor> logger) :
             base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
@@ -68,6 +71,7 @@ namespace SOS.Process.Processors.FishData
                                                      throw new ArgumentNullException(
                                                          nameof(fishDataObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.FishDataObservations;

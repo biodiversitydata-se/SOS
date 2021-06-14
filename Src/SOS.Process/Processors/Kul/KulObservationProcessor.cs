@@ -25,7 +25,7 @@ namespace SOS.Process.Processors.Kul
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
-
+        private readonly IGeometryManager _geometryManager;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -34,7 +34,7 @@ namespace SOS.Process.Processors.Kul
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new KulObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new KulObservationFactory(dataProvider, taxa, _areaHelper, _geometryManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -44,17 +44,18 @@ namespace SOS.Process.Processors.Kul
                 cancellationToken);
         }
 
-       /// <summary>
-       /// Constructor
-       /// </summary>
-       /// <param name="kulObservationVerbatimRepository"></param>
-       /// <param name="areaHelper"></param>
-       /// <param name="processedPublicObservationRepository"></param>
-       /// <param name="vocabularyValueResolver"></param>
-       /// <param name="dwcArchiveFileWriterCoordinator"></param>
-       /// <param name="processManager"></param>
-       /// <param name="validationManager"></param>
-       /// <param name="logger"></param>
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="kulObservationVerbatimRepository"></param>
+        /// <param name="areaHelper"></param>
+        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="vocabularyValueResolver"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="processManager"></param>
+        /// <param name="validationManager"></param>
+        /// <param name="geometryManager"></param>
+        /// <param name="logger"></param>
         public KulObservationProcessor(IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
@@ -62,6 +63,7 @@ namespace SOS.Process.Processors.Kul
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IGeometryManager geometryManager,
             ILogger<KulObservationProcessor> logger) :
             base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
@@ -69,6 +71,7 @@ namespace SOS.Process.Processors.Kul
                                                 throw new ArgumentNullException(
                                                     nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.KULObservations;

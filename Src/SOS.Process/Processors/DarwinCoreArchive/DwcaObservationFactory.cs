@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -24,7 +24,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation factory.
     /// </summary>
-    public class DwcaObservationFactory : IObservationFactory<DwcObservationVerbatim>
+    public class DwcaObservationFactory : ObservationfactoryBase, IObservationFactory<DwcObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
@@ -36,19 +36,25 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
 
-        private readonly List<string> errors = new List<string>();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="vocabularyById"></param>
+        /// <param name="areaHelper"></param>
+        /// <param name="geometryManager"></param>
         public DwcaObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
@@ -72,96 +78,102 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper, IGeometryManager geometryManager)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper);
+            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, geometryManager);
         }
 
-        public IEnumerable<Observation> CreateProcessedObservations(
-            IEnumerable<DwcObservationVerbatim> verbatimObservations)
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+            IEnumerable<DwcObservationVerbatim> verbatims)
         {
-            return verbatimObservations.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatimObservation)
+        public async Task<Observation> CreateProcessedObservationAsync(DwcObservationVerbatim verbatim)
         {
-            if (verbatimObservation == null)
+            if (verbatim == null)
             {
                 return null;
             }
 
             var obs = new Observation();
             obs.DataProviderId = _dataProvider.Id;
-            //AddVerbatimObservationAsJson(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
+            //AddVerbatimObservationAsJson(obs, verbatim); // todo - this could be used to store the original verbatim observation
 
             // Other
-            //obs.Id = verbatimObservation.Id;
+            //obs.Id = verbatim.Id;
             // todo - handle properties below.
-            //obs.DataProviderId = verbatimObservation.DataProviderId;
-            //obs.DataProviderIdentifier = verbatimObservation.DataProviderIdentifier;
+            //obs.DataProviderId = verbatim.DataProviderId;
+            //obs.DataProviderIdentifier = verbatim.DataProviderIdentifier;
 
             // Record level
-            if (verbatimObservation.ObservationMeasurementOrFacts.HasItems())
-                obs.MeasurementOrFacts = verbatimObservation.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
-            else if (verbatimObservation.ObservationExtendedMeasurementOrFacts.HasItems())
-                obs.MeasurementOrFacts = verbatimObservation.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
-            obs.AccessRights = GetSosId(verbatimObservation.AccessRights,
+            if (verbatim.ObservationMeasurementOrFacts.HasItems())
+                obs.MeasurementOrFacts = verbatim.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+            else if (verbatim.ObservationExtendedMeasurementOrFacts.HasItems())
+                obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+            obs.AccessRights = GetSosId(verbatim.AccessRights,
                 _vocabularyById[VocabularyId.AccessRights]);
-            obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord,
+            obs.BasisOfRecord = GetSosId(verbatim.BasisOfRecord,
                 _vocabularyById[VocabularyId.BasisOfRecord]);
-            obs.BibliographicCitation = verbatimObservation.BibliographicCitation;
-            obs.CollectionCode = verbatimObservation.CollectionCode;
-            obs.CollectionId = verbatimObservation.CollectionID;
-            obs.DataGeneralizations = verbatimObservation.DataGeneralizations;
-            obs.DatasetId = verbatimObservation.DatasetID;
-            obs.DatasetName = verbatimObservation.DatasetName;
-            obs.DynamicProperties = verbatimObservation.DynamicProperties;
-            obs.InformationWithheld = verbatimObservation.InformationWithheld;
-            obs.InstitutionId = verbatimObservation.InstitutionID;
-            obs.InstitutionCode = GetSosId(verbatimObservation.InstitutionCode,
+            obs.BibliographicCitation = verbatim.BibliographicCitation;
+            obs.CollectionCode = verbatim.CollectionCode;
+            obs.CollectionId = verbatim.CollectionID;
+            obs.DataGeneralizations = verbatim.DataGeneralizations;
+            obs.DatasetId = verbatim.DatasetID;
+            obs.DatasetName = verbatim.DatasetName;
+            obs.DynamicProperties = verbatim.DynamicProperties;
+            obs.InformationWithheld = verbatim.InformationWithheld;
+            obs.InstitutionId = verbatim.InstitutionID;
+            obs.InstitutionCode = GetSosId(verbatim.InstitutionCode,
                 _vocabularyById[VocabularyId.Institution]);
-            obs.Language = verbatimObservation.Language;
-            obs.License = verbatimObservation.License;
-            obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified)?.ToUniversalTime();
-            obs.OwnerInstitutionCode = verbatimObservation.OwnerInstitutionCode;
-            obs.References = verbatimObservation.References;
-            obs.RightsHolder = verbatimObservation.RightsHolder;
-            obs.Type = GetSosId(verbatimObservation.Type,
+            obs.Language = verbatim.Language;
+            obs.License = verbatim.License;
+            obs.Modified = DwcParser.ParseDate(verbatim.Modified)?.ToUniversalTime();
+            obs.OwnerInstitutionCode = verbatim.OwnerInstitutionCode;
+            obs.References = verbatim.References;
+            obs.RightsHolder = verbatim.RightsHolder;
+            obs.Type = GetSosId(verbatim.Type,
                 _vocabularyById[VocabularyId.Type]);
 
             // Event
-            obs.Event = CreateProcessedEvent(verbatimObservation);
+            obs.Event = CreateProcessedEvent(verbatim);
 
             // Geological
-            obs.GeologicalContext = CreateProcessedGeologicalContext(verbatimObservation);
+            obs.GeologicalContext = CreateProcessedGeologicalContext(verbatim);
 
             // Identification
-            obs.Identification = CreateProcessedIdentification(verbatimObservation);
+            obs.Identification = CreateProcessedIdentification(verbatim);
 
             // Taxon
-            obs.Taxon = CreateProcessedTaxon(verbatimObservation);
+            obs.Taxon = CreateProcessedTaxon(verbatim);
 
             // Location
-            obs.Location = CreateProcessedLocation(verbatimObservation, obs.Taxon?.Attributes?.DisturbanceRadius);
-
+            obs.Location = CreateProcessedLocation(verbatim);
+            if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))
+            {
+                coordinateSystem = CoordinateSys.WGS84;
+            }
+            await AddPositionData(obs.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
+                    coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, obs.Taxon?.Attributes?.DisturbanceRadius);
+           
             // MaterialSample
-            obs.MaterialSample = CreateProcessedMaterialSample(verbatimObservation);
+            obs.MaterialSample = CreateProcessedMaterialSample(verbatim);
 
             // Occurrence
-            obs.Occurrence = CreateProcessedOccurrence(verbatimObservation);
+            obs.Occurrence = CreateProcessedOccurrence(verbatim);
 
             // Organism
-            obs.Organism = CreateProcessedOrganism(verbatimObservation);
+            obs.Organism = CreateProcessedOrganism(verbatim);
 
            
 
@@ -172,10 +184,10 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         private static void AddVerbatimObservationAsJson(Observation obs,
-            DwcObservationVerbatim verbatimObservation)
+            DwcObservationVerbatim verbatim)
         {
             //obs.VerbatimObservation = JsonConvert.SerializeObject(
-            //    verbatimObservation,
+            //    verbatim,
             //    Formatting.Indented,
             //    new JsonSerializerSettings()
             //    {
@@ -200,74 +212,74 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return null;
         }
 
-        private Organism CreateProcessedOrganism(DwcObservationVerbatim verbatimObservation)
+        private Organism CreateProcessedOrganism(DwcObservationVerbatim verbatim)
         {
             var processedOrganism = new Organism();
-            processedOrganism.OrganismId = verbatimObservation.OrganismID;
-            processedOrganism.OrganismName = verbatimObservation.OrganismName;
-            processedOrganism.OrganismScope = verbatimObservation.OrganismScope;
-            processedOrganism.AssociatedOccurrences = verbatimObservation.AssociatedOccurrences;
-            processedOrganism.AssociatedOrganisms = verbatimObservation.AssociatedOrganisms;
-            processedOrganism.PreviousIdentifications = verbatimObservation.PreviousIdentifications;
-            processedOrganism.OrganismRemarks = verbatimObservation.OrganismRemarks;
+            processedOrganism.OrganismId = verbatim.OrganismID;
+            processedOrganism.OrganismName = verbatim.OrganismName;
+            processedOrganism.OrganismScope = verbatim.OrganismScope;
+            processedOrganism.AssociatedOccurrences = verbatim.AssociatedOccurrences;
+            processedOrganism.AssociatedOrganisms = verbatim.AssociatedOrganisms;
+            processedOrganism.PreviousIdentifications = verbatim.PreviousIdentifications;
+            processedOrganism.OrganismRemarks = verbatim.OrganismRemarks;
 
             return processedOrganism;
         }
 
-        private GeologicalContext CreateProcessedGeologicalContext(DwcObservationVerbatim verbatimObservation)
+        private GeologicalContext CreateProcessedGeologicalContext(DwcObservationVerbatim verbatim)
         {
             var processedGeologicalContext = new GeologicalContext();
-            processedGeologicalContext.Bed = verbatimObservation.Bed;
-            processedGeologicalContext.EarliestAgeOrLowestStage = verbatimObservation.EarliestAgeOrLowestStage;
-            processedGeologicalContext.EarliestEonOrLowestEonothem = verbatimObservation.EarliestEonOrLowestEonothem;
-            processedGeologicalContext.EarliestEpochOrLowestSeries = verbatimObservation.EarliestEpochOrLowestSeries;
-            processedGeologicalContext.EarliestEraOrLowestErathem = verbatimObservation.EarliestEraOrLowestErathem;
-            processedGeologicalContext.EarliestGeochronologicalEra = verbatimObservation.EarliestGeochronologicalEra;
-            processedGeologicalContext.EarliestPeriodOrLowestSystem = verbatimObservation.EarliestPeriodOrLowestSystem;
-            processedGeologicalContext.Formation = verbatimObservation.Formation;
-            processedGeologicalContext.GeologicalContextId = verbatimObservation.GeologicalContextID;
-            processedGeologicalContext.Group = verbatimObservation.Group;
-            processedGeologicalContext.HighestBiostratigraphicZone = verbatimObservation.HighestBiostratigraphicZone;
-            processedGeologicalContext.LatestAgeOrHighestStage = verbatimObservation.LatestAgeOrHighestStage;
-            processedGeologicalContext.LatestEonOrHighestEonothem = verbatimObservation.LatestEonOrHighestEonothem;
-            processedGeologicalContext.LatestEpochOrHighestSeries = verbatimObservation.LatestEpochOrHighestSeries;
-            processedGeologicalContext.LatestEraOrHighestErathem = verbatimObservation.LatestEraOrHighestErathem;
-            processedGeologicalContext.LatestGeochronologicalEra = verbatimObservation.LatestGeochronologicalEra;
-            processedGeologicalContext.LatestPeriodOrHighestSystem = verbatimObservation.LatestPeriodOrHighestSystem;
-            processedGeologicalContext.LithostratigraphicTerms = verbatimObservation.LithostratigraphicTerms;
-            processedGeologicalContext.LowestBiostratigraphicZone = verbatimObservation.LowestBiostratigraphicZone;
-            processedGeologicalContext.Member = verbatimObservation.Member;
+            processedGeologicalContext.Bed = verbatim.Bed;
+            processedGeologicalContext.EarliestAgeOrLowestStage = verbatim.EarliestAgeOrLowestStage;
+            processedGeologicalContext.EarliestEonOrLowestEonothem = verbatim.EarliestEonOrLowestEonothem;
+            processedGeologicalContext.EarliestEpochOrLowestSeries = verbatim.EarliestEpochOrLowestSeries;
+            processedGeologicalContext.EarliestEraOrLowestErathem = verbatim.EarliestEraOrLowestErathem;
+            processedGeologicalContext.EarliestGeochronologicalEra = verbatim.EarliestGeochronologicalEra;
+            processedGeologicalContext.EarliestPeriodOrLowestSystem = verbatim.EarliestPeriodOrLowestSystem;
+            processedGeologicalContext.Formation = verbatim.Formation;
+            processedGeologicalContext.GeologicalContextId = verbatim.GeologicalContextID;
+            processedGeologicalContext.Group = verbatim.Group;
+            processedGeologicalContext.HighestBiostratigraphicZone = verbatim.HighestBiostratigraphicZone;
+            processedGeologicalContext.LatestAgeOrHighestStage = verbatim.LatestAgeOrHighestStage;
+            processedGeologicalContext.LatestEonOrHighestEonothem = verbatim.LatestEonOrHighestEonothem;
+            processedGeologicalContext.LatestEpochOrHighestSeries = verbatim.LatestEpochOrHighestSeries;
+            processedGeologicalContext.LatestEraOrHighestErathem = verbatim.LatestEraOrHighestErathem;
+            processedGeologicalContext.LatestGeochronologicalEra = verbatim.LatestGeochronologicalEra;
+            processedGeologicalContext.LatestPeriodOrHighestSystem = verbatim.LatestPeriodOrHighestSystem;
+            processedGeologicalContext.LithostratigraphicTerms = verbatim.LithostratigraphicTerms;
+            processedGeologicalContext.LowestBiostratigraphicZone = verbatim.LowestBiostratigraphicZone;
+            processedGeologicalContext.Member = verbatim.Member;
 
             return processedGeologicalContext;
         }
 
-        private MaterialSample CreateProcessedMaterialSample(DwcObservationVerbatim verbatimObservation)
+        private MaterialSample CreateProcessedMaterialSample(DwcObservationVerbatim verbatim)
         {
             var processedMaterialSample = new MaterialSample();
-            processedMaterialSample.MaterialSampleId = verbatimObservation.MaterialSampleID;
+            processedMaterialSample.MaterialSampleId = verbatim.MaterialSampleID;
             return processedMaterialSample;
         }
 
-        private Event CreateProcessedEvent(DwcObservationVerbatim verbatimObservation)
+        private Event CreateProcessedEvent(DwcObservationVerbatim verbatim)
         {
             var processedEvent = new Event();
-            processedEvent.EventId = verbatimObservation.EventID;
-            processedEvent.ParentEventId = verbatimObservation.ParentEventID;
-            processedEvent.EventRemarks = verbatimObservation.EventRemarks;
-            processedEvent.FieldNotes = verbatimObservation.FieldNotes;
-            processedEvent.FieldNumber = verbatimObservation.FieldNumber;
-            processedEvent.Habitat = verbatimObservation.Habitat;
-            processedEvent.SampleSizeUnit = verbatimObservation.SampleSizeUnit;
-            processedEvent.SampleSizeValue = verbatimObservation.SampleSizeValue;
-            processedEvent.SamplingEffort = verbatimObservation.SamplingEffort;
-            processedEvent.SamplingProtocol = verbatimObservation.SamplingProtocol;
-            processedEvent.VerbatimEventDate = verbatimObservation.VerbatimEventDate;
+            processedEvent.EventId = verbatim.EventID;
+            processedEvent.ParentEventId = verbatim.ParentEventID;
+            processedEvent.EventRemarks = verbatim.EventRemarks;
+            processedEvent.FieldNotes = verbatim.FieldNotes;
+            processedEvent.FieldNumber = verbatim.FieldNumber;
+            processedEvent.Habitat = verbatim.Habitat;
+            processedEvent.SampleSizeUnit = verbatim.SampleSizeUnit;
+            processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
+            processedEvent.SamplingEffort = verbatim.SamplingEffort;
+            processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
+            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
 
             DwcParser.TryParseEventDate(
-                verbatimObservation.EventDate,
-                verbatimObservation.Year,
-                verbatimObservation.Month,
-                verbatimObservation.Day,
+                verbatim.EventDate,
+                verbatim.Year,
+                verbatim.Month,
+                verbatim.Day,
                 out var startDate,
                 out var endDate);
 
@@ -275,35 +287,35 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedEvent.EndDate = endDate?.ToUniversalTime();
 
             processedEvent.Media = CreateProcessedMultimedia(
-                verbatimObservation.EventMultimedia,
-                verbatimObservation.EventAudubonMedia);
-            if (verbatimObservation.EventMeasurementOrFacts.HasItems())
-                processedEvent.MeasurementOrFacts = verbatimObservation.EventMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
-            else if (verbatimObservation.EventExtendedMeasurementOrFacts.HasItems())
-                processedEvent.MeasurementOrFacts = verbatimObservation.EventExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+                verbatim.EventMultimedia,
+                verbatim.EventAudubonMedia);
+            if (verbatim.EventMeasurementOrFacts.HasItems())
+                processedEvent.MeasurementOrFacts = verbatim.EventMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+            else if (verbatim.EventExtendedMeasurementOrFacts.HasItems())
+                processedEvent.MeasurementOrFacts = verbatim.EventExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
 
             return processedEvent;
         }
 
-        private Identification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
+        private Identification CreateProcessedIdentification(DwcObservationVerbatim verbatim)
         {
             string dateIdentifiedString = null;
-            if (DateTime.TryParse(verbatimObservation.DateIdentified, out var dateIdentified))
+            if (DateTime.TryParse(verbatim.DateIdentified, out var dateIdentified))
             {
                 dateIdentifiedString = dateIdentified.ToUniversalTime().ToString();
             }
 
             var processedIdentification = new Identification();
             processedIdentification.DateIdentified = dateIdentifiedString;
-            processedIdentification.IdentificationId = verbatimObservation.IdentificationID;
-            processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
-            processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
-            processedIdentification.IdentificationRemarks = verbatimObservation.IdentificationRemarks;
-            processedIdentification.ValidationStatus = GetSosId(verbatimObservation.IdentificationVerificationStatus, _vocabularyById[VocabularyId.ValidationStatus]);
+            processedIdentification.IdentificationId = verbatim.IdentificationID;
+            processedIdentification.IdentificationQualifier = verbatim.IdentificationQualifier;
+            processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
+            processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks;
+            processedIdentification.ValidationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.ValidationStatus]);
             processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
             //processedIdentification.UncertainDetermination = !processedIdentification.Validated; // todo - is this correct?
-            processedIdentification.IdentifiedBy = verbatimObservation.IdentifiedBy;
-            processedIdentification.TypeStatus = verbatimObservation.TypeStatus;
+            processedIdentification.IdentifiedBy = verbatim.IdentifiedBy;
+            processedIdentification.TypeStatus = verbatim.TypeStatus;
             return processedIdentification;
         }
 
@@ -326,99 +338,96 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return false;
         }
 
-        private Location CreateProcessedLocation(DwcObservationVerbatim verbatimObservation, int? disturbanceRadius)
+        private Location CreateProcessedLocation(DwcObservationVerbatim verbatim)
         {
-            if (!GISExtensions.TryParseCoordinateSystem(verbatimObservation.GeodeticDatum, out var coordinateSystem))
-            {
-                coordinateSystem = CoordinateSys.WGS84;
-            }
            
-            var processedLocation = new Location(verbatimObservation.DecimalLongitude.ParseDouble(), verbatimObservation.DecimalLatitude.ParseDouble(), coordinateSystem, verbatimObservation.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, disturbanceRadius);
+           
+            var processedLocation = new Location();
             processedLocation.Continent = GetSosId(
-                verbatimObservation.Continent,
+                verbatim.Continent,
                 _vocabularyById[VocabularyId.Continent],
                 (int) ContinentId.Europe,
                 MappingNotFoundLogic.UseDefaultValue);
-            processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
+            processedLocation.CoordinatePrecision = verbatim.CoordinatePrecision.ParseDouble();
             processedLocation.CoordinateUncertaintyInMeters =
-                verbatimObservation.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
+                verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
             processedLocation.Country = GetSosId(
-                verbatimObservation.Country,
+                verbatim.Country,
                 _vocabularyById[VocabularyId.Country],
                 (int) CountryId.Sweden,
                 MappingNotFoundLogic.UseDefaultValue);
-            processedLocation.CountryCode = verbatimObservation.CountryCode;
-            processedLocation.FootprintSpatialFit = verbatimObservation.FootprintSpatialFit;
-            processedLocation.FootprintSRS = verbatimObservation.FootprintSRS;
-            processedLocation.FootprintWKT = verbatimObservation.FootprintWKT;
-            processedLocation.GeoreferencedBy = verbatimObservation.GeoreferencedBy;
-            processedLocation.GeoreferencedDate = verbatimObservation.GeoreferencedDate;
-            processedLocation.GeoreferenceProtocol = verbatimObservation.GeoreferenceProtocol;
-            processedLocation.GeoreferenceRemarks = verbatimObservation.GeoreferenceRemarks;
-            processedLocation.GeoreferenceSources = verbatimObservation.GeoreferenceSources;
-            processedLocation.GeoreferenceVerificationStatus = verbatimObservation.GeoreferenceVerificationStatus;
-            processedLocation.HigherGeography = verbatimObservation.HigherGeography;
-            processedLocation.HigherGeographyID = verbatimObservation.HigherGeographyID;
-            processedLocation.Island = verbatimObservation.Island;
-            processedLocation.IslandGroup = verbatimObservation.IslandGroup;
-            processedLocation.Locality = verbatimObservation.Locality;
-            processedLocation.LocationAccordingTo = verbatimObservation.LocationAccordingTo;
-            processedLocation.LocationId = verbatimObservation.LocationID;
-            processedLocation.LocationRemarks = verbatimObservation.LocationRemarks;
-            processedLocation.MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters.ParseDouble();
+            processedLocation.CountryCode = verbatim.CountryCode;
+            processedLocation.FootprintSpatialFit = verbatim.FootprintSpatialFit;
+            processedLocation.FootprintSRS = verbatim.FootprintSRS;
+            processedLocation.FootprintWKT = verbatim.FootprintWKT;
+            processedLocation.GeoreferencedBy = verbatim.GeoreferencedBy;
+            processedLocation.GeoreferencedDate = verbatim.GeoreferencedDate;
+            processedLocation.GeoreferenceProtocol = verbatim.GeoreferenceProtocol;
+            processedLocation.GeoreferenceRemarks = verbatim.GeoreferenceRemarks;
+            processedLocation.GeoreferenceSources = verbatim.GeoreferenceSources;
+            processedLocation.GeoreferenceVerificationStatus = verbatim.GeoreferenceVerificationStatus;
+            processedLocation.HigherGeography = verbatim.HigherGeography;
+            processedLocation.HigherGeographyID = verbatim.HigherGeographyID;
+            processedLocation.Island = verbatim.Island;
+            processedLocation.IslandGroup = verbatim.IslandGroup;
+            processedLocation.Locality = verbatim.Locality;
+            processedLocation.LocationAccordingTo = verbatim.LocationAccordingTo;
+            processedLocation.LocationId = verbatim.LocationID;
+            processedLocation.LocationRemarks = verbatim.LocationRemarks;
+            processedLocation.MaximumDepthInMeters = verbatim.MaximumDepthInMeters.ParseDouble();
             processedLocation.MaximumDistanceAboveSurfaceInMeters =
-                verbatimObservation.MaximumDistanceAboveSurfaceInMeters.ParseDouble();
-            processedLocation.MaximumElevationInMeters = verbatimObservation.MaximumElevationInMeters.ParseDouble();
-            processedLocation.MinimumDepthInMeters = verbatimObservation.MinimumDepthInMeters.ParseDouble();
+                verbatim.MaximumDistanceAboveSurfaceInMeters.ParseDouble();
+            processedLocation.MaximumElevationInMeters = verbatim.MaximumElevationInMeters.ParseDouble();
+            processedLocation.MinimumDepthInMeters = verbatim.MinimumDepthInMeters.ParseDouble();
             processedLocation.MinimumDistanceAboveSurfaceInMeters =
-                verbatimObservation.MinimumDistanceAboveSurfaceInMeters.ParseDouble();
-            processedLocation.MinimumElevationInMeters = verbatimObservation.MinimumElevationInMeters.ParseDouble();
-            processedLocation.Attributes.VerbatimMunicipality = verbatimObservation.Municipality;
-            processedLocation.Attributes.VerbatimProvince = verbatimObservation.StateProvince;
-            processedLocation.VerbatimCoordinates = verbatimObservation.VerbatimCoordinates;
-            processedLocation.VerbatimCoordinateSystem = verbatimObservation.VerbatimCoordinateSystem;
-            processedLocation.VerbatimDepth = verbatimObservation.VerbatimDepth;
-            processedLocation.VerbatimElevation = verbatimObservation.VerbatimElevation;
-            processedLocation.WaterBody = verbatimObservation.WaterBody;
-
+                verbatim.MinimumDistanceAboveSurfaceInMeters.ParseDouble();
+            processedLocation.MinimumElevationInMeters = verbatim.MinimumElevationInMeters.ParseDouble();
+            processedLocation.Attributes.VerbatimMunicipality = verbatim.Municipality;
+            processedLocation.Attributes.VerbatimProvince = verbatim.StateProvince;
+            processedLocation.VerbatimCoordinates = verbatim.VerbatimCoordinates;
+            processedLocation.VerbatimCoordinateSystem = verbatim.VerbatimCoordinateSystem;
+            processedLocation.VerbatimDepth = verbatim.VerbatimDepth;
+            processedLocation.VerbatimElevation = verbatim.VerbatimElevation;
+            processedLocation.WaterBody = verbatim.WaterBody;
+            
             return processedLocation;
         }
 
 
-        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatimObservation)
+        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim)
         {
             var processedOccurrence = new Occurrence();
-            processedOccurrence.AssociatedMedia = verbatimObservation.AssociatedMedia;
-            processedOccurrence.AssociatedReferences = verbatimObservation.AssociatedReferences;
-            processedOccurrence.AssociatedSequences = verbatimObservation.AssociatedSequences;
-            processedOccurrence.AssociatedTaxa = verbatimObservation.AssociatedTaxa;
-            processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber ?? verbatimObservation.OccurrenceID;
-            processedOccurrence.Disposition = verbatimObservation.Disposition;
-            processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans,
+            processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
+            processedOccurrence.AssociatedReferences = verbatim.AssociatedReferences;
+            processedOccurrence.AssociatedSequences = verbatim.AssociatedSequences;
+            processedOccurrence.AssociatedTaxa = verbatim.AssociatedTaxa;
+            processedOccurrence.CatalogNumber = verbatim.CatalogNumber ?? verbatim.OccurrenceID;
+            processedOccurrence.Disposition = verbatim.Disposition;
+            processedOccurrence.EstablishmentMeans = GetSosId(verbatim.EstablishmentMeans,
                 _vocabularyById[VocabularyId.EstablishmentMeans]);
-            processedOccurrence.IndividualCount = verbatimObservation.IndividualCount;
-            processedOccurrence.LifeStage = GetSosId(verbatimObservation.LifeStage, _vocabularyById[VocabularyId.LifeStage]);
+            processedOccurrence.IndividualCount = verbatim.IndividualCount;
+            processedOccurrence.LifeStage = GetSosId(verbatim.LifeStage, _vocabularyById[VocabularyId.LifeStage]);
             processedOccurrence.Media = CreateProcessedMultimedia(
-                verbatimObservation.ObservationMultimedia,
-                verbatimObservation.ObservationAudubonMedia);
-            processedOccurrence.OccurrenceId = verbatimObservation.OccurrenceID;
-            processedOccurrence.OccurrenceRemarks = verbatimObservation.OccurrenceRemarks;
+                verbatim.ObservationMultimedia,
+                verbatim.ObservationAudubonMedia);
+            processedOccurrence.OccurrenceId = verbatim.OccurrenceID;
+            processedOccurrence.OccurrenceRemarks = verbatim.OccurrenceRemarks;
             processedOccurrence.OccurrenceStatus = GetSosId(
-                verbatimObservation.OccurrenceStatus,
+                verbatim.OccurrenceStatus,
                 _vocabularyById[VocabularyId.OccurrenceStatus],
                 (int)OccurrenceStatusId.Present);
-            processedOccurrence.OrganismQuantity = verbatimObservation.OrganismQuantity;
-            processedOccurrence.OrganismQuantityUnit = GetSosId(verbatimObservation.OrganismQuantityType, _vocabularyById[VocabularyId.Unit]);
-            processedOccurrence.OtherCatalogNumbers = verbatimObservation.OtherCatalogNumbers;
-            processedOccurrence.Preparations = verbatimObservation.Preparations;
-            processedOccurrence.RecordedBy = verbatimObservation.RecordedBy;
-            processedOccurrence.RecordNumber = verbatimObservation.RecordNumber;
+            processedOccurrence.OrganismQuantity = verbatim.OrganismQuantity;
+            processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, _vocabularyById[VocabularyId.Unit]);
+            processedOccurrence.OtherCatalogNumbers = verbatim.OtherCatalogNumbers;
+            processedOccurrence.Preparations = verbatim.Preparations;
+            processedOccurrence.RecordedBy = verbatim.RecordedBy;
+            processedOccurrence.RecordNumber = verbatim.RecordNumber;
             processedOccurrence.Activity = GetSosId(
-                verbatimObservation.ReproductiveCondition,
+                verbatim.ReproductiveCondition,
                 _vocabularyById[VocabularyId.Activity]);
-            processedOccurrence.Sex = GetSosId(verbatimObservation.Sex, _vocabularyById[VocabularyId.Sex]);
-            processedOccurrence.ReproductiveCondition = GetSosId(verbatimObservation.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
-            processedOccurrence.Behavior = GetSosId(verbatimObservation.Behavior, _vocabularyById.GetValue(VocabularyId.Behavior));
+            processedOccurrence.Sex = GetSosId(verbatim.Sex, _vocabularyById[VocabularyId.Sex]);
+            processedOccurrence.ReproductiveCondition = GetSosId(verbatim.ReproductiveCondition, _vocabularyById.GetValue(VocabularyId.ReproductiveCondition));
+            processedOccurrence.Behavior = GetSosId(verbatim.Behavior, _vocabularyById.GetValue(VocabularyId.Behavior));
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
@@ -430,23 +439,23 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             // todo - handle the following fields:
-            // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
-            // processedOccurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}"
+            // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
+            // processedOccurrence.URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
 
             return processedOccurrence;
         }
 
-        private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
+        private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(DwcObservationVerbatim verbatim)
         {
             // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
             var processedTaxon = TryGetTaxonInformation(
-                verbatimObservation.TaxonID,
-                verbatimObservation.ScientificName,
-                verbatimObservation.ScientificNameAuthorship,
-                verbatimObservation.VernacularName,
-                verbatimObservation.Kingdom,
-                verbatimObservation.TaxonRank,
-                verbatimObservation.Species);
+                verbatim.TaxonID,
+                verbatim.ScientificName,
+                verbatim.ScientificNameAuthorship,
+                verbatim.VernacularName,
+                verbatim.Kingdom,
+                verbatim.TaxonRank,
+                verbatim.Species);
 
             return processedTaxon;
         }
@@ -631,16 +640,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             UseDefaultValue
         }
 
-        public void ValidateVerbatimData(DwcObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
+        public void ValidateVerbatimData(DwcObservationVerbatim verbatim, DwcaValidationRemarksBuilder validationRemarksBuilder)
         {
             validationRemarksBuilder.NrValidatedObservations++;
 
-            if (string.IsNullOrWhiteSpace(verbatimObservation.CoordinateUncertaintyInMeters))
+            if (string.IsNullOrWhiteSpace(verbatim.CoordinateUncertaintyInMeters))
             {
                 validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
             }
 
-            if (string.IsNullOrWhiteSpace(verbatimObservation.IdentificationVerificationStatus))
+            if (string.IsNullOrWhiteSpace(verbatim.IdentificationVerificationStatus))
             {
                 validationRemarksBuilder.NrMissingIdentificationVerificationStatus++;
             }

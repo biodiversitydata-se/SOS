@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
@@ -14,7 +15,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.FishData
 {
-    public class FishDataObservationFactory : IObservationFactory<FishDataObservationVerbatim>
+    public class FishDataObservationFactory : ObservationfactoryBase, IObservationFactory<FishDataObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
@@ -22,13 +23,14 @@ namespace SOS.Process.Processors.FishData
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="geometryManager"></param>
         public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -40,10 +42,10 @@ namespace SOS.Process.Processors.FishData
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
             IEnumerable<FishDataObservationVerbatim> verbatims)
         {
-            return verbatims.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace SOS.Process.Processors.FishData
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim)
+        public async Task<Observation> CreateProcessedObservationAsync(FishDataObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
@@ -74,7 +76,10 @@ namespace SOS.Process.Processors.FishData
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location(verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius),
+                Location = new Location
+                {
+                    Locality = verbatim.Locality
+                },
                 Modified = verbatim.Start,
                 Occurrence = new Occurrence
                 {
@@ -94,7 +99,8 @@ namespace SOS.Process.Processors.FishData
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
-
+            await AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
+                CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 
             return obs;

@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NetTopologySuite.Geometries;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
@@ -42,6 +43,7 @@ namespace SOS.Process.UnitTests.Processors
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _geometryManagerMock = new Mock<IGeometryManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
@@ -54,6 +56,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
+        private readonly Mock<IGeometryManager> _geometryManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
 
@@ -69,6 +72,7 @@ namespace SOS.Process.UnitTests.Processors
             _diffusionManagerMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
+            _geometryManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -159,6 +163,9 @@ namespace SOS.Process.UnitTests.Processors
             _processedProtectedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
+
+            _geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
+                .ReturnsAsync(null as Polygon);
 
             var dataProvider = new DataProvider
             {

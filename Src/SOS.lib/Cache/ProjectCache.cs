@@ -1,5 +1,4 @@
 ﻿using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Cache

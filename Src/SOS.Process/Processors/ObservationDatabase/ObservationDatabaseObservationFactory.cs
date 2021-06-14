@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -17,18 +19,20 @@ namespace SOS.Process.Processors.ObservationDatabase
     /// <summary>
     /// Observation database factory
     /// </summary>
-    public class ObservationDatabaseObservationFactory : IObservationFactory<ObservationDatabaseVerbatim>
+    public class ObservationDatabaseObservationFactory : ObservationfactoryBase, IObservationFactory<ObservationDatabaseVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
-        public ObservationDatabaseObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        /// <param name="areaHelper"></param>
+        /// <param name="geometryManager"></param>
+        public ObservationDatabaseObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -40,10 +44,10 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
             IEnumerable<ObservationDatabaseVerbatim> verbatims)
         {
-            return verbatims.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim)
+        public async Task<Observation> CreateProcessedObservationAsync(ObservationDatabaseVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.TaxonId, out var taxon);
 
@@ -80,7 +84,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 InstitutionId = verbatim.SCI_code,
-                Location = new Location(verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
+                Location = new Location
                 {
                     Attributes = new LocationAttributes
                     {
@@ -111,6 +115,9 @@ namespace SOS.Process.Processors.ObservationDatabase
                 RightsHolder = verbatim.SCI_name,
                 Taxon = taxon
             };
+
+            await AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, 
+                verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 

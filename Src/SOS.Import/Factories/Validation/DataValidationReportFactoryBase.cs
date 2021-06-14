@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Import.Factories.Validation.Interfaces;
-using SOS.Import.Managers;
-using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
@@ -31,20 +29,22 @@ namespace SOS.Import.Factories.Validation
         protected readonly ITaxonRepository _processedTaxonRepository;
         protected Dictionary<int, Taxon> _taxonById;
         protected IDictionary<VocabularyId, Vocabulary> _vocabularyById;
+        protected IGeometryManager _geometryManager;
 
         protected DataValidationReportFactoryBase(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
-            ITaxonRepository processedTaxonRepository)
+            ITaxonRepository processedTaxonRepository,
+            IGeometryManager geometryManager)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
-            
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
             Task.Run(InitializeAsync).Wait();
         }
 
@@ -59,7 +59,7 @@ namespace SOS.Import.Factories.Validation
 
         protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync(DataProvider dataProvider);
         protected abstract Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider);
-        protected abstract Observation CreateProcessedObservation(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
+        protected abstract Task<Observation> CreateProcessedObservationAsync(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
         protected abstract void ValidateVerbatimData(TVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder);
         protected abstract void UpdateTermDictionaryValueSummary(
             Observation processedObservation,
@@ -101,7 +101,7 @@ namespace SOS.Import.Factories.Validation
                 foreach (var verbatimObservation in cursor.Current)
                 {
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
-                    var processedObservation = CreateProcessedObservation(verbatimObservation, dataProvider);
+                    var processedObservation = await CreateProcessedObservationAsync(verbatimObservation, dataProvider);
                     nrProcessedObservations++;
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                             {processedObservation}, true);

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -14,7 +16,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Nors
 {
-    public class NorsObservationFactory : IObservationFactory<NorsObservationVerbatim>
+    public class NorsObservationFactory : ObservationfactoryBase, IObservationFactory<NorsObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
@@ -22,12 +24,13 @@ namespace SOS.Process.Processors.Nors
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        /// <param name="geometryManager"></param>
+        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -39,10 +42,10 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
             IEnumerable<NorsObservationVerbatim> verbatims)
         {
-            return verbatims.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim)
+        public async Task<Observation> CreateProcessedObservationAsync(NorsObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
@@ -73,7 +76,7 @@ namespace SOS.Process.Processors.Nors
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location(verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius)
+                Location = new Location
                 {
                     Locality = verbatim.Locality
                 },
@@ -95,7 +98,8 @@ namespace SOS.Process.Processors.Nors
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
-
+            await AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
+                CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 
             return obs;

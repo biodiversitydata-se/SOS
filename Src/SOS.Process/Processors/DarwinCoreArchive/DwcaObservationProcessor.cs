@@ -28,6 +28,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly IGeometryManager _geometryManager;
 
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
             DataProvider dataProvider,
@@ -44,7 +45,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 dataProvider,
                 taxa,
                 _processedVocabularyRepository,
-                _areaHelper);
+                _areaHelper,
+                _geometryManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -65,6 +67,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public DwcaObservationProcessor(
             IVerbatimClient verbatimClient,
@@ -75,6 +78,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IGeometryManager geometryManager,
             ILogger<DwcaObservationProcessor> logger) :
                 base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
@@ -82,6 +86,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.DwcA;

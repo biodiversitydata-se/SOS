@@ -29,8 +29,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository,
+            IGeometryManager geometryManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _clamPortalObservationVerbatimRepository = clamPortalObservationVerbatimRepository;
         }
@@ -45,9 +46,9 @@ namespace SOS.Import.Factories.Validation
             return await _clamPortalObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(ClamObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = await GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -89,7 +90,8 @@ namespace SOS.Import.Factories.Validation
                 _clamPortalObservationFactory = new ClamPortalObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _geometryManager);
             }
 
             return _clamPortalObservationFactory;

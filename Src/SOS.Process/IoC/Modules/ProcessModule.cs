@@ -86,9 +86,10 @@ namespace SOS.Process.IoC.Modules
             // Caches
             builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
             builder.RegisterType<DataProviderCache>().As<IDataProviderCache>().SingleInstance();
-            builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
+            builder.RegisterType<GeometryCache>().As<IGeometryCache>().SingleInstance();
             builder.RegisterType<TaxonCache>().As<ICache<int, Taxon>>().SingleInstance();
             builder.RegisterType<TaxonListCache>().As<ICache<int, TaxonList>>().SingleInstance();
+            builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
 
             // Helpers, single instance since static data
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
@@ -156,6 +157,7 @@ namespace SOS.Process.IoC.Modules
             // Add managers
             builder.RegisterType<DiffusionManager>().As<IDiffusionManager>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
+            builder.RegisterType<GeometryManager>().As<IGeometryManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessManager>().As<IProcessManager>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationManager>().As<IValidationManager>().InstancePerLifetimeScope();

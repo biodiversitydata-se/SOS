@@ -26,6 +26,7 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly IGeometryManager _geometryManager;
 
         /// <summary>
         /// Constructor
@@ -40,6 +41,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="diffusionManager"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
@@ -51,6 +53,7 @@ namespace SOS.Process.Processors.Artportalen
             IDiffusionManager diffusionManager,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IGeometryManager geometryManager,
             ILogger<ArtportalenObservationProcessor> logger) : 
                 base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processManager, processConfiguration, logger)
         {
@@ -58,7 +61,7 @@ namespace SOS.Process.Processors.Artportalen
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
-
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
             if (processConfiguration == null)
             {
                 throw new ArgumentNullException(nameof(processConfiguration));
@@ -73,7 +76,7 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, mode != JobRunModes.Full);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository, _geometryManager, mode != JobRunModes.Full);
             _artportalenVerbatimRepository.Mode = mode;
 
             return await base.ProcessObservationsAsync(

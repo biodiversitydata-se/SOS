@@ -9,6 +9,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Services;
 using SOS.Lib.Configuration.Export;
@@ -18,6 +19,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
@@ -150,6 +152,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
+            var geometryManagerMock = new Mock<IGeometryManager>();
+            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
+                .ReturnsAsync(null as Geometry);
+
             return new DwcaObservationProcessor(
                 verbatimClient,
                 processedObservationRepository,
@@ -159,6 +165,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                geometryManagerMock.Object,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

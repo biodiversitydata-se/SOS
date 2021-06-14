@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using SOS.Process.IntegrationTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
@@ -15,7 +16,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         private readonly DwcaObservationFactoryIntegrationFixture _fixture;
 
         [Fact]
-        public void Wgs84_coordinates_is_parsed_to_double_data_type()
+        public async Task Wgs84_coordinates_is_parsed_to_double_data_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -31,7 +32,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

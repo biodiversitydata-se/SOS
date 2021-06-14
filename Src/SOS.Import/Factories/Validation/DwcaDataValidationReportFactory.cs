@@ -13,7 +13,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -35,8 +34,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
+            IGeometryManager geometryManager,
             ILoggerFactory loggerFactory)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
@@ -62,9 +62,9 @@ namespace SOS.Import.Factories.Validation
             return await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = await GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation);
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -125,7 +125,8 @@ namespace SOS.Import.Factories.Validation
                     dataProvider,
                     _taxonById,
                     dwcaVocabularyById,
-                    _areaHelper);
+                    _areaHelper,
+                    _geometryManager);
             }
 
             return _dwcaObservationFactory;

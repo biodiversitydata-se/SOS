@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using SOS.Lib.Constants;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
@@ -17,7 +18,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
-        public void Null_value_is_not_mapped()
+        public async Task Null_value_is_not_mapped()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -31,7 +32,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -40,7 +41,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public void Value_that_doesnt_exist_in_vocabulary_is_mapped_to_NoMappingFoundCustomValueIsUsedId()
+        public async Task Value_that_doesnt_exist_in_vocabulary_is_mapped_to_NoMappingFoundCustomValueIsUsedId()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -54,7 +55,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts

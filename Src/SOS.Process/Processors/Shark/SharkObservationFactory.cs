@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
@@ -15,7 +16,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Shark
 {
-    public class SharkObservationFactory : IObservationFactory<SharkObservationVerbatim>
+    public class SharkObservationFactory : ObservationfactoryBase, IObservationFactory<SharkObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
@@ -23,12 +24,13 @@ namespace SOS.Process.Processors.Shark
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        /// <param name="geometryManager"></param>
+        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -40,10 +42,10 @@ namespace SOS.Process.Processors.Shark
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
+        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
             IEnumerable<SharkObservationVerbatim> verbatims)
         {
-            return verbatims.Select(CreateProcessedObservation);
+            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
         }
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace SOS.Process.Processors.Shark
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
+        public async Task<Observation> CreateProcessedObservationAsync(SharkObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
             var sharkSampleId = verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId;
@@ -75,7 +77,7 @@ namespace SOS.Process.Processors.Shark
                     Validated = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                Location = new Location(verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius)
+                Location = new Location
                 {
                     MaximumDepthInMeters = verbatim.WaterDepthM,
                     MinimumDepthInMeters = verbatim.WaterDepthM
@@ -96,7 +98,8 @@ namespace SOS.Process.Processors.Shark
                 OwnerInstitutionCode = verbatim.ReportingInstituteNameSv,
                 Taxon = taxon
             };
-
+            await AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, 
+                CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 
             /*

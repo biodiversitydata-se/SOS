@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
@@ -18,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
 
 
         [Fact]
-        public void EventDate_is_parsed_correct()
+        public async Task EventDate_is_parsed_correct()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -33,7 +34,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

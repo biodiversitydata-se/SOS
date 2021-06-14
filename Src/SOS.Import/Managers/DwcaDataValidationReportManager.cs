@@ -31,6 +31,7 @@ namespace SOS.Import.Managers
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ITaxonRepository _processedTaxonRepository;
+        private readonly IGeometryManager _geometryManager;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
         private Dictionary<int, Taxon> _taxonById;
         private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
@@ -42,6 +43,7 @@ namespace SOS.Import.Managers
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
+            IGeometryManager geometryManager,
             ILogger<DwcaDataValidationReportManager> logger)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -50,6 +52,7 @@ namespace SOS.Import.Managers
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -87,7 +90,8 @@ namespace SOS.Import.Managers
                 dataProvider,
                 _taxonById,
                 _dwcaVocabularyById,
-                _areaHelper);
+                _areaHelper,
+                _geometryManager);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
             var observationsBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(
@@ -117,7 +121,7 @@ namespace SOS.Import.Managers
                 foreach (var verbatimObservation in observationsBatch)
                 {
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
-                    var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
+                    var processedObservation = await dwcaObservationFactory.CreateProcessedObservationAsync(verbatimObservation);
                     nrProcessedObservations++;
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation}, true);

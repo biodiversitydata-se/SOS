@@ -7,6 +7,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
+using NetTopologySuite.Geometries;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
@@ -40,6 +41,7 @@ namespace SOS.Process.UnitTests.Processors
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _geometryManagerMock = new Mock<IGeometryManager>();
             _loggerMock = new Mock<ILogger<NorsObservationProcessor>>();
         }
 
@@ -50,6 +52,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
+        private readonly Mock<IGeometryManager> _geometryManagerMock;
         private readonly Mock<ILogger<NorsObservationProcessor>> _loggerMock;
 
         private NorsObservationProcessor TestObject => new NorsObservationProcessor(
@@ -60,6 +63,7 @@ namespace SOS.Process.UnitTests.Processors
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
+            _geometryManagerMock.Object,
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()
@@ -151,6 +155,9 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
+
+            _geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
+                .ReturnsAsync(null as Polygon);
 
             var taxa = new Dictionary<int, Taxon>
             {

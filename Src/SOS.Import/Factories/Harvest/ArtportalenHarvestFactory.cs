@@ -13,6 +13,7 @@ using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
@@ -20,7 +21,7 @@ namespace SOS.Import.Factories.Harvest
     internal class ArtportalenHarvestFactory : HarvestBaseFactory, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
-        private readonly ILogger<ArtportalenObservationHarvester> _logger;
+        private readonly IGeometryManager _geometryManager;
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
@@ -28,6 +29,7 @@ namespace SOS.Import.Factories.Harvest
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ConcurrentDictionary<int, Site> _sites;
+        private readonly ILogger<ArtportalenObservationHarvester> _logger;
 
         /// <summary>
         /// Cast sighting itemEntity to model .
@@ -332,7 +334,7 @@ namespace SOS.Import.Factories.Harvest
             var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
             var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
 
-            var sites = CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
 
             if (sites?.Any() ?? false)
             {
@@ -351,7 +353,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="sitesAreas"></param>
         /// <param name="sitesGeometry"></param>
         /// <returns></returns>
-        private IEnumerable<Site> CastSiteEntitiesToVerbatim(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<AreaEntityBase>> sitesAreas, IDictionary<int, string> sitesGeometry)
+        private async Task<IEnumerable<Site>> CastSiteEntitiesToVerbatimAsync(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<AreaEntityBase>> sitesAreas, IDictionary<int, string> sitesGeometry)
         {
             var sites = new List<Site>();
 
@@ -369,7 +371,7 @@ namespace SOS.Import.Factories.Harvest
                 sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
                 sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
 
-                var site = CastSiteEntityToVerbatim(siteEntity, siteAreas, geometryWkt);
+                var site = await CastSiteEntityToVerbatimAsync(siteEntity, siteAreas, geometryWkt);
 
                 if (site != null)
                 {
@@ -387,7 +389,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="areas"></param>
         /// <param name="geometryWkt"></param>
         /// <returns></returns>
-        private Site CastSiteEntityToVerbatim(SiteEntity entity, ICollection<AreaEntityBase> areas, string geometryWkt)
+        private async Task<Site> CastSiteEntityToVerbatimAsync(SiteEntity entity, ICollection<AreaEntityBase> areas, string geometryWkt)
         {
             if (entity == null)
             {
@@ -420,7 +422,7 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point?.ToCircle(accuracy))?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry :  await _geometryManager.GetCircleAsync(wgs84Point, accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
@@ -535,6 +537,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="speciesCollectionRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public ArtportalenHarvestFactory(
             IProjectRepository projectRepository,
@@ -544,6 +547,7 @@ namespace SOS.Import.Factories.Harvest
             ISpeciesCollectionItemRepository speciesCollectionRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
+            IGeometryManager geometryManager,
             ILogger<ArtportalenObservationHarvester> logger) : base()
         {
             _projectRepository = projectRepository;
@@ -553,6 +557,7 @@ namespace SOS.Import.Factories.Harvest
             _speciesCollectionRepository = speciesCollectionRepository;
             _artportalenMetadataContainer = artportalenMetadataContainer;
             _areaHelper = areaHelper;
+            _geometryManager = geometryManager;
             _logger = logger;
             _sites = new ConcurrentDictionary<int, Site>();
         }

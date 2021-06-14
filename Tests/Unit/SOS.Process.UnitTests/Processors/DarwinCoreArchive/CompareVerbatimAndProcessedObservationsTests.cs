@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
@@ -28,7 +29,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
         }
 
         [Fact]
-        public void Sex_with_Male_value_is_field_mapped()
+        public async Task Sex_with_Male_value_is_field_mapped()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -45,7 +46,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var processedObservation = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
             vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation> {processedObservation});
             var compareResult = new CompareObservation
             {

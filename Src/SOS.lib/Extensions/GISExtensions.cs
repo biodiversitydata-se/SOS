@@ -152,6 +152,16 @@ namespace SOS.Lib.Extensions
             return newCoordinates.ToArray();
         }
 
+        private static (LinearRing shell, LinearRing[] holes) ToGeometryPolygonCoordinates(this ArrayList coordinates)
+        {
+            var rings = coordinates.ToArray()
+                .Select(lr => (lr as double[][]).Select(c => new Coordinate(c[0], c[1])).ToArray()).ToArray();
+            var shell = new LinearRing(rings.First());
+            var holes = rings.Skip(1)?.Select(c => new LinearRing(c))?.ToArray();
+
+            return (shell, holes);
+        }
+
         /// <summary>
         ///     Cast polygon coordinates to geo json polygon coordinates
         /// </summary>
@@ -447,6 +457,42 @@ namespace SOS.Lib.Extensions
                     }
 
                     return Geometry.DefaultFactory.CreateMultiPolygon(polygons.ToArray());
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        ///     Cast geojson geometry to geometry
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static Geometry ToGeometry(this GeoJsonGeometry geometry)
+        {
+            if (!geometry?.IsValid ?? true)
+            {
+                return null;
+            }
+
+            switch (geometry.Type?.ToLower())
+            {
+                case "point":
+                    var coordinates = geometry.Coordinates.ToArray().Select(p => (double)p).ToArray();
+                    return Geometry.DefaultFactory.CreatePoint(new Coordinate(coordinates[0],
+                        coordinates[1]));
+                case "polygon":
+                case "holepolygon":
+                    var (shell,  holes) = geometry.Coordinates.ToGeometryPolygonCoordinates();
+                    return Geometry.DefaultFactory.CreatePolygon(shell, holes);
+                case "multipolygon":
+                    var polygones = new List<Polygon>();
+                    foreach (ArrayList polyCoordinates in geometry.Coordinates)
+                    {
+                        var (polyShell, polyHoles) = polyCoordinates.ToGeometryPolygonCoordinates();
+                        polygones.Add(Geometry.DefaultFactory.CreatePolygon(polyShell, polyHoles)); ;
+                    }
+
+                    return Geometry.DefaultFactory.CreateMultiPolygon(polygones.ToArray());
                 default:
                     return null;
             }

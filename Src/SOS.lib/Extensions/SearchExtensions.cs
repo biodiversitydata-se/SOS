@@ -593,21 +593,29 @@ namespace SOS.Lib.Extensions
             
             if (geometryFilter.UseDisturbanceRadius)
             {
+                // Add both point and pointWithDisturbanceBuffer, since pointWithDisturbanceBuffer can be null if no dist buffer exists
+                boundingBoxContainers.TryAddBoundingBoxCriteria(
+                    "location.point",
+                    geometryFilter.BoundingBox);
+
                 boundingBoxContainers.TryAddBoundingBoxCriteria(
                     "location.pointWithDisturbanceBuffer",
                     geometryFilter.BoundingBox);
             }
 
-            query.Add(q => q
-                .Bool(b => b
-                    .Should(boundingBoxContainers)
-                )
-            );
-
-            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            if (boundingBoxContainers.Any())
+            {
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(boundingBoxContainers)
+                    )
+                );
+            }
 
             if (geometryFilter?.IsValid ?? false)
             {
+                var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
                 foreach (var geom in geometryFilter.Geometries)
                 {
                     switch (geom.Type.ToLower())
@@ -632,13 +640,13 @@ namespace SOS.Lib.Extensions
                             break;
                     }
                 }
-            }
 
-            query.Add(q => q
-                .Bool(b => b
-                    .Should(geometryContainers)
-                )
-            );
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(geometryContainers)
+                    )
+                );
+            }
         }
 
         /// <summary>

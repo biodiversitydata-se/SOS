@@ -29,8 +29,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
+            IGeometryManager geometryManager)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
         }
@@ -45,9 +46,9 @@ namespace SOS.Import.Factories.Validation
             return await _virtualHerbariumObservationVerbatimRepository.CountAllDocumentsAsync();
         }
 
-        protected override Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        protected override async Task<Observation> CreateProcessedObservationAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
+            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservationAsync(verbatimObservation).Result;
             _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
             return processedObservation;
         }
@@ -83,7 +84,7 @@ namespace SOS.Import.Factories.Validation
         {
             if (_virtualHerbariumObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper);
+                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper, _geometryManager);
             }
 
             return _virtualHerbariumObservationFactory;
