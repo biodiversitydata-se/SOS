@@ -484,10 +484,6 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.Add(q => q.GeoBoundingBox(bb => bb
-                .Field("location.pointLocation")
-                .BoundingBox(b =>
-                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
 
             Dictionary<int,int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
                 indexName,
@@ -747,11 +743,7 @@ namespace SOS.Observations.Api.Repositories
                 int zoom)
         {
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.Add(q => q.GeoBoundingBox(bb => bb
-                .Field("location.pointLocation")
-                .BoundingBox(b =>
-                    b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))));
-            
+
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
             CompositeKey nextPageKey = null;
 
