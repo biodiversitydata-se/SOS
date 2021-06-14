@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         /// <remarks>
         ///     Translations exists if the <see cref="Localized" /> property is set to true.
         /// </remarks>
-        public ICollection<VocabularyValueTranslationDto> Translations { get; set; }
+        public IEnumerable<VocabularyValueTranslationDto> Translations { get; set; }
 
     }
 }

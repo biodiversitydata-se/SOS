@@ -44,6 +44,7 @@ namespace SOS.Observations.Api.Middleware
                   context.Request.Method.ToLower() != "post")
             {
                 await _next(context);
+                return;
             }
 
             var originalBody = context.Response.Body;

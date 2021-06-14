@@ -1,4 +1,6 @@
-﻿namespace SOS.Observations.Api.Dtos.Vocabulary
+﻿using System;
+
+namespace SOS.Observations.Api.Dtos.Vocabulary
 {
     public enum VocabularyIdDto
     {

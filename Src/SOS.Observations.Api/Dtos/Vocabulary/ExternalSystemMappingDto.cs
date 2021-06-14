@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SOS.Observations.Api.Dtos.Vocabulary
 {
@@ -10,6 +7,6 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         public ExternalSystemIdDto Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public ICollection<ExternalSystemMappingFieldDto> Mappings { get; set; }
+        public IEnumerable<ExternalSystemMappingFieldDto> Mappings { get; set; }
     }
 }
