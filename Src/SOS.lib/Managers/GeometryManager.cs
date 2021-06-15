@@ -31,6 +31,8 @@ namespace SOS.Lib.Managers
                 return null;
             }
 
+            return wgs84Point.ToCircle(accuracy);
+
             // Create key
             var key = $"{Math.Round(wgs84Point.Coordinate.X, 5)}:{Math.Round(wgs84Point.Coordinate.Y, 5)}:{accuracy ?? 0}";
 

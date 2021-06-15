@@ -422,7 +422,7 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry :  await _geometryManager.GetCircleAsync(wgs84Point, accuracy))?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : await _geometryManager.GetCircleAsync(wgs84Point, accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
