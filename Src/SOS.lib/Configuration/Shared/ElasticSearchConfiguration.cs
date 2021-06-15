@@ -13,6 +13,11 @@ namespace SOS.Lib.Configuration.Shared
         private string _indexPrefix;
 
         /// <summary>
+        /// Enable debug mode if true
+        /// </summary>
+        public bool DebugMode { get; set; }
+
+        /// <summary>
         ///     How many items to read in a time when scrolling
         /// </summary>
         public int ReadBatchSize { get; set; }
@@ -81,7 +86,7 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with cuurent configuration
         /// </summary>
         /// <returns></returns>
-        public ElasticClient GetClient(bool enableDebugMode = false)
+        public ElasticClient GetClient()
         {
             var uris = Hosts.Select(u => new Uri(u));
 
@@ -97,7 +102,7 @@ namespace SOS.Lib.Configuration.Shared
             }
 
             //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
-            if (enableDebugMode)
+            if (DebugMode)
             {
                 settings.DisableDirectStreaming().EnableDebugMode().PrettyJson();
             }
