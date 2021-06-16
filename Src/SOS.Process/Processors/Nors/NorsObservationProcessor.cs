@@ -25,7 +25,6 @@ namespace SOS.Process.Processors.Nors
     {
         private readonly IAreaHelper _areaHelper;
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
-        private readonly IGeometryManager _geometryManager;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -34,7 +33,7 @@ namespace SOS.Process.Processors.Nors
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new NorsObservationFactory(dataProvider, taxa, _areaHelper, _geometryManager);
+            var observationFactory = new NorsObservationFactory(dataProvider, taxa, _areaHelper);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -54,7 +53,6 @@ namespace SOS.Process.Processors.Nors
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
-        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
@@ -63,7 +61,6 @@ namespace SOS.Process.Processors.Nors
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
-            IGeometryManager geometryManager,
             ILogger<NorsObservationProcessor> logger) :
             base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
         {
@@ -71,7 +68,6 @@ namespace SOS.Process.Processors.Nors
                                                  throw new ArgumentNullException(
                                                      nameof(norsObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.NorsObservations;

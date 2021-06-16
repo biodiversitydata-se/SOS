@@ -29,9 +29,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
-            IGeometryManager geometryManager)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
         }
@@ -84,7 +83,7 @@ namespace SOS.Import.Factories.Validation
         {
             if (_virtualHerbariumObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper, _geometryManager);
+                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper);
             }
 
             return _virtualHerbariumObservationFactory;

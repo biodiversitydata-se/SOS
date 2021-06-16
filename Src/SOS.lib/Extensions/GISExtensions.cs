@@ -315,23 +315,21 @@ namespace SOS.Lib.Extensions
                 accuracy = 1;
             }
 
-            Geometry circle = null;
+            var shapeFactory = new GeometricShapeFactory();
+            shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
+            shapeFactory.Centre = point.Coordinate;
+            var diameterInMeters = (double)accuracy * 2;
+
             switch ((CoordinateSys)point.SRID)
             {
                 // Metric systems, add buffer to create a circle
                 case CoordinateSys.SWEREF99:
                 case CoordinateSys.SWEREF99_TM:
                 case CoordinateSys.Rt90_25_gon_v:
-                    circle = point.Buffer((double)(accuracy == 0 ? 1 : accuracy));
+                    shapeFactory.Height = diameterInMeters;
+                    shapeFactory.Width = diameterInMeters;
                     break;
                 default: // Degree systems
-                         //  case CoordinateSys.WebMercator:
-                         //  case CoordinateSys.WGS84:
-                    var diameterInMeters = (double) (accuracy == 0 ? 1 : accuracy * 2);
-
-                    var shapeFactory = new GeometricShapeFactory();
-                    shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
-                    shapeFactory.Centre = point.Coordinate;
 
                     // Length in meters of 1° of latitude = always 111.32 km
                     shapeFactory.Height = diameterInMeters / 111320d;
@@ -339,11 +337,12 @@ namespace SOS.Lib.Extensions
                     // Length in meters of 1° of longitude = 40075 km * cos( latitude radian ) / 360
                     shapeFactory.Width = diameterInMeters / (40075000 * Math.Cos(point.Y.ToRadians()) / 360);
 
-                    circle = shapeFactory.CreateCircle();
                     break;
             }
 
-            return circle is Polygon circlePolygon ? circlePolygon.TryMakeValid() : circle;
+            var circle = shapeFactory.CreateCircle();
+            circle.SRID = point.SRID;
+            return circle;
         }
 
         /// <summary>

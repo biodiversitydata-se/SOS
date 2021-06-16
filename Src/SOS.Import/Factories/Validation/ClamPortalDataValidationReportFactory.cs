@@ -29,9 +29,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository,
-            IGeometryManager geometryManager) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _clamPortalObservationVerbatimRepository = clamPortalObservationVerbatimRepository;
         }
@@ -90,8 +89,7 @@ namespace SOS.Import.Factories.Validation
                 _clamPortalObservationFactory = new ClamPortalObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper,
-                    _geometryManager);
+                    _areaHelper);
             }
 
             return _clamPortalObservationFactory;

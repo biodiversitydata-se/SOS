@@ -15,7 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using NeoSmart.Caching.Sqlite;
 using Nest;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
@@ -104,11 +103,6 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // Add cache
-                    services.AddSqliteCache(options => {
-                        options.CachePath = hostContext.Configuration.GetValue<string>("PersistentCachePath");
-                    });
-                    
                     services.AddMemoryCache();
                     services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
                     services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();

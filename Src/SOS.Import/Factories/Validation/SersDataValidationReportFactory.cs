@@ -29,9 +29,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            ISersObservationVerbatimRepository sersObservationVerbatimRepository,
-            IGeometryManager geometryManager) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            ISersObservationVerbatimRepository sersObservationVerbatimRepository) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _sersObservationVerbatimRepository = sersObservationVerbatimRepository;
         }
@@ -87,8 +86,7 @@ namespace SOS.Import.Factories.Validation
                 _sersObservationFactory = new SersObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper,
-                    _geometryManager);
+                    _areaHelper);
             }
 
             return _sersObservationFactory;

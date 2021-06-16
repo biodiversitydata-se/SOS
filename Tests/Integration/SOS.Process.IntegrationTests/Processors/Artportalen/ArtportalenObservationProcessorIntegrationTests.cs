@@ -9,7 +9,6 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Services;
 using SOS.Lib.Configuration.Export;
@@ -19,7 +18,6 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
@@ -127,9 +125,6 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
-            var geometryManagerMock = new Mock<IGeometryManager>();
-            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
-                .ReturnsAsync(null as Geometry);
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
@@ -142,7 +137,6 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 diffusionManager,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<ArtportalenObservationProcessor>());
         }
 

@@ -29,9 +29,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
-            IGeometryManager geometryManager) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            IMvmObservationVerbatimRepository mvmObservationVerbatimRepository) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository;
         }
@@ -87,8 +86,7 @@ namespace SOS.Import.Factories.Validation
                 _mvmObservationFactory = new MvmObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper,
-                    _geometryManager);
+                    _areaHelper);
             }
 
             return _mvmObservationFactory;

@@ -4,14 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Process.Processors.DarwinCoreArchive;
@@ -56,16 +53,11 @@ namespace SOS.Process.IntegrationTests.TestHelpers
             var areaHelper =
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
 
-            var geometryManagerMock = new Mock<IGeometryManager>();
-            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
-                .ReturnsAsync(null as Geometry);
-
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
                 vocabularyRepository,
-                areaHelper,
-                geometryManagerMock.Object);
+                areaHelper);
 
             return dwcaObservationFactory;
         }

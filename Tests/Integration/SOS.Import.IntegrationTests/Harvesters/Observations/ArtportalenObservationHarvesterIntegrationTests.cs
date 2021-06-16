@@ -4,7 +4,6 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NetTopologySuite.Geometries;
 using SOS.Import.Containers;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
@@ -14,7 +13,6 @@ using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -69,9 +67,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
             var areaHelper = new AreaHelper(areaRepository);
-            var geometryManagerMock = new Mock<IGeometryManager>();
-            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
-                .ReturnsAsync(null as Geometry);
+
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -88,7 +84,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 processedProtectedObservationRepository,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
-                geometryManagerMock.Object,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -138,9 +133,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
             var areaHelper = new AreaHelper(areaRepository);
 
-            var geometryManagerMock = new Mock<IGeometryManager>();
-            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
-                .ReturnsAsync(null as Geometry);
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -157,7 +149,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 processedProtectedObservationRepository,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
-                geometryManagerMock.Object,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

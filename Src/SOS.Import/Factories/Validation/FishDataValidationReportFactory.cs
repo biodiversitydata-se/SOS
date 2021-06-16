@@ -29,9 +29,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
-            IGeometryManager geometryManager) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository;
         }
@@ -87,8 +86,7 @@ namespace SOS.Import.Factories.Validation
                 _fishdataObservationFactory = new FishDataObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper,
-                    _geometryManager);
+                    _areaHelper);
             }
 
             return _fishdataObservationFactory;

@@ -7,7 +7,6 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
-using NetTopologySuite.Geometries;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Services;
 using SOS.Lib.Cache;
@@ -19,7 +18,6 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -119,10 +117,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
 
-            var geometryManagerMock = new Mock<IGeometryManager>();
-            geometryManagerMock.Setup(g => g.GetCircleAsync(It.IsAny<Point>(), It.IsAny<int?>()))
-                .ReturnsAsync(null as Geometry);
-            
+          
             var clamPortalProcessor = new ClamPortalObservationProcessor(
                 new ClamObservationVerbatimRepository(verbatimClient,
                     new NullLogger<ClamObservationVerbatimRepository>()),
@@ -132,7 +127,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator, 
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
@@ -143,7 +137,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
@@ -154,7 +147,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
@@ -165,7 +157,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
@@ -176,7 +167,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
@@ -187,7 +177,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
@@ -198,7 +187,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
@@ -209,7 +197,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
@@ -222,7 +209,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 diffusionManager,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
                 new ProcessedPublicObservationRepository(processClient, elasticClient,
@@ -243,7 +229,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
-                geometryManagerMock.Object,
                 new NullLogger<DwcaObservationProcessor>());
 
             var observationDatabaseProcessor = new ObservationDatabaseProcessor(
@@ -257,7 +242,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 areaHelper,
-                geometryManagerMock.Object,
                 processConfiguration,
                 new NullLogger<ObservationDatabaseProcessor>());
 
