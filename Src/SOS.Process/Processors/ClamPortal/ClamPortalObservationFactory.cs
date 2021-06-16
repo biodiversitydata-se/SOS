@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -41,18 +40,18 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<ClamObservationVerbatim> verbatims)
         {
-            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
+            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>
-        ///     Cast clam observation verbatim to processed observation
+        ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatim"></param>
+        /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public async Task<Observation> CreateProcessedObservationAsync(ClamObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(ClamObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 

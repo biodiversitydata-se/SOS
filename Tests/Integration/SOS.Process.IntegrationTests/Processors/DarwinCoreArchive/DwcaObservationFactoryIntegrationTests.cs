@@ -32,7 +32,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -39,18 +38,18 @@ namespace SOS.Process.Processors.Sers
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<SersObservationVerbatim> verbatims)
         {
-            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
+            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>
-        ///     Cast SERS observation verbatim to ProcessedObservation
+        ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatim"></param>
+        /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public async Task<Observation> CreateProcessedObservationAsync(SersObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(SersObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 

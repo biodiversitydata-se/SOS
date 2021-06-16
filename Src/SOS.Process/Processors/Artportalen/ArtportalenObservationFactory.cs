@@ -67,10 +67,10 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<ArtportalenObservationVerbatim> verbatims)
         {
-            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
+            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public async Task<Observation> CreateProcessedObservationAsync(ArtportalenObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
         {
             try
             {

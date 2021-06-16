@@ -43,7 +43,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
             int? parsedTaxonId = observation.Taxon?.Id;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

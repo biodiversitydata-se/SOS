@@ -143,7 +143,7 @@ namespace SOS.Process.Processors
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var observation = await observationFactory.CreateProcessedObservationAsync(verbatimObservation);
+                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation);
 
                     if (observation == null)
                     {
@@ -164,7 +164,7 @@ namespace SOS.Process.Processors
                         }
 
                         // Recreate observation to make a new object
-                        observation = await observationFactory.CreateProcessedObservationAsync(verbatimObservation);
+                        observation = observationFactory.CreateProcessedObservation(verbatimObservation);
                         // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
                         _diffusionManager.DiffuseObservation(observation);
                     }
