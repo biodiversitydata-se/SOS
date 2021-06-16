@@ -117,7 +117,7 @@ namespace SOS.Import.Managers
                 foreach (var verbatimObservation in observationsBatch)
                 {
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
-                    var processedObservation = await dwcaObservationFactory.CreateProcessedObservationAsync(verbatimObservation);
+                    var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation}, true);

@@ -86,18 +86,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper);
         }
 
-        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<DwcObservationVerbatim> verbatims)
         {
-            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
+            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatim"></param>
+        /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public async Task<Observation> CreateProcessedObservationAsync(DwcObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatim)
         {
             if (verbatim == null)
             {

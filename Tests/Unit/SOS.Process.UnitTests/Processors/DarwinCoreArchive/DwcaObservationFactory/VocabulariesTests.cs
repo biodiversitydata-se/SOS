@@ -32,7 +32,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts
@@ -55,7 +55,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await _fixture.DwcaObservationFactory.CreateProcessedObservationAsync(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Asserts

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -40,18 +39,18 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<VirtualHerbariumObservationVerbatim> verbatims)
         {
-            return await Task.WhenAll(verbatims.Select(CreateProcessedObservationAsync));
+            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>
-        ///     Cast Virtual Herbarium observation verbatim to ProcessedObservation
+        ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatim"></param>
+        /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public async Task<Observation> CreateProcessedObservationAsync(VirtualHerbariumObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
         {
             if (verbatim == null)
             {

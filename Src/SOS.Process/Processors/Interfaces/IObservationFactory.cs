@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -15,7 +14,7 @@ namespace SOS.Process.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
+        IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<TEntity> verbatims);
 
         /// <summary>
@@ -23,6 +22,6 @@ namespace SOS.Process.Processors.Interfaces
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        Task<Observation> CreateProcessedObservationAsync(TEntity verbatim);
+        Observation CreateProcessedObservation(TEntity verbatim);
     }
 }
