@@ -69,7 +69,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncFail()
+        public void RunAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange

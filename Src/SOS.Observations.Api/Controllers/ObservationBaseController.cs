@@ -237,7 +237,6 @@ namespace SOS.Observations.Api.Controllers
         /// Make sure filter contains taxa
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="allowUnderlyingTaxa"></param>
         /// <returns></returns>
         protected Result ValidateTaxonExists(SearchFilterBaseDto filter)
         {

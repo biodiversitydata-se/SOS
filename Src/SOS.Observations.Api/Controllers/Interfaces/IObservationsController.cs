@@ -107,8 +107,9 @@ namespace SOS.Observations.Api.Controllers.Interfaces
            bool protectedObservations = false);
 
         /// <summary>
-        /// Signal search
+        ///  Signal search
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter"></param>
         /// <param name="areaBuffer"></param>

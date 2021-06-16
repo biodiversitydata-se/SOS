@@ -103,7 +103,6 @@ namespace SOS.Administration.Gui.Controllers
     {
 
         private readonly ElasticClient _testElasticClient;
-        private readonly string _indexName;
         private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
         private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
         private ApplicationInsightsConfiguration _aiConfig;
@@ -135,7 +134,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("failed")]
-        public async Task<IEnumerable<FailedData>> GetFailedRequests()
+        public IEnumerable<FailedData> GetFailedRequests()
         {
             var query = @"requests
                             | where success == false and resultCode != 404
@@ -155,6 +154,7 @@ namespace SOS.Administration.Gui.Controllers
             }
             return failedRequests;
         }
+
         [HttpGet]
         [Route("loadtestsummary")]
         public async Task<IEnumerable<LoadTestSummary>> GetLoadTestSummary()
@@ -176,7 +176,7 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("")]
-        public async Task<PerformanceData> GetPerformanceData(string interval, string timespan)
+        public PerformanceData GetPerformanceData(string interval, string timespan)
         {
             if(string.IsNullOrEmpty(interval))
             {

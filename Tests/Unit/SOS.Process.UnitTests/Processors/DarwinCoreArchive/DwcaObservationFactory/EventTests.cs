@@ -19,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
 
 
         [Fact]
-        public async Task EventDate_is_parsed_correct()
+        public void EventDate_is_parsed_correct()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

@@ -86,7 +86,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
         }
 
         [Fact]
-        public async Task Read_eml_xml_data()
+        public void Read_eml_xml_data()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

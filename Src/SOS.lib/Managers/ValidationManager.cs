@@ -84,6 +84,13 @@ namespace SOS.Lib.Managers
             {
                 observationValidation.Defects.Add("Event StartDate and/or EndDate is missing");
             }
+            else
+            {
+                if (observation.Event.StartDate > observation.Event.EndDate)
+                {
+                    observationValidation.Defects.Add("Event StartDate is greater than EndDate");
+                }
+            }
 
             if (observation.Taxon == null)
             {

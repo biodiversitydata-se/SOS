@@ -31,7 +31,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncException()
+        public void RunAsyncException()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -58,7 +58,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncFail()
+        public void RunAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
