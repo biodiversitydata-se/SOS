@@ -29,22 +29,19 @@ namespace SOS.Import.Factories.Validation
         protected readonly ITaxonRepository _processedTaxonRepository;
         protected Dictionary<int, Taxon> _taxonById;
         protected IDictionary<VocabularyId, Vocabulary> _vocabularyById;
-        protected IGeometryManager _geometryManager;
 
         protected DataValidationReportFactoryBase(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
-            ITaxonRepository processedTaxonRepository,
-            IGeometryManager geometryManager)
+            ITaxonRepository processedTaxonRepository)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
-            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
             Task.Run(InitializeAsync).Wait();
         }
 

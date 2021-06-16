@@ -120,16 +120,12 @@ namespace SOS.Import.IoC.Modules
             // Containers, single instance for best performance (re-init on full harvest)
             builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
 
-            // Cache
-            builder.RegisterType<GeometryCache>().As<IGeometryCache>().SingleInstance();
-
             // Managers
             builder.RegisterType<ApiUsageStatisticsManager>().As<IApiUsageStatisticsManager>().InstancePerLifetimeScope();
             builder.RegisterType<CacheManager>().As<ICacheManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
-            builder.RegisterType<GeometryManager>().As<IGeometryManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
 
             // Repositories source

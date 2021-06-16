@@ -9,7 +9,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -39,14 +38,12 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
-        /// <param name="geometryManager"></param>
         /// <param name="incrementalMode"></param>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IGeometryManager geometryManager,
-            bool incrementalMode) : base(geometryManager)
+            bool incrementalMode) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -58,12 +55,11 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            IGeometryManager geometryManager,
             bool incrementalMode)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, geometryManager, incrementalMode);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
         }
 
         /// <summary>
@@ -174,13 +170,14 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
-                await AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
+                AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
                     verbatimObservation.Site?.YCoord,
                     CoordinateSys.WebMercator,
                     point,
                     verbatimObservation.Site?.PointWithBuffer?.ToGeometry(),
                     verbatimObservation.Site?.Accuracy,
                     taxon?.Attributes?.DisturbanceRadius);
+
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages

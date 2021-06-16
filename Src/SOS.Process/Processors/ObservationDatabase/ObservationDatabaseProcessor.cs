@@ -25,7 +25,6 @@ namespace SOS.Process.Processors.ObservationDatabase
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        private readonly IGeometryManager _geometryManager;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
@@ -34,7 +33,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new ObservationDatabaseObservationFactory(dataProvider, taxa, _areaHelper, _geometryManager);
+            var observationFactory = new ObservationDatabaseObservationFactory(dataProvider, taxa, _areaHelper);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -56,7 +55,6 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public ObservationDatabaseProcessor(IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
@@ -68,7 +66,6 @@ namespace SOS.Process.Processors.ObservationDatabase
             IProcessManager processManager,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
-            IGeometryManager geometryManager,
             ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
                 base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processManager, processConfiguration, logger)
@@ -76,7 +73,6 @@ namespace SOS.Process.Processors.ObservationDatabase
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
         }
 
         public override DataProviderType Type => DataProviderType.ObservationDatabase;

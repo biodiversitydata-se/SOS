@@ -13,7 +13,6 @@ using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
@@ -21,7 +20,6 @@ namespace SOS.Import.Factories.Harvest
     internal class ArtportalenHarvestFactory : HarvestBaseFactory, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
-        private readonly IGeometryManager _geometryManager;
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
@@ -422,7 +420,7 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : await _geometryManager.GetCircleAsync(wgs84Point, accuracy))?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
@@ -537,7 +535,6 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="speciesCollectionRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public ArtportalenHarvestFactory(
             IProjectRepository projectRepository,
@@ -547,7 +544,6 @@ namespace SOS.Import.Factories.Harvest
             ISpeciesCollectionItemRepository speciesCollectionRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
-            IGeometryManager geometryManager,
             ILogger<ArtportalenObservationHarvester> logger) : base()
         {
             _projectRepository = projectRepository;
@@ -557,7 +553,6 @@ namespace SOS.Import.Factories.Harvest
             _speciesCollectionRepository = speciesCollectionRepository;
             _artportalenMetadataContainer = artportalenMetadataContainer;
             _areaHelper = areaHelper;
-            _geometryManager = geometryManager;
             _logger = logger;
             _sites = new ConcurrentDictionary<int, Site>();
         }

@@ -10,7 +10,6 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -44,12 +43,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         public DwcaObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
+            IAreaHelper areaHelper) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -78,14 +76,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            IAreaHelper areaHelper, IGeometryManager geometryManager)
+            IAreaHelper areaHelper)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, geometryManager);
+            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper);
         }
 
         public async Task<IEnumerable<Observation>> CreateProcessedObservationsAsync(
@@ -163,7 +161,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 coordinateSystem = CoordinateSys.WGS84;
             }
-            await AddPositionData(obs.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
+            AddPositionData(obs.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
                     coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, obs.Taxon?.Attributes?.DisturbanceRadius);
            
             // MaterialSample

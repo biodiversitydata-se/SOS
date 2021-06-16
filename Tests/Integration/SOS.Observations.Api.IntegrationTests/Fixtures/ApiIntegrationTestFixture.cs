@@ -87,7 +87,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var observationApiConfiguration = GetObservationApiConfiguration();
-            var elasticClient = elasticConfiguration.GetClient(true);
+            var elasticClient = elasticConfiguration.GetClient();
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,

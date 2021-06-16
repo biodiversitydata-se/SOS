@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -13,7 +12,6 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -45,7 +43,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _artportalenMetadataContainerMock = new Mock<IArtportalenMetadataContainer>();
             _areaHelperMock = new Mock<IAreaHelper>();
-            _geometryManagerMock = new Mock<IGeometryManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationHarvester>>();
         }
 
@@ -63,7 +60,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IArtportalenMetadataContainer> _artportalenMetadataContainerMock;
         private readonly Mock<IAreaHelper> _areaHelperMock;
-        private readonly Mock<IGeometryManager> _geometryManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationHarvester>> _loggerMock;
 
         private ArtportalenObservationHarvester TestObject => new ArtportalenObservationHarvester(
@@ -81,7 +77,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _processedProtectedObservationRepositoryMock.Object,
             _artportalenMetadataContainerMock.Object,
             _areaHelperMock.Object,
-            _geometryManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>

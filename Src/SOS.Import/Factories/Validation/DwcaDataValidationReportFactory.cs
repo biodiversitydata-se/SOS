@@ -34,9 +34,8 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IGeometryManager geometryManager,
             ILoggerFactory loggerFactory)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, geometryManager)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
@@ -125,8 +124,7 @@ namespace SOS.Import.Factories.Validation
                     dataProvider,
                     _taxonById,
                     dwcaVocabularyById,
-                    _areaHelper,
-                    _geometryManager);
+                    _areaHelper);
             }
 
             return _dwcaObservationFactory;

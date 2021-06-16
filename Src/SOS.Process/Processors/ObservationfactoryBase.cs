@@ -1,12 +1,9 @@
-﻿ using System;
-using System.Globalization;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
@@ -14,8 +11,6 @@ namespace SOS.Process.Processors
 {
     public class ObservationfactoryBase
     {
-        private readonly IGeometryManager _geometryManager;
-        
         /// <summary>
         /// Init location class
         /// </summary>
@@ -27,7 +22,7 @@ namespace SOS.Process.Processors
         /// <param name="pointWithBuffer"></param>
         /// <param name="pointWithDisturbanceBuffer"></param>
         /// <param name="coordinateUncertaintyInMeters"></param>
-        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        private static void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             location.Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
             location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
@@ -63,26 +58,18 @@ namespace SOS.Process.Processors
         /// <param name="point"></param>
         /// <param name="taxonDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<Geometry> GetPointWithDisturbanceBufferAsync(Point point, int? taxonDisturbanceRadius)
+        private static Geometry GetPointWithDisturbanceBuffer(Point point, int? taxonDisturbanceRadius)
         {
             if (!(taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0))
             {
                 return null;
             }
 
-            return await _geometryManager.GetCircleAsync(point, taxonDisturbanceRadius);
+            return point.ToCircle(taxonDisturbanceRadius);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="geometryManager"></param>
-        protected ObservationfactoryBase(IGeometryManager geometryManager)
-        {
-            _geometryManager = geometryManager ?? throw new ArgumentNullException(nameof(geometryManager));
-        }
 
-        protected async Task AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
+        protected static void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             Point point = null;
             if (verbatimLongitude.HasValue && verbatimLongitude.Value > 0 && verbatimLatitude.HasValue && verbatimLatitude > 0)
@@ -95,17 +82,17 @@ namespace SOS.Process.Processors
                 }
             }
 
-            var pointWithBuffer = await _geometryManager.GetCircleAsync(point, coordinateUncertaintyInMeters);
-            var pointWithDisturbanceBuffer = await GetPointWithDisturbanceBufferAsync(point, taxonDisturbanceRadius);
+            var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters);
+            var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }
 
-        protected async Task AddPositionData(Location location, double? verbatimLongitude,
+        protected static void AddPositionData(Location location, double? verbatimLongitude,
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
             Geometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
-            var pointWithDisturbanceBuffer = await GetPointWithDisturbanceBufferAsync(point, taxonDisturbanceRadius);
+            var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }

@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Nest;
-using Newtonsoft.Json;
-using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
@@ -76,7 +71,7 @@ namespace SOS.Administration.Gui.Controllers
 
         public LogsController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<ElasticSearchConfiguration> elasticConfiguration)
         {          
-            _elasticClient = elasticConfiguration.CurrentValue.GetClient(true);
+            _elasticClient = elasticConfiguration.CurrentValue.GetClient();
         }
      
         [HttpGet]

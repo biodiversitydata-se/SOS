@@ -29,8 +29,7 @@ namespace SOS.Process.Processors.Nors
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
-        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper, IGeometryManager geometryManager) : base(geometryManager)
+        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -98,7 +97,7 @@ namespace SOS.Process.Processors.Nors
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
-            await AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
+            AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);
 

@@ -13,7 +13,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="MongoDB.Driver" Version="2.12.3" />
         <PackageReference Include="MongoDB.Driver.GridFS" Version="2.12.3" />
-        <PackageReference Include="NeoSmart.Caching.Sqlite" Version="3.1.1" />
         <PackageReference Include="NetTopologySuite" Version="2.2.0" />
         <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
     </ItemGroup>
