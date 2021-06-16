@@ -16,7 +16,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         private readonly DwcaObservationFactoryIntegrationFixture _fixture;
 
         [Fact]
-        public async Task Wgs84_coordinates_is_parsed_to_double_data_type()
+        public void Wgs84_coordinates_is_parsed_to_double_data_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

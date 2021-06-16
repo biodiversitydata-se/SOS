@@ -94,6 +94,10 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("HarvestProjects/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

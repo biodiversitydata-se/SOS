@@ -488,7 +488,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         {
             var filePath = @"c:\temp\DwcDataStatistics.xlsx";
             const int maxNrOfValues = 10000;
-            var collectionName = nameof(DwcObservationVerbatim);
             var dwcRepository = CreateArchiveVerbatimRepository();
 
             // Delete the file if it exists.

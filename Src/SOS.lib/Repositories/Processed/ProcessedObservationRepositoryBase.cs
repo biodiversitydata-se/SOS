@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
-using Newtonsoft.Json;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
@@ -194,7 +192,7 @@ namespace SOS.Lib.Repositories.Processed
         public string IndexName => GetIndexName(CurrentInstance);
 
         /// <inheritdoc />
-        public new async Task<int> AddManyAsync(IEnumerable<Observation> items)
+        public async Task<int> AddManyAsync(IEnumerable<Observation> items)
         {
             // Save valid processed data
             Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");

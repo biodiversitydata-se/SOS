@@ -88,7 +88,7 @@ namespace SOS.Administration.Gui.Controllers
                 };
                 return realObs;
             }
-            catch(InvalidOperationException e)
+            catch
             {
                 return null;
             }
@@ -122,7 +122,7 @@ namespace SOS.Administration.Gui.Controllers
                 result.Take = sosResult.Take;
                 result.TotalCount = sosResult.TotalCount;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }

@@ -324,6 +324,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Count the number of observations matching the provided search filter.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="protectedObservations">If true only protected observations will be searched (this requires authentication and authorization). If false, default, public available observations will be searched.</param>
@@ -393,6 +394,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -543,6 +545,7 @@ namespace SOS.Observations.Api.Controllers
         /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
         /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
@@ -606,6 +609,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Gets a single observation.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">
@@ -649,6 +653,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="skip">Start index of returned observations.</param>
         /// <param name="take">Max number of observations to return.</param>
@@ -747,6 +752,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Get observations matching the provided search filter. This endpoint allows to retrieve up to 100 000 observations by using Elasticsearch scroll API.
         ///     Timeout between calls are two minutes.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="scrollId">The scroll id to use to get next batch. In first request scrollId should be empty.</param>
         /// <param name="take">Max number of observations to return. Max is 10 000 observations in each request.</param>
@@ -821,6 +827,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Count matching observations using internal filter
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -862,6 +869,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Aggregate observations by the specified aggregation type.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="aggregationType">The aggregation type.</param>
         /// <param name="skip">Start index of returned observations.</param>
@@ -945,6 +953,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -1004,6 +1013,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Aggregates observations into grid cells and returns them as a GeoJSON file.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -1096,6 +1106,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="geoTilePage">The GeoTile key used to retrieve the next next page of data. Should be null in the first request.</param>
@@ -1154,6 +1165,7 @@ namespace SOS.Observations.Api.Controllers
         /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
         /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
@@ -1216,6 +1228,7 @@ namespace SOS.Observations.Api.Controllers
         /// If protectedObservations is set to false, you must be aware of that the result can include false positives
         /// since the protected observations coordinates are generalized to a grid depending on the protection level.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -1267,6 +1280,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Gets a single observation, including internal fields.
         /// </summary>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="protectedObservations">

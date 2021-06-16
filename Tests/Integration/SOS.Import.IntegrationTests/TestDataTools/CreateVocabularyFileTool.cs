@@ -56,7 +56,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\Vocabularies.msgpck";
-            const int batchSize = 50000;
             var verbatimDbConfiguration = GetProcessDbConfiguration();
             var importClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),

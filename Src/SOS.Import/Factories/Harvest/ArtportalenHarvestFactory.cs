@@ -171,7 +171,7 @@ namespace SOS.Import.Factories.Harvest
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to cast Artportalen entity with SightingId={sightingId}");
-                throw ex;
+                throw;
             }
         }
 

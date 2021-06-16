@@ -160,6 +160,11 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static async Task<string> ReadFormFileAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -171,6 +176,11 @@ namespace SOS.Administration.Api.Controllers
             return await reader.ReadToEndAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static async Task<string> ReadAsStringAsync(IFormFile file)
         {
             var result = new StringBuilder();

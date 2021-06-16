@@ -19,7 +19,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
-        public async Task DateIdentified_is_parsed_to_DateTime_type()
+        public void DateIdentified_is_parsed_to_DateTime_type()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -42,7 +42,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         }
 
         [Fact]
-        public async Task DateIdentified_specified_as_DateTime_type_is_parsed_to_same_DateTime()
+        public void DateIdentified_specified_as_DateTime_type_is_parsed_to_same_DateTime()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -68,7 +68,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [Theory]
         [InlineData("verified", ValidationStatusId.Verified, true)]
         [InlineData("unverified", ValidationStatusId.Unvalidated, false)]
-        public async Task IdentificationVerificationStatus_field_with_valid_value_is_mapped_to_ValidationStatus_vocabulary(
+        public void IdentificationVerificationStatus_field_with_valid_value_is_mapped_to_ValidationStatus_vocabulary(
             string identificationVerificationStatusValue,
             ValidationStatusId expectedValidationStatusId,
             bool expectedValidatedValue)

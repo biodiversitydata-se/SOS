@@ -60,7 +60,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [InlineData(null, "TaxonId_text_without_taxon_id")] // text with no id
         [InlineData(null, "TaxonId_text_with_id_that_doesnt_exist_9999999")] // taxon id that doesn't exist
         [InlineData(null, "TaxonId_text_with_id_that_is_larger_than_max_integer_9999999000000000000")] // integer larger than int.max
-        public async Task Fails_to_parse_taxon_from_taxonId_and_scientific_name(
+        public void Fails_to_parse_taxon_from_taxonId_and_scientific_name(
             string scientificName,
             string taxonId)
         {

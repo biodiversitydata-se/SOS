@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
@@ -29,7 +28,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
         }
 
         [Fact]
-        public async Task Sex_with_Male_value_is_field_mapped()
+        public void Sex_with_Male_value_is_field_mapped()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

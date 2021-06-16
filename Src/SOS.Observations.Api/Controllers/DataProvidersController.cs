@@ -28,9 +28,10 @@ namespace SOS.Observations.Api.Controllers
         private readonly ILogger<DataProvidersController> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
+        /// <param name="observationManager"></param>
         /// <param name="logger"></param>
         public DataProvidersController(
             IDataProviderManager dataProviderManager,
