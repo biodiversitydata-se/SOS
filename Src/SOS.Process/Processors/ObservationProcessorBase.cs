@@ -22,9 +22,8 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors
 {
-    public abstract class ObservationProcessorBase<TClass, TVerbatim, TFactory, TVerbatimRepository> 
-        where TVerbatim : IEntity<int> 
-        where TFactory : IObservationFactory<TVerbatim> 
+    public abstract class ObservationProcessorBase<TClass, TVerbatim, TVerbatimRepository> 
+        where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
         private readonly IProcessManager _processManager;
@@ -118,7 +117,7 @@ namespace SOS.Process.Processors
             int startId,
             int endId,
             JobRunModes mode,
-            TFactory observationFactory,
+            IObservationFactory<TVerbatim> observationFactory,
             TVerbatimRepository observationVerbatimRepository,
             IJobCancellationToken cancellationToken)
         {
@@ -203,13 +202,12 @@ namespace SOS.Process.Processors
             catch (Exception e)
             {
                 Logger.LogError(e, $"Process {dataProvider.Identifier} sightings from id: {startId} to id: {endId} failed");
+                throw;
             }
             finally
             {
                 _processManager.Release();
             }
-
-            return (0, 0);
         }
 
         /// <summary>
@@ -316,7 +314,7 @@ namespace SOS.Process.Processors
         protected async Task<(int publicCount, int protectedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             JobRunModes mode,
-            TFactory observationFactory,
+            IObservationFactory<TVerbatim> observationFactory,
             TVerbatimRepository observationVerbatimRepository,
             IJobCancellationToken cancellationToken)
         {

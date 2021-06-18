@@ -22,7 +22,7 @@ namespace SOS.Process.Processors
         /// <param name="pointWithBuffer"></param>
         /// <param name="pointWithDisturbanceBuffer"></param>
         /// <param name="coordinateUncertaintyInMeters"></param>
-        private static void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             location.Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
             location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
@@ -58,7 +58,7 @@ namespace SOS.Process.Processors
         /// <param name="point"></param>
         /// <param name="taxonDisturbanceRadius"></param>
         /// <returns></returns>
-        private static Geometry GetPointWithDisturbanceBuffer(Point point, int? taxonDisturbanceRadius)
+        private Geometry GetPointWithDisturbanceBuffer(Point point, int? taxonDisturbanceRadius)
         {
             if (!(taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0))
             {
@@ -69,7 +69,7 @@ namespace SOS.Process.Processors
         }
 
 
-        protected static void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
+        protected void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             Point point = null;
             if (verbatimLongitude.HasValue && verbatimLongitude.Value > 0 && verbatimLatitude.HasValue && verbatimLatitude > 0)
@@ -88,7 +88,7 @@ namespace SOS.Process.Processors
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }
 
-        protected static void AddPositionData(Location location, double? verbatimLongitude,
+        protected void AddPositionData(Location location, double? verbatimLongitude,
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
             Geometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {

@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.ObservationDatabase
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class ObservationDatabaseProcessor : ObservationProcessorBase<ObservationDatabaseProcessor, ObservationDatabaseVerbatim, ObservationDatabaseObservationFactory, IObservationDatabaseVerbatimRepository>, 
+    public class ObservationDatabaseProcessor : ObservationProcessorBase<ObservationDatabaseProcessor, ObservationDatabaseVerbatim, IObservationDatabaseVerbatimRepository>, 
         IObservationDatabaseProcessor
     {
         private readonly IObservationDatabaseVerbatimRepository _observationDatabaseVerbatimRepository;

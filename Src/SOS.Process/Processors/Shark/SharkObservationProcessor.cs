@@ -19,7 +19,7 @@ namespace SOS.Process.Processors.Shark
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class SharkObservationProcessor : ObservationProcessorBase<SharkObservationProcessor, SharkObservationVerbatim, SharkObservationFactory, ISharkObservationVerbatimRepository>,
+    public class SharkObservationProcessor : ObservationProcessorBase<SharkObservationProcessor, SharkObservationVerbatim, ISharkObservationVerbatimRepository>,
         ISharkObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

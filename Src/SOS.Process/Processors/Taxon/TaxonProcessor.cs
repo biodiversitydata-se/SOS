@@ -41,7 +41,7 @@ namespace SOS.Process.Processors.Taxon
 
             var taxonCount = taxa.Count();
             var skip = 0;
-            const int take = 1000;
+            const int take = 500;
 
             var getTaxonAttributesTasks = new List<Task>();
 
@@ -67,90 +67,95 @@ namespace SOS.Process.Processors.Taxon
         /// <returns></returns>
         private async Task GetTaxonAttributes(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IEnumerable<int> taxonIds, int currentRedlistPeriodId)
         {
-            _logger.LogDebug("Start get taxon attributes batch");
-            var taxonAttributes =
-                    await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
-                        (int[])Enum.GetValues(typeof(FactorEnum)),
-                        new[] { 0, currentRedlistPeriodId });
-
-            if (taxonAttributes?.Any() ?? false)
+            try
             {
-                foreach (var taxonAttribute in taxonAttributes)
+                _logger.LogDebug("Start get taxon attributes batch");
+                var taxonAttributes =
+                        await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
+                            (int[])Enum.GetValues(typeof(FactorEnum)),
+                            new[] { 0, currentRedlistPeriodId });
+
+                if (taxonAttributes?.Any() ?? false)
                 {
-                    if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon))
+                    foreach (var taxonAttribute in taxonAttributes)
                     {
-                        continue;
-                    }
-
-                    if (taxon.DynamicProperties == null)
-                    {
-                        taxon.DynamicProperties = new TaxonDynamicProperties();
-                    }
-
-                    foreach (var factor in taxonAttribute.Factors)
-                    {
-                        switch ((FactorEnum)factor.Id)
+                        if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon))
                         {
-                            case FactorEnum.ActionPlan:
-                                taxon.DynamicProperties.ActionPlan =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
-                            case FactorEnum.BirdDirective:
-                                taxon.DynamicProperties.BirdDirective = factor.Attributes
-                                    ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                        StringComparison.CurrentCultureIgnoreCase);
-                                break;
-                            case FactorEnum.DisturbanceRadius:
-                                taxon.DynamicProperties.DisturbanceRadius =
-                                    int.Parse(factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value ?? "0");
-                                break;
-                            case FactorEnum.Natura2000HabitatsDirectiveArticle2:
-                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = factor.Attributes
-                                    ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                        StringComparison.CurrentCultureIgnoreCase);
-                                break;
-                            case FactorEnum.Natura2000HabitatsDirectiveArticle4:
-                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = factor.Attributes
-                                    ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                        StringComparison.CurrentCultureIgnoreCase);
-                                break;
-                            case FactorEnum.Natura2000HabitatsDirectiveArticle5:
-                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = factor.Attributes
-                                    ?.FirstOrDefault(a => a.IsMainField)?.Value.Contains("ja",
-                                        StringComparison.CurrentCultureIgnoreCase);
-                                break;
-                            case FactorEnum.OrganismGroup:
-                                taxon.DynamicProperties.OrganismGroup =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
-                            case FactorEnum.ProtectedByLaw:
-                                taxon.DynamicProperties.ProtectedByLaw = factor.Attributes
-                                    ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
-                                        StringComparison.CurrentCultureIgnoreCase);
-                                break;
-                            case FactorEnum.ProtectionLevel:
-                                taxon.DynamicProperties.ProtectionLevel =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
-                            case FactorEnum.RedlistCategory:
-                                taxon.DynamicProperties.RedlistCategory =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
-                            case FactorEnum.SwedishHistory:
-                                taxon.DynamicProperties.SwedishHistory =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
-                            case FactorEnum.SwedishOccurrence:
-                                taxon.DynamicProperties.SwedishOccurrence =
-                                    factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                break;
+                            continue;
+                        }
+
+                        if (taxon.DynamicProperties == null)
+                        {
+                            taxon.DynamicProperties = new TaxonDynamicProperties();
+                        }
+
+                        foreach (var factor in taxonAttribute.Factors)
+                        {
+                            switch ((FactorEnum)factor.Id)
+                            {
+                                case FactorEnum.ActionPlan:
+                                    taxon.DynamicProperties.ActionPlan =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                                case FactorEnum.BirdDirective:
+                                    taxon.DynamicProperties.BirdDirective = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.DisturbanceRadius:
+                                    taxon.DynamicProperties.DisturbanceRadius =
+                                        int.Parse(factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value ?? "0");
+                                    break;
+                                case FactorEnum.Natura2000HabitatsDirectiveArticle2:
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.Natura2000HabitatsDirectiveArticle4:
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.Natura2000HabitatsDirectiveArticle5:
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.OrganismGroup:
+                                    taxon.DynamicProperties.OrganismGroup =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                                case FactorEnum.ProtectedByLaw:
+                                    taxon.DynamicProperties.ProtectedByLaw = factor.Attributes
+                                        ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.ProtectionLevel:
+                                    taxon.DynamicProperties.ProtectionLevel =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                                case FactorEnum.RedlistCategory:
+                                    taxon.DynamicProperties.RedlistCategory =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                                case FactorEnum.SwedishHistory:
+                                    taxon.DynamicProperties.SwedishHistory =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                                case FactorEnum.SwedishOccurrence:
+                                    taxon.DynamicProperties.SwedishOccurrence =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    break;
+                            }
                         }
                     }
                 }
+                _logger.LogDebug("Finish get taxon attributes batch");
             }
-            _logger.LogDebug("Finish get taxon attributes batch");
-
-            _semaphore.Release();
+            catch
+            {
+                _semaphore.Release();
+            }
         }
 
         /// <summary>

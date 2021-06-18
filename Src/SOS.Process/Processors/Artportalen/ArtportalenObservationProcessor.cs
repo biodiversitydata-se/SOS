@@ -21,7 +21,7 @@ namespace SOS.Process.Processors.Artportalen
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class ArtportalenObservationProcessor : ObservationProcessorBase<ArtportalenObservationProcessor, ArtportalenObservationVerbatim, ArtportalenObservationFactory, IArtportalenVerbatimRepository>,
+    public class ArtportalenObservationProcessor : ObservationProcessorBase<ArtportalenObservationProcessor, ArtportalenObservationVerbatim, IArtportalenVerbatimRepository>,
         IArtportalenObservationProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
