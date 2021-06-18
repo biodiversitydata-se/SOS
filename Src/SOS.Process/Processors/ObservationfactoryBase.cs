@@ -5,6 +5,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Process.Processors
@@ -22,7 +23,7 @@ namespace SOS.Process.Processors
         /// <param name="pointWithBuffer"></param>
         /// <param name="pointWithDisturbanceBuffer"></param>
         /// <param name="coordinateUncertaintyInMeters"></param>
-        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, PolygonGeoShape pointWithBuffer, PolygonGeoShape pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             location.Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
             location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
@@ -37,10 +38,10 @@ namespace SOS.Process.Processors
 
             location.DecimalLongitude = point.X;
             location.DecimalLatitude = point.Y;
-            location.Point = (PointGeoShape)point.ToGeoShape();
+            location.Point = point.ToGeoShape() as PointGeoShape;
             location.PointLocation = point.ToGeoLocation();
-            location.PointWithBuffer = (PolygonGeoShape)pointWithBuffer?.ToGeoShape();
-            location.PointWithDisturbanceBuffer = (PolygonGeoShape)pointWithDisturbanceBuffer?.ToGeoShape();
+            location.PointWithBuffer = pointWithBuffer;
+            location.PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
 
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
 
@@ -85,16 +86,16 @@ namespace SOS.Process.Processors
             var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
-            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
+            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
         }
 
         protected void AddPositionData(Location location, double? verbatimLongitude,
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
-            Geometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
+            GeoJsonGeometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
-            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
+            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
         }
     }
 }
