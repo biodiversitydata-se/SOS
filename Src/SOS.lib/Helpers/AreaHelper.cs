@@ -220,7 +220,7 @@ namespace SOS.Lib.Helpers
 
                 if (!_featureCache.ContainsKey(key))
                 {
-                    _featureCache.Add(key, positionLocation);
+                    _featureCache.TryAdd(key, positionLocation);
                 }
             }
 
