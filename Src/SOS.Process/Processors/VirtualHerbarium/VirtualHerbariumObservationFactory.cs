@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -32,17 +31,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-        /// <summary>
-        ///     Cast multiple clam observations to ProcessedObservation
-        /// </summary>
-        /// <param name="verbatims"></param>
-        /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
-            IEnumerable<VirtualHerbariumObservationVerbatim> verbatims)
-        {
-            return verbatims?.Select(v => CreateProcessedObservation(v));
         }
 
         /// <summary>

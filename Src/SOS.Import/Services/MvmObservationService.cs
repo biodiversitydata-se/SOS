@@ -15,7 +15,7 @@ namespace SOS.Import.Services
         private readonly MvmServiceConfiguration _mvmServiceConfiguration;
         private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
 
-        private async Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId, byte attempt)
+        private async Task<(long maxChangeId, IEnumerable<WebSpeciesObservation> observations)> GetAsync(long getFromId, byte attempt)
         {
             try
             {
@@ -32,13 +32,13 @@ namespace SOS.Import.Services
                         maxReturnedChanges = _mvmServiceConfiguration.MaxReturnedChangesInOnePage
                     }
                 );
-
-                var result = response?.GetSpeciesObservationChangeAsSpeciesResult;
-
                 _logger.LogDebug(
-                    $"Getting observations from MVM Service: From id: {getFromId}, Created: {result?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result?.DeletedSpeciesObservationGuids?.Length ?? 0}");
-                return new Tuple<long, IEnumerable<WebSpeciesObservation>>(result.MaxChangeId,
-                    result.CreatedSpeciesObservations);
+                    $"´Start getting observations from MVM Service: From id: {getFromId}");
+                var result = response?.GetSpeciesObservationChangeAsSpeciesResult;
+                _logger.LogDebug(
+                    $"´Finish getting observations from MVM Service: From id: {getFromId}");
+
+                return (result.MaxChangeId, result.CreatedSpeciesObservations);
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ namespace SOS.Import.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId)
+        public async Task<(long MaxChangeId, IEnumerable<WebSpeciesObservation> Observations)> GetAsync(long getFromId)
         {
             return await GetAsync(getFromId, 1);
         }

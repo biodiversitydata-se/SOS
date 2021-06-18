@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -66,17 +67,16 @@ namespace SOS.Import.Harvesters.Observations
 
                 var nrSightingsHarvested = 0;
                 var result = await _mvmObservationService.GetAsync(0);
-                var maxId = result?.Item1 ?? 0;
+               
                 var dataLastModified = DateTime.MinValue;
                 var verbatimFactory = new MvmHarvestFactory();
 
                 // Loop until all sightings are fetched.
-                while (maxId != 0)
+                while (result.MaxChangeId != 0)
                 {
-                    var sightings = result?.Item2;
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(sightings))?.ToArray();
+                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
                     nrSightingsHarvested += verbatims.Length;
 
                     // Add sightings to MongoDb
@@ -95,8 +95,10 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    result = await _mvmObservationService.GetAsync(maxId + 1);
-                    maxId = result?.Item1 ?? 0;
+                    // Give target service some slack
+                    Thread.Sleep(1000);
+
+                    result = await _mvmObservationService.GetAsync(result.MaxChangeId + 1);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for MVM data provider");

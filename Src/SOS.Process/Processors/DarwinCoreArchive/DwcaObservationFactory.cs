@@ -86,12 +86,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper);
         }
 
-        public IEnumerable<Observation> CreateProcessedObservations(
-            IEnumerable<DwcObservationVerbatim> verbatims)
-        {
-            return verbatims?.Select(v => CreateProcessedObservation(v));
-        }
-
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>

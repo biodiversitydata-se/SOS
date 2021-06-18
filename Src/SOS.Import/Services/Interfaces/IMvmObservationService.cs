@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MvmService;
 
@@ -12,6 +11,6 @@ namespace SOS.Import.Services.Interfaces
         /// </summary>
         /// <param name="getFromId"></param>
         /// <returns></returns>
-        Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId);
+        Task<(long MaxChangeId, IEnumerable<WebSpeciesObservation> Observations)> GetAsync(long getFromId);
     }
 }
