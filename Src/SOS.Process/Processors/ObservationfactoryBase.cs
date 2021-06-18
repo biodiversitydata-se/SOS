@@ -69,7 +69,15 @@ namespace SOS.Process.Processors
             return point.ToCircle(taxonDisturbanceRadius);
         }
 
-
+        /// <summary>
+        /// Add position data
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="verbatimLongitude"></param>
+        /// <param name="verbatimLatitude"></param>
+        /// <param name="verbatimCoordinateSystem"></param>
+        /// <param name="coordinateUncertaintyInMeters"></param>
+        /// <param name="taxonDisturbanceRadius"></param>
         protected void AddPositionData(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
             Point point = null;
@@ -89,6 +97,17 @@ namespace SOS.Process.Processors
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
         }
 
+        /// <summary>
+        /// Add position data
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="verbatimLongitude"></param>
+        /// <param name="verbatimLatitude"></param>
+        /// <param name="verbatimCoordinateSystem"></param>
+        /// <param name="point"></param>
+        /// <param name="pointWithBuffer"></param>
+        /// <param name="coordinateUncertaintyInMeters"></param>
+        /// <param name="taxonDisturbanceRadius"></param>
         protected void AddPositionData(Location location, double? verbatimLongitude,
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
             GeoJsonGeometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
