@@ -164,7 +164,7 @@ namespace SOS.Process.Processors.Artportalen
                     verbatimObservation.Site?.YCoord,
                     CoordinateSys.WebMercator,
                     point,
-                    verbatimObservation.Site?.PointWithBuffer?.ToGeometry(),
+                    verbatimObservation.Site?.PointWithBuffer,
                     verbatimObservation.Site?.Accuracy,
                     taxon?.Attributes?.DisturbanceRadius);
 
