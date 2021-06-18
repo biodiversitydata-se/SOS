@@ -267,10 +267,15 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine(
                 $"[ProcessedDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");
             sb.AppendLine(
-                $"[VerbatimDb].[Servers]: {string.Join(", ", _processDbConfiguration.Hosts.Select(x => x.Name))}");
-            sb.AppendLine($"[VerbatimDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");
-            sb.AppendLine($"[VerbatimDb].[ReadBatchSize]: {_processDbConfiguration.ReadBatchSize}");
-            sb.AppendLine($"[VerbatimDb].[WriteBatchSize]: {_processDbConfiguration.WriteBatchSize}");
+                $"[ProcessedDb].[Servers]: {string.Join(", ", _processDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[ProcessedDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[ProcessedDb].[ReadBatchSize]: {_processDbConfiguration.ReadBatchSize}");
+            sb.AppendLine($"[ProcessedDb].[WriteBatchSize]: {_processDbConfiguration.WriteBatchSize}");
+            sb.AppendLine("");
+            sb.AppendLine($"[ProcessedDb].[NoOfThreads]: {_processConfiguration.NoOfThreads}");
+            sb.AppendLine($"[ProcessedDb].[Diffusion]: {_processConfiguration.Diffusion}");
+            sb.AppendLine($"[ProcessedDb].[Export_Container]: {_processConfiguration.Export_Container}");
+            sb.AppendLine($"[ProcessedDb].[RunIncrementalAfterFull]: {_processConfiguration.RunIncrementalAfterFull}");
             sb.AppendLine("");
 
             sb.AppendLine("Export settings:");

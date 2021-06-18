@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using AgileObjects.AgileMapper.Extensions;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -87,10 +89,12 @@ namespace SOS.Process.Jobs
                 return null;
             }
 
-            var taxonById = taxa.ToDictionary(m => m.Id, m => m);
-            _logger.LogInformation("Finish getting processed taxa");
-
-            return taxonById;
+            var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
+            taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
+            
+            _logger.LogInformation($"Finish getting processed taxa ({taxaDictonary.Count})");
+            
+            return taxaDictonary;
         }
 
         private async Task InitializeAreaHelperAsync()

@@ -191,7 +191,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Post to {requestUri.AbsolutePath} failed");
+                _logger.LogError($"Post to {requestUri} failed", ex);
             }
             finally
             {

@@ -63,17 +63,6 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        ///     Cast multiple clam observations to ProcessedObservation
-        /// </summary>
-        /// <param name="verbatims"></param>
-        /// <returns></returns>
-        public IEnumerable<Observation> CreateProcessedObservations(
-            IEnumerable<ArtportalenObservationVerbatim> verbatims)
-        {
-            return verbatims?.Select(v => CreateProcessedObservation(v));
-        }
-
-        /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
         /// <param name="verbatimObservation"></param>
