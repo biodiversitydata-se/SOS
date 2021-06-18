@@ -152,7 +152,7 @@ namespace SOS.Process.Processors.Taxon
                 }
                 _logger.LogDebug("Finish get taxon attributes batch");
             }
-            catch
+            finally
             {
                 _semaphore.Release();
             }
