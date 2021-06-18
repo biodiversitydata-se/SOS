@@ -19,7 +19,7 @@ namespace SOS.Process.Processors.Mvm
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor, MvmObservationVerbatim, MvmObservationFactory, IMvmObservationVerbatimRepository>, IMvmObservationProcessor
+    public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor, MvmObservationVerbatim, IMvmObservationVerbatimRepository>, IMvmObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;

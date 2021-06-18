@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.Kul
     ///     Process factory class
     /// </summary>
     public class KulObservationProcessor : 
-        ObservationProcessorBase<KulObservationProcessor, KulObservationVerbatim, KulObservationFactory, IKulObservationVerbatimRepository>, 
+        ObservationProcessorBase<KulObservationProcessor, KulObservationVerbatim, IKulObservationVerbatimRepository>, 
         IKulObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

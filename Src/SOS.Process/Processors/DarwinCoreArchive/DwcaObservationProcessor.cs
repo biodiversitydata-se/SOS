@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation processor.
     /// </summary>
-    public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor, DwcObservationVerbatim, DwcaObservationFactory, IDarwinCoreArchiveVerbatimRepository>,
+    public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor, DwcObservationVerbatim, IDarwinCoreArchiveVerbatimRepository>,
         IDwcaObservationProcessor
     {
         private readonly IVerbatimClient _verbatimClient;

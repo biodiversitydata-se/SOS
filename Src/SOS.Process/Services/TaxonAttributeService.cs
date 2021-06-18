@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
@@ -18,6 +19,29 @@ namespace SOS.Process.Services
         private readonly IHttpClientService _httpClientService;
         private readonly ILogger<TaxonAttributeService> _logger;
         private readonly TaxonAttributeServiceConfiguration _taxonAttributeServiceConfiguration;
+
+        private async Task<IEnumerable<TaxonAttributeModel>> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
+            IEnumerable<int> factorIds, IEnumerable<int> periodIds, int attempt)
+        {
+            try
+            {
+                return await _httpClientService.PostDataAsync<IEnumerable<TaxonAttributeModel>>(
+                    new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/Taxa"),
+                    new { taxonIds, factorIds, periodIds, qualityIds = new[] { 1, 2, 3 } }, GetHeaderData());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to get taxon attributes attempt: {attempt}");
+
+                if (attempt > 2)
+                {
+                    return null;
+                }
+
+                Thread.Sleep(attempt * 500);
+                return await GetTaxonAttributesAsync(taxonIds, factorIds, periodIds, ++attempt);
+            }
+        }
 
         /// <summary>
         ///     Constructor
@@ -59,17 +83,7 @@ namespace SOS.Process.Services
         public async Task<IEnumerable<TaxonAttributeModel>> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
             IEnumerable<int> factorIds, IEnumerable<int> periodIds)
         {
-            try
-            {
-                return await _httpClientService.PostDataAsync<IEnumerable<TaxonAttributeModel>>(
-                    new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/Taxa"),
-                    new {taxonIds, factorIds, periodIds, qualityIds = new[] {1, 2, 3}}, GetHeaderData());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get taxon attributes");
-                return null;
-            }
+            return await GetTaxonAttributesAsync(taxonIds, factorIds, periodIds, 1);
         }
 
         /// <summary>

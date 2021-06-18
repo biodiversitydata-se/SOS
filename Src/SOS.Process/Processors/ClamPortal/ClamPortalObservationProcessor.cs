@@ -19,7 +19,7 @@ namespace SOS.Process.Processors.ClamPortal
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class ClamPortalObservationProcessor : ObservationProcessorBase<ClamPortalObservationProcessor, ClamObservationVerbatim, ClamPortalObservationFactory, IClamObservationVerbatimRepository>,
+    public class ClamPortalObservationProcessor : ObservationProcessorBase<ClamPortalObservationProcessor, ClamObservationVerbatim, IClamObservationVerbatimRepository>,
         IClamPortalObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

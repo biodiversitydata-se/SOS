@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
     ///     Process factory class
     /// </summary>
     public class VirtualHerbariumObservationProcessor : 
-        ObservationProcessorBase<VirtualHerbariumObservationProcessor, VirtualHerbariumObservationVerbatim, VirtualHerbariumObservationFactory, IVirtualHerbariumObservationVerbatimRepository>,
+        ObservationProcessorBase<VirtualHerbariumObservationProcessor, VirtualHerbariumObservationVerbatim, IVirtualHerbariumObservationVerbatimRepository>,
         IVirtualHerbariumObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

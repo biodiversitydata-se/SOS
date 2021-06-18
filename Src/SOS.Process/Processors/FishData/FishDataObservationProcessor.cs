@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.FishData
     ///     Process factory class
     /// </summary>
     public class FishDataObservationProcessor : 
-        ObservationProcessorBase<FishDataObservationProcessor, FishDataObservationVerbatim, FishDataObservationFactory, IFishDataObservationVerbatimRepository>, IFishDataObservationProcessor
+        ObservationProcessorBase<FishDataObservationProcessor, FishDataObservationVerbatim, IFishDataObservationVerbatimRepository>, IFishDataObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IFishDataObservationVerbatimRepository _fishDataObservationVerbatimRepository;

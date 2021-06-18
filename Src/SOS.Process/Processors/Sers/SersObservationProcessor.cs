@@ -19,7 +19,7 @@ namespace SOS.Process.Processors.Sers
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class SersObservationProcessor : ObservationProcessorBase<SersObservationProcessor, SersObservationVerbatim, SersObservationFactory, ISersObservationVerbatimRepository>,
+    public class SersObservationProcessor : ObservationProcessorBase<SersObservationProcessor, SersObservationVerbatim, ISersObservationVerbatimRepository>,
         ISersObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;

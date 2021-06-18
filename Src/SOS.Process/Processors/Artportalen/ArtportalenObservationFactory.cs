@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -649,7 +650,7 @@ namespace SOS.Process.Processors.Artportalen
             ExternalSystemId externalSystemId,
             ICollection<Vocabulary> allVocabularies)
         {
-            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
+            var dic = new ConcurrentDictionary<VocabularyId, IDictionary<object, int>>();
 
             if (allVocabularies == null)
             {
@@ -664,7 +665,7 @@ namespace SOS.Process.Processors.Artportalen
                     var mappingKey = "Id";
                     var mapping = processedVocabularies.Mappings.Single(m => m.Key == mappingKey);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(vocabulary.Id, sosIdByValue);
+                    dic.TryAdd(vocabulary.Id, sosIdByValue);
                 }
             }
 

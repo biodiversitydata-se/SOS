@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.Nors
     ///     Process factory class
     /// </summary>
     public class NorsObservationProcessor : 
-        ObservationProcessorBase<NorsObservationProcessor, NorsObservationVerbatim, NorsObservationFactory, INorsObservationVerbatimRepository>,
+        ObservationProcessorBase<NorsObservationProcessor, NorsObservationVerbatim, INorsObservationVerbatimRepository>,
         INorsObservationProcessor
     {
         private readonly IAreaHelper _areaHelper;
