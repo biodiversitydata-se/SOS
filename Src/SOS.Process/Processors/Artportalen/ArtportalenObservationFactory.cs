@@ -26,7 +26,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.Artportalen
 {
-    public class ArtportalenObservationFactory : ObservationfactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
+    public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
@@ -85,10 +85,10 @@ namespace SOS.Process.Processors.Artportalen
                 var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
-
+               
                 var taxonId = verbatimObservation.TaxonId ?? -1;
                 _taxa.TryGetValue(taxonId, out var taxon);
-
+               
                 var obs = new Observation();
 
                 // Record level
@@ -145,7 +145,7 @@ namespace SOS.Process.Processors.Artportalen
                 }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
                 obs.Identification.UncertainIdentification = verbatimObservation.UnsureDetermination;
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
-
+               
                 // Location
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;

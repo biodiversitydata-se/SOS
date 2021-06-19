@@ -23,7 +23,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation factory.
     /// </summary>
-    public class DwcaObservationFactory : ObservationfactoryBase, IObservationFactory<DwcObservationVerbatim>
+    public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactory<DwcObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;

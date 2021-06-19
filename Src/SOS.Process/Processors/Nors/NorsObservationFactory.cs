@@ -12,7 +12,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Nors
 {
-    public class NorsObservationFactory : ObservationfactoryBase, IObservationFactory<NorsObservationVerbatim>
+    public class NorsObservationFactory : ObservationFactoryBase, IObservationFactory<NorsObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -103,13 +104,14 @@ namespace SOS.Process.Processors
         }
 
         /// <summary>
-        /// Process a batch of data
+        ///  Process a batch of data
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="startId"></param>
         /// <param name="endId"></param>
         /// <param name="mode"></param>
         /// <param name="observationFactory"></param>
+        /// <param name="observationVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<(int publicCount, int protectedCount)> ProcessBatchAsync(
@@ -132,18 +134,16 @@ namespace SOS.Process.Processors
                 {
                     return (0, 0);
                 }
-
+       
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
-
-                var publicObservations = new List<Observation>();
-                var protectedObservations = new List<Observation>();
+                
+                var publicObservations = new HashSet<Observation>();
+                var protectedObservations = new HashSet<Observation>();
                
                 foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
-
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation);
-
+                 
                     if (observation == null)
                     {
                         continue;

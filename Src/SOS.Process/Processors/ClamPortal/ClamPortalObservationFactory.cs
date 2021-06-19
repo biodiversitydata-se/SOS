@@ -14,7 +14,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.ClamPortal
 {
-    public class ClamPortalObservationFactory : ObservationfactoryBase, IObservationFactory<ClamObservationVerbatim>
+    public class ClamPortalObservationFactory : ObservationFactoryBase, IObservationFactory<ClamObservationVerbatim>
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly DataProvider _dataProvider;
@@ -100,7 +100,7 @@ namespace SOS.Process.Processors.ClamPortal
                 },
                 DynamicProperties = string.IsNullOrEmpty(verbatim.ProjectName)
                     ? null
-                    : JsonConvert.SerializeObject(new {ProjectName = verbatim.ProjectName}),
+                    : JsonConvert.SerializeObject(new {verbatim.ProjectName}),
                 RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
             };

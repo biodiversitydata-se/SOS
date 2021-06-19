@@ -12,7 +12,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Mvm
 {
-    public class MvmObservationFactory : ObservationfactoryBase, IObservationFactory<MvmObservationVerbatim>
+    public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory<MvmObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
