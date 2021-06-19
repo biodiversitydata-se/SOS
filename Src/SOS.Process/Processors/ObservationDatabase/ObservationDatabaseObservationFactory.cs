@@ -15,7 +15,7 @@ namespace SOS.Process.Processors.ObservationDatabase
     /// <summary>
     /// Observation database factory
     /// </summary>
-    public class ObservationDatabaseObservationFactory : ObservationfactoryBase, IObservationFactory<ObservationDatabaseVerbatim>
+    public class ObservationDatabaseObservationFactory : ObservationFactoryBase, IObservationFactory<ObservationDatabaseVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;

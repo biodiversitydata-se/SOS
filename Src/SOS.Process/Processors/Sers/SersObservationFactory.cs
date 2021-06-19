@@ -12,7 +12,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Sers
 {
-    public class SersObservationFactory : ObservationfactoryBase, IObservationFactory<SersObservationVerbatim>
+    public class SersObservationFactory : ObservationFactoryBase, IObservationFactory<SersObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;

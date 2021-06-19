@@ -12,7 +12,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.FishData
 {
-    public class FishDataObservationFactory : ObservationfactoryBase, IObservationFactory<FishDataObservationVerbatim>
+    public class FishDataObservationFactory : ObservationFactoryBase, IObservationFactory<FishDataObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;

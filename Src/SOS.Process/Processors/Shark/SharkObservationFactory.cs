@@ -13,7 +13,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Shark
 {
-    public class SharkObservationFactory : ObservationfactoryBase, IObservationFactory<SharkObservationVerbatim>
+    public class SharkObservationFactory : ObservationFactoryBase, IObservationFactory<SharkObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;

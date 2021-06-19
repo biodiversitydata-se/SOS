@@ -13,7 +13,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Process.Processors.VirtualHerbarium
 {
-    public class VirtualHerbariumObservationFactory : ObservationfactoryBase, IObservationFactory<VirtualHerbariumObservationVerbatim>
+    public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObservationFactory<VirtualHerbariumObservationVerbatim>
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;

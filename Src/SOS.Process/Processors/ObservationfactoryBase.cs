@@ -10,7 +10,10 @@ using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Process.Processors
 {
-    public class ObservationfactoryBase
+    /// <summary>
+    /// Base class for observation factories
+    /// </summary>
+    public class ObservationFactoryBase
     {
         /// <summary>
         /// Init location class

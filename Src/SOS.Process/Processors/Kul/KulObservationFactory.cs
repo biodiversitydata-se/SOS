@@ -12,7 +12,7 @@ using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Kul
 {
-    public class KulObservationFactory : ObservationfactoryBase, IObservationFactory<KulObservationVerbatim>
+    public class KulObservationFactory : ObservationFactoryBase, IObservationFactory<KulObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
