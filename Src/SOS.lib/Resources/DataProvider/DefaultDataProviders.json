@@ -1148,5 +1148,287 @@
         "HarvestFailPreventProcessing": false,
         "IncludeInHealthCheck": true,
         "LatestUploadedFileHash": null
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Bird Survey: Swedish coastal bird monitoring programme"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeltaxeringen: Nationella kustfågelövervakningen"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The Swedish coastal bird monitoring programme (aka the ”Archipelago squares”/”Kustfågelrutorna”) is one of several schemes within the Swedish Bird Survey (see below), run by the Department of Biology at Lund University. The survey scheme was initiated in 2015 as a standardized method for detecting and reporting changes in the abundance of coastal and archipelagic birds and their distributions in Sweden over time. The 200 archipelago squares are distributed along the Swedish coastline and are surveyed during the breeding season."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": " Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Lund University", "Swedish Bird Survey: Swedish coastal bird monitoring programme" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds universitet", "Fågeltaxeringen: Nationella kustfågelövervakningen" ]
+            }
+        ],
+        "Url": "https://www.naturdatavardskap.lu.se/start",
+        "ContactPerson": {
+            "FirstName": "Fredrik",
+            "LastName": "Haas",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "DownloadUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_kfr&v=1.2",
+        "DownloadUrlEml": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr&v=1.2",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "SupportDynamicEml": true,
+        "IncludeInSearchByDefault": true,
+        "Id": 20,
+        "Identifier": "SBS-BirdMonitoringProgramme",
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Bird Survey: Summer point count routes"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeltaxeringen: Sommarpunktrutterna"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "he summer and winter point count routes (“punktrutterna”) are two of several schemes within the Swedish Bird Survey (see below), run by the Department of Biology at Lund University. The point count routes were initiated in 1975 as a standardised method for detecting and reporting changes in the abundance of birds and their distributions in Sweden over time. The point count routes can be surveyed in summer and/or winter. The surveys are initiated and carried out by volunteer ornithologists who use standardised methods to count birds along routes of their own choice. More than 3000 point count routes have been surveyed at least once up to and including the year 2019, and approximately 1200 of these have been surveyed during the summer. The dataset presented here is for the summer point count routes."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": " Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Lund University", "Swedish Bird Survey: Summer point count routes" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds universitet", "Fågeltaxeringen: Sommarpunktrutterna" ]
+            }
+        ],
+        "Url": "http://www.fageltaxering.lu.se/inventera/metoder/punktrutter",
+        "ContactPerson": {
+            "FirstName": "Åke",
+            "LastName": "Lindström",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "DownloadUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_spkt&v=1.2",
+        "DownloadUrlEml": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt&v=1.2",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "SupportDynamicEml": true,
+        "IncludeInSearchByDefault": true,
+        "Id": 21,
+        "Identifier": "SBS-SummerPointCountRoutes",
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Bird Survey: Fixed routes"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Fågeltaxeringen: Standardrutterna"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The fixed routes (standardrutterna) are one of several schemes within the Swedish Bird Survey (see below), run by the Department of Biology at Lund University, on behalf of the Swedish Environmental Protection Agency. The fixed routes were initiated in 1996 as a standardized method for detecting and reporting changes in the abundance of birds (since 1996) and mammals (since 2011), and their distributions in Sweden over time. This is possible due to the routes being distributed across Sweden in such a way that all main habitats are surveyed in a representative manner, and by counting birds and mammals using the same methods, in the same locations, year after year. The surveys are carried out by volunteer ornithologists."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": " Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Lund University", "Swedish Bird Survey: Fixed routes" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds universitet", "Fågeltaxeringen: Standardrutterna" ]
+            }
+        ],
+        "Url": "http://www.fageltaxering.lu.se/inventera/metoder/standardrutter",
+        "ContactPerson": {
+            "FirstName": "Åke",
+            "LastName": "Lindström",
+            "Email": "fageltaxering@biol.lu.se"
+        },
+        "DownloadUrl": "https://www.gbif.se/ipt/archive.do?r=lu_sft_std&v=1.8",
+        "DownloadUrlEml": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std&v=1.8",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "SupportDynamicEml": true,
+        "IncludeInSearchByDefault": true,
+        "Id": 22,
+        "Identifier": "SBS-FixedRoutes",
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Coastal birds in the Gulf of Bothnia"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Kustfåglar i Bottniska viken"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Coastal birds in the Gulf of Bothnia (Kustfåglar i Bottniska Viken) is a joint subprogramme (gemensamt delprogram) within the regional environmental monitoring in Sweden. The programme is run by the four County Administrative Boards (Länsstyrelsen) of Norrbotten, Västerbotten, Västernorrland and Gävleborg. The programme was developed in 2009-2010, and its purpose is to register the presence and population sizes of breeding bird species characteristic of coastal and archipelagic areas in the Gulf of Bothnia, thus enabling changes of these to be monitored. The work is carried out in collaboration with, and is supported by, the Swedish Environmental Protection Agency. The surveys are carried out by employees at the County Administrative Boards as well as hired consultants and experienced ornithologists."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": " Lund University"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Lunds universitet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Lund University", "Coastal birds in the Gulf of Bothnia" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "Lunds universitet", "Kustfåglar i Bottniska viken" ]
+            }
+        ],
+        "Url": "",
+        "ContactPerson": {
+            "FirstName": "Peter",
+            "LastName": "Nilsson",
+            "Email": "peter.nilsson@lansstyrelsen.se"
+        },
+        "DownloadUrl": "https://www.gbif.se/ipt/archive.do?r=lu_kbv&v=1.3",
+        "DownloadUrlEml": "https://www.gbif.se/ipt/eml.do?r=lu_kbv&v=1.3",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "SupportDynamicEml": true,
+        "IncludeInSearchByDefault": true,
+        "Id": 23,
+        "Identifier": "BirdsInTheGulf",
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
+    },
+    {
+        "Type": "DwcA",
+        "IsActive": true,
+        "Names": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "National Meadow and Pasture Inventory (TUVA)"
+            }
+        ],
+        "Descriptions": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "The Meadow and Pasture Inventory is a Swedish national inventory of biologically valuable meadows and pastures. The inventory collects information about a number of natural and cultural environments containing flora and other organisms that are highly dependent on hay-making or grazing animals. In the inventory only nature values connected to hay-making or grazing are assessed. The information from the inventory is open to all and collected in the Swedish Board of Agriculture database TUVA (www.jordbruksverket.se/tuva). The TUVA database contains information about: 1. Fully inventoried pastures and meadows (classified as mown meadow, open pasture, forest pasture and mountain pasture), 2. Meadows and pastures that are restorable, 3. Non-applicable meadows and pastures. A sub-classification of the types of meadows and pastures treated was also made using the Habitat Directive; Council Directive 92/43/EEC, or they were classified as developmental- or other types of fields. Inventories of indicator species (vascular plants), meadow fungi, trees and shrubs, cultural elements, water bodies and status of present management was also performed. The majority of the meadows and pastures in TUVA were inventoried between the years 2002 and 2004. Inventories have since then and up until 2012 been performed on a smaller scale. From 2016 and onwards, the national inventory has been reopened with a focus on performing repeated monitoring of already inventoried meadows and pastures. The information from the Meadow and Pasture Inventory is used for monitoring the environmental quality objective set up by the Swedish government; ‘a rich farming landscape’. It is also used for evaluating rural programs and for reporting to the EU Habitat Directive. The inventory is also used as a basis for national, regional and local strategies and programs for environmental management, spatial planning and case management. Data from the inventory have also been used for research."
+            }
+        ],
+        "Organizations": [
+            {
+                "CultureCode": "en-GB",
+                "Value": "Swedish Museum of Natural History"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Naturhistoriska riksmuseet"
+            }
+        ],
+        "Paths": [
+            {
+                "CultureCode": "en-GB",
+                "path": [ "Swedish Museum of Natural History", "National Meadow and Pasture Inventory" ]
+            }
+        ],
+        "Url": "",
+        "ContactPerson": {
+            "FirstName": "Anders",
+            "LastName": "Telenius",
+            "Email": "anders.telenius@nrm.se"
+        },
+        "DownloadUrl": "https://www.gbif.se/ipt/archive.do?r=sjv-tuva&v=2.3",
+        "DownloadUrlEml": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva&v=2.3",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "SupportProtectedHarvest": false,
+        "SupportDynamicEml": true,
+        "IncludeInSearchByDefault": true,
+        "Id": 24,
+        "Identifier": "TUVA",
+        "HarvestSchedule": "* * * * *",
+        "HarvestFailPreventProcessing": false,
+        "IncludeInHealthCheck": true
     }
 ]
