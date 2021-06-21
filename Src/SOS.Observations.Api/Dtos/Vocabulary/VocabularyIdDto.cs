@@ -24,6 +24,7 @@ namespace SOS.Observations.Api.Dtos.Vocabulary
         DeterminationMethod = 21,
         ReproductiveCondition = 22,
         Behavior = 23,
-        TaxonProtectionLevel = 24
+        TaxonProtectionLevel = 24,
+        BirdNestActivity = 25
     }
 }
