@@ -351,6 +351,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
+            services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
@@ -370,7 +371,7 @@ namespace SOS.Observations.Api
         /// <param name="apiVersionDescriptionProvider"></param>
         /// <param name="configuration"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration, IProtectedLogRepository protectedLogRepository)
         {
             
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
@@ -435,6 +436,12 @@ namespace SOS.Observations.Api
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });
             });
+
+            // make sure protected log is created and indexed
+            if (protectedLogRepository.VerifyCollectionAsync().Result)
+            {
+                protectedLogRepository.CreateIndexAsync();
+            }
         }
 
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)

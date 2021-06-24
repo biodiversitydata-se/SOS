@@ -15,7 +15,6 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;

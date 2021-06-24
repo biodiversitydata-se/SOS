@@ -28,6 +28,7 @@ import { LoginComponent } from './login/login.component';
 import { JwtModule } from '@auth0/angular-jwt';
 import { AuthGuard } from './guard/authguard';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
+import { ProtectedLogComponent } from './protected-log/protected-log.component';
 
 export function tokenGetter() {
   return localStorage.getItem("jwt");
@@ -49,6 +50,7 @@ export function tokenGetter() {
     ObservationViewerComponent,
     LoginComponent,
     LogViewerComponent,
+    ProtectedLogComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -64,6 +66,7 @@ export function tokenGetter() {
       { path: 'log-viewer', component: LogViewerComponent },
       { path: 'observation-viewer', component: ObservationViewerComponent, canActivate: [AuthGuard] },
       { path: 'application-insights', component: ApplicationInsightsComponent },
+      { path: 'protected-log', component: ProtectedLogComponent, canActivate: [AuthGuard] },
       { path: 'login', component: LoginComponent },
     ]),
     LeafletModule,

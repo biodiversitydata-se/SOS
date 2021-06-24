@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Nest;
 using SOS.Administration.Gui.Models;
@@ -26,7 +23,7 @@ namespace SOS.Administration.Gui.Controllers
         private string _mongoSuffix = "";
         private MongoDbConfiguration _mongoConfiguration;
 
-        public StatusInfoController(ILogger<StatusInfoController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings, IOptionsMonitor<ElasticSearchConfiguration> elasticConfiguration)
+        public StatusInfoController(ILogger<StatusInfoController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings, ElasticSearchConfiguration elasticConfiguration)
         {
             _logger = logger;
             _mongoClient = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
@@ -35,7 +32,7 @@ namespace SOS.Administration.Gui.Controllers
             {
                 _mongoSuffix = "-st";
             }
-            _elasticClient = elasticConfiguration.CurrentValue.GetClient();
+            _elasticClient = elasticConfiguration.GetClient();
 
         }
 

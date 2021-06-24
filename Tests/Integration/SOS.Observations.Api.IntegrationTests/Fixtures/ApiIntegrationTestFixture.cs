@@ -137,9 +137,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var areaCache = new AreaCache(areaRepository);
             var dataproviderRepsoitory = new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
             var dataproviderCache = new DataProviderCache(dataproviderRepsoitory);
+            var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             _filterManager = new FilterManager(taxonManager, CreateUserService(), areaCache, dataproviderCache);
-            var observationsManager = new ObservationManager(processedObservationRepository, vocabularyManager,
-                _filterManager,  new NullLogger<ObservationManager>());
+            var observationsManager = new ObservationManager(processedObservationRepository,
+                protectedLogRepository,
+                vocabularyManager,
+                _filterManager,  
+                new HttpContextAccessor(),
+                new NullLogger<ObservationManager>());
 
             return observationsManager;
         }

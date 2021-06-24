@@ -721,7 +721,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private IEnumerable<string> EnsureCoordinatesIsRetrievedFromDb(IEnumerable<string> outputFields)
+        private ICollection<string> EnsureCoordinatesIsRetrievedFromDb(ICollection<string> outputFields)
         {
             if (outputFields == null || !outputFields.Any())
             {

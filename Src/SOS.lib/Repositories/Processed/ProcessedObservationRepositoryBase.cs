@@ -321,6 +321,30 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<Observation>> GetObservationsByOccurrenceIdsAsync(
+            IEnumerable<string> occurrenceIds,
+            IEnumerable<string> outputFields)
+        {
+            var searchResponse = await ElasticClient.SearchAsync<Observation>(s => s
+                .Index(IndexName)
+                .Query(q => q
+                    .Terms(t => t
+                        .Field(f => f.Occurrence.OccurrenceId)
+                        .Terms(occurrenceIds)
+                    )
+                )
+                .Source(p => p
+                    .Includes(i => i
+                        .Fields(outputFields
+                            .Select(f => new Field(f)))))
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return searchResponse.Documents;
+        }
+
         /// <inheritdoc /> 
         public async Task<(DateTime? firstSpotted, DateTime? lastSpotted, GeoBounds geographicCoverage)> GetProviderMetaDataAsync(int providerId)
         {

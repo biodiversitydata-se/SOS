@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -24,9 +19,9 @@ namespace SOS.Administration.Gui.Controllers
     {
         private AuthenticationConfiguration _config;
 
-        public AuthenticationController(IOptionsMonitor<AuthenticationConfiguration> authConfig)
+        public AuthenticationController(AuthenticationConfiguration authConfig)
         {
-            _config = authConfig.CurrentValue;
+            _config = authConfig;
         }
         [AllowAnonymous]
         [HttpPost]

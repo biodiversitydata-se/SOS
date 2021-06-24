@@ -18,6 +18,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         ///     your projection is a conditional query where you dictates which fields should be returned by the API.
         ///     Omit this parameter and you will receive the complete collection of fields.
         /// </summary>
-        public IEnumerable<string> OutputFields { get; set; }
+        public ICollection<string> OutputFields { get; set; }
     }
 }

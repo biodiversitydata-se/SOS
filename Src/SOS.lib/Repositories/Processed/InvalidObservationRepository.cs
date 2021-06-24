@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -30,7 +29,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<InvalidObservation>>
+            var indexModels = new []
             {
                 new CreateIndexModel<InvalidObservation>(
                     Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),
