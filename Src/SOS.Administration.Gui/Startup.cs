@@ -4,12 +4,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using System.Text;
 using System.Text.Json.Serialization;
+using Nest;
+using SOS.Administration.Gui.Managers;
+using SOS.Administration.Gui.Managers.Interfaces;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
@@ -17,9 +23,31 @@ namespace SOS.Administration.Gui
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private bool _isDevelopment;
+
+        /// <summary>
+        ///     Start up
+        /// </summary>
+        /// <param name="env"></param>
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            var environment = env.EnvironmentName.ToLower();
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{environment}.json", true)
+                .AddEnvironmentVariables();
+            _isDevelopment =  environment.Equals("local");
+            if (_isDevelopment)
+            {
+                // If Development mode, add secrets stored on developer machine 
+                // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+                // In production you should store the secret values as environment variables.
+                builder.AddUserSecrets<Startup>();
+            }
+
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -37,7 +65,8 @@ namespace SOS.Administration.Gui
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-            var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration));
+         
+            var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration)).Get<AuthenticationConfiguration>();
             services.AddAuthentication(opt => {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,21 +79,28 @@ namespace SOS.Administration.Gui
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = authConfig["Issuer"],
-                    ValidAudience = authConfig["Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig["SecretKey"]))
+                    ValidIssuer = authConfig.Issuer,
+                    ValidAudience = authConfig.Issuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.SecretKey))
                 };
             });
             services.Configure<MongoDbConfiguration>(
                 Configuration.GetSection(nameof(MongoDbConfiguration)));
 
-            services.Configure<AuthenticationConfiguration>(authConfig);
+            // Processed Mongo Db
+            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
+            services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
+                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
-            services.Configure<ElasticSearchConfiguration>(
-              Configuration.GetSection(nameof(ElasticSearchConfiguration)));
+            //setup the elastic search configuration
+            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            services.AddScoped<IElasticClient, ElasticClient>(p => elasticConfiguration.GetClient());
+            var testElasticSearchConfiguration = Configuration.GetSection("SearchDbConfigurationTest").Get<TestElasticSearchConfiguration>();
 
-            services.Configure<TestElasticSearchConfiguration>(
-                Configuration.GetSection(nameof(TestElasticSearchConfiguration)));
+            services.AddSingleton(authConfig);
+            services.AddSingleton(elasticConfiguration);
+            services.AddSingleton(testElasticSearchConfiguration);
 
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));
@@ -76,12 +112,17 @@ namespace SOS.Administration.Gui
             services.AddSingleton(Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>());
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IApplicationInsightsService, ApplicationInsightsService>();
+
+            services.AddScoped<IProtectedLogManager, ProtectedLogManager>();
+
+            services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
+            services.AddScoped<IProcessedProtectedObservationRepository, ProcessedProtectedObservationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -94,7 +135,7 @@ namespace SOS.Administration.Gui
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
+            if (!_isDevelopment)
             {
                 app.UseSpaStaticFiles();
             }
@@ -117,7 +158,7 @@ namespace SOS.Administration.Gui
 
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
+                if (_isDevelopment)
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }

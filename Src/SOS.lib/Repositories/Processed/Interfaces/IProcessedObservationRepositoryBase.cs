@@ -96,6 +96,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             string scrollId);
 
         /// <summary>
+        /// Get observations by their occurrence id's
+        /// </summary>
+        /// <param name="occurrenceIds"></param>
+        /// <param name="outputFields"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Observation>> GetObservationsByOccurrenceIdsAsync(
+            IEnumerable<string> occurrenceIds,
+            IEnumerable<string> outputFields);
+
+        /// <summary>
         ///     Get multimedia.
         /// </summary>
         /// <param name="filter"></param>

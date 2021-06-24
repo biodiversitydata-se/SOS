@@ -1,0 +1,30 @@
+<form (ngSubmit)="onSearchFormSubmit(this)" class="gy-2 gx-3 align-items-center">
+  <div class="form-row">
+    <div class="col-md-4">
+      <label for="startDate" class="form-label">Start date</label>
+      <dl-date-time-picker name="startDate"
+                           maxView="year"
+                           minView="minute"
+                           startView="day"
+                           minuteStep="5"
+                           [(ngModel)]="startDate">
+      </dl-date-time-picker>
+    </div>
+    <div class="col-md-4">
+      <label for="endDate" class="form-label">End date</label>
+      <dl-date-time-picker name="endDate"
+                           maxView="year"
+                           minView="minute"
+                           startView="day"
+                           minuteStep="5"
+                           [(ngModel)]="endDate">
+      </dl-date-time-picker>
+    </div>
+    <div class="col-md-4">
+      <div>
+        <button type="submit" [disabled]="!(startDate && endDate)" class="btn btn-primary">Download log data items from {{formatDate(startDate)}} to {{formatDate(endDate)}}</button>
+      </div>
+    </div>
+  </div>
+</form>
+

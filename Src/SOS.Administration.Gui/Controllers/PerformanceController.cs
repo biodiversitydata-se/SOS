@@ -4,12 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Nest;
 using Newtonsoft.Json;
-using SOS.Administration.Gui.Models;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Gui.Controllers
@@ -108,9 +106,9 @@ namespace SOS.Administration.Gui.Controllers
         private ApplicationInsightsConfiguration _aiConfig;
 
 
-        public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<TestElasticSearchConfiguration> testElasticConfiguration)
+        public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
         {          
-            _testElasticClient = testElasticConfiguration.CurrentValue.GetClient();
+            _testElasticClient = testElasticConfiguration.GetClient();
             _aiConfig = aiConfig.CurrentValue;
         }
      
@@ -178,48 +176,56 @@ namespace SOS.Administration.Gui.Controllers
         [Route("")]
         public PerformanceData GetPerformanceData(string interval, string timespan)
         {
-            if(string.IsNullOrEmpty(interval))
+            try
             {
-                interval = "PT30M";
-            }
-            if (string.IsNullOrEmpty(interval))
-            {
-                interval = "PT12H";
-            }
-
-            var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey,"metrics/requests/duration", $"interval={interval}&timespan={timespan}&segment=request/name&top={1000}");
-            var ret = JsonConvert.DeserializeObject<ApplicationsInsightsTelemetryReturn>(json);
-            Dictionary<string, List<PerformanceData.Request>> requestDictionary = new Dictionary<string, List<PerformanceData.Request>>();
-            foreach(var segment in ret.Value.Segments)
-            {
-                var startDate = segment.Start;
-                var endDate = segment.End;
-                if (segment.Segments != null)
+                if (string.IsNullOrEmpty(interval))
                 {
-                    foreach(var innerSeg in segment.Segments)
+                    interval = "PT30M";
+                }
+                if (string.IsNullOrEmpty(interval))
+                {
+                    interval = "PT12H";
+                }
+
+                var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "metrics/requests/duration", $"interval={interval}&timespan={timespan}&segment=request/name&top={1000}");
+                var ret = JsonConvert.DeserializeObject<ApplicationsInsightsTelemetryReturn>(json);
+                Dictionary<string, List<PerformanceData.Request>> requestDictionary = new Dictionary<string, List<PerformanceData.Request>>();
+                foreach (var segment in ret.Value.Segments)
+                {
+                    var startDate = segment.Start;
+                    var endDate = segment.End;
+                    if (segment.Segments != null)
                     {
-                        if (!requestDictionary.ContainsKey(innerSeg.RequestName))
+                        foreach (var innerSeg in segment.Segments)
                         {
-                            requestDictionary[innerSeg.RequestName] = new List<PerformanceData.Request>();
+                            if (!requestDictionary.ContainsKey(innerSeg.RequestName))
+                            {
+                                requestDictionary[innerSeg.RequestName] = new List<PerformanceData.Request>();
+                            }
+                            requestDictionary[innerSeg.RequestName].Add(new PerformanceData.Request()
+                            {
+                                RequestName = innerSeg.RequestName,
+                                Timestamp = startDate,
+                                TimeTakenMs = innerSeg.RequestDuration.Avg
+                            });
                         }
-                        requestDictionary[innerSeg.RequestName].Add(new PerformanceData.Request()
-                        {
-                            RequestName = innerSeg.RequestName,
-                            Timestamp = startDate,
-                            TimeTakenMs = innerSeg.RequestDuration.Avg
-                        });
                     }
                 }
+                var requests = new List<PerformanceData.Request[]>();
+                foreach (var value in requestDictionary.Values)
+                {
+                    requests.Add(value.OrderBy(p => p.Timestamp).ToArray());
+                }
+                return new PerformanceData()
+                {
+                    Requests = requests
+                };
             }
-            var requests = new List<PerformanceData.Request[]>();
-            foreach (var value in requestDictionary.Values)
+            catch (Exception e)
             {
-                requests.Add(value.OrderBy(p=>p.Timestamp).ToArray());
+                return null;
             }
-            return new PerformanceData()
-            {
-                Requests = requests
-            };
+            
         }
     }
 }

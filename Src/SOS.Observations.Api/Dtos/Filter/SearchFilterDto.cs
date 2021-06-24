@@ -13,6 +13,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// For example, to retrieve only basic observation data, specify:
         /// ["event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus"]. 
         /// </summary>
-        public IEnumerable<string> OutputFields { get; set; }
+        public ICollection<string> OutputFields { get; set; }
     }
 }

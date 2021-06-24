@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Nest;
 using SOS.Lib.Configuration.Shared;
 
@@ -69,9 +68,9 @@ namespace SOS.Administration.Gui.Controllers
         private readonly string _indexName = "logs-*";
 
 
-        public LogsController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, IOptionsMonitor<ElasticSearchConfiguration> elasticConfiguration)
+        public LogsController(ElasticSearchConfiguration elasticConfiguration)
         {          
-            _elasticClient = elasticConfiguration.CurrentValue.GetClient();
+            _elasticClient = elasticConfiguration.GetClient();
         }
      
         [HttpGet]

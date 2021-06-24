@@ -479,9 +479,14 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
-                harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
-                var lastBackupDate = await _metadataRepository.GetLastBackupDateAsync();
-                harvestInfo.Notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
+                
+                if (mode == JobRunModes.Full)
+                {
+                    harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
+
+                    var lastBackupDate = await _metadataRepository.GetLastBackupDateAsync();
+                    harvestInfo.Notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
+                }
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Count = nrSightingsHarvested;
             }

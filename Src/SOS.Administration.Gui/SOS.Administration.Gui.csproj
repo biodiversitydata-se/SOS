@@ -22,6 +22,7 @@
     <PackageReference Include="NEST" Version="7.12.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
+    <PackageReference Include="NReco.Csv" Version="1.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
 
