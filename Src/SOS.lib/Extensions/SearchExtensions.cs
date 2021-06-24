@@ -136,8 +136,12 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.Months?.Any() ?? false)
             {
-                string monthStartDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());";
-                string monthEndDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.endDate'].value.getMonthValue());";
+                string monthStartDateScript = $@"
+                                    ZonedDateTime convertedStartDate = doc['event.startDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
+                string monthEndDateScript = $@"
+                                    ZonedDateTime convertedStartDate = doc['event.endDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
                 if (internalFilter.MonthsComparison == MonthsFilterComparison.StartDate)
                 {
                     query.AddScript(monthStartDateScript);
@@ -252,7 +256,7 @@ namespace SOS.Lib.Extensions
             if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
             {
                 var selector = "";
-                /*   if (internalFilter.StartDate.Value.Month == internalFilter.EndDate.Value.Month) 
+                   if (internalFilter.StartDate.Value.Month == internalFilter.EndDate.Value.Month) 
                    {
                        if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                        {
@@ -272,7 +276,7 @@ namespace SOS.Lib.Extensions
                        }
                    }
                    else
-                   {
+                   {/*
                        if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                        {
                            selector = @"( (startMonth >= fromMonth && startMonth <= toMonth) && (endMonth >= fromMonth && endMonth <= toMonth) &&
@@ -308,8 +312,9 @@ namespace SOS.Lib.Extensions
                                selector += $" || (startMonth == {month}) || (endMonth == {month})";
                            }
                        }
+                    */
 
-                   }*/
+                   }
                 if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
                     selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
