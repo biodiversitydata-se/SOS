@@ -136,8 +136,12 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.Months?.Any() ?? false)
             {
-                string monthStartDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());";
-                string monthEndDateScript = $@"return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(doc['event.endDate'].value.getMonthValue());";
+                string monthStartDateScript = $@"
+                                    ZonedDateTime convertedStartDate = doc['event.startDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
+                string monthEndDateScript = $@"
+                                    ZonedDateTime convertedStartDate = doc['event.endDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
+                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
                 if (internalFilter.MonthsComparison == MonthsFilterComparison.StartDate)
                 {
                     query.AddScript(monthStartDateScript);
@@ -252,64 +256,65 @@ namespace SOS.Lib.Extensions
             if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
             {
                 var selector = "";
-                /*   if (internalFilter.StartDate.Value.Month == internalFilter.EndDate.Value.Month) 
-                   {
-                       if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
-                       {
-                           selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay && endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
-                       {
-                           selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay)";
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
-                       {
-                           selector = "(endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
-                       {
-                           selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay) || (endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
-                       }
-                   }
-                   else
-                   {
-                       if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
-                       {
-                           selector = @"( (startMonth >= fromMonth && startMonth <= toMonth) && (endMonth >= fromMonth && endMonth <= toMonth) &&
-                                           ((startMonth > fromMonth) || (startMonth == fromMonth && startDay >= fromDay)) &&
-                                           ((endMonth < toMonth) || (endMonth == toMonth && endDay <= toDay)) )";
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
-                       {
-                           selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
-                                        (startMonth == toMonth && startDay <= toDay)";
-                           for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
-                           {
-                               selector += $" || (startMonth == {month})";
-                           }
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
-                       {
-                           selector = @"(endMonth == fromMonth && endDay >= fromDay) ||
-                                        (endMonth == toMonth && endDay <= toDay)";
-                           for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
-                           {
-                               selector += $" || (endMonth == {month})";
-                           }
-                       }
-                       else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
-                       {
-                           selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
-                                        (endMonth == fromMonth && endDay >= fromDay) ||
-                                        (startMonth == toMonth && startDay <= toDay) || 
-                                        (endMonth == toMonth && endDay <= toDay)";
-                           for(int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
-                           {
-                               selector += $" || (startMonth == {month}) || (endMonth == {month})";
-                           }
-                       }
+                /*if (internalFilter.StartDate.Value.Month == internalFilter.EndDate.Value.Month) 
+                {
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay && endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay)";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                    {
+                        selector = "(endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                    {
+                        selector = "(startMonth == fromMonth && startDay >= fromDay && startDay <= toDay) || (endMonth == fromMonth && endDay >= fromDay && endDay <= toDay)";
+                    }
+                }
+                else
+                {
+                    if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    {
+                        selector = @"( (startMonth >= fromMonth && startMonth <= toMonth) && (endMonth >= fromMonth && endMonth <= toMonth) &&
+                                        ((startMonth > fromMonth) || (startMonth == fromMonth && startDay >= fromDay)) &&
+                                        ((endMonth < toMonth) || (endMonth == toMonth && endDay <= toDay)) )";
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                    {
+                        selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
+                                     (startMonth == toMonth && startDay <= toDay)";
+                        for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (startMonth == {month})";
+                        }
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                    {
+                        selector = @"(endMonth == fromMonth && endDay >= fromDay) ||
+                                     (endMonth == toMonth && endDay <= toDay)";
+                        for (int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (endMonth == {month})";
+                        }
+                    }
+                    else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                    {
+                        selector = @"(startMonth == fromMonth && startDay >= fromDay) || 
+                                     (endMonth == fromMonth && endDay >= fromDay) ||
+                                     (startMonth == toMonth && startDay <= toDay) || 
+                                     (endMonth == toMonth && endDay <= toDay)";
+                        for(int month = internalFilter.StartDate.Value.Month + 1; month < internalFilter.EndDate.Value.Month; month++)
+                        {
+                            selector += $" || (startMonth == {month}) || (endMonth == {month})";
+                        }
+                    }
+                 
 
-                   }*/
+            }*/
                 if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
                     selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
