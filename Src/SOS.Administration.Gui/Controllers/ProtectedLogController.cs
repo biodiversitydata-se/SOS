@@ -5,6 +5,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NReco.Csv;
@@ -15,6 +16,7 @@ namespace SOS.Administration.Gui.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class ProtectedLogController : ControllerBase
     {
         private IProtectedLogManager _protectedLogManager;

@@ -30,6 +30,8 @@ import { AuthGuard } from './guard/authguard';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
 import { ProtectedLogComponent } from './protected-log/protected-log.component';
 
+import { FileService } from './services/file-service';
+
 export function tokenGetter() {
   return localStorage.getItem("jwt");
 }
@@ -85,7 +87,7 @@ export function tokenGetter() {
       }
     })
   ],
-  providers: [ThemeService, AuthGuard, DatePipe],
+  providers: [ThemeService, AuthGuard, DatePipe, FileService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

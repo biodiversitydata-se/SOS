@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { FileService } from '../services/file-service';
+import { saveAs } from 'file-saver';
 
 import * as moment from 'moment';
 
@@ -8,13 +9,12 @@ import * as moment from 'moment';
   templateUrl: './protected-log.component.html'
 })
 export class ProtectedLogComponent {
-  private _http: HttpClient;
   private _baseUrl: string;
 
   startDate: Date = null;
   endDate: Date = null;
 
-  constructor(private datePipe: DatePipe, http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+  constructor(private datePipe: DatePipe, private _fileService: FileService, @Inject('BASE_URL') baseUrl: string) {
     moment.locale('sv', {
       longDateFormat: {
         LT: 'HH:mm',
@@ -27,7 +27,7 @@ export class ProtectedLogComponent {
         llll: 'ddd D MMM YYYY HH:mm'
       }
     });
-    this._http = http;
+
     this._baseUrl = baseUrl;
   }
 
@@ -36,7 +36,9 @@ export class ProtectedLogComponent {
   }
 
   onSearchFormSubmit(event) {
-    window.location.href =
-      `${this._baseUrl}protectedLog?from=${this.formatDate(this.startDate)}&to=${this.formatDate(this.endDate)}`;
+
+    this._fileService
+      .downloadFile(`${this._baseUrl}protectedLog?from=${this.formatDate(this.startDate)}&to=${this.formatDate(this.endDate)}`)
+      .subscribe(blob => saveAs(blob, 'logdata.csv')), (error: any) => console.log('Error downloading the file');
   }
 }

@@ -1,27 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
-using Xunit;
 
 namespace SOS.Administration.Gui.Controllers
 {
