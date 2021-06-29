@@ -23,7 +23,15 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="areaBuffer"></param>
         /// <param name="authorizationUsePointAccuracy"></param>
         /// <param name="authorizationUseDisturbanceRadius"></param>
+        /// <param name=""></param>
+        /// <param name="setDefaultProviders"></param>
         /// <returns></returns>
-        Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity = "Sighting", int? areaBuffer = 0, bool? authorizationUsePointAccuracy = false, bool? authorizationUseDisturbanceRadius = false);
+        Task PrepareFilter(string authorizationApplicationIdentifier, 
+            FilterBase filter, 
+            string authorityIdentity = "Sighting", 
+            int? areaBuffer = 0, 
+            bool? authorizationUsePointAccuracy = false, 
+            bool? authorizationUseDisturbanceRadius = false, 
+            bool? setDefaultProviders = true);
     }
 }

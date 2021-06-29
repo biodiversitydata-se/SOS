@@ -494,7 +494,7 @@ namespace SOS.Observations.Api.Managers
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
             
             filter.ProtectedObservations = protectedObservations;
-            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, null, null, null, null, false);
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
             PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);

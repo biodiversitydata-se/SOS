@@ -107,9 +107,8 @@ namespace SOS.Lib.Managers
             return extendedAuthorizationFilters;
         }
 
-        private async Task<IEnumerable<int>> PopulateDataProviderFilterAsync(IEnumerable<int> dataproviderIds)
+        private async Task<IEnumerable<int>> GetDefaultDataProvidersIfEmptyAsync(IEnumerable<int> dataproviderIds)
         {
-            
             // If no data provider is passed, get them with data quality is approved
             if (!dataproviderIds?.Any() ?? true)
             {
@@ -293,7 +292,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius)
+        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
             if (filter.ProtectedObservations)
             {
@@ -320,7 +319,11 @@ namespace SOS.Lib.Managers
                 }
             }
 
-            filter.DataProviderIds = await PopulateDataProviderFilterAsync(filter.DataProviderIds);
+            if (setDefaultProviders.HasValue && setDefaultProviders.Value)
+            {
+                filter.DataProviderIds = await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds);
+            }
+           
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
             PopulateTaxonFilter(filter.Taxa);
         }
