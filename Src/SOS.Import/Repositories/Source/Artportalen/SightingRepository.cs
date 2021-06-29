@@ -123,7 +123,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                svr.RegionalSightingStateId as RegionalSightingStateId,
                     (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) AS SightingPublishTypeIds,
-                    (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds
+                    (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds,
+                    sdc.DatasourceId
                 FROM
 	                {SightingsFromBasics}
                     {join}
@@ -141,7 +142,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId
-                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId                    
+                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId 
+                    LEFT JOIN SightingDatasource sdc ON s.SightingId = sdc.SightingId
                 WHERE
 	                {SightingWhereBasics}
                     {where} ";

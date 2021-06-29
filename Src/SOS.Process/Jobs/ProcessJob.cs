@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AgileObjects.AgileMapper.Extensions;
+using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -57,6 +58,7 @@ namespace SOS.Process.Jobs
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
+        private readonly long _minObservationCount;
 
         private async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
@@ -172,7 +174,28 @@ namespace SOS.Process.Jobs
         /// <returns></returns>
         private async Task<bool> ValidateIndexesAsync()
         {
-            var protectedCount = (int)await _processedProtectedObservationRepository.IndexCount();
+            var healthStatusTasks = new[]
+            {
+                _processedPublicObservationRepository.GetHealthStatusAsync(WaitForStatus.Green),
+                _processedProtectedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green)
+            };
+
+            await Task.WhenAll(healthStatusTasks);
+
+            if (healthStatusTasks.Any(t => t.Result == WaitForStatus.Red))
+            {
+                return false;
+            }
+
+            var publicCount = await _processedPublicObservationRepository.IndexCountAsync();
+
+            // Make sure we have a reasonable amount of observations processed
+            if (publicCount < _minObservationCount)
+            {
+                return false;
+            }
+
+            var protectedCount = (int)await _processedProtectedObservationRepository.IndexCountAsync();
             if (protectedCount < 1)
             {
                 // No protected observations found. No more validation can be done
@@ -706,6 +729,7 @@ namespace SOS.Process.Jobs
             _exportContainer = processConfiguration?.Export_Container ??
                                throw new ArgumentNullException(nameof(processConfiguration));
             _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
+            _minObservationCount = processConfiguration.MinObservationCount;
         }
 
         /// <inheritdoc />

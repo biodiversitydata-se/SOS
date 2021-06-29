@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
@@ -58,6 +59,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task EnableIndexingAsync();
 
         /// <summary>
+        /// Get index health status
+        /// </summary>
+        /// <param name="waitForStatus"></param>
+        /// <returns></returns>
+        Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus);
+
+        /// <summary>
         /// Get index name
         /// </summary>
         /// <param name="instance"></param>
@@ -83,7 +91,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Count documents in index
         /// </summary>
         /// <returns></returns>
-        Task<long> IndexCount();
+        Task<long> IndexCountAsync();
 
         /// <summary>
         ///     Get observation by scroll. 
