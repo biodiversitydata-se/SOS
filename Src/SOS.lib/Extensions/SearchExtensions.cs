@@ -865,7 +865,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
-        private static void TryAddTermCriteria<T>(
+        public static void TryAddTermCriteria<T>(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, T value)
         {
             if (!string.IsNullOrEmpty(value?.ToString()))

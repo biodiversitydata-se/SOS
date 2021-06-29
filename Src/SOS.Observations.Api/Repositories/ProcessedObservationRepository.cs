@@ -1083,11 +1083,11 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.TryAddTermsCriteria("occurrence.occurrenceId", new List<string>() { occurrenceId });
+            query.TryAddTermCriteria("occurrence.occurrenceId",  occurrenceId);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
 
-            operation.Telemetry.Properties["OccurrenceId"] = occurrenceId.ToString();
+            operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
