@@ -223,6 +223,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal = new ArtportalenInternal();
                 obs.ArtportalenInternal.BirdValidationAreaIds = verbatimObservation.Site?.BirdValidationAreaIds;
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
+                obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;
                 obs.ArtportalenInternal.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;

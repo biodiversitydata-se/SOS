@@ -39,5 +39,10 @@
         /// Blob storage container for export files
         /// </summary>
         public string Export_Container { get; set; }
+
+        /// <summary>
+        /// Minimum observations processed for switching active instance
+        /// </summary>
+        public long MinObservationCount { get; set; }
     }
 }

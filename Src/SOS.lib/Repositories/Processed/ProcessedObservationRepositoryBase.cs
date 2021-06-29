@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Configuration.Shared;
@@ -291,6 +292,22 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus)
+        {
+            var response = await ElasticClient.Cluster.HealthAsync(new ClusterHealthRequest() {  WaitForStatus = waitForStatus });
+
+            var healthColor = response.Status.ToString().ToLower();
+
+            return healthColor switch
+            {
+                "green" => WaitForStatus.Green,
+                "yellow" => WaitForStatus.Yellow,
+                "red" => WaitForStatus.Red,
+                _ => WaitForStatus.Red
+            };
+        }
+
+        /// <inheritdoc />
         public string GetIndexName(byte instance) => IndexHelper.GetIndexName<Observation>(_indexPrefix, true, instance, _protected);
 
         /// <inheritdoc />
@@ -385,11 +402,11 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<long> IndexCount()
+        public async Task<long> IndexCountAsync()
         {
             try
             {
-                var countResponse = await ElasticClient.CountAsync<Observation>(s => s
+                var countResponse = await ElasticClient.CountAsync<dynamic>(s => s
                     .Index(IndexName)
                 );
 

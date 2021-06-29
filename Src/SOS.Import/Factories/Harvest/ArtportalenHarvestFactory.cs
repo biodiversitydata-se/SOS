@@ -72,6 +72,7 @@ namespace SOS.Import.Factories.Harvest
                 observation.BiotopeDescription = entity.BiotopeDescription;
                 observation.CollectionID = entity.CollectionID;
                 observation.Comment = entity.Comment;
+                observation.DatasourceId = entity.DatasourceId;
                 observation.DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _artportalenMetadataContainer.DiscoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
                     ? _artportalenMetadataContainer.DiscoveryMethods[entity.DiscoveryMethodId.Value]
                     : null;

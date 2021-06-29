@@ -21,6 +21,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? ConfirmationYear { get; set; }
 
         /// <summary>
+        /// Data source id
+        /// </summary>
+        public int? DatasourceId { get; set; }
+
+        /// <summary>
         /// Year of determination.
         /// </summary>
         public int? DeterminationYear { get; set; }

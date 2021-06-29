@@ -63,13 +63,13 @@ namespace SOS.Observations.Api.Dtos.Filter
         public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
         
         public bool UsePeriodForAllYears { get; set; }
-        public List<int> Months { get; set; }
+        public IEnumerable<int> Months { get; set; }
         public MonthsFilterComparisonDto MonthsComparison { get; set; } = MonthsFilterComparisonDto.StartDate;
-        public List<int> DiscoveryMethodIds { get; set; }
+        public IEnumerable<int> DiscoveryMethodIds { get; set; }
 
-        public List<int> LifeStageIds { get; set; }
+        public IEnumerable<int> LifeStageIds { get; set; }
 
-        public List<int> ActivityIds { get; set; }
+        public IEnumerable<int> ActivityIds { get; set; }
 
         public bool HasTriggerdValidationRule { get; set; }
         public bool HasTriggerdValidationRuleWithWarning { get; set; }
@@ -82,8 +82,8 @@ namespace SOS.Observations.Api.Dtos.Filter
         public int? Quantity { get; set; }
         public string QuantityOperator { get; set; }
 
-        public List<int> ValidationStatusIds { get; set; }
-        public List<int> ExcludeValidationStatusIds { get; set; }
+        public IEnumerable<int> ValidationStatusIds { get; set; }
+        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }
 
         public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
 
@@ -102,13 +102,15 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public bool OnlySecondHandInformation { get; set; }
 
-        public List<int> PublishTypeIdsFilter { get; set; }
+        public IEnumerable<int> PublishTypeIdsFilter { get; set; }
 
-        public List<int> RegionalSightingStateIdsFilter { get; set; }
+        public IEnumerable<int> RegionalSightingStateIdsFilter { get; set; }
 
-        public List<int> SiteIds { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
 
-        public List<int> SpeciesFactsIds { get; set; }
+        public IEnumerable<int> SpeciesFactsIds { get; set; }
         public string InstitutionId { get; set; }
+
+        public IEnumerable<int> DatasourceIds { get; set; }
     }
 }

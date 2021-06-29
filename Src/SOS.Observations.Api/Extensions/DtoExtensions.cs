@@ -136,6 +136,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
                 internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
                 internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
+                internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
             }
 
         }
