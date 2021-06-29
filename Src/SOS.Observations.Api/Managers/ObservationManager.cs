@@ -498,8 +498,8 @@ namespace SOS.Observations.Api.Managers
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
             PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
-      
-            return processedObservation == null ? null: processedObservation[0];
+           
+            return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
     }
 }
