@@ -137,8 +137,19 @@ export class StatusComponent implements OnInit {
           let compare = new DataCompare();
           compare.source = provider.dataProviderIdentifier;
           compare.today = provider.publicProcessCount + provider.protectedProcessCount;
-          let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
-          compare.yesterday = inactiveprovider.publicProcessCount + inactiveprovider.protectedProcessCount;
+
+          if (inactive) {
+            let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
+
+            if (inactiveprovider) {
+              compare.yesterday = inactiveprovider.publicProcessCount + inactiveprovider.protectedProcessCount;
+            } else {
+              compare.yesterday = 0;
+            }
+          } else {
+            compare.yesterday = 0;
+          }
+         
           this.totalDataDifference += compare.today - compare.yesterday;
           this.dataComparison.push(compare);
         }
