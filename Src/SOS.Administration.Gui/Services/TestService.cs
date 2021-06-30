@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json;
@@ -241,11 +240,11 @@ namespace SOS.Administration.Gui.Services
                 return testResults;
             }
 
-            try { Assert.Equal("Tranås", result.Records.First().Location.Municipality.Name); results.Add(new TestResult() { Result = "Location Municipality equals Tranås", Status = "Succeeded" }); }
-            catch (Exception e) { results.Add(new TestResult() { Result = "Location Municipality equals Tranås:" + e.Message, Status = "Failed" }); }
+            try { Assert.Equal("687", result.Records.First().Location.Municipality.FeatureId); results.Add(new TestResult() { Result = "Location Municipality FeatureId equals 687", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Location Municipality FeatureId equals 687:" + e.Message, Status = "Failed" }); }
 
-            try { Assert.Equal("utter", result.Records.First().Taxon.VernacularName); results.Add(new TestResult() { Result = "Vernacular name equals utter", Status = "Succeeded" }); }
-            catch (Exception e) { results.Add(new TestResult() { Result = "Vernacular name equals utter:" + e.Message, Status = "Failed" }); }
+            try { Assert.Equal(100077, result.Records.First().Taxon.Id); results.Add(new TestResult() { Result = "Taxon id equals 100077", Status = "Succeeded" }); }
+            catch (Exception e) { results.Add(new TestResult() { Result = "Taxon id equals 100077:" + e.Message, Status = "Failed" }); }
 
             return testResults;
         }
