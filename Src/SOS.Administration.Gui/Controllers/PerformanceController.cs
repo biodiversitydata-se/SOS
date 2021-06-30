@@ -139,17 +139,24 @@ namespace SOS.Administration.Gui.Controllers
                             | summarize failedCount = sum(itemCount) by name
                             | top 10 by failedCount desc";
             var json = GetTelemetry(_aiConfig.ApplicationId, _aiConfig.ApiKey, "query", "timespan=P1D&query=" + query );
-            var result = JsonConvert.DeserializeObject<ApplicationInsightsQueryReturn>(json);
+
             var failedRequests = new List<FailedData>();
-            foreach(var row in result.Tables[0].Rows)
+
+            if (json.StartsWith('{') && json.EndsWith('}'))
             {
-                var failedRequest = new FailedData()
+                var result = JsonConvert.DeserializeObject<ApplicationInsightsQueryReturn>(json);
+
+                foreach (var row in result.Tables[0].Rows)
                 {
-                    Name = (string)row[0],
-                    Count = (long)row[1]
-                };
-                failedRequests.Add(failedRequest);
+                    var failedRequest = new FailedData()
+                    {
+                        Name = (string)row[0],
+                        Count = (long)row[1]
+                    };
+                    failedRequests.Add(failedRequest);
+                }
             }
+           
             return failedRequests;
         }
 
