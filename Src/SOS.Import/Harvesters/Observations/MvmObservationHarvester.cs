@@ -109,6 +109,10 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
+
+                _logger.LogInformation("Start permanentize temp collection for MVM verbatim");
+                await _mvmObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for MVM verbatim");
             }
             catch (JobAbortedException)
             {
@@ -119,12 +123,6 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest MVM");
                 harvestInfo.Status = RunStatus.Failed;
-            }
-            finally
-            {
-                _logger.LogInformation("Start permanentize temp collection for MVM verbatim");
-                await _mvmObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for MVM verbatim");
             }
 
             return harvestInfo;

@@ -147,6 +147,10 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = observationCount;
+
+                _logger.LogInformation($"Start permanentize temp collection for {dataProvider.Identifier}");
+                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation($"Finish permanentize temp collection for {dataProvider.Identifier}");
             }
             catch (JobAbortedException e)
             {
@@ -158,13 +162,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
                 harvestInfo.Status = RunStatus.Failed;
             }
-            finally
-            {
-                _logger.LogInformation($"Start permanentize temp collection for {dataProvider.Identifier}");
-                await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation($"Finish permanentize temp collection for {dataProvider.Identifier}");
-            }
-            
+
             return harvestInfo;
         }
 

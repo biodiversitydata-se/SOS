@@ -77,6 +77,10 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = verbatims?.Count() ?? 0;
+
+                _logger.LogInformation("Start permanentize temp collection for clams verbatim");
+                await _clamObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for clams verbatim");
             }
             catch (JobAbortedException e)
             {
@@ -87,12 +91,6 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed harvest of clams");
                 harvestInfo.Status = RunStatus.Failed;
-            }
-            finally
-            {
-                _logger.LogInformation("Start permanentize temp collection for clams verbatim");
-                await _clamObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for clams verbatim");
             }
 
             return harvestInfo;

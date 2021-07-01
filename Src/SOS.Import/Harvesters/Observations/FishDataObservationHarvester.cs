@@ -107,6 +107,10 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
+
+                _logger.LogInformation("Start permanentize temp collection for Fish Data verbatim");
+                await _fishDataObservationVerbatimRepository.PermanentizeCollectionAsync();
+                _logger.LogInformation("Finish permanentize temp collection for Fish Data verbatim");
             }
             catch (JobAbortedException)
             {
@@ -117,12 +121,6 @@ namespace SOS.Import.Harvesters.Observations
             {
                 _logger.LogError(e, "Failed to harvest Fish Data");
                 harvestInfo.Status = RunStatus.Failed;
-            }
-            finally
-            {
-                _logger.LogInformation("Start permanentize temp collection for Fish Data verbatim");
-                await _fishDataObservationVerbatimRepository.PermanentizeCollectionAsync();
-                _logger.LogInformation("Finish permanentize temp collection for Fish Data verbatim");
             }
 
             return harvestInfo;
