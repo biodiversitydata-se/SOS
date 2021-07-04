@@ -36,7 +36,7 @@ namespace SOS.Lib.Factories
                 var xDoc = XDocument.Load(stream);
                 var dataset = xDoc.Root.Element("dataset");
                 var pubDateElement = GetElement(dataset, "pubDate");
-                pubDateElement.Remove();
+                pubDateElement?.Remove();
                 var bytes = await xDoc.ToBytesAsync();
                 return bytes.LongLength;
             }
