@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -40,13 +42,18 @@ namespace SOS.Export.IO.DwcArchive
                 foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
                 {
                     fileSize += zipEntry.CompressedSize;
+                    zipEntry.Extract();    
                 }
-
+                
                 var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
 
                 if (emlFile == null)
                 {
                     fileSize -= 1;
+                }
+                else
+                {
+                    fileSize += await GetEmlFileSizeWithoutPubDateAsync(emlFile);
                 }
 
                 return fileSize.ToString();
@@ -54,6 +61,22 @@ namespace SOS.Export.IO.DwcArchive
             catch
             {
                 return string.Empty;
+            }
+        }
+
+        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipEntry emlZipEntry)
+        {
+            try
+            {
+                await using var stream = new MemoryStream();
+                emlZipEntry.Extract(stream);
+                stream.Position = 0;
+                var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
+                return size;
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
 
