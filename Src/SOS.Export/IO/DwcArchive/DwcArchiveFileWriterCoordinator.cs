@@ -36,15 +36,20 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 using var zip = ZipFile.Read(path);
-                var occurenceFile = zip.FirstOrDefault(
-                    f => f.FileName.Contains("occurrence", StringComparison.CurrentCultureIgnoreCase));
-
-                if (occurenceFile == null)
+                long fileSize = 0;
+                foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
                 {
-                    return string.Empty;
+                    fileSize += zipEntry.CompressedSize;
                 }
 
-                return occurenceFile.CompressedSize.ToString();
+                var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
+
+                if (emlFile == null)
+                {
+                    fileSize -= 1;
+                }
+
+                return fileSize.ToString();
             }
             catch
             {
