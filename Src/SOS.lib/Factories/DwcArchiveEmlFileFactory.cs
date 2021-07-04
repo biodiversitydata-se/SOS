@@ -106,6 +106,12 @@ namespace SOS.Lib.Factories
             GetElement(dataset, "pubDate").SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
         }
 
+        public static void SetPubDateToCurrentDate(XDocument xDoc)
+        {
+            var dataset = xDoc.Root.Element("dataset");
+            GetElement(dataset, "pubDate").SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
         /// <summary>
         /// Creates an EML XML file.
         /// </summary>
