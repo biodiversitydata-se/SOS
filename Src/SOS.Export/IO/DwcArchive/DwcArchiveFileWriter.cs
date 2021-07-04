@@ -165,6 +165,7 @@ namespace SOS.Export.IO.DwcArchive
                 }
                 else
                 {
+                    DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                     await using var fileStream = File.Create(emlXmlFilePath);
                     await emlFile.SaveAsync(fileStream, SaveOptions.None, CancellationToken.None);
                 }
@@ -363,6 +364,7 @@ namespace SOS.Export.IO.DwcArchive
             else
             {
                 // Create eml.xml
+                DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                 compressedFileStream.PutNextEntry("eml.xml");
                 await emlFile.SaveAsync(compressedFileStream, SaveOptions.None, CancellationToken.None);
             }
