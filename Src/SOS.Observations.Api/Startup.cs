@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using HealthChecks.Elasticsearch;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +24,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -299,12 +302,8 @@ namespace SOS.Observations.Api
                         })
             );
 
-            services.AddHealthChecks();
-            services.AddHealthChecks()
-                .AddCheck<SearchHealthCheck>("search_health_check");
-
-            //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+        //setup the elastic search configuration
+        var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
             services.AddScoped<IElasticClient, ElasticClient>(p=>elasticConfiguration.GetClient());
             
             // Processed Mongo Db
@@ -321,6 +320,23 @@ namespace SOS.Observations.Api
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+
+            services.AddHealthChecks()
+                .AddDiskStorageHealthCheck(
+                    x => x.AddDrive("C:\\", 1000),
+                    name: "Primary disk: min 1GB free - warning",
+                    failureStatus: HealthStatus.Degraded,
+                    tags: new[] { "disk" })
+                .AddMongoDb(processedDbConfiguration.GetConnectionString())
+                .AddElasticsearch(a => a
+                    .UseServer(string.Join(';', elasticConfiguration.Hosts))
+                    .UseBasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
+                    .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
+                    .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null, tags: new[] { "database", "elasticsearch", "system" })
+                .AddHangfire(a => a
+                    .MinimumAvailableServers = 1, "Hangfire", tags: new [] {"hangfire"})
+                .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" });
+
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
