@@ -8,6 +8,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Utilities;
+using Org.BouncyCastle.Utilities.Collections;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
@@ -207,6 +208,30 @@ namespace SOS.Lib.Extensions
 
             return Geometry.DefaultFactory.CreateLinearRing(newRingCoordinates);
         }
+
+        private static IEnumerable<GeoCoordinate> TryMakeRingValid(this IEnumerable<GeoCoordinate> linearRing)
+        {
+            var count = linearRing?.Count() ?? 0;
+            if (count < 2)
+            {
+                return null;
+            }
+
+            // Use hash set, no duplicates will be added
+            var validatedCoordinates = new HashSet<GeoCoordinate>();
+
+            foreach (var coordinate in linearRing)
+            {
+                validatedCoordinates.Add(coordinate);
+            }
+
+            var newRingCoordinates = new GeoCoordinate[validatedCoordinates.Count + 1];
+            validatedCoordinates.CopyTo(newRingCoordinates, 0);
+            new[] {new GeoCoordinate(newRingCoordinates[0].Latitude, newRingCoordinates[0].Longitude)}.CopyTo(
+                newRingCoordinates, validatedCoordinates.Count);
+
+            return newRingCoordinates;
+        }
         #endregion Private
 
         #region Public
@@ -281,6 +306,25 @@ namespace SOS.Lib.Extensions
             return geometry;
         }
 
+        public static IGeoShape TryMakeValid(this IGeoShape geoShape)
+        {
+            if (geoShape == null)
+            {
+                return null;
+            }
+
+            switch (geoShape.Type?.ToLower())
+            {
+                case "polygon":
+                    var polygon = (PolygonGeoShape)geoShape;
+                    return new PolygonGeoShape(polygon.Coordinates.Select(c => c.TryMakeRingValid()));
+                case "multipolygon":
+                    var multiPolygon = (MultiPolygonGeoShape)geoShape;
+                    return new MultiPolygonGeoShape(multiPolygon.Coordinates.Select(p => p.Select(c => c.TryMakeRingValid())));
+            }
+
+            return geoShape;
+        }
 
         /// <summary>
         ///     Gets the Srid for the specified coordinate system.

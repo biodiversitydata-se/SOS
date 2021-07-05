@@ -599,12 +599,13 @@ namespace SOS.Lib.Extensions
                             break;
                         case "polygon":
                         case "multipolygon":
-                            geometryContainers.AddGeoShapeCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, geometryFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
+                            var vaildGeometry = geom.TryMakeValid();
+                            geometryContainers.AddGeoShapeCriteria($"location.{(geometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", vaildGeometry, geometryFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
                             if (!geometryFilter.UseDisturbanceRadius)
                             {
                                 continue;
                             }
-                            geometryContainers.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
+                            geometryContainers.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", vaildGeometry, GeoShapeRelation.Intersects);
                             break;
                     }
                 }
