@@ -41,7 +41,7 @@ namespace SOS.Export.IO.DwcArchive
                 long fileSize = 0;
                 foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
                 {
-                    fileSize += zipEntry.CompressedSize;
+                    fileSize += zipEntry.UncompressedSize;
                 }
                 
                 var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
