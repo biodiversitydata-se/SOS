@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Authentication;
+using System.Text;
 using MongoDB.Driver;
 
 namespace SOS.Lib.Configuration.Shared
@@ -94,7 +95,52 @@ namespace SOS.Lib.Configuration.Shared
                 mongoSettings.ReplicaSetName = ReplicaSetName;
                 mongoSettings.ReadPreference = ReadPreference.PrimaryPreferred;
             }
+
             return mongoSettings;
+        }
+
+        /// <summary>
+        /// Get connection string
+        /// </summary>
+        /// <returns></returns>
+        public string GetConnectionString()
+        {
+            var connectionStringBuilder = new StringBuilder("mongodb://");
+
+            if (!string.IsNullOrEmpty(AuthenticationDb) && !string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+            {
+                connectionStringBuilder.Append($"{UserName}:{Password}@");
+            }
+
+            connectionStringBuilder.Append(string.Join(',', Hosts.Select(h => $"{h.Name}:{h.Port}")));
+            connectionStringBuilder.Append($"/{DatabaseName}");
+
+            var paramBuilder = new StringBuilder();
+
+            if (Hosts.Length > 1)
+            {
+                AddParameter(paramBuilder, "replicaSet", ReplicaSetName);
+            }
+
+            if (!string.IsNullOrEmpty(AuthenticationDb) && !string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+            {
+                AddParameter(paramBuilder, "authSource", AuthenticationDb);
+            }
+
+            if (UseTls)
+            {
+                AddParameter(paramBuilder, "tls", "true");
+            }
+
+            connectionStringBuilder.Append(paramBuilder);
+            return connectionStringBuilder.ToString();
+        }
+
+        private void AddParameter(StringBuilder paramBuilder, string name, string value)
+        {
+            paramBuilder.Append(paramBuilder.Length == 0 ? '?' : '&');
+
+            paramBuilder.Append($"{name}={value}");
         }
     }
 }

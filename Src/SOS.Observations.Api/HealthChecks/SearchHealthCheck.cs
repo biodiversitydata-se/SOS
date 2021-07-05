@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.HealthChecks
                     IncludeUnderlyingTaxa = true
                 },
                 ValidationStatus = FilterBase.StatusValidation.BothValidatedAndNotValidated,
-                PositiveSightings = false,
+                PositiveSightings = true,
                 OutputFields = new []
                 {
                     "taxon.id"
@@ -47,7 +47,6 @@ namespace SOS.Observations.Api.HealthChecks
             sw.Stop();
 
             return result.TotalCount > 0 ? sw.ElapsedMilliseconds < 500 ? HealthStatus.Healthy : HealthStatus.Degraded : HealthStatus.Unhealthy;
-           
         }
 
         private async Task<HealthStatus> SearchByProviderAsync()
