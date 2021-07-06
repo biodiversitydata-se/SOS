@@ -19,8 +19,6 @@ using SOS.Import.Repositories.Source.ObservationsDatabase;
 using SOS.Import.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
-using SOS.Lib.Cache;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -54,6 +52,9 @@ namespace SOS.Import.IoC.Modules
             // Add configuration
             if (Configurations.ImportConfiguration.ArtportalenConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
+                    .SingleInstance();
+            if (Configurations.ImportConfiguration.BiologConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.BiologConfiguration).As<BiologConfiguration>()
                     .SingleInstance();
             if (Configurations.ImportConfiguration.DwcaConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.DwcaConfiguration).As<DwcaConfiguration>()
@@ -181,6 +182,8 @@ namespace SOS.Import.IoC.Modules
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<BiologObservationHarvester>().As<IBiologObservationHarvester>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>()
                 .InstancePerLifetimeScope();
