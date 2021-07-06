@@ -1109,5 +1109,28 @@ namespace SOS.Observations.Api.Repositories
             return searchResponse.Documents;
 
         }
+
+        /// <inheritdoc />
+        public async Task<long> IndexCountAsync(bool protectedIndex)
+        {
+            try
+            {
+                var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                    .Index(protectedIndex ? ProtectedIndex : PublicIndex)
+                );
+
+                if (!countResponse.IsValid)
+                {
+                    throw new InvalidOperationException(countResponse.DebugInformation);
+                }
+
+                return countResponse.Count;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return -1;
+            }
+        }
     }
 }
