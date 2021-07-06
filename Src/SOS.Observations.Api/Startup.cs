@@ -315,16 +315,19 @@ namespace SOS.Observations.Api
             var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
                 .Get<BlobStorageConfiguration>();
 
+            var healthCheckConfiguration = Configuration.GetSection("HealthCheckConfiguration").Get<HealthCheckConfiguration>();
+
             // Add configuration
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+            services.AddSingleton(healthCheckConfiguration);
 
             services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
-                    x => x.AddDrive("C:\\", 1000),
-                    name: "Primary disk: min 1GB free - warning",
+                    x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
+                    name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
                     failureStatus: HealthStatus.Degraded,
                     tags: new[] { "disk" })
                 .AddMongoDb(processedDbConfiguration.GetConnectionString())
@@ -335,7 +338,9 @@ namespace SOS.Observations.Api
                     .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null, tags: new[] { "database", "elasticsearch", "system" })
                 .AddHangfire(a => a
                     .MinimumAvailableServers = 1, "Hangfire", tags: new [] {"hangfire"})
-                .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" });
+                .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
+                .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new [] { "data providers", "meta data" });
 
 
             // Add security

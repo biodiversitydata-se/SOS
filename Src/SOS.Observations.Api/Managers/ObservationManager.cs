@@ -501,5 +501,11 @@ namespace SOS.Observations.Api.Managers
            
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
+
+        /// <inheritdoc />
+        public async Task<long> IndexCountAsync(bool protectedIndex = false)
+        {
+            return await _processedObservationRepository.IndexCountAsync(protectedIndex);
+        }
     }
 }

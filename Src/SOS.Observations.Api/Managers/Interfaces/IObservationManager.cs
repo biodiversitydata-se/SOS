@@ -170,5 +170,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchFilter filter, 
             int areaBuffer,
             bool onlyAboveMyClearance = true);
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        Task<long> IndexCountAsync(bool protectedIndex = false);
     }
 }

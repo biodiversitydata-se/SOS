@@ -127,5 +127,12 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,
             bool onlyAboveMyClearance);
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        Task<long> IndexCountAsync(bool protectedIndex);
     }
 }
