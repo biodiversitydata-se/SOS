@@ -114,8 +114,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-               
-
                 _logger.LogDebug($"Start clearing DwC-A observations for {dataProvider.Identifier}");
                 await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 _logger.LogDebug($"Finish clearing DwC-A observations for {dataProvider.Identifier}");

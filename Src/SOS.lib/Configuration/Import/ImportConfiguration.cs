@@ -11,6 +11,11 @@ namespace SOS.Lib.Configuration.Import
         ///     Configuration for Artportalen
         /// </summary>
         public ArtportalenConfiguration ArtportalenConfiguration { get; set; }
+        
+        /// <summary>
+        /// Biologg configuration
+        /// </summary>
+        public BiologConfiguration BiologConfiguration { get; set; }
 
         /// <summary>
         ///     Configuration for DwC-A
