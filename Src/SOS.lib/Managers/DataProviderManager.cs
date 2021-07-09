@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver.Core.Authentication;
 using Newtonsoft.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Enums;
@@ -87,7 +86,6 @@ namespace SOS.Lib.Managers
         public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
         {
             var message = string.Empty;
-            await _dataProviderRepository.ClearEmlAsync();
             var providers = await _dataProviderRepository.GetAllAsync();
 
             if (datproviderIds?.Any() ?? false)
@@ -95,7 +93,7 @@ namespace SOS.Lib.Managers
                 providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
             }
 
-            if (!providers?.Any() ?? true)
+            if ((!providers?.Any() ?? true) && !datproviderIds.Contains(-1))
             {
                 message = "No providers found";
                 _logger.LogWarning(message);
@@ -104,6 +102,11 @@ namespace SOS.Lib.Managers
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml");
+
+            if ((datproviderIds?.Any() ?? false) || datproviderIds.Contains(-1))
+            {
+               providers.Add(DataProvider.CompleteSosDataProvider);
+            }
 
             foreach (var provider in providers)
             {

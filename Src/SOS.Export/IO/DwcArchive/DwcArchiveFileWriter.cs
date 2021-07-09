@@ -265,7 +265,10 @@ namespace SOS.Export.IO.DwcArchive
             }
             finally
             {
-                if (tempFilePath != null && File.Exists(tempFilePath)) File.Delete(tempFilePath);
+                if (tempFilePath != null && File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
             }
         }
 
@@ -292,7 +295,10 @@ namespace SOS.Export.IO.DwcArchive
             }
             finally
             {
-                if (tempFilePath != null && File.Exists(tempFilePath)) File.Delete(tempFilePath);
+                if (tempFilePath != null && File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
             }
         }
 
@@ -305,6 +311,11 @@ namespace SOS.Export.IO.DwcArchive
         private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
             IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
+            if (dataProvider.UseVerbatimFileInExport)
+            {
+                return;
+            }
+
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var stream = File.Create(tempFilePath);
             await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };

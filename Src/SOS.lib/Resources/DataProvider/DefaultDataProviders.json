@@ -58,7 +58,8 @@
         "Identifier": "Artportalen",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": true,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "ClamPortalObservations",
@@ -119,7 +120,8 @@
         "Identifier": "ClamGateway",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "KULObservations",
@@ -180,7 +182,8 @@
         "Identifier": "KUL",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "MvmObservations",
@@ -241,7 +244,8 @@
         "Identifier": "MVM",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "NorsObservations",
@@ -302,7 +306,8 @@
         "Identifier": "NORS",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "SersObservations",
@@ -363,7 +368,8 @@
         "Identifier": "SERS",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "VirtualHerbariumObservations",
@@ -424,7 +430,8 @@
         "Identifier": "VirtualHerbarium",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "SharkObservations",
@@ -485,7 +492,8 @@
         "Identifier": "SHARK",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -547,7 +555,8 @@
         "Identifier": "BirdRingingCentre",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -609,7 +618,8 @@
         "Identifier": "EntomologicalCollection",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -671,7 +681,8 @@
         "Identifier": "MalaiseTrap",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -733,7 +744,8 @@
         "Identifier": "Porpoises",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -791,7 +803,8 @@
         "Identifier": "ButterflyMonitoring",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -840,7 +853,8 @@
         "Identifier": "SharkZooplankton",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "FishDataObservations",
@@ -901,7 +915,8 @@
         "Identifier": "Fishdata2",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -962,7 +977,8 @@
         "Identifier": "ForestInventory",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport":  true 
     },
     {
         "Type": "ObservationDatabase",
@@ -1023,7 +1039,8 @@
         "Identifier": "ObservationDatabase",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": false
+        "IncludeInHealthCheck": false,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "BiologObservations",
@@ -1085,7 +1102,8 @@
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
         "IncludeInHealthCheck": true,
-        "LatestUploadedFileHash": null
+        "LatestUploadedFileHash": null,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "iNaturalistObservations",
@@ -1147,7 +1165,8 @@
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
         "IncludeInHealthCheck": true,
-        "LatestUploadedFileHash": null
+        "LatestUploadedFileHash": null,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -1205,7 +1224,8 @@
         "Identifier": "SBS-BirdMonitoringProgramme",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -1263,7 +1283,8 @@
         "Identifier": "SBS-SummerPointCountRoutes",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -1321,7 +1342,8 @@
         "Identifier": "SBS-FixedRoutes",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -1379,7 +1401,8 @@
         "Identifier": "BirdsInTheGulf",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     },
     {
         "Type": "DwcA",
@@ -1429,6 +1452,7 @@
         "Identifier": "TUVA",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true
+        "IncludeInHealthCheck": true,
+        "UseVerbatimFileInExport": false
     }
 ]

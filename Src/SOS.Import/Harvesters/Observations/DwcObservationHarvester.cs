@@ -138,7 +138,14 @@ namespace SOS.Import.Harvesters.Observations
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }
 
-                
+                if(dataProvider.UseVerbatimFileInExport)
+                {
+                    _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
+                    await using var fileStream = File.OpenRead(archivePath);
+                    await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
+                    _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
+                }
+
                 _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
 
                 // Update harvest info
