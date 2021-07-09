@@ -129,6 +129,11 @@ namespace SOS.Lib.Models.Shared
         public string Url { get; set; }
 
         /// <summary>
+        /// Use verbatim file as export file
+        /// </summary>
+        public bool UseVerbatimFileInExport { get; set; }
+
+        /// <summary>
         ///  Indicates that provider is ready to harvest
         /// </summary>
         /// <param name="lastSuccessfulHarvest"></param>

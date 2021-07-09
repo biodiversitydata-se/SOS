@@ -9,10 +9,12 @@ using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -24,6 +26,8 @@ namespace SOS.Export.IO.DwcArchive
         private readonly DwcaFilesCreationConfiguration _dwcaFilesCreationConfiguration;
         private readonly ILogger<DwcArchiveFileWriterCoordinator> _logger;
         private readonly IDataProviderRepository _dataProviderRepository;
+        private readonly IVerbatimClient _importClient;
+
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
 
         /// <summary>
@@ -56,12 +60,16 @@ namespace SOS.Export.IO.DwcArchive
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
+            IVerbatimClient importClient,
             DwcaFilesCreationConfiguration dwcaFilesCreationConfiguration,
             ILogger<DwcArchiveFileWriterCoordinator> logger)
         {
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+            _importClient = importClient ??
+                            throw new ArgumentNullException(
+                                nameof(importClient));
             _dwcaFilesCreationConfiguration = dwcaFilesCreationConfiguration ?? throw new ArgumentNullException(nameof(dwcaFilesCreationConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -88,6 +96,15 @@ namespace SOS.Export.IO.DwcArchive
         {
             if (!_dwcaFilesCreationConfiguration.IsEnabled || !(processedObservations?.Any() ?? false))
             {
+                return true;
+            }
+
+            if (dataProvider.UseVerbatimFileInExport)
+            {
+                if (!_dwcaFilePartsInfoByDataProvider?.ContainsKey(dataProvider) ?? true)
+                {
+                    CreateDwcaFilePartsInfo(dataProvider);
+                }
                 return true;
             }
 
@@ -133,12 +150,50 @@ namespace SOS.Export.IO.DwcArchive
                 var dwcaCreationTasks = new Dictionary<DataProvider, Task<string>>();
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
-                    dwcaCreationTasks.Add(pair.Key, _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(pair.Key,
+                    var provider = pair.Key;
+                    if (provider.UseVerbatimFileInExport)
+                    {
+                        try
+                        {
+                            var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(provider, _importClient, _logger);
+                            // try to get source file
+                            var sourceStream = await darwinCoreArchiveVerbatimRepository.GetSourceFileAsync(provider.Id);
+
+                            if (sourceStream != null)
+                            {
+                                // Store source file on disk and add it to file tasks
+                                var filePath = Path.Combine(_dwcaFilesCreationConfiguration.FolderPath, $"{provider.Identifier}.dwca.zip");
+
+                                if (File.Exists(filePath))
+                                {
+                                    File.Delete(filePath);
+                                }
+
+                                var fileStream = File.OpenWrite(filePath);
+                                
+                                sourceStream.Seek(0, SeekOrigin.Begin);
+                                await sourceStream.CopyToAsync(fileStream);
+                                await fileStream.FlushAsync();
+                                await fileStream.DisposeAsync();
+                                await sourceStream.DisposeAsync();
+                     
+                                dwcaCreationTasks.Add(provider, Task.FromResult(filePath));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                           _logger.LogError(e, "Failed to use source file in export");
+                        }
+
+                        continue;
+                    }
+
+                    dwcaCreationTasks.Add(provider, _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(provider,
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                 }
 
                 dwcaCreationTasks.Add(new DataProvider(),  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
-                    _dwcaFilePartsInfoByDataProvider.Values));
+                    _dwcaFilePartsInfoByDataProvider.Values.Where(fp => !fp.DataProvider.UseVerbatimFileInExport)));
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
                 var createdDwcaFiles = new List<string>();
@@ -189,6 +244,12 @@ namespace SOS.Export.IO.DwcArchive
         {
             var dwcaFilePartsInfo = DwcaFilePartsInfo.Create(dataProvider, _dwcaFilesCreationConfiguration.FolderPath);
             _dwcaFilePartsInfoByDataProvider.Add(dataProvider, dwcaFilePartsInfo);
+
+            if (dataProvider.UseVerbatimFileInExport)
+            {
+                return dwcaFilePartsInfo;
+            }
+
             if (!Directory.Exists(dwcaFilePartsInfo.ExportFolder))
             {
                 _fileService.CreateFolder(dwcaFilePartsInfo.ExportFolder);
