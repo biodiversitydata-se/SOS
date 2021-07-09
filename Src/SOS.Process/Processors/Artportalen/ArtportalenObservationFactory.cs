@@ -215,7 +215,21 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.Url = $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
-                
+
+                if (verbatimObservation.Media?.Any() ?? false)
+                {
+                    obs.Occurrence.Media = verbatimObservation.Media.Select(m => new Multimedia
+                    {
+                        Created = m.UploadDateTime?.ToShortDateString(),
+                        Format = string.Empty, // Todo map from file url?
+                        Identifier = $"https://www.artportalen.se/{m.FileUri}",
+                        License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText,
+                        References = $"https://www.artportalen.se/Image/{m.Id}",
+                        RightsHolder = m.RightsHolder,
+                        Type = m.FileType
+                    }).ToList();
+                }
+
                 // Taxon
                 obs.Taxon = taxon;
 

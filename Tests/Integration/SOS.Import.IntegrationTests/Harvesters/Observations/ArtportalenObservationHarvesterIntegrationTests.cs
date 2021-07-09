@@ -43,6 +43,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 verbatimDbConfiguration.WriteBatchSize);
             var sightingVerbatimRepository =
                 new ArtportalenVerbatimRepository(importClient, new Mock<ILogger<ArtportalenVerbatimRepository>>().Object);
+            var mediadataRepository =
+                new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
             var metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             var projectRepository =
@@ -71,6 +73,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
+                mediadataRepository,
                 metadataRepository,
                 projectRepository,
                 sightingRepository,
@@ -109,6 +112,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var sightingVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
+            var mediadataRepository =
+                new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);
             IMetadataRepository metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             IProjectRepository projectRepository =
@@ -136,6 +141,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
+                mediadataRepository,
                 metadataRepository,
                 projectRepository,
                 sightingRepository,

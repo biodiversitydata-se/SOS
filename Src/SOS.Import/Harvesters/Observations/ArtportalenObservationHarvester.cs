@@ -27,6 +27,7 @@ namespace SOS.Import.Harvesters.Observations
     public class ArtportalenObservationHarvester : IArtportalenObservationHarvester
     {
         private readonly ArtportalenConfiguration _artportalenConfiguration;
+        private readonly IMediaRepository _mediaRepository;
         private readonly IMetadataRepository _metadataRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IPersonRepository _personRepository;
@@ -335,6 +336,7 @@ namespace SOS.Import.Harvesters.Observations
         /// Constructor
         /// </summary>
         /// <param name="artportalenConfiguration"></param>
+        /// <param name="mediaRepository"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
@@ -348,10 +350,10 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
+            IMediaRepository mediaRepository,
             IMetadataRepository metadataRepository,
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
@@ -369,6 +371,7 @@ namespace SOS.Import.Harvesters.Observations
         {
             _artportalenConfiguration = artportalenConfiguration ??
                                         throw new ArgumentNullException(nameof(artportalenConfiguration));
+            _mediaRepository = mediaRepository ?? throw new ArgumentNullException(nameof(mediaRepository));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
@@ -450,6 +453,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 _logger.LogDebug("Start creating factory");
                 var harvestFactory = new ArtportalenHarvestFactory(
+                    _mediaRepository,
                     _projectRepository,
                     _sightingRepository,
                     _siteRepository,

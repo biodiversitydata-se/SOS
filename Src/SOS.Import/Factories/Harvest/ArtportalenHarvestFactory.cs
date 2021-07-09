@@ -20,6 +20,7 @@ namespace SOS.Import.Factories.Harvest
     internal class ArtportalenHarvestFactory : HarvestBaseFactory, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
+        private readonly IMediaRepository _mediaRepository;
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
@@ -35,10 +36,12 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="entity"></param>
         /// <param name="personSightings"></param>
         /// <param name="sightingsProjects"></param>
+        /// <param name="sightingMedia"></param>
         /// <returns></returns>
         private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
             IDictionary<int, PersonSighting> personSightings,
-            IDictionary<int, Project[]> sightingsProjects)
+            IDictionary<int, Project[]> sightingsProjects,
+            IDictionary<int, ICollection<Media>> sightingMedias)
         {
             int sightingId = -1;
 
@@ -167,6 +170,11 @@ namespace SOS.Import.Factories.Harvest
                     observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
                 }
 
+                if (sightingMedias.TryGetValue(entity.Id, out var media))
+                {
+                    observation.Media = media;
+                }
+
                 return observation;
             }
             catch (Exception ex)
@@ -197,14 +205,68 @@ namespace SOS.Import.Factories.Harvest
             return ids.Any() ? ids : null;
         }
 
-        #region Project
-        
-        /// <summary>
-        ///     Cast project parameter itemEntity to aggregate
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
+        #region Media
+
+        private async Task<Media> CastMediaEntityToVerbatimAsync(MediaEntity entity)
+        {
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return new Media
+            {
+                CopyrightText = entity.CopyrightText,
+                FileType = entity.FileType,
+                FileUri = entity.FileUri,
+                Id = entity.Id,
+                RightsHolder = entity.RightsHolder,
+                UploadDateTime = entity.UploadDateTime
+            };
+        }
+
+        private async Task<IDictionary<int, ICollection<Media>>> GetSightingMediaAsync(IEnumerable<int> sightingIds, bool live)
+        {
+            var sightingsMedias = new Dictionary<int, ICollection<Media>>();
+
+            if (!sightingIds?.Any() ?? true)
+            {
+                return sightingsMedias;
+            }
+
+            var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds, live);
+
+            if (sightingMediaEntities == null)
+            {
+                return sightingsMedias;
+            }
+
+            foreach (var sightingMediaEntity in sightingMediaEntities)
+            {
+                var media = await CastMediaEntityToVerbatimAsync(sightingMediaEntity);
+
+                
+                if (!sightingsMedias.TryGetValue(sightingMediaEntity.SightingId, out var sightingMedia))
+                {
+                    sightingMedia = new List<Media>();
+                    sightingsMedias.Add(sightingMediaEntity.SightingId, sightingMedia);
+                }
+
+                sightingsMedias[sightingMediaEntity.SightingId].Add(media);
+            }
+
+            return sightingsMedias;
+        }
+        #endregion Media
+
+            #region Project
+
+            /// <summary>
+            ///     Cast project parameter itemEntity to aggregate
+            /// </summary>
+            /// <param name="entity"></param>
+            /// <returns></returns>
+            private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
         {
             if (entity == null)
             {
@@ -529,6 +591,7 @@ namespace SOS.Import.Factories.Harvest
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="mediaRepository"></param>
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
@@ -538,6 +601,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ArtportalenHarvestFactory(
+            IMediaRepository mediaRepository,
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
@@ -547,6 +611,7 @@ namespace SOS.Import.Factories.Harvest
             IAreaHelper areaHelper,
             ILogger<ArtportalenObservationHarvester> logger) : base()
         {
+            _mediaRepository = mediaRepository ?? throw new ArgumentNullException(nameof(mediaRepository));
             _projectRepository = projectRepository;
             _sightingRepository = sightingRepository;
             _siteRepository = siteRepository;
@@ -602,10 +667,12 @@ namespace SOS.Import.Factories.Harvest
                 speciesCollections,
                 sightingRelations);
 
+            var sightingsMedias = await GetSightingMediaAsync(sightingIds, IncrementalMode);
+
             var verbatims = new List<ArtportalenObservationVerbatim>();
             for (var i = 0; i < entities.Length; i++)
             {
-                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects));
+                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias));
             }
 
             return verbatims;
