@@ -64,6 +64,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+
             var mockCursor = new Mock<IAsyncCursor<DwcObservationVerbatim>>();
             mockCursor.Setup(_ => _.Current).Returns(dwcObservationVerbatims); //<-- Note the entities here
             mockCursor
@@ -110,7 +117,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository, importClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,

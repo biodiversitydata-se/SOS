@@ -113,9 +113,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository, verbatimClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
 
           
             var clamPortalProcessor = new ClamPortalObservationProcessor(

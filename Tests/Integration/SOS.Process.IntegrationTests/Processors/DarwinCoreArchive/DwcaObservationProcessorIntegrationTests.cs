@@ -169,6 +169,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var verbatimClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
@@ -187,7 +194,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new FileService(),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), dataProviderRepository, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), dataProviderRepository, verbatimClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return dwcArchiveFileWriterCoordinator;
         }
 
