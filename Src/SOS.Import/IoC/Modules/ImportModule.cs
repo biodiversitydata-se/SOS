@@ -131,6 +131,7 @@ namespace SOS.Import.IoC.Modules
 
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<MediaRepository>().As<IMediaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseRepository>().As<IObservationDatabaseRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>().InstancePerLifetimeScope();

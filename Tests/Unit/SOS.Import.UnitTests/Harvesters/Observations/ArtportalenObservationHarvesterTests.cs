@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -30,6 +31,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         public ArtportalenObservationHarvesterTests()
         {
             _artportalenConfiguration = new ArtportalenConfiguration();
+            _mediaRepositoryMock = new Mock<IMediaRepository>();
             _metadataRepositoryMock = new Mock<IMetadataRepository>();
             _projectRepositoryMock = new Mock<IProjectRepository>();
             _sightingRepositoryMock = new Mock<ISightingRepository>();
@@ -47,6 +49,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         private readonly ArtportalenConfiguration _artportalenConfiguration;
+        private readonly Mock<IMediaRepository> _mediaRepositoryMock;
         private readonly Mock<IMetadataRepository> _metadataRepositoryMock;
         private readonly Mock<IProjectRepository> _projectRepositoryMock;
         private readonly Mock<ISightingRepository> _sightingRepositoryMock;
@@ -64,6 +67,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
         private ArtportalenObservationHarvester TestObject => new ArtportalenObservationHarvester(
             _artportalenConfiguration,
+            _mediaRepositoryMock.Object,
             _metadataRepositoryMock.Object,
             _projectRepositoryMock.Object,
             _sightingRepositoryMock.Object,
@@ -120,6 +124,9 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                         CultureCode = "sv-GB"
                     }
                 });
+            _mediaRepositoryMock.Setup(mdr => mdr.GetAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()))
+                .ReturnsAsync(
+                    new[] { new MediaEntity() { SightingId = 1, FileType = "image", UploadDateTime = DateTime.Now } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetBiotopesAsync())
                 .ReturnsAsync(
                     new[] {new MetadataEntity {Id = 1, Translation = "Biotope", CultureCode = Cultures.en_GB}});

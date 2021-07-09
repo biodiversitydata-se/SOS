@@ -112,6 +112,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? MaxHeight { get; set; }
 
         /// <summary>
+        /// Images etc
+        /// </summary>
+        public IEnumerable<Media> Media { get; set; }
+
+        /// <summary>
         ///     Migrate obs id
         /// </summary>
         public int? MigrateSightingObsId { get; set; }
