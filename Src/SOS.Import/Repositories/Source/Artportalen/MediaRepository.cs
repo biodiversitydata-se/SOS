@@ -50,7 +50,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                  LEFT JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49
 	                  LEFT JOIN [User] u ON mf.UserId = u.Id
 	                  LEFT JOIN Person p ON u.PersonId = p.Id
-                      INNER JOIN @tvp t ON mf.SightingID = t.Id";
+                      INNER JOIN @tvp tvp ON mf.SightingID = tvp.Id";
 
                 return await QueryAsync<MediaEntity>(query,
                     new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);

@@ -221,7 +221,7 @@ namespace SOS.Process.Processors.Artportalen
                     obs.Occurrence.Media = verbatimObservation.Media.Select(m => new Multimedia
                     {
                         Created = m.UploadDateTime?.ToShortDateString(),
-                        Format = string.Empty, // Todo map from file url?
+                        Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.')): string.Empty,
                         Identifier = $"https://www.artportalen.se/{m.FileUri}",
                         License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText,
                         References = $"https://www.artportalen.se/Image/{m.Id}",
