@@ -91,7 +91,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = taxon?.Attributes.ProtectionLevel?.Id ?? 1,
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },

@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -32,31 +33,38 @@ namespace SOS.Process.UnitTests.Processors
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _diffusionManagerMock = new Mock<IDiffusionManager>();
             _loggerMock = new Mock<ILogger<ClamPortalObservationProcessor>>();
         }
 
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepository;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepository;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
+        private readonly Mock<IDiffusionManager> _diffusionManagerMock;
         private readonly Mock<ILogger<ClamPortalObservationProcessor>> _loggerMock;
 
         private ClamPortalObservationProcessor TestObject => new ClamPortalObservationProcessor(
             _clamObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
-            _processedObservationRepositoryMock.Object,
-            _vocabularyResolverMock.Object, 
+            _processedPublicObservationRepository.Object,
+            _processedProtectedObservationRepository.Object,
+            _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
+            _diffusionManagerMock.Object,
+            new ProcessConfiguration(),
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()
@@ -137,7 +145,11 @@ namespace SOS.Process.UnitTests.Processors
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
 
-            _processedObservationRepositoryMock
+            _processedPublicObservationRepository
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+                .ReturnsAsync(1);
+
+            _processedProtectedObservationRepository
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 

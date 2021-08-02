@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -118,6 +119,36 @@ namespace SOS.Process.Processors
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
+        }
+
+        /// <summary>
+        ///     Calculate protection level
+        /// </summary>
+        /// <param name="taxon"></param>
+        /// <param name="hiddenByProviderUntil"></param>
+        /// <param name="protectedBySystem"></param>
+        /// <returns></returns>
+        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
+        {
+            var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
+            var taxonProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 3;
+
+            if (hiddenByProvider || protectedBySystem)
+            {
+                return Math.Max(3, taxonProtectionLevel);
+            }
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Calculate protection level
+        /// </summary>
+        /// <param name="taxon"></param>
+        /// <returns></returns>
+        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon)
+        {
+           return taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
         }
     }
 }

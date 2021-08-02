@@ -68,7 +68,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processManager, processConfiguration, logger)
+                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));

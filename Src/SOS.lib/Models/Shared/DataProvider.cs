@@ -112,11 +112,6 @@ namespace SOS.Lib.Models.Shared
         public bool SupportIncrementalHarvest { get; set; }
 
         /// <summary>
-        /// True if provider support protected observation harvest
-        /// </summary>
-        public bool SupportProtectedHarvest { get; set; }
-
-        /// <summary>
         ///     The harvest data format.
         /// </summary>
         [BsonRepresentation(BsonType.String)]

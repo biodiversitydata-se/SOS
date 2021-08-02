@@ -76,7 +76,7 @@ namespace SOS.Process.Processors.Shark
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
-                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Taxonomist,
                     ReportedBy = verbatim.ReportedStationName,
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)

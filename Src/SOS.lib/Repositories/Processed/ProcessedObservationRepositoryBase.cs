@@ -174,7 +174,7 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             IElasticClient elasticClient,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedPublicObservationRepository> logger
+            ILogger<ProcessedObservationRepositoryBase> logger
         ) : base(client, true, logger)
         {
             _protected = protectedIndex;

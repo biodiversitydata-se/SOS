@@ -90,7 +90,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
                 processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>());
             }
             else
             {
@@ -123,80 +123,104 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<ClamObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyValueResolver, 
                 dwcArchiveFileWriterCoordinator, 
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
                     new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
                     new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
                     new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
                     new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
                 processedPublicObservationRepository,
-                vocabularyValueResolver, 
+                processedProtectedObservationRepository,
+                vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
@@ -204,17 +228,17 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedProtectedObservationRepository,
                 vocabularyRepository,
                 vocabularyValueResolver,
-                processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
-                diffusionManager,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
                 new ProcessedPublicObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>()),
                 new ProcessedProtectedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>()),
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
             
@@ -223,12 +247,15 @@ namespace SOS.Process.IntegrationTests.Jobs
             var dwcaProcessor = new DwcaObservationProcessor(
                 verbatimClient,
                 processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyRepository,
-                new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
+                vocabularyValueResolver,
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
 
             var observationDatabaseProcessor = new ObservationDatabaseProcessor(

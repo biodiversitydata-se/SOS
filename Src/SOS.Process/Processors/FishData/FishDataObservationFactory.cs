@@ -75,7 +75,7 @@ namespace SOS.Process.Processors.FishData
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),

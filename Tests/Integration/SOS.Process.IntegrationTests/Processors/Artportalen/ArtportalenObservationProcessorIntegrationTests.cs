@@ -107,7 +107,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
                 processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>());
             }
             else
             {
@@ -132,11 +132,11 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processedProtectedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
-                processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
-                diffusionManager,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
         }
 

@@ -28,7 +28,6 @@ namespace SOS.Process.Processors
     {
         private readonly IProcessManager _processManager;
         private readonly IDiffusionManager _diffusionManager;
-        private readonly bool _handleProtected;
 
         /// <summary>
         /// Commit batch
@@ -148,8 +147,8 @@ namespace SOS.Process.Processors
                         continue;
                     }
 
-                    // If provider handle protected observations and observation is protected
-                    if (_handleProtected && observation.Occurrence.ProtectionLevel > 2)
+                    // If  observation is protected
+                    if (observation.Occurrence.ProtectionLevel > 2)
                     {
                         observation.Protected = true;
                         protectedObservations.Add(observation);
@@ -173,24 +172,17 @@ namespace SOS.Process.Processors
 
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                var validateAndStoreTasks = new List<Task<int>>
+                var validateAndStoreTasks = new[]
                 {
-                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, $"{startId}-{endId}")
+                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, $"{startId}-{endId}"),
+                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, $"{startId}-{endId}")
                 };
-                if (_handleProtected)
-                {
-                    validateAndStoreTasks.Add(ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, $"{startId}-{endId}"));
-                }
-
+                
                 await Task.WhenAll(validateAndStoreTasks);
 
                 var publicCount = validateAndStoreTasks[0].Result;
-                var protectedCount = 0;
-                if (_handleProtected)
-                {
-                    protectedCount = validateAndStoreTasks[1].Result;
-                }
-
+                var protectedCount = validateAndStoreTasks[1].Result;
+                
                 return (publicCount, protectedCount);
             }
             catch (JobAbortedException e)
@@ -241,25 +233,6 @@ namespace SOS.Process.Processors
         protected bool EnableDiffusion { get; }
 
         /// <summary>
-        /// Constructor for public only 
-        /// </summary>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="processManager"></param>
-        /// <param name="logger"></param>
-        protected ObservationProcessorBase(
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IVocabularyValueResolver vocabularyValueResolver,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IValidationManager validationManager,
-            IProcessManager processManager,
-            ILogger<TClass> logger) : this(processedPublicObservationRepository, null, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager,null, processManager, new ProcessConfiguration{Diffusion = false}, logger)
-        {
-        }
-
-        /// <summary>
         /// Constructor for public and protected
         /// </summary>
         /// <param name="processedPublicObservationRepository"></param>
@@ -275,27 +248,21 @@ namespace SOS.Process.Processors
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
-            IProcessManager processManager,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger)
         {
-            _handleProtected = processedProtectedObservationRepository != null;
-
-           PublicRepository = processedPublicObservationRepository ??
+            PublicRepository = processedPublicObservationRepository ??
                                throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            ProtectedRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository)); ;
+            _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
 
             this.vocabularyValueResolver = vocabularyValueResolver ??
                                            throw new ArgumentNullException(nameof(vocabularyValueResolver));
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
             ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
-
-            if (_handleProtected)
-            {
-                ProtectedRepository = processedProtectedObservationRepository;
-                _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
-            }
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
@@ -363,9 +330,9 @@ namespace SOS.Process.Processors
                 var occurrenceIds = observations.Select(o => o.Occurrence.OccurrenceId).ToArray();
                 var success = await DeleteBatchAsync(protectedObservations, occurrenceIds);
 
-                // If provider supports protected observations and diffusion is disabled,
+                // If diffusion is disabled,
                 // make sure the observation don't exists in both public and protected index
-                if (dataProvider.SupportProtectedHarvest && !EnableDiffusion)
+                if (!EnableDiffusion)
                 {
                     success = await DeleteBatchAsync(!protectedObservations, occurrenceIds);
                 }
@@ -428,7 +395,7 @@ namespace SOS.Process.Processors
                         Logger.LogError($"Failed to delete {dataProvider.Identifier} public data");
                     }
 
-                    if (dataProvider.SupportProtectedHarvest && !await ProtectedRepository.DeleteProviderDataAsync(dataProvider))
+                    if (!await ProtectedRepository.DeleteProviderDataAsync(dataProvider))
                     {
                         Logger.LogError($"Failed to delete {dataProvider.Identifier} protected data");
                     }

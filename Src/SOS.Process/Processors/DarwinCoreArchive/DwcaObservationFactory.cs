@@ -162,7 +162,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.MaterialSample = CreateProcessedMaterialSample(verbatim);
 
             // Occurrence
-            obs.Occurrence = CreateProcessedOccurrence(verbatim);
+            obs.Occurrence = CreateProcessedOccurrence(verbatim, obs.Taxon);
 
             // Organism
             obs.Organism = CreateProcessedOrganism(verbatim);
@@ -386,7 +386,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
 
-        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim)
+        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
             var processedOccurrence = new Occurrence();
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
@@ -429,6 +429,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 processedOccurrence.IsPositiveObservation = false;
                 processedOccurrence.IsNeverFoundObservation = true;
             }
+
+            processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon);
 
             // todo - handle the following fields:
             // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -35,11 +36,13 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock =
                 new Mock<IVirtualHerbariumObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
             _processManagerMock = new Mock<IProcessManager>();
+            _diffusionManagerMock = new Mock<IDiffusionManager>();
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationProcessor>>();
         }
 
@@ -47,21 +50,26 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock;
 
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
+        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
+        private readonly Mock<IDiffusionManager> _diffusionManagerMock;
         private readonly Mock<ILogger<VirtualHerbariumObservationProcessor>> _loggerMock;
 
         private VirtualHerbariumObservationProcessor TestObject => new VirtualHerbariumObservationProcessor(
             _virtualHerbariumObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
-            _processedObservationRepositoryMock.Object,
+            _processedPublicObservationRepositoryMock.Object,
+            _processedProtectedObservationRepositoryMock.Object,
             _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
+            _diffusionManagerMock.Object,
+            new ProcessConfiguration{Diffusion = false},
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()
@@ -84,7 +92,9 @@ namespace SOS.Process.UnitTests.Processors
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataprovider = CreateDataProvider();
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedPublicObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ThrowsAsync(new Exception("Failed"));
+            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -124,10 +134,16 @@ namespace SOS.Process.UnitTests.Processors
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
 
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedPublicObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
-            _processedObservationRepositoryMock
+            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+
+            _processedPublicObservationRepositoryMock
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+                .ReturnsAsync(1);
+            _processedProtectedObservationRepositoryMock
                 .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 

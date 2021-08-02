@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -48,21 +49,27 @@ namespace SOS.Process.Processors.FishData
         /// <param name="fishDataObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="diffusionManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public FishDataObservationProcessor(
             IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IDiffusionManager diffusionManager,
+            ProcessConfiguration processConfiguration,
             ILogger<FishDataObservationProcessor> logger) :
-            base(processedPublicObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, processManager, logger)
+            base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
                                                      throw new ArgumentNullException(

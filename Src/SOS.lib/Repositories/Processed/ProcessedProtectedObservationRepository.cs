@@ -27,7 +27,7 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             IElasticClient elasticClient,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedPublicObservationRepository> logger
+            ILogger<ProcessedProtectedObservationRepository> logger
         ) : base(true, client, elasticClient, elasticConfiguration, logger)
         {
             

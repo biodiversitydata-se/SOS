@@ -35,25 +35,24 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="processedProtectedObservationRepository"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
-        /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="diffusionManager"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
-        /// <param name="geometryManager"></param>
+        /// <param name="diffusionManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessedProtectedObservationRepository processedProtectedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
-            ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IDiffusionManager diffusionManager,
             IProcessManager processManager,
             IValidationManager validationManager,
+            IDiffusionManager diffusionManager,
+            ProcessConfiguration processConfiguration,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, validationManager, diffusionManager, processManager, processConfiguration, logger)
+                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
