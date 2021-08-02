@@ -245,14 +245,13 @@ namespace SOS.Import.Factories.Harvest
             {
                 var media = await CastMediaEntityToVerbatimAsync(sightingMediaEntity);
 
-                
                 if (!sightingsMedias.TryGetValue(sightingMediaEntity.SightingId, out var sightingMedia))
                 {
                     sightingMedia = new List<Media>();
                     sightingsMedias.Add(sightingMediaEntity.SightingId, sightingMedia);
                 }
 
-                sightingsMedias[sightingMediaEntity.SightingId].Add(media);
+                sightingMedia.Add(media);
             }
 
             return sightingsMedias;
