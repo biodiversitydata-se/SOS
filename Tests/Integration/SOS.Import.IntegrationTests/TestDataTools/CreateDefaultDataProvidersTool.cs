@@ -945,8 +945,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
                     IncludeInSearchByDefault = true,
-                    HarvestSchedule = "* * * * *",
-                    SupportProtectedHarvest = true
+                    HarvestSchedule = "* * * * *"
                 },
                 new DataProvider
                 {

@@ -91,7 +91,7 @@ namespace SOS.Process.Processors.ClamPortal
                     OrganismQuantityInt = verbatim.Quantity,
                     OrganismQuantity = verbatim.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
-                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate.ToUniversalTime(),

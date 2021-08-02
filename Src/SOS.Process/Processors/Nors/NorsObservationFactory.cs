@@ -74,7 +74,7 @@ namespace SOS.Process.Processors.Nors
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    ProtectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1,
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)

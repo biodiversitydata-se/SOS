@@ -135,15 +135,23 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             
             var processManager = new ProcessManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedPublicObservationRepository processedObservationRepository;
+            var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+            var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
+
+            IProcessedPublicObservationRepository processedPublicObservationRepository;
+            IProcessedProtectedObservationRepository processedProtectedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
+                processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
+
+                processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>());
             }
             else
             {
-                processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
+                processedPublicObservationRepository = CreateProcessedPublicObservationRepositoryMock(batchSize).Object;
+                processedProtectedObservationRepository = CreateProcessedProtectedObservationRepositoryMock(batchSize).Object;
             }
 
             var vocabularyRepository =
@@ -151,13 +159,16 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             return new DwcaObservationProcessor(
                 verbatimClient,
-                processedObservationRepository,
+                processedPublicObservationRepository,
+                processedProtectedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
-                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>())),
+                areaHelper,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
                 validationManager,
+                diffusionManager,
+                processConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 
@@ -198,9 +209,17 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedPublicObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedPublicObservationRepository> CreateProcessedPublicObservationRepositoryMock(int batchSize)
         {
             var mock = new Mock<IProcessedPublicObservationRepository>();
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
+            mock.Setup(m => m.BatchSize).Returns(batchSize);
+            return mock;
+        }
+
+        private Mock<IProcessedProtectedObservationRepository> CreateProcessedProtectedObservationRepositoryMock(int batchSize)
+        {
+            var mock = new Mock<IProcessedProtectedObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(batchSize);
             return mock;

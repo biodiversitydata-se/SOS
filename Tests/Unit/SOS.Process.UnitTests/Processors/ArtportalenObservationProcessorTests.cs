@@ -65,11 +65,11 @@ namespace SOS.Process.UnitTests.Processors
             _processedProtectedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
             _vocabularyResolverMock.Object,
-            _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
-            _diffusionManagerMock.Object,
             _processManagerMock.Object,
             _validationManagerMock.Object,
+            _diffusionManagerMock.Object,
+            _processConfiguration,
             _loggerMock.Object);
 
         /// <summary>
@@ -164,8 +164,7 @@ namespace SOS.Process.UnitTests.Processors
             var dataProvider = new DataProvider
             {
                 Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
-                Type = DataProviderType.ArtportalenObservations,
-                SupportProtectedHarvest = true
+                Type = DataProviderType.ArtportalenObservations
             };
 
             var taxa = new Dictionary<int, Taxon>
