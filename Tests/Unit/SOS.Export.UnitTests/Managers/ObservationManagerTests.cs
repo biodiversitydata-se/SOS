@@ -5,10 +5,12 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Export.IO.Excel.Interfaces;
+using SOS.Export.IO.GeoJson.Interfaces;
 using SOS.Export.Managers;
-using SOS.Export.Managers.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
@@ -30,6 +32,8 @@ namespace SOS.Export.UnitTests.Managers
         public ObservationManagerTests()
         {
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
+            _excelFileWriter = new Mock<IExcelFileWriter>();
+            _geoJsonFileWriter = new Mock<IGeoJsonFileWriter>();
             _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
@@ -40,6 +44,8 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
+        private readonly Mock<IExcelFileWriter> _excelFileWriter;
+        private readonly Mock<IGeoJsonFileWriter> _geoJsonFileWriter;
         private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
@@ -53,6 +59,8 @@ namespace SOS.Export.UnitTests.Managers
         /// </summary>
         private ObservationManager TestObject => new ObservationManager(
             _dwcArchiveFileWriterMock.Object,
+            _excelFileWriter.Object,
+            _geoJsonFileWriter.Object,
             _processedObservationRepositoryMock.Object,
             _processInfoRepositoryMock.Object,
             _fileServiceMock.Object,
@@ -93,7 +101,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "",
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC,
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -133,7 +141,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "",
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC,
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -159,7 +167,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "",
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC,
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

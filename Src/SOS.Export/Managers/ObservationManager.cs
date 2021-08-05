@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Export.IO.Excel.Interfaces;
+using SOS.Export.IO.GeoJson.Interfaces;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search;
@@ -27,6 +29,8 @@ namespace SOS.Export.Managers
         private readonly IFilterManager _filterManager;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly IExcelFileWriter _excelWriter;
+        private readonly IGeoJsonFileWriter _geoJsonWriter;
         private readonly string _exportPath;
         private readonly IFileService _fileService;
         private readonly ILogger<ObservationManager> _logger;
@@ -35,9 +39,11 @@ namespace SOS.Export.Managers
         private readonly IZendToService _zendToService;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
+        /// <param name="excelWriter"></param>
+        /// <param name="geoJsonWriter"></param>
         /// <param name="processedPublicObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
@@ -48,6 +54,8 @@ namespace SOS.Export.Managers
         /// <param name="logger"></param>
         public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
+            IExcelFileWriter excelWriter,
+            IGeoJsonFileWriter geoJsonWriter,
             IProcessedPublicObservationRepository processedPublicObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
@@ -57,6 +65,13 @@ namespace SOS.Export.Managers
             IFilterManager filterManager,
             ILogger<ObservationManager> logger)
         {
+            _dwcArchiveFileWriter =
+                dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
+            _excelWriter =
+                excelWriter ?? throw new ArgumentNullException(nameof(excelWriter));
+            _geoJsonWriter =
+                geoJsonWriter ?? throw new ArgumentNullException(nameof(geoJsonWriter));
+
             _processedPublicObservationRepository = processedPublicObservationRepository ??
                                                     throw new ArgumentNullException(nameof(processedPublicObservationRepository));
             _processInfoRepository =
@@ -66,22 +81,28 @@ namespace SOS.Export.Managers
             _zendToService = zendToService ?? throw new ArgumentNullException(nameof(zendToService));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
-            _dwcArchiveFileWriter =
-                dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
+            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<bool> ExportAndSendAsync(SearchFilter filter, 
             string emailAddress,
             string description,
+            ExportFormat exportFormat,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
             {
                 await _filterManager.PrepareFilter(null, filter);
-                zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
 
+                zipFilePath = exportFormat switch
+                {
+                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken)
+                };
+                
                 // zend file to user
                 return await _zendToService.SendFile(emailAddress, description, zipFilePath);
             }
@@ -191,6 +212,56 @@ namespace SOS.Export.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to export sightings");
+                throw;
+            }
+        }
+
+        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string fileName,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var zipFilePath = await _excelWriter.CreateFileAync(
+                    filter,
+                    _exportPath,
+                    fileName,
+                    cancellationToken);
+
+                return zipFilePath;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to Excel was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to Excel");
+                throw;
+            }
+        }
+
+        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string fileName,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var zipFilePath = await _geoJsonWriter.CreateFileAync(
+                   filter,
+                   _exportPath,
+                   fileName,
+                    cancellationToken);
+                
+                return zipFilePath;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to GeoJson was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to GeoJson");
                 throw;
             }
         }

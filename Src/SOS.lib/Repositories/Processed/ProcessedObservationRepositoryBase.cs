@@ -64,7 +64,6 @@ namespace SOS.Lib.Repositories.Processed
         private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
         {
             if (dynamicObjects == null) return null;
-
             return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects),
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
@@ -519,6 +518,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Field("location.point")
                         .Field("location.pointLocation")
                         .Field("location.pointWithBuffer")
+                        .Field("location.pointWithDisturbanceBuffer")
                     );
                
                 searchResponse = await ElasticClient

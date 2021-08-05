@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Export.IO.Excel;
+using SOS.Export.IO.Excel.Interfaces;
+using SOS.Export.IO.GeoJson.Interfaces;
 using SOS.Export.Jobs;
 using SOS.Export.Managers;
 using SOS.Export.Managers.Interfaces;
@@ -110,6 +113,9 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<SimpleMultimediaCsvWriter>().As<ISimpleMultimediaCsvWriter>()
                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<ExcelFileWriter>().As<IExcelFileWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<GeoJsonFileWriter>().As<IGeoJsonFileWriter>().InstancePerLifetimeScope();
 
             // Helpers, static data => single instance 
             builder.RegisterType<VocabularyValueResolver>().As<IVocabularyValueResolver>().SingleInstance();

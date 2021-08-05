@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 
@@ -30,17 +31,18 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Export observations. Email={1}, Description={2}")]
+        [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
         public async Task<bool> RunAsync(SearchFilter filter, 
             string email, 
             string description,
+            ExportFormat exportFormat,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation("Start export and send job");
-                var success = await _observationManager.ExportAndSendAsync(filter, email, description, cancellationToken);
-
+                var success = await _observationManager.ExportAndSendAsync(filter, email, description, exportFormat, cancellationToken);
+                
                 _logger.LogInformation($"End export and send job. Success: {success}");
 
                 return success ? true : throw new Exception("Export and send job failed");
