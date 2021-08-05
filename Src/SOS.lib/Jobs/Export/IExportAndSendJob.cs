@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Jobs.Export
@@ -11,17 +12,19 @@ namespace SOS.Lib.Jobs.Export
     public interface IExportAndSendJob
     {
         /// <summary>
-        ///     Run DOI export job
+        ///  Run export job
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="email"></param>
         /// <param name="description"></param>
+        /// <param name="exportFormat"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisplayName("Export observations. Email={1}, Description={2}")]
+        [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
         Task<bool> RunAsync(SearchFilter filter, 
             string email, 
             string description,
+            ExportFormat exportFormat,
             IJobCancellationToken cancellationToken);
     }
 }

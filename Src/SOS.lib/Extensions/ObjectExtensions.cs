@@ -1,19 +1,40 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.Json;
 
 namespace SOS.Lib.Extensions
 {
     public static class ObjectExtensions
     {
+        public static bool IsValueTypeOrString(this Type type)
+        {
+            return type.IsValueType || type == typeof(string);
+        }
+
+        public static string ToStringValueType(this object value)
+        {
+            return value switch
+            {
+                DateTime dateTime => dateTime.ToString("o"),
+                bool boolean => boolean.ToStringLowerCase(),
+                _ => value.ToString()
+            };
+        }
+
+        public static bool IsIEnumerable(this Type type)
+        {
+            return type.IsAssignableTo(typeof(IEnumerable));
+        }
+
+        public static string ToStringLowerCase(this bool boolean)
+        {
+            return boolean ? "true" : "false";
+        }
+
         /// <summary>
         /// Get object property
         /// </summary>

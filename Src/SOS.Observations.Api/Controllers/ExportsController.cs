@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
@@ -28,6 +30,77 @@ namespace SOS.Observations.Api.Controllers
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
+
+        /// <summary>
+        /// Populate output fields based on property set
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPropertySet"></param>
+        private void PopulateOutputFields(SearchFilter filter, ExportPropertySet exportPropertySet)
+        {
+            if (exportPropertySet == ExportPropertySet.All)
+            {
+                return;
+            }
+
+            var outputFields = new List<string>
+            {
+                "datasetName",
+                "event.startDate",
+                "event.endDate",
+                "identification.validated",
+                "location.decimalLongitude",
+                "location.decimalLatitude",
+                "occurrence.occurrenceId",
+                "occurrence.reportedBy",
+                "taxon.id",
+                "taxon.scientificName",
+                "taxon.vernacularName"
+            };
+
+            if (exportPropertySet == ExportPropertySet.Extended)
+            {
+                outputFields.Add("location.county");
+                outputFields.Add("location.locality");
+                outputFields.Add("location.municipality");
+                outputFields.Add("location.province");
+                outputFields.Add("location.parish");
+                outputFields.Add("taxon.kingdom");
+                outputFields.Add("taxon.organismGroup");
+                outputFields.Add("taxon.redlistCategory");
+            }
+
+            filter.OutputFields = outputFields;
+        }
+
+        private async Task<IActionResult> ValidateAsync(ExportFilterDto filter)
+        {
+            var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
+
+            var validationResults = Result.Combine(
+                ValidateSearchFilter(filter),
+                ValidateEmail(email));
+
+            if (validationResults.IsFailure)
+            {
+                return BadRequest(validationResults.Error);
+            }
+
+            var exportFilter = filter.ToSearchFilter("en-GB", false);
+            var matchCount = await ObservationManager.GetMatchCountAsync(null, exportFilter);
+
+            if (matchCount == 0)
+            {
+                return NoContent();
+            }
+
+            if (matchCount > _exportObservationsLimit)
+            {
+                return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
+            }
+            
+            return new OkObjectResult((email, exportFilter));
+        }
 
         /// <summary>
         /// Constructor
@@ -76,47 +149,94 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Request")]
+        [HttpPost("DwC")]
         [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> PostRequest([FromBody] ExportFilterDto filter, [FromQuery] string description)
+        public async Task<IActionResult> ExportDwC([FromBody] ExportFilterDto filter, [FromQuery] string description)
         {
             try
             {
-                var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
+                var validateResult = await ValidateAsync(filter);
 
-                var validationResults = Result.Combine(
-                    ValidateSearchFilter(filter),
-                    ValidateEmail(email));
-
-                if (validationResults.IsFailure)
+                if (validateResult is not OkObjectResult okResult)
                 {
-                    return BadRequest(validationResults.Error);
+                    return validateResult;
                 }
 
-                var exportFilter = filter.ToSearchFilter("en-GB", false);
-                var matchCount = await ObservationManager.GetMatchCountAsync(null, exportFilter);
-
-                if (matchCount == 0)
-                {
-                    return NoContent();
-                }
-
-                if (matchCount > _exportObservationsLimit)
-                {
-                    return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
-                }
+                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Running export failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Excel")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ExportExcel([FromBody] ExportFilterDto filter, [FromQuery] string description, [FromQuery] ExportPropertySet exportPropertySet)
+        {
+            try
+            {
+                var validateResult = await ValidateAsync(filter);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
+                PopulateOutputFields(exportFilter, exportPropertySet);
+
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, JobCancellationToken.Null)));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("GeoJson")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ExportGeoJson([FromBody] ExportFilterDto filter, [FromQuery] string description, [FromQuery] ExportPropertySet exportPropertySet)
+        {
+            try
+            {
+                var validateResult = await ValidateAsync(filter);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
+                PopulateOutputFields(exportFilter, exportPropertySet);
+
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, JobCancellationToken.Null)));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }
