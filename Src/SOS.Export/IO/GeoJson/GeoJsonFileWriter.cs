@@ -92,13 +92,16 @@ namespace SOS.Export.IO.Excel
                             var openObjects = 0;
                             foreach (var objectProperty in objectProperties.OrderBy(p => p.Key))
                             {
+                                // Check if property is included (OutputFields empty = all)
                                 if (!((!filter.OutputFields?.Any() ?? true) || filter.OutputFields.Contains(objectProperty.Key, StringComparer.CurrentCultureIgnoreCase)))
                                 {
                                     continue;
                                 }
 
+                                // Split property parts to array
                                 var propertyParts = objectProperty.Key.Split('.');
 
+                                // Check if we have any open sub objects that should be closed
                                 for (var i = 0; i < prevPropertyParts.Length -1; i++)
                                 {
                                     if (openObjects == 0 || (i < propertyParts.Length - 1 &&
@@ -121,20 +124,23 @@ namespace SOS.Export.IO.Excel
                                         continue;
                                     }
 
+                                    // Are we still in the same sub object? continue
                                     if (i < prevPropertyParts.Length - 1 && propertyParts[i].Equals(prevPropertyParts[i], StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         continue;
                                     }
+
+                                    // Open new sub object
                                     await streamWriter.WriteAsync($"{(firstProperty ? "" : ",")} \"{propertyPart.ToCamelCase()}\": {{");
                                     openObjects++;
                                     firstProperty = true;
                                 }
 
-                                //  await streamWriter.WriteAsync($"{(firstProperty ? "" : ",")}{{\"{objectProperty.Key.ToCamelCase()}\": \"{objectProperty.Value}\"}}");
                                 firstProperty = false;
                                 prevPropertyParts = propertyParts;
                             }
 
+                            // Close sub objects if any
                             while (openObjects > 0)
                             {
                                 await streamWriter.WriteAsync("}");
@@ -147,13 +153,10 @@ namespace SOS.Export.IO.Excel
                         await streamWriter.WriteAsync("}");
                     }
                     
-                    await streamWriter.FlushAsync();
-                    
                     // Get next batch of observations.
                     scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
                 await streamWriter.WriteAsync("] }");
-                await streamWriter.FlushAsync();
                 streamWriter.Close();
                 fileStream.Close();
                 var zipFilePath = _fileService.CompressFolder(exportPath, fileName);

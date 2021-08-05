@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using SOS.Export.IO.Excel.Interfaces;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Constants;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -17,6 +22,24 @@ namespace SOS.Export.IO.Excel
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
+
+        /// <summary>
+        /// Write sheet header
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <param name="propertyIndexes"></param>
+        private void WriteHeader(ExcelWorksheet sheet, Dictionary<string, int> propertyIndexes)
+        {
+            if (!propertyIndexes?.Any() ?? true)
+            {
+                return;
+            }
+
+            foreach (var propertyIndex in propertyIndexes)
+            {
+                sheet.Cells[1, propertyIndex.Value].Value = propertyIndex.Key;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -48,13 +71,102 @@ namespace SOS.Export.IO.Excel
             try
             {
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
+                if (!Directory.Exists(temporaryZipExportFolderPath))
+                {
+                    Directory.CreateDirectory(temporaryZipExportFolderPath);
+                }
+                
+                var scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, null);
+
+                var objectFlattenerHelper = new ObjectFlattenerHelper();
+                var propertyIndexes = new Dictionary<string, int>();
+                var fileCount = 0;
+                var rowIndex = 0;
+                ExcelPackage package = null;
+                ExcelWorksheet sheet = null;
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                while (scrollResult?.Records?.Any() ?? false)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    // Fetch observations from ElasticSearch.
+                    var processedObservations = scrollResult.Records.ToArray();
+
+                    // Convert observations to DwC format.
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
+
+                    // Write occurrence rows to CSV file.
+                    foreach (var observation in processedObservations)
+                    {
+                        // Max 500000 rows in a file
+                        if (rowIndex % 500000 == 0)
+                        {
+                            // If we have a package, save it
+                            if (package != null)
+                            {
+                                WriteHeader(sheet, propertyIndexes);
+
+                                // Save to file
+                                await package.SaveAsync();
+                                sheet.Dispose();
+                                package.Dispose();
+                            }
+
+                            // Create new file
+                            fileCount++;
+                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-{fileName}.xlsx"));
+                            package = new ExcelPackage(file);
+                            sheet = package.Workbook.Worksheets.Add("Observations");
+                            rowIndex = 1;
+                        }
+
+                        var objectProperties = objectFlattenerHelper.Execute(observation);
+                        if (objectProperties?.Any() ?? false)
+                        {
+                            foreach (var objectProperty in objectProperties.OrderBy(p => p.Key))
+                            {
+                                // Check if property is included (OutputFields empty = all)
+                                if (!((!filter.OutputFields?.Any() ?? true) || filter.OutputFields.Contains(objectProperty.Key, StringComparer.CurrentCultureIgnoreCase)))
+                                {
+                                    continue;
+                                }
+
+                                if (!propertyIndexes.TryGetValue(objectProperty.Key, out var index))
+                                {
+                                    index = propertyIndexes.Count+1;
+                                    propertyIndexes.Add(objectProperty.Key, index);
+                                }
+
+                                sheet.Cells[rowIndex+1, index].Value = objectProperty.Value;
+                            }
+                        }
+
+                        rowIndex++;
+                    }
+
+                    // Get next batch of observations.
+                    scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                }
+                
+                // If we have a package, save it
+                if (package != null)
+                {
+                    WriteHeader(sheet, propertyIndexes);
+
+                    // Save to file
+                    await package.SaveAsync();
+                    sheet.Dispose();
+                    package.Dispose();
+                }
+
                 var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                _fileService.DeleteFolder(temporaryZipExportFolderPath);
+
                 return zipFilePath;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create Excel File.");
+                _logger.LogError(e, "Failed to create GeoJson File.");
                 throw;
             }
             finally

@@ -5,14 +5,14 @@
 
     <ItemGroup>
         <PackageReference Include="Autofac" Version="6.2.0" />
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.17.0" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.18.0" />
         <PackageReference Include="Dapper" Version="2.0.90" />
         <PackageReference Include="Hangfire.Core" Version="1.7.24" />
         <PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.12.4" />
-        <PackageReference Include="MongoDB.Driver.GridFS" Version="2.12.4" />
+        <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+        <PackageReference Include="MongoDB.Driver.GridFS" Version="2.13.1" />
         <PackageReference Include="NetTopologySuite" Version="2.3.0" />
         <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
     </ItemGroup>

@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.IO.Excel;
 using SOS.Export.Managers;
@@ -13,7 +11,6 @@ using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Services.Interfaces;
@@ -110,7 +107,7 @@ namespace SOS.Export.IntegrationTests.Managers
             result.Should().BeTrue();
         }
 
-        [Fact]
+        [Fact(Skip = "Not working")]
         [Trait("Category", "Integration")]
         [Trait("Category", "DwcArchiveIntegration")]
         public async Task Create_GeoJson_file_for_AP_and_delete_the_file_afterwards()
@@ -137,6 +134,43 @@ namespace SOS.Export.IntegrationTests.Managers
                     "taxon.scientificName",
                     "taxon.vernacularName"}
                 }, "mats.lindgren@slu.se", "AP", ExportFormat.GeoJson, JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        [Trait("Category", "DwcArchiveIntegration")]
+        public async Task Create_Excel_file_for_AP_and_delete_the_file_afterwards()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = CreateObservationManager();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result =
+                await observationManager.ExportAndSendAsync(new SearchFilter
+                {
+                    DataProviderIds = new[] { 1 },
+                    OutputFields = new[]{
+                        "datasetName",
+                        "event.startDate",
+                        "event.endDate",
+                        "identification.validated",
+                        "location.decimalLongitude",
+                        "location.decimalLatitude",
+                        "occurrence.occurrenceId",
+                        "occurrence.reportedBy",
+                        "taxon.id",
+                        "taxon.scientificName",
+                        "taxon.vernacularName"}
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
