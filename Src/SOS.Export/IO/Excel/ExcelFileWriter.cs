@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -16,7 +18,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.Excel
 {
-    public class ExcelFileWriter : IExcelFileWriter
+    public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     {
         private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
         private readonly IFileService _fileService;
@@ -159,6 +161,8 @@ namespace SOS.Export.IO.Excel
                     sheet.Dispose();
                     package.Dispose();
                 }
+
+                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
 
                 var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
 

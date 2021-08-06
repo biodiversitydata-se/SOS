@@ -85,7 +85,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 return BadRequest(validationResults.Error);
             }
-
+            
             var exportFilter = filter.ToSearchFilter("en-GB", false);
             var matchCount = await ObservationManager.GetMatchCountAsync(null, exportFilter);
 
