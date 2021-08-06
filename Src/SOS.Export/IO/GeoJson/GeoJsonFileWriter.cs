@@ -17,7 +17,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.Excel
 {
-    public class GeoJsonFileWriter : IGeoJsonFileWriter
+    public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
         private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
         private readonly IFileService _fileService;
@@ -159,6 +159,9 @@ namespace SOS.Export.IO.Excel
                 await streamWriter.WriteAsync("] }");
                 streamWriter.Close();
                 fileStream.Close();
+
+                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+
                 var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
                 
                 return zipFilePath;
