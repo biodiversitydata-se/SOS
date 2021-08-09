@@ -133,7 +133,7 @@ namespace SOS.Lib.Repositories.Processed
         /// Get name of instance
         /// </summary>
         /// <param name="instance"></param>
-
+        /// <param name="protectedObservations"></param>
         /// <returns></returns>
         protected string GetInstanceName(byte instance, bool protectedObservations) =>
             IndexHelper.GetInstanceName<TEntity>(_toggleable, instance, protectedObservations);
@@ -144,7 +144,6 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
-        /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         public ProcessRepositoryBase(
             IProcessClient client,
@@ -187,7 +186,6 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
-
 
         /// <inheritdoc />
         public bool LiveMode { get; set; }

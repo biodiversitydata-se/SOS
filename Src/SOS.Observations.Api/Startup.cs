@@ -36,6 +36,11 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
@@ -357,18 +362,20 @@ namespace SOS.Observations.Api
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();
-            services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
-            services.AddScoped<IVocabularyManager, VocabularyManager>();
-            services.AddScoped<ITaxonListManager, TaxonListManager>();
+            services.AddScoped<IDataProviderManager, DataProviderManager>();
+            services.AddScoped<IExportManager, ExportManager>();
+            services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
+            services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
-            services.AddScoped<IFilterManager, FilterManager>();
+            services.AddScoped<IVocabularyManager, VocabularyManager>();
 
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IProcessedPublicObservationRepository, ProcessedPublicObservationRepository>(); // Todo refactor and remove this, use ProcessedObservationRepository
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
@@ -381,7 +388,13 @@ namespace SOS.Observations.Api
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
-        }
+
+            // Add writers
+            services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();
+            services.AddScoped<IExcelFileWriter, ExcelFileWriter>();
+            services.AddScoped<IGeoJsonFileWriter, GeoJsonFileWriter>();
+
+    }
 
         /// <summary>
         ///  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

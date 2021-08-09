@@ -11,12 +11,12 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.IO.DwcArchive;
 using SOS.Export.UnitTests.TestHelpers.Builders;
 using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Models.Search;
 using Xunit;
 
