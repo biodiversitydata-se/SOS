@@ -161,7 +161,7 @@ namespace SOS.Export.IO.DwcArchive
                 var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
                 if (emlFile == null)
                 {
-                    _logger.LogWarning($"No eml found for provider: {dataProvider.Identifier}");
+                    throw new Exception($"No eml found for provider: {dataProvider.Identifier}");
                 }
                 else
                 {
