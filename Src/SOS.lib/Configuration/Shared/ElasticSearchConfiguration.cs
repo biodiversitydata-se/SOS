@@ -86,7 +86,7 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with cuurent configuration
         /// </summary>
         /// <returns></returns>
-        public ElasticClient GetClient()
+        public ElasticClient GetClient(bool debugMode = false)
         {
             var uris = Hosts.Select(u => new Uri(u));
 
@@ -102,9 +102,9 @@ namespace SOS.Lib.Configuration.Shared
             }
 
             //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
-            if (DebugMode)
+            if (DebugMode || debugMode)
             {
-                settings.DisableDirectStreaming().EnableDebugMode().PrettyJson();
+                settings.DisableDirectStreaming().EnableDebugMode();
             }
 
             return new ElasticClient(settings);
