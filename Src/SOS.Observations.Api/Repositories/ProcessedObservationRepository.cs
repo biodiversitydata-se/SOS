@@ -53,12 +53,12 @@ namespace SOS.Observations.Api.Repositories
         /// <summary>
         /// Name of public index 
         /// </summary>
-        private string PublicIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, false);
+        public string PublicIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, false);
 
         /// <summary>
         /// Name of protected index 
         /// </summary>
-        private string ProtectedIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, true);
+        public string ProtectedIndex => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, ActiveInstance, true);
 
         /// <summary>
         /// Get public index name and also protected index name if user is authorized

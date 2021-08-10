@@ -6,16 +6,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
-using SOS.Export.IO.DwcArchive;
-using SOS.Export.Services;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
