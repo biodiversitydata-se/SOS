@@ -60,7 +60,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         private static ProcessedPublicObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient, ElasticSearchConfiguration elasticConfiguration)
         {
             var processedObservationRepository = new ProcessedPublicObservationRepository(
-                  exportClient, elasticConfiguration.GetClient(),
+                  exportClient, elasticConfiguration.GetClient(true),
                   elasticConfiguration,
                   new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
               return processedObservationRepository;

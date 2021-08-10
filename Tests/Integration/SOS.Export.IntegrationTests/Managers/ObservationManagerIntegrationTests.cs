@@ -29,7 +29,7 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticConfoguration = GetElasticConfiguration();
-            var elasticClient = elasticConfoguration.GetClient();
+            var elasticClient = elasticConfoguration.GetClient(true);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var exportClient = new ProcessClient(
