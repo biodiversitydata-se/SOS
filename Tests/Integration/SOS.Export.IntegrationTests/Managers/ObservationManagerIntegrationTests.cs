@@ -4,10 +4,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Export.IO.DwcArchive;
-using SOS.Export.IO.Excel;
 using SOS.Export.Managers;
-using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
@@ -15,10 +12,13 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.IO.Excel;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers

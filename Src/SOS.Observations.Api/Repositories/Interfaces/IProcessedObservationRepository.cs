@@ -91,6 +91,16 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<long> GetMatchCountAsync(FilterBase filter);
 
         /// <summary>
+        /// Name of public index 
+        /// </summary>
+        string PublicIndex { get; }
+
+        /// <summary>
+        /// Name of protected index 
+        /// </summary>
+        string ProtectedIndex { get; }
+
+        /// <summary>
         /// Aggregate observations by taxon. Sort by observation count descending.
         /// </summary>
         /// <param name="filter"></param>

@@ -6,9 +6,9 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
-using SOS.Export.Enums;
-using SOS.Export.IO.DwcArchive;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive
