@@ -67,7 +67,7 @@ namespace SOS.Lib.IO.DwcArchive
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
@@ -78,7 +78,7 @@ namespace SOS.Lib.IO.DwcArchive
                 dataProvider, 
                 filter,
                 fileName,
-                processedPublicObservationRepository,
+                processedObservationRepository,
                 fieldDescriptions,
                 processInfo,
                 exportFolderPath,
@@ -90,7 +90,7 @@ namespace SOS.Lib.IO.DwcArchive
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,
@@ -118,7 +118,7 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         fieldDescriptions,
-                        processedPublicObservationRepository,
+                        processedObservationRepository,
                         cancellationToken);
                 }
 
@@ -129,7 +129,7 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         fieldDescriptions,
-                        processedPublicObservationRepository,
+                        processedObservationRepository,
                         cancellationToken);
                 }
 
@@ -140,7 +140,7 @@ namespace SOS.Lib.IO.DwcArchive
                         filter,
                         fileStream,
                         fieldDescriptions,
-                        processedPublicObservationRepository,
+                        processedObservationRepository,
                         cancellationToken);
                 }
 

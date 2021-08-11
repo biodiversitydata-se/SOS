@@ -124,19 +124,17 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination 
-            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedProtectedObservationRepository>().As<IProcessedProtectedObservationRepository>()
-                .InstancePerLifetimeScope();
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
-
+            
             // Add processors
             builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>()
                 .InstancePerLifetimeScope();

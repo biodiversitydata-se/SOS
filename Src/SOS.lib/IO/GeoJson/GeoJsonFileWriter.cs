@@ -19,7 +19,7 @@ namespace SOS.Lib.IO.Excel
 {
     public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
-        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<GeoJsonFileWriter> _logger;
@@ -27,18 +27,18 @@ namespace SOS.Lib.IO.Excel
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public GeoJsonFileWriter(IProcessedPublicObservationRepository processedPublicObservationRepository,
+        public GeoJsonFileWriter(IProcessedObservationRepository processedObservationRepository,
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver, 
             ILogger<GeoJsonFileWriter> logger)
         {
-            _processedPublicObservationRepository = processedPublicObservationRepository ??
+            _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
-                                                        nameof(processedPublicObservationRepository));
+                                                        nameof(processedObservationRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _vocabularyValueResolver = vocabularyValueResolver ??
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -63,7 +63,7 @@ namespace SOS.Lib.IO.Excel
 
                 await streamWriter.WriteAsync("{\"type\":\"FeatureCollection\", \"crs\":\"EPSG:4326\", \"features\":[");
 
-                var scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, null);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, null);
 
                 var objectFlattenerHelper = new ObjectFlattenerHelper();
                 while (scrollResult?.Records?.Any() ?? false)
@@ -154,7 +154,7 @@ namespace SOS.Lib.IO.Excel
                     }
                     
                     // Get next batch of observations.
-                    scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
                 await streamWriter.WriteAsync("] }");
                 streamWriter.Close();

@@ -61,8 +61,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
 
-            var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
-            var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
+            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>())).ReturnsAsync(new List<SiteEntity>());
 
             var processedDbConfiguration = GetProcessDbConfiguration();
@@ -83,8 +82,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                processedPublicObservationRepository,
-                processedProtectedObservationRepository,
+                processedObservationRepository,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
@@ -130,14 +128,12 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()));
-            var processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>().Object;
-            var processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>().Object;
+            var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
 
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
             var areaHelper = new AreaHelper(areaRepository);
-
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -151,8 +147,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                processedPublicObservationRepository,
-                processedProtectedObservationRepository,
+                processedObservationRepository,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
