@@ -33,8 +33,8 @@ namespace SOS.Export.IntegrationTests.Managers
         private ObservationManager CreateObservationManager()
         {
             var exportConfiguration = GetExportConfiguration();
-            var elasticConfoguration = GetElasticConfiguration();
-            var elasticClient = elasticConfoguration.GetClient(true);
+            var elasticConfiguration = GetElasticConfiguration();
+            var elasticClient = elasticConfiguration.GetClient(true);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
