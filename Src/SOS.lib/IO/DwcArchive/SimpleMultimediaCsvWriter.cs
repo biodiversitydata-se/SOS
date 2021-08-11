@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,7 +9,6 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -30,12 +28,12 @@ namespace SOS.Lib.IO.DwcArchive
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var scrollResult = await processedPublicObservationRepository.ScrollMultimediaAsync(filter, null);
+                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
@@ -60,7 +58,7 @@ namespace SOS.Lib.IO.DwcArchive
                     await streamWriter.FlushAsync();
 
                     // Get next batch of observations.
-                    scrollResult = await processedPublicObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

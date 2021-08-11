@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nest;
+﻿using Nest;
 using SOS.Lib.Models.Gis;
 
-namespace SOS.Observations.Api.Extensions
+namespace SOS.Lib.Extensions
 {
     public static class LatLonCoordinateExtensions
     {

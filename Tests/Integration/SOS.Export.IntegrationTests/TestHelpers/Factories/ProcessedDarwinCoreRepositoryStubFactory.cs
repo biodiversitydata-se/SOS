@@ -15,23 +15,13 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedPublicObservationRepository> Create(string fileName)
+        public static Mock<IProcessedObservationRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedPublicObservationRepository>();
+            var stub = new Mock<IProcessedObservationRepository>();
             var observations = LoadObservations(fileName);
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(observations);
-
-            return stub;
-        }
-
-        public static Mock<IProcessedPublicObservationRepository> Create(Observation observation)
-        {
-            var stub = new Mock<IProcessedPublicObservationRepository>();
-            stub
-                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<Observation> {Records = new[] {observation}});
 
             return stub;
         }

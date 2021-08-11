@@ -1,4 +1,4 @@
-﻿namespace SOS.Observations.Api.Models.AggregatedResult
+﻿namespace SOS.Lib.Models.Processed.AggregatedResult
 {
     /// <summary>
     ///     Fields to return from aggregated result

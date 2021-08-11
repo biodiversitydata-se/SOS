@@ -2,15 +2,20 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
+using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
@@ -56,14 +61,17 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
-
-        private static ProcessedPublicObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient, ElasticSearchConfiguration elasticConfiguration)
+        private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
         {
-            var processedObservationRepository = new ProcessedPublicObservationRepository(
-                  exportClient, elasticConfiguration.GetClient(),
-                  elasticConfiguration,
-                  new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
-              return processedObservationRepository;
+            var processedObservationRepository = new ProcessedObservationRepository(
+                elasticConfiguration.GetClient(),
+                processClient,
+                elasticConfiguration,
+                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
+                new TelemetryClient(),
+                new HttpContextAccessor(),
+                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+            return processedObservationRepository;
 
         }
 

@@ -33,8 +33,7 @@ namespace SOS.Process.UnitTests.Processors
         public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
-            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _processConfiguration = new ProcessConfiguration();
@@ -46,8 +45,7 @@ namespace SOS.Process.UnitTests.Processors
         }
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
-        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly ProcessConfiguration _processConfiguration;
@@ -60,8 +58,7 @@ namespace SOS.Process.UnitTests.Processors
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
-            _processedPublicObservationRepositoryMock.Object,
-            _processedProtectedObservationRepositoryMock.Object,
+            _processedObservationRepositoryMock.Object,
             _vocabularyRepositoryMock.Object,
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
@@ -138,11 +135,8 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedPublicObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);
-            _processedProtectedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
-                .ReturnsAsync(true);
-
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
                 .ReturnsAsync(new[]
                 {
@@ -152,12 +146,8 @@ namespace SOS.Process.UnitTests.Processors
                     }
                 });
 
-            _processedPublicObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
-                .ReturnsAsync(1);
-
-            _processedProtectedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+            _processedObservationRepositoryMock
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
 
             var dataProvider = new DataProvider

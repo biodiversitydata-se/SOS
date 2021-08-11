@@ -7,11 +7,13 @@ using DwC_A;
 using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
 using Nest;
 using SOS.Import.DarwinCore;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -20,6 +22,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -92,21 +95,18 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-            IProcessedPublicObservationRepository processedPublicObservationRepository;
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository;
+            IProcessedObservationRepository processedObservationRepository;
+            
             if (storeProcessedObservations)
             {
-                processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
-
-                processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient,
-                    elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationRepository(elasticClient, processClient,
+                    new ElasticSearchConfiguration(),  
+                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new NullLogger<ProcessedObservationRepository>());
             }
             else
             {
-                processedPublicObservationRepository = CreateProcessedPublicObservationRepositoryMock().Object;
-                processedProtectedObservationRepository = CreateProcessedProtectedObservationRepositoryMock().Object;
+                processedObservationRepository = CreateProcessedObservationRepositoryMock().Object;
             }
 
             var dataProviderRepository =
@@ -129,8 +129,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,
-                processedPublicObservationRepository,
-                processedProtectedObservationRepository,
+                processedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 areaHelper,
@@ -142,18 +141,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcaObservationProcessor>());
         }
 
-        private Mock<IProcessedPublicObservationRepository> CreateProcessedPublicObservationRepositoryMock()
+        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
         {
-            var mock = new Mock<IProcessedPublicObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(100000);
-            return mock;
-        }
-
-        private Mock<IProcessedProtectedObservationRepository> CreateProcessedProtectedObservationRepositoryMock()
-        {
-            var mock = new Mock<IProcessedProtectedObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
+            var mock = new Mock<IProcessedObservationRepository>();
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(100000);
             return mock;
         }

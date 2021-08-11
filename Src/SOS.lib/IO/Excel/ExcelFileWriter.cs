@@ -18,7 +18,7 @@ namespace SOS.Lib.IO.Excel
 {
     public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     {
-        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
@@ -48,14 +48,14 @@ namespace SOS.Lib.IO.Excel
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public ExcelFileWriter(IProcessedPublicObservationRepository processedPublicObservationRepository, 
+        public ExcelFileWriter(IProcessedObservationRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)
         {
-            _processedPublicObservationRepository = processedPublicObservationRepository ??
+            _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(
-                                                        nameof(processedPublicObservationRepository));
+                                                        nameof(processedObservationRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _vocabularyValueResolver = vocabularyValueResolver ??
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -76,7 +76,7 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
                 
-                var scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, null);
+                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, null);
 
                 var objectFlattenerHelper = new ObjectFlattenerHelper();
                 var propertyIndexes = new Dictionary<string, int>();
@@ -146,7 +146,7 @@ namespace SOS.Lib.IO.Excel
                     }
 
                     // Get next batch of observations.
-                    scrollResult = await _processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
                 
                 // If we have a package, save it

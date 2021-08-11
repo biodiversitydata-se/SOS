@@ -69,8 +69,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
-using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
-using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
+
 
 namespace SOS.Observations.Api
 {
@@ -375,7 +374,6 @@ namespace SOS.Observations.Api
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-            services.AddScoped<IProcessedPublicObservationRepository, ProcessedPublicObservationRepository>(); // Todo refactor and remove this, use ProcessedObservationRepository
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();

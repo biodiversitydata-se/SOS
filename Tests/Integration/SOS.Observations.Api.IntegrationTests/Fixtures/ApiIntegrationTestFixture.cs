@@ -128,7 +128,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         }
 
         private ObservationManager CreateObservationManager(
-            Repositories.ProcessedObservationRepository processedObservationRepository, 
+            ProcessedObservationRepository processedObservationRepository, 
             VocabularyManager vocabularyManager,
             ProcessClient processClient,
             TaxonManager taxonManager)
@@ -169,21 +169,21 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return vocabularyManager;
         }
 
-        private Repositories.ProcessedObservationRepository CreateProcessedObservationRepository(
+        private ProcessedObservationRepository CreateProcessedObservationRepository(
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClient elasticClient,
             IProcessClient processClient,
             IMemoryCache memoryCache)
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
-            var processedObservationRepository = new Repositories.ProcessedObservationRepository(
+            var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClient, 
                 processClient,
-                elasticConfiguration, 
-                new TelemetryClient(), 
-                new NullLogger<Repositories.ProcessedObservationRepository>(),
+                elasticConfiguration,
                 processedConfigurationCache,
-                new HttpContextAccessor());
+                new TelemetryClient(),
+                new HttpContextAccessor(),
+                new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }
 

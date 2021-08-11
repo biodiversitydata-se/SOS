@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IGeoJsonFileWriter _geoJsonWriter;
         private readonly string _exportPath;
         private readonly ILogger<ExportManager> _logger;
-        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
 
         /// <summary>
@@ -42,13 +42,13 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedPublicObservationRepository.IndexName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
-                    _processedPublicObservationRepository,
+                    _processedObservationRepository,
                     fieldDescriptions,
                     processInfo,
                     _exportPath,
@@ -125,7 +125,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
@@ -133,7 +133,7 @@ namespace SOS.Observations.Api.Managers
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFilterManager filterManager,
             ILogger<ExportManager> logger)
@@ -145,8 +145,8 @@ namespace SOS.Observations.Api.Managers
             _geoJsonWriter =
                 geoJsonWriter ?? throw new ArgumentNullException(nameof(geoJsonWriter));
 
-            _processedPublicObservationRepository = processedPublicObservationRepository ??
-                                                    throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository =
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
