@@ -64,7 +64,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
         {
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticConfiguration.GetClient(),
+                elasticConfiguration.GetClient(true),
                 processClient,
                 elasticConfiguration,
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),

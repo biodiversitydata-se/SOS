@@ -188,5 +188,58 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             result.Records.All(m => m.Location.County.FeatureId == TestData.Areas.JonkopingCounty.FeatureId).Should()
                 .BeTrue("Search is done with permission to Jönköping county");
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Try_get_protected_species_in_Jonkoping_county_with_too_low_protection_level_authority()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var authorityBuilder = new UserAuthorizationTestBuilder();
+            var jonkopingAuthority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(3)
+                .WithAreaAccess(TestData.AreaAuthority.JonkopingCounty)
+                .WithTaxonIdsAccess(new List<int> { 100054 })// Pilgrimsfalk (protection level 5)
+                .Build();
+            var ostergotlandAuthority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(5)
+                .WithAreaAccess(TestData.AreaAuthority.OstergotlandCounty)
+                .Build();
+            _fixture.UseMockUserService(jonkopingAuthority, ostergotlandAuthority);
+            var searchFilter = new SearchFilterInternalDto
+            {
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                Geographics = new GeographicsFilterDto
+                {
+                    Areas = new List<AreaFilterDto>
+                    {
+                        TestData.Areas.JonkopingCounty,
+                    }
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                "CountyAdministrationObservation",
+                searchFilter,
+                0,
+                10,
+                "",
+                SearchSortOrder.Asc,
+                false,
+                "sv-SE",
+                true);
+            var result = response.GetResult<GeoPagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().Be(0, "because Pilgrimsfalk has ProtectionLevel 5, but the authority is max protection level 3");
+        }
     }
 }
