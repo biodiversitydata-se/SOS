@@ -10,6 +10,7 @@ using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
@@ -135,9 +136,9 @@ namespace SOS.Export.IO.DwcArchive
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
                 }
 
-                // Exclude sensitive species. Replace this implementation when the protected species implementation is finished.
-                var publicObservations =  processedObservations
-                    .Where(observation => observation?.Taxon != null && !ProtectedSpeciesHelper.IsSensitiveSpecies(observation.Taxon.Id)).ToArray();
+                // Exclude sensitive species.
+                var publicObservations = processedObservations
+                    .Where(observation => observation?.AccessRights != null && (AccessRightsId)observation?.AccessRights.Id != AccessRightsId.NotForPublicUsage).ToArray();
                 await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
                 return true;
             }
