@@ -15,6 +15,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -124,10 +125,10 @@ namespace SOS.Lib.IO.DwcArchive
 
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
                 }
-
-                // Exclude sensitive species. Replace this implementation when the protected species implementation is finished.
-                var publicObservations =  processedObservations
-                    .Where(observation => observation?.Taxon != null && !ProtectedSpeciesHelper.IsSensitiveSpecies(observation.Taxon.Id)).ToArray();
+                
+                // Exclude sensitive species.
+                var publicObservations = processedObservations
+                    .Where(observation => observation?.AccessRights != null && (AccessRightsId)observation?.AccessRights.Id != AccessRightsId.NotForPublicUsage).ToArray();
                 await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
                 return true;
             }
