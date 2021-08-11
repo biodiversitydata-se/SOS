@@ -26,7 +26,9 @@ namespace SOS.TestHelpers.Helpers.Builders
 
         public virtual TItem Build()
         {
-            return MutateItem(CreateEntity());
+            var result = MutateItem(CreateEntity());
+            ClearMutations();
+            return result;
         }
 
         protected abstract TItem CreateEntity();
