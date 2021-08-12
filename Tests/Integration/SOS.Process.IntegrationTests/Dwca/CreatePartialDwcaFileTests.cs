@@ -48,5 +48,34 @@ namespace SOS.Process.IntegrationTests.Dwca
             //-----------------------------------------------------------------------------------------------------------            
             filePath.Should().NotBeEmpty();
         }
+
+
+        [Fact]
+        public void Create_partial_event_dwca_file()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            string sourceFilePath = @"C:\DwC-A\_PartialRead\Riksskogstaxeringen.dwca.zip";
+            string outputFolder = @"C:\Temp\";
+            string outputFileName = "Riksskogstaxeringen";
+            int nrRowsLimit = 100;
+            int startRow = 0;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------            
+            string filePath = PartialEventDwcaFileCreator.CreateDwcaFile(
+                sourceFilePath,
+                outputFolder,
+                outputFileName,
+                nrRowsLimit,
+                startRow);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            filePath.Should().NotBeEmpty();
+        }
     }
 }
