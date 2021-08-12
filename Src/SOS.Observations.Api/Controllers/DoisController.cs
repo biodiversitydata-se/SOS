@@ -42,7 +42,7 @@ namespace SOS.Observations.Api.Controllers
             ObservationApiConfiguration observationApiConfiguration,
             ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager)
         {
-            _exportObservationsLimit = observationApiConfiguration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _exportObservationsLimit = observationApiConfiguration?.OrderExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
