@@ -129,6 +129,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
+        /// Get locations by id
+        /// </summary>
+        /// <param name="locationIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds);
+
+        /// <summary>
         /// Get number of matches for query
         /// </summary>
         /// <param name="filter"></param>

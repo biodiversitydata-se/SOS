@@ -413,6 +413,12 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds)
+        {
+            return await _processedObservationRepository.GetLocationsAsync(locationIds);
+        }
+
+        /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(string authorizationApplicationIdentifier, FilterBase filter)
         {
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
