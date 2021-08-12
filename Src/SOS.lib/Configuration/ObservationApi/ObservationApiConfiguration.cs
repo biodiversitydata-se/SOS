@@ -4,7 +4,20 @@ namespace SOS.Lib.Configuration.ObservationApi
 {
     public class ObservationApiConfiguration
     {
-        public int  ExportObservationsLimit { get; set; }
+        /// <summary>
+        /// Max number of observations allowed for file download
+        /// </summary>
+        public int  DownloadExportObservationsLimit { get; set; }
+
+        /// <summary>
+        /// File Export path
+        /// </summary>
+        public string ExportPath { get; set; }
+
+        /// <summary>
+        /// Max number of observations allowed for file order
+        /// </summary>
+        public int OrderExportObservationsLimit { get; set; }
 
         /// <summary>
         /// Max calculated tiles returned

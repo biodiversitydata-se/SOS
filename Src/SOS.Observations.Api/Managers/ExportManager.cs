@@ -25,19 +25,19 @@ namespace SOS.Observations.Api.Managers
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly IExcelFileWriter _excelWriter;
         private readonly IGeoJsonFileWriter _geoJsonWriter;
-        private readonly string _exportPath;
         private readonly ILogger<ExportManager> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
 
         /// <summary>
-        ///     Create a Darwin Core Archive file
+        /// Create a Darwin Core Archive file
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>Path to created file</returns>
-        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string fileName,
+        /// <returns></returns>
+        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string exportPath, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.Managers
                     _processedObservationRepository,
                     fieldDescriptions,
                     processInfo,
-                    _exportPath,
+                    exportPath,
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();
 
@@ -69,14 +69,22 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string fileName,
+        /// <summary>
+        /// Create an Excel file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string exportPath, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var zipFilePath = await _excelWriter.CreateFileAync(
-                    filter,
-                    _exportPath,
+                    filter, 
+                    exportPath,
                     fileName,
                     cancellationToken);
 
@@ -94,14 +102,22 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string fileName,
+        /// <summary>
+        /// Create a GeoJson file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string exportPath, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var zipFilePath = await _geoJsonWriter.CreateFileAync(
                    filter,
-                   _exportPath,
+                   exportPath,
                    fileName,
                     cancellationToken);
 
@@ -157,6 +173,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<string> CreateExportFileAsync(SearchFilter filter,
             ExportFormat exportFormat,
+            string exportPath,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -165,9 +182,9 @@ namespace SOS.Observations.Api.Managers
 
                 var zipFilePath = exportFormat switch
                 {
-                    ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken)
+                    ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
                 };
 
                 // zend file to user
