@@ -5,16 +5,14 @@ using System.IO.Compression;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive
 {
     /// <summary>
-    /// Provides functionality for creating a small DwC-A file by extracting observations from a large DwC-A file.
+    /// Provides functionality for creating a small sampling event DwC-A file by extracting events from a large DwC-A file.
     /// The file can then be used in GBIF data validator.    
     /// </summary>
-    public static class PartialDwcaFileCreator
+    public static class PartialEventDwcaFileCreator
     {
         /// <summary>
         /// Reads a large DwC-A file and creates a smaller one.
@@ -30,20 +28,20 @@ namespace SOS.Lib.IO.DwcArchive
            string outputFilename,
            int nrRowsLimit,
            int startRow = 0)
-        {            
+        {
             var dwcaFileComponents = GetDwcaFileComponents(sourceFilePath, nrRowsLimit, startRow);
-            string filePath = CreateDwcaFileFromComponents(dwcaFileComponents, outputFolder, outputFilename);
+            string filePath = CreateEventDwcaFileFromComponents(dwcaFileComponents, outputFolder, outputFilename);
             return filePath;
         }
 
-        private static string CreateDwcaFileFromComponents(DwcaFileComponents dwcaFileComponents, string outputFolder, string filename)
+        private static string CreateEventDwcaFileFromComponents(EventDwcaFileComponents dwcaFileComponents, string outputFolder, string filename)
         {
             string folderName = Guid.NewGuid().ToString();
             string destinationFolder = Path.Combine(outputFolder, folderName);
             Directory.CreateDirectory(destinationFolder);
             File.WriteAllText(Path.Join(destinationFolder, "meta.xml"), dwcaFileComponents.Meta);
             File.WriteAllText(Path.Join(destinationFolder, "eml.xml"), dwcaFileComponents.Eml);
-            File.WriteAllLines(Path.Join(destinationFolder, "occurrence.csv"), dwcaFileComponents.OccurrenceComponent.GetRowsWithHeader());
+            File.WriteAllLines(Path.Join(destinationFolder, dwcaFileComponents.EventComponent.Filename), dwcaFileComponents.EventComponent.GetRowsWithHeader());            
             foreach (var extensionComponent in dwcaFileComponents.Extensions)
             {
                 File.WriteAllLines(Path.Join(destinationFolder, extensionComponent.Filename), extensionComponent.GetRowsWithHeader());
@@ -54,9 +52,9 @@ namespace SOS.Lib.IO.DwcArchive
             return filePath;
         }
 
-        private static DwcaFileComponents GetDwcaFileComponents(string sourceFilePath, int nrRowsLimit, int startRow)
+        private static EventDwcaFileComponents GetDwcaFileComponents(string sourceFilePath, int nrRowsLimit, int startRow)
         {
-            var dwcaFileComponents = new DwcaFileComponents();
+            var dwcaFileComponents = new EventDwcaFileComponents();
 
             using (FileStream zipToOpen = new FileStream(sourceFilePath, FileMode.Open))
             {
@@ -65,25 +63,33 @@ namespace SOS.Lib.IO.DwcArchive
                     var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
                     dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);
                     var emlEntry = archive.Entries.Single(m => m.FullName.Equals("eml.xml", StringComparison.InvariantCultureIgnoreCase));
-                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);                    
+                    dwcaFileComponents.Eml = ReadZipEntryAsString(emlEntry);
+
+                    var eventsEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("event", StringComparison.InvariantCultureIgnoreCase));
+                    string eventsFilename = eventsEntry.Name;
+                    var eventComponent = ReadEventCsvFile(nrRowsLimit, startRow, eventsEntry);
+                    dwcaFileComponents.EventComponent = eventComponent;
+
                     var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
                                                                              || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
-                    var occurrenceComponent = ReadOccurrenceCsvFile(nrRowsLimit, startRow, occurrenceEntry);
-                    dwcaFileComponents.OccurrenceComponent = occurrenceComponent;
+                    if (occurrenceEntry != null)
+                    {
+                        var extensionComponent = ReadExtensionCsvFile(occurrenceEntry, eventComponent.EventIds);
+                        dwcaFileComponents.Extensions.Add(extensionComponent);
+                    }                    
 
                     var multimediaEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("multimedia", StringComparison.InvariantCultureIgnoreCase));
                     if (multimediaEntry != null)
                     {
-                        var extensionComponent = ReadExtensionCsvFile(multimediaEntry, occurrenceComponent.ObservationIds);
+                        var extensionComponent = ReadExtensionCsvFile(multimediaEntry, eventComponent.EventIds);
                         dwcaFileComponents.Extensions.Add(extensionComponent);
                     }
 
-                    var emofEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("extendedmeasurement", StringComparison.InvariantCultureIgnoreCase)
-                                                                     || m.FullName.StartsWith("measurement", StringComparison.InvariantCultureIgnoreCase)
-                                                                     || m.FullName.StartsWith("emof", StringComparison.InvariantCultureIgnoreCase));
+                    var emofEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("extended", StringComparison.InvariantCultureIgnoreCase)
+                                                                     || m.FullName.StartsWith("measurement", StringComparison.InvariantCultureIgnoreCase));
                     if (emofEntry != null)
                     {
-                        var extensionComponent = ReadExtensionCsvFile(emofEntry, occurrenceComponent.ObservationIds);
+                        var extensionComponent = ReadExtensionCsvFile(emofEntry, eventComponent.EventIds);
                         dwcaFileComponents.Extensions.Add(extensionComponent);
                     }
                 }
@@ -100,38 +106,38 @@ namespace SOS.Lib.IO.DwcArchive
             return str;
         }
 
-        private static DwcaOccurrenceComponent ReadOccurrenceCsvFile(int nrRowsLimit, int startRow, ZipArchiveEntry occurrenceEntry)
+        private static DwcaEventComponent ReadEventCsvFile(int nrRowsLimit, int startRow, ZipArchiveEntry eventsEntry)
         {
             int nrRowsRead = 0;
             int nrObservations = 0;
-            Stream stream = occurrenceEntry.Open();
+            Stream stream = eventsEntry.Open();
             StreamReader reader = new StreamReader(stream, Encoding.UTF8);
-            var dwcaOccurrenceComponent = new DwcaOccurrenceComponent() { Filename = occurrenceEntry.Name };
+            var dwcaEventComponent = new DwcaEventComponent() { Filename = eventsEntry.Name };
             while (!reader.EndOfStream && nrObservations < nrRowsLimit)
             {
                 string line = reader.ReadLine();
                 if (nrRowsRead == 0) // Read header
                 {
-                    dwcaOccurrenceComponent.Header = line;
+                    dwcaEventComponent.Header = line;
                     nrRowsRead++;
                     continue;
                 }
 
                 if (startRow < nrRowsRead)
                 {
-                    dwcaOccurrenceComponent.Rows.Add(line);
+                    dwcaEventComponent.Rows.Add(line);
                     string occurrenceId = line.Substring(0, Math.Max(line.IndexOf('\t'), 0));
-                    dwcaOccurrenceComponent.ObservationIds.Add(occurrenceId);
+                    dwcaEventComponent.EventIds.Add(occurrenceId);
                     nrObservations++;
                 }
 
                 nrRowsRead++;
             }
 
-            return dwcaOccurrenceComponent;
+            return dwcaEventComponent;
         }
 
-        private static DwcaExtensionComponent ReadExtensionCsvFile(ZipArchiveEntry zipArchiveEntry, HashSet<string> observationIds)
+        private static DwcaExtensionComponent ReadExtensionCsvFile(ZipArchiveEntry zipArchiveEntry, HashSet<string> eventIds)
         {
             int nrRowsRead = 0;
             Stream stream = zipArchiveEntry.Open();
@@ -147,8 +153,8 @@ namespace SOS.Lib.IO.DwcArchive
                     continue;
                 }
 
-                string occurrenceId = line.Substring(0, Math.Max(line.IndexOf('\t'), 0));
-                if (observationIds.Contains(occurrenceId))
+                string eventId = line.Substring(0, Math.Max(line.IndexOf('\t'), 0));
+                if (eventIds.Contains(eventId))
                 {
                     extensionComponent.Rows.Add(line);
                 }
@@ -159,20 +165,20 @@ namespace SOS.Lib.IO.DwcArchive
             return extensionComponent;
         }
 
-        public class DwcaFileComponents
+        public class EventDwcaFileComponents
         {
             public string Meta { get; set; }
             public string Eml { get; set; }
-            public DwcaOccurrenceComponent OccurrenceComponent { get; set; }
+            public DwcaEventComponent EventComponent { get; set; }            
             public List<DwcaExtensionComponent> Extensions { get; set; } = new List<DwcaExtensionComponent>();
         }
 
-        public class DwcaOccurrenceComponent
+        public class DwcaEventComponent
         {
             public string Filename { get; set; }
             public string Header { get; set; }
             public List<string> Rows { get; set; } = new List<string>();
-            public HashSet<string> ObservationIds { get; set; } = new HashSet<string>();
+            public HashSet<string> EventIds { get; set; } = new HashSet<string>();
             public List<string> GetRowsWithHeader()
             {
                 List<string> rows = new List<string> { Header };
