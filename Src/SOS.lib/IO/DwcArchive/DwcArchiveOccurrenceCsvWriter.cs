@@ -40,7 +40,7 @@ namespace SOS.Lib.IO.DwcArchive
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -50,8 +50,8 @@ namespace SOS.Lib.IO.DwcArchive
                 var csvWritingStopwatch = new Stopwatch();
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
-                processedPublicObservationRepository.LiveMode = true;
-                var scrollResult = await processedPublicObservationRepository.ScrollObservationsAsync(filter, null);
+                processedObservationRepository.LiveMode = true;
+                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
                 elasticRetrievalStopwatch.Stop();
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter,"\t");
@@ -83,7 +83,7 @@ namespace SOS.Lib.IO.DwcArchive
                     
                     // Get next batch of observations.
                     elasticRetrievalStopwatch.Start();
-                    scrollResult = await processedPublicObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                     elasticRetrievalStopwatch.Stop();
                 }
 

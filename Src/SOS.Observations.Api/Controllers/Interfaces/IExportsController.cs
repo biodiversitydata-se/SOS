@@ -17,6 +17,31 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GetDatasetsList();
 
         /// <summary>
+        /// Download DwC export file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadDwCAsync([FromBody] ExportFilterDto filter);
+
+        /// <summary>
+        /// Download Excel export file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPropertySet"></param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter,
+            [FromQuery] ExportPropertySet exportPropertySet);
+
+        /// <summary>
+        /// Download GeoJson export file 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPropertySet"></param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter,
+            [FromQuery] ExportPropertySet exportPropertySet);
+
+        /// <summary>
         /// Starts the process of creating a DwC-A file with observations based on provided filter.
         /// When the file is ready, you will receive an email containing a download link.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
@@ -24,7 +49,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <returns></returns>
-        Task<IActionResult> ExportDwC(ExportFilterDto filter, string description);
+        Task<IActionResult> OrderDwCAsync(ExportFilterDto filter, string description);
 
         /// <summary>
         /// Starts the process of creating a Excel file with observations based on provided filter.
@@ -35,7 +60,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
         /// <returns></returns>
-        Task<IActionResult> ExportExcel(ExportFilterDto filter, string description,
+        Task<IActionResult> OrderExcelAsync(ExportFilterDto filter, string description,
             ExportPropertySet exportPropertySet);
 
         /// <summary>
@@ -47,7 +72,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
         /// <returns></returns>
-        Task<IActionResult> ExportGeoJson(ExportFilterDto filter, string description,
+        Task<IActionResult> OrderGeoJsonAsync(ExportFilterDto filter, string description,
             ExportPropertySet exportPropertySet);
     }
 }

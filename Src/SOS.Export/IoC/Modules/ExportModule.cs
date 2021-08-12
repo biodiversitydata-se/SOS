@@ -22,6 +22,7 @@ using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -75,15 +76,18 @@ namespace SOS.Export.IoC.Modules
 
             // Add cache
             builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
+            builder.RegisterType<ClassCache<ProcessedConfiguration>>().As<IClassCache<ProcessedConfiguration>>().SingleInstance();
 
             // Add managers
             builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
 
-            // Repositories mongo
-            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository> ()
+            // Repositories elastic
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
                 .InstancePerLifetimeScope();
+
+            // Repositories mongo
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()

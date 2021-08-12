@@ -35,8 +35,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             _kulObservationVerbatimRepositoryMock = new Mock<IKulObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedPublicObservationRepository = new Mock<IProcessedPublicObservationRepository>();
-            _processedProtectedObservationRepository = new Mock<IProcessedProtectedObservationRepository>();
+            _processedObservationRepository = new Mock<IProcessedObservationRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
@@ -47,8 +46,7 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<IKulObservationVerbatimRepository> _kulObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepository;
-        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepository;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepository;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
@@ -59,8 +57,7 @@ namespace SOS.Process.UnitTests.Processors
         private KulObservationProcessor TestObject => new KulObservationProcessor(
             _kulObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
-            _processedPublicObservationRepository.Object,
-            _processedProtectedObservationRepository.Object,
+            _processedObservationRepository.Object,
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
@@ -152,18 +149,13 @@ namespace SOS.Process.UnitTests.Processors
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
 
-            _processedPublicObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
-                .ReturnsAsync(true);
-            _processedProtectedObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepository.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);
 
-            _processedPublicObservationRepository
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+            _processedObservationRepository
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
-            _processedProtectedObservationRepository
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
-                .ReturnsAsync(1);
-
+            
             var taxa = new Dictionary<int, Taxon>
             {
                 {0, new Taxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}

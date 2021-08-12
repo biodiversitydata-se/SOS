@@ -32,10 +32,13 @@ using NLog.Web;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel;
@@ -69,8 +72,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
-using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
-using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
+
 
 namespace SOS.Observations.Api
 {
@@ -327,6 +329,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
+            services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
 
             services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
@@ -375,7 +378,6 @@ namespace SOS.Observations.Api
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-            services.AddScoped<IProcessedPublicObservationRepository, ProcessedPublicObservationRepository>(); // Todo refactor and remove this, use ProcessedObservationRepository
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
@@ -386,15 +388,23 @@ namespace SOS.Observations.Api
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
 
             // Add writers
             services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();
+            services.AddScoped<IDwcArchiveFileWriterCoordinator, DwcArchiveFileWriterCoordinator>();
+            services.AddScoped<IDwcArchiveOccurrenceCsvWriter, DwcArchiveOccurrenceCsvWriter>();
+            services.AddScoped<IExtendedMeasurementOrFactCsvWriter, ExtendedMeasurementOrFactCsvWriter>();
+            services.AddScoped<ISimpleMultimediaCsvWriter, SimpleMultimediaCsvWriter>();
+
             services.AddScoped<IExcelFileWriter, ExcelFileWriter>();
             services.AddScoped<IGeoJsonFileWriter, GeoJsonFileWriter>();
 
-    }
+            // Helpers, static data => single instance 
+            services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
+        }
 
         /// <summary>
         ///  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

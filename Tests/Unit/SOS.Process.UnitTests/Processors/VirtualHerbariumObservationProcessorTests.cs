@@ -36,8 +36,7 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock =
                 new Mock<IVirtualHerbariumObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedPublicObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
-            _processedProtectedObservationRepositoryMock = new Mock<IProcessedProtectedObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _validationManagerMock = new Mock<IValidationManager>();
@@ -50,8 +49,7 @@ namespace SOS.Process.UnitTests.Processors
             _virtualHerbariumObservationVerbatimRepositoryMock;
 
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedPublicObservationRepositoryMock;
-        private readonly Mock<IProcessedProtectedObservationRepository> _processedProtectedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<IProcessManager> _processManagerMock;
@@ -62,8 +60,7 @@ namespace SOS.Process.UnitTests.Processors
         private VirtualHerbariumObservationProcessor TestObject => new VirtualHerbariumObservationProcessor(
             _virtualHerbariumObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
-            _processedPublicObservationRepositoryMock.Object,
-            _processedProtectedObservationRepositoryMock.Object,
+            _processedObservationRepositoryMock.Object,
             _vocabularyResolverMock.Object, 
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
@@ -92,11 +89,9 @@ namespace SOS.Process.UnitTests.Processors
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dataprovider = CreateDataProvider();
-            _processedPublicObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ThrowsAsync(new Exception("Failed"));
-            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
-                .ThrowsAsync(new Exception("Failed"));
-
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -134,19 +129,13 @@ namespace SOS.Process.UnitTests.Processors
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
 
-            _processedPublicObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
                 .ReturnsAsync(true);
 
-            _processedProtectedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
-                .ReturnsAsync(true);
-
-            _processedPublicObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
+            _processedObservationRepositoryMock
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>()))
                 .ReturnsAsync(1);
-            _processedProtectedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
-                .ReturnsAsync(1);
-
+            
             var dataProvider = CreateDataProvider();
             var taxa = new Dictionary<int, Taxon>
             {

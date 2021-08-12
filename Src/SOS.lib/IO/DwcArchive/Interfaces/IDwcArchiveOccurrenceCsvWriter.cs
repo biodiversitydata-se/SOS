@@ -17,14 +17,14 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateOccurrenceCsvFileAsync(
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

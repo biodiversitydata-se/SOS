@@ -59,7 +59,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// Constructor
         /// </summary>
         /// <param name="verbatimClient"></param>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processedVocabularyRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="areaHelper"></param>
@@ -69,8 +69,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="logger"></param>
         public DwcaObservationProcessor(
             IVerbatimClient verbatimClient,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,
@@ -80,7 +79,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDiffusionManager diffusionManager,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaObservationProcessor> logger) :
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??

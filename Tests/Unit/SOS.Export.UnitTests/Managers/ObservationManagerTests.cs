@@ -34,7 +34,7 @@ namespace SOS.Export.UnitTests.Managers
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
             _excelFileWriter = new Mock<IExcelFileWriter>();
             _geoJsonFileWriter = new Mock<IGeoJsonFileWriter>();
-            _processedObservationRepositoryMock = new Mock<IProcessedPublicObservationRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
             _blobStorageServiceMock = new Mock<IBlobStorageService>();
@@ -46,7 +46,7 @@ namespace SOS.Export.UnitTests.Managers
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
         private readonly Mock<IExcelFileWriter> _excelFileWriter;
         private readonly Mock<IGeoJsonFileWriter> _geoJsonFileWriter;
-        private readonly Mock<IProcessedPublicObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
         private readonly Mock<IBlobStorageService> _blobStorageServiceMock;

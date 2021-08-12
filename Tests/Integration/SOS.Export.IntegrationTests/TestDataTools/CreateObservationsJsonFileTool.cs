@@ -2,12 +2,15 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
 using Newtonsoft.Json;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.TestHelpers.JsonConverters;
@@ -35,11 +38,12 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedObservationRepository = new ProcessedPublicObservationRepository(
-                exportClient,
+            var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClient,
+                exportClient,
                 new ElasticSearchConfiguration(),
-                new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
+                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

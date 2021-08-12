@@ -21,7 +21,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dataProvider"></param>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        /// <param name="processedPublicObservationRepository">The repository to read observation data from.</param>
+        /// <param name="processedObservationRepository">The repository to read observation data from.</param>
         /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
@@ -30,7 +30,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
@@ -43,7 +43,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dataProvider"></param>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        /// <param name="processedPublicObservationRepository">The repository to read observation data from.</param>
+        /// <param name="processedObservationRepository">The repository to read observation data from.</param>
         /// <param name="fieldDescriptions"></param>
         /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
@@ -53,7 +53,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,

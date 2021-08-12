@@ -9,15 +9,21 @@ using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Http;
 using Nest;
 using SOS.Administration.Gui.Managers;
 using SOS.Administration.Gui.Managers.Interfaces;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.ApplicationInsights;
 
 namespace SOS.Administration.Gui
 {
@@ -101,6 +107,12 @@ namespace SOS.Administration.Gui
             services.AddSingleton(authConfig);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(testElasticSearchConfiguration);
+            
+            // Add cache
+            services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             services.Configure<ApiTestConfiguration>(
               Configuration.GetSection(nameof(ApiTestConfiguration)));
@@ -116,7 +128,7 @@ namespace SOS.Administration.Gui
             services.AddScoped<IProtectedLogManager, ProtectedLogManager>();
 
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
-            services.AddScoped<IProcessedProtectedObservationRepository, ProcessedProtectedObservationRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

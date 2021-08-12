@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
+using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using Xunit;
@@ -55,7 +58,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             projectParameters.Should().NotBeEmpty();
         }
 
-        private ProcessedPublicObservationRepository GetProcessedObservationRepository()
+        private ProcessedObservationRepository GetProcessedObservationRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -74,11 +77,12 @@ namespace SOS.Export.IntegrationTests.Repositories
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
-                new ProcessedPublicObservationRepository(
-                    exportClient,
+                new ProcessedObservationRepository(
                     elasticClient,
+                    exportClient,
                     elasticConfiguration,
-                    new NullLogger<ProcessedPublicObservationRepository>());
+                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;
         }
