@@ -56,9 +56,9 @@ namespace SOS.Process.Processors
                 }
 
                 Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
-                var processedCount = protectedData
-                    ? await ProtectedRepository.AddManyAsync(processedObservations)
-                    : await PublicRepository.AddManyAsync(processedObservations);
+                var processedCount =
+                    await ProcessedObservationRepository.AddManyAsync(processedObservations, protectedData);
+                   
                 Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
@@ -90,9 +90,7 @@ namespace SOS.Process.Processors
         {
             try
             {
-                return protectedObservations ?
-                    await ProtectedRepository.DeleteByOccurrenceIdAsync(occurrenceIds) :
-                    await PublicRepository.DeleteByOccurrenceIdAsync(occurrenceIds);
+                return await ProcessedObservationRepository.DeleteByOccurrenceIdAsync(occurrenceIds, protectedObservations);
             }
             catch (Exception e)
             {
@@ -226,8 +224,7 @@ namespace SOS.Process.Processors
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
         protected readonly ILogger<TClass> Logger;
-        protected readonly IProcessedPublicObservationRepository PublicRepository;
-        protected readonly IProcessedProtectedObservationRepository ProtectedRepository;
+        protected readonly IProcessedObservationRepository ProcessedObservationRepository;
         protected readonly IValidationManager ValidationManager;
 
         protected bool EnableDiffusion { get; }
@@ -235,8 +232,7 @@ namespace SOS.Process.Processors
         /// <summary>
         /// Constructor for public and protected
         /// </summary>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="validationManager"></param>
@@ -244,8 +240,7 @@ namespace SOS.Process.Processors
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         protected ObservationProcessorBase(
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
@@ -254,9 +249,8 @@ namespace SOS.Process.Processors
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger)
         {
-            PublicRepository = processedPublicObservationRepository ??
-                               throw new ArgumentNullException(nameof(processedPublicObservationRepository));
-            ProtectedRepository = processedProtectedObservationRepository ?? throw new ArgumentNullException(nameof(processedProtectedObservationRepository)); ;
+            ProcessedObservationRepository = processedObservationRepository ??
+                                             throw new ArgumentNullException(nameof(processedObservationRepository));
             _diffusionManager = diffusionManager ?? throw new ArgumentNullException(nameof(diffusionManager));
 
             this.vocabularyValueResolver = vocabularyValueResolver ??
@@ -364,7 +358,7 @@ namespace SOS.Process.Processors
             return observations;
         }
 
-        protected int WriteBatchSize => PublicRepository.WriteBatchSize;
+        protected int WriteBatchSize => ProcessedObservationRepository.WriteBatchSize;
 
         public abstract DataProviderType Type { get; }
 
@@ -390,12 +384,12 @@ namespace SOS.Process.Processors
                 if (mode == JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
-                    if (!await PublicRepository.DeleteProviderDataAsync(dataProvider))
+                    if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, false))
                     {
                         Logger.LogError($"Failed to delete {dataProvider.Identifier} public data");
                     }
 
-                    if (!await ProtectedRepository.DeleteProviderDataAsync(dataProvider))
+                    if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, true))
                     {
                         Logger.LogError($"Failed to delete {dataProvider.Identifier} protected data");
                     }

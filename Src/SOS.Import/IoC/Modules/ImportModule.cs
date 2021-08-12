@@ -19,6 +19,8 @@ using SOS.Import.Repositories.Source.ObservationsDatabase;
 using SOS.Import.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -26,6 +28,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -115,6 +118,9 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
                 Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
 
+            // Add cache
+            builder.RegisterType<ClassCache<ProcessedConfiguration>>().As<IClassCache<ProcessedConfiguration>>().SingleInstance();
+
             // Darwin Core
             builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
 
@@ -128,6 +134,10 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
+
+            // Repositories elastic
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+                .InstancePerLifetimeScope();
 
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
@@ -167,8 +177,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseVerbatimRepository>().As<IObservationDatabaseVerbatimRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedPublicObservationRepository>().As<IProcessedPublicObservationRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();

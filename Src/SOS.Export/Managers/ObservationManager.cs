@@ -34,7 +34,7 @@ namespace SOS.Export.Managers
         private readonly string _exportPath;
         private readonly IFileService _fileService;
         private readonly ILogger<ObservationManager> _logger;
-        private readonly IProcessedPublicObservationRepository _processedPublicObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IZendToService _zendToService;
 
@@ -44,7 +44,7 @@ namespace SOS.Export.Managers
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="blobStorageService"></param>
@@ -56,7 +56,7 @@ namespace SOS.Export.Managers
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
@@ -72,8 +72,8 @@ namespace SOS.Export.Managers
             _geoJsonWriter =
                 geoJsonWriter ?? throw new ArgumentNullException(nameof(geoJsonWriter));
 
-            _processedPublicObservationRepository = processedPublicObservationRepository ??
-                                                    throw new ArgumentNullException(nameof(processedPublicObservationRepository));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository =
                 processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -83,6 +83,9 @@ namespace SOS.Export.Managers
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
             
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // Make sure we are working with live data
+            _processedObservationRepository.LiveMode = true;
         }
 
         public async Task<bool> ExportAndSendAsync(SearchFilter filter, 
@@ -189,13 +192,13 @@ namespace SOS.Export.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedPublicObservationRepository.IndexName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
-                    _processedPublicObservationRepository,
+                    _processedObservationRepository,
                     fieldDescriptions,
                     processInfo,
                     _exportPath,

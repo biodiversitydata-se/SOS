@@ -1,11 +1,15 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
+using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.Managers;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
@@ -15,6 +19,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
@@ -28,17 +33,17 @@ namespace SOS.Export.IntegrationTests.Managers
         private ObservationManager CreateObservationManager()
         {
             var exportConfiguration = GetExportConfiguration();
-            var elasticConfoguration = GetElasticConfiguration();
-            var elasticClient = elasticConfoguration.GetClient(true);
+            var elasticConfiguration = GetElasticConfiguration();
+            var elasticClient = elasticConfiguration.GetClient(true);
 
             var processDbConfiguration = GetProcessDbConfiguration();
-            var exportClient = new ProcessClient(
+            var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var vocabularyRepository =
-                new VocabularyRepository(exportClient, new NullLogger<VocabularyRepository>());
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyValueResolver =
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
@@ -48,20 +53,24 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                 new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
                 new FileService(),
-                new DataProviderRepository(exportClient, new NullLogger<DataProviderRepository>()),
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
 
-            var processedPublicObservationRepository = new ProcessedPublicObservationRepository(
-                exportClient,
+            var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClient,
-                elasticConfoguration,
-                new Mock<ILogger<ProcessedPublicObservationRepository>>().Object);
+                processClient,
+                elasticConfiguration,
+                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
+                new TelemetryClient(),
+                new HttpContextAccessor(),
+                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+            
 
-            var excelWriter = new ExcelFileWriter(processedPublicObservationRepository, new FileService(), vocabularyValueResolver,
+
+            var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());
-            var geoJsonlWriter = new GeoJsonFileWriter(processedPublicObservationRepository, new FileService(), vocabularyValueResolver,
+            var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<GeoJsonFileWriter>());
-            var elasticConfiguration = GetElasticConfiguration();
 
             var filterManager = new Mock<IFilterManager>();
             filterManager
@@ -73,8 +82,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 dwcArchiveFileWriter,
                 excelWriter,
                 geoJsonlWriter,
-                processedPublicObservationRepository,
-                new ProcessInfoRepository(exportClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                processedObservationRepository,
+                new ProcessInfoRepository(processClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,

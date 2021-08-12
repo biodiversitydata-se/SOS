@@ -48,8 +48,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
@@ -59,8 +58,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="logger"></param>
         public ClamPortalObservationProcessor(IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
@@ -68,7 +66,7 @@ namespace SOS.Process.Processors.ClamPortal
             IDiffusionManager diffusionManager,
             ProcessConfiguration processConfiguration,
             ILogger<ClamPortalObservationProcessor> logger) :
-            base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

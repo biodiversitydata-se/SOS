@@ -49,8 +49,7 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="norsObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
@@ -60,8 +59,7 @@ namespace SOS.Process.Processors.Nors
         /// <param name="logger"></param>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
@@ -69,7 +67,7 @@ namespace SOS.Process.Processors.Nors
             IDiffusionManager diffusionManager,
             ProcessConfiguration processConfiguration,
             ILogger<NorsObservationProcessor> logger) :
-            base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

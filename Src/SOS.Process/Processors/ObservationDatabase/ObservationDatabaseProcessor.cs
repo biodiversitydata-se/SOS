@@ -47,8 +47,7 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// Constructor
         /// </summary>
         /// <param name="observationDatabaseVerbatimRepository"></param>
-        /// <param name="processedPublicObservationRepository"></param>
-        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="diffusionManager"></param>
@@ -58,8 +57,7 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public ObservationDatabaseProcessor(IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
-            IProcessedPublicObservationRepository processedPublicObservationRepository,
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IDiffusionManager diffusionManager,
@@ -68,7 +66,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
-                base(processedPublicObservationRepository, processedProtectedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));

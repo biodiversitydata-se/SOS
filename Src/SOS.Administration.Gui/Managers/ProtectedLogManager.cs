@@ -13,7 +13,7 @@ namespace SOS.Administration.Gui.Managers
     public class ProtectedLogManager : IProtectedLogManager
     {
         private readonly IProtectedLogRepository _protectedLogRepository;
-        private readonly IProcessedProtectedObservationRepository _processedProtectedObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ILogger<ProtectedLogManager> _logger;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Administration.Gui.Managers
         private async Task<ProtectedLogDto> PopulateLogAsync(ProtectedLog log)
         {
             var observations =
-                await _processedProtectedObservationRepository.GetObservationsByOccurrenceIdsAsync(log.OccurenceIds,
+                await _processedObservationRepository.GetObservationsAsync(log.OccurenceIds,
                     new[]
                     {
                         "event.startDate",
@@ -38,7 +38,7 @@ namespace SOS.Administration.Gui.Managers
                         "taxon.vernacularName",
                         "taxon.scientificName",
                         "taxon.attributes.protectionLevel"
-                    });
+                    }, true);
 
             return new ProtectedLogDto
             {
@@ -68,17 +68,17 @@ namespace SOS.Administration.Gui.Managers
         /// Constructor
         /// </summary>
         /// <param name="protectedLogRepository"></param>
-        /// <param name="processedProtectedObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         public ProtectedLogManager(IProtectedLogRepository protectedLogRepository, 
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository, 
+            IProcessedObservationRepository processedObservationRepository, 
             ILogger<ProtectedLogManager> logger)
         {
             _protectedLogRepository =
                 protectedLogRepository ?? throw new ArgumentNullException(nameof(protectedLogRepository));
-            _processedProtectedObservationRepository = processedProtectedObservationRepository ??
+            _processedObservationRepository = processedObservationRepository ??
                                                        throw new ArgumentNullException(
-                                                           nameof(processedProtectedObservationRepository));
+                                                           nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

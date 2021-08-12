@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -17,6 +19,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
@@ -100,19 +103,17 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
-            IProcessedPublicObservationRepository processedPublicObservationRepository;
-            IProcessedProtectedObservationRepository processedProtectedObservationRepository;
+            IProcessedObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedPublicObservationRepository = new ProcessedPublicObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedPublicObservationRepository>());
-                processedProtectedObservationRepository = new ProcessedProtectedObservationRepository(processClient, elasticClient,
-                    new ElasticSearchConfiguration(), new NullLogger<ProcessedProtectedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationRepository(elasticClient, processClient,
+                    new ElasticSearchConfiguration(), 
+                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new NullLogger<ProcessedObservationRepository>());
             }
             else
             {
-                processedPublicObservationRepository = CreateProcessedPublicObservationRepositoryMock(batchSize).Object;
-                processedProtectedObservationRepository = CreateProcessedProtectedObservationRepositoryMock(batchSize).Object;
+                processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
             }
 
 
@@ -128,8 +129,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
-                processedPublicObservationRepository,
-                processedProtectedObservationRepository,
+                processedObservationRepository,
                 vocabularyRepository,
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 dwcArchiveFileWriterCoordinator,
@@ -179,18 +179,10 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             return dwcArchiveFileWriterCoordinator;
         }
 
-        private Mock<IProcessedPublicObservationRepository> CreateProcessedPublicObservationRepositoryMock(int batchSize)
+        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
         {
-            var mock = new Mock<IProcessedPublicObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(batchSize);
-            return mock;
-        }
-
-        private Mock<IProcessedProtectedObservationRepository> CreateProcessedProtectedObservationRepositoryMock(int batchSize)
-        {
-            var mock = new Mock<IProcessedProtectedObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
+            var mock = new Mock<IProcessedObservationRepository>();
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(batchSize);
             return mock;
         }
