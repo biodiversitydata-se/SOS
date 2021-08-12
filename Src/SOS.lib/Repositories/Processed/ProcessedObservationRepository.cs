@@ -1046,6 +1046,42 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds)
+        {
+            if (!locationIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
+                .Index($"{PublicIndexName}, {ProtectedIndexName}")
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(f => f
+                            .Terms(t => t
+                                .Field("location.locationId")
+                                .Terms(locationIds)
+                            )
+                        )
+                    )
+                )
+                .Collapse(c => c.Field("location.locationId"))
+               .Source(s => s
+                    .Includes(i => i
+                        .Field("location")
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse.Documents?.Select(d => d.Location);
+        }
+
+        /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
