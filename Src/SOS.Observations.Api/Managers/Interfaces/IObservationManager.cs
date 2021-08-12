@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
 
@@ -113,6 +114,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<DateTime?> GetLatestModifiedDateForProviderAsync(int providerId);
+
+        /// <summary>
+        /// Get locations by id
+        /// </summary>
+        /// <param name="locationIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds);
 
         /// <summary>
         /// Get number of matching observations
