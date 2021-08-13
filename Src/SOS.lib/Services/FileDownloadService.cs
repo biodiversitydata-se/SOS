@@ -5,10 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Services.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
-namespace SOS.Import.Services
+namespace SOS.Lib.Services
 {
     public class FileDownloadService : IFileDownloadService
     {
