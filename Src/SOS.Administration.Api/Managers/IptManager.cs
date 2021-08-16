@@ -98,8 +98,8 @@ namespace SOS.Administration.Api.Managers
                     var eighthCol = GetValue(arrayItem.Value, seventhCol.CurrentIndex, "'", "'");
                     var ninthCol = GetValue(arrayItem.Value, eighthCol.CurrentIndex, "'", "'");
 
-                    if (fourthCol.Value.Equals("Occurrence", StringComparison.CurrentCultureIgnoreCase) &&
-                        fifthCol.Value.Equals("Specimen", StringComparison.CurrentCultureIgnoreCase))
+                    if (fourthCol.Value.Equals("Occurrence", StringComparison.CurrentCultureIgnoreCase))/* &&
+                        fifthCol.Value.Equals("Specimen", StringComparison.CurrentCultureIgnoreCase))*/
                     {
                         resources.Add(new IptResource
                         {
