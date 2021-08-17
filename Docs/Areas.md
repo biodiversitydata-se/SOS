@@ -1,4 +1,9 @@
 # Areas
+- [County (Län)](#county-län)
+- [Province (Landskap)](#province-landskap)
+- [Municipality (Kommun)](#municipality-kommun)
+- [Parish (Socken)](#parish-socken)
+
 ## County (Län)
 | FeatureId | Name |
 |:---	|:---	|
