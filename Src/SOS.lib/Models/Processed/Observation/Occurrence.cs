@@ -42,9 +42,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string AssociatedReferences { get; set; }
 
         /// <summary>
-        ///     A list (concatenated and separated) of identifiers of
-        ///     other Occurrence records and their associations to
-        ///     this Occurrence.
+        /// A list (concatenated and separated) of identifiers (publication, global unique identifier, URI) 
+        /// of genetic sequence information associated with the Occurrence.
         /// </summary>
         public string AssociatedSequences { get; set; }
 
@@ -88,9 +87,9 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     within the data set or collection.
         /// </summary>
         public string CatalogNumber { get; set; }
-        
+
         /// <summary>
-        /// Catalog Id.
+        /// An int32 identifier (preferably unique) for the record within the data set or collection.
         /// </summary>
         public int CatalogId { get; set; }
 
@@ -102,10 +101,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Disposition { get; set; }
 
         /// <summary>
-        ///     The process by which the biological individual(s)
-        ///     represented in the Occurrence became established at the
-        ///     location.
-        ///     Recommended best practice is to use a controlled vocabulary.
+        ///  Statement about whether an organism or organisms have been introduced to a 
+        ///  given place and time through the direct or indirect activity of modern humans.        
         /// </summary>
         /// <remarks>
         ///     This field uses a controlled vocabulary.
@@ -171,7 +168,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue LifeStage { get; set; }
 
         /// <summary>
-        ///     Media linked to the observation
+        ///     Media associated with the observation
         /// </summary>
         [Nested]
         public ICollection<Multimedia> Media { get; set; }

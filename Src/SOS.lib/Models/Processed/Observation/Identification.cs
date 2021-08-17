@@ -61,8 +61,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     A categorical indicator of the extent to which the taxonomic
         ///     identification has been verified to be correct.
-        ///     Recommended best practice is to use a controlled vocabulary
-        ///     such as that used in HISPID/ABCD.
         /// </summary>
         /// <remarks>
         ///     This field uses a controlled vocabulary.
