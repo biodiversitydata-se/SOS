@@ -19,9 +19,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Administration.Api
 {
@@ -163,6 +166,13 @@ namespace SOS.Administration.Api
             services.AddSingleton<SosApiConfiguration>(sosApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();
+
+     /*       // Add managers
+            services.AddSingleton<IIptManager, IIptManager>();
+
+            // Add services
+            services.AddSingleton<IFileDownloadService, FileDownloadService>();
+            services.AddSingleton<IHttpClientService, HttpClientService>();*/
         }
 
         /// <summary>

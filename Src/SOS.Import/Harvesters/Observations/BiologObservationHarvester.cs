@@ -7,12 +7,12 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Observations.Interfaces;
-using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
 {
