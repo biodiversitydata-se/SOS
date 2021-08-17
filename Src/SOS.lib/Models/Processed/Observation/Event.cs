@@ -22,9 +22,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        ///     A list (concatenated and separated) of identifiers
-        ///     (publication, global unique identifier, URI) of
-        ///     media associated with the Occurrence.
+        ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
         /// </summary>
         public string EventId { get; set; }
 
@@ -52,8 +50,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Habitat { get; set; }
 
         /// <summary>
-        ///     An identifier for the set of information associated with an Event (something that occurs at a place and time).
-        ///     May be a global unique identifier or an identifier specific to the data set.
+        /// An identifier for the broader Event that groups this and potentially other Events.
         /// </summary>
         /// <example>
         ///     A1 (parentEventID to identify the main Whittaker Plot in nested samples, each with its own eventID - A1:1, A1:2).
@@ -103,13 +100,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public string VerbatimEventDate { get; set; }
 
         /// <summary>
-        ///     Multimedia linked to the event.
+        ///     Multimedia associated with the event.
         /// </summary>
         [Nested]
         public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
-        ///     Measurement or facts linked to the event.
+        ///     Measurement or facts associated with the event.
         /// </summary>
         [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }

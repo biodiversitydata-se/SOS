@@ -214,9 +214,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string InformationWithheld { get; set; }
 
         /// <summary>
-        ///     The name (or acronym) in use by the institution
-        ///     having custody of the object(s) or information
-        ///     referred to in the record.
+        /// An identifier for the institution having custody of the object(s) or information referred to in the record.
         /// </summary>
         public string InstitutionId { get; set; }
 
@@ -320,7 +318,7 @@ namespace SOS.Lib.Models.Processed.Observation
         #endregion Record level
 
         /// <summary>
-        ///     Measurement or facts linked to the observation.
+        ///     Measurement or facts associated with the observation.
         /// </summary>
         [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }

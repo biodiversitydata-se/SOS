@@ -5,15 +5,13 @@
     /// </summary>
     public class GeologicalContext
     {
-        /// <summary>
-        ///     Darwin Core term name: bed.
+        /// <summary>        
         ///     The full name of the lithostratigraphic bed from which
         ///     the cataloged item was collected.
         /// </summary>
         public string Bed { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: earliestAgeOrLowestStage.
+        /// <summary>        
         ///     The full name of the earliest possible geochronologic
         ///     age or lowest chronostratigraphic stage attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -21,8 +19,7 @@
         /// </summary>
         public string EarliestAgeOrLowestStage { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: earliestEonOrLowestEonothem.
+        /// <summary>        
         ///     The full name of the earliest possible geochronologic eon
         ///     or lowest chrono-stratigraphic eonothem or the informal
         ///     name ("Precambrian") attributable to the stratigraphic
@@ -30,8 +27,7 @@
         /// </summary>
         public string EarliestEonOrLowestEonothem { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: earliestEpochOrLowestSeries.
+        /// <summary>        
         ///     The full name of the earliest possible geochronologic
         ///     epoch or lowest chronostratigraphic series attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -39,8 +35,7 @@
         /// </summary>
         public string EarliestEpochOrLowestSeries { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: earliestEraOrLowestErathem.
+        /// <summary>        
         ///     The full name of the earliest possible geochronologic
         ///     era or lowest chronostratigraphic erathem attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -56,8 +51,7 @@
         /// </summary>
         public string EarliestGeochronologicalEra { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: earliestPeriodOrLowestSystem.
+        /// <summary>        
         ///     The full name of the earliest possible geochronologic
         ///     period or lowest chronostratigraphic system attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -65,15 +59,13 @@
         /// </summary>
         public string EarliestPeriodOrLowestSystem { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: formation.
+        /// <summary>        
         ///     The full name of the lithostratigraphic formation from
         ///     which the cataloged item was collected.
         /// </summary>
         public string Formation { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: geologicalContextID.
+        /// <summary>        
         ///     An identifier for the set of information associated
         ///     with a GeologicalContext (the location within a geological
         ///     context, such as stratigraphy). May be a global unique
@@ -82,23 +74,20 @@
         // ReSharper disable once InconsistentNaming
         public string GeologicalContextId { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: group.
+        /// <summary>        
         ///     The full name of the lithostratigraphic group from
         ///     which the cataloged item was collected.
         /// </summary>
         public string Group { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: highestBiostratigraphicZone.
+        /// <summary>        
         ///     The full name of the highest possible geological
         ///     biostratigraphic zone of the stratigraphic horizon
         ///     from which the cataloged item was collected.
         /// </summary>
         public string HighestBiostratigraphicZone { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: latestAgeOrHighestStage.
+        /// <summary>        
         ///     The full name of the latest possible geochronologic
         ///     age or highest chronostratigraphic stage attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -106,8 +95,7 @@
         /// </summary>
         public string LatestAgeOrHighestStage { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: latestEonOrHighestEonothem.
+        /// <summary>        
         ///     The full name of the latest possible geochronologic eon
         ///     or highest chrono-stratigraphic eonothem or the informal
         ///     name ("Precambrian") attributable to the stratigraphic
@@ -115,8 +103,7 @@
         /// </summary>
         public string LatestEonOrHighestEonothem { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: latestEpochOrHighestSeries.
+        /// <summary>        
         ///     The full name of the latest possible geochronologic
         ///     epoch or highest chronostratigraphic series attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -124,8 +111,7 @@
         /// </summary>
         public string LatestEpochOrHighestSeries { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: latestEraOrHighestErathem.
+        /// <summary>        
         ///     The full name of the latest possible geochronologic
         ///     era or highest chronostratigraphic erathem attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -140,8 +126,7 @@
         /// </summary>
         public string LatestGeochronologicalEra { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: latestPeriodOrHighestSystem.
+        /// <summary>        
         ///     The full name of the latest possible geochronologic
         ///     period or highest chronostratigraphic system attributable
         ///     to the stratigraphic horizon from which the cataloged
@@ -149,23 +134,20 @@
         /// </summary>
         public string LatestPeriodOrHighestSystem { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: lithostratigraphicTerms.
+        /// <summary>        
         ///     The combination of all litho-stratigraphic names for
         ///     the rock from which the cataloged item was collected.
         /// </summary>
         public string LithostratigraphicTerms { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: lowestBiostratigraphicZone.
+        /// <summary>        
         ///     The full name of the lowest possible geological
         ///     biostratigraphic zone of the stratigraphic horizon
         ///     from which the cataloged item was collected.
         /// </summary>
         public string LowestBiostratigraphicZone { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: member.
+        /// <summary>        
         ///     The full name of the lithostratigraphic member from
         ///     which the cataloged item was collected.
         /// </summary>
