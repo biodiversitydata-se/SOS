@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
+using Topshelf.Hosts;
 
 namespace SOS.Observations.Api.Extensions
 {
@@ -513,6 +514,53 @@ namespace SOS.Observations.Api.Extensions
                 Id = taxonInformation.Id,
                 ScientificName = taxonInformation.ScientificName,
                 SwedishName = taxonInformation.SwedishName
+            };
+        }
+
+        /// <summary>
+        /// Cast Location to locationDto
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public static LocationDto ToDto(this Location location)
+        {
+            if (location == null)
+            {
+                return null;
+            }
+
+            return new LocationDto
+            {
+                Continent = location.Continent == null
+                    ? null
+                    : new IdValueDto<int> {Id = location.Continent.Id, Value = location.Continent.Value},
+                CoordinatePrecision = location.CoordinatePrecision,
+                CoordinateUncertaintyInMeters = location.CoordinateUncertaintyInMeters,
+                Country = location.Country == null
+                    ? null
+                    : new IdValueDto<int> { Id = location.Country.Id, Value = location.Country.Value },
+                CountryCode = location.CountryCode,
+                County = location.County == null
+                    ? null
+                    : new IdValueDto<string> { Id= location.County.FeatureId, Value = location.County.Name },
+                DecimalLatitude = location.DecimalLatitude,
+                DecimalLongitude = location.DecimalLongitude,
+                Locality = location.Locality,
+                LocationAccordingTo = location.LocationAccordingTo,
+                LocationId = location.LocationId,
+                LocationRemarks = location.LocationRemarks,
+                Municipality = location.Municipality == null
+                    ? null
+                    : new IdValueDto<string> { Id = location.Municipality.FeatureId, Value = location.Municipality.Name },
+                Province = location.Province == null
+                    ? null
+                    : new IdValueDto<string> { Id = location.Province.FeatureId, Value = location.Province.Name },
+                Parish = location.Parish == null
+                    ? null
+                    : new IdValueDto<string> { Id = location.Parish.FeatureId, Value = location.Parish.Name },
+                Point = location.Point,
+                PointWithBuffer = location.PointWithBuffer,
+                PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer
             };
         }
     }

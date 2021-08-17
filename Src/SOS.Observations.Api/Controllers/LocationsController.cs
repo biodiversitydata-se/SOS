@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Locations.Api.Controllers
@@ -36,7 +37,7 @@ namespace SOS.Locations.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost]
-        [ProducesResponseType(typeof(SOS.Lib.Models.Processed.Observation.Location), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(LocationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetLocationsAsync([FromBody]IEnumerable<string> locationIds)

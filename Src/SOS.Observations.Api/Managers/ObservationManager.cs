@@ -413,9 +413,11 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds)
+        public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
         {
-            return await _processedObservationRepository.GetLocationsAsync(locationIds);
+            var locations =  await _processedObservationRepository.GetLocationsAsync(locationIds);
+
+            return locations?.Select(l => l.ToDto());
         }
 
         /// <inheritdoc />

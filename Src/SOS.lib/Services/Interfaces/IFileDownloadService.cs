@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SOS.Import.Services.Interfaces
+namespace SOS.Lib.Services.Interfaces
 {
     public interface IFileDownloadService
     {

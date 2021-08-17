@@ -120,7 +120,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="locationIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds);
+        Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds);
 
         /// <summary>
         /// Get number of matching observations
