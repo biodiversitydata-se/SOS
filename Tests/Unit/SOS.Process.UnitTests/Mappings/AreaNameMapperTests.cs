@@ -22,7 +22,7 @@ namespace SOS.Process.UnitTests.Mappings
             areaNameMapper.ProvinceNameByProvinceNameSpelling.Should().NotBeEmpty();
             areaNameMapper.ProvinceNameByProvinceNameSpelling
                 .Should().ContainKey("Hallnad")
-                .WhichValue.Should().Be("Halland");
+                .WhoseValue.Should().Be("Halland");
         }
     }
 }

@@ -70,10 +70,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            yearsStartDate.Should().BeEquivalentTo(2018, 2019, 2020);
-            yearsEndDate.Should().BeEquivalentTo(2018, 2019, 2020);
-            monthsStartDate.Should().BeEquivalentTo(1,2,4);
-            monthsEndDate.Should().BeEquivalentTo(1, 2, 4);
+            yearsStartDate.Should().BeEquivalentTo(new []{2018, 2019, 2020 });
+            yearsEndDate.Should().BeEquivalentTo(new[] { 2018, 2019, 2020 });
+            monthsStartDate.Should().BeEquivalentTo(new[] { 1, 2, 4 });
+            monthsEndDate.Should().BeEquivalentTo(new[] { 1, 2, 4 });
         }
 
         [Fact]
@@ -123,8 +123,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            yearsStartDate.Should().BeEquivalentTo(2018, 2019, 2020);
-            monthsStartDate.Should().BeEquivalentTo(1, 2, 4);
+            yearsStartDate.Should().BeEquivalentTo(new[] {2018, 2019, 2020 });
+            monthsStartDate.Should().BeEquivalentTo(new []{ 1, 2, 4 });
             yearsEndDate.Should().Contain(new[] { 2018, 2019, 2020});
             monthsEndDate.Should().Contain(new[] { 1, 2, 4 });
         }
@@ -175,8 +175,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            monthsStartDate.Should().BeEquivalentTo(1, 2);
-            monthsEndDate.Should().BeEquivalentTo(1, 2);
+            monthsStartDate.Should().BeEquivalentTo(new []{ 1, 2 });
+            monthsEndDate.Should().BeEquivalentTo(new[] { 1, 2 });
             yearsStartDate.Count.Should().BeGreaterOrEqualTo(10, "because all years are included in the search when UsePeriodForAllYears=true");
         }
     }

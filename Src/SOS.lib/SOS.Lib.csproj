@@ -30,7 +30,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NReco.Csv" Version="1.0.0" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.19.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.20.0" />
     <PackageReference Include="NGeoHash" Version="1.2.0" />
   </ItemGroup>
 
