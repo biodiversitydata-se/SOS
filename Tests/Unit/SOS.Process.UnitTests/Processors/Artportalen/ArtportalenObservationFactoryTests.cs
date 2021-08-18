@@ -29,7 +29,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
                 new Dictionary<VocabularyId, IDictionary<object, int>>(),
                 false);
             ArtportalenObservationVerbatim verbatimObservation = new ArtportalenObservationVerbatim();
-            //verbatimObservation.Activity = new MetadataWithCategory(1, 1);
+            verbatimObservation.Activity = new MetadataWithCategory(1, 1);
             Taxon taxon = new Taxon();
             taxon.Attributes = new TaxonAttributes();
             taxon.Attributes.OrganismGroup = "fåglar";
