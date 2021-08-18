@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="http://gbif.org/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-        packageId="33de556f-5923-ccd5f-3eed-31e55c95a5f7"  system="http://gbif.org" scope="system"
-  xml:lang="en">
+         packageId="33de556f-5923-ccd5f-3eed-31e55c95a5f7" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="en">
 	<dataset>
-		<alternateIdentifier>33de556f-5923-ccd5f-3eed-31e55c95a5f7</alternateIdentifier>
+		<identifier>33de556f-5923-ccd5f-3eed-31e55c95a5f7</identifier>
+        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:VirtualHerbarium</alternateIdentifier>
         <title>Swedish Virtual Herbarium</title>
 		<creator>
 			<organizationName>Umeå University</organizationName>
@@ -13,6 +18,8 @@
 				<country>SE</country>
 			</address>
 			<electronicMailAddress></electronicMailAddress>
+            <onlineUrl>https://www.umu.se/</onlineUrl>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<organizationName>Umeå University</organizationName>
@@ -50,6 +57,16 @@
 					<southBoundingCoordinate>0.0</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:SingleDate></sos:SingleDate>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+            </temporalCoverage>
+            <taxonomicCoverage>
+                <sos:TaxonomicDescription></sos:TaxonomicDescription>
+                <taxonId></taxonId>
+                <sos:TaxonList></sos:TaxonList>
+            </taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -68,6 +85,33 @@
 				<city>Umeå</city>
 				<country>SE</country>
 			</address>
+            <onlineUrl>http://herbarium.emg.umu.se</onlineUrl>
+            <sos:contactNameType>Personal</sos:contactNameType>
 		</contact>
+        <sos:datsetSubtype>collection data</sos:datsetSubtype>
+        <sos:resourceHomepage>http://herbarium.emg.umu.se</sos:resourceHomepage>
+        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
+        <project>
+            <sos:projectTitle></sos:projectTitle>
+            <sos:fundingDescription></sos:fundingDescription>
+            <funderIdentifier></funderIdentifier>
+            <dc:funderIdentifierType></dc:funderIdentifierType>
+            <designDescription></designDescription>
+        </project>
+        <samplingMethods>
+            <studyExtent></studyExtent>
+            <samplingDescription></samplingDescription>
+            <methodStep></methodStep>
+            <qualityControl></qualityControl>
+        </samplingMethods>
+        <additionalMetadata>
+            <sos:dateCreated></sos:dateCreated>
+            <sos:datePublished></sos:datePublished>
+            <purpose></purpose>
+            <gettingStarted></gettingStarted>
+            <personalData></personalData>
+            <sensitiveData></sensitiveData>
+            <sensitiveDataDescription></sensitiveDataDescription>
+        </additionalMetadata>
 	</dataset>
 </eml:eml>
