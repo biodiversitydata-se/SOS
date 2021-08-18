@@ -1,7 +1,6 @@
-﻿using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
+﻿using SOS.Administration.Gui.Dtos;
 using System.Threading.Tasks;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Administration.Gui.Services
 {
