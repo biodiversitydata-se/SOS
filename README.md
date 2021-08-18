@@ -10,6 +10,11 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Authentication](Docs/Authentication.md)
 - [FAQ](Docs/FAQ.md)
 
+## Data types and vocabularies
+- [Observation](Docs/Observation.md)
+- [Vocabularies](Docs/Vocabularies.md)
+- [Areas](Docs/Areas.md)
+
 ## API changes
 - [Change log](CHANGELOG.md)
 
