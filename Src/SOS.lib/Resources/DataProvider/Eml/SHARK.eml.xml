@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="http://gbif.org/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-        packageId="339cf623d-4b3a-2c9c-f555-cd1244477c11"  system="http://gbif.org" scope="system"
-  xml:lang="en">
+         packageId="339cf623d-4b3a-2c9c-f555-cd1244477c11" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="en">
 	<dataset>
-		<alternateIdentifier>339cf623d-4b3a-2c9c-f555-cd1244477c11</alternateIdentifier>
+		<identifier>339cf623d-4b3a-2c9c-f555-cd1244477c11</identifier>
+        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:SHARK</alternateIdentifier>
         <title>Shark SMHI</title>
 		<creator>
 			<organizationName>SMHI</organizationName>
@@ -12,7 +17,9 @@
 				<city>Norrköping</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>Email</electronicMailAddress>
+			<electronicMailAddress></electronicMailAddress>
+            <onlineUrl>http://sharkweb.smhi.se/</onlineUrl>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<organizationName>SMHI</organizationName>
@@ -50,6 +57,16 @@
 					<southBoundingCoordinate>0.0</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:SingleDate></sos:SingleDate>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+            </temporalCoverage>
+            <taxonomicCoverage>
+                <sos:TaxonomicDescription>Data from SHARK includes marine benthic fauna, marine benthic vegetation, plankton, and seal observations</sos:TaxonomicDescription>
+                <taxonId></taxonId>
+                <sos:TaxonList></sos:TaxonList>
+            </taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -68,6 +85,33 @@
 				<city>Norrköping</city>
 				<country>SE</country>
 			</address>
+            <onlineUrl>http://sharkweb.smhi.se/</onlineUrl>
+            <sos:contactNameType>Personal</sos:contactNameType>
 		</contact>
+        <sos:datsetSubtype>census data</sos:datsetSubtype>
+        <sos:resourceHomepage>http://sharkweb.smhi.se/</sos:resourceHomepage>
+        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
+        <project>
+            <sos:projectTitle></sos:projectTitle>
+            <sos:fundingDescription></sos:fundingDescription>
+            <funderIdentifier></funderIdentifier>
+            <dc:funderIdentifierType></dc:funderIdentifierType>
+            <designDescription></designDescription>
+        </project>
+        <samplingMethods>
+            <studyExtent></studyExtent>
+            <samplingDescription></samplingDescription>
+            <methodStep></methodStep>
+            <qualityControl></qualityControl>
+        </samplingMethods>
+        <additionalMetadata>
+            <sos:dateCreated></sos:dateCreated>
+            <sos:datePublished></sos:datePublished>
+            <purpose></purpose>
+            <gettingStarted></gettingStarted>
+            <personalData></personalData>
+            <sensitiveData></sensitiveData>
+            <sensitiveDataDescription></sensitiveDataDescription>
+        </additionalMetadata>
 	</dataset>
 </eml:eml>

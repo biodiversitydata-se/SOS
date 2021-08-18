@@ -62,7 +62,7 @@ namespace SOS.Lib.Factories
                 return;
             }
             
-            var temporalCoverage = GetElement(dataset, "temporalCoverage");
+            var temporalCoverage = GetElement(GetElement(dataset, "coverage"), "temporalCoverage");
             var rangeOfDates = GetElement(temporalCoverage, "rangeOfDates");
            
             if (firstSpotted.HasValue)
@@ -104,13 +104,15 @@ namespace SOS.Lib.Factories
             var xDoc = XDocument.Load(emlTemplatePath);
             var dataset = xDoc.Root.Element("dataset");
 
-            SetPubDateToCurrentDate(dataset);
+            GetElement(dataset, "identifier").SetValue(new Guid().ToString());
+            GetElement(dataset, "alternateIdentifier").SetValue($"urn:lsid:artdata.slu.se:SOS:{dataProvider.Identifier}");
+            
             GetElement(dataset,"title").SetValue(dataProvider.Names.Translate("en-GB") ?? "N/A");
             GetElement(GetElement(dataset, "abstract"), "para").SetValue(dataProvider.Descriptions?.Translate("en-GB") ?? "N/A");
             SetContact(dataset, dataProvider);
 
-            GetElement(GetElement(GetElement(dataset, "distribution"), "online"), "url").SetValue(dataProvider.Url ?? "N/A");
-           
+            GetElement(dataset, "sos:resourceHomepage").SetValue(dataProvider.Url ?? "N/A");
+
             return xDoc;
         }
 
@@ -127,6 +129,7 @@ namespace SOS.Lib.Factories
             var dataset = eml.Root.Element("dataset");
             SetTemporalCoverage(dataset, firstSpotted, lastSpotted);
             SetGeographicCoverage(dataset, geographicCoverage);
+            SetPubDateToCurrentDate(dataset);
         }
     }
 }

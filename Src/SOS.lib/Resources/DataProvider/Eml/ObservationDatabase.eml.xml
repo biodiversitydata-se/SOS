@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="http://gbif.org/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-        packageId="339900cc-b086-33dc-22fe-9fea76c4ba09"  system="http://gbif.org" scope="system"
-  xml:lang="en">
+         packageId="339900cc-b086-33dc-22fe-9fea76c4ba09" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="en">
 	<dataset>
-		<alternateIdentifier>339900cc-b086-33dc-22fe-9fea76c4ba09</alternateIdentifier>
+		<identifier>339900cc-b086-33dc-22fe-9fea76c4ba09</identifier>
+        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:ObservationDatabase</alternateIdentifier>
         <title>Observation database of Redlisted species</title>
 		<creator>
 			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
@@ -12,7 +17,9 @@
 				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress>Email</electronicMailAddress>
+			<electronicMailAddress></electronicMailAddress>
+            <onlineUrl>http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata</onlineUrl>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<organizationName>SLU Swedish Species Information Centre (SLU Artdatabanken)</organizationName>
@@ -50,6 +57,16 @@
 					<southBoundingCoordinate>0.0</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+            <temporalCoverage>
+                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+                <sos:SingleDate></sos:SingleDate>
+                <sos:LivingTimePeriod></sos:LivingTimePeriod>
+            </temporalCoverage>
+            <taxonomicCoverage>
+                <sos:TaxonomicDescription></sos:TaxonomicDescription>
+                <taxonId></taxonId>
+                <sos:TaxonList></sos:TaxonList>
+            </taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -68,6 +85,33 @@
 				<city>Uppsala</city>
 				<country>SE</country>
 			</address>
+            <onlineUrl>http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata</onlineUrl>
+            <sos:contactNameType>Personal</sos:contactNameType>
 		</contact>
+        <sos:datsetSubtype>collection data</sos:datsetSubtype>
+        <sos:resourceHomepage>http://www.artdatabanken.se/verksamhet-och-uppdrag/arter-kunskapsinsamling/fynd-av-arter/soeka-och-goera-uttag-av-fynddata/?st=uttag+av+fynddata</sos:resourceHomepage>
+        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
+        <project>
+            <sos:projectTitle></sos:projectTitle>
+            <sos:fundingDescription></sos:fundingDescription>
+            <funderIdentifier></funderIdentifier>
+            <dc:funderIdentifierType></dc:funderIdentifierType>
+            <designDescription></designDescription>
+        </project>
+        <samplingMethods>
+            <studyExtent></studyExtent>
+            <samplingDescription></samplingDescription>
+            <methodStep></methodStep>
+            <qualityControl></qualityControl>
+        </samplingMethods>
+        <additionalMetadata>
+            <sos:dateCreated></sos:dateCreated>
+            <sos:datePublished></sos:datePublished>
+            <purpose></purpose>
+            <gettingStarted></gettingStarted>
+            <personalData></personalData>
+            <sensitiveData></sensitiveData>
+            <sensitiveDataDescription></sensitiveDataDescription>
+        </additionalMetadata>
 	</dataset>
 </eml:eml>
