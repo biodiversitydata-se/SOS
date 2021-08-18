@@ -24,7 +24,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
         /// <summary>
-        ///     Darwin Core term name: scientificName.
         ///     The full scientific name, with authorship and date
         ///     information if known. When forming part of an
         ///     Identification, this should be the name in lowest level

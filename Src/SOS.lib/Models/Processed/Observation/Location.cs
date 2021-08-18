@@ -92,13 +92,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public Area Parish { get; set; }
- 
-        /// <summary>
-        ///     Darwin Core term name: stateProvince.
+
+        /// <summary>       
         ///     The name of the next smaller administrative region than
         ///     country (state, province, canton, department, region, etc.)
         ///     in which the Location occurs.
-        ///     ('landskap' in swedish).
+        ///     ('landskap' in swedish). Darwin Core term name: stateProvince.
         /// </summary>
         [Object]
         public Area Province { get; set; }
@@ -413,8 +412,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string VerbatimLocality { get; set; }
 
-        /// <summary>
-        ///     Darwin Core term name: verbatimLongitude.
+        /// <summary>        
         ///     The verbatim original longitude of the Location.
         ///     The coordinate ellipsoid, geodeticDatum, or full
         ///     Spatial Reference System (SRS) for these coordinates
