@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sos="https://sos-search.artdata.slu.se/"
+         xmlns:gbif="http://gbif.org/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-        packageId="38b4c89f-584c-41bb-bd8f-cd1def33e92f"  system="http://gbif.org" scope="system"
-  xml:lang="en">
+         packageId="38b4c89f-584c-41bb-bd8f-cd1def33e92f" system="https://sos-search.artdata.slu.se/" scope="system"
+         xml:lang="en">
 	<dataset>
-		<alternateIdentifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</alternateIdentifier>		
+		<identifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</identifier>		
 		<title>Sos Data Providers Combined</title>
 		<creator>
 			<organizationName>SLU Swedish Species Information Centre</organizationName>
@@ -13,6 +17,7 @@
 				<country>SE</country>
 			</address>
 			<electronicMailAddress>webservices@artdatabanken.se</electronicMailAddress>
+            <sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<organizationName>SLU Swedish Species Information Centre</organizationName>
@@ -48,6 +53,11 @@
 					<southBoundingCoordinate>55.11</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
+            <taxonomicCoverage>
+                <sos:TaxonomicDescription></sos:TaxonomicDescription>
+                <taxonId></taxonId>
+                <sos:TaxonList></sos:TaxonList>
+            </taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -67,5 +77,30 @@
 				<country>SE</country>
 			</address>
 		</contact>
+        <sos:datsetSubtype></sos:datsetSubtype>
+        <sos:resourceHomepage></sos:resourceHomepage>
+        <gbif:UpdateFrequency>daily</gbif:UpdateFrequency>
+        <project>
+            <sos:projectTitle></sos:projectTitle>
+            <sos:fundingDescription></sos:fundingDescription>
+            <funderIdentifier></funderIdentifier>
+            <dc:funderIdentifierType></dc:funderIdentifierType>
+            <designDescription></designDescription>
+        </project>
+        <samplingMethods>
+            <studyExtent></studyExtent>
+            <samplingDescription></samplingDescription>
+            <methodStep></methodStep>
+            <qualityControl></qualityControl>
+        </samplingMethods>
+        <additionalMetadata>
+            <sos:dateCreated></sos:dateCreated>
+            <sos:datePublished></sos:datePublished>
+            <purpose></purpose>
+            <gettingStarted></gettingStarted>
+            <personalData></personalData>
+            <sensitiveData></sensitiveData>
+            <sensitiveDataDescription></sensitiveDataDescription>
+        </additionalMetadata>
 	</dataset>
 </eml:eml>

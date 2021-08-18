@@ -86,7 +86,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            run.Should().Throw<Exception>()
+            run.Should().ThrowAsync<Exception>()
                 .WithMessage("Process taxa job failed");
         }
 

@@ -128,7 +128,8 @@ namespace SOS.Process.Processors
         /// <returns></returns>
         protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon)
         {
-           return taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
+            var protectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
+           return protectionLevel > 0 ? protectionLevel : 1;
         }
     }
 }
