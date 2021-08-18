@@ -14,7 +14,11 @@ namespace SOS.Lib.Factories
     /// </summary>
     public static class DwCArchiveEmlFileFactory
     {
-        private static XElement GetElement(XElement dataset, string name)
+        private static XNamespace dcNs = "http://purl.org/dc/terms/";
+        private static XNamespace gbifNs = "http://gbif.org/";
+        private static XNamespace sosNs = "https://sos-search.artdata.slu.se/";
+
+        private static XElement GetElement(XElement dataset, XName name)
         {
             var element = dataset.Element(name);
 
@@ -104,6 +108,7 @@ namespace SOS.Lib.Factories
             var xDoc = XDocument.Load(emlTemplatePath);
             var dataset = xDoc.Root.Element("dataset");
 
+            SetPubDateToCurrentDate(dataset);
             GetElement(dataset, "identifier").SetValue(new Guid().ToString());
             GetElement(dataset, "alternateIdentifier").SetValue($"urn:lsid:artdata.slu.se:SOS:{dataProvider.Identifier}");
             
@@ -111,7 +116,7 @@ namespace SOS.Lib.Factories
             GetElement(GetElement(dataset, "abstract"), "para").SetValue(dataProvider.Descriptions?.Translate("en-GB") ?? "N/A");
             SetContact(dataset, dataProvider);
 
-            GetElement(dataset, "sos:resourceHomepage").SetValue(dataProvider.Url ?? "N/A");
+            GetElement(dataset, sosNs + "resourceHomepage").SetValue(dataProvider.Url ?? "N/A");
 
             return xDoc;
         }
