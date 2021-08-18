@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Administration.Gui.Controllers
 {

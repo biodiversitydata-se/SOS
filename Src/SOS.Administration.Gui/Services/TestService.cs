@@ -1,7 +1,5 @@
 ﻿using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +8,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json;
-using SOS.Observations.Api.Dtos.Enum;
 using Microsoft.Extensions.Options;
+using SOS.Administration.Gui.Dtos;
+using SOS.Administration.Gui.Dtos.Enum;
 
 namespace SOS.Administration.Gui.Services
 {

@@ -1,17 +1,14 @@
 ﻿using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
+using SOS.Administration.Gui.Dtos;
 
 namespace SOS.Administration.Gui.Services
 {
-
-
     public class SearchService : ISearchService
     {
 
