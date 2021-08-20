@@ -12,7 +12,8 @@ namespace SOS.Lib.Helpers.Interfaces
         /// </summary>
         /// <param name="object"></param>
         /// <param name="prefix"></param>
+        /// <param name="valuesAsString"></param>
         /// <returns></returns>
-        IDictionary<string, string> Execute(object @object, string prefix = "");
+        IDictionary<string, object> Execute(object @object, string prefix = "", bool valuesAsString = false);
     }
 }

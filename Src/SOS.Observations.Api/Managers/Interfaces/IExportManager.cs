@@ -16,11 +16,15 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="exportFormat"></param>
         /// <param name="exportPath"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut">Only applicable when GeoJson is selected as export format</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<string> CreateExportFileAsync(SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
+            string culture,
+            bool flatOut,
             IJobCancellationToken cancellationToken);
     }
 }

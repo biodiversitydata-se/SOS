@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.GeoJson.Interfaces;
-using SOS.Lib.Constants;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -46,7 +45,8 @@ namespace SOS.Lib.IO.Excel
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath, string fileName,
+        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath, 
+            string fileName, string culture, bool flatOut,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
@@ -58,7 +58,7 @@ namespace SOS.Lib.IO.Excel
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, $"{fileName}.geojson"));
+                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "Observations.geojson"));
                 await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
 
                 await streamWriter.WriteAsync("{\"type\":\"FeatureCollection\", \"crs\":\"EPSG:4326\", \"features\":[");
@@ -74,7 +74,7 @@ namespace SOS.Lib.IO.Excel
                     var processedObservations = scrollResult.Records.ToArray();
                     
                     // Convert observations to DwC format.
-                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                     var numberFormatInfo = new NumberFormatInfo {CurrencyDecimalSeparator = "."};
                     var firstFeature = true;
                     // Write occurrence rows to CSV file.
@@ -100,6 +100,15 @@ namespace SOS.Lib.IO.Excel
 
                                 // Split property parts to array
                                 var propertyParts = objectProperty.Key.Split('.');
+
+                                if (flatOut)
+                                {
+                                    // Join property parts in camel case
+                                    var propertyName = string.Join('.', propertyParts.Select(pp => pp.ToCamelCase()));
+                                    await streamWriter.WriteAsync($"{(firstProperty ? "" : ",")} \"{propertyName}\": \"{objectProperty.Value}\"");
+                                    firstProperty = false;
+                                    continue;
+                                }
 
                                 // Check if we have any open sub objects that should be closed
                                 for (var i = 0; i < prevPropertyParts.Length -1; i++)

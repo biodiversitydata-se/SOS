@@ -12,12 +12,14 @@ namespace SOS.Lib.Jobs.Export
     public interface IExportAndSendJob
     {
         /// <summary>
-        ///  Run export job
+        /// Run export job
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="email"></param>
         /// <param name="description"></param>
         /// <param name="exportFormat"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
@@ -25,6 +27,8 @@ namespace SOS.Lib.Jobs.Export
             string email, 
             string description,
             ExportFormat exportFormat,
+            string culture,
+            bool flatOut,
             IJobCancellationToken cancellationToken);
     }
 }

@@ -15,24 +15,19 @@ namespace SOS.Lib.Extensions
             return type.IsValueType || type == typeof(string);
         }
 
-        public static string ToStringValueType(this object value)
+        public static object GetValue(this object value, bool asString)
         {
             return value switch
             {
-                DateTime dateTime => dateTime.ToString("o"),
-                bool boolean => boolean.ToStringLowerCase(),
-                _ => value.ToString()
+                DateTime dateTime => asString ? dateTime.ToLocalTime().ToString("yyyy-MM-dd hh:mm") : dateTime.ToLocalTime(),
+                bool boolean => asString ? boolean.ToString().ToLower() : value,
+                _ => value
             };
         }
 
         public static bool IsIEnumerable(this Type type)
         {
             return type.IsAssignableTo(typeof(IEnumerable));
-        }
-
-        public static string ToStringLowerCase(this bool boolean)
-        {
-            return boolean ? "true" : "false";
         }
 
         /// <summary>

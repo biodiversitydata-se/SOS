@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
@@ -50,30 +51,91 @@ namespace SOS.Observations.Api.Controllers
 
             var outputFields = new List<string>
             {
-                "datasetName",
-                "event.startDate",
-                "event.endDate",
-                "identification.validated",
-                "location.decimalLongitude",
-                "location.decimalLatitude",
-                "occurrence.occurrenceId",
-                "occurrence.reportedBy",
-                "taxon.id",
-                "taxon.scientificName",
-                "taxon.vernacularName"
+                "DatasetName",
+                "Identification.Validated",
+                "Identification.UncertainIdentification",
+                "Location.County.Name",
+                "Location.Municipality.Name",
+                "Location.DecimalLongitude",
+                "Location.DecimalLatitude",
+                "Location.CoordinateUncertaintyInMeters",
+                "Occurrence.OccurrenceStatus.Value",
+                "Occurrence.RecordedBy",
+                "Taxon.Attributes.OrganismGroup",
+                "Taxon.ScientificName",
+                "Taxon.VernacularName"
             };
 
             if (exportPropertySet == ExportPropertySet.Extended)
             {
-                outputFields.Add("location.county");
-                outputFields.Add("location.locality");
-                outputFields.Add("location.municipality");
-                outputFields.Add("location.province");
-                outputFields.Add("location.parish");
-                outputFields.Add("taxon.kingdom");
-                outputFields.Add("taxon.organismGroup");
-                outputFields.Add("taxon.redlistCategory");
+                outputFields.AddRange(new []
+                {
+                    "CollectionCode",
+                    "InstitutionCode",
+                    "OwnerInstitutionCode",
+                    "BasisOfRecord",
+                    "Event.Habitat",
+                    "Event.EventRemarks",
+                    "Event.SamplingEffort",
+                    "Event.SamplingProtocol",
+                    "Event.SampleSizeUnit",
+                    "Event.SampleSizeValue",
+                    "Location.Locality",
+                    "Location.Province.Name",
+                    "Location.Parish.Name",
+                    "Location.GeodeticDatum",
+                    "Occurrence.ReportedBy",
+                    "Occurrence.Url",
+                    "Occurrence.AssociatedMedia",
+                    "Occurrence.OccurrenceRemarks",
+                    "Occurrence.Activity.Value",
+                    "Occurrence.Behavior.Value",
+                    "Occurrence.LifeStage.Value",
+                    "Occurrence.ReproductiveCondition.Value",
+                    "Occurrence.Sex.Value",
+                    "Occurrence.Biotope.Value",
+                    "Occurrence.BiotopeDescription",
+                    "Occurrence.ProtectionLevel",
+                    "Occurrence.IsNeverFoundObservation",
+                    "Occurrence.IsNotRediscoveredObservation",
+                    "Occurrence.IsNaturalOccurrence",
+                    "Occurrence.IsPositiveObservation",
+                    "Occurrence.Substrate.Name.Value",
+                    "Occurrence.individualCount",
+                    "Occurrence.OrganismQuantity",
+                    "Occurrence.OrganismQuantityInt",
+                    "Occurrence.OrganismQuantityUnit",
+                    "Identification.ValidationStatus",
+                    "Identification.ConfirmedBy",
+                    "Identification.IdentifiedBy",
+                    "Identification.VerifiedBy",
+                    "Identification.DeterminationMethod.Value",
+                    "Taxon.Kingdom",
+                    "Taxon.Phylum",
+                    "Taxon.Class",
+                    "Taxon.Order",
+                    "Taxon.Family",
+                    "Taxon.Genus",
+                    "Taxon.TaxonId",
+                    "Taxon.Attributes.DyntaxaTaxonId",
+                    "Taxon.Attributes.ProtectionLevel.Value",
+                    "Taxon.Attributes.RedlistCategory",
+                    "Taxon.Attributes.ProtectedByLaw",
+                    "Project.Id",
+                    "Project.Name"
+                });
             }
+
+            // Order fields by name
+            outputFields = outputFields.OrderBy(s => s).ToList();
+
+            // Make sure some selected fields occurs first
+            outputFields.InsertRange(0, new []
+            {
+                "Occurrence.OccurrenceId",
+                "Event.StartDate",
+                "Event.EndDate"
+            });
 
             filter.OutputFields = outputFields;
         }
@@ -226,7 +288,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.DwC, _exportPath,
+                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.DwC, _exportPath, Cultures.en_GB, false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_DwC.zip");
             }
@@ -245,7 +307,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] ExportPropertySet exportPropertySet)
+        public async Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture)
         {
             var filePath = string.Empty;
             try
@@ -261,7 +323,9 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, _exportPath,
+                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
+                        _exportPath, culture,
+                        false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_Excel.zip");
             }
@@ -280,7 +344,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter, [FromQuery] ExportPropertySet exportPropertySet)
+        public async Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter, 
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture, [FromQuery] bool flatOut)
         {
             var filePath = string.Empty;
             try
@@ -296,7 +361,8 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.GeoJson, _exportPath,
+                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.GeoJson, 
+                        _exportPath, culture, flatOut,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_GeoJson.zip");
             }
@@ -332,7 +398,7 @@ namespace SOS.Observations.Api.Controllers
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -348,7 +414,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> OrderExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, [FromQuery] ExportPropertySet exportPropertySet)
+        public async Task<IActionResult> OrderExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture)
         {
             try
             {
@@ -363,7 +430,7 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, culture, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -379,7 +446,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> OrderGeoJsonAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, [FromQuery] ExportPropertySet exportPropertySet)
+        public async Task<IActionResult> OrderGeoJsonAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture, [FromQuery] bool flatOut)
         {
             try
             {
@@ -394,7 +462,7 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, culture, flatOut, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

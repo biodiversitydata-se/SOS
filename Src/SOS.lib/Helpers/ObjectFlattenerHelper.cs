@@ -15,12 +15,13 @@ namespace SOS.Lib.Helpers
     {
         private static readonly ConcurrentDictionary<Type, Dictionary<PropertyInfo, Func<object, object>>> CachedProperties;
 
-        private static Dictionary<string, string> ExecuteInternal(
+        private static Dictionary<string, object> ExecuteInternal(
             object @object,
-            Dictionary<string, string> dictionary = default,
-            string prefix = "")
+            Dictionary<string, object> dictionary = default,
+            string prefix = "",
+            bool valuesAsString = false)
         {
-            dictionary ??= new Dictionary<string, string>();
+            dictionary ??= new Dictionary<string, object>();
             var type = @object.GetType();
             var properties = GetProperties(type);
 
@@ -37,7 +38,7 @@ namespace SOS.Lib.Helpers
 
                 if (property.PropertyType.IsValueTypeOrString())
                 {
-                    dictionary.Add(key, value.ToStringValueType());
+                    dictionary.Add(key, value.GetValue(valuesAsString));
                 }
                 else
                 {
@@ -50,17 +51,17 @@ namespace SOS.Lib.Helpers
                             var itemType = item.GetType();
                             if (itemType.IsValueTypeOrString())
                             {
-                                dictionary.Add(itemKey, item.ToStringValueType());
+                                dictionary.Add(itemKey, item.GetValue(valuesAsString));
                             }
                             else
                             {
-                                ExecuteInternal(item, dictionary, itemKey);
+                                ExecuteInternal(item, dictionary, itemKey, valuesAsString);
                             }
                         }
                     }
                     else
                     {
-                        ExecuteInternal(value, dictionary, key);
+                        ExecuteInternal(value, dictionary, key, valuesAsString);
                     }
                 }
             }
@@ -135,9 +136,9 @@ namespace SOS.Lib.Helpers
         }
 
         /// <inheritdoc />
-        public IDictionary<string, string> Execute(object @object, string prefix = "")
+        public IDictionary<string, object> Execute(object @object, string prefix = "", bool valuesAsString = false)
         {
-            return ExecuteInternal(@object, prefix: prefix);
+            return ExecuteInternal(@object, prefix: prefix, valuesAsString: valuesAsString);
         }
     }
 }

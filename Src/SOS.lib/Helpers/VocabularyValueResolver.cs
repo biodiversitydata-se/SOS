@@ -42,6 +42,11 @@ namespace SOS.Lib.Helpers
             string cultureCode,
             bool forceResolve = false)
         {
+            if (string.IsNullOrEmpty(cultureCode))
+            {
+                cultureCode = "en-GB";
+            }
+
             if (!forceResolve && !_vocabularyConfiguration.ResolveValues) return;
             var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
 
