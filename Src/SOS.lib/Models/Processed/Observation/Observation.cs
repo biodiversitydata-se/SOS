@@ -324,7 +324,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
-        ///     Projects from Artportalen connected to the observation.
+        ///     Projects from Artportalen associated with the observation.
         /// </summary>
         [Nested]
         public IEnumerable<Project> Projects { get; set; }
