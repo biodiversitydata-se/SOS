@@ -244,12 +244,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Preparations { get; set; }
 
         /// <summary>
-        ///     A list (concatenated and separated) of previous
-        ///     assignments of names to the Occurrence.
-        /// </summary>
-        public string PreviousIdentifications { get; set; }
-
-        /// <summary>
         /// Information about how protected information about a species is in Sweden.
         /// This is a value between 1 to 5.
         /// 1 indicates public access and 5 is the highest used security level.

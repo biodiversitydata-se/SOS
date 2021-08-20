@@ -75,9 +75,11 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filter"></param>
         /// <param name="exportPath"></param>
         /// <param name="fileName"></param>
+        /// <param name="culture"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string exportPath, string fileName,
+        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string exportPath, 
+            string fileName, string culture,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -86,6 +88,7 @@ namespace SOS.Observations.Api.Managers
                     filter, 
                     exportPath,
                     fileName,
+                    culture,
                     cancellationToken);
 
                 return zipFilePath;
@@ -108,10 +111,13 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filter"></param>
         /// <param name="exportPath"></param>
         /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string exportPath, string fileName,
-            IJobCancellationToken cancellationToken)
+        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string exportPath, 
+            string fileName, string culture, bool flatOut,
+            IJobCancellationToken cancellationToken) 
         {
             try
             {
@@ -119,6 +125,8 @@ namespace SOS.Observations.Api.Managers
                    filter,
                    exportPath,
                    fileName,
+                   culture,
+                   flatOut,
                     cancellationToken);
 
                 return zipFilePath;
@@ -174,6 +182,8 @@ namespace SOS.Observations.Api.Managers
         public async Task<string> CreateExportFileAsync(SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
+            string culture,
+            bool flatOut,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -183,8 +193,8 @@ namespace SOS.Observations.Api.Managers
                 var zipFilePath = exportFormat switch
                 {
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken)
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, cancellationToken)
                 };
 
                 // zend file to user

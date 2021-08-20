@@ -142,7 +142,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     "taxon.id",
                     "taxon.scientificName",
                     "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.GeoJson, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.GeoJson, "en-GB", false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -179,7 +179,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         "taxon.id",
                         "taxon.scientificName",
                         "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

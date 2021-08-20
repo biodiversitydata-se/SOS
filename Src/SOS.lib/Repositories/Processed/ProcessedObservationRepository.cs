@@ -291,15 +291,13 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private string GetCurrentIndex(FilterBase filter)
         {
-            if (filter == null || !filter.ProtectedObservations)
+            if (!filter?.ProtectedObservations ?? true)
             {
                 return PublicIndexName;
             }
 
-            if (_httpContextAccessor?.HttpContext?.User?.Claims?.Count(c =>
-                (c.Type?.Equals("scope", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
-                (c.Value?.Equals(_elasticConfiguration.ProtectedScope, StringComparison.CurrentCultureIgnoreCase) ?? false)) == 0 
-                || (!filter.ExtendedAuthorizations?.Any() ?? true))
+            if (!_httpContextAccessor?.HttpContext?.User?.IsAuthorized(_elasticConfiguration.ProtectedScope,
+                filter.ExtendedAuthorizations) ?? true)
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }

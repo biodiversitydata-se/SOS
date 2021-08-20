@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using SOS.Lib.IO.Excel.Interfaces;
-using SOS.Lib.Constants;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Search;
@@ -37,14 +38,19 @@ namespace SOS.Lib.IO.Excel
 
             foreach (var propertyIndex in propertyIndexes)
             {
-                sheet.Cells[1, propertyIndex.Value].Value = propertyIndex.Key;
+                sheet.Cells[1, propertyIndex.Value].Value = propertyIndex.Key.Replace(".Value", "", StringComparison.CurrentCultureIgnoreCase);
+                sheet.Cells[1, propertyIndex.Value].Style.Font.Bold = true;
+                sheet.Cells[1, propertyIndex.Value].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
+                sheet.Cells[1, propertyIndex.Value].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                sheet.Cells[1, propertyIndex.Value].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
+                sheet.Column(propertyIndex.Value).AutoFit();
             }
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedPublicObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
@@ -63,7 +69,8 @@ namespace SOS.Lib.IO.Excel
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath, string fileName,
+        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath, 
+            string fileName, string culture,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
@@ -86,6 +93,17 @@ namespace SOS.Lib.IO.Excel
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
+                // If output fields exists, pre populate property index to get field sorting
+                if (filter.OutputFields?.Any() ?? false)
+                {
+                    var index = 1;
+                    foreach (var outputField in filter.OutputFields)
+                    {
+                        propertyIndexes.Add(outputField, index);
+                        index++;
+                    }
+                }
+
                 while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -94,7 +112,7 @@ namespace SOS.Lib.IO.Excel
                     var processedObservations = scrollResult.Records.ToArray();
 
                     // Convert observations to DwC format.
-                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
 
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)
@@ -115,13 +133,13 @@ namespace SOS.Lib.IO.Excel
 
                             // Create new file
                             fileCount++;
-                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-{fileName}.xlsx"));
+                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx"));
                             package = new ExcelPackage(file);
                             sheet = package.Workbook.Worksheets.Add("Observations");
                             rowIndex = 1;
                         }
 
-                        var objectProperties = objectFlattenerHelper.Execute(observation);
+                        var objectProperties = objectFlattenerHelper.Execute(observation, string.Empty, true);
                         if (objectProperties?.Any() ?? false)
                         {
                             foreach (var objectProperty in objectProperties.OrderBy(p => p.Key))

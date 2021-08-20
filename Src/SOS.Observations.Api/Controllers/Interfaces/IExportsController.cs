@@ -21,25 +21,28 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadDwCAsync([FromBody] ExportFilterDto filter);
+        Task<IActionResult> DownloadDwCAsync(ExportFilterDto filter);
 
         /// <summary>
-        /// Download Excel export file
+        ///  Download Excel export file
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="exportPropertySet"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter,
-            [FromQuery] ExportPropertySet exportPropertySet);
+        Task<IActionResult> DownloadExcelAsync(ExportFilterDto filter,
+            ExportPropertySet exportPropertySet, string culture);
 
         /// <summary>
         /// Download GeoJson export file 
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="exportPropertySet"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter,
-            [FromQuery] ExportPropertySet exportPropertySet);
+        Task<IActionResult> DownloadGeoJsonAsync(ExportFilterDto filter,
+           ExportPropertySet exportPropertySet, string culture, bool flatOut);
 
         /// <summary>
         /// Starts the process of creating a DwC-A file with observations based on provided filter.
@@ -52,16 +55,17 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> OrderDwCAsync(ExportFilterDto filter, string description);
 
         /// <summary>
-        /// Starts the process of creating a Excel file with observations based on provided filter.
+        ///  Starts the process of creating a Excel file with observations based on provided filter.
         /// When the file is ready, you will receive an email containing a download link.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
         Task<IActionResult> OrderExcelAsync(ExportFilterDto filter, string description,
-            ExportPropertySet exportPropertySet);
+            ExportPropertySet exportPropertySet, string culture);
 
         /// <summary>
         /// Starts the process of creating a GeoJson file with observations based on provided filter.
@@ -71,8 +75,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
+        /// <param name="culture"></param>
+        /// <param name="flatOut"></param>
         /// <returns></returns>
         Task<IActionResult> OrderGeoJsonAsync(ExportFilterDto filter, string description,
-            ExportPropertySet exportPropertySet);
+            ExportPropertySet exportPropertySet, string culture, bool flatOut);
     }
 }
