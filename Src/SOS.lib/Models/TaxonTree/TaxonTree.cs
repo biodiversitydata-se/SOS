@@ -45,7 +45,9 @@ namespace SOS.Lib.Models.TaxonTree
                 underlyingTaxonIds.Add(treeNode.TaxonId);
             }
 
-            return underlyingTaxonIds;
+            // If we don't find any taxa, return input list. Will result in no hits, since taxon id/s is wrong
+            // If we don't do this. Taxon id's will not be used in query and all observations matching the other criteria (if any) will be returned
+            return underlyingTaxonIds.Any() ? underlyingTaxonIds : taxonIds;
         }
 
         /// <summary>
