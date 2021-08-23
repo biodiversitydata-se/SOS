@@ -7,6 +7,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Managers
@@ -32,17 +33,15 @@ namespace SOS.Lib.Managers
         /// <summary>
         /// Add extended authorization if any
         /// </summary>
+        /// <param name="user"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="authorityIdentity"></param>
         /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(UserModel user, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
-            // Get user
-            var user = await _userService.GetUserAsync();
-
             if (user == null)
             {
                 return null;
@@ -294,27 +293,35 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
-            if (filter.ProtectedObservations)
+            if (filter.ProtectedObservations || filter.ObservedByMe || filter.ReportedByMe)
             {
-                filter.ExtendedAuthorizations = await AddAuthorizationAsync(authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                // Get user
+                var user = await _userService.GetUserAsync();
 
-                // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
-                if (filter is SearchFilter searchFilter)
+                filter.UserId = user?.Id ?? 0;
+
+                if (filter.ProtectedObservations)
                 {
-                    if ((searchFilter.OutputFields?.Any() ?? false) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                    filter.ExtendedAuthorizations = await AddAuthorizationAsync(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+
+                    // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
+                    if (filter is SearchFilter searchFilter)
                     {
-                        searchFilter.OutputFields.Add("occurrence.occurrenceId");
+                        if ((searchFilter.OutputFields?.Any() ?? false) &&
+                            !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                            !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            searchFilter.OutputFields.Add("occurrence.occurrenceId");
+                        }
                     }
-                }
-                if (filter is SearchFilterInternal searchFilterInternal)
-                {
-                    if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
-                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                    if (filter is SearchFilterInternal searchFilterInternal)
                     {
-                        searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
+                        if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
+                            !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                            !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
+                        }
                     }
                 }
             }

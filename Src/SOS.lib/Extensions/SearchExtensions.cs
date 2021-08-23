@@ -619,6 +619,28 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Try to add nested term criteria
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="nestedPath"></param>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        private static void TryAddNestedTermCriteria<T>(this
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath, string field, T value)
+        {
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(nestedPath)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(field)
+                            .Value(value)
+                        )
+                    )));
+        }
+
+        /// <summary>
         /// Try to add nested terms criteria
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -1081,6 +1103,17 @@ namespace SOS.Lib.Extensions
             query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);
+
+            if (filter.ObservedByMe && filter.UserId > 0)
+            {
+                query.TryAddTermCriteria("artportalenInternal.reportedByUserId", filter.UserId);
+            }
+
+            if (filter.ReportedByMe && filter.UserId > 0)
+            {
+                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.id", filter.UserId);
+                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
+            }
 
             if (filter is SearchFilterInternal)
             {

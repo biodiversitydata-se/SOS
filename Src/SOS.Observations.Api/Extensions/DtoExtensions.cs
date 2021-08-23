@@ -9,7 +9,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
-using Topshelf.Hosts;
 
 namespace SOS.Observations.Api.Extensions
 {
@@ -46,7 +45,9 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = searchFilterBaseDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
                 };
-            
+            filter.ObservedByMe = searchFilterBaseDto.ObservedByMe;
+            filter.ReportedByMe = searchFilterBaseDto.ReportedByMe;
+
             if (searchFilterBaseDto.OccurrenceStatus != null)
             {
                 switch (searchFilterBaseDto.OccurrenceStatus)
