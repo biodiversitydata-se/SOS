@@ -97,6 +97,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<UserInternal> OccurrenceRecordedByInternal { get; set; }
 
         /// <summary>
+        /// Info about users verifying the observation
+        /// </summary>
+        [Nested]
+        public IEnumerable<UserInternal> OccurrenceVerifiedByInternal { get; set; }
+
+        /// <summary>
         ///     The original presentation name for ParisRegion from data provider.
         /// </summary>
         public string LocationPresentationNameParishRegion { get; set; }

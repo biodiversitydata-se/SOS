@@ -206,10 +206,10 @@ namespace SOS.Import.Factories
             {
                 var persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId))
                     .OrderBy(ob => ob.Sort)
-                    .Select(v => personsByUserId[v.UserId]);
-                var observers = string.Join(", ", persons.Select(n => n.FullName)).WithMaxLength(256);
+                    .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0 ));
+                var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
-                    (observers, persons.Select(g => new UserInternal {Id = g.Id, UserAlias = g.Alias})));
+                    (observers, persons.Select(g => new UserInternal {Id = g.person.Id, UserAlias = g.person.Alias, ViewAccess = g.viewAccess })));
             }
 
             return observersBySightingId;

@@ -273,11 +273,11 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
-                obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
+                obs.ArtportalenInternal.OccurrenceVerifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
                 obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.URL;
 

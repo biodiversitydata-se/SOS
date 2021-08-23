@@ -88,5 +88,15 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// Filter by uncertain determination
         /// </summary>
         public SightingDeterminationFilterDto DeterminationFilter { get; set; }
+
+        /// <summary>
+        /// Only get observations observed by me
+        /// </summary>
+        public bool ObservedByMe { get; set; }
+
+        /// <summary>
+        /// Only get observations reported by me
+        /// </summary>
+        public bool ReportedByMe { get; set; }
     }
 }
