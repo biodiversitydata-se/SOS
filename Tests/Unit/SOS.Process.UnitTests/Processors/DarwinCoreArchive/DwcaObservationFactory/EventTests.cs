@@ -42,5 +42,56 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18,8,13,26), DateTimeKind.Utc));
         }
 
+        [Fact]
+        public void EventDate_with_time_interval_is_parsed_correct()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithEventDate("2010-06-13")
+                .WithEventTime("12:50:00+02/13:35:00+02")
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2010, 6, 13, 12, 50, 0), DateTimeKind.Utc)
+                .Subtract(TimeSpan.FromHours(2)));
+            result.Event.EndDate.Should().Be(DateTime.SpecifyKind(new DateTime(2010, 6, 13, 13, 35, 0), DateTimeKind.Utc)
+                .Subtract(TimeSpan.FromHours(2)));
+        }
+
+        [Fact]
+        public void EventDate_with_time_is_parsed_correct()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithEventDate("2014-04-24")
+                .WithEventTime("14:30:00+02")
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2014, 4, 24, 14, 30, 0), DateTimeKind.Utc)
+                .Subtract(TimeSpan.FromHours(2)));
+        }
     }
 }
