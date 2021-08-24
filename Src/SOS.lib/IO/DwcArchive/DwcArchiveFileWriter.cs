@@ -22,6 +22,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Factories;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -160,10 +161,11 @@ namespace SOS.Lib.IO.DwcArchive
                 var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
                 if (emlFile == null)
                 {
-                    _logger.LogWarning($"No eml found for provider: {dataProvider.Identifier}");
+                    throw new Exception($"No eml found for provider: {dataProvider.Identifier}");
                 }
                 else
                 {
+                    DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                     await using var fileStream = File.Create(emlXmlFilePath);
                     await emlFile.SaveAsync(fileStream, SaveOptions.None, CancellationToken.None);
                 }
@@ -373,6 +375,7 @@ namespace SOS.Lib.IO.DwcArchive
             else
             {
                 // Create eml.xml
+                DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                 compressedFileStream.PutNextEntry("eml.xml");
                 await emlFile.SaveAsync(compressedFileStream, SaveOptions.None, CancellationToken.None);
             }
