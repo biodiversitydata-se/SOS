@@ -92,5 +92,10 @@ namespace SOS.Lib.Models.DarwinCore
         ///     Comments or notes accompanying the MeasurementOrFact.
         /// </summary>
         public string MeasurementRemarks { get; set; }
+
+        /// <summary>
+        /// The event id.
+        /// </summary>
+        public string EventId { get; set; }
     }
 }

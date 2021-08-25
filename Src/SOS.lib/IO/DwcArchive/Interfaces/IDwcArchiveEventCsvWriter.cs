@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using NReco.Csv;
 using SOS.Export.Models;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
@@ -10,39 +9,43 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
 {
-    public interface IExtendedMeasurementOrFactCsvWriter
+    public interface IDwcArchiveEventCsvWriter
     {
         /// <summary>
-        /// Create a Emof CSV file.
+        ///     Creates a DwC occurrence CSV file.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
-        /// <param name="processedObservationRepository"></param>
+        /// <param name="processedPublicObservationRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
+        Task<bool> CreateEventCsvFileAsync(
+            FilterBase filter,
+            Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Create a headerless Emof CSV file.
+        /// Write Occurrence CSV file without headers using the stream writer.
         /// </summary>
-        /// <param name="emofRows"></param>
+        /// <param name="dwcObservations"></param>
         /// <param name="streamWriter"></param>
-        /// <param name="writeEventId"></param>
+        /// <param name="fieldDescriptions"></param>
         /// <returns></returns>
-        Task WriteHeaderlessEmofCsvFileAsync(
-            IEnumerable<ExtendedMeasurementOrFactRow> emofRows,
+        Task WriteHeaderlessEventCsvFileAsync(
+            IEnumerable<DarwinCore> dwcObservations,
             StreamWriter streamWriter,
-            bool writeEventId = false);
+            IEnumerable<FieldDescription> fieldDescriptions);
 
         /// <summary>
-        /// Write Emof header row.
+        /// Write Occurrence CSV header row.
         /// </summary>
         /// <param name="csvWriter"></param>
-        /// <param name="isEventCore"></param>
-        void WriteHeaderRow(CsvWriter csvWriter, bool isEventCore = false);
+        /// <param name="fieldDescriptions"></param>
+        void WriteHeaderRow(
+            NReco.Csv.CsvWriter csvWriter,
+            IEnumerable<FieldDescription> fieldDescriptions);
     }
 }
