@@ -85,8 +85,9 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         public async Task WriteHeaderlessEmofCsvFileAsync(
-            IEnumerable<ExtendedMeasurementOrFactRow> emofRows, 
-            StreamWriter streamWriter)
+            IEnumerable<ExtendedMeasurementOrFactRow> emofRows,
+            StreamWriter streamWriter,
+            bool writeEventId = false)
         {
             try
             {
@@ -100,7 +101,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write Emof rows to CSV file.
                 foreach (var emofRow in emofRows)
                 {
-                    WriteEmofRow(csvWriter, emofRow);
+                    WriteEmofRow(csvWriter, emofRow, writeEventId);
                 }
 
                 await streamWriter.FlushAsync();
@@ -113,8 +114,12 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter)
+        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, bool isEventCore = false)
         {
+            if (isEventCore)
+            {
+                csvWriter.WriteField("id");
+            }
             var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create();
             foreach (var emofField in emofExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
@@ -129,16 +134,19 @@ namespace SOS.Lib.IO.DwcArchive
         /// </summary>
         /// <param name="csvWriter"></param>
         /// <param name="emofRow"></param>
+        /// <param name="writeEventId"></param>
         /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
         private static void WriteEmofRow(
             NReco.Csv.CsvWriter csvWriter,
-            ExtendedMeasurementOrFactRow emofRow)
+            ExtendedMeasurementOrFactRow emofRow,
+            bool writeEventId = false)
         {
             if (emofRow == null)
             {
                 return;
             }
 
+            if (writeEventId) csvWriter.WriteField(emofRow.EventId);
             csvWriter.WriteField(emofRow.OccurrenceID);
             csvWriter.WriteField(emofRow.MeasurementID);
             csvWriter.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());

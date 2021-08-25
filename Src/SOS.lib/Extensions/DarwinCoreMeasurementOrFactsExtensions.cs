@@ -85,13 +85,13 @@ namespace SOS.Lib.Extensions
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            IEnumerable<Observation> processedObservations)
+            IEnumerable<Observation> processedObservations, bool eventCore = false)
         {
-            return processedObservations?.SelectMany(ToExtendedMeasurementOrFactRows);
+            return processedObservations?.SelectMany(m => m.ToExtendedMeasurementOrFactRows(eventCore));
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            Observation observation)
+            Observation observation, bool eventCore = false)
         {
             if (observation == null)
             {
@@ -101,12 +101,19 @@ namespace SOS.Lib.Extensions
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
             if (observation.MeasurementOrFacts != null)
             {
-                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow());
+                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence.OccurrenceId));
             }
 
             if (observation.Event?.MeasurementOrFacts != null)
             {
-                eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Event.EventId));
+                if (eventCore)
+                {
+                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(m.OccurrenceID, observation.Event.EventId));
+                }
+                else
+                {
+                    eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Occurrence?.OccurrenceId, observation.Event.EventId));
+                }
             }
 
             return (occurrenceEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>())
@@ -178,7 +185,7 @@ namespace SOS.Lib.Extensions
         }
 
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
-            this ExtendedMeasurementOrFact processedEmof, string eventId = null)
+            this ExtendedMeasurementOrFact processedEmof, string occurrenceId, string eventId = null)
         {
             return new ExtendedMeasurementOrFactRow
             {
@@ -194,7 +201,9 @@ namespace SOS.Lib.Extensions
                 MeasurementUnitID = processedEmof.MeasurementUnitID,
                 MeasurementValue = processedEmof.MeasurementValue,
                 MeasurementValueID = processedEmof.MeasurementValueID,
-                OccurrenceID = processedEmof.OccurrenceID
+                OccurrenceID = occurrenceId,
+                //OccurrenceID = processedEmof.OccurrenceID,
+                EventId = eventId
             };
         }
     }

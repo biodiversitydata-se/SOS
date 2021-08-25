@@ -13,7 +13,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 namespace SOS.Lib.Repositories.Verbatim
 {
     /// <summary>
-    ///     Clam verbatim repository
+    ///     Darwin core occurrence verbatim repository
     /// </summary>
     public class DarwinCoreArchiveVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, int>,
         IDarwinCoreArchiveVerbatimRepository

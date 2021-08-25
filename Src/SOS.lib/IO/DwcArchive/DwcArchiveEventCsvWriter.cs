@@ -23,20 +23,20 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.IO.DwcArchive
 {
-    public class DwcArchiveOccurrenceCsvWriter : IDwcArchiveOccurrenceCsvWriter
+    public class DwcArchiveEventCsvWriter : IDwcArchiveEventCsvWriter
     {
-        private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
+        private readonly ILogger<DwcArchiveEventCsvWriter> _logger;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
 
-        public DwcArchiveOccurrenceCsvWriter(
+        public DwcArchiveEventCsvWriter(
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<DwcArchiveOccurrenceCsvWriter> logger)
+            ILogger<DwcArchiveEventCsvWriter> logger)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<bool> CreateOccurrenceCsvFileAsync(
+        public async Task<bool> CreateEventCsvFileAsync(
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
@@ -76,7 +76,7 @@ namespace SOS.Lib.IO.DwcArchive
                     csvWritingStopwatch.Start();
                     foreach (var dwcObservation in dwcObservations)
                     {
-                        WriteOccurrenceRow(csvWriter, dwcObservation, fieldsToWriteArray);
+                        WriteEventRow(csvWriter, dwcObservation, fieldsToWriteArray);
                     }
                     await streamWriter.FlushAsync();
                     csvWritingStopwatch.Stop();
@@ -93,7 +93,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation($"{nameof(WriteHeaderlessOccurrenceCsvFileAsync)} was canceled.");
+                _logger.LogInformation($"{nameof(WriteHeaderlessEventCsvFileAsync)} was canceled.");
                 throw;
             }
             catch (Exception e)
@@ -103,22 +103,29 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        /// <summary>
-        /// Write occurrence record to CSV file.
-        /// </summary>
-        /// <param name="csvWriter"></param>
-        /// <param name="dwcObservation"></param>
-        /// <param name="writeField"></param>
-        /// <param name="isEventCore"></param>
-        /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
-        private static void WriteOccurrenceRow(
-            NReco.Csv.CsvWriter csvWriter,
-            DarwinCore dwcObservation,
-            bool[] writeField,
-            bool isEventCore = false)
+        private static void WriteEventRow(
+                    NReco.Csv.CsvWriter csvWriter,
+                    DarwinCore dwcObservation,
+                    bool[] writeField)
         {
-            if (isEventCore) WriteField(csvWriter, dwcObservation.Event.EventID);
-            if (writeField[(int)FieldDescriptionId.OccurrenceID]) WriteField(csvWriter, dwcObservation.Occurrence.OccurrenceID);
+            if (writeField[(int)FieldDescriptionId.EventID]) WriteField(csvWriter, dwcObservation.Event.EventID);
+            if (writeField[(int)FieldDescriptionId.ParentEventID]) WriteField(csvWriter, dwcObservation.Event.ParentEventID);
+            if (writeField[(int)FieldDescriptionId.EventDate]) WriteField(csvWriter, dwcObservation.Event.EventDate);
+            if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) WriteField(csvWriter, dwcObservation.Event.VerbatimEventDate);
+            if (writeField[(int)FieldDescriptionId.EventTime]) WriteField(csvWriter, dwcObservation.Event.EventTime);
+            if (writeField[(int)FieldDescriptionId.EventRemarks]) WriteField(csvWriter, dwcObservation.Event.EventRemarks);
+            if (writeField[(int)FieldDescriptionId.FieldNotes]) WriteField(csvWriter, dwcObservation.Event.FieldNotes);
+            if (writeField[(int)FieldDescriptionId.FieldNumber]) WriteField(csvWriter, dwcObservation.Event.FieldNumber);
+            if (writeField[(int)FieldDescriptionId.Habitat]) WriteField(csvWriter, dwcObservation.Event.Habitat);
+            if (writeField[(int)FieldDescriptionId.SampleSizeValue]) WriteField(csvWriter, dwcObservation.Event.SampleSizeValue);
+            if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) WriteField(csvWriter, dwcObservation.Event.SampleSizeUnit);
+            if (writeField[(int)FieldDescriptionId.SamplingEffort]) WriteField(csvWriter, dwcObservation.Event.SamplingEffort);
+            if (writeField[(int)FieldDescriptionId.SamplingProtocol]) WriteField(csvWriter, dwcObservation.Event.SamplingProtocol);
+            if (writeField[(int)FieldDescriptionId.Day]) WriteField(csvWriter, dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.Month]) WriteField(csvWriter, dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.Year]) WriteField(csvWriter, dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.EndDayOfYear]) WriteField(csvWriter, dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.StartDayOfYear]) WriteField(csvWriter, dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
             if (writeField[(int)FieldDescriptionId.BasisOfRecord]) WriteField(csvWriter, dwcObservation.BasisOfRecord);
             if (writeField[(int)FieldDescriptionId.BibliographicCitation]) WriteField(csvWriter, dwcObservation.BibliographicCitation);
             if (writeField[(int)FieldDescriptionId.CollectionCode]) WriteField(csvWriter, dwcObservation.CollectionCode);
@@ -137,36 +144,6 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.References]) WriteField(csvWriter, dwcObservation.References);
             if (writeField[(int)FieldDescriptionId.RightsHolder]) WriteField(csvWriter, dwcObservation.RightsHolder);
             if (writeField[(int)FieldDescriptionId.Type]) WriteField(csvWriter, dwcObservation.Type);
-            if (writeField[(int)FieldDescriptionId.Day]) WriteField(csvWriter, dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.EndDayOfYear]) WriteField(csvWriter, dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.EventDate]) WriteField(csvWriter, dwcObservation.Event.EventDate);
-            if (!isEventCore)
-            {
-                if (writeField[(int)FieldDescriptionId.EventID]) WriteField(csvWriter, dwcObservation.Event.EventID);
-            }
-            if (writeField[(int)FieldDescriptionId.EventRemarks]) WriteField(csvWriter, dwcObservation.Event.EventRemarks);
-            if (writeField[(int)FieldDescriptionId.EventTime]) WriteField(csvWriter, dwcObservation.Event.EventTime);
-            if (writeField[(int)FieldDescriptionId.FieldNotes]) WriteField(csvWriter, dwcObservation.Event.FieldNotes);
-            if (writeField[(int)FieldDescriptionId.FieldNumber]) WriteField(csvWriter, dwcObservation.Event.FieldNumber);
-            if (writeField[(int)FieldDescriptionId.Habitat]) WriteField(csvWriter, dwcObservation.Event.Habitat);
-            if (writeField[(int)FieldDescriptionId.Month]) WriteField(csvWriter, dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.ParentEventID]) WriteField(csvWriter, dwcObservation.Event.ParentEventID);
-            if (writeField[(int)FieldDescriptionId.SampleSizeValue]) WriteField(csvWriter, dwcObservation.Event.SampleSizeValue);
-            if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) WriteField(csvWriter, dwcObservation.Event.SampleSizeUnit);
-            if (writeField[(int)FieldDescriptionId.SamplingEffort]) WriteField(csvWriter, dwcObservation.Event.SamplingEffort);
-            if (writeField[(int)FieldDescriptionId.SamplingProtocol]) WriteField(csvWriter, dwcObservation.Event.SamplingProtocol);
-            if (writeField[(int)FieldDescriptionId.StartDayOfYear]) WriteField(csvWriter, dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) WriteField(csvWriter, dwcObservation.Event.VerbatimEventDate);
-            if (writeField[(int)FieldDescriptionId.Year]) WriteField(csvWriter, dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.DateIdentified]) WriteField(csvWriter, dwcObservation.Identification.DateIdentified);
-            if (writeField[(int)FieldDescriptionId.IdentificationID]) WriteField(csvWriter, dwcObservation.Identification.IdentificationID);
-            if (writeField[(int)FieldDescriptionId.IdentificationQualifier]) WriteField(csvWriter, dwcObservation.Identification.IdentificationQualifier);
-            if (writeField[(int)FieldDescriptionId.IdentificationReferences]) WriteField(csvWriter, dwcObservation.Identification.IdentificationReferences);
-            if (writeField[(int)FieldDescriptionId.IdentificationRemarks]) WriteField(csvWriter, dwcObservation.Identification.IdentificationRemarks);
-            if (writeField[(int)FieldDescriptionId.IdentificationVerificationStatus]) WriteField(csvWriter, dwcObservation.Identification.IdentificationVerificationStatus);
-            if (writeField[(int)FieldDescriptionId.IdentifiedBy]) WriteField(csvWriter, dwcObservation.Identification.IdentifiedBy);
-            if (writeField[(int)FieldDescriptionId.TypeStatus]) WriteField(csvWriter, dwcObservation.Identification.TypeStatus);
-            if (writeField[(int)FieldDescriptionId.Continent]) WriteField(csvWriter, dwcObservation.Location.Continent);
             if (writeField[(int)FieldDescriptionId.CoordinatePrecision]) WriteField(csvWriter, dwcObservation.Location.CoordinatePrecision);
             if (writeField[(int)FieldDescriptionId.CoordinateUncertaintyInMeters]) WriteField(csvWriter, GetCoordinateUncertaintyInMetersValue(dwcObservation.Location.CoordinateUncertaintyInMeters));
             if (writeField[(int)FieldDescriptionId.Country]) WriteField(csvWriter, dwcObservation.Location.Country);
@@ -186,6 +163,7 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.GeoreferenceVerificationStatus]) WriteField(csvWriter, dwcObservation.Location.GeoreferenceVerificationStatus);
             if (writeField[(int)FieldDescriptionId.HigherGeography]) WriteField(csvWriter, dwcObservation.Location.HigherGeography);
             if (writeField[(int)FieldDescriptionId.HigherGeographyID]) WriteField(csvWriter, dwcObservation.Location.HigherGeographyID);
+            if (writeField[(int)FieldDescriptionId.Continent]) WriteField(csvWriter, dwcObservation.Location.Continent);
             if (writeField[(int)FieldDescriptionId.Island]) WriteField(csvWriter, dwcObservation.Location.Island);
             if (writeField[(int)FieldDescriptionId.IslandGroup]) WriteField(csvWriter, dwcObservation.Location.IslandGroup);
             if (writeField[(int)FieldDescriptionId.Locality]) WriteField(csvWriter, dwcObservation.Location.Locality);
@@ -210,60 +188,6 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.VerbatimLocality]) WriteField(csvWriter, dwcObservation.Location.VerbatimLocality);
             if (writeField[(int)FieldDescriptionId.VerbatimLongitude]) WriteField(csvWriter, dwcObservation.Location.VerbatimLongitude);
             if (writeField[(int)FieldDescriptionId.VerbatimSRS]) WriteField(csvWriter, dwcObservation.Location.VerbatimSRS);
-            if (writeField[(int)FieldDescriptionId.AssociatedMedia]) WriteField(csvWriter, dwcObservation.Occurrence.AssociatedMedia);
-            if (writeField[(int)FieldDescriptionId.AssociatedReferences]) WriteField(csvWriter, dwcObservation.Occurrence.AssociatedReferences);
-            if (writeField[(int)FieldDescriptionId.AssociatedSequences]) WriteField(csvWriter, dwcObservation.Occurrence.AssociatedSequences);
-            if (writeField[(int)FieldDescriptionId.AssociatedTaxa]) WriteField(csvWriter, dwcObservation.Occurrence.AssociatedTaxa);
-            if (writeField[(int)FieldDescriptionId.Behavior]) WriteField(csvWriter, dwcObservation.Occurrence.Behavior);
-            if (writeField[(int)FieldDescriptionId.CatalogNumber]) WriteField(csvWriter, dwcObservation.Occurrence.CatalogNumber);
-            if (writeField[(int)FieldDescriptionId.Disposition]) WriteField(csvWriter, dwcObservation.Occurrence.Disposition);
-            if (writeField[(int)FieldDescriptionId.EstablishmentMeans]) WriteField(csvWriter, dwcObservation.Occurrence.EstablishmentMeans);
-            if (writeField[(int)FieldDescriptionId.IndividualCount]) WriteField(csvWriter, dwcObservation.Occurrence.IndividualCount);
-            if (writeField[(int)FieldDescriptionId.LifeStage]) WriteField(csvWriter, dwcObservation.Occurrence.LifeStage);
-            if (writeField[(int)FieldDescriptionId.AccessRights]) WriteField(csvWriter, dwcObservation.AccessRights);
-            if (writeField[(int)FieldDescriptionId.OccurrenceRemarks]) WriteField(csvWriter, dwcObservation.Occurrence.OccurrenceRemarks);
-            if (writeField[(int)FieldDescriptionId.OccurrenceStatus]) WriteField(csvWriter, dwcObservation.Occurrence.OccurrenceStatus);
-            if (writeField[(int)FieldDescriptionId.OrganismQuantity]) WriteField(csvWriter, dwcObservation.Occurrence.OrganismQuantity);
-            if (writeField[(int)FieldDescriptionId.OrganismQuantityType]) WriteField(csvWriter, dwcObservation.Occurrence.OrganismQuantityType);
-            if (writeField[(int)FieldDescriptionId.OtherCatalogNumbers]) WriteField(csvWriter, dwcObservation.Occurrence.OtherCatalogNumbers);
-            if (writeField[(int)FieldDescriptionId.Preparations]) WriteField(csvWriter, dwcObservation.Occurrence.Preparations);
-            if (writeField[(int)FieldDescriptionId.RecordedBy]) WriteField(csvWriter, dwcObservation.Occurrence.RecordedBy);
-            if (writeField[(int)FieldDescriptionId.RecordNumber]) WriteField(csvWriter, dwcObservation.Occurrence.RecordNumber);
-            if (writeField[(int)FieldDescriptionId.ReproductiveCondition]) WriteField(csvWriter, dwcObservation.Occurrence.ReproductiveCondition);
-            if (writeField[(int)FieldDescriptionId.Sex]) WriteField(csvWriter, dwcObservation.Occurrence.Sex);
-            if (writeField[(int)FieldDescriptionId.AcceptedNameUsage]) WriteField(csvWriter, dwcObservation.Taxon.AcceptedNameUsage);
-            if (writeField[(int)FieldDescriptionId.AcceptedNameUsageID]) WriteField(csvWriter, dwcObservation.Taxon.AcceptedNameUsageID);
-            if (writeField[(int)FieldDescriptionId.Class]) WriteField(csvWriter, dwcObservation.Taxon.Class);
-            if (writeField[(int)FieldDescriptionId.Family]) WriteField(csvWriter, dwcObservation.Taxon.Family);
-            if (writeField[(int)FieldDescriptionId.Genus]) WriteField(csvWriter, dwcObservation.Taxon.Genus);
-            if (writeField[(int)FieldDescriptionId.HigherClassification]) WriteField(csvWriter, dwcObservation.Taxon.HigherClassification);
-            if (writeField[(int)FieldDescriptionId.InfraspecificEpithet]) WriteField(csvWriter, dwcObservation.Taxon.InfraspecificEpithet);
-            if (writeField[(int)FieldDescriptionId.Kingdom]) WriteField(csvWriter, dwcObservation.Taxon.Kingdom);
-            if (writeField[(int)FieldDescriptionId.NameAccordingTo]) WriteField(csvWriter, dwcObservation.Taxon.NameAccordingTo);
-            if (writeField[(int)FieldDescriptionId.NameAccordingToID]) WriteField(csvWriter, dwcObservation.Taxon.NameAccordingToID);
-            if (writeField[(int)FieldDescriptionId.NamePublishedIn]) WriteField(csvWriter, dwcObservation.Taxon.NamePublishedIn);
-            if (writeField[(int)FieldDescriptionId.NamePublishedInID]) WriteField(csvWriter, dwcObservation.Taxon.NamePublishedInID);
-            if (writeField[(int)FieldDescriptionId.NamePublishedInYear]) WriteField(csvWriter, dwcObservation.Taxon.NamePublishedInYear);
-            if (writeField[(int)FieldDescriptionId.NomenclaturalCode]) WriteField(csvWriter, dwcObservation.Taxon.NomenclaturalCode);
-            if (writeField[(int)FieldDescriptionId.NomenclaturalStatus]) WriteField(csvWriter, dwcObservation.Taxon.NomenclaturalStatus);
-            if (writeField[(int)FieldDescriptionId.Order]) WriteField(csvWriter, dwcObservation.Taxon.Order);
-            if (writeField[(int)FieldDescriptionId.OriginalNameUsage]) WriteField(csvWriter, dwcObservation.Taxon.OriginalNameUsage);
-            if (writeField[(int)FieldDescriptionId.OriginalNameUsageID]) WriteField(csvWriter, dwcObservation.Taxon.OriginalNameUsageID);
-            if (writeField[(int)FieldDescriptionId.ParentNameUsage]) WriteField(csvWriter, dwcObservation.Taxon.ParentNameUsage);
-            if (writeField[(int)FieldDescriptionId.ParentNameUsageID]) WriteField(csvWriter, dwcObservation.Taxon.ParentNameUsageID);
-            if (writeField[(int)FieldDescriptionId.Phylum]) WriteField(csvWriter, dwcObservation.Taxon.Phylum);
-            if (writeField[(int)FieldDescriptionId.ScientificName]) WriteField(csvWriter, dwcObservation.Taxon.ScientificName);
-            if (writeField[(int)FieldDescriptionId.ScientificNameAuthorship]) WriteField(csvWriter, dwcObservation.Taxon.ScientificNameAuthorship);
-            if (writeField[(int)FieldDescriptionId.ScientificNameID]) WriteField(csvWriter, dwcObservation.Taxon.ScientificNameID);
-            if (writeField[(int)FieldDescriptionId.SpecificEpithet]) WriteField(csvWriter, dwcObservation.Taxon.SpecificEpithet);
-            if (writeField[(int)FieldDescriptionId.Subgenus]) WriteField(csvWriter, dwcObservation.Taxon.Subgenus);
-            if (writeField[(int)FieldDescriptionId.TaxonConceptID]) WriteField(csvWriter, dwcObservation.Taxon.TaxonConceptID);
-            if (writeField[(int)FieldDescriptionId.TaxonID]) WriteField(csvWriter, dwcObservation.Taxon.TaxonID);
-            if (writeField[(int)FieldDescriptionId.TaxonomicStatus]) WriteField(csvWriter, dwcObservation.Taxon.TaxonomicStatus);
-            if (writeField[(int)FieldDescriptionId.TaxonRank]) WriteField(csvWriter, dwcObservation.Taxon.TaxonRank);
-            if (writeField[(int)FieldDescriptionId.TaxonRemarks]) WriteField(csvWriter, dwcObservation.Taxon.TaxonRemarks);
-            if (writeField[(int)FieldDescriptionId.VerbatimTaxonRank]) WriteField(csvWriter, dwcObservation.Taxon.VerbatimTaxonRank);
-            if (writeField[(int)FieldDescriptionId.VernacularName]) WriteField(csvWriter, dwcObservation.Taxon.VernacularName);
             if (writeField[(int)FieldDescriptionId.Bed]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Bed);
             if (writeField[(int)FieldDescriptionId.EarliestAgeOrLowestStage]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestAgeOrLowestStage);
             if (writeField[(int)FieldDescriptionId.EarliestEonOrLowestEonothem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestEonOrLowestEonothem);
@@ -282,10 +206,10 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.LithostratigraphicTerms]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LithostratigraphicTerms);
             if (writeField[(int)FieldDescriptionId.LowestBiostratigraphicZone]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LowestBiostratigraphicZone);
             if (writeField[(int)FieldDescriptionId.Member]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Member);
-            if (writeField[(int)FieldDescriptionId.MaterialSampleID]) WriteField(csvWriter, dwcObservation.MaterialSample?.MaterialSampleID);
 
             csvWriter.NextRecord();
         }
+
 
         private static void WriteField(CsvWriter csvWriter, string val, bool replaceNewLines = true)
         {
@@ -324,11 +248,10 @@ namespace SOS.Lib.IO.DwcArchive
             csvWriter.NextRecord();
         }
 
-        public async Task WriteHeaderlessOccurrenceCsvFileAsync(
+        public async Task WriteHeaderlessEventCsvFileAsync(
             IEnumerable<DarwinCore> dwcObservations,
             StreamWriter streamWriter,
-            IEnumerable<FieldDescription> fieldDescriptions,
-            bool isEventCore = false)
+            IEnumerable<FieldDescription> fieldDescriptions)
         {
             try
             {
@@ -339,7 +262,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write occurrence rows to CSV file.
                 foreach (var dwcObservation in dwcObservations)
                 {
-                    WriteOccurrenceRow(csvWriter, dwcObservation, fieldsToWriteArray, isEventCore);
+                    WriteEventRow(csvWriter, dwcObservation, fieldsToWriteArray);
                 }
                 await streamWriter.FlushAsync();
 

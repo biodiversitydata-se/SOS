@@ -112,6 +112,8 @@ namespace SOS.Export.IoC.Modules
             // DwC Archive
             builder.RegisterType<DwcArchiveFileWriterCoordinator>().As<IDwcArchiveFileWriterCoordinator>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcArchiveEventCsvWriter>().As<IDwcArchiveEventCsvWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcArchiveEventFileWriter>().As<IDwcArchiveEventFileWriter>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().InstancePerLifetimeScope();
             builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
                 .InstancePerLifetimeScope();

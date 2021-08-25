@@ -39,7 +39,7 @@ namespace SOS.Lib.Helpers
             AllFields = LoadFieldDescriptions().ToList();
             AllFieldsByName = AllFields.ToDictionary(x => x.Name, x => x);
             AllFieldsById = AllFields.ToDictionary(x => x.Id, x => x);
-            AllFieldsByFieldDescriptionId = AllFields.ToDictionary(x => (FieldDescriptionId) x.Id, x => x);
+            AllFieldsByFieldDescriptionId = AllFields.ToDictionary(x => (FieldDescriptionId)x.Id, x => x);
         }
 
         private static List<FieldDescription> LoadFieldDescriptions()
@@ -61,7 +61,7 @@ namespace SOS.Lib.Helpers
         {
             return AllFields
                 .Where(x => x.IncludedByDefaultInDwcExport)
-                .Select(x => (FieldDescriptionId) x.Id)
+                .Select(x => (FieldDescriptionId)x.Id)
                 .AddMandatoryFieldDescriptionIdsFirst();
         }
 
@@ -82,11 +82,13 @@ namespace SOS.Lib.Helpers
         public static IEnumerable<FieldDescription> GetFieldDescriptions(
             IEnumerable<FieldDescriptionId> fieldDescriptionIds)
         {
-            var list = fieldDescriptionIds.ToList();
-            return AllFieldsByFieldDescriptionId
-                .Where(x => list.Contains(x.Key))
-                .Select(x => x.Value)
-                .OrderBy(x => x.Id);
+            var fieldDescriptions = new List<FieldDescription>();
+            foreach (var fieldDescriptionId in fieldDescriptionIds)
+            {
+                fieldDescriptions.Add(AllFieldsByFieldDescriptionId[fieldDescriptionId]);
+            }
+
+            return fieldDescriptions;
         }
 
         public static IEnumerable<FieldDescriptionId> AddMandatoryFieldDescriptionIds(
@@ -109,7 +111,7 @@ namespace SOS.Lib.Helpers
         public static IEnumerable<FieldDescriptionId> GetMissingFieldDescriptionIds(
             IEnumerable<FieldDescriptionId> fieldDescriptionIds)
         {
-            return AllFields.Select(x => (FieldDescriptionId) x.Id).Except(fieldDescriptionIds);
+            return AllFields.Select(x => (FieldDescriptionId)x.Id).Except(fieldDescriptionIds);
         }
 
         /// <summary>
@@ -123,10 +125,10 @@ namespace SOS.Lib.Helpers
             var fieldDescriptionIdsSet = new HashSet<FieldDescriptionId>();
             foreach (var fieldDescription in fieldDescriptions)
             {
-                fieldDescriptionIdsSet.Add((FieldDescriptionId) fieldDescription.Id);
+                fieldDescriptionIdsSet.Add((FieldDescriptionId)fieldDescription.Id);
             }
 
-            bool[] writeField = new bool[AllFields.Max(f => f.Id) +1];
+            bool[] writeField = new bool[AllFields.Max(f => f.Id) + 1];
             foreach (var field in AllFields.OrderBy(m => m.Id))
             {
                 if (fieldDescriptionIdsSet.Contains(field.FieldDescriptionId))
@@ -172,6 +174,16 @@ namespace SOS.Lib.Helpers
         public static IEnumerable<FieldDescription> GetAllDwcOccurrenceCoreFieldDescriptions()
         {
             return GetFieldDescriptions(AllDwcOccurrenceCoreFieldDescriptions);
+        }
+
+        public static IEnumerable<FieldDescription> GetAllEventDwcOccurrenceCoreFieldDescriptions()
+        {
+            var fieldDescriptions = GetFieldDescriptions(AllDwcOccurrenceCoreFieldDescriptions).ToList();
+            var eventIdFieldDescription =
+                fieldDescriptions.First(m => m.FieldDescriptionId == FieldDescriptionId.EventID);
+            fieldDescriptions.Remove(eventIdFieldDescription);
+            fieldDescriptions.Insert(0, eventIdFieldDescription);
+            return fieldDescriptions;
         }
 
         private static readonly FieldDescriptionId[] AllDwcOccurrenceCoreFieldDescriptions =
@@ -340,5 +352,200 @@ namespace SOS.Lib.Helpers
             FieldDescriptionId.MaterialSampleID
         };
 
+        public static IEnumerable<FieldDescription> GetAllDwcEventCoreFieldDescriptions()
+        {
+            return GetFieldDescriptions(AllDwcEventCoreFieldDescriptions);
+        }
+
+        private static readonly FieldDescriptionId[] AllDwcEventCoreFieldDescriptions =
+        {
+            FieldDescriptionId.EventID
+            ,FieldDescriptionId.ParentEventID
+            ,FieldDescriptionId.EventDate
+            ,FieldDescriptionId.VerbatimEventDate
+            ,FieldDescriptionId.EventTime
+            ,FieldDescriptionId.EventRemarks
+            ,FieldDescriptionId.FieldNotes
+            ,FieldDescriptionId.FieldNumber
+            ,FieldDescriptionId.Habitat
+            ,FieldDescriptionId.SampleSizeValue
+            ,FieldDescriptionId.SampleSizeUnit
+            ,FieldDescriptionId.SamplingEffort
+            ,FieldDescriptionId.SamplingProtocol
+            ,FieldDescriptionId.Day
+            ,FieldDescriptionId.Month
+            ,FieldDescriptionId.Year
+            ,FieldDescriptionId.EndDayOfYear
+            ,FieldDescriptionId.StartDayOfYear
+            ,FieldDescriptionId.BibliographicCitation
+            ,FieldDescriptionId.DataGeneralizations
+            ,FieldDescriptionId.DatasetID
+            ,FieldDescriptionId.DatasetName
+            ,FieldDescriptionId.DynamicProperties
+            ,FieldDescriptionId.InformationWithheld
+            ,FieldDescriptionId.InstitutionCode
+            ,FieldDescriptionId.InstitutionID
+            ,FieldDescriptionId.Language
+            ,FieldDescriptionId.License
+            ,FieldDescriptionId.Modified
+            ,FieldDescriptionId.OwnerInstitutionCode
+            ,FieldDescriptionId.References
+            ,FieldDescriptionId.RightsHolder
+            ,FieldDescriptionId.Type
+            ,FieldDescriptionId.CoordinatePrecision
+            ,FieldDescriptionId.CoordinateUncertaintyInMeters
+            ,FieldDescriptionId.Country
+            ,FieldDescriptionId.CountryCode
+            ,FieldDescriptionId.County
+            ,FieldDescriptionId.DecimalLatitude
+            ,FieldDescriptionId.DecimalLongitude
+            ,FieldDescriptionId.FootprintSpatialFit
+            ,FieldDescriptionId.FootprintSRS
+            ,FieldDescriptionId.FootprintWKT
+            ,FieldDescriptionId.GeodeticDatum
+            ,FieldDescriptionId.GeoreferencedBy
+            ,FieldDescriptionId.GeoreferencedDate
+            ,FieldDescriptionId.GeoreferenceProtocol
+            ,FieldDescriptionId.GeoreferenceRemarks
+            ,FieldDescriptionId.GeoreferenceSources
+            ,FieldDescriptionId.GeoreferenceVerificationStatus
+            ,FieldDescriptionId.HigherGeography
+            ,FieldDescriptionId.HigherGeographyID
+            ,FieldDescriptionId.Continent
+            ,FieldDescriptionId.Island
+            ,FieldDescriptionId.IslandGroup
+            ,FieldDescriptionId.Locality
+            ,FieldDescriptionId.LocationAccordingTo
+            ,FieldDescriptionId.LocationID
+            ,FieldDescriptionId.LocationRemarks
+            ,FieldDescriptionId.MaximumDepthInMeters
+            ,FieldDescriptionId.MaximumDistanceAboveSurfaceInMeters
+            ,FieldDescriptionId.MaximumElevationInMeters
+            ,FieldDescriptionId.MinimumDepthInMeters
+            ,FieldDescriptionId.MinimumDistanceAboveSurfaceInMeters
+            ,FieldDescriptionId.MinimumElevationInMeters
+            ,FieldDescriptionId.Municipality
+            ,FieldDescriptionId.PointRadiusSpatialFit
+            ,FieldDescriptionId.StateProvince
+            ,FieldDescriptionId.WaterBody
+            ,FieldDescriptionId.VerbatimCoordinates
+            ,FieldDescriptionId.VerbatimCoordinateSystem
+            ,FieldDescriptionId.VerbatimDepth
+            ,FieldDescriptionId.VerbatimElevation
+            ,FieldDescriptionId.VerbatimLatitude
+            ,FieldDescriptionId.VerbatimLocality
+            ,FieldDescriptionId.VerbatimLongitude
+            ,FieldDescriptionId.VerbatimSRS
+            ,FieldDescriptionId.Bed
+            ,FieldDescriptionId.EarliestAgeOrLowestStage
+            ,FieldDescriptionId.EarliestEonOrLowestEonothem
+            ,FieldDescriptionId.EarliestEpochOrLowestSeries
+            ,FieldDescriptionId.EarliestEraOrLowestErathem
+            ,FieldDescriptionId.EarliestPeriodOrLowestSystem
+            ,FieldDescriptionId.Formation
+            ,FieldDescriptionId.GeologicalContextID
+            ,FieldDescriptionId.Group
+            ,FieldDescriptionId.HighestBiostratigraphicZone
+            ,FieldDescriptionId.LatestAgeOrHighestStage
+            ,FieldDescriptionId.LatestEonOrHighestEonothem
+            ,FieldDescriptionId.LatestEpochOrHighestSeries
+            ,FieldDescriptionId.LatestEraOrHighestErathem
+            ,FieldDescriptionId.LatestPeriodOrHighestSystem
+            ,FieldDescriptionId.LithostratigraphicTerms
+            ,FieldDescriptionId.LowestBiostratigraphicZone
+            ,FieldDescriptionId.Member
+        };
+
+        public static IEnumerable<FieldDescription> GetAllDwcEventCoreOccurrenceFieldDescriptions()
+        {
+            return GetFieldDescriptions(AllDwcEventCoreOccurrenceFieldDescriptions);
+        }
+
+        private static readonly FieldDescriptionId[] AllDwcEventCoreOccurrenceFieldDescriptions =
+        {
+            FieldDescriptionId.EventID,
+            FieldDescriptionId.OccurrenceID,
+            FieldDescriptionId.BasisOfRecord,
+            FieldDescriptionId.BibliographicCitation,
+            FieldDescriptionId.CollectionCode,
+            FieldDescriptionId.CollectionID,
+            FieldDescriptionId.DataGeneralizations,
+            FieldDescriptionId.DatasetID,
+            FieldDescriptionId.DatasetName,
+            FieldDescriptionId.DynamicProperties,
+            FieldDescriptionId.InformationWithheld,
+            FieldDescriptionId.InstitutionCode,
+            FieldDescriptionId.InstitutionID,
+            FieldDescriptionId.Language,
+            FieldDescriptionId.License,
+            FieldDescriptionId.Modified,
+            FieldDescriptionId.OwnerInstitutionCode,
+            FieldDescriptionId.References,
+            FieldDescriptionId.RightsHolder,
+            FieldDescriptionId.Type,
+            FieldDescriptionId.DateIdentified,
+            FieldDescriptionId.IdentificationID,
+            FieldDescriptionId.IdentificationQualifier,
+            FieldDescriptionId.IdentificationReferences,
+            FieldDescriptionId.IdentificationRemarks,
+            FieldDescriptionId.IdentificationVerificationStatus,
+            FieldDescriptionId.IdentifiedBy,
+            FieldDescriptionId.TypeStatus,
+            FieldDescriptionId.AssociatedMedia,
+            FieldDescriptionId.AssociatedReferences,
+            FieldDescriptionId.AssociatedSequences,
+            FieldDescriptionId.AssociatedTaxa,
+            FieldDescriptionId.Behavior,
+            FieldDescriptionId.CatalogNumber,
+            FieldDescriptionId.Disposition,
+            FieldDescriptionId.EstablishmentMeans,
+            FieldDescriptionId.IndividualCount,
+            FieldDescriptionId.LifeStage,
+            FieldDescriptionId.AccessRights,
+            FieldDescriptionId.OccurrenceRemarks,
+            FieldDescriptionId.OccurrenceStatus,
+            FieldDescriptionId.OrganismQuantity,
+            FieldDescriptionId.OrganismQuantityType,
+            FieldDescriptionId.OtherCatalogNumbers,
+            FieldDescriptionId.Preparations,
+            FieldDescriptionId.RecordedBy,
+            FieldDescriptionId.RecordNumber,
+            FieldDescriptionId.ReproductiveCondition,
+            FieldDescriptionId.Sex,
+            FieldDescriptionId.AcceptedNameUsage,
+            FieldDescriptionId.AcceptedNameUsageID,
+            FieldDescriptionId.Class,
+            FieldDescriptionId.Family,
+            FieldDescriptionId.Genus,
+            FieldDescriptionId.HigherClassification,
+            FieldDescriptionId.InfraspecificEpithet,
+            FieldDescriptionId.Kingdom,
+            FieldDescriptionId.NameAccordingTo,
+            FieldDescriptionId.NameAccordingToID,
+            FieldDescriptionId.NamePublishedIn,
+            FieldDescriptionId.NamePublishedInID,
+            FieldDescriptionId.NamePublishedInYear,
+            FieldDescriptionId.NomenclaturalCode,
+            FieldDescriptionId.NomenclaturalStatus,
+            FieldDescriptionId.Order,
+            FieldDescriptionId.OriginalNameUsage,
+            FieldDescriptionId.OriginalNameUsageID,
+            FieldDescriptionId.ParentNameUsage,
+            FieldDescriptionId.ParentNameUsageID,
+            FieldDescriptionId.Phylum,
+            FieldDescriptionId.ScientificName,
+            FieldDescriptionId.ScientificNameAuthorship,
+            FieldDescriptionId.ScientificNameID,
+            FieldDescriptionId.SpecificEpithet,
+            FieldDescriptionId.Subgenus,
+            FieldDescriptionId.TaxonConceptID,
+            FieldDescriptionId.TaxonID,
+            FieldDescriptionId.TaxonomicStatus,
+            FieldDescriptionId.TaxonRank,
+            FieldDescriptionId.TaxonRemarks,
+            FieldDescriptionId.VerbatimTaxonRank,
+            FieldDescriptionId.VernacularName,
+            FieldDescriptionId.MaterialSampleID
+        };
     }
 }
