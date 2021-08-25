@@ -54,8 +54,9 @@ namespace SOS.Lib.Helpers
         public static IEnumerable<FieldDescription> GetDefaultDwcExportFieldDescriptions()
         {
             var fieldIds = GetDefaultDwcExportFieldDescriptionIds();
-            return GetFieldDescriptions(fieldIds);
-        }
+            var fieldDescriptions = GetFieldDescriptions(fieldIds);
+            return fieldDescriptions.OrderBy(m => m.Id);
+        }    
 
         public static IEnumerable<FieldDescriptionId> GetDefaultDwcExportFieldDescriptionIds()
         {
@@ -173,7 +174,8 @@ namespace SOS.Lib.Helpers
 
         public static IEnumerable<FieldDescription> GetAllDwcOccurrenceCoreFieldDescriptions()
         {
-            return GetFieldDescriptions(AllDwcOccurrenceCoreFieldDescriptions);
+            var fieldDescriptions = GetFieldDescriptions(AllDwcOccurrenceCoreFieldDescriptions);
+            return fieldDescriptions.OrderBy(m => m.Id);            
         }
 
         public static IEnumerable<FieldDescription> GetAllEventDwcOccurrenceCoreFieldDescriptions()
