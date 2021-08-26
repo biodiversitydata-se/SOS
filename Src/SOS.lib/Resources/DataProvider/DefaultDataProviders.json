@@ -1026,12 +1026,12 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "Type": "BiologObservations",
+        "Type": "BiologgObservations",
         "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Biolog"
+                "Value": "Biologg"
             },
             {
                 "CultureCode": "sv-SE",
@@ -1041,7 +1041,7 @@
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Biolog is a mobile game that logs observations of species in the wild. In the game you can collect points, level up in different species groups and do challenges. The data collected will later be used for research and nature conservation."
+                "Value": "Biologg is a mobile game that logs observations of species in the wild. In the game you can collect points, level up in different species groups and do challenges. The data collected will later be used for research and nature conservation."
             },
             {
                 "CultureCode": "sv-SE",
@@ -1061,7 +1061,7 @@
         "Paths": [
             {
                 "CultureCode": "en-GB",
-                "path": [ "Overstellar Solutions AB", "Biolog" ]
+                "path": [ "Overstellar Solutions AB", "Biologg" ]
             },
             {
                 "CultureCode": "sv-SE",

@@ -3,7 +3,7 @@
     /// <summary>
     ///     Biologg observation harvester interface
     /// </summary>
-    public interface IBiologObservationHarvester : IObservationHarvester
+    public interface IBiologgObservationHarvester : IObservationHarvester
     {
     }
 }

@@ -699,6 +699,7 @@ namespace SOS.Process.Jobs
                 {DataProviderType.ArtportalenObservations, artportalenObservationProcessor},
                 {DataProviderType.ClamPortalObservations, clamPortalObservationProcessor},
                 {DataProviderType.DwcA, dwcaObservationProcessor},
+                {DataProviderType.BiologgObservations, dwcaObservationProcessor},
                 {DataProviderType.FishDataObservations, fishDataObservationProcessor},
                 {DataProviderType.KULObservations, kulObservationProcessor},
                 {DataProviderType.MvmObservations, mvmObservationProcessor},
