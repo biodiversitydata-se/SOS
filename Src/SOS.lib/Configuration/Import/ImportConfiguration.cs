@@ -15,7 +15,7 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         /// Biologg configuration
         /// </summary>
-        public BiologConfiguration BiologConfiguration { get; set; }
+        public BiologgConfiguration BiologgConfiguration { get; set; }
 
         /// <summary>
         ///     Configuration for DwC-A

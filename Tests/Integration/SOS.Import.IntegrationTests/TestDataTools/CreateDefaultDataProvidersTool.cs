@@ -996,7 +996,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                         LastName = "Eriksson"
                     },
                     Url = "https://www.biologg.se/",
-                    Type = DataProviderType.DwcA,
+                    Type = DataProviderType.BiologgObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     IncludeInSearchByDefault = false,
