@@ -155,7 +155,7 @@ namespace SOS.Lib.IO.DwcArchive
                 
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
-                    .Where(observation => observation?.AccessRights != null && (AccessRightsId)observation?.AccessRights.Id != AccessRightsId.NotForPublicUsage).ToArray();
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
                 await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
                 return true;
             }
