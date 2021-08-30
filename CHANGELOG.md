@@ -1,9 +1,22 @@
 # Changelog
 
-## [Unreleased]
-**Test**: 
+## [1.0.3]
+**Test**: 2021-08-30 
 
-**Prod**: 
+**Prod**: Not yet released
+
+### `Added`
+- New search parameter : `ReportedByMe`. Requires authorization token.
+- New search parameter : `ObservedByMe`. Requires authorization token.
+- New `/Location` endpoint used to retrieve information about Artportalen sites.
+- General support for protected species. Ie. also support for other data sources in addition to Artportalen and the Observation Database.
+- Export to Excel.
+- Export to GeoJSON.
+- Multimedia extension is added to the Artportalen DwC-A export.
+- Support for storing imported DwC-A file.
+
+### `Fixed`
+- DwC-A time parsing bug in the harvest step.
 
 ## [1.0.2]
 

@@ -31,11 +31,10 @@ These flows are described in [RFC-6749](https://tools.ietf.org/html/rfc6749) and
 
 | Name 	| Value 	|
 |-	|-	|
-| OAuth 2.0 Server 	| https://ids.artdatabanken.se 	|
 | Scope 	| SOS.Observations.Protected openid 	|
+| OAuth 2.0 Server 	| https://ids.artdatabanken.se 	|
 | Auth URL 	| https://ids.artdatabanken.se/connect/authorize 	|
 | Access token URL 	| https://ids.artdatabanken.se/connect/token 	|
-| Login URL 	| https://ids.artdatabanken.se/account/login 	|
 
 
 ![Login page](Images/ids-login2.png "Login page")

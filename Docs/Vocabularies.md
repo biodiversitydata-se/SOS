@@ -1,5 +1,5 @@
 # Vocabularies
-
+All vocabularies used in SOS are listed on this page. The vocabularies can be downloaded using the endpoint `/Vocabularies` *(Vocabularies_GetVocabularies)*.
 - [accessRights](#accessrights)
 - [activity](#activity)
 - [areaType](#areatype)
