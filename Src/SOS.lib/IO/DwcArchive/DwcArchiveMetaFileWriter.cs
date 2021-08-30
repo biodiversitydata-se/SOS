@@ -267,8 +267,8 @@ namespace SOS.Lib.IO.DwcArchive
 
             foreach (var f in metaData.Fields.OrderBy(o => o.Index))
             {
+                if (f.ExcludeMetaRow) continue;
                 var field = doc.CreateElement("field", elementNamespace);
-
 
                 attr = doc.CreateAttribute("index");
                 attr.Value = f.Index.ToString();
