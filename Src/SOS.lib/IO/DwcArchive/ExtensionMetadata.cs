@@ -19,56 +19,100 @@ namespace SOS.Lib.IO.DwcArchive
 
         public class ExtensionMetadataField
         {
-            public ExtensionMetadataField(int index, string term, string csvColumnName)
+            public ExtensionMetadataField(int index, string term, string csvColumnName, bool excludeMetaRow = false)
             {
                 Index = index;
                 Term = term;
                 CSVColumnName = csvColumnName;
+                ExcludeMetaRow = excludeMetaRow;
             }
 
             public int Index { get; protected set; }
             public string Term { get; protected set; }
-
             public string CSVColumnName { get; protected set; }
+            
+            /// <summary>
+            /// Indicates whether this column shouldn't be written to meta.xml.
+            /// </summary>
+            public bool ExcludeMetaRow { get; protected set; }
         }
 
         public static class EmofFactory
         {
             public static ExtensionMetadata Create(bool isEventCore = false)
             {
+                if (isEventCore)
+                    return CreateEventEmof();
+                else
+                    return CreateOccurrenceEmof();
+            }
+
+            private static ExtensionMetadata CreateOccurrenceEmof()
+            {
                 var extension = new ExtensionMetadata("http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact",
                     "extendedMeasurementOrFact.csv");
-                int index = 0;
-                if (isEventCore)
-                {
-                    index = 1;
-                }
-
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/occurrenceID",
+                
+                extension.Fields.Add(new ExtensionMetadataField(0, "http://rs.tdwg.org/dwc/terms/occurrenceID",
                     "occurrenceID"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementID",
+                extension.Fields.Add(new ExtensionMetadataField(1, "http://rs.tdwg.org/dwc/terms/measurementID",
                     "measurementID"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementType",
+                extension.Fields.Add(new ExtensionMetadataField(2, "http://rs.tdwg.org/dwc/terms/measurementType",
                     "measurementType"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.iobis.org/obis/terms/measurementTypeID",
+                extension.Fields.Add(new ExtensionMetadataField(3, "http://rs.iobis.org/obis/terms/measurementTypeID",
                     "measurementTypeID"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementValue",
+                extension.Fields.Add(new ExtensionMetadataField(4, "http://rs.tdwg.org/dwc/terms/measurementValue",
                     "measurementValue"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.iobis.org/obis/terms/measurementValueID",
+                extension.Fields.Add(new ExtensionMetadataField(5, "http://rs.iobis.org/obis/terms/measurementValueID",
                     "measurementValueID"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementAccuracy",
+                extension.Fields.Add(new ExtensionMetadataField(6, "http://rs.tdwg.org/dwc/terms/measurementAccuracy",
                     "measurementAccuracy"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementUnit",
+                extension.Fields.Add(new ExtensionMetadataField(7, "http://rs.tdwg.org/dwc/terms/measurementUnit",
                     "measurementUnit"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.iobis.org/obis/terms/measurementUnitID",
+                extension.Fields.Add(new ExtensionMetadataField(8, "http://rs.iobis.org/obis/terms/measurementUnitID",
                     "measurementUnitID"));
-                extension.Fields.Add(new ExtensionMetadataField(index++,
+                extension.Fields.Add(new ExtensionMetadataField(9,
                     "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate", "measurementDeterminedDate"));
-                extension.Fields.Add(new ExtensionMetadataField(index++,
+                extension.Fields.Add(new ExtensionMetadataField(10,
                     "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy", "measurementDeterminedBy"));
-                extension.Fields.Add(new ExtensionMetadataField(index++, "http://rs.tdwg.org/dwc/terms/measurementRemarks",
+                extension.Fields.Add(new ExtensionMetadataField(11, "http://rs.tdwg.org/dwc/terms/measurementRemarks",
                     "measurementRemarks"));
-                extension.Fields.Add(new ExtensionMetadataField(index, "http://rs.tdwg.org/dwc/terms/measurementMethod",
+                extension.Fields.Add(new ExtensionMetadataField(12, "http://rs.tdwg.org/dwc/terms/measurementMethod",
+                    "measurementMethod"));
+
+                return extension;
+            }
+
+            private static ExtensionMetadata CreateEventEmof()
+            {
+                var extension = new ExtensionMetadata("http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact",
+                    "extendedMeasurementOrFact.csv");
+                extension.Fields.Add(new ExtensionMetadataField(0, "",
+                    "eventID", true));
+                extension.Fields.Add(new ExtensionMetadataField(1, "http://rs.tdwg.org/dwc/terms/occurrenceID",
+                    "occurrenceID"));
+                extension.Fields.Add(new ExtensionMetadataField(2, "http://rs.tdwg.org/dwc/terms/measurementID",
+                    "measurementID"));
+                extension.Fields.Add(new ExtensionMetadataField(3, "http://rs.tdwg.org/dwc/terms/measurementType",
+                    "measurementType"));
+                extension.Fields.Add(new ExtensionMetadataField(4, "http://rs.iobis.org/obis/terms/measurementTypeID",
+                    "measurementTypeID"));
+                extension.Fields.Add(new ExtensionMetadataField(5, "http://rs.tdwg.org/dwc/terms/measurementValue",
+                    "measurementValue"));
+                extension.Fields.Add(new ExtensionMetadataField(6, "http://rs.iobis.org/obis/terms/measurementValueID",
+                    "measurementValueID"));
+                extension.Fields.Add(new ExtensionMetadataField(7, "http://rs.tdwg.org/dwc/terms/measurementAccuracy",
+                    "measurementAccuracy"));
+                extension.Fields.Add(new ExtensionMetadataField(8, "http://rs.tdwg.org/dwc/terms/measurementUnit",
+                    "measurementUnit"));
+                extension.Fields.Add(new ExtensionMetadataField(9, "http://rs.iobis.org/obis/terms/measurementUnitID",
+                    "measurementUnitID"));
+                extension.Fields.Add(new ExtensionMetadataField(10,
+                    "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate", "measurementDeterminedDate"));
+                extension.Fields.Add(new ExtensionMetadataField(11,
+                    "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy", "measurementDeterminedBy"));
+                extension.Fields.Add(new ExtensionMetadataField(12, "http://rs.tdwg.org/dwc/terms/measurementRemarks",
+                    "measurementRemarks"));
+                extension.Fields.Add(new ExtensionMetadataField(13, "http://rs.tdwg.org/dwc/terms/measurementMethod",
                     "measurementMethod"));
 
                 return extension;
@@ -81,8 +125,8 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia",
                     "multimedia.csv");
-                extension.Fields.Add(new ExtensionMetadataField(0, "http://rs.tdwg.org/dwc/terms/occurrenceID",
-                    "occurrenceID"));
+                extension.Fields.Add(new ExtensionMetadataField(0, "",
+                    "occurrenceID", true));
                 extension.Fields.Add(new ExtensionMetadataField(1, "http://purl.org/dc/terms/type",
                     "type"));
                 extension.Fields.Add(new ExtensionMetadataField(2, "http://purl.org/dc/terms/format",

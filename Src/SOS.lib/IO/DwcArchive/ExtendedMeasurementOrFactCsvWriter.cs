@@ -116,11 +116,7 @@ namespace SOS.Lib.IO.DwcArchive
 
         public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, bool isEventCore = false)
         {
-            if (isEventCore)
-            {
-                csvWriter.WriteField("id");
-            }
-            var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create();
+            var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create(isEventCore);
             foreach (var emofField in emofExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
                 csvWriter.WriteField(emofField.CSVColumnName);
