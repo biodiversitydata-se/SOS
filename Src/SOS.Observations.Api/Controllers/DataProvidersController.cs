@@ -12,6 +12,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using Newtonsoft.Json;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -48,10 +49,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "en-GB")
+        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode);
 
                 if (!dataProviders?.Any() ?? true)
