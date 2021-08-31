@@ -142,7 +142,22 @@ namespace SOS.Lib.IO.Excel
                         var objectProperties = objectFlattenerHelper.Execute(observation, string.Empty, true);
                         if (objectProperties?.Any() ?? false)
                         {
-                            foreach (var objectProperty in objectProperties.OrderBy(p => p.Key))
+                            objectProperties = objectProperties.OrderBy(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
+                            // Ugly fix to put occurrence id first
+                            if ((!filter.OutputFields?.Any() ?? true) && objectProperties.TryGetValue("Occurrence.OccurrenceId", out var occurrenceId))
+                            {
+                                var tmpObjectProperties = new Dictionary<string, object>
+                                {
+                                    {"Occurrence.OccurrenceId", occurrenceId}
+                                };
+                                objectProperties.Remove("Occurrence.OccurrenceId");
+                                var combined =
+                                    tmpObjectProperties.Union(objectProperties)
+                                        .ToDictionary(p => p.Key, p => p.Value);
+                                objectProperties = combined;
+                            }
+
+                            foreach (var objectProperty in objectProperties)
                             {
                                 // Check if property is included (OutputFields empty = all)
                                 if (!((!filter.OutputFields?.Any() ?? true) || filter.OutputFields.Contains(objectProperty.Key, StringComparer.CurrentCultureIgnoreCase)))
