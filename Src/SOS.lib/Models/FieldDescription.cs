@@ -32,5 +32,10 @@ namespace SOS.Export.Models
         {
             return Id;
         }
+
+        public override string ToString()
+        {
+            return $"{Name} [Id={Id}]";
+        }
     }
 }

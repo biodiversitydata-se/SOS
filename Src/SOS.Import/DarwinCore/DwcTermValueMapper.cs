@@ -543,61 +543,61 @@ namespace SOS.Import.DarwinCore
                     observation.Year = val;
                     break;
 
-                // todo - more mappings?
-                //case "http://rs.tdwg.org/dwc/terms/measurementAccuracy":
-                //    observation.MeasurementAccuracy = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy":
-                //    observation.MeasurementDeterminedBy = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate":
-                //    observation.MeasurementDeterminedDate = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementID":
-                //    observation.MeasurementID = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementMethod":
-                //    observation.MeasurementMethod = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/MeasurementOrFact":
-                //    observation.MeasurementOrFact = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementRemarks":
-                //    observation.MeasurementRemarks = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementType":
-                //    observation.MeasurementType = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementUnit":
-                //    observation.MeasurementUnit = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/measurementValue":
-                //    observation.MeasurementValue = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/relatedResourceID":
-                //    observation.RelatedResourceID = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/relationshipAccordingTo":
-                //    observation.RelationshipAccordingTo = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/relationshipEstablishedDate":
-                //    observation.RelationshipEstablishedDate = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/relationshipOfResource":
-                //    observation.RelationshipOfResource = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/relationshipRemarks":
-                //    observation.RelationshipRemarks = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/resourceID":
-                //    observation.ResourceID = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/ResourceRelationship":
-                //    observation.ResourceRelationship = val;
-                //    break;
-                //case "http://rs.tdwg.org/dwc/terms/resourceRelationshipID":
-                //    observation.ResourceRelationshipID = val;
-                //    break;
+                    // todo - more mappings?
+                    //case "http://rs.tdwg.org/dwc/terms/measurementAccuracy":
+                    //    observation.MeasurementAccuracy = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy":
+                    //    observation.MeasurementDeterminedBy = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate":
+                    //    observation.MeasurementDeterminedDate = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementID":
+                    //    observation.MeasurementID = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementMethod":
+                    //    observation.MeasurementMethod = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/MeasurementOrFact":
+                    //    observation.MeasurementOrFact = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementRemarks":
+                    //    observation.MeasurementRemarks = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementType":
+                    //    observation.MeasurementType = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementUnit":
+                    //    observation.MeasurementUnit = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/measurementValue":
+                    //    observation.MeasurementValue = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/relatedResourceID":
+                    //    observation.RelatedResourceID = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/relationshipAccordingTo":
+                    //    observation.RelationshipAccordingTo = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/relationshipEstablishedDate":
+                    //    observation.RelationshipEstablishedDate = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/relationshipOfResource":
+                    //    observation.RelationshipOfResource = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/relationshipRemarks":
+                    //    observation.RelationshipRemarks = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/resourceID":
+                    //    observation.ResourceID = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/ResourceRelationship":
+                    //    observation.ResourceRelationship = val;
+                    //    break;
+                    //case "http://rs.tdwg.org/dwc/terms/resourceRelationshipID":
+                    //    observation.ResourceRelationshipID = val;
+                    //    break;
             }
         }
 
@@ -1355,5 +1355,620 @@ namespace SOS.Import.DarwinCore
                     break;
             }
         }
+
+        public static void MapValueByTerm(
+            DwcEventVerbatim eventVerbatim,
+            string term,
+            string val)
+        {
+            switch (term)
+            {
+                case "id":
+                    eventVerbatim.RecordId = val;
+                    break;
+                case "http://purl.org/dc/terms/accessRights":
+                    eventVerbatim.AccessRights = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/bed":
+                    eventVerbatim.Bed = val;
+                    break;
+                case "http://purl.org/dc/terms/bibliographicCitation":
+                    eventVerbatim.BibliographicCitation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/continent":
+                    eventVerbatim.Continent = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/coordinatePrecision":
+                    eventVerbatim.CoordinatePrecision = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters":
+                    eventVerbatim.CoordinateUncertaintyInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/country":
+                    eventVerbatim.Country = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/countryCode":
+                    eventVerbatim.CountryCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/county":
+                    eventVerbatim.County = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/dataGeneralizations":
+                    eventVerbatim.DataGeneralizations = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/datasetID":
+                    eventVerbatim.DatasetID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/datasetName":
+                    eventVerbatim.DatasetName = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/day":
+                    eventVerbatim.Day = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/decimalLatitude":
+                    eventVerbatim.DecimalLatitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/decimalLongitude":
+                    eventVerbatim.DecimalLongitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/dynamicProperties":
+                    eventVerbatim.DynamicProperties = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage":
+                    eventVerbatim.EarliestAgeOrLowestStage = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem":
+                    eventVerbatim.EarliestEonOrLowestEonothem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries":
+                    eventVerbatim.EarliestEpochOrLowestSeries = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem":
+                    eventVerbatim.EarliestEraOrLowestErathem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/iri/earliestGeochronologicalEra":
+                    eventVerbatim.EarliestGeochronologicalEra = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem":
+                    eventVerbatim.EarliestPeriodOrLowestSystem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/endDayOfYear":
+                    eventVerbatim.EndDayOfYear = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventDate":
+                    eventVerbatim.EventDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventID":
+                    eventVerbatim.EventID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventRemarks":
+                    eventVerbatim.EventRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventTime":
+                    eventVerbatim.EventTime = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/fieldNotes":
+                    eventVerbatim.FieldNotes = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/fieldNumber":
+                    eventVerbatim.FieldNumber = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintSpatialFit":
+                    eventVerbatim.FootprintSpatialFit = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintSRS":
+                    eventVerbatim.FootprintSRS = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintWKT":
+                    eventVerbatim.FootprintWKT = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/formation":
+                    eventVerbatim.Formation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/geodeticDatum":
+                    eventVerbatim.GeodeticDatum = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/geologicalContextID":
+                    eventVerbatim.GeologicalContextID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferencedBy":
+                    eventVerbatim.GeoreferencedBy = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferencedDate":
+                    eventVerbatim.GeoreferencedDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceProtocol":
+                    eventVerbatim.GeoreferenceProtocol = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceRemarks":
+                    eventVerbatim.GeoreferenceRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceSources":
+                    eventVerbatim.GeoreferenceSources = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus":
+                    eventVerbatim.GeoreferenceVerificationStatus = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/group":
+                    eventVerbatim.Group = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/habitat":
+                    eventVerbatim.Habitat = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/higherGeography":
+                    eventVerbatim.HigherGeography = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/higherGeographyID":
+                    eventVerbatim.HigherGeographyID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone":
+                    eventVerbatim.HighestBiostratigraphicZone = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/informationWithheld":
+                    eventVerbatim.InformationWithheld = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/institutionCode":
+                    eventVerbatim.InstitutionCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/institutionID":
+                    eventVerbatim.InstitutionID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/island":
+                    eventVerbatim.Island = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/islandGroup":
+                    eventVerbatim.IslandGroup = val;
+                    break;
+                case "http://purl.org/dc/terms/language":
+                    eventVerbatim.Language = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage":
+                    eventVerbatim.LatestAgeOrHighestStage = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem":
+                    eventVerbatim.LatestEonOrHighestEonothem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries":
+                    eventVerbatim.LatestEpochOrHighestSeries = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem":
+                    eventVerbatim.LatestEraOrHighestErathem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/iri/latestGeochronologicalEra":
+                    eventVerbatim.LatestGeochronologicalEra = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem":
+                    eventVerbatim.LatestPeriodOrHighestSystem = val;
+                    break;
+                case "http://purl.org/dc/terms/license":
+                    eventVerbatim.License = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms":
+                    eventVerbatim.LithostratigraphicTerms = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locality":
+                    eventVerbatim.Locality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationAccordingTo":
+                    eventVerbatim.LocationAccordingTo = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationID":
+                    eventVerbatim.LocationID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationRemarks":
+                    eventVerbatim.LocationRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone":
+                    eventVerbatim.LowestBiostratigraphicZone = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters":
+                    eventVerbatim.MaximumDepthInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters":
+                    eventVerbatim.MaximumDistanceAboveSurfaceInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters":
+                    eventVerbatim.MaximumElevationInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/member":
+                    eventVerbatim.Member = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters":
+                    eventVerbatim.MinimumDepthInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters":
+                    eventVerbatim.MinimumDistanceAboveSurfaceInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters":
+                    eventVerbatim.MinimumElevationInMeters = val;
+                    break;
+                case "http://purl.org/dc/terms/modified":
+                    eventVerbatim.Modified = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/month":
+                    eventVerbatim.Month = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/municipality":
+                    eventVerbatim.Municipality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/ownerInstitutionCode":
+                    eventVerbatim.OwnerInstitutionCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/parentEventID":
+                    eventVerbatim.ParentEventID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit":
+                    eventVerbatim.PointRadiusSpatialFit = val;
+                    break;
+                case "http://purl.org/dc/terms/references":
+                    eventVerbatim.References = val;
+                    break;
+                case "http://purl.org/dc/terms/rightsHolder":
+                    eventVerbatim.RightsHolder = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/sampleSizeUnit":
+                    eventVerbatim.SampleSizeUnit = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/sampleSizeValue":
+                    eventVerbatim.SampleSizeValue = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/samplingEffort":
+                    eventVerbatim.SamplingEffort = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/samplingProtocol":
+                    eventVerbatim.SamplingProtocol = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/startDayOfYear":
+                    eventVerbatim.StartDayOfYear = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/stateProvince":
+                    eventVerbatim.StateProvince = val;
+                    break;
+                case "http://purl.org/dc/terms/type":
+                    eventVerbatim.Type = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimCoordinates":
+                    eventVerbatim.VerbatimCoordinates = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem":
+                    eventVerbatim.VerbatimCoordinateSystem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimDepth":
+                    eventVerbatim.VerbatimDepth = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimElevation":
+                    eventVerbatim.VerbatimElevation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimEventDate":
+                    eventVerbatim.VerbatimEventDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLatitude":
+                    eventVerbatim.VerbatimLatitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLocality":
+                    eventVerbatim.VerbatimLocality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLongitude":
+                    eventVerbatim.VerbatimLongitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimSRS":
+                    eventVerbatim.VerbatimSRS = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/waterBody":
+                    eventVerbatim.WaterBody = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/year":
+                    eventVerbatim.Year = val;
+                    break;
+            }
+        }
+
+        public static void MapValueByTerm(
+            DwcEventOccurrenceVerbatim eventVerbatim,
+            string term,
+            string val)
+        {
+            switch (term)
+            {
+                case "id":
+                    eventVerbatim.RecordId = val;
+                    break;
+                case "http://purl.org/dc/terms/accessRights":
+                    eventVerbatim.AccessRights = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/bed":
+                    eventVerbatim.Bed = val;
+                    break;
+                case "http://purl.org/dc/terms/bibliographicCitation":
+                    eventVerbatim.BibliographicCitation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/continent":
+                    eventVerbatim.Continent = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/coordinatePrecision":
+                    eventVerbatim.CoordinatePrecision = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters":
+                    eventVerbatim.CoordinateUncertaintyInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/country":
+                    eventVerbatim.Country = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/countryCode":
+                    eventVerbatim.CountryCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/county":
+                    eventVerbatim.County = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/dataGeneralizations":
+                    eventVerbatim.DataGeneralizations = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/datasetID":
+                    eventVerbatim.DatasetID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/datasetName":
+                    eventVerbatim.DatasetName = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/day":
+                    eventVerbatim.Day = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/decimalLatitude":
+                    eventVerbatim.DecimalLatitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/decimalLongitude":
+                    eventVerbatim.DecimalLongitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/dynamicProperties":
+                    eventVerbatim.DynamicProperties = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage":
+                    eventVerbatim.EarliestAgeOrLowestStage = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem":
+                    eventVerbatim.EarliestEonOrLowestEonothem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries":
+                    eventVerbatim.EarliestEpochOrLowestSeries = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem":
+                    eventVerbatim.EarliestEraOrLowestErathem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/iri/earliestGeochronologicalEra":
+                    eventVerbatim.EarliestGeochronologicalEra = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem":
+                    eventVerbatim.EarliestPeriodOrLowestSystem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/endDayOfYear":
+                    eventVerbatim.EndDayOfYear = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventDate":
+                    eventVerbatim.EventDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventID":
+                    eventVerbatim.EventID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventRemarks":
+                    eventVerbatim.EventRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/eventTime":
+                    eventVerbatim.EventTime = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/fieldNotes":
+                    eventVerbatim.FieldNotes = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/fieldNumber":
+                    eventVerbatim.FieldNumber = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintSpatialFit":
+                    eventVerbatim.FootprintSpatialFit = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintSRS":
+                    eventVerbatim.FootprintSRS = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/footprintWKT":
+                    eventVerbatim.FootprintWKT = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/formation":
+                    eventVerbatim.Formation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/geodeticDatum":
+                    eventVerbatim.GeodeticDatum = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/geologicalContextID":
+                    eventVerbatim.GeologicalContextID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferencedBy":
+                    eventVerbatim.GeoreferencedBy = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferencedDate":
+                    eventVerbatim.GeoreferencedDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceProtocol":
+                    eventVerbatim.GeoreferenceProtocol = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceRemarks":
+                    eventVerbatim.GeoreferenceRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceSources":
+                    eventVerbatim.GeoreferenceSources = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus":
+                    eventVerbatim.GeoreferenceVerificationStatus = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/group":
+                    eventVerbatim.Group = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/habitat":
+                    eventVerbatim.Habitat = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/higherGeography":
+                    eventVerbatim.HigherGeography = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/higherGeographyID":
+                    eventVerbatim.HigherGeographyID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone":
+                    eventVerbatim.HighestBiostratigraphicZone = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/informationWithheld":
+                    eventVerbatim.InformationWithheld = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/institutionCode":
+                    eventVerbatim.InstitutionCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/institutionID":
+                    eventVerbatim.InstitutionID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/island":
+                    eventVerbatim.Island = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/islandGroup":
+                    eventVerbatim.IslandGroup = val;
+                    break;
+                case "http://purl.org/dc/terms/language":
+                    eventVerbatim.Language = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage":
+                    eventVerbatim.LatestAgeOrHighestStage = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem":
+                    eventVerbatim.LatestEonOrHighestEonothem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries":
+                    eventVerbatim.LatestEpochOrHighestSeries = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem":
+                    eventVerbatim.LatestEraOrHighestErathem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/iri/latestGeochronologicalEra":
+                    eventVerbatim.LatestGeochronologicalEra = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem":
+                    eventVerbatim.LatestPeriodOrHighestSystem = val;
+                    break;
+                case "http://purl.org/dc/terms/license":
+                    eventVerbatim.License = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms":
+                    eventVerbatim.LithostratigraphicTerms = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locality":
+                    eventVerbatim.Locality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationAccordingTo":
+                    eventVerbatim.LocationAccordingTo = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationID":
+                    eventVerbatim.LocationID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/locationRemarks":
+                    eventVerbatim.LocationRemarks = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone":
+                    eventVerbatim.LowestBiostratigraphicZone = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters":
+                    eventVerbatim.MaximumDepthInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters":
+                    eventVerbatim.MaximumDistanceAboveSurfaceInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters":
+                    eventVerbatim.MaximumElevationInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/member":
+                    eventVerbatim.Member = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters":
+                    eventVerbatim.MinimumDepthInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters":
+                    eventVerbatim.MinimumDistanceAboveSurfaceInMeters = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters":
+                    eventVerbatim.MinimumElevationInMeters = val;
+                    break;
+                case "http://purl.org/dc/terms/modified":
+                    eventVerbatim.Modified = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/month":
+                    eventVerbatim.Month = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/municipality":
+                    eventVerbatim.Municipality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/ownerInstitutionCode":
+                    eventVerbatim.OwnerInstitutionCode = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/parentEventID":
+                    eventVerbatim.ParentEventID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit":
+                    eventVerbatim.PointRadiusSpatialFit = val;
+                    break;
+                case "http://purl.org/dc/terms/references":
+                    eventVerbatim.References = val;
+                    break;
+                case "http://purl.org/dc/terms/rightsHolder":
+                    eventVerbatim.RightsHolder = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/sampleSizeUnit":
+                    eventVerbatim.SampleSizeUnit = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/sampleSizeValue":
+                    eventVerbatim.SampleSizeValue = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/samplingEffort":
+                    eventVerbatim.SamplingEffort = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/samplingProtocol":
+                    eventVerbatim.SamplingProtocol = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/startDayOfYear":
+                    eventVerbatim.StartDayOfYear = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/stateProvince":
+                    eventVerbatim.StateProvince = val;
+                    break;
+                case "http://purl.org/dc/terms/type":
+                    eventVerbatim.Type = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimCoordinates":
+                    eventVerbatim.VerbatimCoordinates = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem":
+                    eventVerbatim.VerbatimCoordinateSystem = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimDepth":
+                    eventVerbatim.VerbatimDepth = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimElevation":
+                    eventVerbatim.VerbatimElevation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimEventDate":
+                    eventVerbatim.VerbatimEventDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLatitude":
+                    eventVerbatim.VerbatimLatitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLocality":
+                    eventVerbatim.VerbatimLocality = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimLongitude":
+                    eventVerbatim.VerbatimLongitude = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/verbatimSRS":
+                    eventVerbatim.VerbatimSRS = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/waterBody":
+                    eventVerbatim.WaterBody = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/year":
+                    eventVerbatim.Year = val;
+                    break;
+            }
+        }
+
     }
 }

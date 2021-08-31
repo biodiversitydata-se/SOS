@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Helpers
@@ -53,6 +54,80 @@ namespace SOS.Lib.Helpers
                     "yyyy MMMM"
                 };
             }
+        }
+
+        private static IEnumerable<string> TimePatterns
+        {
+            get
+            {
+                return new[]
+                {
+                    "HH:mm:ssK",
+                    "HH:mm:ss.fK",
+                    "HH:mm:ss.ffK",
+                    "HH:mm:ss.fffK",
+                    "HH:mm:ss.ffffK",
+                    "HH:mm:ss.fffffK",
+                    "HH:mm:ss.ffffffK",
+                    "HH:mm:ss.fffffffK",
+                    "HH:mmK",
+                    "HHK",
+                    "HH:mm",
+                    "hh:mm tt",
+                    "H:mm",
+                    "h:mm tt",
+                    "HH:mm:ss",
+                    "HH:mm:ss.f",
+                    "HH:mm:ss.fffffff",
+                    "HH':'mm':'ss 'GMT'",
+                    "HH':'mm':'ss 'GMT'",
+                    "HH':'mm':'ss",
+                    "HH':'mm':'ss'Z'",
+                };
+            }
+        }
+
+        /// <summary>
+        ///     Try parse event date.
+        /// </summary>
+        /// <param name="eventDate"></param>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <param name="eventTime"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public static bool TryParseEventDate(
+            string eventDate,
+            string year,
+            string month,
+            string day,
+            string eventTime,
+            out DateTime? startDate,
+            out DateTime? endDate)
+        {
+            if (string.IsNullOrWhiteSpace(eventTime))
+            {
+                return TryParseEventDate(eventDate, year, month, day, out startDate, out endDate);
+            }
+
+            if (!TryParseEventDate(eventDate, year, month, day, out startDate, out endDate))
+            {
+                return false;
+            }
+
+            var timeParts = eventTime.Split("/");
+            if (timeParts.Length == 2) // Interval
+            {
+                startDate = ParseTime(timeParts[0], startDate.Value);
+                endDate = ParseTime(timeParts[1], endDate ?? endDate.Value);
+                return true;
+            }
+
+            startDate = ParseTime(eventTime, startDate.Value);
+            endDate = ParseTime(eventTime, endDate.Value);
+            return true;
         }
 
         /// <summary>
@@ -226,6 +301,50 @@ namespace SOS.Lib.Helpers
             if (!endDate.HasValue)
             {
                 startDate = null;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static readonly Regex RxTimeZoneWithOnlyTwoDigits = new Regex(@"[+-]\d{2}$", RegexOptions.Compiled);
+
+        /// <summary>
+        ///     Parse a date string to a DateTime?
+        /// </summary>
+        /// <param name="timeStr">The time string.</param>
+        /// <param name="dateTime">The date</param>
+        /// <param name="dateFormats">The date formats.</param>
+        /// <returns></returns>
+        public static DateTime? ParseTime(string timeStr, DateTime dateTime, params string[] dateFormats)
+        {
+            if (string.IsNullOrWhiteSpace(timeStr)) return dateTime;
+            if (RxTimeZoneWithOnlyTwoDigits.IsMatch(timeStr))
+            {
+                timeStr += "00";
+            }
+            string strDate = $"{dateTime:yyyy-MM-dd}T{timeStr}";
+            var date = ParseDate(strDate);
+            if (date == null) return dateTime;
+            return date;
+        }
+
+        public static bool TryParseTime(string timeStr, DateTime dateTime, out DateTime? date)
+        {
+            if (string.IsNullOrWhiteSpace(timeStr))
+            {
+                date = null;
+                return false;
+            }
+
+            if (RxTimeZoneWithOnlyTwoDigits.IsMatch(timeStr))
+            {
+                timeStr += "00";
+            }
+            string strDate = $"{dateTime:yyyy-MM-dd}T{timeStr}";
+            date = ParseDate(strDate);
+            if (date == null)
+            {
                 return false;
             }
 

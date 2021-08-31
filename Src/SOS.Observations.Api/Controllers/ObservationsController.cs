@@ -13,6 +13,7 @@ using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -299,6 +300,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -416,6 +418,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
@@ -569,6 +572,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);
@@ -695,6 +699,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     ValidateSearchPagingArgumentsInternal(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -792,6 +797,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
                 var takeValidation = take <= 10000
                     ? Result.Success()
@@ -896,6 +902,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var paramsValidationResult = Result.Combine(
                     ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
@@ -976,6 +983,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
@@ -1036,6 +1044,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
@@ -1130,6 +1139,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(zoom, filter, false);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
@@ -1190,6 +1200,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var bboxValidation = await ValidateBoundingBoxAsync(1, filter);
                 var filterValidation = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
                 var pagingArgumentsValidation = ValidateTaxonAggregationPagingArguments(skip, take);

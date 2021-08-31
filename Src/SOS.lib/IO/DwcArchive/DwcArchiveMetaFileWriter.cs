@@ -30,7 +30,7 @@ namespace SOS.Lib.IO.DwcArchive
                     "No field descriptions were provided. You need at least provide the OccurrenceID.");
             }
 
-            if (fieldDescriptions.First().Id != (int) FieldDescriptionId.OccurrenceID)
+            if (fieldDescriptions.First().Id != (int)FieldDescriptionId.OccurrenceID)
             {
                 throw new ArgumentException("OccurrenceID must be first in fieldDescriptions list.");
             }
@@ -41,6 +41,32 @@ namespace SOS.Lib.IO.DwcArchive
             CreateCoreNode(fieldDescriptions, doc, archiveNode);
             if (dwcExtensions.Contains(DwcaFilePart.Emof)) AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create());
             if (dwcExtensions.Contains(DwcaFilePart.Multimedia)) AppendExtension(doc, archiveNode, ExtensionMetadata.SimpleMultimediaFactory.Create());
+            doc.Save(stream);
+        }
+
+        public static void CreateEventMetaXmlFile(
+            Stream stream,
+            IList<FieldDescription> fieldDescriptions,
+            ICollection<DwcaEventFilePart> dwcExtensions,
+            IList<FieldDescription> occurrenceFieldDescriptions)
+        {
+            if (fieldDescriptions == null || fieldDescriptions.Count == 0)
+            {
+                throw new ArgumentException(
+                    "No field descriptions were provided. You need at least provide the EventID.");
+            }
+
+
+            var doc = new XmlDocument();
+            CreateHeaderNode(doc);
+            var archiveNode = CreateArchiveNode(doc);
+            CreateEventCoreNode(fieldDescriptions, doc, archiveNode);
+            int occurrenceEventIdIndex =
+                occurrenceFieldDescriptions.IndexOf(occurrenceFieldDescriptions.Single(m =>
+                    m.FieldDescriptionId == FieldDescriptionId.EventID));
+            if (dwcExtensions.Contains(DwcaEventFilePart.Occurrence)) AppendExtension(doc, archiveNode, ExtensionMetadata.OccurrenceFactory.Create(occurrenceFieldDescriptions), occurrenceEventIdIndex);
+            if (dwcExtensions.Contains(DwcaEventFilePart.Emof)) AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create(isEventCore: true));
+            if (dwcExtensions.Contains(DwcaEventFilePart.Multimedia)) AppendExtension(doc, archiveNode, ExtensionMetadata.SimpleMultimediaFactory.Create());
             doc.Save(stream);
         }
 
@@ -125,7 +151,72 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        private static void AppendExtension(XmlDocument doc, XmlNode coreNode, ExtensionMetadata metaData)
+        private static void CreateEventCoreNode(IList<FieldDescription> fieldDescriptions, XmlDocument doc,
+            XmlNode archiveNode)
+        {
+            // Create: <core encoding = "UTF-8" fieldsTerminatedBy = "\t" linesTerminatedBy = "\n" fieldsEnclosedBy = "" ignoreHeaderLines = "1" rowType = "http://rs.tdwg.org/dwc/terms/Event" >
+            XmlNode coreNode = doc.CreateElement("core", elementNamespace);
+            archiveNode.AppendChild(coreNode);
+            // encoding = "UTF-8"
+            var coreNodeEncodingAttribute = doc.CreateAttribute("encoding");
+            coreNodeEncodingAttribute.Value = "UTF-8";
+            coreNode.Attributes.Append(coreNodeEncodingAttribute);
+            // fieldsTerminatedBy = "\t"
+            var coreNodeFieldsTerminatedByAttribute = doc.CreateAttribute("fieldsTerminatedBy");
+            coreNodeFieldsTerminatedByAttribute.Value = "\\t";
+            coreNode.Attributes.Append(coreNodeFieldsTerminatedByAttribute);
+            // linesTerminatedBy = "\n"
+            var coreNodeLinesTerminatedByAttribute = doc.CreateAttribute("linesTerminatedBy");
+            coreNodeLinesTerminatedByAttribute.Value = "\\n";
+            coreNode.Attributes.Append(coreNodeLinesTerminatedByAttribute);
+            // fieldsEnclosedBy = ""
+            var coreNodeFieldsEnclosedByAttribute = doc.CreateAttribute("fieldsEnclosedBy");
+            coreNodeFieldsEnclosedByAttribute.Value = "";
+            coreNode.Attributes.Append(coreNodeFieldsEnclosedByAttribute);
+            // ignoreHeaderLines = "1"
+            var coreNodeIgnoreHeaderLinesAttribute = doc.CreateAttribute("ignoreHeaderLines");
+            coreNodeIgnoreHeaderLinesAttribute.Value = "1";
+            coreNode.Attributes.Append(coreNodeIgnoreHeaderLinesAttribute);
+            // rowType = "http://rs.tdwg.org/dwc/terms/Event"
+            var coreNodeRowTypeAttribute = doc.CreateAttribute("rowType");
+            coreNodeRowTypeAttribute.Value = "http://rs.tdwg.org/dwc/terms/Event";
+            coreNode.Attributes.Append(coreNodeRowTypeAttribute);
+
+            //Create:
+            //< files >
+            //  < location > taxon.csv </ location >
+            //</ files >
+            XmlNode filesNode = doc.CreateElement("files", elementNamespace);
+            XmlNode locationNode = doc.CreateElement("location", elementNamespace);
+            locationNode.AppendChild(doc.CreateTextNode("event.csv"));
+            filesNode.AppendChild(locationNode);
+            coreNode.AppendChild(filesNode);
+
+            // Create: < id index = "0" />
+            XmlNode idNode = doc.CreateElement("id", elementNamespace);
+            var idNodeIndexAttribute = doc.CreateAttribute("index");
+            idNodeIndexAttribute.Value = "0";
+            idNode.Attributes.Append(idNodeIndexAttribute);
+            coreNode.AppendChild(idNode);
+
+            for (var i = 0; i < fieldDescriptions.Count; i++)
+            {
+                // Create field rows:
+                // < field index = "1" term = "http://rs.tdwg.org/dwc/terms/occurrenceID" />    
+                // ...
+                XmlNode fieldNode = doc.CreateElement("field", elementNamespace);
+                var fieldNodeIndexAttribute = doc.CreateAttribute("index");
+                fieldNodeIndexAttribute.Value = i.ToString();
+                fieldNode.Attributes.Append(fieldNodeIndexAttribute);
+                var fieldNodeTermAttribute = doc.CreateAttribute("term");
+                fieldNodeTermAttribute.Value = fieldDescriptions[i].DwcIdentifier;
+                fieldNode.Attributes.Append(fieldNodeTermAttribute);
+                coreNode.AppendChild(fieldNode);
+            }
+        }
+
+
+        private static void AppendExtension(XmlDocument doc, XmlNode coreNode, ExtensionMetadata metaData, int coreIndex = 0)
         {
             var extension = doc.CreateElement("extension", elementNamespace);
 
@@ -166,7 +257,7 @@ namespace SOS.Lib.IO.DwcArchive
             extension.AppendChild(fileElement);
 
             attr = doc.CreateAttribute("index");
-            attr.Value = "0";
+            attr.Value = coreIndex.ToString();
 
             // <coreid index="0" />
 
@@ -176,8 +267,8 @@ namespace SOS.Lib.IO.DwcArchive
 
             foreach (var f in metaData.Fields.OrderBy(o => o.Index))
             {
+                if (f.ExcludeMetaRow) continue;
                 var field = doc.CreateElement("field", elementNamespace);
-
 
                 attr = doc.CreateAttribute("index");
                 attr.Value = f.Index.ToString();

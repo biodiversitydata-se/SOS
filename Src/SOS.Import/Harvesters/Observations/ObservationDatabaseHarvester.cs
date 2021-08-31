@@ -234,7 +234,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed harvest of observation database");
                 harvestInfo.Status = RunStatus.Failed;
             }
-          
+
             return harvestInfo;
         }
 

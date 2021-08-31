@@ -272,6 +272,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatim.Year,
                 verbatim.Month,
                 verbatim.Day,
+                verbatim.EventTime,
                 out var startDate,
                 out var endDate);
 
