@@ -19,14 +19,14 @@ namespace SOS.Import.Harvesters.Observations
     /// <summary>
     ///     Biologg observation harvester
     /// </summary>
-    public class BiologObservationHarvester : IBiologObservationHarvester
+    public class BiologgObservationHarvester : IBiologgObservationHarvester
     {
         private readonly IFileDownloadService _fileDownloadService;
         private readonly IDwcObservationHarvester _dwcObservationHarvester;
         private readonly IDataProviderRepository _dataProviderRepository;
-        private readonly BiologConfiguration _biologConfiguration;
+        private readonly BiologgConfiguration _biologgConfiguration;
         private readonly DwcaConfiguration _dwcaConfiguration;
-        private readonly ILogger<BiologObservationHarvester> _logger;
+        private readonly ILogger<BiologgObservationHarvester> _logger;
 
         /// <summary>
         /// Constructor
@@ -34,22 +34,22 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="fileDownloadService"></param>
         /// <param name="dwcObservationHarvester"></param>
         /// <param name="dataProviderRepository"></param>
-        /// <param name="biologConfiguration"></param>
+        /// <param name="biologgConfiguration"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
-        public BiologObservationHarvester(
+        public BiologgObservationHarvester(
             IFileDownloadService fileDownloadService,
             IDwcObservationHarvester dwcObservationHarvester,
             IDataProviderRepository dataProviderRepository,
-            BiologConfiguration biologConfiguration,
+            BiologgConfiguration biologgConfiguration,
             DwcaConfiguration dwcaConfiguration,
-            ILogger<BiologObservationHarvester> logger)
+            ILogger<BiologgObservationHarvester> logger)
         {
             _fileDownloadService = fileDownloadService ?? throw new ArgumentNullException(nameof(fileDownloadService));
             _dwcObservationHarvester = dwcObservationHarvester ??
                                        throw new ArgumentNullException(nameof(dwcObservationHarvester));
             _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
-            _biologConfiguration = biologConfiguration ?? throw new ArgumentNullException(nameof(biologConfiguration));
+            _biologgConfiguration = biologgConfiguration ?? throw new ArgumentNullException(nameof(biologgConfiguration));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -68,26 +68,26 @@ namespace SOS.Import.Harvesters.Observations
 
                 if (provider == null)
                 {
-                    throw new Exception("Can't load provider info for Biolog");
+                    throw new Exception("Can't load provider info for Biologg");
                 }
 
-                _logger.LogInformation("Start requesting for download url for Biolog data provider");
+                _logger.LogInformation("Start requesting for download url for Biologg data provider");
 
                 using var httpClient = new HttpClient();
 
                 httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _biologConfiguration.Token);
+                    new AuthenticationHeaderValue("Bearer", _biologgConfiguration.Token);
 
-                var response = await httpClient.GetAsync(_biologConfiguration.Url);
+                var response = await httpClient.GetAsync(_biologgConfiguration.Url);
                 
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new Exception("Failed to retrieve download url for Biolog");
+                    throw new Exception("Failed to retrieve download url for Biologg");
                 }
 
                 var downLoadUrl = await response.Content.ReadAsStringAsync();
 
-                _logger.LogInformation("Finish requesting for download url for Biolog data provider");
+                _logger.LogInformation("Finish requesting for download url for Biologg data provider");
 
                 var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
 
@@ -111,12 +111,12 @@ namespace SOS.Import.Harvesters.Observations
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, "Canceled harvest of biolog");
+                _logger.LogError(e, "Canceled harvest of biologg");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed harvest of biolog");
+                _logger.LogError(e, "Failed harvest of biologg");
                 harvestInfo.Status = RunStatus.Failed;
             }
 

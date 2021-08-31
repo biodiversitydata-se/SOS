@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search;
@@ -307,8 +308,9 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture)
+        public async Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string cultureCode)
         {
+            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
             try
             {
@@ -324,7 +326,7 @@ namespace SOS.Observations.Api.Controllers
 
                 filePath =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
-                        _exportPath, culture,
+                        _exportPath, cultureCode,
                         false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_Excel.zip");
@@ -345,8 +347,9 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter, 
-            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture, [FromQuery] bool flatOut)
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
+            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
             try
             {
@@ -362,7 +365,7 @@ namespace SOS.Observations.Api.Controllers
 
                 filePath =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.GeoJson, 
-                        _exportPath, culture, flatOut,
+                        _exportPath, cultureCode, flatOut,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_GeoJson.zip");
             }
@@ -415,10 +418,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> OrderExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
-            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture)
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string cultureCode)
         {
             try
             {
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
@@ -430,7 +434,7 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, culture, false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -447,10 +451,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> OrderGeoJsonAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
-            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string culture, [FromQuery] bool flatOut)
+            [FromQuery] ExportPropertySet exportPropertySet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
             try
             {
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
@@ -462,7 +467,7 @@ namespace SOS.Observations.Api.Controllers
                 PopulateOutputFields(exportFilter, exportPropertySet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, culture, flatOut, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

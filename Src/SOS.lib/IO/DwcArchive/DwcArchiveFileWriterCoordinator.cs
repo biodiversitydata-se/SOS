@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
@@ -16,6 +17,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Factories;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -41,19 +43,44 @@ namespace SOS.Lib.IO.DwcArchive
             try
             {
                 using var zip = ZipFile.Read(path);
-                var occurenceFile = zip.FirstOrDefault(
-                    f => f.FileName.Contains("occurrence", StringComparison.CurrentCultureIgnoreCase));
-
-                if (occurenceFile == null)
+                long fileSize = 0;
+                foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
                 {
-                    return string.Empty;
+                    fileSize += zipEntry.UncompressedSize;
+                }
+                
+                var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
+
+                if (emlFile == null)
+                {
+                    fileSize -= 1;
+                }
+                else
+                {
+                    fileSize += await GetEmlFileSizeWithoutPubDateAsync(emlFile);
                 }
 
-                return occurenceFile.CompressedSize.ToString();
+                return fileSize.ToString();
             }
             catch
             {
                 return string.Empty;
+            }
+        }
+
+        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipEntry emlZipEntry)
+        {
+            try
+            {
+                await using var stream = new MemoryStream();
+                emlZipEntry.Extract(stream);
+                stream.Position = 0;
+                var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
+                return size;
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
 
@@ -128,7 +155,7 @@ namespace SOS.Lib.IO.DwcArchive
                 
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
-                    .Where(observation => observation?.AccessRights != null && (AccessRightsId)observation?.AccessRights.Id != AccessRightsId.NotForPublicUsage).ToArray();
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
                 await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(publicObservations, filePathByFilePart);
                 return true;
             }

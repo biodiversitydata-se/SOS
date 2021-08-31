@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Helpers;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -47,10 +48,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<TaxonListDefinitionDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "en-GB")
+        public async Task<IActionResult> GetTaxonLists([FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var taxonLists = await _taxonListManager.GetTaxonListsAsync();
 
                 if (!taxonLists?.Any() ?? true)

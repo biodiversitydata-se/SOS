@@ -2,9 +2,9 @@
 namespace SOS.Lib.Configuration.Import
 {
     /// <summary>
-    /// Configuration for bio log
+    /// Configuration for Biologg
     /// </summary>
-    public class BiologConfiguration
+    public class BiologgConfiguration
     {
         /// <summary>
         /// Authentication token

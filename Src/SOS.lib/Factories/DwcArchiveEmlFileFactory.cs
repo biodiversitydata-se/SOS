@@ -32,6 +32,24 @@ namespace SOS.Lib.Factories
 
             return element;
         }
+
+        public static async Task<long> GetEmlSizeWithoutPubDateAsync(Stream stream)
+        {
+            try
+            {
+                var xDoc = XDocument.Load(stream);
+                var dataset = xDoc.Root.Element("dataset");
+                var pubDateElement = GetElement(dataset, "pubDate");
+                pubDateElement?.Remove();
+                var bytes = await xDoc.ToBytesAsync();
+                return bytes.LongLength;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
         private static void SetContact(XElement dataset, DataProvider dataProvider)
         {
             var contact = GetElement(dataset, "contact");
@@ -89,6 +107,12 @@ namespace SOS.Lib.Factories
         /// <param name="dataset"></param>
         private static void SetPubDateToCurrentDate(XElement dataset)
         {
+            GetElement(dataset, "pubDate").SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        public static void SetPubDateToCurrentDate(XDocument xDoc)
+        {
+            var dataset = xDoc.Root.Element("dataset");
             GetElement(dataset, "pubDate").SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
         }
 

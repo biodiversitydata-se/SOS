@@ -122,7 +122,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed to harvest KUL");
                 harvestInfo.Status = RunStatus.Failed;
             }
-
+            
             return harvestInfo;
         }
 

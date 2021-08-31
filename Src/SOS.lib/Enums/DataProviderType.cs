@@ -10,7 +10,7 @@
         Vocabularies,
         Taxa,
         ArtportalenObservations,
-        BiologObservations,
+        BiologgObservations,
         ClamPortalObservations,
         KULObservations,
         DwcA,

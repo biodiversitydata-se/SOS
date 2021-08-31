@@ -33,11 +33,13 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="dwcObservations"></param>
         /// <param name="streamWriter"></param>
         /// <param name="fieldDescriptions"></param>
+        /// <param name="isEventCore"></param>
         /// <returns></returns>
         Task WriteHeaderlessOccurrenceCsvFileAsync(
             IEnumerable<DarwinCore> dwcObservations,
             StreamWriter streamWriter,
-            IEnumerable<FieldDescription> fieldDescriptions);
+            IEnumerable<FieldDescription> fieldDescriptions,
+            bool isEventCore = false);
 
         /// <summary>
         /// Write Occurrence CSV header row.

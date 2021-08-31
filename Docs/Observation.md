@@ -1,5 +1,5 @@
 # Observation object
-
+All fields that are part of an observation are listed on this page.
 
 | Field 	| Type 	| Example 	| Description | Darwin Core 	|
 |:---	|:---	|:---	|:---	|:---	|  

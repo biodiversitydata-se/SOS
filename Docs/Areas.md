@@ -1,4 +1,5 @@
 # Areas
+The most common types of Areas are listed on this page. Information about Areas can be retrieved using the endpoint `/Areas` *(Areas_GetAreas)*. Area geometry can be retrieved using the endpoint `/Area/{areaType}/{featureId}/Export` *(Areas_GetExport)*.
 - [County (Län)](#county-län)
 - [Province (Landskap)](#province-landskap)
 - [Municipality (Kommun)](#municipality-kommun)

@@ -395,6 +395,8 @@ namespace SOS.Observations.Api
             // Add writers
             services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();
             services.AddScoped<IDwcArchiveFileWriterCoordinator, DwcArchiveFileWriterCoordinator>();
+            services.AddScoped<IDwcArchiveEventCsvWriter, DwcArchiveEventCsvWriter>();
+            services.AddScoped<IDwcArchiveEventFileWriter, DwcArchiveEventFileWriter>();            
             services.AddScoped<IDwcArchiveOccurrenceCsvWriter, DwcArchiveOccurrenceCsvWriter>();
             services.AddScoped<IExtendedMeasurementOrFactCsvWriter, ExtendedMeasurementOrFactCsvWriter>();
             services.AddScoped<ISimpleMultimediaCsvWriter, SimpleMultimediaCsvWriter>();

@@ -56,8 +56,8 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.ArtportalenConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
                     .SingleInstance();
-            if (Configurations.ImportConfiguration.BiologConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.BiologConfiguration).As<BiologConfiguration>()
+            if (Configurations.ImportConfiguration.BiologgConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.BiologgConfiguration).As<BiologgConfiguration>()
                     .SingleInstance();
             if (Configurations.ImportConfiguration.DwcaConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.DwcaConfiguration).As<DwcaConfiguration>()
@@ -192,7 +192,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<BiologObservationHarvester>().As<IBiologObservationHarvester>()
+            builder.RegisterType<BiologgObservationHarvester>().As<IBiologgObservationHarvester>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>()
                 .InstancePerLifetimeScope();

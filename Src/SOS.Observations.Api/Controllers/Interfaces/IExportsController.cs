@@ -28,21 +28,21 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="exportPropertySet"></param>
-        /// <param name="culture"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<IActionResult> DownloadExcelAsync(ExportFilterDto filter,
-            ExportPropertySet exportPropertySet, string culture);
+            ExportPropertySet exportPropertySet, string cultureCode);
 
         /// <summary>
         /// Download GeoJson export file 
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="exportPropertySet"></param>
-        /// <param name="culture"></param>
+        /// <param name="cultureCode"></param>
         /// <param name="flatOut"></param>
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJsonAsync(ExportFilterDto filter,
-           ExportPropertySet exportPropertySet, string culture, bool flatOut);
+           ExportPropertySet exportPropertySet, string cultureCode, bool flatOut);
 
         /// <summary>
         /// Starts the process of creating a DwC-A file with observations based on provided filter.
@@ -62,10 +62,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
-        /// <param name="culture"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<IActionResult> OrderExcelAsync(ExportFilterDto filter, string description,
-            ExportPropertySet exportPropertySet, string culture);
+            ExportPropertySet exportPropertySet, string cultureCode);
 
         /// <summary>
         /// Starts the process of creating a GeoJson file with observations based on provided filter.
@@ -75,10 +75,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="description"></param>
         /// <param name="exportPropertySet"></param>
-        /// <param name="culture"></param>
+        /// <param name="cultureCode"></param>
         /// <param name="flatOut"></param>
         /// <returns></returns>
         Task<IActionResult> OrderGeoJsonAsync(ExportFilterDto filter, string description,
-            ExportPropertySet exportPropertySet, string culture, bool flatOut);
+            ExportPropertySet exportPropertySet, string cultureCode, bool flatOut);
     }
 }

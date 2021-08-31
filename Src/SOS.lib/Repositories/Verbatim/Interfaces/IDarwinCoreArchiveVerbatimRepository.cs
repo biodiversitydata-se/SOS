@@ -13,7 +13,6 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         /// <summary>
         /// Count distinct values
         /// </summary>
-        /// <param name="collectionName"></param>
         /// <param name="expression"></param>
         /// <param name="limit"></param>
         /// <returns></returns>

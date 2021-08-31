@@ -236,7 +236,7 @@ namespace SOS.Import.Jobs
         /// Constructor
         /// </summary>
         /// <param name="artportalenObservationHarvester"></param>
-        /// <param name="biologObservationHarvester"></param>
+        /// <param name="biologgObservationHarvester"></param>
         /// <param name="clamPortalObservationHarvester"></param>
         /// <param name="dwcObservationHarvester"></param>
         /// <param name="fishDataObservationHarvester"></param>
@@ -255,7 +255,7 @@ namespace SOS.Import.Jobs
         /// <param name="logger"></param>
         public ObservationsHarvestJob(
             IArtportalenObservationHarvester artportalenObservationHarvester,
-            IBiologObservationHarvester biologObservationHarvester,
+            IBiologgObservationHarvester biologgObservationHarvester,
             IClamPortalObservationHarvester clamPortalObservationHarvester,
             IDwcObservationHarvester dwcObservationHarvester,
             IFishDataObservationHarvester fishDataObservationHarvester,
@@ -280,7 +280,7 @@ namespace SOS.Import.Jobs
             _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));
-            if (biologObservationHarvester == null) throw new ArgumentNullException(nameof(biologObservationHarvester));
+            if (biologgObservationHarvester == null) throw new ArgumentNullException(nameof(biologgObservationHarvester));
             if (clamPortalObservationHarvester == null) throw new ArgumentNullException(nameof(clamPortalObservationHarvester));
             if (dwcObservationHarvester == null) throw new ArgumentNullException(nameof(dwcObservationHarvester));
             if (fishDataObservationHarvester == null) throw new ArgumentNullException(nameof(fishDataObservationHarvester));
@@ -297,7 +297,7 @@ namespace SOS.Import.Jobs
             _harvestersByType = new Dictionary<DataProviderType, IObservationHarvester>
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationHarvester},
-                {DataProviderType.BiologObservations, biologObservationHarvester},
+                {DataProviderType.BiologgObservations, biologgObservationHarvester},
                 {DataProviderType.ClamPortalObservations, clamPortalObservationHarvester},
                 {DataProviderType.DwcA, dwcObservationHarvester},
                 {DataProviderType.FishDataObservations, fishDataObservationHarvester},
