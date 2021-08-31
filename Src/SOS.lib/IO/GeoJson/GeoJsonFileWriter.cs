@@ -90,8 +90,15 @@ namespace SOS.Lib.IO.Excel
                             var firstProperty = true;
                             var prevPropertyParts = new string[0];
                             var openObjects = 0;
+                            var occurrenceId = string.Empty;
                             foreach (var objectProperty in objectProperties.OrderBy(p => p.Key))
                             {
+                                // Add id property
+                                if (objectProperty.Key.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    occurrenceId = objectProperty.Value as string;
+                                }
+
                                 // Check if property is included (OutputFields empty = all)
                                 if (!((!filter.OutputFields?.Any() ?? true) || filter.OutputFields.Contains(objectProperty.Key, StringComparer.CurrentCultureIgnoreCase)))
                                 {
@@ -154,6 +161,11 @@ namespace SOS.Lib.IO.Excel
                             {
                                 await streamWriter.WriteAsync("}");
                                 openObjects--;
+                            }
+
+                            if (!string.IsNullOrEmpty(occurrenceId))
+                            {
+                                await streamWriter.WriteAsync($"{(firstProperty ? "" : ",")} \"id\": \"{occurrenceId}\"");
                             }
 
                             await streamWriter.WriteAsync("}");

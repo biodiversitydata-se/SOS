@@ -291,6 +291,12 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private string GetCurrentIndex(FilterBase filter)
         {
+            if ((filter.ObservedByMe || filter.ReportedByMe) && filter.UserId == 0)
+            {
+                throw new AuthenticationRequiredException("Not authenticated");
+            }
+
+
             if (!filter?.ProtectedObservations ?? true)
             {
                 return PublicIndexName;
