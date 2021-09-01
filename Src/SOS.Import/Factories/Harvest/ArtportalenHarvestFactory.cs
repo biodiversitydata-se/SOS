@@ -167,6 +167,7 @@ namespace SOS.Import.Factories.Harvest
                     observation.ReportedBy = personSighting.ReportedBy;
                     observation.SpeciesCollection = personSighting.SpeciesCollection;
                     observation.ReportedByUserId = personSighting.ReportedByUserId;
+                    observation.ReportedByUserServiceUserId = personSighting.ReportedByUserServiceUserId;
                     observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
                 }
 

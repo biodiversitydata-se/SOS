@@ -11,6 +11,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public IEnumerable<UserInternal> VerifiedByInternal { get; set; }
         public string ReportedBy { get; set; }
         public int ReportedByUserId { get; set; }
+        public int? ReportedByUserServiceUserId { get; set; }
         public string ReportedByUserAlias { get; set; }
         public string SpeciesCollection { get; set; }
 

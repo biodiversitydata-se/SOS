@@ -119,6 +119,7 @@ namespace SOS.Import.Factories
 
                     personSighting.ReportedBy = pair.Value.FullName;
                     personSighting.ReportedByUserId = pair.Value.UserId;
+                    personSighting.ReportedByUserServiceUserId = pair.Value.UserServiceUserId;
                     personSighting.ReportedByUserAlias = pair.Value.Alias;
 
                 }
@@ -134,7 +135,7 @@ namespace SOS.Import.Factories
                     pair.Value.Observers = "Via " + pair.Value.ReportedBy;
                     pair.Value.ObserversInternal = new List<UserInternal>
                     {
-                        new UserInternal {Id = pair.Value.ReportedByUserId, UserAlias = pair.Value.ReportedByUserAlias}
+                        new UserInternal {Id = pair.Value.ReportedByUserId, UserServiceUserId = pair.Value.ReportedByUserServiceUserId, UserAlias = pair.Value.ReportedByUserAlias, ViewAccess = true}
                     };
                 }
             }
@@ -209,7 +210,7 @@ namespace SOS.Import.Factories
                     .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0 ));
                 var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
-                    (observers, persons.Select(g => new UserInternal {Id = g.person.Id, UserAlias = g.person.Alias, ViewAccess = g.viewAccess })));
+                    (observers, persons.Select(g => new UserInternal {Id = g.person.Id, UserServiceUserId = g.person.UserServiceUserId, UserAlias = g.person.Alias, ViewAccess = g.viewAccess })));
             }
 
             return observersBySightingId;

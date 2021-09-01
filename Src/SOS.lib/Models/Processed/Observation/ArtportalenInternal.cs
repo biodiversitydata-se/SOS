@@ -125,6 +125,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? ReportedByUserId { get; set; }
 
         /// <summary>
+        ///     User Service id of the person that reported the species observation.
+        /// </summary>
+        [SwaggerExclude]
+        public int? ReportedByUserServiceUserId { get; set; }
+        
+        /// <summary>
         ///     Alias for the reporter, internal use only.
         /// </summary>
         [SwaggerExclude]
