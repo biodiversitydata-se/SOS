@@ -1106,12 +1106,12 @@ namespace SOS.Lib.Extensions
 
             if (filter.ObservedByMe && filter.UserId > 0)
             {
-                query.TryAddTermCriteria("artportalenInternal.reportedByUserId", filter.UserId);
+                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", filter.UserId);
             }
 
             if (filter.ReportedByMe && filter.UserId > 0)
             {
-                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.id", filter.UserId);
+                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
                 query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
             }
 

@@ -8,6 +8,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// User Service id
+        /// </summary>
+        public int? UserServiceUserId { get; set; }
+
+        /// <summary>
         ///     User alias
         /// </summary>
         public string UserAlias { get; set; }

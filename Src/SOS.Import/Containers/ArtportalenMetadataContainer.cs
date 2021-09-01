@@ -106,7 +106,8 @@ namespace SOS.Import.Containers
                        UserId = e.UserId,
                        FirstName = e.FirstName,
                        LastName = e.LastName,
-                       Alias = e.Alias
+                       Alias = e.Alias,
+                       UserServiceUserId = e.UserServiceUserId
                    };
         }
         #endregion Person

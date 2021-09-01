@@ -16,6 +16,11 @@
         public int UserId { get; set; }
 
         /// <summary>
+        /// Id in User Service
+        /// </summary>
+        public int? UserServiceUserId { get; set; }
+
+        /// <summary>
         ///     First name of person
         /// </summary>
         public string FirstName { get; set; }
