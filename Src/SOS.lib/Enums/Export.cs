@@ -18,23 +18,4 @@
         /// </summary>
         Excel
     }
-
-    /// <summary>
-    /// Export property sets
-    /// </summary>
-    public enum ExportPropertySet
-    {
-        /// <summary>
-        /// Minimum of properties exported
-        /// </summary>
-        Minimum,
-        /// <summary>
-        /// A extended set of properties exported
-        /// </summary>
-        Extended,
-        /// <summary>
-        /// All properties exported
-        /// </summary>
-        All
-    }
 }

@@ -151,17 +151,17 @@ namespace SOS.Observations.Api.Controllers
                 errors.Add(areaValidationResult.Error);
             }
 
-            if (searchFilter?.OutputFields?.Any() ?? false)
+            if (searchFilter?.Output?.Fields?.Any() ?? false)
             {
-                errors.AddRange(searchFilter.OutputFields
+                errors.AddRange(searchFilter.Output.Fields
                     .Where(of => !typeof(Observation).HasProperty(of))
                     .Select(of => $"Output field doesn't exist ({of})"));
             }
 
             var searchFilterInternal = filter as SearchFilterInternalDto;
-            if (searchFilterInternal?.OutputFields?.Any() ?? false)
+            if (searchFilterInternal?.Output?.Fields?.Any() ?? false)
             {
-                errors.AddRange(searchFilterInternal.OutputFields
+                errors.AddRange(searchFilterInternal.Output.Fields
                     .Where(of => !typeof(Observation).HasProperty(of))
                     .Select(of => $"Output field doesn't exist ({of})"));
             }

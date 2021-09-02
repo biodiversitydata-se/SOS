@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -70,7 +71,8 @@ namespace SOS.Observations.Api.Extensions
 
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
-                filter.OutputFields = searchFilterDto.OutputFields;
+                filter.OutputFields = searchFilterDto.Output?.Fields;
+                filter.PopulateOutputFields(searchFilterDto.Output?.FieldSet);
             }
 
             if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
@@ -81,7 +83,8 @@ namespace SOS.Observations.Api.Extensions
                 if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
                 {
                     filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filter.OutputFields = searchFilterInternalDto.OutputFields;
+                    filter.OutputFields = searchFilterInternalDto.Output?.Fields;
+                    filter.PopulateOutputFields(searchFilterInternalDto.Output?.FieldSet);
                 }
             }
 
@@ -346,9 +349,20 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
+        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        {
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+        }
+
         public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
         {
             return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+        }
+
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto,
+            string translationCultureCode, bool protectedObservations)
+        {
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,

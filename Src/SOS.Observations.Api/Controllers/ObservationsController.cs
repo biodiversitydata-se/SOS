@@ -338,7 +338,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Count(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterDto filter,
+            [FromBody] SearchFilterBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {
@@ -709,7 +709,17 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
                 {
-                    filter.OutputFields = EnsureCoordinatesIsRetrievedFromDb(filter?.OutputFields);
+                    var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+
+                    if (outPutFields?.Any() ?? false)
+                    {
+                        if (filter.Output == null)
+                        {
+                            filter.Output = new OutputFilterDto();
+                        }
+
+                        filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+                    }
                 }
                 var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
@@ -846,7 +856,7 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> CountInternal(
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromBody] SearchFilterInternalDto filter,
+            [FromBody] SearchFilterInternalBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool protectedObservations = false)
         {

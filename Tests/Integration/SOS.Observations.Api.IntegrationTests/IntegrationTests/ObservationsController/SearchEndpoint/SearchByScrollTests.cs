@@ -46,7 +46,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                         TestData.Areas.JonkopingCounty // Jönköping County
                     },
                 },
-                OutputFields = new List<string> { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
+                Output = new OutputFilterDto
+                {
+                    Fields = new [] { "event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.occurrenceId", "occurrence.recordedBy", "occurrence.occurrenceStatus" }
+                }
             };
             var observations = new List<Observation>();
 
