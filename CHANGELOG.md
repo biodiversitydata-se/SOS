@@ -14,6 +14,7 @@
 - Export to GeoJSON.
 - Multimedia extension is added to the Artportalen DwC-A export.
 - Support for storing imported DwC-A file.
+- Replaced OutputFields in search filter with output: { fields : string[], fieldSet: enum  (Minimum, Ectended, All)}
 
 ### `Fixed`
 - DwC-A time parsing bug in the harvest step.

@@ -20,6 +20,25 @@ namespace SOS.Lib.Enums
         Desc = 1
     }
 
+    /// <summary>
+    /// Export property sets
+    /// </summary>
+    public enum OutputFieldSet
+    {
+        /// <summary>
+        /// Minimum of properties exported
+        /// </summary>
+        Minimum,
+        /// <summary>
+        /// A extended set of properties exported
+        /// </summary>
+        Extended,
+        /// <summary>
+        /// All properties exported
+        /// </summary>
+        All
+    }
+
     public enum SightingDeterminationFilter
     {
         NoFilter,

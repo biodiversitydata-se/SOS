@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
@@ -14,7 +13,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     {
         Task<IActionResult> Count(
             string authorizationApplicationIdentifier,
-            SearchFilterDto filter,
+            SearchFilterBaseDto filter,
             bool validateSearchFilter = false,
             bool protectedObservations = false);
 
@@ -28,7 +27,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
 
         Task<IActionResult> CountInternal(
             string authorizationApplicationIdentifier,
-            SearchFilterInternalDto filter,
+            SearchFilterInternalBaseDto filter,
             bool validateSearchFilter = false,
             bool protectedObservations = false);
 

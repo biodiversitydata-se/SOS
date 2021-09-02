@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SOS.Observations.Api.Dtos.Filter
+﻿namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
     /// Internal search filter.
@@ -13,11 +11,8 @@ namespace SOS.Observations.Api.Dtos.Filter
         public bool IncludeRealCount { get; set; }
 
         /// <summary>
-        ///     This parameter allows you to create a dynamic view of the collection, or more precisely,
-        ///     to decide what fields should or should not be returned, using a projection. Put another way,
-        ///     your projection is a conditional query where you dictates which fields should be returned by the API.
-        ///     Omit this parameter and you will receive the complete collection of fields.
+        /// Response output settings
         /// </summary>
-        public ICollection<string> OutputFields { get; set; }
+        public OutputFilterDto Output { get; set; }
     }
 }
