@@ -169,7 +169,10 @@ namespace SOS.Lib.Models.Shared
 
         public override string ToString()
         {
-            return $"[Id={Id}, Identfier={Identifier}] - {Names.Translate("en-GB")}";
+            if (Names == null)
+                return $"[Id={Id}, Identfier={Identifier}]";
+            else
+                return $"[Id={Id}, Identfier={Identifier}] - {Names.Translate("en-GB")}";
         }
 
         protected bool Equals(DataProvider other)
