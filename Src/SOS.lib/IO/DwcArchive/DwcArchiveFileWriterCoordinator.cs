@@ -127,15 +127,6 @@ namespace SOS.Lib.IO.DwcArchive
                 return true;
             }
 
-            if (dataProvider.UseVerbatimFileInExport)
-            {
-                if (!_dwcaFilePartsInfoByDataProvider?.ContainsKey(dataProvider) ?? true)
-                {
-                    CreateDwcaFilePartsInfo(dataProvider);
-                }
-                return true;
-            }
-
             // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
@@ -221,7 +212,7 @@ namespace SOS.Lib.IO.DwcArchive
                 }
 
                 dwcaCreationTasks.Add(new DataProvider {Id = 0, Identifier = "SOS Complete"},  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
-                    _dwcaFilePartsInfoByDataProvider.Values.Where(fp => !fp.DataProvider.UseVerbatimFileInExport)));
+                    _dwcaFilePartsInfoByDataProvider.Values));
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
                 var createdDwcaFiles = new List<string>();
