@@ -1102,12 +1102,12 @@ namespace SOS.Lib.Extensions
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);
 
-            if (filter.ObservedByMe && filter.UserId > 0)
+            if (filter.ReportedByMe && filter.UserId > 0)
             {
                 query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", filter.UserId);
             }
 
-            if (filter.ReportedByMe && filter.UserId > 0)
+            if (filter.ObservedByMe && filter.UserId > 0)
             {
                 query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
                 query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
