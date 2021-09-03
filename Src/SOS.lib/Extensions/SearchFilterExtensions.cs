@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
@@ -18,29 +19,29 @@ namespace SOS.Lib.Extensions
         /// <param name="outputFieldSet"></param>
         public static void PopulateOutputFields(this SearchFilter filter, OutputFieldSet? outputFieldSet)
         {
-            if (filter == null || (outputFieldSet ?? OutputFieldSet.All) == OutputFieldSet.All)
-            {
-                return;
-            }
+            const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
+            var fieldSet = outputFieldSet == null ? defaultFieldSet : (OutputFieldSet)outputFieldSet;
+            if (fieldSet == OutputFieldSet.All) return;
 
             var outputFields = new List<string>
             {
                 "DatasetName",
                 "Identification.Validated",
                 "Identification.UncertainIdentification",
-                "Location.County.Name",
-                "Location.Municipality.Name",
+                "Location.County",
+                "Location.Municipality",
                 "Location.DecimalLongitude",
                 "Location.DecimalLatitude",
                 "Location.CoordinateUncertaintyInMeters",
-                "Occurrence.OccurrenceStatus.Value",
+                "Occurrence.OccurrenceStatus",
+                "Occurrence.ReportedBy",
                 "Occurrence.RecordedBy",
                 "Taxon.Attributes.OrganismGroup",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName"
             };
 
-            if (outputFieldSet == OutputFieldSet.Extended)
+            if (fieldSet == OutputFieldSet.Extended)
             {
                 outputFields.AddRange(new[]
                 {
