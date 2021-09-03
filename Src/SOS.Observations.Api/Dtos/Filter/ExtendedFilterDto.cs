@@ -33,8 +33,25 @@ namespace SOS.Observations.Api.Dtos.Filter
             BothStartDateAndEndDate
         }
 
+        /// <summary>
+        /// Reported by Artportalen user id.
+        /// </summary>
         public int? ReportedByUserId { get; set; }
+        
+        /// <summary>
+        /// Observed by Artportalen user id.
+        /// </summary>
         public int? ObservedByUserId { get; set; }
+
+        /// <summary>
+        /// Reported by user service user id.
+        /// </summary>
+        public int? ReportedByUserServiceUserId { get; set; }
+        
+        /// <summary>
+        /// Observed by user service user id.
+        /// </summary>
+        public int? ObservedByUserServiceUserId { get; set; }
 
         /// <summary>
         /// Id of sex to match

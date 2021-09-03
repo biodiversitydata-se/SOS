@@ -109,11 +109,9 @@ namespace SOS.Lib.Extensions
             var internalFilter = filter as SearchFilterInternal;
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
-            query.Add(q => q
-                .Nested(n => n
-                    .Path("artportalenInternal.occurrenceRecordedByInternal")
-                    .Query(qq=>qq
-                        .Term(new Field("artportalenInternal.occurrenceRecordedByInternal.id"),  internalFilter.ObservedByUserId))));
+            query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId);
 
             query.TryAddTermCriteria("institutionId.keyword", internalFilter.InstitutionId);
 
