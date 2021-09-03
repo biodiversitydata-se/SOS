@@ -19,9 +19,14 @@ namespace SOS.Lib.Extensions
         /// <param name="outputFieldSet"></param>
         public static void PopulateOutputFields(this SearchFilter filter, OutputFieldSet? outputFieldSet)
         {
+            if (filter.OutputFields?.Any() == true && outputFieldSet == null) return;
             const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
             var fieldSet = outputFieldSet == null ? defaultFieldSet : (OutputFieldSet)outputFieldSet;
-            if (fieldSet == OutputFieldSet.All) return;
+            if (fieldSet == OutputFieldSet.All)
+            {
+                filter.OutputFields = null;
+                return;
+            }
 
             var outputFields = new List<string>
             {
