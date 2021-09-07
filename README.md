@@ -12,6 +12,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 
 ## Data types and vocabularies
 - [Observation](Docs/Observation.md)
+- [Data providers](Docs/DataProviders.md)
 - [Vocabularies](Docs/Vocabularies.md)
 - [Areas](Docs/Areas.md)
 
