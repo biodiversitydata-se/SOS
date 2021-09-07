@@ -42,6 +42,7 @@ namespace SOS.Lib.Extensions
                 "Occurrence.ReportedBy",
                 "Occurrence.RecordedBy",
                 "Taxon.Attributes.OrganismGroup",
+                "Taxon.Attributes.DyntaxaTaxonId",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName"
             };
@@ -109,7 +110,6 @@ namespace SOS.Lib.Extensions
                     "Taxon.Family",
                     "Taxon.Genus",
                     "Taxon.TaxonId",
-                    "Taxon.Attributes.DyntaxaTaxonId",
                     "Taxon.Attributes.ProtectionLevel",
                     "Taxon.Attributes.RedlistCategory",
                     "Taxon.Attributes.ProtectedByLaw"
