@@ -40,7 +40,7 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationFilter>> AddAuthorizationAsync(UserModel user, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (user == null)
             {
@@ -55,7 +55,7 @@ namespace SOS.Lib.Managers
                 return null;
             }
             
-            var extendedAuthorizationFilters = new List<ExtendedAuthorizationFilter>();
+            var extendedAuthorizationAreaFilters = new List<ExtendedAuthorizationAreaFilter>();
 
             foreach (var authority in authorities)
             {
@@ -65,7 +65,7 @@ namespace SOS.Lib.Managers
                     continue;
                 }
 
-                var extendedAuthorizationFilter = new ExtendedAuthorizationFilter
+                var extendedAuthorizationAreaFilter = new ExtendedAuthorizationAreaFilter
                 {
                     Identity = authority.AuthorityIdentity,
                     MaxProtectionLevel = authority.MaxProtectionLevel
@@ -85,25 +85,25 @@ namespace SOS.Lib.Managers
 
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
-                extendedAuthorizationFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                extendedAuthorizationFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
+                extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
+                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
 
                 // To get extended authorization, taxon id's and some area must be set 
                 if (
                         authorizedToSweden ||
-                        (extendedAuthorizationFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
-                        (extendedAuthorizationFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
-                        (extendedAuthorizationFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
-                        (extendedAuthorizationFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
-                        (extendedAuthorizationFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
-                        (extendedAuthorizationFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
+                        (extendedAuthorizationAreaFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
                 )
                 {
-                    extendedAuthorizationFilters.Add(extendedAuthorizationFilter);
+                    extendedAuthorizationAreaFilters.Add(extendedAuthorizationAreaFilter);
                 }
             }
 
-            return extendedAuthorizationFilters;
+            return extendedAuthorizationAreaFilters;
         }
 
         private async Task<IEnumerable<int>> GetDefaultDataProvidersIfEmptyAsync(IEnumerable<int> dataproviderIds)
@@ -293,16 +293,15 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
-            if (filter.ProtectedObservations || filter.ObservedByMe || filter.ReportedByMe)
+            if (filter.ExtendedAuthorization.ProtectedObservations || filter.ExtendedAuthorization.ViewOwn)
             {
                 // Get user
                 var user = await _userService.GetUserAsync();
+                filter.ExtendedAuthorization.UserId = user?.Id ?? 0;
 
-                filter.UserId = user?.Id ?? 0;
-
-                if (filter.ProtectedObservations)
+                if (filter.ExtendedAuthorization.ProtectedObservations)
                 {
-                    filter.ExtendedAuthorizations = await AddAuthorizationAsync(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                    filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
                     // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                     if (filter is SearchFilter searchFilter)

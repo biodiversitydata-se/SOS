@@ -2,8 +2,19 @@
 
 namespace SOS.Lib.Models.Search
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SearchFilter : FilterBase
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SearchFilter() : base()
+        {
+
+        }
+
         /// <summary>
         ///     This parameter allows you to create a dynamic view of the collection, or more precisely,
         ///     to decide what fields should or should not be returned, using a projection. Put another way,

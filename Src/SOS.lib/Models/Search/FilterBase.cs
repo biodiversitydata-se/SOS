@@ -11,6 +11,14 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public FilterBase()
+        {
+            ExtendedAuthorization = new ExtendedAuthorizationFilter();
+        }
+
         public enum SightingTypeFilter
         {
             DoNotShowMerged,
@@ -111,12 +119,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Filter used to give user extended authorization
         /// </summary>
-        public IEnumerable<ExtendedAuthorizationFilter> ExtendedAuthorizations { get; set; }
-
-        /// <summary>
-        /// Only include ProtectedObservations
-        /// </summary>
-        public bool ProtectedObservations { get; set; }
+        public ExtendedAuthorizationFilter ExtendedAuthorization { get; set; }
 
         /// <summary>
         ///     Vocabulary mapping translation culture code.
@@ -193,21 +196,6 @@ namespace SOS.Lib.Models.Search
         /// not affected by this search criteria. 
         /// </summary>
         public int? BirdNestActivityLimit { get; set; }
-
-        /// <summary>
-        /// Only get observations observed by me
-        /// </summary>
-        public bool ObservedByMe { get; set; }
-
-        /// <summary>
-        /// Only get observations reported by me
-        /// </summary>
-        public bool ReportedByMe { get; set; }
-
-        /// <summary>
-        /// Id of user making the request
-        /// </summary>
-        public int UserId { get; set; }
 
         public FilterBase Clone()
         {
