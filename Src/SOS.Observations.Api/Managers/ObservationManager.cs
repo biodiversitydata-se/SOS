@@ -496,10 +496,12 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
         {
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
-            
+           
+            filter.PopulateOutputFields(outputFieldSet);
+           
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
             filter.ExtendedAuthorization.ObservedByMe = true;
             filter.ExtendedAuthorization.ReportedByMe = true;
