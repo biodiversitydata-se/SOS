@@ -75,20 +75,5 @@ namespace SOS.Lib.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             fieldDescriptions.Should().Contain(x => x.Id == (int) FieldDescriptionId.CatalogNumber);
         }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        public void TestGetAllDefaultDwcFieldDescriptions()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var fields = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            fields.Count().Should().BeGreaterThan(100);
-        }
     }
 }
