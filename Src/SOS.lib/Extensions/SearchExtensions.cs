@@ -37,8 +37,20 @@ namespace SOS.Lib.Extensions
             // If user want to see their reported or observed observations
             if (filter.ViewOwn && !filter.NotOnlyOwn)
             {
-                query.AddAuthorizeMeFilters(filter);
-                return;
+                if (filter.ObservedByMe)
+                {
+                    query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
+                        filter.UserId);
+                }
+
+                if (filter.ReportedByMe)
+                {
+                    query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                        "userServiceUserId",
+                        filter.UserId);
+                    query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                        "viewAccess", true);
+                }
             }
 
             if (!filter.ProtectedObservations)
@@ -69,13 +81,35 @@ namespace SOS.Lib.Extensions
 
             if (filter.AllowViewOwn)
             {
-                var meQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                meQuery.AddAuthorizeMeFilters(filter);
-                authorizeQuerys.Add(q => q
-                    .Bool(b => b
-                        .Filter(meQuery)
-                    )
-                );
+                if (filter.ObservedByMe)
+                {
+                    var observedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                    observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
+                        filter.UserId);
+
+                    authorizeQuerys.Add(q => q
+                        .Bool(b => b
+                            .Filter(observedByMeQuery)
+                        )
+                    );
+                }
+
+                if (filter.ReportedByMe)
+                {
+                    var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+                    reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                        "userServiceUserId",
+                        filter.UserId);
+                    reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                        "viewAccess", true);
+
+                    authorizeQuerys.Add(q => q
+                        .Bool(b => b
+                            .Filter(reportedByMeQuery)
+                        )
+                    );
+                }
             }
 
             if (authorizeQuerys.Any())
@@ -90,32 +124,6 @@ namespace SOS.Lib.Extensions
 
             // No extended areas and not allowed to view own observations. Add criteria to make sure no protected observations will be returned
             query.TryAddTermCriteria("protected", false);
-        }
-
-        /// <summary>
-        /// Add filter to allow access to observations reported or observed by requesting user
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="filter"></param>
-        private static void AddAuthorizeMeFilters(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
-        {
-            if (filter.ObservedByMe)
-            {
-                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
-                    filter.UserId);
-            }
-
-            if (!filter.ReportedByMe)
-            {
-                return;
-            }
-
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                "userServiceUserId",
-                filter.UserId);
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                "viewAccess", true);
         }
 
         private static void AddGeoDistanceCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance)
@@ -162,8 +170,8 @@ namespace SOS.Lib.Extensions
 
             query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
             query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId);
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", internalFilter.ObservedByUserId);
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "userServiceUserId", internalFilter.ObservedByUserServiceUserId);
 
             query.TryAddTermCriteria("institutionId.keyword", internalFilter.InstitutionId);
 
@@ -386,7 +394,7 @@ namespace SOS.Lib.Extensions
         }
 
         private static void AddNestedMustExistsCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string path, string field)
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string path)
         {
             query.Add(q => q
                 .Nested(n => n
@@ -395,7 +403,7 @@ namespace SOS.Lib.Extensions
                         .Bool(b => b
                             .Filter(f => f
                                 .Exists(e => e
-                                    .Field(field)
+                                    .Field(path)
                                 )
                             )
                         )
@@ -1059,7 +1067,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("occurrence.media", "occurrence.media");
+            query.AddNestedMustExistsCriteria("occurrence.media");
             return query;
         }
 
@@ -1067,7 +1075,7 @@ namespace SOS.Lib.Extensions
             this FilterBase filter)
         {
             var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("measurementOrFacts", "measurementOrFacts");
+            query.AddNestedMustExistsCriteria("measurementOrFacts");
             return query;
         }
 
