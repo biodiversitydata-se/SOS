@@ -12,7 +12,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Constructor
         /// </summary>
-        public SearchFilterInternal()
+        public SearchFilterInternal() : base()
         {
 
         }
@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Search
         /// Constructor
         /// </summary>
         /// <param name="searchFilter"></param>
-        public SearchFilterInternal(SearchFilter searchFilter)
+        public SearchFilterInternal(SearchFilter searchFilter) : base()
         {
             if (searchFilter == null)
             {

@@ -32,7 +32,6 @@ namespace SOS.Observations.Api.Extensions
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
             filter.ValidationStatus = (FilterBase.StatusValidation) searchFilterBaseDto.ValidationStatus;
-            filter.ProtectedObservations = protectedObservations;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
             filter.MaxAccuracy = searchFilterBaseDto.Geographics?.MaxAccuracy;
@@ -46,8 +45,10 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = searchFilterBaseDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
                 };
-            filter.ObservedByMe = searchFilterBaseDto.ObservedByMe;
-            filter.ReportedByMe = searchFilterBaseDto.ReportedByMe;
+
+            filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
+            filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
+            filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
 
             if (searchFilterBaseDto.OccurrenceStatus != null)
             {
@@ -414,11 +415,11 @@ namespace SOS.Observations.Api.Extensions
                 NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
                 NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
                 PositiveSightings = true,
-                ProtectedObservations = true,
                 StartDate = searchFilterDto.StartDate,
                 Taxa = PopulateTaxa(searchFilterDto.Taxon),
                 UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
             };
+            searchFilter.ExtendedAuthorization.ProtectedObservations = true;
 
             return searchFilter;
         }
