@@ -72,7 +72,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new SearchFilter(),
                 memoryStream,
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
@@ -158,7 +158,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new SearchFilter(),
                 memoryStream,
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
@@ -193,7 +193,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new SearchFilter(),
                 memoryStream,
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 

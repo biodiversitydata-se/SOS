@@ -24,7 +24,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var fieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions().ToList();
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             fieldDescriptions.RemoveAt(0);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var fieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
