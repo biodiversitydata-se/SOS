@@ -127,24 +127,29 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
+        /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationById(
             string authorizationApplicationIdentifier,
-            string occurrenceId, string translationCultureCode = "sv-SE", bool protectedObservations = false);
+            string occurrenceId, OutputFieldSet fieldSet, 
+            string translationCultureCode = "sv-SE", 
+            bool protectedObservations = false);
 
         /// <summary>
         /// Get observation by occurrence id, include internal data
         /// </summary>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
+        /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationByIdInternal(
             string authorizationApplicationIdentifier,
             string occurrenceId,
+            OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false);
     }

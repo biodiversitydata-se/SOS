@@ -159,11 +159,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
+        /// <param name="outputFieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
         /// <param name="includeInternalFields"></param>
         /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, string translationCultureCode, bool protectedObservations, bool includeInternalFields);
+        Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields);
 
         /// <summary>
         /// Signal search
