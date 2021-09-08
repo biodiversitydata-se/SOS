@@ -291,19 +291,18 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private string GetCurrentIndex(FilterBase filter)
         {
-            if ((filter.ObservedByMe || filter.ReportedByMe) && filter.UserId == 0)
+            if ((filter?.ExtendedAuthorization.ViewOwn ?? false) && (!filter?.ExtendedAuthorization.AllowViewOwn ?? true) && (!filter?.ExtendedAuthorization.NotOnlyOwn ?? true))
             {
                 throw new AuthenticationRequiredException("Not authenticated");
             }
 
-
-            if (!filter?.ProtectedObservations ?? true)
+            if (!filter?.ExtendedAuthorization.ProtectedObservations ?? true)
             {
                 return PublicIndexName;
             }
 
-            if (!_httpContextAccessor?.HttpContext?.User?.IsAuthorized(_elasticConfiguration.ProtectedScope,
-                filter.ExtendedAuthorizations) ?? true)
+            if ((!_httpContextAccessor?.HttpContext?.User?.HasAccessToScope(_elasticConfiguration.ProtectedScope) ?? true) || 
+                (!filter?.ExtendedAuthorization?.AllowProtected ?? true))
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
@@ -1628,10 +1627,10 @@ namespace SOS.Lib.Repositories.Processed
             bool onlyAboveMyClearance)
         {
             // Save user extended authorization to use later
-            var extendedAuthorizations = filter.ExtendedAuthorizations;
+            var extendedAuthorizations = filter.ExtendedAuthorization?.ExtendedAreas;
 
             // Reset extended authorization so it not will affect query
-            filter.ExtendedAuthorizations = null;
+            filter.ExtendedAuthorization.ExtendedAreas = null;
            
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
