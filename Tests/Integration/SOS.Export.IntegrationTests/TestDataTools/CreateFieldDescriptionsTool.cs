@@ -24,7 +24,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             var dic = DarwinCoreDynamicMap.CreateVocabularyDictionary();
             var sb = new StringBuilder();
             var fieldDescriptions = FieldDescriptionHelper.GetAllFieldDescriptions();
-            var dwcFieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();
+            var dwcFieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
             var orderedDictionary = dic.OrderBy(f => fieldDescriptions.First(d => d.FieldDescriptionId == f.Key).Id);
 
             //-----------------------------------------------------------------------------------------------------------
