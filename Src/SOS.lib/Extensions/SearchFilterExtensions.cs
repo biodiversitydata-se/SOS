@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
@@ -18,8 +19,12 @@ namespace SOS.Lib.Extensions
         /// <param name="outputFieldSet"></param>
         public static void PopulateOutputFields(this SearchFilter filter, OutputFieldSet? outputFieldSet)
         {
-            if (filter == null || (outputFieldSet ?? OutputFieldSet.All) == OutputFieldSet.All)
+            if (filter.OutputFields?.Any() == true && outputFieldSet == null) return;
+            const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
+            var fieldSet = outputFieldSet == null ? defaultFieldSet : (OutputFieldSet)outputFieldSet;
+            if (fieldSet == OutputFieldSet.All)
             {
+                filter.OutputFields = null;
                 return;
             }
 
@@ -28,19 +33,21 @@ namespace SOS.Lib.Extensions
                 "DatasetName",
                 "Identification.Validated",
                 "Identification.UncertainIdentification",
-                "Location.County.Name",
-                "Location.Municipality.Name",
+                "Location.County",
+                "Location.Municipality",
                 "Location.DecimalLongitude",
                 "Location.DecimalLatitude",
                 "Location.CoordinateUncertaintyInMeters",
-                "Occurrence.OccurrenceStatus.Value",
+                "Occurrence.OccurrenceStatus",
+                "Occurrence.ReportedBy",
                 "Occurrence.RecordedBy",
                 "Taxon.Attributes.OrganismGroup",
+                "Taxon.Attributes.DyntaxaTaxonId",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName"
             };
 
-            if (outputFieldSet == OutputFieldSet.Extended)
+            if (fieldSet == OutputFieldSet.Extended)
             {
                 outputFields.AddRange(new[]
                 {
@@ -48,34 +55,46 @@ namespace SOS.Lib.Extensions
                     "InstitutionCode",
                     "OwnerInstitutionCode",
                     "BasisOfRecord",
+                    "Projects.Id",
+                    "Projects.Name",
+                    "Projects.Owner",
+                    "Projects.ProjectParameters.Name",
+                    "Projects.ProjectParameters.Value",
+                    "Projects.ProjectParameters.Unit",
+                    "MeasurementOrFacts.MeasurementType",
+                    "MeasurementOrFacts.MeasurementValue",
+                    "MeasurementOrFacts.MeasurementUnit",
                     "Event.Habitat",
                     "Event.EventRemarks",
                     "Event.SamplingEffort",
                     "Event.SamplingProtocol",
                     "Event.SampleSizeUnit",
                     "Event.SampleSizeValue",
+                    "Event.MeasurementOrFacts.MeasurementType",
+                    "Event.MeasurementOrFacts.MeasurementValue",
+                    "Event.MeasurementOrFacts.MeasurementUnit",
                     "Location.Locality",
-                    "Location.Province.Name",
-                    "Location.Parish.Name",
+                    "Location.Province",
+                    "Location.Parish",
                     "Location.GeodeticDatum",
                     "Occurrence.ReportedBy",
                     "Occurrence.Url",
                     "Occurrence.AssociatedMedia",
                     "Occurrence.OccurrenceRemarks",
-                    "Occurrence.Activity.Value",
-                    "Occurrence.Behavior.Value",
-                    "Occurrence.LifeStage.Value",
-                    "Occurrence.ReproductiveCondition.Value",
-                    "Occurrence.Sex.Value",
-                    "Occurrence.Biotope.Value",
+                    "Occurrence.Activity",
+                    "Occurrence.Behavior",
+                    "Occurrence.LifeStage",
+                    "Occurrence.ReproductiveCondition",
+                    "Occurrence.Sex",
+                    "Occurrence.Biotope",
                     "Occurrence.BiotopeDescription",
                     "Occurrence.ProtectionLevel",
                     "Occurrence.IsNeverFoundObservation",
                     "Occurrence.IsNotRediscoveredObservation",
                     "Occurrence.IsNaturalOccurrence",
                     "Occurrence.IsPositiveObservation",
-                    "Occurrence.Substrate.Name.Value",
-                    "Occurrence.individualCount",
+                    "Occurrence.Substrate.Name",
+                    "Occurrence.IndividualCount",
                     "Occurrence.OrganismQuantity",
                     "Occurrence.OrganismQuantityInt",
                     "Occurrence.OrganismQuantityUnit",
@@ -83,7 +102,7 @@ namespace SOS.Lib.Extensions
                     "Identification.ConfirmedBy",
                     "Identification.IdentifiedBy",
                     "Identification.VerifiedBy",
-                    "Identification.DeterminationMethod.Value",
+                    "Identification.DeterminationMethod",
                     "Taxon.Kingdom",
                     "Taxon.Phylum",
                     "Taxon.Class",
@@ -91,12 +110,9 @@ namespace SOS.Lib.Extensions
                     "Taxon.Family",
                     "Taxon.Genus",
                     "Taxon.TaxonId",
-                    "Taxon.Attributes.DyntaxaTaxonId",
-                    "Taxon.Attributes.ProtectionLevel.Value",
+                    "Taxon.Attributes.ProtectionLevel",
                     "Taxon.Attributes.RedlistCategory",
-                    "Taxon.Attributes.ProtectedByLaw",
-                    "Project.Id",
-                    "Project.Name"
+                    "Taxon.Attributes.ProtectedByLaw"
                 });
             }
 

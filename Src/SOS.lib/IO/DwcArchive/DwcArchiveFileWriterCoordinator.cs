@@ -127,15 +127,6 @@ namespace SOS.Lib.IO.DwcArchive
                 return true;
             }
 
-            if (dataProvider.UseVerbatimFileInExport)
-            {
-                if (!_dwcaFilePartsInfoByDataProvider?.ContainsKey(dataProvider) ?? true)
-                {
-                    CreateDwcaFilePartsInfo(dataProvider);
-                }
-                return true;
-            }
-
             // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
@@ -220,8 +211,8 @@ namespace SOS.Lib.IO.DwcArchive
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                 }
 
-                dwcaCreationTasks.Add(new DataProvider(),  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
-                    _dwcaFilePartsInfoByDataProvider.Values.Where(fp => !fp.DataProvider.UseVerbatimFileInExport)));
+                dwcaCreationTasks.Add(new DataProvider {Id = 0, Identifier = "SOS Complete"},  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                    _dwcaFilePartsInfoByDataProvider.Values));
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
                 var createdDwcaFiles = new List<string>();
@@ -240,7 +231,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
 
                     var hash = await GetFileHashAsync(task.Value.Result);
-
+                    _logger.LogInformation($"Generated DwC-A file for {dataProvider}. Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
                     if (dataProvider.LatestUploadedFileHash == hash)
                     {
                         continue;

@@ -240,7 +240,7 @@ This filter will return observations in Tranås municipality since it is part of
 
 
 ### Search for observations within a polygon
-This filter will return observations within the specified polygon.
+This filter will return observations within the specified polygon. The coordinates should be specified in the WGS84 coordinate system.
 > If `"considerObservationAccuracy": true`, then observations that are outside the polygon but possibly inside when accuracy (coordinateUncertaintyInMeters) of observation is considered, will be included in the result.
 ```json
 {
@@ -265,7 +265,7 @@ This filter will return observations within the specified polygon.
 ```
 
 ### Search for observations within a circle
-This filter will return observations within the specified circle with a radius of 500m.
+This filter will return observations within the specified circle with a radius of 500m. The coordinates should be specified in the WGS84 coordinate system.
 ```json
 {
     "geographics": {        
@@ -278,7 +278,7 @@ This filter will return observations within the specified circle with a radius o
 ```
 
 ### Search for observations within a bounding box
-This filter will return observations within the specified bounding box.
+This filter will return observations within the specified bounding box. The coordinates should be specified in the WGS84 coordinate system.
 ```json
 {
     "geographics": {        
