@@ -27,19 +27,30 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
         {
+            if (filter == null)
+            {
+                return;
+            }
+
+            // If user want to see their reported or observed observations
+            if (filter.ViewOwn && !filter.NotOnlyOwn)
+            {
+                query.AddAuthorizeMeFilters(filter);
+                return;
+            }
+
             if (!filter.ProtectedObservations)
             {
                 return;
             }
 
-            var protectedQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var authorizeQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            // Allow protected observations matching user extended authorization
-            if (filter.ExtendedAuthorizations?.Any() ?? false)
+            if (filter.ExtendedAreas?.Any() ?? false)
             {
-                foreach (var extendedAuthorization in filter.ExtendedAuthorizations)
+                foreach (var extendedAuthorization in filter.ExtendedAreas)
                 {
                     var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -48,7 +59,7 @@ namespace SOS.Lib.Extensions
                     protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
                     TryAddGeographicFilter(protectedQuery, extendedAuthorization.GeographicAreas);
 
-                    protectedQuerys.Add(q => q
+                    authorizeQuerys.Add(q => q
                         .Bool(b => b
                             .Filter(protectedQuery)
                         )
@@ -56,14 +67,55 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            if (protectedQuerys.Any())
+            if (filter.AllowViewOwn)
             {
-                query.Add(q => q
+                var meQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                meQuery.AddAuthorizeMeFilters(filter);
+                authorizeQuerys.Add(q => q
                     .Bool(b => b
-                        .Should(protectedQuerys)
+                        .Filter(meQuery)
                     )
                 );
             }
+
+            if (authorizeQuerys.Any())
+            {
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(authorizeQuerys)
+                    )
+                );
+                return;
+            }
+
+            // No extended areas and not allowed to view own observations. Add criteria to make sure no protected observations will be returned
+            query.TryAddTermCriteria("protected", false);
+        }
+
+        /// <summary>
+        /// Add filter to allow access to observations reported or observed by requesting user
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="filter"></param>
+        private static void AddAuthorizeMeFilters(
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
+        {
+            if (filter.ObservedByMe)
+            {
+                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
+                    filter.UserId);
+            }
+
+            if (!filter.ReportedByMe)
+            {
+                return;
+            }
+
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                "userServiceUserId",
+                filter.UserId);
+            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                "viewAccess", true);
         }
 
         private static void AddGeoDistanceCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance)
@@ -321,11 +373,11 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Add field must exists criteria
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        private static void AddMustExistsCriteria(
+            /// Add field must exists criteria
+            /// </summary>
+            /// <param name="query"></param>
+            /// <param name="field"></param>
+            private static void AddMustExistsCriteria(
             this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
         {
             query.Add(q => q
@@ -632,7 +684,7 @@ namespace SOS.Lib.Extensions
                     .Path(nestedPath)
                     .Query(q => q
                         .Term(t => t
-                            .Field(field)
+                            .Field($"{nestedPath}.{field}")
                             .Value(value)
                         )
                     )));
@@ -656,7 +708,7 @@ namespace SOS.Lib.Extensions
                         .Path(nestedPath)
                         .Query(q => q
                             .Terms(t => t
-                                .Field(field)
+                                .Field($"{nestedPath}.{field}")
                                 .Terms(values)
                             )
                         )));
@@ -1026,7 +1078,7 @@ namespace SOS.Lib.Extensions
         /// <param name="extendedAuthorizations"></param>
         /// <param name="onlyAboveMyClearance"></param>
         public static void AddSignalSearchCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationFilter> extendedAuthorizations, bool onlyAboveMyClearance)
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
         {
             if (!extendedAuthorizations?.Any() ?? true)
             {
@@ -1075,7 +1127,7 @@ namespace SOS.Lib.Extensions
                 return query;
             }
 
-            query.AddAuthorizationFilters(filter);
+            query.AddAuthorizationFilters(filter.ExtendedAuthorization);
             
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
@@ -1098,20 +1150,9 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.Taxa?.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.Taxa?.Ids);
-            query.TryAddNestedTermsCriteria("projects", "projects.id", filter.ProjectIds);
+            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);
-
-            if (filter.ReportedByMe && filter.UserId > 0)
-            {
-                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", filter.UserId);
-            }
-
-            if (filter.ObservedByMe && filter.UserId > 0)
-            {
-                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
-                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
-            }
 
             if (filter is SearchFilterInternal)
             {

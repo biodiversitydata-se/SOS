@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IFilterManager _filterManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<ObservationManager> _logger;
-
+        
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
@@ -267,7 +267,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
-                PostProcessObservations(filter.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }
@@ -296,7 +296,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
-                PostProcessObservations(filter.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
             catch (AuthenticationRequiredException e)
@@ -481,7 +481,7 @@ namespace SOS.Observations.Api.Managers
             {
                 await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
 
-                if (!filter.ExtendedAuthorizations?.Any() ?? true)
+                if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
@@ -500,8 +500,20 @@ namespace SOS.Observations.Api.Managers
         {
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
             
-            filter.ProtectedObservations = protectedObservations;
+            filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
+            filter.ExtendedAuthorization.ObservedByMe = true;
+            filter.ExtendedAuthorization.ReportedByMe = true;
+            filter.ExtendedAuthorization.NotOnlyOwn = true;
+
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, null, null, null, null, false);
+            
+            // If no user is authenticated, reset 
+            if (filter.ExtendedAuthorization.UserId == 0)
+            {
+                filter.ExtendedAuthorization.ObservedByMe = false;
+                filter.ExtendedAuthorization.ReportedByMe = false;
+            }
+            
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
             PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
