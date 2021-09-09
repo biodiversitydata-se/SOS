@@ -29,7 +29,9 @@ This page provides information about how to use the search filter parameters.
 - [Determination filter](#determination-filter)
 - [NotRecovered filter](#notrecovered-filter)
 - [BirdNestActivityLimit filter](#birdnestactivitylimit-filter)
-- [OutputFields](#outputfields)
+- [Output](#output)
+  * [FieldSet](#fieldSet)
+  * [Fields](#fields)
 
 
 ## Data provider filter
@@ -508,18 +510,48 @@ This filter will only return observations where `observation.occurrence.birdNest
 }
 ```
 
-## OutputFields
-With outputFields you can specify what fields should be included in the result.
+## Output
+With output you can specify which fields that should be included in the result. The default is the `Minimum` field set (the 22 most important fields). Fields with null value are never returned.
+
+### fieldSet
+There are three predefined field sets to choose from: [Minimum](FieldSets.md#Minimum), [Extended](FieldSets.md#Extended) and [All](FieldSets.md#All). They are described on the [FieldSet documentation page](FieldSets.md)
+
+This filter will return all fields defined in the [Extended](FieldSets.md#Extended) field set.
+```json
+{
+    "output": {
+       "fieldSet": "Extended"
+    }
+}
+```
+
+### fields
+With fields you can specify which additional fields ath should be included in the result.
+
+This filter will return all fields defined in the [Minimum](FieldSets.md#Minimum) field set and also the fields `location.province`, `location.parish`
+```json
+{
+    "output": {
+       "fieldSet": "Minimum",
+       "fields": ["location.province", "location.parish"]
+    }
+}
+```
+
+If you specify `fields` without specifying `fieldSet`, you will retrieve only the specified fields.
+
 ```json
 {        
-    "outputFields": [
+    "output": {
+      "fields": [
         "datasetName", 
         "occurrence.occurrenceId", 
         "location.municipality", 
         "taxon.vernacularName", 
         "event.startDate", 
         "event.endDate"
-    ]
+      ]
+   }
 }
 =>
 {
@@ -542,26 +574,7 @@ With outputFields you can specify what fields should be included in the result.
             "endDate": "2014-06-06T22:00:00Z",
             "startDate": "2014-06-06T22:00:00Z"
         }
-    },
-    {
-        "datasetName": "Artportalen",
-        "location": {
-            "municipality": {
-                "name": "Boden",
-                "featureId": "2582"
-            }
-        },
-        "taxon": {
-            "vernacularName": "utter"
-        },
-        "occurrence": {
-            "occurrenceId": "urn:lsid:artportalen.se:Sighting:4517"
-        },
-        "event": {
-            "endDate": "2008-12-05T23:00:00Z",
-            "startDate": "2008-12-05T23:00:00Z"
-        }
-    },
+    },    
     ...
 }
 ```
