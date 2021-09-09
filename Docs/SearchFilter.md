@@ -29,6 +29,8 @@ This page provides information about how to use the search filter parameters.
 - [Determination filter](#determination-filter)
 - [NotRecovered filter](#notrecovered-filter)
 - [BirdNestActivityLimit filter](#birdnestactivitylimit-filter)
+- [Reported by me filter](#ReportedByMe-filter)
+- [Observed by me filter](#ObservedByMe-filter)
 - [Output](#output)
   * [FieldSet](#fieldSet)
   * [Fields](#fields)
@@ -503,10 +505,26 @@ This filter will only return observations where `observation.occurrence.isNotRed
 ```
 
 ## BirdNestActivityLimit filter
-This filter will only return observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.
+This filter returns observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.
 ```json
 {
     "birdNestActivityLimit": 10
+}
+```
+
+## ReportedByMe filter
+This filter returns observations that are reported by the user specified in the authorization access token.
+```json
+{
+    "reportedByMe": true
+}
+```
+
+## ObservedByMe filter
+This filter returns observations that are observed by the user specified in the authorization access token.
+```json
+{
+    "reportedByMe": true
 }
 ```
 
