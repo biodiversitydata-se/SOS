@@ -9,9 +9,13 @@ using Moq;
 using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.IO.Excel;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -26,6 +30,7 @@ using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers;
 using SOS.Observations.Api.Managers;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.TestHelpers;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 
@@ -35,6 +40,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
     {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
+        public ExportsController ExportsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         private IFilterManager _filterManager { get; set; }
@@ -75,6 +81,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return elasticConfiguration;
         }
 
+        protected UserServiceConfiguration GetUserServiceConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var userServiceConfiguration = config.GetSection($"{configPrefix}:UserServiceConfiguration").Get<UserServiceConfiguration>();
+            return userServiceConfiguration;
+        }
+
         protected ObservationApiConfiguration GetObservationApiConfiguration()
         {
             var config = GetAppSettings();
@@ -86,6 +100,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         private void Initialize()
         {
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
+            var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
             var elasticClient = elasticConfiguration.GetClient(true);
             var mongoDbConfiguration = GetMongoDbConfiguration();
@@ -96,16 +111,48 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var areaManager = CreateAreaManager(processClient);
             var taxonManager = CreateTaxonManager(processClient, memoryCache);
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient, memoryCache);
-            var vocabularyManger = CreateVocabularyManager(processClient);
-            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, taxonManager);
+            var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
+            
             var processInfoRepository = new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, new NullLogger<DataProviderManager>());
+            var fileService = new FileService();
+            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration {ResolveValues = true, LocalizationCultureCode = "sv-SE"});
+            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(vocabularyValueResolver, processClient);
+            var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
+                vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
+            var geojsonFileWriter = new GeoJsonFileWriter(processedObservationRepository, fileService,
+                vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
+            var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
+            var areaCache = new AreaCache(areaRepository);
+            var userService = CreateUserService();
+            var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
+            _filterManager = filterManager;
+            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, filterManager);
+            var exportManager = new ExportManager(dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
+                processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration,  new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
+            ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
+                taxonManager, exportManager, fileService, observationApiConfiguration,
+                new NullLogger<ExportsController>());
             TaxonManager = taxonManager;
+        }
+
+        private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
+        {
+            var dwcArchiveFileWriter = new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(vocabularyValueResolver,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
+                new FileService(), new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new NullLogger<DwcArchiveFileWriter>());
+
+            return dwcArchiveFileWriter;
         }
 
         private AreaManager CreateAreaManager(ProcessClient processClient)
@@ -131,18 +178,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ProcessedObservationRepository processedObservationRepository, 
             VocabularyManager vocabularyManager,
             ProcessClient processClient,
-            TaxonManager taxonManager)
+            FilterManager filterManager)
         {
-            var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-            var areaCache = new AreaCache(areaRepository);
-            var dataproviderRepsoitory = new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
-            var dataproviderCache = new DataProviderCache(dataproviderRepsoitory);
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
-            _filterManager = new FilterManager(taxonManager, CreateUserService(), areaCache, dataproviderCache);
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyManager,
-                _filterManager,  
+                filterManager,  
                 new HttpContextAccessor(),
                 new NullLogger<ObservationManager>());
 
@@ -151,17 +193,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         protected virtual IUserService CreateUserService()
         {
-            var userServiceConfiguration = new UserServiceConfiguration();
-            userServiceConfiguration.BaseAddress = "https://artdatauser-st.artdata.slu.se/api";
-            userServiceConfiguration.AcceptHeaderContentType = "application/json";
+            var userServiceConfiguration = GetUserServiceConfiguration();
             var userService = new UserService(new Mock<IAuthorizationProvider>().Object,
                 new HttpClientService(new NullLogger<HttpClientService>()), userServiceConfiguration, new NullLogger<UserService>());
             return userService;
         }
 
-        private VocabularyManager CreateVocabularyManager(ProcessClient processClient)
+        private VocabularyManager CreateVocabularyManager(ProcessClient processClient, VocabularyRepository vocabularyRepository)
         {
-            var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyCache = new VocabularyCache(vocabularyRepository);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
             var projectInfoCache = new ProjectCache(projectInfoRepository);
