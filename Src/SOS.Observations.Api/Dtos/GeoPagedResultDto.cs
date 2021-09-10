@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Observations.Api.Dtos
 {
@@ -27,11 +28,13 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         ///     Paged records
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IEnumerable<T> Records { get; set; }
 
         /// <summary>
         /// The records as GeoJSON.
         /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string GeoJson { get; set; }
     }
 }
