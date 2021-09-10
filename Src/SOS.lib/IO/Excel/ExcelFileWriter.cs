@@ -38,6 +38,7 @@ namespace SOS.Lib.IO.Excel
 
             foreach (var propertyIndex in propertyIndexes)
             {
+                //string title = FieldDescriptionHelper.GetTranslation(propertyIndex.Key);
                 sheet.Cells[1, propertyIndex.Value].Value = propertyIndex.Key.Replace(".Value", "", StringComparison.CurrentCultureIgnoreCase);
                 sheet.Cells[1, propertyIndex.Value].Style.Font.Bold = true;
                 sheet.Cells[1, propertyIndex.Value].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
