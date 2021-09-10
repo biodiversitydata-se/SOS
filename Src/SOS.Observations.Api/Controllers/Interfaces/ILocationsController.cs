@@ -14,6 +14,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="locationIds"></param>
         /// <returns></returns>
-        Task<IActionResult> GetLocationsAsync(IEnumerable<string> locationIds);
+        Task<IActionResult> GetLocationsByIds(IEnumerable<string> locationIds);
     }
 }

@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadDwCAsync(ExportFilterDto filter);
+        Task<IActionResult> DownloadDwC(ExportFilterDto filter);
 
         /// <summary>
         ///  Download Excel export file
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet"></param>
         /// <param name="cultureCode"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadExcelAsync(ExportFilterDto filter,
+        Task<IActionResult> DownloadExcel(ExportFilterDto filter,
             OutputFieldSet outputFieldSet, string cultureCode);
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cultureCode"></param>
         /// <param name="flatOut"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadGeoJsonAsync(ExportFilterDto filter,
+        Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
            OutputFieldSet outputFieldSet, string cultureCode, bool flatOut);
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderDwCAsync(ExportFilterDto filter, string description);
+        Task<IActionResult> OrderDwC(ExportFilterDto filter, string description);
 
         /// <summary>
         ///  Starts the process of creating a Excel file with observations based on provided filter.
@@ -64,7 +64,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet"></param>
         /// <param name="cultureCode"></param>
         /// <returns></returns>
-        Task<IActionResult> OrderExcelAsync(ExportFilterDto filter, string description,
+        Task<IActionResult> OrderExcel(ExportFilterDto filter, string description,
             OutputFieldSet outputFieldSet, string cultureCode);
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cultureCode"></param>
         /// <param name="flatOut"></param>
         /// <returns></returns>
-        Task<IActionResult> OrderGeoJsonAsync(ExportFilterDto filter, string description,
+        Task<IActionResult> OrderGeoJson(ExportFilterDto filter, string description,
             OutputFieldSet outputFieldSet, string cultureCode, bool flatOut);
     }
 }

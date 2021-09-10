@@ -40,7 +40,7 @@ namespace SOS.Locations.Api.Controllers
         [ProducesResponseType(typeof(LocationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetLocationsAsync([FromBody]IEnumerable<string> locationIds)
+        public async Task<IActionResult> GetLocationsByIds([FromBody]IEnumerable<string> locationIds)
         {
             try
             {

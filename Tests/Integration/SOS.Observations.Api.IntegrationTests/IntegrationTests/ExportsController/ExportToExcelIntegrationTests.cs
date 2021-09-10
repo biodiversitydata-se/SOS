@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcelAsync(searchFilter, OutputFieldSet.Minimum, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
