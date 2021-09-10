@@ -21,6 +21,7 @@ using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -172,6 +173,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
         {
             var filePath = string.Empty;
@@ -206,6 +208,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> DownloadExcel([FromBody] ExportFilterDto filter, [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -244,6 +247,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
@@ -285,6 +289,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> OrderDwC([FromBody] ExportFilterDto filter, [FromQuery] string description)
         {
             try
@@ -315,6 +320,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
         {
@@ -348,6 +354,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
