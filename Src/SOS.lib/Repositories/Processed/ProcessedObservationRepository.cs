@@ -726,7 +726,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Size(0)
                 .Index(indexNames)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Source(s => s.ExcludeAll())
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
