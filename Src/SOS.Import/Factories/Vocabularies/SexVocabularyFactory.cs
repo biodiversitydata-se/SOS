@@ -38,7 +38,7 @@ namespace SOS.Import.Factories.Vocabularies
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
         {
             var sexes = await _artportalenMetadataRepository.GetGendersAsync();
-            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(sexes.ToArray());
+            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(sexes?.ToArray());
             return vocabularyValues;
         }
 
