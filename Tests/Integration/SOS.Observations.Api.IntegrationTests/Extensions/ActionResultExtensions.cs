@@ -15,5 +15,11 @@ namespace SOS.Observations.Api.IntegrationTests.Extensions
             var result = JsonConvert.DeserializeObject<T>(strJson);
             return result;
         }
+
+        public static byte[] GetFileContentResult(this IActionResult response)
+        {
+            var fileContentResult = (FileContentResult)response;
+            return fileContentResult.FileContents;
+        }
     }
 }
