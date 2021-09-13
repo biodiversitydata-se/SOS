@@ -924,6 +924,14 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
+                // If it's a date histogram and default max number of buckets in elastic can be reached
+                if (aggregationType.IsDateHistogram() &&
+                    ((filter?.Date?.EndDate ?? DateTime.Now) - (filter?.Date?.StartDate ?? new DateTime(1, 1, 1)))
+                    .TotalDays >= 65536)
+                {
+                    return BadRequest(Result.Failure("You have to limit the time span. Use date.startDate and date.endDate to limit your request"));
+                }
+
                 var result = await ObservationManager.GetAggregatedChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
