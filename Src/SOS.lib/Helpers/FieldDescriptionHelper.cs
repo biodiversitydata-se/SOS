@@ -549,5 +549,68 @@ namespace SOS.Lib.Helpers
             FieldDescriptionId.VernacularName,
             FieldDescriptionId.MaterialSampleID
         };
+
+        /// <summary>
+        /// Get translated field title.
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        public static string GetTranslation(string field, string cultureCode = "sv-SE")
+        {
+            // todo - Add mappings for all fields here or move the mappings to FieldDescriptions.json.
+            switch (field.ToLowerInvariant())
+            {
+                case "occurrence.occurrenceid":
+                    return "Occurrence Id";
+                case "event.startdate":
+                    return "Startdatum";
+                case "event.enddate":
+                    return "Slutdatum";
+                case "occurrence.occurrencestatus":
+                    return "Fyndstatus";
+                case "occurrence.occurrencestatus.id":
+                    return "Fyndstatus Id";
+                case "occurrence.occurrencestatus.value":
+                    return "Fyndstatus";
+                default:
+                    return field;
+            }
+        }
+
+        /// <summary>
+        /// Get all subfields for the specified fields.
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        public static string[] ExpandFields(ICollection<string> fields)
+        {
+            // todo - Add expand mappings for all fields to the ExpandField() function,
+            // todo - or use reflection or move the mappings to FieldDescriptions.json.
+            // todo - Add support for recursion when expanding fields.
+            var fieldSet = new HashSet<string>();
+            foreach (var field in fields)
+            {
+                var expandedFields = ExpandField(field);
+                foreach (var expandedField in expandedFields)
+                {
+                    fieldSet.Add(expandedField);
+                }
+            }
+
+            return fieldSet.ToArray();
+        }
+
+        private static string[] ExpandField(string field)
+        {
+            // todo - add more mappings. Perhaps use reflection?
+            switch (field.ToLowerInvariant())
+            {
+                case "occurrence.occurrencestatus":
+                    return new[] {"Occurrence.OccurrenceStatus.Id", "Occurrence.OccurrenceStatus.Value"};
+                default:
+                    return new[] {field};
+            }
+        }
     }
 }

@@ -21,6 +21,7 @@ using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -172,7 +173,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadDwCAsync([FromBody] ExportFilterDto filter)
+        [InternalApi]
+        public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
         {
             var filePath = string.Empty;
             try
@@ -206,7 +208,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
+        [InternalApi]
+        public async Task<IActionResult> DownloadExcel([FromBody] ExportFilterDto filter, [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
@@ -244,7 +247,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DownloadGeoJsonAsync([FromBody] ExportFilterDto filter, 
+        [InternalApi]
+        public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -285,7 +289,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> OrderDwCAsync([FromBody] ExportFilterDto filter, [FromQuery] string description)
+        [InternalApi]
+        public async Task<IActionResult> OrderDwC([FromBody] ExportFilterDto filter, [FromQuery] string description)
         {
             try
             {
@@ -315,7 +320,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> OrderExcelAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
+        [InternalApi]
+        public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
         {
             try
@@ -348,7 +354,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> OrderGeoJsonAsync([FromBody] ExportFilterDto filter, [FromQuery] string description, 
+        [InternalApi]
+        public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
         {
             try
