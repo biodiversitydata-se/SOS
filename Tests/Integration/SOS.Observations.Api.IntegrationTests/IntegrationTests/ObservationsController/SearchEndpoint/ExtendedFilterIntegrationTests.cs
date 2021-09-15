@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, searchFilter, 0, 1000);
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, null, searchFilter, 0, 1000);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, searchFilter, 0, 1000);
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, null, searchFilter, 0, 1000);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, searchFilter, 0, 1000);
+            var response = await _fixture.ObservationsController.ObservationsBySearchInternal(null, null, searchFilter, 0, 1000);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------

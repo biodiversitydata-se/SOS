@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(null, filter);
+                await _filterManager.PrepareFilter(0,null, filter);
 
                 var zipFilePath = exportFormat switch
                 {

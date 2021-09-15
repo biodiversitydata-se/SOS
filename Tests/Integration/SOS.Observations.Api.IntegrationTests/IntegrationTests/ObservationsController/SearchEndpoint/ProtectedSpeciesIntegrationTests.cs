@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(null, searchFilter, 0, 10);
+            var response = await _fixture.ObservationsController.ObservationsBySearch(null, null, searchFilter, 0, 10);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,6 +77,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearch(
+                0,
                 null,
                 searchFilter,
                 0,
@@ -120,6 +121,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearch(
+                null,
                 null,
                 searchFilter,
                 0,
@@ -170,6 +172,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
                 "CountyAdministrationObservation",
                 searchFilter,
                 0,
@@ -225,6 +228,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                0,
                 "CountyAdministrationObservation",
                 searchFilter,
                 0,

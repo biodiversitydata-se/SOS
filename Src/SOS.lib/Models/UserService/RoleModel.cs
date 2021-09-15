@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.UserService
 {
@@ -20,11 +21,11 @@ namespace SOS.Lib.Models.UserService
 
         public DateTime CreatedDate { get; set; }
 
-        public string CreatedBy { get; set; }
+        public int? CreatedBy { get; set; }
 
         public DateTime ModifiedDate { get; set; }
 
-        public string ModifiedBy { get; set; }
+        public int? ModifiedBy { get; set; }
 
         public DateTime? ValidFromDate { get; set; }
 
@@ -39,5 +40,7 @@ namespace SOS.Lib.Models.UserService
         public int? MessageTypeId { get; set; }
 
         public bool IsUserAdministrationRole { get; set; }
+
+        public IEnumerable<AuthorityModel> Authorities { get; set; }
     }
 }

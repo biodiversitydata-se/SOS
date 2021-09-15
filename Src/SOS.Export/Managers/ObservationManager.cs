@@ -100,7 +100,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                await _filterManager.PrepareFilter(null, filter);
+                await _filterManager.PrepareFilter(0,null, filter);
 
                 zipFilePath = exportFormat switch
                 {
@@ -144,7 +144,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                await _filterManager.PrepareFilter(null, filter);
+                await _filterManager.PrepareFilter(0,null, filter);
                 zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case

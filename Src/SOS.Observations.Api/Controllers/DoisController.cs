@@ -66,7 +66,7 @@ namespace SOS.Observations.Api.Controllers
                 
                 var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
                 var exportFilter = filter.ToSearchFilter("en-GB", false);
-                var matchCount = await ObservationManager.GetMatchCountAsync(null, exportFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
 
                 if (matchCount == 0)
                 {

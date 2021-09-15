@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.GeogridAggregation(null, searchFilter, 10);
+            var response = await _fixture.ObservationsController.GeogridAggregation(null, null, searchFilter, 10);
             var result = response.GetResult<GeoGridResultDto>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.GeogridAggregation(null, searchFilter, 18);
+            var response = await _fixture.ObservationsController.GeogridAggregation(null, null, searchFilter, 18);
             var result = response.GetResult<GeoGridResultDto>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -118,13 +118,14 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(null, searchFilter, zoom);
+            var response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(null, null, searchFilter, zoom);
             var result = response.GetResult<GeoGridTileTaxonPageResultDto>();
             gridCells.AddRange(result.GridCells);
             nrRequests++;
             while (result.HasMorePages)
             {
                 response = await _fixture.ObservationsController.GeogridTaxaAggregationInternal(
+                    null,
                     null,
                     searchFilter, 
                     zoom, 

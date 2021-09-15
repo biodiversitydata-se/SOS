@@ -48,6 +48,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
                 "",
                 searchFilter,
                 0,
