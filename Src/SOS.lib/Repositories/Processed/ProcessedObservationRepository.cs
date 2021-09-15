@@ -291,7 +291,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private string GetCurrentIndex(FilterBase filter)
         {
-            if ((filter?.ExtendedAuthorization.ViewOwn ?? false) && (!filter?.ExtendedAuthorization.AllowViewOwn ?? true) && (!filter?.ExtendedAuthorization.NotOnlyOwn ?? true))
+            if (((filter?.ExtendedAuthorization.ObservedByMe ?? false) || (filter?.ExtendedAuthorization.ReportedByMe ?? false) || (filter?.ExtendedAuthorization.ProtectedObservations ?? false)) &&
+                (filter?.ExtendedAuthorization.UserId ?? 0) == 0)
             {
                 throw new AuthenticationRequiredException("Not authenticated");
             }
@@ -301,8 +302,7 @@ namespace SOS.Lib.Repositories.Processed
                 return PublicIndexName;
             }
 
-            if ((!_httpContextAccessor?.HttpContext?.User?.HasAccessToScope(_elasticConfiguration.ProtectedScope) ?? true) || 
-                (!filter?.ExtendedAuthorization?.AllowProtected ?? true))
+            if (!_httpContextAccessor?.HttpContext?.User?.HasAccessToScope(_elasticConfiguration.ProtectedScope) ?? true)
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
