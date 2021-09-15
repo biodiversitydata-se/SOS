@@ -503,9 +503,6 @@ namespace SOS.Observations.Api.Managers
             filter.PopulateOutputFields(outputFieldSet);
            
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
-            filter.ExtendedAuthorization.ObservedByMe = true;
-            filter.ExtendedAuthorization.ReportedByMe = true;
-            filter.ExtendedAuthorization.NotOnlyOwn = true;
 
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, null, null, null, null, false);
             

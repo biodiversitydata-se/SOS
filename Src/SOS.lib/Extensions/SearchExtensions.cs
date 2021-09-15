@@ -29,28 +29,19 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
         {
-            if (filter == null)
+            if (filter.ObservedByMe)
             {
-                return;
+                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
+                    filter.UserId);
             }
 
-            // If user want to see their reported or observed observations
-            if (filter.ViewOwn && !filter.NotOnlyOwn)
+            if (filter.ReportedByMe)
             {
-                if (filter.ObservedByMe)
-                {
-                    query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
-                        filter.UserId);
-                }
-
-                if (filter.ReportedByMe)
-                {
-                    query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                        "userServiceUserId",
-                        filter.UserId);
-                    query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                        "viewAccess", true);
-                }
+                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                    "userServiceUserId",
+                    filter.UserId);
+                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                    "viewAccess", true);
             }
 
             if (!filter.ProtectedObservations)
@@ -79,37 +70,31 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            if (filter.AllowViewOwn)
+            if (filter.UserId != 0)
             {
-                if (filter.ObservedByMe)
-                {
-                    var observedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                    observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
-                        filter.UserId);
+                var observedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
+                    filter.UserId);
 
-                    authorizeQuerys.Add(q => q
-                        .Bool(b => b
-                            .Filter(observedByMeQuery)
-                        )
-                    );
-                }
+                authorizeQuerys.Add(q => q
+                    .Bool(b => b
+                        .Filter(observedByMeQuery)
+                    )
+                );
 
-                if (filter.ReportedByMe)
-                {
-                    var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-                    reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                        "userServiceUserId",
-                        filter.UserId);
-                    reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                        "viewAccess", true);
+                reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                    "userServiceUserId",
+                    filter.UserId);
+                reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
+                    "viewAccess", true);
 
-                    authorizeQuerys.Add(q => q
-                        .Bool(b => b
-                            .Filter(reportedByMeQuery)
-                        )
-                    );
-                }
+                authorizeQuerys.Add(q => q
+                    .Bool(b => b
+                        .Filter(reportedByMeQuery)
+                    )
+                );
             }
 
             if (authorizeQuerys.Any())
