@@ -75,7 +75,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilter(null, new SearchFilter(), "Sighting", 0, false, false, true)
+                    .PrepareFilter(0, null, new SearchFilter(), "Sighting", 0, false, false, true)
                 );
 
             var observationManager = new ObservationManager(

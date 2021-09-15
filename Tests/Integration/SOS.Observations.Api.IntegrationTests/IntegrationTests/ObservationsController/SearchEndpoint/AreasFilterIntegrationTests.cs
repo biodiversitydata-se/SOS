@@ -52,7 +52,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(null, searchFilter, 0, 2);
+            var response = await _fixture.ObservationsController.ObservationsBySearch(null, null, searchFilter, 0, 2);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------

@@ -39,7 +39,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.Count(null, searchFilter);
+            var response = await _fixture.ObservationsController.Count(null, null, searchFilter);
             var result = response.GetResult<long>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.Count(
                 null,
+                null,
                 searchFilter,
                 false,
                 true);
@@ -115,6 +116,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.Count(
+                null,
                 null,
                 searchFilter,
                 false,
@@ -160,6 +162,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.CountInternal(
+                null,
                 "CountyAdministrationObservation",
                 searchFilter,
                 false,

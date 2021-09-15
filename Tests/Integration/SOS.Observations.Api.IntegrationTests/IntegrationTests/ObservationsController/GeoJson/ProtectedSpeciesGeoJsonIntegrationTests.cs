@@ -53,6 +53,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
                 "CountyAdministrationObservation",
                 searchFilter,
                 0,
@@ -109,6 +110,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearchInternal(
+                null,
                 "CountyAdministrationObservation",
                 searchFilter,
                 0,
