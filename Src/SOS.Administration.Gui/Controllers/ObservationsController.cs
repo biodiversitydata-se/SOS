@@ -116,6 +116,5 @@ namespace SOS.Administration.Gui.Controllers
             }
             return result;
         }
-
     }
 }
