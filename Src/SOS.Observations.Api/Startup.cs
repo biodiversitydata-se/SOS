@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Elasticsearch.Net;
@@ -28,6 +29,7 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
+using Newtonsoft.Json;
 using NLog.Web;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -479,6 +481,34 @@ namespace SOS.Observations.Api
                 {
                     Predicate = _ => true,
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                endpoints.MapHealthChecks("/health-json", new HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = async (context, report) =>
+                    {
+                        var result = JsonConvert.SerializeObject(
+                            new 
+                            {
+                                status = report.Status.ToString(),
+                                duration = report.TotalDuration,
+                                entries = report.Entries.Select(e => new 
+                                {
+                                    key = e.Key,
+                                    description = e.Value.Description,
+                                    duration = e.Value.Duration,
+                                    status = Enum.GetName(typeof(HealthStatus),
+                                        e.Value.Status),
+                                    tags = e.Value.Tags
+                                }).ToList()
+                            }, Formatting.None,
+                            new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+                        context.Response.ContentType = MediaTypeNames.Application.Json;
+                        await context.Response.WriteAsync(result);
+                    }
                 });
             });
 

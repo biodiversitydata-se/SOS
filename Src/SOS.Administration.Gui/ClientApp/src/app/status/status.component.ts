@@ -37,12 +37,13 @@ function dateSinceFormatter(params) {
   templateUrl: './status.component.html',
   styleUrls: ['./status.component.scss']
 })
-export class StatusComponent implements OnInit {  
+export class StatusComponent implements OnInit {
   searchindexinfo: SearchIndexInfo;
   mongodbinfo: MongoDbInfo[];
   statuses = [];
   processInfo: ProcessInfo[];
   loadTestSummary: LoadTestResult[];
+  healthStatus: HealthStatus;
 
   processColumnDefs = [
     {
@@ -56,12 +57,12 @@ export class StatusComponent implements OnInit {
         return params.value == "Success" ? '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="green" /></svg><span>' + params.value + '</span>' :
           '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="red" /></svg><span>' + params.value + '</span>'
       }
-    },    
+    },
     { field: 'dataProviderIdentifier', sortable: true, filter: true, resizable: true },
     { field: 'publicProcessCount', sortable: true, filter: true, resizable: true },
     { field: 'protectedProcessCount', sortable: true, filter: true, resizable: true },
     { field: 'processStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
-    { field: 'processEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },   
+    { field: 'processEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
     { field: 'harvestCount', sortable: true, filter: true, resizable: true },
     { field: 'harvestStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
     { field: 'harvestEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
@@ -71,33 +72,33 @@ export class StatusComponent implements OnInit {
         return params.value == "2" ? '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="green" /></svg><span>' + params.value + '</span>' :
           '<svg height="20" width="30"><circle cx="10" cy="10" r="10" fill="red" /></svg><span>' + params.value + '</span>'
       }
-    },    
+    },
     { field: 'latestIncrementalPublicCount', sortable: true, filter: true, resizable: true },
     { field: 'latestIncrementalProtectedCount', sortable: true, filter: true, resizable: true },
     { field: 'latestIncrementalStart', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
-    { field: 'latestIncrementalEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },    
+    { field: 'latestIncrementalEnd', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
   ];
 
   processRowData = [
   ];
 
-  searchIndexColumnDefs = [      
+  searchIndexColumnDefs = [
     { field: 'node', sortable: true, filter: true, resizable: true },
     { field: 'percentage', sortable: true, filter: true, resizable: true },
-    { field: 'diskUsed', sortable: true, filter: true, resizable: true },    
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },
     { field: 'diskTotal', sortable: true, filter: true, resizable: true },
   ];
   mongodbInfoColumnDefs = [
     { field: 'node', sortable: true, filter: true, resizable: true },
     { field: 'percentage', sortable: true, filter: true, resizable: true },
-    { field: 'diskUsed', sortable: true, filter: true, resizable: true },    
+    { field: 'diskUsed', sortable: true, filter: true, resizable: true },
     { field: 'diskTotal', sortable: true, filter: true, resizable: true },
   ];
   processingJobsRowData = [];
   processingJobsColumnDefs = [
     { field: 'invocationData', width: 600, sortable: true, filter: true, resizable: true },
     { field: 'createdAt', sortable: true, filter: true, resizable: true, valueFormatter: dateFormatter },
-    { field: 'createdAt', headerName:'Runtime', sortable: true, filter: true, resizable: true, valueFormatter: dateSinceFormatter } 
+    { field: 'createdAt', headerName: 'Runtime', sortable: true, filter: true, resizable: true, valueFormatter: dateSinceFormatter }
   ];
   activeInstance: string;
   runningTests: boolean = false;
@@ -110,21 +111,21 @@ export class StatusComponent implements OnInit {
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
   sumFailedCalls: number = 0;
-  activeInstanceHarvestIsOlderThanOneDay = false;    
-    logDescription: string;
+  activeInstanceHarvestIsOlderThanOneDay = false;
+  logDescription: string;
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
 
   }
 
   ngOnInit() {
     this.statuses = [];
-    this.http.get<ActiveInstanceInfo>(this.baseUrl + 'statusinfo/activeinstance').subscribe(result => {      
+    this.http.get<ActiveInstanceInfo>(this.baseUrl + 'statusinfo/activeinstance').subscribe(result => {
       this.activeInstance = result.activeInstance.toString();
       this.http.get<ProcessInfo[]>(this.baseUrl + 'statusinfo/process').subscribe(result => {
         this.processInfo = result;
         this.totalDataDifference = 0;
         let active = this.processInfo.find(p => p.id.endsWith(this.activeInstance));
-        var activeEndDate = parseISO(active.end);       
+        var activeEndDate = parseISO(active.end);
         var oneDayAgo = subHours(new Date(), 24);
         if (compareAsc(activeEndDate, oneDayAgo) == -1) {
           this.activeInstanceHarvestIsOlderThanOneDay = true;
@@ -149,13 +150,13 @@ export class StatusComponent implements OnInit {
           } else {
             compare.yesterday = 0;
           }
-         
+
           this.totalDataDifference += compare.today - compare.yesterday;
           this.dataComparison.push(compare);
         }
       }, error => console.error(error));
     }, error => console.error(error));
-    
+
     this.http.get<SearchIndexInfo>(this.baseUrl + 'statusinfo/searchindex').subscribe(result => {
       this.searchindexinfo = result;
     }, error => console.error(error));
@@ -171,7 +172,7 @@ export class StatusComponent implements OnInit {
       info.percentage = (result.diskUsed / result.diskTotal) * 100;
       info.percentage = Math.floor(info.percentage);
       this.mongodbinfo.push(info);
-    }, error => console.error(error)); 
+    }, error => console.error(error));
     this.http.get<HangfireJob[]>(this.baseUrl + 'statusinfo/processing').subscribe(result => {
       this.processingJobsRowData = result;
     }, error => console.error(error));
@@ -209,11 +210,16 @@ export class StatusComponent implements OnInit {
           compare.yesterday = request[1].timeTakenMs;
           this.performanceComparison.push(compare);
         }
-    }
+      }
     });
+
+   this.http.get<HealthStatus>(this.baseUrl + 'health').subscribe(result => {
+   this.healthStatus = result;
+   }, error => console.error(error));
   }
+
   formatDate(param) {
-    return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss')
+    return format(parseISO(param), 'yyyy-MM-dd HH:mm:ss');
   }
   formatFrom(param) {
     return formatDistanceToNow(parseISO(param))
@@ -259,7 +265,7 @@ export class StatusComponent implements OnInit {
     }
     else {
       return false;
-    }    
+    }
   }
   isPerformanceGreen(today: number, yesterday: number): boolean {
     if (today <= yesterday) {
@@ -269,44 +275,55 @@ export class StatusComponent implements OnInit {
       return false;
     }
   }
-  getYesterdayDate() {    
-      return format(subHours(new Date(), 24), 'MMM dd')    
+  getYesterdayDate() {
+    return format(subHours(new Date(), 24), 'MMM dd')
   }
   getYesterYesterdayDate() {
     return format(subHours(new Date(), 48), 'MMM dd')
   }
   gaugeColorFunction(value: number): string {
     if (value < 75) {
-      return "green"
+      return "green";
     }
     else if (value > 75 && value < 90) {
-      return "gold"
+      return "blue";
     }
     else {
       return "red";
     }
   }
+  gaugeStatusColorFunction(value: number): string {
+    if (value > 75) {
+      return "green";
+    }
+    if (value > 40) {
+      return "blue";
+    }
+   
+    return "red";
+  }
   gaugeLabelFunction(value: number): string {
     return value + '%';
   }
+
   private runTests() {
     this.runningTests = true;
     this.completedTests = 0;
     this.failedTests = 0;
     this.totalRuntimeMs = 0;
-    this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(result => {      
+    this.http.get<FunctionalTest[]>(this.baseUrl + 'tests').subscribe(result => {
       for (let test of result) {
         test.currentStatus = "Unknown";
       }
       let testsRemaining = result.length;
-      for (let test of result) {        
-        this.http.get<TestResults>('tests/' + test.route).subscribe(result => {          
+      for (let test of result) {
+        this.http.get<TestResults>('tests/' + test.route).subscribe(result => {
           if (result) {
             this.totalRuntimeMs += result.timeTakenMs;
             for (let message of result.results) {
               if (message.status == "Succeeded") { this.completedTests++; }
               if (message.status == "Failed") { this.failedTests++; }
-            }           
+            }
           }
           testsRemaining--;
           if (testsRemaining == 0) {
@@ -319,9 +336,9 @@ export class StatusComponent implements OnInit {
           }
           this.failedTests++;
         });
-       
+
       }
-      
+
     }, error => console.error(error));
   }
 }
@@ -333,4 +350,15 @@ class DataCompare {
 class FailedCalls {
   name: string;
   count: number;
+}
+class HealthStatus {
+  status: string;
+  duration: object;
+  entries: Array<HealthEntry>;
+}
+class HealthEntry {
+  key: string;
+  status: string;
+  duration: object;
+  tags: Array<string>;
 }

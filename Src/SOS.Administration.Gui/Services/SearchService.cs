@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
 using SOS.Administration.Gui.Dtos;
@@ -11,7 +12,6 @@ namespace SOS.Administration.Gui.Services
 {
     public class SearchService : ISearchService
     {
-
         private readonly HttpClient _client;
         private readonly string _apiUrl;
         public SearchService(IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
@@ -63,6 +63,14 @@ namespace SOS.Administration.Gui.Services
             {
                 throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
             }
+        }
+
+        public async Task<string> GetHealthStatus()
+        {
+            var response = await _client.GetAsync(new Uri($"{_apiUrl}health-json"));
+            var resultString = await response.Content.ReadAsStringAsync();
+
+            return resultString;
         }
     }
 }
