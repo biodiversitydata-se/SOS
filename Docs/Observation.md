@@ -36,6 +36,7 @@ All fields that are part of an observation are listed on this page.
 | event.endDate 	| DateTime? 	| "2008-07-07T10:30:00Z" 	| End date and time of the event (UTC).    	|  	|
 | event.eventId 	| string 	| "1A474222-F49B-46C4-A7AB-BCD798A04A36" 	| An identifier   for the set of information associated with an Event (something that occurs at   a place and time).  	| https://dwc.tdwg.org/terms/#dwc:eventID 	|
 | event.eventRemarks 	| string 	| "Tall herbs and young trees mixed with old oaks." 	| Comments or notes about the Event.    	| https://dwc.tdwg.org/terms/#dwc:eventRemarks 	|
+| event.discoveryMethod | VocabularyValue[\<discoveryMethod\>](Vocabularies.md#discoveryMethod)	| \{ "id": 3, "value":"binoculars" \} 	| DiscoveryMethod from Artportalen 	|  	|
 | event.habitat 	| string 	| "Åker" 	| A category or description of the habitat in which the Event occurred.    	| https://dwc.tdwg.org/terms/#dwc:habitat 	|
 | event.samplingEffort 	| string 	| "1 day survey of a 100 m^2 area" 	| The amount of effort expended during an Event.    	| https://dwc.tdwg.org/terms/#dwc:samplingEffort 	|
 | event.samplingProtocol 	| string 	| "ht<span>tps://ww<span>w.slu<span>.se/globalassets/ris_fin_2008.pdf"	| The name of, reference to, or description of the method or protocol used   during an Event.    	| https://dwc.tdwg.org/terms/#dwc:samplingProtocol 	|
@@ -97,7 +98,6 @@ All fields that are part of an observation are listed on this page.
 | occurrence.establishmentMeans 	| VocabularyValue[\<establishmentMeans\>](Vocabularies.md#establishmentMeans)	|  	| Statement   about whether an organism or organisms have been introduced to a given place   and time through the direct or indirect activity of modern humans. 	| https://dwc.tdwg.org/terms/#dwc:occurrence.establishmentMeans 	|
 | occurrence.individualID 	| string 	|  	| An identifier for an individual or   named group of individual organisms represented in the Occurrence.    	|  	|
 | occurrence.otherCatalogNumbers 	| string 	|  	| A list of previous or alternate fully qualified catalog numbers or other   human-used identifiers for the same Occurrence.    	| https://dwc.tdwg.org/terms/#dwc:otherCatalogNumbers 	|
-| occurrence.previousIdentifications 	| string 	|  	| A list of previous assignments of names to the Occurrence.    	| https://dwc.tdwg.org/terms/#dwc:previousIdentifications 	|  
 | &nbsp;  	|  	|  	|  	|  	|
 | **Identification** 	| 	|  	|  	|  	|  
 | identification.confirmedBy 	| string 	| "Gerhard Boré" 	| Confirmed by.    	|  	|

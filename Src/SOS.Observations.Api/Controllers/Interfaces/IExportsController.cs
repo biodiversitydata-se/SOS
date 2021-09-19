@@ -28,10 +28,11 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="outputFieldSet"></param>
+        /// <param name="propertyLabelType"></param>
         /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<IActionResult> DownloadExcel(ExportFilterDto filter,
-            OutputFieldSet outputFieldSet, string cultureCode);
+            OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType, string cultureCode);
 
         /// <summary>
         /// Download GeoJson export file 
@@ -62,10 +63,11 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="description"></param>
         /// <param name="outputFieldSet"></param>
+        /// <param name="propertyLabelType"></param>
         /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<IActionResult> OrderExcel(ExportFilterDto filter, string description,
-            OutputFieldSet outputFieldSet, string cultureCode);
+            OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType, string cultureCode);
 
         /// <summary>
         /// Starts the process of creating a GeoJson file with observations based on provided filter.
