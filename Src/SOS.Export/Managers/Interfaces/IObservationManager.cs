@@ -19,13 +19,17 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="exportFormat"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
+        /// <param name="propertyLabelType"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
         Task<bool> ExportAndSendAsync(SearchFilter filter, string emailAddress,
             string description,
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

@@ -189,7 +189,13 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.DwC, _exportPath, Cultures.en_GB, false,
+                    await _exportManager.CreateExportFileAsync(exportFilter, 
+                        ExportFormat.DwC,
+                        _exportPath, 
+                        Cultures.en_GB, 
+                        false, 
+                        OutputFieldSet.All,
+                        PropertyLabelType.PropertyName,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_DwC.zip");
             }
@@ -209,7 +215,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> DownloadExcel([FromBody] ExportFilterDto filter, [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
+        public async Task<IActionResult> DownloadExcel(
+            [FromBody] ExportFilterDto filter, 
+            [FromQuery] OutputFieldSet outputFieldSet, 
+            [FromQuery] PropertyLabelType propertyLabelType, 
+            [FromQuery] string cultureCode)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
@@ -223,12 +233,14 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
-               
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
+
                 filePath =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
                         _exportPath, cultureCode,
                         false,
+                        outputFieldSet,
+                        propertyLabelType,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_Excel.zip");
             }
@@ -266,8 +278,14 @@ namespace SOS.Observations.Api.Controllers
                 exportFilter.PopulateOutputFields(outputFieldSet);
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.GeoJson, 
-                        _exportPath, cultureCode, flatOut,
+                    await _exportManager.CreateExportFileAsync(
+                        exportFilter, 
+                        ExportFormat.GeoJson, 
+                        _exportPath, 
+                        cultureCode, 
+                        flatOut, 
+                        outputFieldSet,
+                        PropertyLabelType.PropertyName,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_GeoJson.zip");
             }
@@ -304,7 +322,7 @@ namespace SOS.Observations.Api.Controllers
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -322,7 +340,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, [FromQuery] string description, 
-            [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
+            [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] PropertyLabelType propertyLabelType, [FromQuery] string cultureCode)
         {
             try
             {
@@ -338,7 +356,7 @@ namespace SOS.Observations.Api.Controllers
                 exportFilter.PopulateOutputFields(outputFieldSet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, outputFieldSet, propertyLabelType, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -372,7 +390,7 @@ namespace SOS.Observations.Api.Controllers
                 exportFilter.PopulateOutputFields(outputFieldSet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, outputFieldSet, PropertyLabelType.PropertyName, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

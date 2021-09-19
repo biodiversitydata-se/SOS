@@ -21,7 +21,7 @@ namespace SOS.Lib.Enums
     }
 
     /// <summary>
-    /// Export property sets
+    /// Export property sets.
     /// </summary>
     public enum OutputFieldSet
     {
@@ -34,9 +34,39 @@ namespace SOS.Lib.Enums
         /// </summary>
         Extended,
         /// <summary>
+        /// All properties where we know there exist at least one observation with a value.
+        /// </summary>
+        AllWithKnownValues,
+        /// <summary>
         /// All properties exported
         /// </summary>
         All
+    }
+
+    /// <summary>
+    /// Property label type.
+    /// </summary>
+    public enum PropertyLabelType
+    {
+        /// <summary>
+        /// Use the property name as title.
+        /// </summary>
+        PropertyName = 0,
+
+        /// <summary>
+        /// Use the short property name as title.
+        /// </summary>
+        ShortPropertyName = 1,
+
+        /// <summary>
+        /// Use the swedish property name as title.
+        /// </summary>
+        Swedish = 2,
+
+        /// <summary>
+        /// Use the english property name as title.
+        /// </summary>
+        English = 3
     }
 
     public enum SightingDeterminationFilter
