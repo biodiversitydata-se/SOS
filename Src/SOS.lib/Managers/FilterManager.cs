@@ -293,38 +293,35 @@ namespace SOS.Lib.Managers
         /// <inheritdoc />
         public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
-            if (filter.ExtendedAuthorization.ProtectedObservations || filter.ExtendedAuthorization.ViewOwn)
+            // Get user
+            var user = await _userService.GetUserAsync();
+            filter.ExtendedAuthorization.UserId = user?.Id ?? 0;
+
+            if (filter.ExtendedAuthorization.ProtectedObservations)
             {
-                // Get user
-                var user = await _userService.GetUserAsync();
-                filter.ExtendedAuthorization.UserId = user?.Id ?? 0;
+                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
-                if (filter.ExtendedAuthorization.ProtectedObservations)
+                // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
+                if (filter is SearchFilter searchFilter)
                 {
-                    filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
-
-                    // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
-                    if (filter is SearchFilter searchFilter)
+                    if ((searchFilter.OutputFields?.Any() ?? false) &&
+                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        if ((searchFilter.OutputFields?.Any() ?? false) &&
-                            !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                            !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            searchFilter.OutputFields.Add("occurrence.occurrenceId");
-                        }
+                        searchFilter.OutputFields.Add("occurrence.occurrenceId");
                     }
-                    if (filter is SearchFilterInternal searchFilterInternal)
+                }
+                if (filter is SearchFilterInternal searchFilterInternal)
+                {
+                    if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
+                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
-                            !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                            !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
-                        }
+                        searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
                     }
                 }
             }
-
+            
             if (setDefaultProviders.HasValue && setDefaultProviders.Value)
             {
                 filter.DataProviderIds = await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds);
