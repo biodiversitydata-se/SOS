@@ -14,5 +14,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Nested]
         public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
+        public override string ToString()
+        {
+            string strProjectParameters = ProjectParameters == null ? null : string.Join(", ", ProjectParameters);
+            if (string.IsNullOrEmpty(strProjectParameters))
+                return $"{Name} [{Id}]";
+            else
+                return $"{Name} [{Id}], Params: {strProjectParameters}";
+        }
     }
 }
