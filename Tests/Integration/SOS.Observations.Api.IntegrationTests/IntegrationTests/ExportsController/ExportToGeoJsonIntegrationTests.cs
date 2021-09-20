@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Nest;
@@ -24,6 +25,39 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Export_to_GeoJson_filter_with_polygon_geometry()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            ExportFilterDto searchFilter = new ExportFilterDto
+            {
+                ProjectIds = new List<int> { 2976 },
+                Date = new DateFilterDto()
+                {
+                    StartDate = new DateTime(2016, 9, 1),
+                    EndDate = new DateTime(2016, 9, 30),
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithKnownValues, "sv-SE", false);
+            var bytes = response.GetFileContentResult();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            bytes.Length.Should().BeGreaterThan(0);
+
+            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export","zip");
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Export_to_GeoJson_filter_with_projects()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -62,7 +96,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             bytes.Length.Should().BeGreaterThan(0);
 
-            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export","zip");
+            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export", "zip");
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
