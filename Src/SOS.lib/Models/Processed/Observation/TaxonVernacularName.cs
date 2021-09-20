@@ -28,6 +28,11 @@
         /// </summary>
         public bool IsPreferredName { get; set; }
 
+        public override string ToString()
+        {
+            return $"{Name} [{Language}]";
+        }
+
         protected bool Equals(TaxonVernacularName other)
         {
             return Name == other.Name && Language == other.Language && CountryCode == other.CountryCode &&
