@@ -126,7 +126,7 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean? | true |
 
 ## AllWithKnownValues
-All fields that are described on the [Observation documentation page](Observation.md) where there exist at leats one value. I.e. all that contain an example value. 
+All fields that are described on the [Observation documentation page](Observation.md) where there exist at least one value, i.e. all that contain an example value. 
 
 ## All
 All fields that are described on the [Observation documentation page](Observation.md).
