@@ -57,12 +57,11 @@ namespace SOS.Lib.IO.Excel
             string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
-            var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
-
             string temporaryZipExportFolderPath = null;
 
             try
             {
+                var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
