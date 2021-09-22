@@ -1,9 +1,9 @@
 # Changelog
 
 ## [1.0.3]
-**Test**: 2021-08-30 
+**Test**: 2021-09-20 
 
-**Prod**: Not yet released
+**Prod**: 2021-09-21
 
 ### `Added`
 - New search parameter : `ReportedByMe`. Requires authorization token.
@@ -14,7 +14,7 @@
 - Export to GeoJSON.
 - Multimedia extension is added to the Artportalen DwC-A export.
 - Support for storing imported DwC-A file.
-- Replaced OutputFields in search filter with output: { fields : string[], fieldSet: enum  (Minimum, Extended, All)}
+- Replaced OutputFields in search filter with output: { fields : string[], fieldSet: enum  (Minimum, Extended, AllWithKnownValues, All)}
 
 ### `Fixed`
 - DwC-A time parsing bug in the harvest step.
