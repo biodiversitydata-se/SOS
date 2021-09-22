@@ -12,8 +12,9 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///  Get all data providers.
         /// </summary>
         /// <param name="cultureCode"></param>
+        /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
         /// <returns>List of data providers.</returns>
-        Task<IActionResult> GetDataProviders(string cultureCode = "en-GB");
+        Task<IActionResult> GetDataProviders(string cultureCode = "en-GB", bool includeProvidersWithNoObservations = false);
 
         /// <summary>
         /// Get latest modified date for a data provider.

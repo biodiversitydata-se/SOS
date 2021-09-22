@@ -21,7 +21,23 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersCo
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Get_all_data_providers()
+        public async Task Get_all_active_data_providers_except_the_ones_with_no_observations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.DataProvidersController.GetDataProviders("sv-SE", true);
+            var dataProviders = response.GetResult<List<DataProviderDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            dataProviders.Should().NotBeNull();
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Get_all_active_data_providers()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Act

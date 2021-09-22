@@ -1,5 +1,5 @@
 # Field sets
-Several endpoints supports specifying which fields in an observation you want to retrieve using the fields and fieldSet parameter. There are three predefined field sets to choose from.
+Several endpoints supports specifying which fields in an observation you want to retrieve using the fields and fieldSet parameter. There are four predefined field sets to choose from.
 
 - [Minimum (default)](#Minimum)
 - [Extended](#Extended) 

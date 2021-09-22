@@ -15,8 +15,9 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="includeInactive"></param>
         /// <param name="cultureCode"></param>
+        /// <param name="includeProvidersWithNoObservations"></param>
         /// <returns></returns>
-        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode);
+        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true);
 
         /// <summary>
         /// Get provider EML file
