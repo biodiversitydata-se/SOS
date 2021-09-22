@@ -16,6 +16,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;

@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,16 +10,14 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using Newtonsoft.Json;
-using SOS.Lib.IO.GeoJson.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
-namespace SOS.Lib.IO.Excel
+namespace SOS.Lib.IO.GeoJson
 {
     public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
