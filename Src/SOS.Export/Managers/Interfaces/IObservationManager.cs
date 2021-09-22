@@ -20,6 +20,7 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
@@ -30,6 +31,7 @@ namespace SOS.Export.Managers.Interfaces
             bool flatOut,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

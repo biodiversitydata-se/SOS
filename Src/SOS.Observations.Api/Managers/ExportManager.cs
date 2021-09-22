@@ -117,10 +117,19 @@ namespace SOS.Observations.Api.Managers
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, string exportPath, 
-            string fileName, string culture, bool flatOut, OutputFieldSet outputFieldSet,
+        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
+            string exportPath, 
+            string fileName, 
+            string culture, 
+            bool flatOut, 
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken) 
         {
             try
@@ -131,7 +140,10 @@ namespace SOS.Observations.Api.Managers
                    fileName,
                    culture,
                    flatOut,
-                    cancellationToken);
+                   outputFieldSet, 
+                   propertyLabelType, 
+                   excludeNullValues,
+                   cancellationToken);
 
                 return zipFilePath;
             }
@@ -190,6 +202,7 @@ namespace SOS.Observations.Api.Managers
             bool flatOut,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -200,7 +213,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, cancellationToken)
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
                 };
 
                 // zend file to user

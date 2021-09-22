@@ -97,6 +97,7 @@ namespace SOS.Export.Managers
             bool flatOut,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -108,7 +109,7 @@ namespace SOS.Export.Managers
                 {
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, cancellationToken)
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
                 };
                 
                 // zend file to user
@@ -257,7 +258,12 @@ namespace SOS.Export.Managers
         }
 
         private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
-            string fileName, string culture, bool flatOut,
+            string fileName, 
+            string culture, 
+            bool flatOut,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -268,7 +274,10 @@ namespace SOS.Export.Managers
                    fileName,
                    culture,
                    flatOut,
-                    cancellationToken);
+                   outputFieldSet, 
+                   propertyLabelType, 
+                   excludeNullValues,
+                   cancellationToken);
                 
                 return zipFilePath;
             }

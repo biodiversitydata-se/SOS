@@ -147,7 +147,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "AccessRightsValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "AccessRights.Value",
+		"DependsOn": "AccessRights",
 		"FieldSet": "AllWithKnownValues",
 		"Comment": "Extended?"
 	},
@@ -204,7 +204,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "BasisOfRecordValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "BasisOfRecord.Value",
+		"DependsOn": "BasisOfRecord",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -299,7 +299,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "InstitutionCodeValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "InstitutionCode.Value",
+		"DependsOn": "InstitutionCode",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -565,7 +565,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "EventDiscoveryMethodValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Event.DiscoveryMethod.Value",
+		"DependsOn": "Event.DiscoveryMethod",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -1382,7 +1382,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "IdentificationValidationStatusValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Identification.ValidationStatus.Value",
+		"DependsOn": "Identification.ValidationStatus",
 		"FieldSet": "Minimum",
 		"Comment": ""
 	},
@@ -1534,7 +1534,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "IdentificationDeterminationMethodValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Identification.DeterminationMethod.Value",
+		"DependsOn": "Identification.DeterminationMethod",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -2085,7 +2085,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "LocationContinentValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Location.Continent.Value",
+		"DependsOn": "Location.Continent",
 		"FieldSet": "AllWithKnownValues",
 		"Comment": ""
 	},
@@ -2142,7 +2142,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "LocationCountryValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Location.Country.Value",
+		"DependsOn": "Location.Country",
 		"FieldSet": "AllWithKnownValues",
 		"Comment": ""
 	},
@@ -2959,7 +2959,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceOccurrenceStatusValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.OccurrenceStatus.Value",
+		"DependsOn": "Occurrence.OccurrenceStatus",
 		"FieldSet": "Minimum",
 		"Comment": ""
 	},
@@ -3073,7 +3073,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceOrganismQuantityUnitValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.OrganismQuantityUnit.Value",
+		"DependsOn": "Occurrence.OrganismQuantityUnit",
 		"FieldSet": "Minimum",
 		"Comment": ""
 	},
@@ -3244,7 +3244,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceActivityValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.Activity.Value",
+		"DependsOn": "Occurrence.Activity",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3301,7 +3301,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceBehaviorValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.Behavior.Value",
+		"DependsOn": "Occurrence.Behavior",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3358,7 +3358,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceBiotopeValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.Biotope.Value",
+		"DependsOn": "Occurrence.Biotope",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3453,7 +3453,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceLifeStageValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.LifeStage.Value",
+		"DependsOn": "Occurrence.LifeStage",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3510,7 +3510,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceReproductiveConditionValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.ReproductiveCondition.Value",
+		"DependsOn": "Occurrence.ReproductiveCondition",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3567,7 +3567,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceSexValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.Sex.Value",
+		"DependsOn": "Occurrence.Sex",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -3738,7 +3738,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceSubstrateNameValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.Substrate.Name.Value",
+		"DependsOn": "Occurrence.Substrate.Name",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -4422,7 +4422,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "OccurrenceEstablishmentMeansValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Occurrence.EstablishmentMeans.Value",
+		"DependsOn": "Occurrence.EstablishmentMeans",
 		"FieldSet": "All",
 		"Comment": ""
 	},
@@ -5391,7 +5391,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "TaxonAttributesProtectionLevelValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Taxon.Attributes.ProtectionLevel.Value",
+		"DependsOn": "Taxon.Attributes.ProtectionLevel",
 		"FieldSet": "Extended",
 		"Comment": ""
 	},
@@ -5980,7 +5980,7 @@
 		"DwcIdentifier": "",
 		"FlatPropertyName": "TypeValue",
 		"IsPartOfFlatObservation": true,
-		"DependsOn": "Type.Value",
+		"DependsOn": "Type",
 		"FieldSet": "All",
 		"Comment": ""
 	},

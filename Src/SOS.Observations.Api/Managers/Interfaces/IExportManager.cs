@@ -20,6 +20,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="flatOut">Only applicable when GeoJson is selected as export format</param>
         /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<string> CreateExportFileAsync(SearchFilter filter,
@@ -29,6 +30,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             bool flatOut,
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken);
     }
 }
