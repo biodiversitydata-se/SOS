@@ -31,12 +31,25 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             ExportFilterDto searchFilter = new ExportFilterDto
             {
-                ProjectIds = new List<int> { 2976 },
-                Date = new DateFilterDto()
+                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
+                Geographics = new GeographicsFilterDto
                 {
-                    StartDate = new DateTime(2016, 9, 1),
-                    EndDate = new DateTime(2016, 9, 30),
-                }
+                    Geometries = new List<IGeoShape>()
+                    {
+                        new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
+                            {
+                                new GeoCoordinate(57.92573, 15.07063),
+                                new GeoCoordinate(58.16108, 15.00510),
+                                new GeoCoordinate(58.10148, 14.58003),
+                                new GeoCoordinate(57.93294, 14.64143),
+                                new GeoCoordinate(57.92573, 15.07063)
+                            }
+                        })
+                    },
+                    ConsiderObservationAccuracy = true
+                },
+                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -64,31 +77,18 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             ExportFilterDto searchFilter = new ExportFilterDto
             {
-                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
-                Geographics = new GeographicsFilterDto
+                ProjectIds = new List<int> { 2976 },
+                Date = new DateFilterDto()
                 {
-                    Geometries = new List<IGeoShape>()
-                    {
-                        new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
-                            {
-                                new GeoCoordinate(57.92573, 15.07063),
-                                new GeoCoordinate(58.16108, 15.00510),
-                                new GeoCoordinate(58.10148, 14.58003),
-                                new GeoCoordinate(57.93294, 14.64143),
-                                new GeoCoordinate(57.92573, 15.07063)
-                            }
-                        })
-                    },
-                    ConsiderObservationAccuracy = true
-                },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                    StartDate = new DateTime(2016, 9, 1),
+                    EndDate = new DateTime(2016, 9, 30),
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.Minimum, "sv-SE", false);
+            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithKnownValues, "sv-SE", false);
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------

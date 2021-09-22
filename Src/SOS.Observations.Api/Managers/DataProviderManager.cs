@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode)
+        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true)
         {
             var dataProviderDtos = new List<DataProviderDto>();
             var processInfosActive = await _processInfoManager.GetProcessInfoAsync(true);
@@ -55,6 +55,13 @@ namespace SOS.Observations.Api.Managers
 
                 if (providerInfo != null)
                 {
+                    if (!includeProvidersWithNoObservations &&
+                        providerInfo.PublicProcessCount.GetValueOrDefault(0) == 0 &&
+                        providerInfo.ProtectedProcessCount.GetValueOrDefault(0) == 0)
+                    {
+                        continue;
+                    }
+
                     dataProviderDtos.Add(DataProviderDto.Create(
                         dataProvider,
                         providerInfo.PublicProcessCount.GetValueOrDefault(0),
@@ -67,7 +74,10 @@ namespace SOS.Observations.Api.Managers
                 }
                 else
                 {
-                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
+                    if (includeProvidersWithNoObservations)
+                    {
+                        dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
+                    }
                 }
             }
 
