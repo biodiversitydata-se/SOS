@@ -18,6 +18,7 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
