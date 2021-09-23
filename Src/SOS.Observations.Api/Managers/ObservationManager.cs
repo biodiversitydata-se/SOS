@@ -9,6 +9,7 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Log;
@@ -26,11 +27,11 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
-        private readonly IVocabularyManager _vocabularyManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProtectedLogRepository _protectedLogRepository;
         private readonly IFilterManager _filterManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ILogger<ObservationManager> _logger;
         
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
@@ -43,25 +44,17 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 var occurenceIds = new HashSet<string>();
-                foreach (var observation in processedObservations)
+                var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
+                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode);
+
+                foreach (var obs in observations)
                 {
-                    if (observation is IDictionary<string, object> obs)
+                    if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
+                        out var occurrenceObject))
                     {
-                        if (!string.IsNullOrEmpty(cultureCode))
+                        if (occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
                         {
-                            ResolveLocalizedVocabularyMappedValues(obs, cultureCode);
-                        }
-
-                        ResolveNonLocalizedVocabularyMappedValues(obs);
-
-                        if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var occurrenceObject))
-                        {
-                            var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                            if (occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
-                            {
-                                occurenceIds.Add(occurenceId as string);
-                            }
+                            occurenceIds.Add(occurenceId as string);
                         }
                     }
                 }
@@ -96,149 +89,19 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private void ResolveLocalizedVocabularyMappedValues(
-            IDictionary<string, object> obs,
-            string cultureCode)
-        {
-            if(obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
-            {
-                var eventDictionary = eventObject as IDictionary<string, object>;
-                TranslateLocalizedValue(eventDictionary, VocabularyId.DiscoveryMethod,
-                    nameof(Observation.Event.DiscoveryMethod), cultureCode);
-            }
-
-            if (obs.TryGetValue(nameof(Observation.Identification).ToLower(),
-                out var identificationObject))
-            {
-                var identificationDictionary = identificationObject as IDictionary<string, object>;
-                TranslateLocalizedValue(identificationDictionary, VocabularyId.ValidationStatus,
-                    nameof(Observation.Identification.ValidationStatus), cultureCode);
-            }
-
-            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var occurrenceObject))
-            {
-                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Biotope,
-                    nameof(Observation.Occurrence.Biotope), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Activity,
-                    nameof(Observation.Occurrence.Activity), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Behavior,
-                    nameof(Observation.Occurrence.Behavior), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Sex,
-                    nameof(Observation.Occurrence.Sex), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.ReproductiveCondition,
-                    nameof(Observation.Occurrence.ReproductiveCondition), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.LifeStage,
-                    nameof(Observation.Occurrence.LifeStage), cultureCode);
-                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Unit,
-                    nameof(Observation.Occurrence.OrganismQuantityUnit), cultureCode);
-
-                if (occurrenceDictionary.TryGetValue(nameof(Observation.Occurrence.Substrate).ToLower(),
-                    out var substrateObject))
-                {
-                    var substrateDictionary = substrateObject as IDictionary<string, object>;
-                    TranslateLocalizedValue(substrateDictionary, VocabularyId.Substrate,
-                        nameof(Observation.Occurrence.Substrate.Name), cultureCode);
-                }
-            }
-        }
-
-        private void ResolveNonLocalizedVocabularyMappedValues(
-            IDictionary<string, object> obs)
-        {
-            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var occurrenceObject))
-            {
-                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                
-                // Resolve Non Localized Vocabulary Fields
-                ResolveVocabularyMappedValue(occurrenceDictionary, VocabularyId.EstablishmentMeans,
-                    nameof(Observation.Occurrence.EstablishmentMeans));
-                ResolveVocabularyMappedValue(occurrenceDictionary, VocabularyId.OccurrenceStatus,
-                    nameof(Observation.Occurrence.OccurrenceStatus));
-            }
-
-            // Resolve Non Localized Vocabulary Fields
-            ResolveVocabularyMappedValue(obs, VocabularyId.BasisOfRecord,
-                nameof(Observation.BasisOfRecord));
-            ResolveVocabularyMappedValue(obs, VocabularyId.Type, nameof(Observation.Type));
-            ResolveVocabularyMappedValue(obs, VocabularyId.AccessRights,
-                nameof(Observation.AccessRights));
-            ResolveVocabularyMappedValue(obs, VocabularyId.Institution,
-                nameof(Observation.InstitutionCode));
-
-            if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
-            {
-                var locationDictionary = locationObject as IDictionary<string, object>;
-                ResolveVocabularyMappedValue(locationDictionary, VocabularyId.Continent,
-                    nameof(Observation.Location.Continent));
-                ResolveVocabularyMappedValue(locationDictionary, VocabularyId.Country,
-                    nameof(Observation.Location.Country));
-            }
-        }
-
-        private void ResolveVocabularyMappedValue(
-            IDictionary<string, object> observationNode,
-            VocabularyId vocabularyId,
-            string fieldName)
-        {
-            if (observationNode == null) return;
-
-            var camelCaseName = fieldName.ToCamelCase();
-            if (observationNode.ContainsKey(camelCaseName))
-            {
-                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode &&
-                    fieldNode.ContainsKey("id"))
-                {
-                    var id = Convert.ToInt32(fieldNode["id"]);
-                    if (id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId &&
-                        _vocabularyManager.TryGetValue(vocabularyId, id, out var translatedValue))
-                    {
-                        fieldNode["value"] = translatedValue;
-                    }
-                }
-            }
-        }
-
-        private void TranslateLocalizedValue(
-            IDictionary<string, object> observationNode,
-            VocabularyId vocabularyId,
-            string fieldName,
-            string cultureCode)
-        {
-            if (observationNode == null) return;
-            var camelCaseName = fieldName.ToCamelCase();
-            if (observationNode.ContainsKey(camelCaseName))
-            {
-                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode &&
-                    fieldNode.ContainsKey("id"))
-                {
-                    var id = (long)fieldNode["id"];
-                    if (id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId &&
-                        _vocabularyManager.TryGetTranslatedValue(vocabularyId, cultureCode, (int)id,
-                            out var translatedValue))
-                    {
-                        fieldNode["value"] = translatedValue;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="protectedLogRepository"></param>
-        /// <param name="vocabularyManager"></param>
+        /// <param name="vocabularyValueResolver"></param>
         /// <param name="filterManager"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
             IProtectedLogRepository protectedLogRepository,
-            IVocabularyManager vocabularyManager,
+            IVocabularyValueResolver vocabularyValueResolver,
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
             ILogger<ObservationManager> logger)
@@ -247,7 +110,7 @@ namespace SOS.Observations.Api.Managers
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _protectedLogRepository =
                 protectedLogRepository ?? throw new ArgumentNullException(nameof(protectedLogRepository));
-            _vocabularyManager = vocabularyManager ?? throw new ArgumentNullException(nameof(vocabularyManager));
+            _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
