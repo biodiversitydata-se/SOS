@@ -34,5 +34,10 @@
         /// Data type.
         /// </summary>
         public string DataType { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name}={Value}";
+        }
     }
 }

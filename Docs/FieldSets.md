@@ -1,8 +1,9 @@
 # Field sets
-Several endpoints supports specifying which fields in an observation you want to retrieve using the fields and fieldSet parameter. There are three predefined field sets to choose from.
+Several endpoints supports specifying which fields in an observation you want to retrieve using the fields and fieldSet parameter. There are four predefined field sets to choose from.
 
 - [Minimum (default)](#Minimum)
 - [Extended](#Extended) 
+- [AllWithKnownValues](#All)
 - [All](#All)
 
 ## Minimum
@@ -124,5 +125,8 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;taxon.attributes.redlistCategory | string | "LC" |
 | &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean? | true |
 
+## AllWithKnownValues
+All fields that are described on the [Observation documentation page](Observation.md) where there exist at leats one value. I.e. all that contain an example value. 
+
 ## All
-All fields that are described on the [Observation documentation page](Observation.md)
+All fields that are described on the [Observation documentation page](Observation.md).

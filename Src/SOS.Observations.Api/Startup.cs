@@ -43,6 +43,7 @@ using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel;
 using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;

@@ -210,7 +210,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOrganism.OrganismId = verbatim.OrganismID;
             processedOrganism.OrganismName = verbatim.OrganismName;
             processedOrganism.OrganismScope = verbatim.OrganismScope;
-            processedOrganism.AssociatedOccurrences = verbatim.AssociatedOccurrences;
             processedOrganism.AssociatedOrganisms = verbatim.AssociatedOrganisms;
             processedOrganism.PreviousIdentifications = verbatim.PreviousIdentifications;
             processedOrganism.OrganismRemarks = verbatim.OrganismRemarks;

@@ -1621,6 +1621,55 @@ namespace SOS.Lib.Repositories.Processed
             };
         }
 
+        public async Task<ScrollResult<dynamic>> ScrollObservationsAsDynamicAsync(
+            SearchFilter filter,
+            string scrollId)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                var query = filter.ToQuery();
+                var projection = new SourceFilterDescriptor<dynamic>()
+                    .Excludes(e => e
+                        .Field("artportalenInternal")
+                        .Field("location.point")
+                        .Field("location.pointLocation")
+                        .Field("location.pointWithBuffer")
+                        .Field("location.pointWithDisturbanceBuffer")
+                    );
+                var indexNames = GetCurrentIndex(filter);
+                searchResponse = await _elasticClient
+                    .SearchAsync<dynamic>(s => s
+                        .Index(indexNames)
+                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                        //.Source(p => projection)
+                        .Query(q => q
+                            .Bool(b => b
+                                .Filter(query)
+                            )
+                        )
+                        .Scroll(ScrollTimeOut)
+                        .Size(1000)
+                    );
+
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new ScrollResult<dynamic>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata?.Total?.Value ?? 0
+            };
+        }
+
         /// <inheritdoc />
         public async Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,

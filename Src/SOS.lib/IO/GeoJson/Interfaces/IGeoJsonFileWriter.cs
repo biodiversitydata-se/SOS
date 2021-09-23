@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.IO.GeoJson.Interfaces
@@ -14,10 +15,19 @@ namespace SOS.Lib.IO.GeoJson.Interfaces
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        Task<string> CreateFileAync(SearchFilter filter, string exportPath, 
-            string fileName, string culture, bool flatOut,
+        /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
+        /// <param name="cancellationToken"></param>
+        Task<string> CreateFileAync(SearchFilter filter, 
+            string exportPath,
+            string fileName, 
+            string culture, 
+            bool flatOut,
+            OutputFieldSet outputFieldSet, 
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken);
     }
 }

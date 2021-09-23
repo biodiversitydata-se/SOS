@@ -77,5 +77,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Survey method URL.
         /// </summary>
         public string SurveyMethodUrl { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(Name)}: {Name}, {nameof(Owner)}: {Owner}";
+        }
     }
 }

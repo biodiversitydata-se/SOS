@@ -21,5 +21,9 @@
         public string License { get; set; }
         public string RightsHolder { get; set; }
         public string DatasetID { get; set; }
+        public override string ToString()
+        {
+            return $"{nameof(Format)}: {Format}, {nameof(Identifier)}: {Identifier}, {nameof(License)}: {License}, {nameof(RightsHolder)}: {RightsHolder}";
+        }
     }
 }

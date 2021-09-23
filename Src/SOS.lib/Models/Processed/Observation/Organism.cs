@@ -34,12 +34,6 @@
         public string OrganismScope { get; set; }
 
         /// <summary>
-        ///     A list (concatenated and separated) of identifiers of other Occurrence records
-        ///     and their associations to this Occurrence.
-        /// </summary>
-        public string AssociatedOccurrences { get; set; }
-
-        /// <summary>
         ///     A list (concatenated and separated) of identifiers of other Organisms and their
         ///     associations to this Organism.
         /// </summary>
