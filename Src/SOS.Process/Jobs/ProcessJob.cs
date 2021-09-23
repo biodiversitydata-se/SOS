@@ -176,6 +176,7 @@ namespace SOS.Process.Jobs
             var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green);
             if (healthStatus == WaitForStatus.Red)
             {
+                _logger.LogInformation("Elastich health status: Red");
                 return false;
             }
 
