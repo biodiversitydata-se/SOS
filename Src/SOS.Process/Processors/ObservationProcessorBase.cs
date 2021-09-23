@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -99,6 +100,24 @@ namespace SOS.Process.Processors
             }
         }
 
+        private void PopulateDataQuality(Observation observation)
+        {
+            if (observation.Event?.StartDate == null ||
+                (observation.Taxon?.Id ?? 0) == 0 ||
+                (observation.Location?.DecimalLatitude ?? 0) == 0 ||
+                (observation.Location?.DecimalLongitude ?? 0) == 0)
+            {
+                return;
+            }
+
+            var source = $"{observation.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation.Location.DecimalLongitude.Value, 5)}/{Math.Round(observation.Location.DecimalLatitude.Value, 5)}";
+           
+            observation.DataQuality = new DataQuality
+            {
+                UniqueKey = source.ToHash()
+            };
+        }
+
         /// <summary>
         ///  Process a batch of data
         /// </summary>
@@ -145,6 +164,9 @@ namespace SOS.Process.Processors
                         continue;
                     }
 
+                    // Populate data quality property
+                    PopulateDataQuality(observation);
+                    
                     // If  observation is protected
                     if (observation.Occurrence.ProtectionLevel > 2)
                     {
