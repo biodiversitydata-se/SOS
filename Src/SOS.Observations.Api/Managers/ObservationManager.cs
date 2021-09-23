@@ -103,8 +103,6 @@ namespace SOS.Observations.Api.Managers
             if(obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
             {
                 var eventDictionary = eventObject as IDictionary<string, object>;
-                TranslateLocalizedValue(eventDictionary, VocabularyId.Biotope,
-                    nameof(Observation.Occurrence.Biotope), cultureCode);
                 TranslateLocalizedValue(eventDictionary, VocabularyId.DiscoveryMethod,
                     nameof(Observation.Event.DiscoveryMethod), cultureCode);
             }
@@ -121,7 +119,9 @@ namespace SOS.Observations.Api.Managers
                             out var occurrenceObject))
             {
                 var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-               
+
+                TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Biotope,
+                    nameof(Observation.Occurrence.Biotope), cultureCode);
                 TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Activity,
                     nameof(Observation.Occurrence.Activity), cultureCode);
                 TranslateLocalizedValue(occurrenceDictionary, VocabularyId.Behavior,
