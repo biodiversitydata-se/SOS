@@ -25,5 +25,15 @@ namespace SOS.Lib.Helpers.Interfaces
         /// <param name="cultureCode"></param>
         /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
         void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, string cultureCode, bool forceResolve = false);
+
+        /// <summary>
+        ///     Resolve vocabulary mapped values.
+        /// </summary>
+        /// <param name="processedRecords"></param>
+        /// <param name="cultureCode"></param>
+        /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
+        public void ResolveVocabularyMappedValues(IEnumerable<IDictionary<string, object>> processedRecords,
+            string cultureCode,
+            bool forceResolve = false);
     }
 }

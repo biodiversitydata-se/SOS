@@ -117,6 +117,7 @@ namespace SOS.Lib.IO.GeoJson
                     else
                     {
                         var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
+                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                         // todo - implement vocabulary resolver for dynamic type observation.
                         foreach (var record in processedRecords)
                         {
