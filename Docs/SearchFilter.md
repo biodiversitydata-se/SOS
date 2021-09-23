@@ -532,7 +532,7 @@ This filter returns observations that are observed by the user specified in the 
 With output you can specify which fields that should be included in the result. The default is the `Minimum` field set (the 22 most important fields). Fields with null value are never returned.
 
 ### fieldSet
-There are three predefined field sets to choose from: [Minimum](FieldSets.md#Minimum), [Extended](FieldSets.md#Extended) and [All](FieldSets.md#All). They are described on the [FieldSet documentation page](FieldSets.md)
+There are four predefined field sets to choose from: [Minimum](FieldSets.md#Minimum), [Extended](FieldSets.md#Extended), [AllWithKnownValues](FieldSets.md#AllWithKnownValues) and [All](FieldSets.md#All). They are described on the [FieldSet documentation page](FieldSets.md)
 
 This filter will return all fields defined in the [Extended](FieldSets.md#Extended) field set.
 ```json
@@ -544,7 +544,7 @@ This filter will return all fields defined in the [Extended](FieldSets.md#Extend
 ```
 
 ### fields
-With fields you can specify which additional fields ath should be included in the result.
+With fields you can specify which additional fields that should be included in the result.
 
 This filter will return all fields defined in the [Minimum](FieldSets.md#Minimum) field set and also the fields `location.province`, `location.parish`
 ```json

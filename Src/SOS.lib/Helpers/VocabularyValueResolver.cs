@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
@@ -89,6 +90,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
                 ResolveVocabularyMappedValue(observation.Identification?.DeterminationMethod,
                     valueMappingDictionaries[VocabularyId.DeterminationMethod]);
+                ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.ProtectionLevel,
+                    valueMappingDictionaries[VocabularyId.TaxonProtectionLevel]);
             }
         }
 
@@ -133,6 +136,123 @@ namespace SOS.Lib.Helpers
                 && valueById.TryGetValue(vocabularyValue.Id, out var translatedValue))
             {
                 vocabularyValue.Value = translatedValue;
+            }
+        }
+
+        public void ResolveVocabularyMappedValues(IEnumerable<IDictionary<string, object>> processedRecords,
+            string cultureCode,
+            bool forceResolve = false)
+        {
+            if (string.IsNullOrEmpty(cultureCode))
+            {
+                cultureCode = "en-GB";
+            }
+
+            if (!forceResolve && !_vocabularyConfiguration.ResolveValues) return;
+
+            foreach (var record in processedRecords)
+            {
+                ResolveVocabularyMappedValues(record, cultureCode);
+            }
+        }
+
+        private void ResolveVocabularyMappedValues(
+            IDictionary<string, object> obs,
+            string cultureCode)
+        {
+            var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
+
+            // Record level
+            ResolveVocabularyMappedValue(obs, nameof(Observation.BasisOfRecord), valueMappingDictionaries[VocabularyId.BasisOfRecord]);
+            ResolveVocabularyMappedValue(obs, nameof(Observation.Type), valueMappingDictionaries[VocabularyId.Type]);
+            ResolveVocabularyMappedValue(obs, nameof(Observation.AccessRights), valueMappingDictionaries[VocabularyId.AccessRights]);
+            ResolveVocabularyMappedValue(obs, nameof(Observation.InstitutionCode), valueMappingDictionaries[VocabularyId.Institution]);
+            
+            // Event
+            if (obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
+            {
+                var eventDictionary = eventObject as IDictionary<string, object>;
+                ResolveVocabularyMappedValue(eventDictionary, nameof(Observation.Event.DiscoveryMethod), valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
+            }
+
+            // Identification
+            if (obs.TryGetValue(nameof(Observation.Identification).ToLower(),
+                out var identificationObject))
+            {
+                var identificationDictionary = identificationObject as IDictionary<string, object>;
+                ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.ValidationStatus), valueMappingDictionaries[VocabularyId.ValidationStatus]);
+                ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.DeterminationMethod), valueMappingDictionaries[VocabularyId.DeterminationMethod]);
+            }
+
+            // Occurrence
+            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
+                            out var occurrenceObject))
+            {
+                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Activity), valueMappingDictionaries[VocabularyId.Activity]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Behavior), valueMappingDictionaries[VocabularyId.Behavior]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Biotope), valueMappingDictionaries[VocabularyId.Biotope]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.EstablishmentMeans), valueMappingDictionaries[VocabularyId.EstablishmentMeans]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Sex), valueMappingDictionaries[VocabularyId.Sex]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.ReproductiveCondition), valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.LifeStage), valueMappingDictionaries[VocabularyId.LifeStage]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.OrganismQuantityUnit), valueMappingDictionaries[VocabularyId.Unit]);
+                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.OccurrenceStatus), valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
+
+                // Occurrence.Substrate
+                if (occurrenceDictionary != null && occurrenceDictionary.TryGetValue(nameof(Observation.Occurrence.Substrate).ToLower(),
+                    out var substrateObject))
+                {
+                    var substrateDictionary = substrateObject as IDictionary<string, object>;
+                    ResolveVocabularyMappedValue(substrateDictionary, nameof(Observation.Occurrence.Substrate.Name), valueMappingDictionaries[VocabularyId.Substrate]);
+                }
+            }
+
+            // Location
+            if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
+            {
+                var locationDictionary = locationObject as IDictionary<string, object>;
+
+                ResolveVocabularyMappedValue(locationDictionary, nameof(Observation.Location.Continent), valueMappingDictionaries[VocabularyId.Continent]);
+                ResolveVocabularyMappedValue(locationDictionary, nameof(Observation.Location.Country), valueMappingDictionaries[VocabularyId.Country]);
+            }
+
+            // Taxon
+            if (obs.TryGetValue(nameof(Observation.Taxon).ToLower(), out var taxonObject))
+            {
+                var taxonDictionary = taxonObject as IDictionary<string, object>;
+
+                // Taxon.Attributes
+                if (taxonDictionary != null && taxonDictionary.TryGetValue(
+                    nameof(Observation.Taxon.Attributes).ToLower(),
+                    out var taxonAttributesObject))
+                {
+                    var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
+                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.TaxonProtectionLevel]);
+                }
+            }
+        }
+
+        private void ResolveVocabularyMappedValue(
+            IDictionary<string, object> observationNode,
+            string fieldName,
+            Dictionary<int, string> valueById)
+        {
+            if (observationNode == null) return;
+            var camelCaseName = fieldName.ToCamelCase();
+            
+            if (observationNode.ContainsKey(camelCaseName))
+            {
+                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode &&
+                    fieldNode.ContainsKey("id"))
+                {
+                    var id = (long)fieldNode["id"];
+                    if (id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId &&
+                        valueById.TryGetValue((int) id, out var translatedValue))
+                    {
+                        fieldNode["value"] = translatedValue;
+                    }
+                }
             }
         }
     }

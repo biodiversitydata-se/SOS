@@ -189,7 +189,14 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.DwC, _exportPath, Cultures.en_GB, false,
+                    await _exportManager.CreateExportFileAsync(exportFilter, 
+                        ExportFormat.DwC,
+                        _exportPath, 
+                        Cultures.en_GB, 
+                        false, 
+                        OutputFieldSet.All,
+                        PropertyLabelType.PropertyName,
+                        false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_DwC.zip");
             }
@@ -209,7 +216,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> DownloadExcel([FromBody] ExportFilterDto filter, [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
+        public async Task<IActionResult> DownloadExcel(
+            [FromBody] ExportFilterDto filter, 
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            [FromQuery] string cultureCode = "sv-SE")
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
@@ -223,11 +234,14 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
-               
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
+
                 filePath =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
                         _exportPath, cultureCode,
+                        false,
+                        outputFieldSet,
+                        propertyLabelType,
                         false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_Excel.zip");
@@ -249,7 +263,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
-            [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool flatOut = true,
+            bool excludeNullValues = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
@@ -263,11 +281,18 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
 
                 filePath =
-                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.GeoJson, 
-                        _exportPath, cultureCode, flatOut,
+                    await _exportManager.CreateExportFileAsync(
+                        exportFilter, 
+                        ExportFormat.GeoJson, 
+                        _exportPath, 
+                        cultureCode, 
+                        flatOut, 
+                        outputFieldSet,
+                        propertyLabelType,
+                        excludeNullValues,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_GeoJson.zip");
             }
@@ -304,7 +329,7 @@ namespace SOS.Observations.Api.Controllers
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -321,8 +346,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, [FromQuery] string description, 
-            [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode)
+        public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, 
+            [FromQuery] string description, 
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
@@ -335,10 +363,10 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, outputFieldSet, propertyLabelType, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -355,8 +383,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, [FromQuery] string description, 
-            [FromQuery] OutputFieldSet outputFieldSet, [FromQuery] string cultureCode, [FromQuery] bool flatOut)
+        public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, 
+            [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool flatOut = true,
+            bool excludeNullValues = true)
         {
             try
             {
@@ -369,10 +402,10 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

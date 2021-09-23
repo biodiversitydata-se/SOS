@@ -18,6 +18,7 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
@@ -142,7 +143,14 @@ namespace SOS.Export.IntegrationTests.Managers
                     "taxon.id",
                     "taxon.scientificName",
                     "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.GeoJson, "en-GB", false, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", 
+                    ExportFormat.GeoJson, 
+                    "en-GB", 
+                    false, 
+                    OutputFieldSet.All, 
+                    PropertyLabelType.PropertyName,
+                    false,
+                    JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -179,7 +187,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         "taxon.id",
                         "taxon.scientificName",
                         "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

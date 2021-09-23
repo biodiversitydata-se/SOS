@@ -95,6 +95,9 @@ namespace SOS.Export.Managers
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
@@ -105,8 +108,8 @@ namespace SOS.Export.Managers
                 zipFilePath = exportFormat switch
                 {
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, cancellationToken)
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
                 };
                 
                 // zend file to user
@@ -223,7 +226,10 @@ namespace SOS.Export.Managers
         }
 
         private async Task<string> CreateExcelExportAsync(SearchFilter filter, 
-            string fileName, string culture,
+            string fileName, 
+            string culture,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -233,6 +239,8 @@ namespace SOS.Export.Managers
                     _exportPath,
                     fileName,
                     culture,
+                    outputFieldSet,
+                    propertyLabelType,
                     cancellationToken);
 
                 return zipFilePath;
@@ -250,7 +258,12 @@ namespace SOS.Export.Managers
         }
 
         private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
-            string fileName, string culture, bool flatOut,
+            string fileName, 
+            string culture, 
+            bool flatOut,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -261,7 +274,10 @@ namespace SOS.Export.Managers
                    fileName,
                    culture,
                    flatOut,
-                    cancellationToken);
+                   outputFieldSet, 
+                   propertyLabelType, 
+                   excludeNullValues,
+                   cancellationToken);
                 
                 return zipFilePath;
             }

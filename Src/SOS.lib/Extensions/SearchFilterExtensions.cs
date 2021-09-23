@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing.Text;
 using System.Linq;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -12,6 +13,12 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class SearchFilterExtensions
     {
+        public static void PopulateExportOutputFields(this SearchFilter filter, OutputFieldSet outputFieldSet = OutputFieldSet.Minimum)
+        {
+            var outputFields = ObservationPropertyFieldDescriptionHelper.OutputFieldsByFieldSet[outputFieldSet];
+            filter.OutputFields = outputFields;
+        }
+
         /// <summary>
         /// Populate output fields based on property set
         /// </summary>
@@ -22,7 +29,7 @@ namespace SOS.Lib.Extensions
             if (filter.OutputFields?.Any() == true && outputFieldSet == null) return;
             const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
             var fieldSet = outputFieldSet == null ? defaultFieldSet : (OutputFieldSet)outputFieldSet;
-            if (fieldSet == OutputFieldSet.All)
+            if (fieldSet == OutputFieldSet.AllWithKnownValues || fieldSet == OutputFieldSet.All)
             {
                 filter.OutputFields = null;
                 return;

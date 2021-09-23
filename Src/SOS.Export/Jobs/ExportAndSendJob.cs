@@ -38,12 +38,15 @@ namespace SOS.Export.Jobs
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation("Start export and send job");
-                var success = await _observationManager.ExportAndSendAsync(filter, email, description, exportFormat, culture, flatOut, cancellationToken);
+                var success = await _observationManager.ExportAndSendAsync(filter, email, description, exportFormat, culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken);
                 
                 _logger.LogInformation($"End export and send job. Success: {success}");
 

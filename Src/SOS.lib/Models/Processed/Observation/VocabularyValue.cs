@@ -56,5 +56,10 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             return HashCode.Combine(Id, Value);
         }
+
+        public override string ToString()
+        {
+            return $"{Value} [Id={Id}]";
+        }
     }
 }
