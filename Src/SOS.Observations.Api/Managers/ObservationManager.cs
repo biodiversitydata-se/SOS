@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.Managers
             {
                 var occurenceIds = new HashSet<string>();
                 var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
-                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode);
+                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode, true);
 
                 foreach (var obs in observations)
                 {
