@@ -184,12 +184,14 @@ namespace SOS.Process.Jobs
             // Make sure we have a reasonable amount of observations processed
             if (publicCount < _minObservationCount)
             {
+                _logger.LogInformation($"Validation failed. Only {publicCount} public observations processed");
                 return false;
             }
 
             var protectedCount = (int)await _processedObservationRepository.IndexCountAsync(true);
             if (protectedCount < 1)
             {
+                _logger.LogInformation($"Validation failed. Only {protectedCount} protected observations processed");
                 // No protected observations found. No more validation can be done
                 return true;
             }
