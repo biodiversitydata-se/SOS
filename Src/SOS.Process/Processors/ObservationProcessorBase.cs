@@ -109,7 +109,7 @@ namespace SOS.Process.Processors
             {
                 return;
             }
-
+            // Round coordinates to 5 decimals (roughly 1m)
             var source = $"{observation.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation.Location.DecimalLongitude.Value, 5)}/{Math.Round(observation.Location.DecimalLatitude.Value, 5)}";
            
             observation.DataQuality = new DataQuality
