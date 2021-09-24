@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AgileObjects.AgileMapper.Extensions;
 using Elasticsearch.Net;
@@ -338,6 +339,7 @@ namespace SOS.Process.Jobs
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
 
                     _logger.LogInformation($"Start validate indexes");
+                    Thread.Sleep(TimeSpan.FromMinutes(1)); // Try wait for Elasticsearch index.
                     if (!await ValidateIndexesAsync())
                     {
                         throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
