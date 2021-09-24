@@ -1657,7 +1657,7 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
