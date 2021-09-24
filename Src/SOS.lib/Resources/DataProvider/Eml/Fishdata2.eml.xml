@@ -4,6 +4,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns:sos="https://sos-search.artdata.slu.se/"
          xmlns:gbif="http://gbif.org/"
+         xmlns:snd="https://snd.gu.se/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="334f890c-ca33-56f4-0094-1efb44c15eab" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
@@ -27,10 +28,13 @@
 				<city>Lysekil</city>
 				<country>SE</country>
 			</address>
+            <electronicMailAddress></electronicMailAddress>
+            <onlineUrl></onlineUrl>
 		</metadataProvider>		
 		<pubDate>      
 		</pubDate>
 		<language>ENGLISH</language>
+        <licenseName></licenseName>
 		<abstract>
 			<para>The database Fishdata2 at the institute of Marine Research, Department of Aquatic Resources at SLU, stores quality assured data from environmental investigations and fishery investigations of marine fish and shellfish. 
                 It is the national provider of data for the European Data collection Framework (DCF), feeding data to eg. ICES international assessment work of fish and shellfish.</para>
@@ -60,8 +64,9 @@
 			</geographicCoverage>
             <temporalCoverage>
                 <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
-                <sos:SingleDate></sos:SingleDate>
                 <sos:LivingTimePeriod></sos:LivingTimePeriod>
+                <sos:StartDate></sos:StartDate>
+                <sos:EndDate></sos:EndDate>
             </temporalCoverage>
             <taxonomicCoverage>
                 <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>
@@ -89,13 +94,15 @@
             <onlineUrl>https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/</onlineUrl>
             <sos:contactNameType>Personal</sos:contactNameType>
 		</contact>
-        
+        <sos:resourceType>occurrence data</sos:resourceType>
+        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
         <sos:datsetSubtype>census data</sos:datsetSubtype>
         <sos:resourceHomepage>https://www.slu.se/forskning/framgangsrik-forskning/forskningsinfrastruktur/databaser-och-biobanker/Databasen-for-fiske-i-havet/</sos:resourceHomepage>
+        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
         <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
         <project>
             <sos:projectTitle></sos:projectTitle>
-            <sos:fundingDescription></sos:fundingDescription>
+            <funding></funding>
             <funderIdentifier></funderIdentifier>
             <dc:funderIdentifierType></dc:funderIdentifierType>
             <designDescription></designDescription>
@@ -107,13 +114,19 @@
             <qualityControl></qualityControl>
         </samplingMethods>
         <additionalMetadata>
-            <sos:dateCreated></sos:dateCreated>
-            <sos:datePublished></sos:datePublished>
-            <purpose></purpose>
-            <gettingStarted></gettingStarted>
-            <personalData></personalData>
-            <sensitiveData></sensitiveData>
-            <sensitiveDataDescription></sensitiveDataDescription>
+            <metadata>
+                <gettingStarted></gettingStarted>
+                <purpose></purpose>
+                <sos>
+                    <sos:PersonalData></sos:PersonalData>
+                    <sos:SensitiveData></sos:SensitiveData>
+                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
+                </sos>
+                <snd:dataFormat></snd:dataFormat>
+            </metadata>
         </additionalMetadata>
+        <citations>
+            <sos:ResourceCitation></sos:ResourceCitation>
+        </citations>
 	</dataset>
 </eml:eml>
