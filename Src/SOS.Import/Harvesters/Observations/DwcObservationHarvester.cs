@@ -105,7 +105,7 @@ namespace SOS.Import.Harvesters.Observations
             IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
-
+            harvestInfo.Id = dataProvider.Identifier;
             using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
                     dataProvider,
                     _verbatimClient,
