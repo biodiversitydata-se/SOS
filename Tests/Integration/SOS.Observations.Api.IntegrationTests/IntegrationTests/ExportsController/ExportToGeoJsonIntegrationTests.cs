@@ -109,5 +109,47 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
             await System.IO.File.WriteAllBytesAsync(filePath, bytes);
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Export_to_GeoJson_filter_with_specific_day()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            ExportFilterDto searchFilter = new ExportFilterDto
+            {
+                DataProvider = new DataProviderFilterDto()
+                {
+                    Ids = new List<int> { 1 }
+                },
+                Date = new DateFilterDto()
+                {
+                    StartDate = new DateTime(2021, 4, 23),
+                    EndDate = new DateTime(2021, 4, 23),
+                }
+            };
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+                OutputFieldSet.Extended,
+                PropertyLabelType.ShortPropertyName,
+                "sv-SE",
+                true,
+                true);
+            var bytes = response.GetFileContentResult();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            bytes.Length.Should().BeGreaterThan(0);
+
+            var filename = FilenameHelper.CreateFilenameWithDate("geojson_export", "zip");
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
     }
 }
