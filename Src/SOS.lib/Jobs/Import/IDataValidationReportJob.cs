@@ -15,6 +15,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <returns></returns>
         [DisplayName("Data Validation Report, Id: \"{0}\",  Data provider: \"{2}\"")]
+        [Queue("low")]
         Task<Report> RunAsync(
             string reportId, 
             string createdBy, 

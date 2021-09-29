@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -10,6 +11,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <returns></returns>
         [DisplayName("Harvest taxon lists from TaxonListService")]
+        [Queue("high")]
         Task<bool> RunHarvestTaxonListsAsync();
     }
 }

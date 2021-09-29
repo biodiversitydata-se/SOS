@@ -124,7 +124,7 @@ namespace SOS.Hangfire.JobServer
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
                                     Prefix = "hangfire",
-                                    CheckConnection = true
+                                    CheckConnection = true,
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
@@ -132,7 +132,10 @@ namespace SOS.Hangfire.JobServer
                     GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
 
                     // Add the processing server as IHostedService
-                    services.AddHangfireServer();
+                    services.AddHangfireServer(options =>
+                    {
+                        options.Queues = new[] { "high", "medium", "low", "default" };
+                    });
 
                     // MongoDB conventions.
                     ConventionRegistry.Register(

@@ -5,6 +5,11 @@ namespace SOS.Lib.Configuration.ObservationApi
     public class ObservationApiConfiguration
     {
         /// <summary>
+        /// Default max ongoing export jobs for a user
+        /// </summary>
+        public int DefaultUserExportLimit { get; set; }
+
+        /// <summary>
         /// Max number of observations allowed for file download
         /// </summary>
         public int  DownloadExportObservationsLimit { get; set; }

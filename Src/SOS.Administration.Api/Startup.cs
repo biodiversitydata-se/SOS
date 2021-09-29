@@ -19,13 +19,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Services;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Administration.Api
 {
