@@ -93,6 +93,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<UserExportRepository>().As<IUserExportRepository>().InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();

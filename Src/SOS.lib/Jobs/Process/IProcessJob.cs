@@ -16,6 +16,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisplayName("Process Observations [Mode={1}]")]
+        [Queue("high")]
         Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             JobRunModes mode,
@@ -27,6 +28,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Queue("high")]
         Task<bool> RunAsync(
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken);

@@ -25,7 +25,7 @@ namespace SOS.Lib.Security
         /// <returns></returns>
         public string GetAuthHeader()
         {
-            return _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
+            return _httpContextAccessor.HttpContext?.Request?.Headers["Authorization"];
         }
     }
 }

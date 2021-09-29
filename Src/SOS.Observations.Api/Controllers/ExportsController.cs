@@ -15,7 +15,9 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
@@ -35,29 +37,56 @@ namespace SOS.Observations.Api.Controllers
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly IExportManager _exportManager;
         private readonly IFileService _fileService;
+        private readonly IUserExportRepository _userExportRepository;
+        private readonly int _defaultUserExportLimit;
         private readonly long _orderExportObservationsLimit;
         private readonly long _downloadExportObservationsLimit;
         private readonly string _exportPath;
         private readonly ILogger<ExportsController> _logger;
 
+        private string UserEmail => User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
+
+        private int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
+
+        /// <summary>
+        /// Get user export info
+        /// </summary>
+        /// <returns></returns>
+        private async Task<UserExport> GetUserExportsAsync()
+        {
+            var userExport = await _userExportRepository.GetAsync(UserId);
+            return userExport ?? new UserExport { Id = UserId, Limit = _defaultUserExportLimit };
+        }
+
+        /// <summary>
+        /// Update user exports
+        /// </summary>
+        /// <param name="userExport"></param>
+        /// <returns></returns>
+        private async Task UpdateUserExportsAsync(UserExport userExport)
+        {
+            await _userExportRepository.AddOrUpdateAsync(userExport);
+        }
+
         /// <summary>
         /// Validate input for order request
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="email"></param>
+        /// <param name="userExport"></param>
         /// <returns></returns>
-        private async Task<IActionResult> OrderValidateAsync(ExportFilterDto filter)
+        private async Task<IActionResult> OrderValidateAsync(ExportFilterDto filter, string email, UserExport userExport)
         {
-            var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-
             var validationResults = Result.Combine(
                 ValidateSearchFilter(filter),
-                ValidateEmail(email));
+                ValidateEmail(email),
+                ValidateUserExport(userExport));
 
             if (validationResults.IsFailure)
             {
                 return BadRequest(validationResults.Error);
             }
-            
+
             var exportFilter = filter.ToSearchFilter("en-GB", false);
             var matchCount = await ObservationManager.GetMatchCountAsync(0, null, exportFilter);
 
@@ -71,18 +100,22 @@ namespace SOS.Observations.Api.Controllers
                 return BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations.");
             }
             
-            return new OkObjectResult((email, exportFilter));
+            return new OkObjectResult(exportFilter);
         }
 
         /// <summary>
         /// Validate input for download request
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="userExport"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(ExportFilterDto filter)
+        private async Task<IActionResult> DownloadValidateAsync(ExportFilterDto filter, UserExport userExport)
         {
-            
-            if (ValidateSearchFilter(filter).IsFailure)
+            var validationResults = Result.Combine(
+                ValidateSearchFilter(filter),
+                ValidateUserExport(userExport));
+
+            if (validationResults.IsFailure)
             {
                 return BadRequest(ValidateSearchFilter(filter).Error);
             }
@@ -101,6 +134,21 @@ namespace SOS.Observations.Api.Controllers
             }
 
             return new OkObjectResult(exportFilter);
+        }
+
+        /// <summary>
+        /// Validate user export
+        /// </summary>
+        /// <param name="userExport"></param>
+        /// <returns></returns>
+        private Result ValidateUserExport(UserExport userExport)
+        {
+            if ((userExport?.OnGoingJobIds?.Count() ?? 0) > (userExport?.Limit ?? 1))
+            {
+                return Result.Failure($"User already has {userExport.OnGoingJobIds.Count()} on going exports.");
+            }
+
+            return Result.Success();
         }
 
         /// <summary>
@@ -124,6 +172,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="taxonManager"></param>
         /// <param name="exportManager"></param>
         /// <param name="fileService"></param>
+        /// <param name="userExportRepository"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         public ExportsController(IObservationManager observationManager,
@@ -132,13 +181,17 @@ namespace SOS.Observations.Api.Controllers
             ITaxonManager taxonManager,
             IExportManager exportManager,
             IFileService fileService,
+            IUserExportRepository userExportRepository,
             ObservationApiConfiguration configuration,
             ILogger<ExportsController> logger) : base(observationManager, areaManager, taxonManager)
         {
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _orderExportObservationsLimit = configuration?.OrderExportObservationsLimit ?? throw new ArgumentNullException(nameof(configuration));
+            _userExportRepository =
+                userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
+            _defaultUserExportLimit = configuration?.DefaultUserExportLimit ?? throw new ArgumentNullException(nameof(configuration));
+            _orderExportObservationsLimit = configuration.OrderExportObservationsLimit;
             _downloadExportObservationsLimit = configuration.DownloadExportObservationsLimit;
             _exportPath = configuration.ExportPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -177,14 +230,20 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
         {
             var filePath = string.Empty;
+            var jobId = Guid.NewGuid().ToString();
+            var userExports = await GetUserExportsAsync();
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+               
+                var validateResult = await DownloadValidateAsync(filter, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
+
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
 
@@ -201,6 +260,8 @@ namespace SOS.Observations.Api.Controllers
             finally
             {
                 _fileService.DeleteFile(filePath);
+                userExports.OnGoingJobIds.Remove(jobId);
+                await UpdateUserExportsAsync(userExports);
             }
         }
 
@@ -213,14 +274,19 @@ namespace SOS.Observations.Api.Controllers
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
+            var jobId = Guid.NewGuid().ToString();
+            var userExports = await GetUserExportsAsync();
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+                var validateResult = await DownloadValidateAsync(filter, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
+
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateOutputFields(outputFieldSet);
@@ -240,6 +306,8 @@ namespace SOS.Observations.Api.Controllers
             finally
             {
                 _fileService.DeleteFile(filePath);
+                userExports.OnGoingJobIds.Remove(jobId);
+                await UpdateUserExportsAsync(userExports);
             }
         }
 
@@ -253,14 +321,19 @@ namespace SOS.Observations.Api.Controllers
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;
+            var jobId = Guid.NewGuid().ToString();
+            var userExports = await GetUserExportsAsync();
             try
             {
-                var validateResult = await DownloadValidateAsync(filter);
+                var validateResult = await DownloadValidateAsync(filter, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
+
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateOutputFields(outputFieldSet);
@@ -279,6 +352,8 @@ namespace SOS.Observations.Api.Controllers
             finally
             {
                 _fileService.DeleteFile(filePath);
+                userExports.OnGoingJobIds.Remove(jobId);
+                await UpdateUserExportsAsync(userExports);
             }
         }
 
@@ -294,17 +369,23 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validateResult = await OrderValidateAsync(filter);
+                var userExports = await GetUserExportsAsync();
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
 
-                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
+                var exportFilter = (SearchFilter)okResult.Value;
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.DwC, "en-GB", false, null,
+                        JobCancellationToken.Null));
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)));
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
             }
             catch (Exception e)
             {
@@ -326,19 +407,25 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
 
-                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
+                var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateOutputFields(outputFieldSet);
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Excel, cultureCode, false,
+                        null, JobCancellationToken.Null));
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.Excel, cultureCode, false, JobCancellationToken.Null)));
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
             }
             catch (Exception e)
             {
@@ -360,19 +447,25 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
 
-                var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
+                var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateOutputFields(outputFieldSet);
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.GeoJson, cultureCode,
+                        flatOut, null, JobCancellationToken.Null));
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.GeoJson, cultureCode, flatOut, JobCancellationToken.Null)));
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
             }
             catch (Exception e)
             {

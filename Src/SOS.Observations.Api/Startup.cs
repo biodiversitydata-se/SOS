@@ -387,6 +387,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+            services.AddScoped<IUserExportRepository, UserExportRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();

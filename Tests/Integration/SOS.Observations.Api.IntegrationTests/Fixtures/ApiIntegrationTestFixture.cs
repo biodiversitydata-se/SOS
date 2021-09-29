@@ -133,11 +133,12 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, filterManager);
             var exportManager = new ExportManager(dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
+            var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration,  new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
-                taxonManager, exportManager, fileService, observationApiConfiguration,
+                taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             TaxonManager = taxonManager;
         }

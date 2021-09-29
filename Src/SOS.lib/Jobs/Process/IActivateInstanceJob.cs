@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Lib.Jobs.Process
 {
@@ -9,6 +10,7 @@ namespace SOS.Lib.Jobs.Process
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
+        [Queue("high")]
         Task<bool> RunAsync(byte instance);
     }
 }
