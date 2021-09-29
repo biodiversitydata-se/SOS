@@ -9,6 +9,7 @@ namespace SOS.Lib.Models.Processed.Observation
     public class FlatObservation
     {
         private Observation _observation;
+        private static TimeZoneInfo swedenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
         public FlatObservation(Observation observation)
         {
             _observation = observation;
@@ -20,9 +21,10 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Event?.StartDate;
                 if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                if (swedenDate.Hour == 0 && swedenDate.Minute == 0) return null;
                 string format = "HH:mm";
-
-                return date.Value.ToString(format, CultureInfo.InvariantCulture);
+                return swedenDate.ToString(format, CultureInfo.InvariantCulture);
             }
         }
 
@@ -32,17 +34,38 @@ namespace SOS.Lib.Models.Processed.Observation
             {
                 var date = _observation?.Event?.EndDate;
                 if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                if (swedenDate.Hour == 0 && swedenDate.Minute == 0) return null;
                 string format = "HH:mm";
-
-                return date.Value.ToString(format, CultureInfo.InvariantCulture);
+                return swedenDate.ToString(format, CultureInfo.InvariantCulture);
             }
         }
         public string OccurrenceId => _observation?.Occurrence?.OccurrenceId;
         public string EventDiscoveryMethod => _observation?.Event?.DiscoveryMethod?.ToString();
         public int? EventDiscoveryMethodId => _observation?.Event?.DiscoveryMethod?.Id;
         public string EventDiscoveryMethodValue => _observation?.Event?.DiscoveryMethod?.Value;
-        public DateTime? EventStartDate => _observation?.Event?.StartDate;
-        public DateTime? EventEndDate => _observation?.Event?.EndDate;
+        public DateTime? EventStartDate
+        {
+            get
+            {
+                var date = _observation?.Event?.StartDate;
+                if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                return swedenDate;
+                //return _observation?.Event?.StartDate;
+            }
+        }
+        public DateTime? EventEndDate
+        {
+            get
+            {
+                var date = _observation?.Event?.EndDate;
+                if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                return swedenDate;
+                //return _observation?.Event?.EndDate;
+            }
+        }
         public string EventEventId => _observation?.Event?.EventId;
         public string EventEventRemarks => _observation?.Event?.EventRemarks;
         public string EventFieldNotes => _observation?.Event?.FieldNotes;
@@ -200,7 +223,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OccurrenceRecordedBy => _observation?.Occurrence?.RecordedBy;
         public string OccurrenceRecordNumber => _observation?.Occurrence?.RecordNumber;
         public string OccurrenceReportedBy => _observation?.Occurrence?.ReportedBy;
-        public DateTime? OccurrenceReportedDate => _observation?.Occurrence?.ReportedDate;
+        public DateTime? OccurrenceReportedDate
+        {
+            get
+            {
+                var date = _observation?.Occurrence?.ReportedDate;
+                if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                return swedenDate;
+                //return _observation?.Occurrence?.ReportedDate;
+            }
+        }
         public string OccurrenceReproductiveCondition => _observation?.Occurrence?.ReproductiveCondition?.ToString();
         public int? OccurrenceReproductiveConditionId => _observation?.Occurrence?.ReproductiveCondition?.Id;
         public string OccurrenceReproductiveConditionValue => _observation?.Occurrence?.ReproductiveCondition?.Value;
@@ -302,7 +335,17 @@ namespace SOS.Lib.Models.Processed.Observation
         public string InstitutionCodeValue => _observation?.InstitutionCode?.Value;
         public string Language => _observation?.Language;
         public string License => _observation?.License;
-        public DateTime? Modified => _observation?.Modified;
+        public DateTime? Modified
+        {
+            get
+            {
+                var date = _observation?.Modified;
+                if (date == null) return null;
+                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
+                return swedenDate;
+                //return _observation?.Modified;
+            }
+        }
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
         public string PrivateCollection => _observation?.PrivateCollection;
         public bool? Protected => _observation?.Protected;

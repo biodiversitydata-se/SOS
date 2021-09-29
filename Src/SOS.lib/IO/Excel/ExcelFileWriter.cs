@@ -117,7 +117,7 @@ namespace SOS.Lib.IO.Excel
                             var value = flatObservation.GetValue(propertyField);
                             if (propertyField.DataTypeEnum == PropertyFieldDataType.DateTime)
                             {
-                                value = ((DateTime?) value)?.ToShortDateString();
+                                value = ((DateTime?)value)?.ToString("yyyy-MM-dd");
                             }
                             else if (propertyField.DataTypeEnum == PropertyFieldDataType.Boolean)
                             {
