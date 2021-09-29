@@ -1039,7 +1039,7 @@
     },
     {
         "Type": "BiologgObservations",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1087,7 +1087,7 @@
             "Email": "info@biologg.se"
         },
         "DownloadUrl": null,
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
         "IncludeInSearchByDefault": false,
@@ -1101,7 +1101,7 @@
     },
     {
         "Type": "iNaturalistObservations",
-        "IsActive": false,
+        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
