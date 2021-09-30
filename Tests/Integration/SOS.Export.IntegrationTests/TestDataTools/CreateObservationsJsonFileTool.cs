@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
@@ -31,7 +32,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\TenProcessedTestObservations.json";
-            var elasticClient = new ElasticClient();
+            var elasticSearchConfiguration = new ElasticSearchConfiguration();
             var processDbConfiguration = GetProcessDbConfiguration();
             var exportClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
@@ -39,7 +40,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClient,
+                new ElasticClientManager(elasticSearchConfiguration, true),
                 exportClient,
                 new ElasticSearchConfiguration(),
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),

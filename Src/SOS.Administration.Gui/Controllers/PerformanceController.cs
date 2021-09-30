@@ -108,7 +108,7 @@ namespace SOS.Administration.Gui.Controllers
 
         public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
         {          
-            _testElasticClient = testElasticConfiguration.GetClient();
+            _testElasticClient = testElasticConfiguration.GetClients().FirstOrDefault();
             _aiConfig = aiConfig.CurrentValue;
         }
      
