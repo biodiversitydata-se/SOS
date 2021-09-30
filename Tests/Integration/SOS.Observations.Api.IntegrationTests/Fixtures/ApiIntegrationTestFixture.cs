@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -102,7 +103,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
-            var elasticClient = elasticConfiguration.GetClient(true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
@@ -110,7 +111,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(processClient);
             var taxonManager = CreateTaxonManager(processClient, memoryCache);
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClient, processClient, memoryCache);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
             
@@ -211,13 +212,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         private ProcessedObservationRepository CreateProcessedObservationRepository(
             ElasticSearchConfiguration elasticConfiguration,
-            IElasticClient elasticClient,
+            IElasticClientManager elasticClientManager,
             IProcessClient processClient,
             IMemoryCache memoryCache)
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClient, 
+                elasticClientManager, 
                 processClient,
                 elasticConfiguration,
                 processedConfigurationCache,

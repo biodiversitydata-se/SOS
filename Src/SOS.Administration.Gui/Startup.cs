@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -101,7 +102,7 @@ namespace SOS.Administration.Gui
 
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-            services.AddScoped<IElasticClient, ElasticClient>(p => elasticConfiguration.GetClient());
+            services.AddScoped<IEnumerable<IElasticClient>, IEnumerable<ElasticClient>>(p => elasticConfiguration.GetClients());
             var testElasticSearchConfiguration = Configuration.GetSection("SearchDbConfigurationTest").Get<TestElasticSearchConfiguration>();
 
             services.AddSingleton(authConfig);

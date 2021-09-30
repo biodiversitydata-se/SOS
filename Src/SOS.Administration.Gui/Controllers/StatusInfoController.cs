@@ -32,8 +32,7 @@ namespace SOS.Administration.Gui.Controllers
             {
                 _mongoSuffix = "-st";
             }
-            _elasticClient = elasticConfiguration.GetClient();
-
+            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
         }
 
         [HttpGet]

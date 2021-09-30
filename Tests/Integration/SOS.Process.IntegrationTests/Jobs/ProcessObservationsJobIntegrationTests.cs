@@ -47,14 +47,7 @@ namespace SOS.Process.IntegrationTests.Jobs
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var uris = new Uri[elasticConfiguration.Hosts.Length];
-            for (var i = 0; i < uris.Length; i++)
-            {
-                uris[i] = new Uri(elasticConfiguration.Hosts[i]);
-            }
-
-            var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
-
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -88,7 +81,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClient, processClient,
+                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
                     new NullLogger<ProcessedObservationRepository>());
@@ -226,7 +219,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(elasticClient, processClient,
+                new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),  
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
                     new NullLogger<ProcessedObservationRepository>()),

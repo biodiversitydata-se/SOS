@@ -70,7 +70,7 @@ namespace SOS.Administration.Gui.Controllers
 
         public LogsController(ElasticSearchConfiguration elasticConfiguration)
         {          
-            _elasticClient = elasticConfiguration.GetClient();
+            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
         }
      
         [HttpGet]

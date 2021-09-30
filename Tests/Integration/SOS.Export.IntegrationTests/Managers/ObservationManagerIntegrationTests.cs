@@ -18,6 +18,7 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
@@ -34,7 +35,7 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClient = elasticConfiguration.GetClient(true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -57,7 +58,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new NullLogger<DwcArchiveFileWriter>());
 
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClient,
+                elasticClientManager,
                 processClient,
                 elasticConfiguration,
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
