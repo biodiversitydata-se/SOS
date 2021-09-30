@@ -58,9 +58,26 @@ namespace SOS.Lib.Models.DarwinCore
         public string OrganismGroup { get; set; }
 
         /// <summary>
-        ///     True if taxon is protected by law
+        ///     True if taxon is protected by law according to Artskyddsförordningen (SFS 2007:845)
         /// </summary>
-        public bool? ProtectedByLaw { get; set; }
+        public bool? ProtectedByLawSpeciesProtection { get; set; }
+
+        /// <summary>
+        ///     True if taxon is protected by law and is a bird.
+        /// </summary>
+        public bool? ProtectedByLawBirds { get; set; }
+
+        /// <summary>
+        ///     True if taxon is protected by law according to Artskyddsförordningen (SFS 2007:845)
+        /// </summary>
+        public bool? ProtectedByLaw
+        {
+            get
+            {
+                if (ProtectedByLawSpeciesProtection == null && ProtectedByLawBirds == null) return null;
+                return ProtectedByLawSpeciesProtection.GetValueOrDefault() || ProtectedByLawBirds.GetValueOrDefault();
+            }
+        }
 
         /// <summary>
         ///     True if taxon is protected by law
