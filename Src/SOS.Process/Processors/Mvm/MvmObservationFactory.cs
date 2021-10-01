@@ -48,6 +48,7 @@ namespace SOS.Process.Processors.Mvm
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.MVM}",
                 DatasetName = "MVM",
+                DynamicProperties = string.IsNullOrEmpty(verbatim.ProductName) ? null : @"{""productName"": " + verbatim.ProductName + "}",
                 Event = new Event
                 {
                     EndDate = verbatim.End.ToUniversalTime(),

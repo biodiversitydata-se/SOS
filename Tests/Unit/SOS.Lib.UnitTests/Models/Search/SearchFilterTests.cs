@@ -20,26 +20,29 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                AreaGeographic = new GeographicAreasFilter
+                Location = new LocationFilter
                 {
-                    CountyIds = new[] { "5", "24", "14" },
-                    GeometryFilter = new GeographicsFilter
+                    AreaGeographic = new GeographicAreasFilter
                     {
-                        MaxDistanceFromPoint = 50,
-                        UsePointAccuracy = true,
-                        Geometries = new List<IGeoShape>
+                        CountyIds = new[] { "5", "24", "14" },
+                        GeometryFilter = new GeographicsFilter
                         {
-                            new PolygonGeoShape(new[]
+                            MaxDistanceFromPoint = 50,
+                            UsePointAccuracy = true,
+                            Geometries = new List<IGeoShape>
                             {
-                                new[]
+                                new PolygonGeoShape(new[]
                                 {
-                                    new GeoCoordinate(1, 2),
-                                    new GeoCoordinate(3, 4)
-                                }
-                            })
+                                    new[]
+                                    {
+                                        new GeoCoordinate(1, 2),
+                                        new GeoCoordinate(3, 4)
+                                    }
+                                })
+                            }
                         }
                     }
-                },
+                }, 
                 EndDate = currentDate
             };
 
@@ -64,23 +67,26 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                AreaGeographic = new GeographicAreasFilter
+                Location = new LocationFilter
                 {
-                    CountyIds = new[] { "14", "5", "24" },
-                    GeometryFilter = new GeographicsFilter
+                    AreaGeographic = new GeographicAreasFilter
                     {
-                        MaxDistanceFromPoint = 50,
-                        UsePointAccuracy = true,
-                        Geometries = new List<IGeoShape>
+                        CountyIds = new[] { "14", "5", "24" },
+                        GeometryFilter = new GeographicsFilter
                         {
-                            new PolygonGeoShape(new[]
+                            MaxDistanceFromPoint = 50,
+                            UsePointAccuracy = true,
+                            Geometries = new List<IGeoShape>
                             {
-                                new[]
+                                new PolygonGeoShape(new[]
                                 {
-                                    new GeoCoordinate(1, 2),
-                                    new GeoCoordinate(3, 4)
-                                }
-                            })
+                                    new[]
+                                    {
+                                        new GeoCoordinate(1, 2),
+                                        new GeoCoordinate(3, 4)
+                                    }
+                                })
+                            }
                         }
                     }
                 },

@@ -461,7 +461,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.Taxa?.Ids?.Count() > 10000)
                 {
@@ -488,7 +488,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {

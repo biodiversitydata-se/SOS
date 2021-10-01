@@ -891,7 +891,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Field("location.pointLocation")
                     .Size(maxNrReturnedBuckets + 1)
                     .GeoHashPrecision((GeoHashPrecision)precision)
-                    .Bounds(b => b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
+                    .Bounds(b => b.TopLeft(filter.Location.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Location.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
                     .Aggregations(b => b
                         .Cardinality("taxa_count", t => t
                             .Field("taxon.id")))
@@ -938,7 +938,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var gridResult = new GeoGridResult()
             {
-                BoundingBox = filter.Geometries.BoundingBox,
+                BoundingBox = filter.Location.Geometries.BoundingBox,
                 Precision = precision,
                 GridCellCount = nrOfGridCells,
                 GridCells = georesult
@@ -966,7 +966,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a.Filter("geotile_filter", g => g
                     .Filter(f => f.GeoBoundingBox(bb => bb
                         .Field("location.pointLocation")
-                        .BoundingBox(b => b.TopLeft(filter.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
+                        .BoundingBox(b => b.TopLeft(filter.Location.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Location.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
                    ))
                     .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
                         .Field("location.pointLocation")
@@ -1014,7 +1014,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var gridResult = new GeoGridTileResult()
             {
-                BoundingBox = filter.Geometries.BoundingBox,
+                BoundingBox = filter.Location.Geometries.BoundingBox,
                 Zoom = zoom,
                 GridCellTileCount = nrOfGridCells,
                 GridCellTiles = georesult

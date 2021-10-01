@@ -64,7 +64,7 @@ namespace SOS.Administration.Gui.Controllers
     public class LogsController : ControllerBase
     {
 
-        private readonly ElasticClient _elasticClient;
+        private readonly IElasticClient _elasticClient;
         private readonly string _indexName = "logs-*";
 
 
