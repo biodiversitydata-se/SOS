@@ -1642,7 +1642,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Field("location.pointWithDisturbanceBuffer")
                     );
                 var indexNames = GetCurrentIndex(filter);
-                searchResponse = await _elasticClient
+                searchResponse = await Client
                     .SearchAsync<dynamic>(s => s
                         .Index(indexNames)
                         .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
@@ -1659,7 +1659,7 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                searchResponse = await _elasticClient
+                searchResponse = await Client
                     .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 

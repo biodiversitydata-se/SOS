@@ -37,7 +37,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
+        [DisplayName("Export observations. Email={2}, Description={3}, ExportFormat={4}")]
         public async Task<bool> RunAsync(SearchFilter filter, 
             int userId,
             string email, 
