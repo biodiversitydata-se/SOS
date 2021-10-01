@@ -329,8 +329,12 @@ namespace SOS.Lib.Managers
             {
                 filter.DataProviderIds = await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds);
             }
-           
-            filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
+
+            if (filter.Location?.Areas != null)
+            {
+                filter.Location.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Location.Areas, areaBuffer ?? 0, filter.Location.Geometries?.UsePointAccuracy ?? false, filter.Location.Geometries?.UseDisturbanceRadius ?? false);
+            }
+            
             PopulateTaxonFilter(filter.Taxa);
         }
     }

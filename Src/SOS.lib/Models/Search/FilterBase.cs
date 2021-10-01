@@ -17,6 +17,7 @@ namespace SOS.Lib.Models.Search
         public FilterBase()
         {
             ExtendedAuthorization = new ExtendedAuthorizationFilter();
+            Location = new LocationFilter();
         }
 
         public enum SightingTypeFilter
@@ -87,16 +88,6 @@ namespace SOS.Lib.Models.Search
         }
 
         /// <summary>
-        /// Filter on area geometries 
-        /// </summary>
-        public GeographicAreasFilter AreaGeographic { get; set; }
-
-        /// <summary>
-        /// Geographical areas to filter by
-        /// </summary>
-        public IEnumerable<AreaFilter> Areas { get; set; }
-
-        /// <summary>
         ///     Only get data from these providers
         /// </summary>
         public IEnumerable<int> DataProviderIds { get; set; }
@@ -130,14 +121,9 @@ namespace SOS.Lib.Models.Search
         public string FieldTranslationCultureCode { get; set; }
 
         /// <summary>
-        /// Geometry filter
+        /// Location related filter
         /// </summary>
-        public GeographicsFilter Geometries { get; set; }
-
-        /// <summary>
-        /// Limit observation accuracy. Only observations with accuracy less than this will be returned
-        /// </summary>
-        public int? MaxAccuracy { get; set; }
+        public LocationFilter Location { get; set; }
 
         /// <summary>
         /// Filter for observation not recovered
