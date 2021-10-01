@@ -18,6 +18,7 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -65,8 +66,6 @@ namespace SOS.Export.IntegrationTests.Managers
                 new TelemetryClient(),
                 new HttpContextAccessor(),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
-            
-
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());

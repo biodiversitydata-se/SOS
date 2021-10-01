@@ -349,16 +349,15 @@ namespace SOS.Observations.Api
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
+                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
+                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
                 .AddElasticsearch(a => a
                         .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => c.Hosts)))
                         .UseBasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
                         .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
                         .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null,
-                    tags: new[] { "database", "elasticsearch", "system" }); ;
-                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new [] { "data providers", "meta data" })
-                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                    tags: new[] { "database", "elasticsearch", "system" });
 
-            
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
