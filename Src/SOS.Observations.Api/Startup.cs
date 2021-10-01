@@ -46,6 +46,7 @@ using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel;
 using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
@@ -354,6 +355,8 @@ namespace SOS.Observations.Api
                         .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
                         .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null,
                     tags: new[] { "database", "elasticsearch", "system" }); ;
+                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new [] { "data providers", "meta data" })
+                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
 
             
             // Add security

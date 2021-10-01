@@ -49,12 +49,12 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(List<DataProviderDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "sv-SE")
+        public async Task<IActionResult> GetDataProviders([FromQuery] string cultureCode = "sv-SE", [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode);
+                var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode, includeProvidersWithNoObservations);
 
                 if (!dataProviders?.Any() ?? true)
                 {

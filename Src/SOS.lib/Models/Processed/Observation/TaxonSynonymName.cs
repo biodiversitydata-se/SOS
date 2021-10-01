@@ -35,5 +35,10 @@
         ///     It requires no taxonomic opinion.
         /// </summary>
         public string NomenclaturalStatus { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

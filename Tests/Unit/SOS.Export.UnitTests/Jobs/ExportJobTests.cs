@@ -54,7 +54,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
                 )
                 .ReturnsAsync(false);
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
@@ -66,7 +66,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
                 )
                 .ReturnsAsync(true);
 
@@ -99,7 +99,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            var result = await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, null, JobCancellationToken.Null);
+            var result = await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -116,7 +116,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)
                 )
                 .Throws(new Exception());
             _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
@@ -128,7 +128,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB",false, null, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB",false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
