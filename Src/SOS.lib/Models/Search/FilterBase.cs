@@ -94,12 +94,12 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Geographical areas to filter by
         /// </summary>
-        public IEnumerable<AreaFilter> Areas { get; set; }
+        public List<AreaFilter> Areas { get; set; }
 
         /// <summary>
         ///     Only get data from these providers
         /// </summary>
-        public IEnumerable<int> DataProviderIds { get; set; }
+        public List<int> DataProviderIds { get; set; }
 
         /// <summary>
         ///     Which type of date filtering that should be used
@@ -109,7 +109,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Filter by diffuse status
         /// </summary>
-        public IEnumerable<DiffusionStatus> DiffusionStatuses { get; set; }
+        public List<DiffusionStatus> DiffusionStatuses { get; set; }
 
         /// <summary>
         ///     Observation end date specified in the ISO 8601 standard.
@@ -159,7 +159,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Sex id's to match. Queryable values are available in sex vocabulary.
         /// </summary>
-        public IEnumerable<int> SexIds { get; set; }
+        public List<int> SexIds { get; set; }
 
         /// <summary>
         ///     Observation start date specified in the ISO 8601 standard.
@@ -174,7 +174,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Predefined time ranges.
         /// </summary>
-        public IEnumerable<TimeRange> TimeRanges { get; set; }
+        public List<TimeRange> TimeRanges { get; set; }
 
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
 

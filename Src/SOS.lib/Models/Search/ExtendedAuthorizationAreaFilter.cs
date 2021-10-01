@@ -25,6 +25,6 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Taxa user has extended authorization to see
         /// </summary>
-        public IEnumerable<int> TaxonIds { get; set; }
+        public List<int> TaxonIds { get; set; }
     }
 }

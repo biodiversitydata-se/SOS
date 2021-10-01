@@ -34,7 +34,7 @@ namespace SOS.Observations.Api.HealthChecks
                 },
                 ValidationStatus = FilterBase.StatusValidation.BothValidatedAndNotValidated,
                 PositiveSightings = true,
-                OutputFields = new []
+                OutputFields = new List<string>
                 {
                     "taxon.id"
                 }
@@ -65,8 +65,8 @@ namespace SOS.Observations.Api.HealthChecks
             {
                 var serachFilter = new SearchFilter()
                 {
-                    DataProviderIds = new []{ provider.Id },
-                    OutputFields = new[]
+                    DataProviderIds = new List<int> { provider.Id },
+                    OutputFields = new List<string>
                     {
                         "taxon.id"
                     }

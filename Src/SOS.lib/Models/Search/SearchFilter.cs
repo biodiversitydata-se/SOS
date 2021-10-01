@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Search
         ///     your projection is a conditional query where you dictates which fields should be returned by the API.
         ///     Omit this parameter and you will receive the complete collection of fields.
         /// </summary>
-        public ICollection<string> OutputFields { get; set; }
+        public List<string> OutputFields { get; set; }
 
         public new SearchFilter Clone()
         {

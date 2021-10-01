@@ -36,7 +36,7 @@ namespace SOS.Lib.Models.Search
         ///     If point and accuracy is greater tha 0, sightings inside circle (center point + buffer (accuracy)) will be returned
         ///     If polygon, sightings inside polygon will be returned
         /// </summary>
-        public ICollection<IGeoShape> Geometries { get; set; }
+        public List<IGeoShape> Geometries { get; set; }
 
         /// <summary>
         /// Makes a simple validation of the geometry

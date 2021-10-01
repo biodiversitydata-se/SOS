@@ -86,7 +86,7 @@ namespace SOS.Lib.Managers
                     areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                 }
                 extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
+                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null)?.ToList();
 
                 // To get extended authorization, taxon id's and some area must be set 
                 if (
@@ -299,7 +299,7 @@ namespace SOS.Lib.Managers
 
             if (filter.ExtendedAuthorization.ProtectedObservations)
             {
-                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorization.ExtendedAreas = (await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false))?.ToList();
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)
@@ -324,7 +324,7 @@ namespace SOS.Lib.Managers
             
             if (setDefaultProviders.HasValue && setDefaultProviders.Value)
             {
-                filter.DataProviderIds = await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds);
+                filter.DataProviderIds = (await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds))?.ToList();
             }
            
             filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
