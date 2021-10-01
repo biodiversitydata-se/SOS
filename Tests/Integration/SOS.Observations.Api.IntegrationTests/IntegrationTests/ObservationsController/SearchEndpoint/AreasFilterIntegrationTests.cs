@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -46,7 +47,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
                 ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                Output = new OutputFilterDto {FieldSet = OutputFieldSet.AllWithKnownValues}
             };
 
             //-----------------------------------------------------------------------------------------------------------

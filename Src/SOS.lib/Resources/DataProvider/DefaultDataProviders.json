@@ -188,11 +188,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "MVM"
+                "Value": "MVM environmental data"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "MVM"
+                "Value": "MVM miljödata"
             }
         ],
         "Descriptions": [
@@ -795,17 +795,25 @@
     },
     {
         "Type": "DwcA",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
                 "Value": "SHARK - National zooplankton monitoring in Sweden since 1979"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979"
             }
         ],
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
                 "Value": "Zooplankton have been monitored in Sweden since 1979. The national monitoring program was initiated by the Swedish Environmental Protection Agency and is now financed by the Swedish Agency for Marine and Water Management. Monitoring is performed by Stockholm University, Umeå University and Swedish Meteorological and Hydrological Institute and Gothenburg University. Data are stored in the Swedish Ocean Archive database (SHARK), by the Swedish Meteorological and Hydrological Institute. Data are collected and analyzed according to the HELCOM COMBINE Manual - Part C Annex C7 Mesozooplankton (https://helcom.fi/media/publications/Guidelines-for-monitoring-of-mesozooplankton.pdf) or similar methods. \"Mesozooplankton constitute an important part of zooplankton in the pelagic food webs, since these are the organisms representing the link between primary producers (phytoplankton) and higher trophic levels (zooplanktivorous fish and invertebrates)...The sampling of mesozooplankton serves...to describe the species composition and the spatial distribution of mesozooplankton abundance and biomass.\" (HELCOM COMBINE Manual https://helcom.fi/media/publications/Guidelines-for-monitoring-of-mesozooplankton.pdf). Information about the program and the methods are also available in Swedish at https://www.havochvatten.se/hav/vagledning--lagar/vagledningar/ovriga-vagledningar/undersokningstyper-for-miljoovervakning/undersokningstyper/djurplankton-trend--och-omradesovervakning.html"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Zooplankton har övervakats i Sverige sedan 1979. Det nationella övervakningsprogrammet initierades av Naturvårdsverket och finansieras nu av Havs- och vattenmyndigheten. Övervakningen utförs av Stockholms universitet, Umeå universitet och Meteorologiska och hydrologiska institutet och Göteborgs universitet. Data lagras i Svenska havsarkivdatabasen (SHARK), av SMHI."
             }
         ],
         "Organizations": [
@@ -822,6 +830,10 @@
             {
                 "CultureCode": "en-GB",
                 "path": [ "SMHI", "National zooplankton monitoring in Sweden since 1979" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "path": [ "SMHI", "SHARK - Nationell zooplankton övervakning i Sverige sedan 1979" ]
             }
         ],
         "Url": "http://sharkdata.se/",
@@ -909,11 +921,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Presence-absence Vegetation data"
+                "Value": "Swedish national forest inventory vegetation data"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Förekomst- och icke förekomst. Vegetationsdata"
+                "Value": "Riksskogstaxeringens vegetationsdata"
             }
         ],
         "Descriptions": [
@@ -1388,12 +1400,20 @@
             {
                 "CultureCode": "en-GB",
                 "Value": "National Meadow and Pasture Inventory (TUVA)"
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Nationell ängs- och betesinventering (TUVA)"
             }
         ],
         "Descriptions": [
             {
                 "CultureCode": "en-GB",
                 "Value": "The Meadow and Pasture Inventory is a Swedish national inventory of biologically valuable meadows and pastures. The inventory collects information about a number of natural and cultural environments containing flora and other organisms that are highly dependent on hay-making or grazing animals. In the inventory only nature values connected to hay-making or grazing are assessed. The information from the inventory is open to all and collected in the Swedish Board of Agriculture database TUVA (www.jordbruksverket.se/tuva). The TUVA database contains information about: 1. Fully inventoried pastures and meadows (classified as mown meadow, open pasture, forest pasture and mountain pasture), 2. Meadows and pastures that are restorable, 3. Non-applicable meadows and pastures. A sub-classification of the types of meadows and pastures treated was also made using the Habitat Directive; Council Directive 92/43/EEC, or they were classified as developmental- or other types of fields. Inventories of indicator species (vascular plants), meadow fungi, trees and shrubs, cultural elements, water bodies and status of present management was also performed. The majority of the meadows and pastures in TUVA were inventoried between the years 2002 and 2004. Inventories have since then and up until 2012 been performed on a smaller scale. From 2016 and onwards, the national inventory has been reopened with a focus on performing repeated monitoring of already inventoried meadows and pastures. The information from the Meadow and Pasture Inventory is used for monitoring the environmental quality objective set up by the Swedish government; ‘a rich farming landscape’. It is also used for evaluating rural programs and for reporting to the EU Habitat Directive. The inventory is also used as a basis for national, regional and local strategies and programs for environmental management, spatial planning and case management. Data from the inventory have also been used for research."
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Value": "Äng- och betesinventeringen är en svensk nationell inventering av biologiskt värdefulla ängar och betesmarker. Inventeringen samlar in information om ett antal natur- och kulturmiljöer som innehåller flora och andra organismer som är starkt beroende av hö- eller betande djur. I inventeringen bedöms endast naturvärden kopplade till slåtter eller bete. Informationen från inventeringen är öppen för alla och samlad i Jordbruksverkets databas TUVA (www.jordbruksverket.se/tuva). TUVA-databasen innehåller information om: 1. Fullt inventerade betesmarker och ängar (klassificerade som slått äng, öppen hage, skogshage och fjällmark), 2. Ängar och betesmarker som är restaurerbara, 3. Ej tillämpbara ängar och betesmarker. En underklassificering av de behandlade ängarna och betesmarkerna gjordes också med hjälp av livsmiljödirektivet. Rådets direktiv 92/43/EEG, eller så klassificerades de som utvecklings- eller andra typer av fält. Inventeringar av indikatorarter (kärlväxter), ängssvampar, träd och buskar, kulturella element, vattenförekomster och status för nuvarande förvaltning utfördes också. Majoriteten av ängarna och betesmarkerna i TUVA inventerades mellan åren 2002 och 2004. Inventeringar har sedan dess och fram till 2012 utförts i mindre skala. Från 2016 och framåt har den nationella inventeringen öppnats igen med fokus på att utföra upprepad övervakning av redan inventerade ängar och betesmarker. Informationen från ängs- och betesinventeringen används för att övervaka miljökvalitetsmålet som den svenska regeringen har satt upp; ’Ett rikt jordbrukslandskap’. Det används också för utvärdering av landsbygdsprogram och för rapportering till EU: s habitatdirektiv. Inventeringen används också som grund för nationella, regionala och lokala strategier och program för miljöledning, fysisk planering och ärendehantering. Data från inventeringen har också använts för forskning."
             }
         ],
         "Organizations": [
@@ -1410,6 +1430,10 @@
             {
                 "CultureCode": "en-GB",
                 "path": [ "Swedish Museum of Natural History", "National Meadow and Pasture Inventory" ]
+            },
+            {
+                "CultureCode": "sv-SE",
+                "Path": [ "Naturhistoriska riksmuseet", "Nationell ängs- och betesinventering (TUVA)" ]
             }
         ],
         "Url": "",

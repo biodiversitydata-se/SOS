@@ -17,6 +17,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
+using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -131,7 +132,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
-            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyManger, processClient, filterManager);
+            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, processClient, filterManager);
             var exportManager = new ExportManager(dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
@@ -178,14 +179,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         private ObservationManager CreateObservationManager(
             ProcessedObservationRepository processedObservationRepository, 
-            VocabularyManager vocabularyManager,
+            VocabularyValueResolver vocabularyValueResolver,
             ProcessClient processClient,
             FilterManager filterManager)
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
-                vocabularyManager,
+                vocabularyValueResolver,
                 filterManager,  
                 new HttpContextAccessor(),
                 new NullLogger<ObservationManager>());

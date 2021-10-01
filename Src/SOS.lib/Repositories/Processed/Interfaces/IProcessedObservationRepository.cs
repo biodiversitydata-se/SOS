@@ -273,6 +273,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             FilterBase filter,
             string scrollId);
 
+        Task<ScrollResult<dynamic>> ScrollObservationsAsDynamicAsync(
+            SearchFilter filter,
+            string scrollId);
+
         /// <summary>
         /// Signal search
         /// </summary>

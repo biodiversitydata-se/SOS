@@ -22,8 +22,11 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="exportFormat"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="excludeNullValues"></param>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
         [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
         [Queue("medium")]
@@ -35,6 +38,9 @@ namespace SOS.Lib.Jobs.Export
             string culture,
             bool flatOut,
             PerformContext context,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
             IJobCancellationToken cancellationToken);
     }
 }
