@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Areas where user has extended authorization
         /// </summary>
-        public IEnumerable<ExtendedAuthorizationAreaFilter> ExtendedAreas{ get; set; }
+        public List<ExtendedAuthorizationAreaFilter> ExtendedAreas{ get; set; }
 
         /// <summary>
         /// Only get observations observed by me
