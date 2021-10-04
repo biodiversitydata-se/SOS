@@ -27,6 +27,7 @@
     <PackageReference Include="NEST" Version="7.14.1" />
     <PackageReference Include="NetTopologySuite" Version="2.3.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NReco.Csv" Version="1.0.0" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
