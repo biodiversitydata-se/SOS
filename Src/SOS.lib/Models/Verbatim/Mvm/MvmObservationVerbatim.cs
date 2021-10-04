@@ -46,6 +46,9 @@ namespace SOS.Lib.Models.Verbatim.Mvm
         public int ProjectID { get; set; }
         public string ProjectName { get; set; }
         
+        public string Quantity { get; set; }
+        public string QuantityUnit { get; set; }
+
         public string RecordedBy { get; set; }
 
         public string ReportedBy { get; set; }
