@@ -102,6 +102,39 @@ namespace SOS.Import.Factories.Harvest
                     case SpeciesObservationPropertyId.DynamicProperties:
                         observation.ProductName = field.Value;
                         break;
+                    case SpeciesObservationPropertyId.CatalogNumber:
+                        observation.CatalogNumber = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.OccurrenceStatus:
+                        observation.OccurrenceStatus = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.IsPositiveObservation:
+                        observation.IsPositiveObservation = field.Value.WebParseBoolean();
+                        break;
+                    case SpeciesObservationPropertyId.IndividualCount:
+                        observation.IndividualCount = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.LocationRemarks:
+                        observation.LocationRemarks = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.Habitat:
+                        observation.Habitat = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.ReportedDate:
+                        observation.ReportedDate = field.Value.WebParseDateTime();
+                        break;
+                    case SpeciesObservationPropertyId.ProjectID:
+                        observation.ProjectID = field.Value.WebParseInt32();
+                        break;
+                    case SpeciesObservationPropertyId.ProjectName:
+                        observation.ProductName = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.IsPublic:
+                        observation.IsPublic = field.Value.WebParseBoolean();
+                        break;
+                    default:
+                        var unhandled = field.Property.Id;
+                        break;
                 }
             }
             
