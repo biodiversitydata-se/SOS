@@ -247,6 +247,10 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     createdDwcaFiles.Add(completeDwcArchiveFilePath);
                 }
+                else
+                {
+                    File.Delete(completeDwcArchiveFilePath);
+                }
 
                 DeleteTemporaryCreatedCsvFiles();
 

@@ -132,6 +132,12 @@ namespace SOS.Import.Factories.Harvest
                     case SpeciesObservationPropertyId.IsPublic:
                         observation.IsPublic = field.Value.WebParseBoolean();
                         break;
+                    case SpeciesObservationPropertyId.Quantity:
+                        observation.Quantity = field.Value;
+                        break;
+                    case SpeciesObservationPropertyId.QuantityUnit:
+                        observation.QuantityUnit = field.Value;
+                        break;
                     default:
                         var unhandled = field.Property.Id;
                         break;

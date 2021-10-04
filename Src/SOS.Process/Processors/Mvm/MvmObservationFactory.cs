@@ -78,6 +78,8 @@ namespace SOS.Process.Processors.Mvm
                     IsPositiveObservation = verbatim.IsPositiveObservation,
                     OccurrenceId = verbatim.OccurrenceId,
                     ProtectionLevel = CalculateProtectionLevel(taxon),
+                    OrganismQuantity = verbatim.Quantity,
+                    OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate.ToUniversalTime(),
