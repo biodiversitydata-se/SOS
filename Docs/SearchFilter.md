@@ -592,6 +592,6 @@ If you specify `fields` without specifying `fieldSet`, you will retrieve only th
             "endDate": "2014-06-06T22:00:00Z",
             "startDate": "2014-06-06T22:00:00Z"
         }
-    }
+    }]
 }
 ```
