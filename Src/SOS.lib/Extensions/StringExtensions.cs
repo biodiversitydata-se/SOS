@@ -315,5 +315,29 @@ namespace SOS.Lib.Extensions
         {
             return string.IsNullOrEmpty(value) ? string.Empty : char.ToLower(value[0]) + value.Substring(1);
         }
+
+        /// <summary>
+        /// Returns the input string with the first character converted to uppercase
+        /// </summary>
+        public static string ToUpperFirst(this string s)
+        {
+            if (string.IsNullOrEmpty(s)) return string.Empty;
+            Span<char> a = stackalloc char[s.Length];
+            s.AsSpan(1).CopyTo(a.Slice(1));
+            a[0] = char.ToUpper(s[0]);
+            return new string(a);
+        }
+
+        /// <summary>
+        /// Returns the input string with the first character converted to lowercase
+        /// </summary>
+        public static string ToLowerFirst(this string s)
+        {
+            if (string.IsNullOrEmpty(s)) return string.Empty;
+            Span<char> a = stackalloc char[s.Length];
+            s.AsSpan(1).CopyTo(a.Slice(1));
+            a[0] = char.ToLower(s[0]);
+            return new string(a);
+        }
     }
 }
