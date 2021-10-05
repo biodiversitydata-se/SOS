@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Ionic.Zip;
 using Microsoft.Extensions.Logging;
+using SharpCompress.Common.Zip;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -42,22 +41,18 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                using var zip = ZipFile.Read(path);
-                long fileSize = 0;
-                foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
+                using var zip = ZipFile.OpenRead(path);
+                var fileSize = 0L;
+                foreach (var zipEntry in zip.Entries)
                 {
-                    fileSize += zipEntry.UncompressedSize;
-                }
-                
-                var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
-
-                if (emlFile == null)
-                {
-                    fileSize -= 1;
-                }
-                else
-                {
-                    fileSize += await GetEmlFileSizeWithoutPubDateAsync(emlFile);
+                    if (zipEntry.Name.Equals("eml.xml", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        fileSize += await GetEmlFileSizeWithoutPubDateAsync(zipEntry);
+                    }
+                    else
+                    {
+                        fileSize += zipEntry.Length;
+                    }
                 }
 
                 return fileSize.ToString();
@@ -68,12 +63,11 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipEntry emlZipEntry)
+        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipArchiveEntry emlZipEntry)
         {
             try
             {
-                await using var stream = new MemoryStream();
-                emlZipEntry.Extract(stream);
+                await using var stream = emlZipEntry.Open();
                 stream.Position = 0;
                 var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
                 return size;

@@ -14,7 +14,6 @@
     <PackageReference Include="Cronos" Version="0.7.1" />
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="DotNetCore.Mapping" Version="15.27.0" />
-    <PackageReference Include="DotNetZip" Version="1.15.0" />
     <PackageReference Include="EPPlus" Version="5.7.5" />
     <PackageReference Include="Hangfire.Core" Version="1.7.25" />
     <PackageReference Include="MailKit" Version="2.15.0" />
