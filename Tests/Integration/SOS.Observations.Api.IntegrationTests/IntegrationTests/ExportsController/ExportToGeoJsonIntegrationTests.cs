@@ -94,7 +94,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, 
                 OutputFieldSet.Extended,
-                PropertyLabelType.ShortPropertyName,
+                PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
                 true);
@@ -136,7 +136,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
                 OutputFieldSet.Extended,
-                PropertyLabelType.ShortPropertyName,
+                PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
                 true);

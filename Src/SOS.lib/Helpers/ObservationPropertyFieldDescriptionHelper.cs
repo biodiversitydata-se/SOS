@@ -16,7 +16,7 @@ namespace SOS.Lib.Helpers
     public static class ObservationPropertyFieldDescriptionHelper
     {
         public static readonly List<PropertyFieldDescription> AllFields;
-        public static readonly Dictionary<string, PropertyFieldDescription> FieldByName;
+        public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
         public static readonly Dictionary<OutputFieldSet, List<PropertyFieldDescription>> FieldsByFieldSet;
         public static readonly Dictionary<OutputFieldSet, List<string>> OutputFieldsByFieldSet;
 
@@ -24,7 +24,7 @@ namespace SOS.Lib.Helpers
         {
             AllFields = LoadFieldDescriptionsFromJson();
             InitDataTypeEnum(AllFields);
-            FieldByName = AllFields.ToDictionary(x => x.Name, x => x);
+            FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath, x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
             OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
         }
@@ -40,16 +40,16 @@ namespace SOS.Lib.Helpers
         {
             switch (propertyLabelType)
             {
+                case PropertyLabelType.PropertyPath:
+                    return field.PropertyPath;
                 case PropertyLabelType.PropertyName:
                     return field.Name;
-                case PropertyLabelType.ShortPropertyName:
-                    return field.ShortName;
                 case PropertyLabelType.Swedish:
                     return field.GetSwedishTitle();
                 case PropertyLabelType.English:
                     return field.GetEnglishTitle();
                 default:
-                    return field.Name;
+                    return field.PropertyPath;
             }
         }
 
@@ -86,24 +86,24 @@ namespace SOS.Lib.Helpers
 
         public static bool ValidateUniquePropertyNames()
         {
+            var propertyPathSet = new HashSet<string>();
             var propertyNameSet = new HashSet<string>();
-            var shortPropertyNameSet = new HashSet<string>();
             var swedishNameSet = new HashSet<string>();
             var englishNameSet = new HashSet<string>();
 
             foreach (var field in FieldsByFieldSet[OutputFieldSet.All])
             {
-                if (propertyNameSet.Contains(field.Name.ToLowerInvariant()))
+                if (propertyPathSet.Contains(field.PropertyPath.ToLowerInvariant()))
                     return false;
-                if (shortPropertyNameSet.Contains(field.ShortName.ToLowerInvariant()))
+                if (propertyNameSet.Contains(field.Name.ToLowerInvariant()))
                     return false;
                 if (swedishNameSet.Contains(field.GetSwedishTitle().ToLowerInvariant()))
                     return false;
                 if (englishNameSet.Contains(field.GetEnglishTitle().ToLowerInvariant()))
                     return false;
 
+                propertyPathSet.Add(field.PropertyPath.ToLowerInvariant());
                 propertyNameSet.Add(field.Name.ToLowerInvariant());
-                shortPropertyNameSet.Add(field.ShortName.ToLowerInvariant());
                 swedishNameSet.Add(field.GetSwedishTitle().ToLowerInvariant());
                 englishNameSet.Add(field.GetEnglishTitle().ToLowerInvariant());
             }

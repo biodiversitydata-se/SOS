@@ -149,7 +149,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     "en-GB", 
                     false, 
                     OutputFieldSet.All, 
-                    PropertyLabelType.PropertyName,
+                    PropertyLabelType.PropertyPath,
                     false,
                     JobCancellationToken.Null);
 
@@ -188,7 +188,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         "taxon.id",
                         "taxon.scientificName",
                         "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
