@@ -413,7 +413,7 @@ This filter will return observations for all mammal species (TaxonId=4000107) an
 ```json
 {        
     "taxon" : {
-        "ids" [4000107],
+        "ids": [4000107],
         "includeUnderlyingTaxa": true,
         "taxonListIds": [ 8 ],
         "taxonListOperator": "Merge"
@@ -427,7 +427,7 @@ This filter will return observations for mammal (TaxonId=4000107) species that a
 ```json
 {        
     "taxon" : {
-        "ids" [4000107],
+        "ids": [4000107],
         "includeUnderlyingTaxa": true,
         "taxonListIds": [ 8 ],
         "taxonListOperator": "Filter"
@@ -592,7 +592,6 @@ If you specify `fields` without specifying `fieldSet`, you will retrieve only th
             "endDate": "2014-06-06T22:00:00Z",
             "startDate": "2014-06-06T22:00:00Z"
         }
-    },    
-    ...
+    }
 }
 ```
