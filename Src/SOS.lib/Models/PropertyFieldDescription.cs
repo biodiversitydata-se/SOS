@@ -10,8 +10,8 @@ namespace SOS.Lib.Models
     public class PropertyFieldDescription
     {
         public int Id { get; set; }
-        public string ShortName { get; set; }
         public string Name { get; set; }
+        public string PropertyPath { get; set; }
         public string ParentName { get; set; }
         public string DataType { get; set; }
         public bool? DataTypeNullable { get; set; }
@@ -33,15 +33,15 @@ namespace SOS.Lib.Models
         public PropertyFieldDataType DataTypeEnum { get; set; }
         public string GetSwedishTitle()
         {
-            return string.IsNullOrEmpty(SwedishTitle) ? ShortName : SwedishTitle;
+            return string.IsNullOrEmpty(SwedishTitle) ? Name : SwedishTitle;
         }
         public string GetEnglishTitle()
         {
-            return string.IsNullOrEmpty(EnglishTitle) ? ShortName : EnglishTitle;
+            return string.IsNullOrEmpty(EnglishTitle) ? Name : EnglishTitle;
         }
         public override string ToString()
         {
-            return $"{nameof(Id)}: {Id}, {nameof(Name)}: {Name}, {nameof(DataType)}: {DataType}, {nameof(IsClass)}: {IsClass}, #{nameof(Children)}: {Children?.Count ?? 0}";
+            return $"{nameof(Id)}: {Id}, {nameof(PropertyPath)}: {PropertyPath}, {nameof(DataType)}: {DataType}, {nameof(IsClass)}: {IsClass}, #{nameof(Children)}: {Children?.Count ?? 0}";
         }
     }
 }

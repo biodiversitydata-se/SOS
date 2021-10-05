@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> DownloadExcel(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flatOut = true,
             bool excludeNullValues = true);
@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> OrderExcel(ExportFilterDto filter, 
             string description,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> OrderGeoJson(ExportFilterDto filter,
             string description,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flatOut = true,
             bool excludeNullValues = true);

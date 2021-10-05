@@ -364,7 +364,7 @@ namespace SOS.Lib.Models.Processed.Observation
             : string.Join(", ", _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds);
         public object GetValue(PropertyFieldDescription propertyField)
         {
-            switch (propertyField.Name)
+            switch (propertyField.PropertyPath)
             {
                 case "Occurrence.OccurrenceId":
                     return OccurrenceOccurrenceId;
@@ -926,7 +926,7 @@ namespace SOS.Lib.Models.Processed.Observation
                     return OrganismOrganismRemarks;
 
                 default:
-                    throw new ArgumentException($"Field is not mapped: \"{propertyField.Name}\"");
+                    throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"");
             }
         }
     }
