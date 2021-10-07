@@ -107,6 +107,7 @@ namespace SOS.Lib.Configuration.Shared
                 settings.DisableDirectStreaming().EnableDebugMode();
             }
 
+            settings.RequestTimeout(TimeSpan.FromMinutes(2));
             return new ElasticClient(settings);
         }
     }
