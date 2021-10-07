@@ -261,11 +261,6 @@ namespace SOS.Lib.IO.DwcArchive
             var dwcaFilePartsInfo = DwcaFilePartsInfo.Create(dataProvider, _dwcaFilesCreationConfiguration.FolderPath);
             _dwcaFilePartsInfoByDataProvider.Add(dataProvider, dwcaFilePartsInfo);
 
-            if (dataProvider.UseVerbatimFileInExport)
-            {
-                return dwcaFilePartsInfo;
-            }
-
             if (!Directory.Exists(dwcaFilePartsInfo.ExportFolder))
             {
                 _fileService.CreateFolder(dwcaFilePartsInfo.ExportFolder);
