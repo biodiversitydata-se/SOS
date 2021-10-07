@@ -28,6 +28,7 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
+using Newtonsoft.Json;
 using NLog.Web;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -289,12 +290,12 @@ namespace SOS.Observations.Api
 
             // Hangfire
             var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-
+            
             services.AddHangfire(configuration =>
                 configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                     .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings()
+                    .UseRecommendedSerializerSettings(m => m.TypeNameHandling = TypeNameHandling.None)
                     .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
                         mongoConfiguration.DatabaseName,
                         new MongoStorageOptions
