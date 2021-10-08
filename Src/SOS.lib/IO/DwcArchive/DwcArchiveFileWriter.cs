@@ -234,8 +234,9 @@ namespace SOS.Lib.IO.DwcArchive
             var multimediaRows = processedObservations.ToSimpleMultimediaRows();
             if (multimediaRows != null && multimediaRows.Any())
             {
-                await using StreamWriter multimediaFileStream = File.AppendText(multimediaCsvFilePath);
-                await _simpleMultimediaCsvWriter.WriteHeaderlessCsvFileAsync(
+                await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
+               
+                _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
             }
@@ -327,13 +328,19 @@ namespace SOS.Lib.IO.DwcArchive
             // Create occurrence.csv
             var occurrenceFilePaths = GetFilePaths(dwcaFilePartsInfos, "occurrence*");
             await using var occurrenceFileStream = archive.CreateEntry("occurrence.csv", CompressionLevel.Optimal).Open();
-            await WriteOccurrenceHeaderRow(occurrenceFileStream);
+
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(occurrenceFileStream, "\t");
+
+            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
                 await readStream.CopyToAsync(occurrenceFileStream);
                 readStream.Close();
             }
+            csvFileHelper.FinishWrite();
             occurrenceFileStream.Close();
 
             // Create emof.csv
@@ -342,13 +349,15 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaFilePart.Emof);
                 await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Optimal).Open();
-                await WriteEmofHeaderRow(extendedMeasurementOrFactFileStream);
+                csvFileHelper.InitializeWrite(extendedMeasurementOrFactFileStream, "\t");
+                _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvFileHelper);
                 foreach (var filePath in emofFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
                     await readStream.CopyToAsync(extendedMeasurementOrFactFileStream);
                     readStream.Close();
                 }
+                csvFileHelper.FinishWrite();
                 extendedMeasurementOrFactFileStream.Close();
             }
             
@@ -358,14 +367,15 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaFilePart.Multimedia);
                 await using var multimediaFileStream = archive.CreateEntry("multimedia.csv", CompressionLevel.Optimal).Open();
-              
-                await WriteMultimediaHeaderRow(multimediaFileStream);
+                csvFileHelper.InitializeWrite(multimediaFileStream, "\t");
+                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
                 foreach (var filePath in multimediaFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
                     await readStream.CopyToAsync(multimediaFileStream);
                     readStream.Close();
                 }
+                csvFileHelper.FinishWrite();
                 multimediaFileStream.Close();
             }
 
@@ -402,31 +412,6 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             return filePaths;
-        }
-
-        private async Task WriteOccurrenceHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
-               FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
-            await streamWriter.FlushAsync();
-        }
-
-        private async Task WriteEmofHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvWriter);
-            await streamWriter.FlushAsync();
-        }
-
-        private async Task WriteMultimediaHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _simpleMultimediaCsvWriter.WriteHeaderRow(csvWriter);
-            await streamWriter.FlushAsync();
         }
     }
 }

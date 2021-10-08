@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Nest;
 using Newtonsoft.Json;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;

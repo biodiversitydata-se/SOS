@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -46,11 +46,11 @@ namespace SOS.Lib.IO.DwcArchive
                 var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
                 if (!scrollResult?.Records?.Any() ?? true) return false;
 
-                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(stream, "\t");
 
                 // Write header row
-                WriteHeaderRow(csvWriter);
+                WriteHeaderRow(csvFileHelper);
 
                 while (scrollResult.Records.Any())
                 {
@@ -62,14 +62,15 @@ namespace SOS.Lib.IO.DwcArchive
                     // Write occurrence rows to CSV file.
                     foreach (var emofRow in emofRows)
                     {
-                        WriteEmofRow(csvWriter, emofRow);
+                        WriteEmofRow(csvFileHelper, emofRow);
                     }
-                    await streamWriter.FlushAsync();
+                    await csvFileHelper.FlushAsync();
 
                     // Get next batch of observations.
                     scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, scrollResult.ScrollId);
                 }
 
+                csvFileHelper.FinishWrite();
                 return true;
             }
             catch (JobAbortedException)
@@ -96,15 +97,16 @@ namespace SOS.Lib.IO.DwcArchive
                     return;
                 }
 
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(streamWriter, "\t");
 
                 // Write Emof rows to CSV file.
                 foreach (var emofRow in emofRows)
                 {
-                    WriteEmofRow(csvWriter, emofRow, writeEventId);
+                    WriteEmofRow(csvFileHelper, emofRow, writeEventId);
                 }
 
-                await streamWriter.FlushAsync();
+                csvFileHelper.FinishWrite();
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }
             catch (Exception e)
@@ -114,26 +116,26 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, bool isEventCore = false)
+        public void WriteHeaderRow(CsvFileHelper csvFileHelper, bool isEventCore = false)
         {
             var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create(isEventCore);
             foreach (var emofField in emofExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
-                csvWriter.WriteField(emofField.CSVColumnName);
+                csvFileHelper.WriteField(emofField.CSVColumnName);
             }
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
 
         /// <summary>
         /// Write Emof record to CSV file.
         /// </summary>
-        /// <param name="csvWriter"></param>
+        /// <param name="csvFileHelper"></param>
         /// <param name="emofRow"></param>
         /// <param name="writeEventId"></param>
         /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
         private static void WriteEmofRow(
-            NReco.Csv.CsvWriter csvWriter,
+            CsvFileHelper csvFileHelper,
             ExtendedMeasurementOrFactRow emofRow,
             bool writeEventId = false)
         {
@@ -142,22 +144,22 @@ namespace SOS.Lib.IO.DwcArchive
                 return;
             }
 
-            if (writeEventId) csvWriter.WriteField(emofRow.EventId);
-            csvWriter.WriteField(emofRow.OccurrenceID);
-            csvWriter.WriteField(emofRow.MeasurementID);
-            csvWriter.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementTypeID);
-            csvWriter.WriteField(emofRow.MeasurementValue.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementValueID);
-            csvWriter.WriteField(emofRow.MeasurementAccuracy.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementUnit.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementUnitID);
-            csvWriter.WriteField(emofRow.MeasurementDeterminedDate);
-            csvWriter.WriteField(emofRow.MeasurementDeterminedBy.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementRemarks.RemoveNewLineTabs());
-            csvWriter.WriteField(emofRow.MeasurementMethod.RemoveNewLineTabs());
+            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
+            csvFileHelper.WriteField(emofRow.OccurrenceID);
+            csvFileHelper.WriteField(emofRow.MeasurementID);
+            csvFileHelper.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementTypeID);
+            csvFileHelper.WriteField(emofRow.MeasurementValue.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementValueID);
+            csvFileHelper.WriteField(emofRow.MeasurementAccuracy.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementUnit.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementUnitID);
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementRemarks.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementMethod.RemoveNewLineTabs());
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
     }
 }

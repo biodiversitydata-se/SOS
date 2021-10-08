@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -47,7 +48,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="csvWriter"></param>
         /// <param name="fieldDescriptions"></param>
         void WriteHeaderRow(
-            NReco.Csv.CsvWriter csvWriter, 
+            CsvFileHelper csvFileHelper, 
             IEnumerable<FieldDescription> fieldDescriptions);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,10 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
+using NReco.Csv;
+using RecordParser.Builders.Reader;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Helpers;
 using SOS.Process.Services.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
@@ -25,17 +25,7 @@ namespace SOS.Process.Services
         private readonly string _taxonDwcUrl;
         private readonly ITaxonServiceProxy _taxonServiceProxy;
 
-        private static CsvConfiguration GetCsvConfiguration(string csvFieldDelimiter) => new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            
-            Delimiter = csvFieldDelimiter,
-            Encoding = Encoding.UTF8,
-            HasHeaderRecord = true,
-            PrepareHeaderForMatch = args => args.Header.ToLower(),
-            HeaderValidated = null,
-            MissingFieldFound = null
-        };
-
+      
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -88,6 +78,46 @@ namespace SOS.Process.Services
 
             return null;
         }
+
+        private IVariableLengthReaderBuilder<DarwinCoreTaxon> TaxonMapping => new VariableLengthReaderBuilder<DarwinCoreTaxon>()
+        .Map(t => t.TaxonID, indexColumn: 0)
+        .Map(t => t.AcceptedNameUsageID, 1)
+        .Map(t => t.ParentNameUsageID, 2)
+        .Map(t => t.ScientificName, 3)
+        .Map(t => t.TaxonRank, 4)
+        .Map(t => t.ScientificNameAuthorship, 5)
+        .Map(t => t.TaxonomicStatus, 6)
+        .Map(t => t.NomenclaturalStatus, 7)
+        .Map(t => t.TaxonRemarks, 8)
+        .Map(t => t.Kingdom, 9)
+        .Map(t => t.Phylum, 10)
+        .Map(t => t.Class, 11)
+        .Map(t => t.Order, 12)
+        .Map(t => t.Family, 13)
+        .Map(t => t.Genus, 14);
+
+        private IVariableLengthReaderBuilder<TaxonRelation<string>> TaxonRelationMapping => new VariableLengthReaderBuilder<TaxonRelation<string>>()
+            .Map(t => t.ParentTaxonId, indexColumn: 0)
+            .Map(t => t.ChildTaxonId, 1)
+            .Map(t => t.IsMainRelation, 2);
+
+        private IVariableLengthReaderBuilder<TaxonSortOrder<string>> TaxonSortOrderMapping => new VariableLengthReaderBuilder<TaxonSortOrder<string>>()
+            .Map(t => t.TaxonId, indexColumn: 0)
+            .Map(t => t.SortOrder, 1);
+
+
+        private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
+            new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
+                .Map(t => t.TaxonID, indexColumn: 0)
+                .Map(t => t.VernacularName, 1)
+                .Map(t => t.Language, 2)
+                .Map(t => t.CountryCode, 3)
+                .Map(t => t.Source, 4)
+                .Map(t => t.IsPreferredName, 5)
+                .Map(t => t.TaxonRemarks, 6);
+
+
+
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)
         {
             var csvFieldDelimiter = "\t";
@@ -123,13 +153,15 @@ namespace SOS.Process.Services
                 return null; // If no taxon data file found, we can't do anything more
             }
             // Read taxon data
-            using var taxonReader = new StreamReader(taxonFile.Open(), Encoding.UTF8);
-            using var taxonCsv = new CsvReader(taxonReader, GetCsvConfiguration(csvFieldDelimiter));
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeRead(taxonFile.Open(), csvFieldDelimiter);
 
-            // Get all taxa from file
-            var alltaxa = taxonCsv
-                .GetRecords<DarwinCoreTaxon>().ToArray();
-            
+
+        // Get all taxa from file
+            var alltaxa = csvFileHelper
+                .GetRecords(TaxonMapping);
+            csvFileHelper.FinishRead();
+
             var taxonByTaxonId = alltaxa
                 .Where(taxon => taxon.TaxonomicStatus == "accepted")
                 .ToDictionary(taxon => taxon.TaxonID, taxon => taxon);
@@ -203,19 +235,22 @@ namespace SOS.Process.Services
                 _logger.LogError("Failed to open TaxonRelations.csv");
                 return; // If no taxon relations file found, we can't do anything more
             }
+
             // Read taxon relations data
-            using var taxonRelationsReader = new StreamReader(taxonRelationsFile.Open(), Encoding.UTF8);
-            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, GetCsvConfiguration(csvFieldDelimiter));
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeRead(taxonRelationsFile.Open(), csvFieldDelimiter);
 
             // Get taxon relations using Guids (string) and convert to taxon relations using Dyntaxa Taxon Id (int)
-            var allTaxonRelations = taxonRelationsCsv
-                .GetRecords<TaxonRelation<string>>()
+            var allTaxonRelations = csvFileHelper
+                .GetRecords(TaxonRelationMapping)
                 .Select(m => new TaxonRelation<int>
                 {
                     IsMainRelation = m.IsMainRelation,
                     ParentTaxonId = GetTaxonIdfromDyntaxaGuid(m.ParentTaxonId),
                     ChildTaxonId = GetTaxonIdfromDyntaxaGuid(m.ChildTaxonId)
                 });
+
+            csvFileHelper.FinishRead();
 
             var taxonRelationsByChildId = allTaxonRelations
                 .GroupBy(m => m.ChildTaxonId)
@@ -262,18 +297,18 @@ namespace SOS.Process.Services
                 return; // If no taxon sort orders file found, we can't do anything more
             }
             // Read taxon sort order data
-            using var taxonSortOrdersReader = new StreamReader(taxonSortOrdersFile.Open(), Encoding.UTF8);
-            using var taxonSortOrdersCsv = new CsvReader(taxonSortOrdersReader, GetCsvConfiguration(csvFieldDelimiter));
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeRead(taxonSortOrdersFile.Open(), csvFieldDelimiter);
 
             // Get taxon sort orders by guid
-            var allTaxonSortOrders = taxonSortOrdersCsv
-                .GetRecords<TaxonSortOrder<string>>()
+            var allTaxonSortOrders = csvFileHelper
+                .GetRecords(TaxonSortOrderMapping)
                 .Select(m => new TaxonSortOrder<int>
                 {
                     SortOrder = m.SortOrder,
                     TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),                    
                 });
-
+            csvFileHelper.FinishRead();
             var taxonSortOrdersById = allTaxonSortOrders                
                 .ToDictionary(g => g.TaxonId, g => g.SortOrder);
 
@@ -309,14 +344,16 @@ namespace SOS.Process.Services
                 return; // If no vernacular name file found, we can't do anything more
             }
             // Read vernacular name data
-            using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
-            using var vernacularNameCsv = new CsvReader(vernacularNameReader, GetCsvConfiguration(csvFieldDelimiter));
-
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeRead(vernacularNameFile.Open(), csvFieldDelimiter);
+           
             // Get all vernacular names from file
-            var vernacularNames = vernacularNameCsv.GetRecords<DarwinCoreVernacularName>().ToArray();
+            var vernacularNames = csvFileHelper.GetRecords(VernacularNameMapping);
             var vernacularNamesByTaxonId = vernacularNames
                 .GroupBy(m => m.TaxonID)
                 .ToDictionary(g => g.Key, g => g.Select(m => m));
+
+            csvFileHelper.FinishRead();
 
             foreach (var taxon in taxa.Values)
             {
