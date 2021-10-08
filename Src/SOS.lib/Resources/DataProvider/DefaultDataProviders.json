@@ -44,9 +44,9 @@
         ],
         "Url": "https://www.artportalen.se/",
         "ContactPerson": {
-            "FirstName": "Stephen",
-            "LastName": "Coulson",
-            "Email": "stephen.coulson@slu.se"
+            "FirstName": "Johan",
+            "LastName": "Liljeblad",
+            "Email": "Johan.Liljeblad@slu.se"
         },
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": true,
