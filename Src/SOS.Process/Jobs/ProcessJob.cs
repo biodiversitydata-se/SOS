@@ -223,6 +223,7 @@ namespace SOS.Process.Jobs
             // Get 1000 random observations from protected index
             var protectedObservations = (await _processedObservationRepository.GetRandomObservationsAsync(observationsCount, true))?
                 .Where(o => o.Occurrence != null)
+                .Distinct()
                 .ToDictionary(o => o.Occurrence.OccurrenceId, o => o);
 
             if (protectedObservations?.Any() ?? false)
