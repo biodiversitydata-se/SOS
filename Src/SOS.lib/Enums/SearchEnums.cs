@@ -52,12 +52,10 @@ namespace SOS.Lib.Enums
         /// Use the property name as title.
         /// </summary>
         PropertyName = 0,
-
         /// <summary>
-        /// Use the short property name as title.
+        /// Use the property path as title.
         /// </summary>
-        ShortPropertyName = 1,
-
+        PropertyPath = 1,
         /// <summary>
         /// Use the swedish property name as title.
         /// </summary>

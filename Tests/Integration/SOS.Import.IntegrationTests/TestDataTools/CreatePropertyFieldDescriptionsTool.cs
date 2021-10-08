@@ -103,7 +103,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Act
             foreach (var fieldDescription in propertyFields.Where(m => m.IsPartOfFlatObservation.GetValueOrDefault()))
             {
-                sb.AppendLine($"case \"{fieldDescription.Name}\":");
+                sb.AppendLine($"case \"{fieldDescription.PropertyPath}\":");
                 sb.AppendLine($"    return {fieldDescription.FlatPropertyName};");
             }
             string result = sb.ToString();
@@ -128,7 +128,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             {
                 string dataType = GetDataTypeString(fieldDescription.DataType, fieldDescription.DataTypeNullable.GetValueOrDefault());
                 string propertyName = fieldDescription.FlatPropertyName;
-                string str = $"public {dataType} {propertyName} => _observation?.{fieldDescription.Name.Replace(".","?.")};";
+                string str = $"public {dataType} {propertyName} => _observation?.{fieldDescription.PropertyPath.Replace(".","?.")};";
                 sb.AppendLine(str);
             }
             string result = sb.ToString();
@@ -184,7 +184,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var propertyField in propertyFields)
             {
                 var ssosFieldDescription = ssosFieldDescriptions.FirstOrDefault(
-                    m => m.Name.ToLowerInvariant() == propertyField.ShortName.ToLowerInvariant());
+                    m => m.Name.ToLowerInvariant() == propertyField.Name.ToLowerInvariant());
                 if (ssosFieldDescription != null)
                 {
                     propertyField.SwedishTitle = ssosFieldDescription.SwedishLabel;
@@ -198,7 +198,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var propertyField in propertyFields)
             {
                 var sosFieldDescription = sosFieldDescriptions.FirstOrDefault(
-                    m => m.Name.ToLowerInvariant() == propertyField.ShortName.ToLowerInvariant());
+                    m => m.Name.ToLowerInvariant() == propertyField.Name.ToLowerInvariant());
                 if (sosFieldDescription != null && sosFieldDescription.IsDwC)
                 {
                     propertyField.DwcIdentifier = sosFieldDescription.DwcIdentifier;
@@ -237,8 +237,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 if (includeClassTypes || isValueTypeOrString)
                 {
                     var propertyField = new PropertyFieldDescription();
-                    propertyField.Name = $"{prefix}{pi.Name}";
-                    propertyField.ShortName = pi.Name;
+                    propertyField.PropertyPath = $"{prefix}{pi.Name}";
+                    propertyField.Name = pi.Name;
                     if (isValueTypeOrString)
                     {
                         propertyField.DataType = pi.PropertyType.Name;
@@ -249,7 +249,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
                     if (parent != null)
                     {
-                        propertyField.ParentName = parent.Name;
+                        propertyField.ParentName = parent.PropertyPath;
                         propertyField.ParentId = parent.Id;
                         parent.Children ??= new List<PropertyFieldDescription>();
                         parent.Children.Add(propertyField);

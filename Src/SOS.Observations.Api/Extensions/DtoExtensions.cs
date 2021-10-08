@@ -26,9 +26,9 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
-            filter.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
-            filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
+            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr).ToList();
+            filter.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList();
+            filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids?.ToList();
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
             filter.ValidationStatus = (FilterBase.StatusValidation) searchFilterBaseDto.ValidationStatus;
@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.Extensions
                 : new GeographicsFilter
                 {
                     BoundingBox = searchFilterBaseDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
-                    Geometries = searchFilterBaseDto.Geographics.Geometries,
+                    Geometries = searchFilterBaseDto.Geographics.Geometries?.ToList(),
                     MaxDistanceFromPoint = searchFilterBaseDto.Geographics.MaxDistanceFromPoint,
                     UseDisturbanceRadius = searchFilterBaseDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
@@ -66,13 +66,13 @@ namespace SOS.Observations.Api.Extensions
                 }
             }
 
-            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus) dsd);
+            filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus) dsd)?.ToList();
 
             filter.DeterminationFilter = (SightingDeterminationFilter)searchFilterBaseDto.DeterminationFilter;
 
             if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
             {
-                filter.OutputFields = searchFilterDto.Output?.Fields;
+                filter.OutputFields = searchFilterDto.Output?.Fields?.ToList();
                 filter.PopulateOutputFields(searchFilterDto.Output?.FieldSet);
             }
 
@@ -84,7 +84,7 @@ namespace SOS.Observations.Api.Extensions
                 if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
                 {
                     filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                    filter.OutputFields = searchFilterInternalDto.Output?.Fields;
+                    filter.OutputFields = searchFilterInternalDto.Output?.Fields?.ToList();
                     filter.PopulateOutputFields(searchFilterInternalDto.Output?.FieldSet);
                 }
             }
@@ -142,7 +142,7 @@ namespace SOS.Observations.Api.Extensions
                     searchFilterInternalDto.ExtendedFilter.RegionalSightingStateIdsFilter;
                 internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
-                internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
+                internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds?.ToList();
                 internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
                 internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
             }
@@ -398,15 +398,15 @@ namespace SOS.Observations.Api.Extensions
 
             var searchFilter = new SearchFilterInternal
             {
-                Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }),
+                Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType })?.ToList(),
                 BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
-                DataProviderIds = searchFilterDto.DataProvider?.Ids,
+                DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList(),
                 Geometries = searchFilterDto.Geographics == null
                 ? null
                 : new GeographicsFilter
                 {
                     BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
-                    Geometries = searchFilterDto.Geographics.Geometries,
+                    Geometries = searchFilterDto.Geographics.Geometries?.ToList(),
                     MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
                     UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
+using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
@@ -26,6 +27,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
@@ -113,7 +115,11 @@ namespace SOS.Hangfire.JobServer
                         configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
-                            .UseRecommendedSerializerSettings()
+                            .UseRecommendedSerializerSettings(m =>
+                            {
+                                m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                                m.Converters.Add(new StringEnumConverter());
+                            })
                             .UseMongoStorage(new MongoClient(_hangfireDbConfiguration.GetMongoDbSettings()),
                                 _hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions

@@ -125,8 +125,13 @@ namespace SOS.Process.Processors.Taxon
                                     taxon.DynamicProperties.OrganismGroup =
                                         factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
-                                case FactorEnum.ProtectedByLaw:
-                                    taxon.DynamicProperties.ProtectedByLaw = factor.Attributes
+                                case FactorEnum.ProtectedByLawSpeciesProtection:
+                                    taxon.DynamicProperties.ProtectedByLawSpeciesProtection = factor.Attributes
+                                        ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
+                                    break;
+                                case FactorEnum.ProtectedByLawBirds:
+                                    taxon.DynamicProperties.ProtectedByLawBirds = factor.Attributes
                                         ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
                                             StringComparison.CurrentCultureIgnoreCase);
                                     break;

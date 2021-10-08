@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AgileObjects.AgileMapper.Extensions;
 using Elasticsearch.Net;
@@ -176,7 +177,7 @@ namespace SOS.Process.Jobs
             var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green);
             if (healthStatus == WaitForStatus.Red)
             {
-                _logger.LogInformation("Elastich health status: Red");
+                _logger.LogError("Elastich health status: Red");
                 return false;
             }
 
@@ -185,14 +186,14 @@ namespace SOS.Process.Jobs
             // Make sure we have a reasonable amount of observations processed
             if (publicCount < _minObservationCount)
             {
-                _logger.LogInformation($"Validation failed. Only {publicCount} public observations processed");
+                _logger.LogError($"Validation failed. Only {publicCount} public observations processed. It should be at least {_minObservationCount}");
                 return false;
             }
 
             var protectedCount = (int)await _processedObservationRepository.IndexCountAsync(true);
             if (protectedCount < 1)
             {
-                _logger.LogInformation($"Validation failed. Only {protectedCount} protected observations processed");
+                _logger.LogError($"Validation failed. Only {protectedCount} protected observations processed");
                 // No protected observations found. No more validation can be done
                 return true;
             }
@@ -339,6 +340,7 @@ namespace SOS.Process.Jobs
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
 
                     _logger.LogInformation($"Start validate indexes");
+                    Thread.Sleep(TimeSpan.FromMinutes(1)); // Try wait for Elasticsearch index.
                     if (!await ValidateIndexesAsync())
                     {
                         throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");

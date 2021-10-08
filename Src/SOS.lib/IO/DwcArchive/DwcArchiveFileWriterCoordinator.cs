@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -42,22 +40,18 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                using var zip = ZipFile.Read(path);
-                long fileSize = 0;
-                foreach (var zipEntry in zip.Where(m => m.FileName != "eml.xml"))
+                using var zip = ZipFile.OpenRead(path);
+                var fileSize = 0L;
+                foreach (var zipEntry in zip.Entries)
                 {
-                    fileSize += zipEntry.UncompressedSize;
-                }
-                
-                var emlFile = zip.FirstOrDefault(zipEntry => zipEntry.FileName == "eml.xml");
-
-                if (emlFile == null)
-                {
-                    fileSize -= 1;
-                }
-                else
-                {
-                    fileSize += await GetEmlFileSizeWithoutPubDateAsync(emlFile);
+                    if (zipEntry.Name.Equals("eml.xml", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        fileSize += await GetEmlFileSizeWithoutPubDateAsync(zipEntry);
+                    }
+                    else
+                    {
+                        fileSize += zipEntry.Length;
+                    }
                 }
 
                 return fileSize.ToString();
@@ -68,12 +62,11 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipEntry emlZipEntry)
+        private async Task<long> GetEmlFileSizeWithoutPubDateAsync(ZipArchiveEntry emlZipEntry)
         {
             try
             {
-                await using var stream = new MemoryStream();
-                emlZipEntry.Extract(stream);
+                await using var stream = emlZipEntry.Open();
                 stream.Position = 0;
                 var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
                 return size;
@@ -118,7 +111,7 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify the specific batch that was processed.</param>
         /// <returns></returns>
         public async Task<bool> WriteObservations(
-            IEnumerable<Observation> processedObservations, 
+            IEnumerable<Observation> processedObservations,
             DataProvider dataProvider,
             string batchId = "")
         {
@@ -143,7 +136,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
                 }
-                
+
                 // Exclude sensitive species.
                 var publicObservations = processedObservations
                     .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
@@ -189,19 +182,19 @@ namespace SOS.Lib.IO.DwcArchive
                                 }
 
                                 var fileStream = File.OpenWrite(filePath);
-                                
+
                                 sourceStream.Seek(0, SeekOrigin.Begin);
                                 await sourceStream.CopyToAsync(fileStream);
                                 await fileStream.FlushAsync();
                                 await fileStream.DisposeAsync();
                                 await sourceStream.DisposeAsync();
-                     
+
                                 dwcaCreationTasks.Add(provider, Task.FromResult(filePath));
                             }
                         }
                         catch (Exception e)
                         {
-                           _logger.LogError(e, "Failed to use source file in export");
+                            _logger.LogError(e, "Failed to use source file in export");
                         }
 
                         continue;
@@ -211,7 +204,7 @@ namespace SOS.Lib.IO.DwcArchive
                         _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                 }
 
-                dwcaCreationTasks.Add(new DataProvider {Id = 0, Identifier = "SOS Complete"},  _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                dwcaCreationTasks.Add(new DataProvider { Id = 0, Identifier = "SOS Complete" }, _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
                     _dwcaFilePartsInfoByDataProvider.Values));
                 await Task.WhenAll(dwcaCreationTasks.Values);
 
@@ -222,7 +215,7 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     var dataProvider = task.Key;
                     var filePath = task.Value.Result;
-                    
+
                     // Id 0 = complete Dwc archive file
                     if (dataProvider.Id == 0)
                     {
@@ -247,6 +240,10 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     createdDwcaFiles.Add(completeDwcArchiveFilePath);
                 }
+                else
+                {
+                    File.Delete(completeDwcArchiveFilePath);
+                }
 
                 DeleteTemporaryCreatedCsvFiles();
 
@@ -258,16 +255,11 @@ namespace SOS.Lib.IO.DwcArchive
                 return null;
             }
         }
-       
+
         private DwcaFilePartsInfo CreateDwcaFilePartsInfo(DataProvider dataProvider)
         {
             var dwcaFilePartsInfo = DwcaFilePartsInfo.Create(dataProvider, _dwcaFilesCreationConfiguration.FolderPath);
             _dwcaFilePartsInfoByDataProvider.Add(dataProvider, dwcaFilePartsInfo);
-
-            if (dataProvider.UseVerbatimFileInExport)
-            {
-                return dwcaFilePartsInfo;
-            }
 
             if (!Directory.Exists(dwcaFilePartsInfo.ExportFolder))
             {
