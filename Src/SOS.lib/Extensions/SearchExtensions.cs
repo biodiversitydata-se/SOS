@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CsvHelper.Configuration.Attributes;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;

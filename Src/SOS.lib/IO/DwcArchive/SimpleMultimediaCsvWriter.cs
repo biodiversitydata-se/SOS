@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -37,11 +37,10 @@ namespace SOS.Lib.IO.DwcArchive
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
-                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-
+                var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(stream, "\t");
                 // Write header row
-                WriteHeaderRow(csvWriter);
+                WriteHeaderRow(csvFileHelper);
 
                 while (scrollResult?.Records?.Any() ?? false)
                 {
@@ -53,14 +52,14 @@ namespace SOS.Lib.IO.DwcArchive
                     // Write occurrence rows to CSV file.
                     foreach (var row in multimediaRows)
                     {
-                        WriteSimpleMultimediaRow(csvWriter, row);
+                        WriteSimpleMultimediaRow(csvFileHelper, row);
                     }
-                    await streamWriter.FlushAsync();
+                    await csvFileHelper.FlushAsync();
 
                     // Get next batch of observations.
                     scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
                 }
-
+                csvFileHelper.FinishWrite();
                 return true;
             }
             catch (JobAbortedException)
@@ -75,21 +74,22 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public async Task WriteHeaderlessCsvFileAsync(
-            IEnumerable<SimpleMultimediaRow> multimediaRows, 
+        public void WriteHeaderlessCsvFile(
+            IEnumerable<SimpleMultimediaRow> multimediaRows,
             StreamWriter streamWriter)
         {
             try
             {
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(streamWriter, "\t");
 
                 // Write simple multimedia rows to CSV file.
                 foreach (var multimediaRow in multimediaRows)
                 {
-                    WriteSimpleMultimediaRow(csvWriter, multimediaRow);
+                    WriteSimpleMultimediaRow(csvFileHelper, multimediaRow);
                 }
 
-                await streamWriter.FlushAsync();
+                csvFileHelper.FinishWrite();
             }
             catch (Exception e)
             {
@@ -98,44 +98,44 @@ namespace SOS.Lib.IO.DwcArchive
             }
         }
 
-        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter)
+        public void WriteHeaderRow(CsvFileHelper csvFileHelper)
         {
             var multimediaExtensionMetadata = ExtensionMetadata.SimpleMultimediaFactory.Create();
             foreach (var multimediaField in multimediaExtensionMetadata.Fields.OrderBy(field => field.Index))
             {
-                csvWriter.WriteField(multimediaField.CSVColumnName);
+                csvFileHelper.WriteField(multimediaField.CSVColumnName);
             }
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
 
         /// <summary>
         /// Write multimedia record to CSV file.
         /// </summary>
-        /// <param name="csvWriter"></param>
+        /// <param name="csvFileHelper"></param>
         /// <param name="multimediaRow"></param>
         /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
         private static void WriteSimpleMultimediaRow(
-            NReco.Csv.CsvWriter csvWriter,
+            CsvFileHelper csvFileHelper,
             SimpleMultimediaRow multimediaRow)
         {
-            csvWriter.WriteField(multimediaRow.OccurrenceId);
-            csvWriter.WriteField(multimediaRow.Type);
-            csvWriter.WriteField(multimediaRow.Format);
-            csvWriter.WriteField(multimediaRow.Identifier);
-            csvWriter.WriteField(multimediaRow.References);
-            csvWriter.WriteField(multimediaRow.Title);
-            csvWriter.WriteField(multimediaRow.Description);
-            csvWriter.WriteField(multimediaRow.Source);
-            csvWriter.WriteField(multimediaRow.Audience);
-            csvWriter.WriteField(multimediaRow.Created);
-            csvWriter.WriteField(multimediaRow.Creator);
-            csvWriter.WriteField(multimediaRow.Contributor);
-            csvWriter.WriteField(multimediaRow.Publisher);
-            csvWriter.WriteField(multimediaRow.License);
-            csvWriter.WriteField(multimediaRow.RightsHolder);
+            csvFileHelper.WriteField(multimediaRow.OccurrenceId);
+            csvFileHelper.WriteField(multimediaRow.Type);
+            csvFileHelper.WriteField(multimediaRow.Format);
+            csvFileHelper.WriteField(multimediaRow.Identifier);
+            csvFileHelper.WriteField(multimediaRow.References);
+            csvFileHelper.WriteField(multimediaRow.Title);
+            csvFileHelper.WriteField(multimediaRow.Description);
+            csvFileHelper.WriteField(multimediaRow.Source);
+            csvFileHelper.WriteField(multimediaRow.Audience);
+            csvFileHelper.WriteField(multimediaRow.Created);
+            csvFileHelper.WriteField(multimediaRow.Creator);
+            csvFileHelper.WriteField(multimediaRow.Contributor);
+            csvFileHelper.WriteField(multimediaRow.Publisher);
+            csvFileHelper.WriteField(multimediaRow.License);
+            csvFileHelper.WriteField(multimediaRow.RightsHolder);
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
     }
 }
