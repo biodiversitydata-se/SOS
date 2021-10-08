@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> DownloadExcel(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flatOut = true,
             bool excludeNullValues = true);
@@ -70,16 +70,16 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// The limit is 2 000 000 observations.
         /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="description"></param>
-        /// <param name="outputFieldSet"></param>
-        /// <param name="propertyLabelType"></param>
-        /// <param name="cultureCode"></param>
+        /// <param name="filter">Search filter.</param>
+        /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
+        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         Task<IActionResult> OrderExcel(ExportFilterDto filter, 
             string description,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> OrderGeoJson(ExportFilterDto filter,
             string description,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flatOut = true,
             bool excludeNullValues = true);

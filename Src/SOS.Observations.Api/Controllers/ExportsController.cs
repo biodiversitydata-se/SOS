@@ -195,7 +195,7 @@ namespace SOS.Observations.Api.Controllers
                         Cultures.en_GB, 
                         false, 
                         OutputFieldSet.All,
-                        PropertyLabelType.PropertyName,
+                        PropertyLabelType.PropertyPath,
                         false,
                         JobCancellationToken.Null);
                 return GetFile(filePath, "Observations_DwC.zip");
@@ -219,7 +219,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> DownloadExcel(
             [FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE")
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -264,7 +264,7 @@ namespace SOS.Observations.Api.Controllers
         [InternalApi]
         public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flatOut = true,
             bool excludeNullValues = true)
@@ -329,7 +329,7 @@ namespace SOS.Observations.Api.Controllers
                 var (email, exportFilter) = ((string, SearchFilter))okResult.Value;
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null)));
+                    job.RunAsync(exportFilter, email, description, ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -349,7 +349,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, 
             [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName, 
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE")
         {
             try
@@ -386,7 +386,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flatOut = true,
             bool excludeNullValues = true)

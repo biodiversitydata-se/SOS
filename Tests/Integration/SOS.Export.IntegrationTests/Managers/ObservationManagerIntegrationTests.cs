@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.ApplicationInsights;
@@ -131,7 +132,7 @@ namespace SOS.Export.IntegrationTests.Managers
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await observationManager.ExportAndSendAsync(new SearchFilter{ DataProviderIds = new []{1}, OutputFields = new []{
+                await observationManager.ExportAndSendAsync(new SearchFilter{ DataProviderIds = new List<int>{1}, OutputFields = new List<string>{
                     "datasetName",
                     "event.startDate",
                     "event.endDate",
@@ -148,7 +149,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     "en-GB", 
                     false, 
                     OutputFieldSet.All, 
-                    PropertyLabelType.PropertyName,
+                    PropertyLabelType.PropertyPath,
                     false,
                     JobCancellationToken.Null);
 
@@ -174,8 +175,8 @@ namespace SOS.Export.IntegrationTests.Managers
             var result =
                 await observationManager.ExportAndSendAsync(new SearchFilter
                 {
-                    DataProviderIds = new[] { 1 },
-                    OutputFields = new[]{
+                    DataProviderIds = new List<int> { 1 },
+                    OutputFields = new List<string> {
                         "datasetName",
                         "event.startDate",
                         "event.endDate",
@@ -187,7 +188,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         "taxon.id",
                         "taxon.scientificName",
                         "taxon.vernacularName"}
-                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyName, false, JobCancellationToken.Null);
+                }, "mats.lindgren@slu.se", "AP", ExportFormat.Excel, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

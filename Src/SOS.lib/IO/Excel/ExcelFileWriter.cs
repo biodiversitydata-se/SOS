@@ -117,7 +117,7 @@ namespace SOS.Lib.IO.Excel
                             var value = flatObservation.GetValue(propertyField);
                             if (propertyField.DataTypeEnum == PropertyFieldDataType.DateTime)
                             {
-                                value = ((DateTime?) value)?.ToShortDateString();
+                                value = ((DateTime?)value)?.ToString("yyyy-MM-dd");
                             }
                             else if (propertyField.DataTypeEnum == PropertyFieldDataType.Boolean)
                             {
@@ -180,7 +180,7 @@ namespace SOS.Lib.IO.Excel
                 sheet.Cells[1, columnIndex].Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
                 sheet.Cells[1, columnIndex].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 sheet.Cells[1, columnIndex].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
-                sheet.Column(columnIndex).AutoFit();
+                sheet.Column(columnIndex).AutoFit(10, 70);
                 columnIndex++;
             }
         }
