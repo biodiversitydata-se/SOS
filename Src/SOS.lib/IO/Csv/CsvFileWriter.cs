@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,7 @@ namespace SOS.Lib.IO.Excel
     /// <summary>
     /// Excel file writer.
     /// </summary>
-    public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
+    public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFileService _fileService;
@@ -39,7 +38,7 @@ namespace SOS.Lib.IO.Excel
         /// <param name="fileService"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="logger"></param>
-        public ExcelFileWriter(IProcessedObservationRepository processedObservationRepository, 
+        public CsvFileWriter(IProcessedObservationRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
             ILogger<ExcelFileWriter> logger)
@@ -68,13 +67,11 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
 
+                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "Observations.csv"));
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(fileStream, "\t");
+                csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
                 var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, null);
-                var fileCount = 0;
-                var rowIndex = 0;
-                ExcelPackage package = null;
-                ExcelWorksheet sheet = null;
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
                 while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -89,63 +86,30 @@ namespace SOS.Lib.IO.Excel
                     foreach (var observation in processedObservations)
                     {
                         var flatObservation = new FlatObservation(observation);
-                        // Max 500000 rows in a file
-                        if (rowIndex % 500000 == 0)
-                        {
-                            // If we have a package, save it
-                            if (package != null)
-                            {
-                                WriteHeader(sheet, propertyFields, propertyLabelType);
-
-                                // Save to file
-                                await package.SaveAsync();
-                                sheet.Dispose();
-                                package.Dispose();
-                            }
-
-                            // Create new file
-                            fileCount++;
-                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx"));
-                            package = new ExcelPackage(file);
-                            sheet = package.Workbook.Worksheets.Add("Observations");
-                            rowIndex = 1;
-                        }
-
-                        int columnIndex = 1;
+                        
                         foreach (var propertyField in propertyFields)
                         {
                             var value = flatObservation.GetValue(propertyField);
+
                             var stringValue = value == null ? string.Empty : propertyField.DataTypeEnum switch
                             {
                                 PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),
-                                PropertyFieldDataType.DateTime => ((DateTime?)value)?.ToShortDateString(),
-                                PropertyFieldDataType.Double => ((double)value).ToString(CultureInfo.InvariantCulture),
+                                PropertyFieldDataType.DateTime => ((DateTime?) value)?.ToShortDateString(),
+                                PropertyFieldDataType.Double => ((double) value).ToString(CultureInfo.InvariantCulture),
                                 PropertyFieldDataType.Int32 => ((int)value).ToString(),
                                 PropertyFieldDataType.Int64 => ((long)value).ToString(),
                                 _ => (string)value
                             };
 
-                            sheet.Cells[rowIndex + 1, columnIndex].Value = stringValue;
-                            columnIndex++;
+                            csvFileHelper.WriteField(stringValue);
                         }
-
-                        rowIndex++;
+                        csvFileHelper.NextRecord();
                     }
 
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
-
-                // If we have a package, save it
-                if (package != null)
-                {
-                    WriteHeader(sheet, propertyFields, propertyLabelType);
-
-                    // Save to file
-                    await package.SaveAsync();
-                    sheet.Dispose();
-                    package.Dispose();
-                }
+                csvFileHelper.FinishWrite();
 
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
 

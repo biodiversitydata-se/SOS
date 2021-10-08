@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NReco.Csv;
@@ -160,6 +161,19 @@ namespace SOS.Lib.Helpers
         public void WriteField(string field)
         {
             _csvWriter.WriteField(field);
+        }
+
+        /// <summary>
+        /// Write a row
+        /// </summary>
+        /// <param name="fields"></param>
+        public void WriteRow(IEnumerable<string> fields)
+        {
+            foreach (var field in fields)
+            {
+                WriteField(field);
+            }
+            NextRecord();
         }
     }
 }

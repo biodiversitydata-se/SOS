@@ -223,6 +223,59 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("Download/Csv")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> DownloadCsv(
+             [FromBody] ExportFilterDto filter,
+             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+             [FromQuery] string cultureCode = "sv-SE")
+        {
+            cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+            var filePath = string.Empty;
+            var jobId = Guid.NewGuid().ToString();
+            var userExports = await GetUserExportsAsync();
+            try
+            {
+                var validateResult = await DownloadValidateAsync(filter, userExports);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                exportFilter.PopulateExportOutputFields(outputFieldSet);
+
+                filePath =
+                    await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Csv,
+                        _exportPath, cultureCode,
+                        false,
+                        outputFieldSet,
+                        propertyLabelType,
+                        false,
+                        JobCancellationToken.Null);
+                return GetFile(filePath, "Observations_Csv.zip");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error exporting Csv file");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                _fileService.DeleteFile(filePath);
+                userExports.OnGoingJobIds.Remove(jobId);
+                await UpdateUserExportsAsync(userExports);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -379,6 +432,49 @@ namespace SOS.Observations.Api.Controllers
                 _fileService.DeleteFile(filePath);
                 userExports.OnGoingJobIds.Remove(jobId);
                 await UpdateUserExportsAsync(userExports);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Order/Csv")]
+        [Authorize/*(Roles = "Privat")*/]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> OrderCsv([FromBody] ExportFilterDto filter,
+            [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] string cultureCode = "sv-SE")
+        {
+            try
+            {
+                var userExports = await GetUserExportsAsync();
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
+
+                if (validateResult is not OkObjectResult okResult)
+                {
+                    return validateResult;
+                }
+
+                var exportFilter = (SearchFilter)okResult.Value;
+                exportFilter.PopulateOutputFields(outputFieldSet);
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Csv, cultureCode, false,
+                        outputFieldSet, propertyLabelType, false, null, JobCancellationToken.Null));
+
+                userExports.OnGoingJobIds.Add(jobId);
+                await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

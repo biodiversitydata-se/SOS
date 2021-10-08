@@ -5,7 +5,10 @@ using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.IO.Excel.Interfaces
 {
-    public interface IExcelFileWriter
+    /// <summary>
+    /// Csv file writer
+    /// </summary>
+    public interface ICsvFileWriter
     {
         /// <summary>
         ///  Create export file

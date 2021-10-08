@@ -122,6 +122,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<SimpleMultimediaCsvWriter>().As<ISimpleMultimediaCsvWriter>()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterType<CsvFileWriter>().As<ICsvFileWriter>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelFileWriter>().As<IExcelFileWriter>().InstancePerLifetimeScope();
             builder.RegisterType<GeoJsonFileWriter>().As<IGeoJsonFileWriter>().InstancePerLifetimeScope();
 

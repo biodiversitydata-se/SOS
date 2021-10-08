@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using AgileObjects.AgileMapper.Extensions;
 using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
@@ -29,7 +28,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json;
 using NLog.Web;
 using SOS.Lib.Cache;
@@ -349,7 +347,6 @@ namespace SOS.Observations.Api
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
                 .AddElasticsearch(a => a
                         .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => c.Hosts)))
@@ -410,6 +407,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IExtendedMeasurementOrFactCsvWriter, ExtendedMeasurementOrFactCsvWriter>();
             services.AddScoped<ISimpleMultimediaCsvWriter, SimpleMultimediaCsvWriter>();
 
+            services.AddScoped<ICsvFileWriter, CsvFileWriter>();
             services.AddScoped<IExcelFileWriter, ExcelFileWriter>();
             services.AddScoped<IGeoJsonFileWriter, GeoJsonFileWriter>();
 
