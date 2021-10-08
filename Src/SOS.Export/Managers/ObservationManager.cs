@@ -28,6 +28,7 @@ namespace SOS.Export.Managers
     {
         private readonly IFilterManager _filterManager;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly ICsvFileWriter _csvWriter;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly IExcelFileWriter _excelWriter;
         private readonly IGeoJsonFileWriter _geoJsonWriter;
@@ -107,6 +108,7 @@ namespace SOS.Export.Managers
 
                 zipFilePath = exportFormat switch
                 {
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
@@ -183,6 +185,48 @@ namespace SOS.Export.Managers
             {
                 // Remove local file
                 _fileService.DeleteFile(zipFilePath);
+            }
+        }
+
+        /// <summary>
+        /// Create a csv export file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="outputFieldSet"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<string> CreateCsvExportAsync(SearchFilter filter,
+            string fileName,
+            string culture,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var zipFilePath = await _csvWriter.CreateFileAync(
+                    filter,
+                    _exportPath,
+                    fileName,
+                    culture,
+                    outputFieldSet,
+                    propertyLabelType,
+                    cancellationToken);
+
+                return zipFilePath;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to Csv was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to Csv");
+                throw;
             }
         }
 

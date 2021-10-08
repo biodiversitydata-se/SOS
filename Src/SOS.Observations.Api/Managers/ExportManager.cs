@@ -23,11 +23,52 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IFilterManager _filterManager;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly ICsvFileWriter _csvWriter;
         private readonly IExcelFileWriter _excelWriter;
         private readonly IGeoJsonFileWriter _geoJsonWriter;
         private readonly ILogger<ExportManager> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
+
+        /// <summary>
+        /// Create an Csv file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="exportPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="culture"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="outputFieldSet"></param>
+        /// <returns></returns>
+        private async Task<string> CreateCsvExportAsync(SearchFilter filter, string exportPath,
+            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                var zipFilePath = await _csvWriter.CreateFileAync(
+                    filter,
+                    exportPath,
+                    fileName,
+                    culture,
+                    outputFieldSet,
+                    propertyLabelType,
+                    cancellationToken);
+
+                return zipFilePath;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings to Csv was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings to Csv");
+                throw;
+            }
+        }
 
         /// <summary>
         /// Create a Darwin Core Archive file
@@ -170,6 +211,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
         public ExportManager(
+            ICsvFileWriter csvWriter,
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
@@ -178,6 +220,7 @@ namespace SOS.Observations.Api.Managers
             IFilterManager filterManager,
             ILogger<ExportManager> logger)
         {
+            _csvWriter = csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
             _dwcArchiveFileWriter =
                 dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _excelWriter =
@@ -211,6 +254,7 @@ namespace SOS.Observations.Api.Managers
 
                 var zipFilePath = exportFormat switch
                 {
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
                     ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)

@@ -17,6 +17,20 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GetDatasetsList();
 
         /// <summary>
+        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// </summary>
+        /// <param name="filter">The search filter</param>
+        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <returns></returns>
+        Task<IActionResult> DownloadCsv(
+            [FromBody] ExportFilterDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] string cultureCode = "sv-SE");
+
+        /// <summary>
         /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
         /// </summary>
         /// <param name="filter"></param>
@@ -52,6 +66,24 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string cultureCode = "sv-SE",
             bool flatOut = true,
             bool excludeNullValues = true);
+
+        /// <summary>
+        /// Starts the process of creating a Csv file with observations based on provided filter.
+        /// When the file is ready, you will receive an email containing a download link.
+        /// The limit is 2 000 000 observations.
+        /// You can see the status of your export request by calling the "/Jobs/{jobId}/Status" endpoint.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="description"></param>
+        /// <param name="outputFieldSet"></param>
+        /// <param name="propertyLabelType"></param>
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        Task<IActionResult> OrderCsv(ExportFilterDto filter,
+            string description,
+            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            string cultureCode = "sv-SE");
 
         /// <summary>
         /// Starts the process of creating a DwC-A file with observations based on provided filter.
