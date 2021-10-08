@@ -29,6 +29,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -295,7 +296,11 @@ namespace SOS.Observations.Api
                 configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                     .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings(m => m.TypeNameHandling = TypeNameHandling.None)
+                    .UseRecommendedSerializerSettings(m =>
+                    {
+                        m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                        m.Converters.Add(new StringEnumConverter());
+                    })
                     .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
                         mongoConfiguration.DatabaseName,
                         new MongoStorageOptions
