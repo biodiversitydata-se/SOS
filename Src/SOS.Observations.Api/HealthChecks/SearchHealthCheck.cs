@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.HealthChecks
             var sw = new Stopwatch();
             sw.Start();
             
-            var result = await _observationManager.GetChunkAsync(null,serachFilter, 0, 2, "", SearchSortOrder.Asc);
+            var result = await _observationManager.GetChunkAsync(null,serachFilter, 0, 1, "", SearchSortOrder.Asc);
             sw.Stop();
 
             return result.TotalCount > 0 ? sw.ElapsedMilliseconds < 500 ? HealthStatus.Healthy : HealthStatus.Degraded : HealthStatus.Unhealthy;
@@ -77,7 +77,7 @@ namespace SOS.Observations.Api.HealthChecks
             await Task.WhenAll(providerSearchTasks.Values);
 
             var providerCount = providers.Count();
-            var successfulProviders = providerSearchTasks.Count(t => t.Value.Result.TotalCount > 0);
+            var successfulProviders = providerSearchTasks.Count(t => (t.Value.Result?.TotalCount ?? 0) > 0);
 
             // All providers successful
             if (successfulProviders == providerCount)

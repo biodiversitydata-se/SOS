@@ -51,9 +51,14 @@ namespace SOS.Import.Jobs
                 )
             );
 
+            var processProviders = activeProviders.Where(p =>
+                mode.Equals(JobRunModes.Full) ||
+                    p.SupportIncrementalHarvest
+            );
+
             return await RunAsync(mode,
                 harvestProviders,
-                activeProviders,
+                processProviders,
                 true,
                 cancellationToken);
         }
