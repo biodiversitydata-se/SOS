@@ -42,11 +42,12 @@ namespace SOS.Process.Processors.ClamPortal
         public Observation CreateProcessedObservation(ClamObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
+            var accessRights = GetAccessRightsIdFromString(verbatim.AccessRights);
 
             var obs = new Observation
             {
                 DataProviderId = _dataProvider.Id,
-                AccessRights = GetAccessRightsIdFromString(verbatim.AccessRights),
+                AccessRights = accessRights,
                 BasisOfRecord = GetBasisOfRecordIdFromString(verbatim.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",
                 DatasetName = "Träd och musselportalen",
@@ -91,7 +92,7 @@ namespace SOS.Process.Processors.ClamPortal
                     OrganismQuantityInt = verbatim.Quantity,
                     OrganismQuantity = verbatim.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, accessRights != null ? (AccessRightsId)accessRights.Id : null),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate.ToUniversalTime(),
