@@ -113,7 +113,7 @@ namespace SOS.Export.Managers
                 };
                 
                 // zend file to user
-                return await _zendToService.SendFile(emailAddress, description, zipFilePath);
+                return await _zendToService.SendFile(emailAddress, description, zipFilePath, exportFormat);
             }
             catch (Exception e)
             {
@@ -165,7 +165,7 @@ namespace SOS.Export.Managers
                 if (!string.IsNullOrEmpty(emailAddress))
                 {
                     // Send file to user
-                    tasks.Add(_zendToService.SendFile(emailAddress, description, zipFilePath));
+                    tasks.Add(_zendToService.SendFile(emailAddress, description, zipFilePath, ExportFormat.DwC));
                 }
 
                 await Task.WhenAll(tasks);

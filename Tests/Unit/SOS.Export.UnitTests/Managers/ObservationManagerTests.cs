@@ -95,7 +95,7 @@ namespace SOS.Export.UnitTests.Managers
                 )
             ).ReturnsAsync("filePath");
 
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
                 .ReturnsAsync(false);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ namespace SOS.Export.UnitTests.Managers
                 )
             ).ReturnsAsync("filePath");
 
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
