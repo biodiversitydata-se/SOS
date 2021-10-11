@@ -15,6 +15,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
@@ -64,7 +65,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient processClient, ElasticSearchConfiguration elasticConfiguration)
         {
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticConfiguration.GetClient(true),
+                new ElasticClientManager(elasticConfiguration, true),
                 processClient,
                 elasticConfiguration,
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),

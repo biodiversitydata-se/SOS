@@ -100,7 +100,7 @@ namespace SOS.Administration.Gui.Controllers
     public class PerformanceController : ControllerBase
     {
 
-        private readonly ElasticClient _testElasticClient;
+        private readonly IElasticClient _testElasticClient;
         private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
         private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
         private ApplicationInsightsConfiguration _aiConfig;
@@ -108,7 +108,7 @@ namespace SOS.Administration.Gui.Controllers
 
         public PerformanceController( IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
         {          
-            _testElasticClient = testElasticConfiguration.GetClient();
+            _testElasticClient = testElasticConfiguration.GetClients().FirstOrDefault();
             _aiConfig = aiConfig.CurrentValue;
         }
      

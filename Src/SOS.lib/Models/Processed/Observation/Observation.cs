@@ -333,5 +333,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The date the observation was created (UTC).
         /// </summary>
         public DateTime Created { get; set; }
+
+        public DataQuality DataQuality { get; set; }
     }
 }

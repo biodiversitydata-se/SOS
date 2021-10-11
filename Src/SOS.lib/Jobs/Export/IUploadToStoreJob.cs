@@ -18,6 +18,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisplayName("Upload file to Azure Blob Storage [Src=\"{0}\"]")]
+        [Queue("medium")]
         Task<bool> RunAsync(string sourcePath, string blobStorageContainer, bool deleteSourceOnSuccess,
             IJobCancellationToken cancellationToken);
     }

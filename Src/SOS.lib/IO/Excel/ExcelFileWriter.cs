@@ -114,16 +114,17 @@ namespace SOS.Lib.IO.Excel
                         foreach (var propertyField in propertyFields)
                         {
                             var value = flatObservation.GetValue(propertyField);
-                            if (propertyField.DataTypeEnum == PropertyFieldDataType.DateTime)
+                            var stringValue = value == null ? string.Empty : propertyField.DataTypeEnum switch
                             {
-                                value = ((DateTime?)value)?.ToString("yyyy-MM-dd");
-                            }
-                            else if (propertyField.DataTypeEnum == PropertyFieldDataType.Boolean)
-                            {
-                                value = ((bool?) value)?.ToString(CultureInfo.InvariantCulture);
-                            }
+                                PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),
+                                PropertyFieldDataType.DateTime => ((DateTime?)value)?.ToShortDateString(),
+                                PropertyFieldDataType.Double => ((double)value).ToString(CultureInfo.InvariantCulture),
+                                PropertyFieldDataType.Int32 => ((int)value).ToString(),
+                                PropertyFieldDataType.Int64 => ((long)value).ToString(),
+                                _ => (string)value
+                            };
 
-                            sheet.Cells[rowIndex + 1, columnIndex].Value = value;
+                            sheet.Cells[rowIndex + 1, columnIndex].Value = stringValue;
                             columnIndex++;
                         }
 

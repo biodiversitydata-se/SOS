@@ -6,7 +6,7 @@
   },
   "ExtendedData": {
     "inputs": [
-      "http://miljodata.slu.se/mvm/ws/SpeciesObservationChangeService.svc"
+        "https://miljodata-test.slu.se/MVM_QA/ws/SpeciesObservationChangeService.svc"
     ],
     "collectionTypes": [
       "System.Array",

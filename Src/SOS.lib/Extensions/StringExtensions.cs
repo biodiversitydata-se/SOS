@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Extensions
@@ -338,6 +340,19 @@ namespace SOS.Lib.Extensions
             s.AsSpan(1).CopyTo(a.Slice(1));
             a[0] = char.ToLower(s[0]);
             return new string(a);
+        }
+
+        /// <summary>
+        /// Compute unique hash of string
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string ToHash(this string source)
+        {
+            var sha1 = SHA1.Create();
+            var buf = Encoding.UTF8.GetBytes(source);
+            var hash = sha1.ComputeHash(buf, 0, buf.Length);
+            return BitConverter.ToString(hash).Replace("-", "");
         }
     }
 }

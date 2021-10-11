@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using NReco.Csv;
 using SOS.Export.Models;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -35,14 +35,14 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="multimediaRows"></param>
         /// <param name="streamWriter"></param>
         /// <returns></returns>
-        Task WriteHeaderlessCsvFileAsync(
+        void WriteHeaderlessCsvFile(
             IEnumerable<SimpleMultimediaRow> multimediaRows,
             StreamWriter streamWriter);
 
         /// <summary>
         /// Write Simple multimedia extension header row.
         /// </summary>
-        /// <param name="csvWriter"></param>
-        void WriteHeaderRow(CsvWriter csvWriter);
+        /// <param name="csvFileHelper"></param>
+        void WriteHeaderRow(CsvFileHelper csvFileHelper);
     }
 }

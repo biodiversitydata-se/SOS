@@ -27,14 +27,12 @@ namespace SOS.Lib.Models.Search
             {
                 return;
             }
-
-            AreaGeographic = searchFilter.AreaGeographic;
-            Areas = searchFilter.Areas;
+            
             DataProviderIds = searchFilter.DataProviderIds;
             DateFilterType = searchFilter.DateFilterType;
             EndDate = searchFilter.EndDate;
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
-            Geometries = searchFilter.Geometries;
+            Location = searchFilter.Location;
             Taxa = searchFilter.Taxa;
             ValidationStatus = searchFilter.ValidationStatus;
             PositiveSightings = searchFilter.PositiveSightings;

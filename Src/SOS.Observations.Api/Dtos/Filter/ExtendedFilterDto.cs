@@ -129,5 +129,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         public string InstitutionId { get; set; }
 
         public IEnumerable<int> DatasourceIds { get; set; }
+
+        public string LocationNameFilter { get; set; }
     }
 }

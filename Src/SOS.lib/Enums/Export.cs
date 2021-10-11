@@ -6,6 +6,10 @@
     public enum ExportFormat
     {
         /// <summary>
+        /// Export format csv
+        /// </summary>
+        Csv,
+        /// <summary>
         /// Export format DarwinCore Archive
         /// </summary>
         DwC,

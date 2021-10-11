@@ -26,8 +26,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Services;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Administration.Api
 {

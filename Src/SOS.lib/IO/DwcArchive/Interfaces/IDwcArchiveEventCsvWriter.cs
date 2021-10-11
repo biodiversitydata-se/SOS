@@ -39,13 +39,5 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             StreamWriter streamWriter,
             IEnumerable<FieldDescription> fieldDescriptions);
 
-        /// <summary>
-        /// Write Occurrence CSV header row.
-        /// </summary>
-        /// <param name="csvWriter"></param>
-        /// <param name="fieldDescriptions"></param>
-        void WriteHeaderRow(
-            NReco.Csv.CsvWriter csvWriter,
-            IEnumerable<FieldDescription> fieldDescriptions);
     }
 }

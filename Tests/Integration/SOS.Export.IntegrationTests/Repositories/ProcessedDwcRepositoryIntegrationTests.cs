@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
@@ -62,15 +63,6 @@ namespace SOS.Export.IntegrationTests.Repositories
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var uris = new Uri[elasticConfiguration.Hosts.Length];
-            for (var i = 0; i < uris.Length; i++)
-            {
-                uris[i] = new Uri(elasticConfiguration.Hosts[i]);
-            }
-
-            var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
-                .DisableDirectStreaming().EnableDebugMode().PrettyJson());
-
             var exportClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
                 processDbConfiguration.DatabaseName,
@@ -78,7 +70,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
                 new ProcessedObservationRepository(
-                    elasticClient,
+                    new ElasticClientManager(elasticConfiguration, true),
                     exportClient,
                     elasticConfiguration,
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),

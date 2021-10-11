@@ -7,7 +7,9 @@ using Moq;
 using SOS.Export.Jobs;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Jobs
@@ -23,10 +25,12 @@ namespace SOS.Export.UnitTests.Jobs
         public ExportAndSendJobTests()
         {
             _observationManager = new Mock<IObservationManager>();
+            _userExportRepository = new Mock<IUserExportRepository>();
             _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
         }
 
         private readonly Mock<IObservationManager> _observationManager;
+        private readonly Mock<IUserExportRepository> _userExportRepository;
         private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
 
         /// <summary>
@@ -34,6 +38,7 @@ namespace SOS.Export.UnitTests.Jobs
         /// </summary>
         private ExportAndSendJob TestObject => new ExportAndSendJob(
             _observationManager.Object,
+            _userExportRepository.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -52,7 +57,8 @@ namespace SOS.Export.UnitTests.Jobs
                     .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null)
                 )
                 .ReturnsAsync(false);
-
+            _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
+            _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -60,7 +66,7 @@ namespace SOS.Export.UnitTests.Jobs
 
             Func<Task> act = async () =>
             {
-                await observationManager.RunAsync(new SearchFilter(), null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
+                await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, null, JobCancellationToken.Null);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -86,12 +92,14 @@ namespace SOS.Export.UnitTests.Jobs
                 )
                 .ReturnsAsync(true);
 
+            _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
+            _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            var result = await observationManager.RunAsync(new SearchFilter(), null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null);
+            var result = await observationManager.RunAsync(new SearchFilter(), 0, null, "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -111,7 +119,8 @@ namespace SOS.Export.UnitTests.Jobs
                     .ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false, JobCancellationToken.Null)
                 )
                 .Throws(new Exception());
-
+            _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
+            _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

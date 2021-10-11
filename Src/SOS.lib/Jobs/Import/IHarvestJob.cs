@@ -11,6 +11,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Queue("high")]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
@@ -19,6 +20,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Queue("high")]
         Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
     }
 }

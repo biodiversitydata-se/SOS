@@ -121,13 +121,14 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
@@ -147,6 +148,7 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int take, 
@@ -156,7 +158,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
@@ -175,11 +177,13 @@ namespace SOS.Observations.Api.Managers
 
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
 
                 if(aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
@@ -202,11 +206,11 @@ namespace SOS.Observations.Api.Managers
 
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision);
             }
             catch (Exception e)
@@ -217,11 +221,11 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
             }
             catch (Exception e)
@@ -233,13 +237,14 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, 
             int zoom)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
             }
             catch (Exception e)
@@ -251,6 +256,7 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int zoom,
@@ -259,7 +265,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
             }
             catch (Exception e)
@@ -284,14 +290,15 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(string authorizationApplicationIdentifier, FilterBase filter)
+        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
         {
-            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int? skip,
@@ -299,7 +306,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, skip, take);
             }
             catch (Exception e)
@@ -311,12 +318,13 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter)
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.Taxa?.Ids?.Count() > 10000)
                 {
@@ -335,6 +343,7 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<bool> SignalSearchInternalAsync(
+            int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int areaBuffer,
@@ -342,7 +351,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Geometries?.UsePointAccuracy, filter?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
@@ -359,22 +368,14 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        public async Task<dynamic> GetObservationAsync(string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+        public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
         {
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
-           
+
             filter.PopulateOutputFields(outputFieldSet);
-           
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
 
-            await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter, null, null, null, null, false);
-            
-            // If no user is authenticated, reset 
-            if (filter.ExtendedAuthorization.UserId == 0)
-            {
-                filter.ExtendedAuthorization.ObservedByMe = false;
-                filter.ExtendedAuthorization.ReportedByMe = false;
-            }
+            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, null, null, null, null, false);
             
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 

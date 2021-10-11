@@ -4,12 +4,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using NReco.Csv;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Lib.Constants;
@@ -53,11 +51,11 @@ namespace SOS.Lib.IO.DwcArchive
                 processedObservationRepository.LiveMode = true;
                 var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
                 elasticRetrievalStopwatch.Stop();
-                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(stream, "\t");
+                
                 // Write header row
-                WriteHeaderRow(csvWriter, fieldDescriptions);
+                WriteHeaderRow(csvFileHelper, fieldDescriptions);
 
                 while (scrollResult?.Records?.Any() ?? false)
                 {
@@ -76,9 +74,9 @@ namespace SOS.Lib.IO.DwcArchive
                     csvWritingStopwatch.Start();
                     foreach (var dwcObservation in dwcObservations)
                     {
-                        WriteEventRow(csvWriter, dwcObservation, fieldsToWriteArray);
+                        WriteEventRow(csvFileHelper, dwcObservation, fieldsToWriteArray);
                     }
-                    await streamWriter.FlushAsync();
+                    await csvFileHelper.FlushAsync();
                     csvWritingStopwatch.Stop();
 
                     // Get next batch of observations.
@@ -86,6 +84,7 @@ namespace SOS.Lib.IO.DwcArchive
                     scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                     elasticRetrievalStopwatch.Stop();
                 }
+                csvFileHelper.FinishWrite();
 
                 stopwatch.Stop();
                 _logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
@@ -93,7 +92,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation($"{nameof(WriteHeaderlessEventCsvFileAsync)} was canceled.");
+                _logger.LogInformation($"{nameof(CreateEventCsvFileAsync)} was canceled.");
                 throw;
             }
             catch (Exception e)
@@ -104,122 +103,122 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         private static void WriteEventRow(
-                    NReco.Csv.CsvWriter csvWriter,
+            CsvFileHelper csvFileHelper,
                     DarwinCore dwcObservation,
                     bool[] writeField)
         {
-            if (writeField[(int)FieldDescriptionId.EventID]) WriteField(csvWriter, dwcObservation.Event.EventID);
-            if (writeField[(int)FieldDescriptionId.ParentEventID]) WriteField(csvWriter, dwcObservation.Event.ParentEventID);
-            if (writeField[(int)FieldDescriptionId.EventDate]) WriteField(csvWriter, dwcObservation.Event.EventDate);
-            if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) WriteField(csvWriter, dwcObservation.Event.VerbatimEventDate);
-            if (writeField[(int)FieldDescriptionId.EventTime]) WriteField(csvWriter, dwcObservation.Event.EventTime);
-            if (writeField[(int)FieldDescriptionId.EventRemarks]) WriteField(csvWriter, dwcObservation.Event.EventRemarks);
-            if (writeField[(int)FieldDescriptionId.FieldNotes]) WriteField(csvWriter, dwcObservation.Event.FieldNotes);
-            if (writeField[(int)FieldDescriptionId.FieldNumber]) WriteField(csvWriter, dwcObservation.Event.FieldNumber);
-            if (writeField[(int)FieldDescriptionId.Habitat]) WriteField(csvWriter, dwcObservation.Event.Habitat);
-            if (writeField[(int)FieldDescriptionId.SampleSizeValue]) WriteField(csvWriter, dwcObservation.Event.SampleSizeValue);
-            if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) WriteField(csvWriter, dwcObservation.Event.SampleSizeUnit);
-            if (writeField[(int)FieldDescriptionId.SamplingEffort]) WriteField(csvWriter, dwcObservation.Event.SamplingEffort);
-            if (writeField[(int)FieldDescriptionId.SamplingProtocol]) WriteField(csvWriter, dwcObservation.Event.SamplingProtocol);
-            if (writeField[(int)FieldDescriptionId.Day]) WriteField(csvWriter, dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.Month]) WriteField(csvWriter, dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.Year]) WriteField(csvWriter, dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.EndDayOfYear]) WriteField(csvWriter, dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.StartDayOfYear]) WriteField(csvWriter, dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
-            if (writeField[(int)FieldDescriptionId.BasisOfRecord]) WriteField(csvWriter, dwcObservation.BasisOfRecord);
-            if (writeField[(int)FieldDescriptionId.BibliographicCitation]) WriteField(csvWriter, dwcObservation.BibliographicCitation);
-            if (writeField[(int)FieldDescriptionId.CollectionCode]) WriteField(csvWriter, dwcObservation.CollectionCode);
-            if (writeField[(int)FieldDescriptionId.CollectionID]) WriteField(csvWriter, dwcObservation.CollectionID);
-            if (writeField[(int)FieldDescriptionId.DataGeneralizations]) WriteField(csvWriter, dwcObservation.DataGeneralizations);
-            if (writeField[(int)FieldDescriptionId.DatasetID]) WriteField(csvWriter, dwcObservation.DatasetID);
-            if (writeField[(int)FieldDescriptionId.DatasetName]) WriteField(csvWriter, dwcObservation.DatasetName);
-            if (writeField[(int)FieldDescriptionId.DynamicProperties]) WriteField(csvWriter, dwcObservation.DynamicProperties);
-            if (writeField[(int)FieldDescriptionId.InformationWithheld]) WriteField(csvWriter, dwcObservation.InformationWithheld);
-            if (writeField[(int)FieldDescriptionId.InstitutionCode]) WriteField(csvWriter, dwcObservation.InstitutionCode);
-            if (writeField[(int)FieldDescriptionId.InstitutionID]) WriteField(csvWriter, dwcObservation.InstitutionID);
-            if (writeField[(int)FieldDescriptionId.Language]) WriteField(csvWriter, dwcObservation.Language);
-            if (writeField[(int)FieldDescriptionId.License]) WriteField(csvWriter, dwcObservation.License);
-            if (writeField[(int)FieldDescriptionId.Modified]) WriteField(csvWriter, dwcObservation.Modified?.ToString("s", CultureInfo.InvariantCulture));
-            if (writeField[(int)FieldDescriptionId.OwnerInstitutionCode]) WriteField(csvWriter, dwcObservation.OwnerInstitutionCode);
-            if (writeField[(int)FieldDescriptionId.References]) WriteField(csvWriter, dwcObservation.References);
-            if (writeField[(int)FieldDescriptionId.RightsHolder]) WriteField(csvWriter, dwcObservation.RightsHolder);
-            if (writeField[(int)FieldDescriptionId.Type]) WriteField(csvWriter, dwcObservation.Type);
-            if (writeField[(int)FieldDescriptionId.CoordinatePrecision]) WriteField(csvWriter, dwcObservation.Location.CoordinatePrecision);
-            if (writeField[(int)FieldDescriptionId.CoordinateUncertaintyInMeters]) WriteField(csvWriter, GetCoordinateUncertaintyInMetersValue(dwcObservation.Location.CoordinateUncertaintyInMeters));
-            if (writeField[(int)FieldDescriptionId.Country]) WriteField(csvWriter, dwcObservation.Location.Country);
-            if (writeField[(int)FieldDescriptionId.CountryCode]) WriteField(csvWriter, dwcObservation.Location.CountryCode);
-            if (writeField[(int)FieldDescriptionId.County]) WriteField(csvWriter, dwcObservation.Location.County);
-            if (writeField[(int)FieldDescriptionId.DecimalLatitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLatitude?.ToString("F5", CultureInfo.InvariantCulture));
-            if (writeField[(int)FieldDescriptionId.DecimalLongitude]) WriteField(csvWriter, dwcObservation.Location.DecimalLongitude?.ToString("F5", CultureInfo.InvariantCulture));
-            if (writeField[(int)FieldDescriptionId.FootprintSpatialFit]) WriteField(csvWriter, dwcObservation.Location.FootprintSpatialFit);
-            if (writeField[(int)FieldDescriptionId.FootprintSRS]) WriteField(csvWriter, dwcObservation.Location.FootprintSRS);
-            if (writeField[(int)FieldDescriptionId.FootprintWKT]) WriteField(csvWriter, dwcObservation.Location.FootprintWKT);
-            if (writeField[(int)FieldDescriptionId.GeodeticDatum]) WriteField(csvWriter, dwcObservation.Location.GeodeticDatum);
-            if (writeField[(int)FieldDescriptionId.GeoreferencedBy]) WriteField(csvWriter, dwcObservation.Location.GeoreferencedBy);
-            if (writeField[(int)FieldDescriptionId.GeoreferencedDate]) WriteField(csvWriter, dwcObservation.Location.GeoreferencedDate);
-            if (writeField[(int)FieldDescriptionId.GeoreferenceProtocol]) WriteField(csvWriter, dwcObservation.Location.GeoreferenceProtocol);
-            if (writeField[(int)FieldDescriptionId.GeoreferenceRemarks]) WriteField(csvWriter, dwcObservation.Location.GeoreferenceRemarks);
-            if (writeField[(int)FieldDescriptionId.GeoreferenceSources]) WriteField(csvWriter, dwcObservation.Location.GeoreferenceSources);
-            if (writeField[(int)FieldDescriptionId.GeoreferenceVerificationStatus]) WriteField(csvWriter, dwcObservation.Location.GeoreferenceVerificationStatus);
-            if (writeField[(int)FieldDescriptionId.HigherGeography]) WriteField(csvWriter, dwcObservation.Location.HigherGeography);
-            if (writeField[(int)FieldDescriptionId.HigherGeographyID]) WriteField(csvWriter, dwcObservation.Location.HigherGeographyID);
-            if (writeField[(int)FieldDescriptionId.Continent]) WriteField(csvWriter, dwcObservation.Location.Continent);
-            if (writeField[(int)FieldDescriptionId.Island]) WriteField(csvWriter, dwcObservation.Location.Island);
-            if (writeField[(int)FieldDescriptionId.IslandGroup]) WriteField(csvWriter, dwcObservation.Location.IslandGroup);
-            if (writeField[(int)FieldDescriptionId.Locality]) WriteField(csvWriter, dwcObservation.Location.Locality);
-            if (writeField[(int)FieldDescriptionId.LocationAccordingTo]) WriteField(csvWriter, dwcObservation.Location.LocationAccordingTo);
-            if (writeField[(int)FieldDescriptionId.LocationID]) WriteField(csvWriter, dwcObservation.Location.LocationID);
-            if (writeField[(int)FieldDescriptionId.LocationRemarks]) WriteField(csvWriter, dwcObservation.Location.LocationRemarks);
-            if (writeField[(int)FieldDescriptionId.MaximumDepthInMeters]) WriteField(csvWriter, dwcObservation.Location.MaximumDepthInMeters);
-            if (writeField[(int)FieldDescriptionId.MaximumDistanceAboveSurfaceInMeters]) WriteField(csvWriter, dwcObservation.Location.MaximumDistanceAboveSurfaceInMeters);
-            if (writeField[(int)FieldDescriptionId.MaximumElevationInMeters]) WriteField(csvWriter, dwcObservation.Location.MaximumElevationInMeters);
-            if (writeField[(int)FieldDescriptionId.MinimumDepthInMeters]) WriteField(csvWriter, dwcObservation.Location.MinimumDepthInMeters);
-            if (writeField[(int)FieldDescriptionId.MinimumDistanceAboveSurfaceInMeters]) WriteField(csvWriter, dwcObservation.Location.MinimumDistanceAboveSurfaceInMeters);
-            if (writeField[(int)FieldDescriptionId.MinimumElevationInMeters]) WriteField(csvWriter, dwcObservation.Location.MinimumElevationInMeters);
-            if (writeField[(int)FieldDescriptionId.Municipality]) WriteField(csvWriter, dwcObservation.Location.Municipality);
-            if (writeField[(int)FieldDescriptionId.PointRadiusSpatialFit]) WriteField(csvWriter, dwcObservation.Location.PointRadiusSpatialFit);
-            if (writeField[(int)FieldDescriptionId.StateProvince]) WriteField(csvWriter, dwcObservation.Location.StateProvince);
-            if (writeField[(int)FieldDescriptionId.WaterBody]) WriteField(csvWriter, dwcObservation.Location.WaterBody);
-            if (writeField[(int)FieldDescriptionId.VerbatimCoordinates]) WriteField(csvWriter, dwcObservation.Location.VerbatimCoordinates);
-            if (writeField[(int)FieldDescriptionId.VerbatimCoordinateSystem]) WriteField(csvWriter, dwcObservation.Location.VerbatimCoordinateSystem);
-            if (writeField[(int)FieldDescriptionId.VerbatimDepth]) WriteField(csvWriter, dwcObservation.Location.VerbatimDepth);
-            if (writeField[(int)FieldDescriptionId.VerbatimElevation]) WriteField(csvWriter, dwcObservation.Location.VerbatimElevation);
-            if (writeField[(int)FieldDescriptionId.VerbatimLatitude]) WriteField(csvWriter, dwcObservation.Location.VerbatimLatitude);
-            if (writeField[(int)FieldDescriptionId.VerbatimLocality]) WriteField(csvWriter, dwcObservation.Location.VerbatimLocality);
-            if (writeField[(int)FieldDescriptionId.VerbatimLongitude]) WriteField(csvWriter, dwcObservation.Location.VerbatimLongitude);
-            if (writeField[(int)FieldDescriptionId.VerbatimSRS]) WriteField(csvWriter, dwcObservation.Location.VerbatimSRS);
-            if (writeField[(int)FieldDescriptionId.Bed]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Bed);
-            if (writeField[(int)FieldDescriptionId.EarliestAgeOrLowestStage]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestAgeOrLowestStage);
-            if (writeField[(int)FieldDescriptionId.EarliestEonOrLowestEonothem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestEonOrLowestEonothem);
-            if (writeField[(int)FieldDescriptionId.EarliestEpochOrLowestSeries]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestEpochOrLowestSeries);
-            if (writeField[(int)FieldDescriptionId.EarliestEraOrLowestErathem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestEraOrLowestErathem);
-            if (writeField[(int)FieldDescriptionId.EarliestPeriodOrLowestSystem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.EarliestPeriodOrLowestSystem);
-            if (writeField[(int)FieldDescriptionId.Formation]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Formation);
-            if (writeField[(int)FieldDescriptionId.GeologicalContextID]) WriteField(csvWriter, dwcObservation.GeologicalContext?.GeologicalContextID);
-            if (writeField[(int)FieldDescriptionId.Group]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Group);
-            if (writeField[(int)FieldDescriptionId.HighestBiostratigraphicZone]) WriteField(csvWriter, dwcObservation.GeologicalContext?.HighestBiostratigraphicZone);
-            if (writeField[(int)FieldDescriptionId.LatestAgeOrHighestStage]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LatestAgeOrHighestStage);
-            if (writeField[(int)FieldDescriptionId.LatestEonOrHighestEonothem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LatestEonOrHighestEonothem);
-            if (writeField[(int)FieldDescriptionId.LatestEpochOrHighestSeries]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LatestEpochOrHighestSeries);
-            if (writeField[(int)FieldDescriptionId.LatestEraOrHighestErathem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LatestEraOrHighestErathem);
-            if (writeField[(int)FieldDescriptionId.LatestPeriodOrHighestSystem]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LatestPeriodOrHighestSystem);
-            if (writeField[(int)FieldDescriptionId.LithostratigraphicTerms]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LithostratigraphicTerms);
-            if (writeField[(int)FieldDescriptionId.LowestBiostratigraphicZone]) WriteField(csvWriter, dwcObservation.GeologicalContext?.LowestBiostratigraphicZone);
-            if (writeField[(int)FieldDescriptionId.Member]) WriteField(csvWriter, dwcObservation.GeologicalContext?.Member);
+            if (writeField[(int)FieldDescriptionId.EventID]) WriteField(csvFileHelper, dwcObservation.Event.EventID);
+            if (writeField[(int)FieldDescriptionId.ParentEventID]) WriteField(csvFileHelper, dwcObservation.Event.ParentEventID);
+            if (writeField[(int)FieldDescriptionId.EventDate]) WriteField(csvFileHelper, dwcObservation.Event.EventDate);
+            if (writeField[(int)FieldDescriptionId.VerbatimEventDate]) WriteField(csvFileHelper, dwcObservation.Event.VerbatimEventDate);
+            if (writeField[(int)FieldDescriptionId.EventTime]) WriteField(csvFileHelper, dwcObservation.Event.EventTime);
+            if (writeField[(int)FieldDescriptionId.EventRemarks]) WriteField(csvFileHelper, dwcObservation.Event.EventRemarks);
+            if (writeField[(int)FieldDescriptionId.FieldNotes]) WriteField(csvFileHelper, dwcObservation.Event.FieldNotes);
+            if (writeField[(int)FieldDescriptionId.FieldNumber]) WriteField(csvFileHelper, dwcObservation.Event.FieldNumber);
+            if (writeField[(int)FieldDescriptionId.Habitat]) WriteField(csvFileHelper, dwcObservation.Event.Habitat);
+            if (writeField[(int)FieldDescriptionId.SampleSizeValue]) WriteField(csvFileHelper, dwcObservation.Event.SampleSizeValue);
+            if (writeField[(int)FieldDescriptionId.SampleSizeUnit]) WriteField(csvFileHelper, dwcObservation.Event.SampleSizeUnit);
+            if (writeField[(int)FieldDescriptionId.SamplingEffort]) WriteField(csvFileHelper, dwcObservation.Event.SamplingEffort);
+            if (writeField[(int)FieldDescriptionId.SamplingProtocol]) WriteField(csvFileHelper, dwcObservation.Event.SamplingProtocol);
+            if (writeField[(int)FieldDescriptionId.Day]) WriteField(csvFileHelper, dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.Month]) WriteField(csvFileHelper, dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.Year]) WriteField(csvFileHelper, dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.EndDayOfYear]) WriteField(csvFileHelper, dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.StartDayOfYear]) WriteField(csvFileHelper, dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null);
+            if (writeField[(int)FieldDescriptionId.BasisOfRecord]) WriteField(csvFileHelper, dwcObservation.BasisOfRecord);
+            if (writeField[(int)FieldDescriptionId.BibliographicCitation]) WriteField(csvFileHelper, dwcObservation.BibliographicCitation);
+            if (writeField[(int)FieldDescriptionId.CollectionCode]) WriteField(csvFileHelper, dwcObservation.CollectionCode);
+            if (writeField[(int)FieldDescriptionId.CollectionID]) WriteField(csvFileHelper, dwcObservation.CollectionID);
+            if (writeField[(int)FieldDescriptionId.DataGeneralizations]) WriteField(csvFileHelper, dwcObservation.DataGeneralizations);
+            if (writeField[(int)FieldDescriptionId.DatasetID]) WriteField(csvFileHelper, dwcObservation.DatasetID);
+            if (writeField[(int)FieldDescriptionId.DatasetName]) WriteField(csvFileHelper, dwcObservation.DatasetName);
+            if (writeField[(int)FieldDescriptionId.DynamicProperties]) WriteField(csvFileHelper, dwcObservation.DynamicProperties);
+            if (writeField[(int)FieldDescriptionId.InformationWithheld]) WriteField(csvFileHelper, dwcObservation.InformationWithheld);
+            if (writeField[(int)FieldDescriptionId.InstitutionCode]) WriteField(csvFileHelper, dwcObservation.InstitutionCode);
+            if (writeField[(int)FieldDescriptionId.InstitutionID]) WriteField(csvFileHelper, dwcObservation.InstitutionID);
+            if (writeField[(int)FieldDescriptionId.Language]) WriteField(csvFileHelper, dwcObservation.Language);
+            if (writeField[(int)FieldDescriptionId.License]) WriteField(csvFileHelper, dwcObservation.License);
+            if (writeField[(int)FieldDescriptionId.Modified]) WriteField(csvFileHelper, dwcObservation.Modified?.ToString("s", CultureInfo.InvariantCulture));
+            if (writeField[(int)FieldDescriptionId.OwnerInstitutionCode]) WriteField(csvFileHelper, dwcObservation.OwnerInstitutionCode);
+            if (writeField[(int)FieldDescriptionId.References]) WriteField(csvFileHelper, dwcObservation.References);
+            if (writeField[(int)FieldDescriptionId.RightsHolder]) WriteField(csvFileHelper, dwcObservation.RightsHolder);
+            if (writeField[(int)FieldDescriptionId.Type]) WriteField(csvFileHelper, dwcObservation.Type);
+            if (writeField[(int)FieldDescriptionId.CoordinatePrecision]) WriteField(csvFileHelper, dwcObservation.Location.CoordinatePrecision);
+            if (writeField[(int)FieldDescriptionId.CoordinateUncertaintyInMeters]) WriteField(csvFileHelper, GetCoordinateUncertaintyInMetersValue(dwcObservation.Location.CoordinateUncertaintyInMeters));
+            if (writeField[(int)FieldDescriptionId.Country]) WriteField(csvFileHelper, dwcObservation.Location.Country);
+            if (writeField[(int)FieldDescriptionId.CountryCode]) WriteField(csvFileHelper, dwcObservation.Location.CountryCode);
+            if (writeField[(int)FieldDescriptionId.County]) WriteField(csvFileHelper, dwcObservation.Location.County);
+            if (writeField[(int)FieldDescriptionId.DecimalLatitude]) WriteField(csvFileHelper, dwcObservation.Location.DecimalLatitude?.ToString("F5", CultureInfo.InvariantCulture));
+            if (writeField[(int)FieldDescriptionId.DecimalLongitude]) WriteField(csvFileHelper, dwcObservation.Location.DecimalLongitude?.ToString("F5", CultureInfo.InvariantCulture));
+            if (writeField[(int)FieldDescriptionId.FootprintSpatialFit]) WriteField(csvFileHelper, dwcObservation.Location.FootprintSpatialFit);
+            if (writeField[(int)FieldDescriptionId.FootprintSRS]) WriteField(csvFileHelper, dwcObservation.Location.FootprintSRS);
+            if (writeField[(int)FieldDescriptionId.FootprintWKT]) WriteField(csvFileHelper, dwcObservation.Location.FootprintWKT);
+            if (writeField[(int)FieldDescriptionId.GeodeticDatum]) WriteField(csvFileHelper, dwcObservation.Location.GeodeticDatum);
+            if (writeField[(int)FieldDescriptionId.GeoreferencedBy]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferencedBy);
+            if (writeField[(int)FieldDescriptionId.GeoreferencedDate]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferencedDate);
+            if (writeField[(int)FieldDescriptionId.GeoreferenceProtocol]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferenceProtocol);
+            if (writeField[(int)FieldDescriptionId.GeoreferenceRemarks]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferenceRemarks);
+            if (writeField[(int)FieldDescriptionId.GeoreferenceSources]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferenceSources);
+            if (writeField[(int)FieldDescriptionId.GeoreferenceVerificationStatus]) WriteField(csvFileHelper, dwcObservation.Location.GeoreferenceVerificationStatus);
+            if (writeField[(int)FieldDescriptionId.HigherGeography]) WriteField(csvFileHelper, dwcObservation.Location.HigherGeography);
+            if (writeField[(int)FieldDescriptionId.HigherGeographyID]) WriteField(csvFileHelper, dwcObservation.Location.HigherGeographyID);
+            if (writeField[(int)FieldDescriptionId.Continent]) WriteField(csvFileHelper, dwcObservation.Location.Continent);
+            if (writeField[(int)FieldDescriptionId.Island]) WriteField(csvFileHelper, dwcObservation.Location.Island);
+            if (writeField[(int)FieldDescriptionId.IslandGroup]) WriteField(csvFileHelper, dwcObservation.Location.IslandGroup);
+            if (writeField[(int)FieldDescriptionId.Locality]) WriteField(csvFileHelper, dwcObservation.Location.Locality);
+            if (writeField[(int)FieldDescriptionId.LocationAccordingTo]) WriteField(csvFileHelper, dwcObservation.Location.LocationAccordingTo);
+            if (writeField[(int)FieldDescriptionId.LocationID]) WriteField(csvFileHelper, dwcObservation.Location.LocationID);
+            if (writeField[(int)FieldDescriptionId.LocationRemarks]) WriteField(csvFileHelper, dwcObservation.Location.LocationRemarks);
+            if (writeField[(int)FieldDescriptionId.MaximumDepthInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MaximumDepthInMeters);
+            if (writeField[(int)FieldDescriptionId.MaximumDistanceAboveSurfaceInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MaximumDistanceAboveSurfaceInMeters);
+            if (writeField[(int)FieldDescriptionId.MaximumElevationInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MaximumElevationInMeters);
+            if (writeField[(int)FieldDescriptionId.MinimumDepthInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MinimumDepthInMeters);
+            if (writeField[(int)FieldDescriptionId.MinimumDistanceAboveSurfaceInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MinimumDistanceAboveSurfaceInMeters);
+            if (writeField[(int)FieldDescriptionId.MinimumElevationInMeters]) WriteField(csvFileHelper, dwcObservation.Location.MinimumElevationInMeters);
+            if (writeField[(int)FieldDescriptionId.Municipality]) WriteField(csvFileHelper, dwcObservation.Location.Municipality);
+            if (writeField[(int)FieldDescriptionId.PointRadiusSpatialFit]) WriteField(csvFileHelper, dwcObservation.Location.PointRadiusSpatialFit);
+            if (writeField[(int)FieldDescriptionId.StateProvince]) WriteField(csvFileHelper, dwcObservation.Location.StateProvince);
+            if (writeField[(int)FieldDescriptionId.WaterBody]) WriteField(csvFileHelper, dwcObservation.Location.WaterBody);
+            if (writeField[(int)FieldDescriptionId.VerbatimCoordinates]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimCoordinates);
+            if (writeField[(int)FieldDescriptionId.VerbatimCoordinateSystem]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimCoordinateSystem);
+            if (writeField[(int)FieldDescriptionId.VerbatimDepth]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimDepth);
+            if (writeField[(int)FieldDescriptionId.VerbatimElevation]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimElevation);
+            if (writeField[(int)FieldDescriptionId.VerbatimLatitude]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimLatitude);
+            if (writeField[(int)FieldDescriptionId.VerbatimLocality]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimLocality);
+            if (writeField[(int)FieldDescriptionId.VerbatimLongitude]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimLongitude);
+            if (writeField[(int)FieldDescriptionId.VerbatimSRS]) WriteField(csvFileHelper, dwcObservation.Location.VerbatimSRS);
+            if (writeField[(int)FieldDescriptionId.Bed]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.Bed);
+            if (writeField[(int)FieldDescriptionId.EarliestAgeOrLowestStage]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.EarliestAgeOrLowestStage);
+            if (writeField[(int)FieldDescriptionId.EarliestEonOrLowestEonothem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.EarliestEonOrLowestEonothem);
+            if (writeField[(int)FieldDescriptionId.EarliestEpochOrLowestSeries]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.EarliestEpochOrLowestSeries);
+            if (writeField[(int)FieldDescriptionId.EarliestEraOrLowestErathem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.EarliestEraOrLowestErathem);
+            if (writeField[(int)FieldDescriptionId.EarliestPeriodOrLowestSystem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.EarliestPeriodOrLowestSystem);
+            if (writeField[(int)FieldDescriptionId.Formation]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.Formation);
+            if (writeField[(int)FieldDescriptionId.GeologicalContextID]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.GeologicalContextID);
+            if (writeField[(int)FieldDescriptionId.Group]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.Group);
+            if (writeField[(int)FieldDescriptionId.HighestBiostratigraphicZone]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.HighestBiostratigraphicZone);
+            if (writeField[(int)FieldDescriptionId.LatestAgeOrHighestStage]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LatestAgeOrHighestStage);
+            if (writeField[(int)FieldDescriptionId.LatestEonOrHighestEonothem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LatestEonOrHighestEonothem);
+            if (writeField[(int)FieldDescriptionId.LatestEpochOrHighestSeries]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LatestEpochOrHighestSeries);
+            if (writeField[(int)FieldDescriptionId.LatestEraOrHighestErathem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LatestEraOrHighestErathem);
+            if (writeField[(int)FieldDescriptionId.LatestPeriodOrHighestSystem]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LatestPeriodOrHighestSystem);
+            if (writeField[(int)FieldDescriptionId.LithostratigraphicTerms]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LithostratigraphicTerms);
+            if (writeField[(int)FieldDescriptionId.LowestBiostratigraphicZone]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.LowestBiostratigraphicZone);
+            if (writeField[(int)FieldDescriptionId.Member]) WriteField(csvFileHelper, dwcObservation.GeologicalContext?.Member);
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
 
 
-        private static void WriteField(CsvWriter csvWriter, string val, bool replaceNewLines = true)
+        private static void WriteField(CsvFileHelper csvFileHelper, string val, bool replaceNewLines = true)
         {
             if (val != null && replaceNewLines)
             {
-                csvWriter.WriteField(val.RemoveNewLineTabs());
+                csvFileHelper.WriteField(val.RemoveNewLineTabs());
             }
             else
             {
-                csvWriter.WriteField(val);
+                csvFileHelper.WriteField(val);
             }
         }
 
@@ -238,14 +237,14 @@ namespace SOS.Lib.IO.DwcArchive
             return coordinateUncertaintyInMeters.Value.ToString();
         }
 
-        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, IEnumerable<FieldDescription> fieldDescriptions)
+        private void WriteHeaderRow(CsvFileHelper csvFileHelper, IEnumerable<FieldDescription> fieldDescriptions)
         {
             foreach (var fieldDescription in fieldDescriptions)
             {
-                csvWriter.WriteField(fieldDescription.Name);
+                csvFileHelper.WriteField(fieldDescription.Name);
             }
 
-            csvWriter.NextRecord();
+            csvFileHelper.NextRecord();
         }
 
         public async Task WriteHeaderlessEventCsvFileAsync(
@@ -257,14 +256,16 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                var csvWriter = new CsvWriter(streamWriter, "\t");
-
+                
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(streamWriter, "\t");
+               
                 // Write occurrence rows to CSV file.
                 foreach (var dwcObservation in dwcObservations)
                 {
-                    WriteEventRow(csvWriter, dwcObservation, fieldsToWriteArray);
+                    WriteEventRow(csvFileHelper, dwcObservation, fieldsToWriteArray);
                 }
-                await streamWriter.FlushAsync();
+                csvFileHelper.FinishWrite();
 
                 //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
             }

@@ -56,7 +56,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var countResponse = await _fixture.ObservationsController.Count(null, searchFilter);
+            var countResponse = await _fixture.ObservationsController.Count(null, null, searchFilter);
             int count = countResponse.GetResult<int>();
             count.Should().BeLessOrEqualTo(100000,"because our limit for the scroll endpoint is 100000");
             string scrollId = null; // no scroll in first request
@@ -66,6 +66,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             do
             {
                 IActionResult response = await _fixture.ObservationsController.ObservationsScroll(
+                    0,
                     null, searchFilter, scrollId, 10000);
                 ScrollResultDto<Observation> result = response.GetResult<ScrollResultDto<Observation>>();
                 observations.AddRange(result.Records);
