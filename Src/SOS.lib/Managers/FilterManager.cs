@@ -41,7 +41,7 @@ namespace SOS.Lib.Managers
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (user == null)
             {
@@ -137,12 +137,12 @@ namespace SOS.Lib.Managers
                 filter.TaxonListOperator);
         }
 
-        private IEnumerable<int> GetTaxonIds(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge)
+        private List<int> GetTaxonIds(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge)
         {
             var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
             if (!listIds?.Any() ?? true)
             {
-                return taxaIds;
+                return taxaIds?.ToList();
             }
 
             var taxonListIdsSet = new HashSet<int>();
@@ -156,24 +156,24 @@ namespace SOS.Lib.Managers
 
             if (taxonListIdsSet.Count == 0)
             {
-                return taxaIds;
+                return taxaIds?.ToList();
             }
 
             if (!taxaIds?.Any() ?? true)
             {
-                return taxonListIdsSet;
+                return taxonListIdsSet.ToList();
             }
 
             if (listOperator == TaxonFilter.TaxonListOp.Merge)
             {
                 taxonListIdsSet.UnionWith(taxaIds);
-                return taxonListIdsSet;
+                return taxonListIdsSet.ToList();
             }
 
             var taxaSet = new HashSet<int>();
             taxaSet.UnionWith(taxaIds);
             taxaSet.IntersectWith(taxonListIdsSet);
-            return taxaSet;
+            return taxaSet.ToList();
         }
 
         private IEnumerable<int> GetTaxonFilterIds(

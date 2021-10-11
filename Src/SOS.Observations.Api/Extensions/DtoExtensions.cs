@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
             filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr);
+            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr).ToList();
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
@@ -409,7 +409,7 @@ namespace SOS.Observations.Api.Extensions
                         : new GeographicsFilter
                         {
                             BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
-                            Geometries = searchFilterDto.Geographics.Geometries,
+                            Geometries = searchFilterDto.Geographics.Geometries?.ToList(),
                             MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
                             UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
                             UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,

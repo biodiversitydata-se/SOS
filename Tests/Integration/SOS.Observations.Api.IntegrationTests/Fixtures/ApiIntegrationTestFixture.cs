@@ -115,13 +115,15 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
-            
+
             var processInfoRepository = new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
-            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration {ResolveValues = true, LocalizationCultureCode = "sv-SE"});
+            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,
+                vocabularyValueResolver, new NullLogger<CsvFileWriter>());
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(vocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
                 vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
@@ -133,10 +135,10 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, processClient, filterManager);
-            var exportManager = new ExportManager(dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
+            var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration,  new NullLogger<ObservationsController>());
+            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
@@ -170,15 +172,15 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
-            var taxonManager = new TaxonManager(taxonRepository, taxonListRepository, 
+            var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
                 new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
-                new ClassCache<TaxonListSetsById>(memoryCache), 
+                new ClassCache<TaxonListSetsById>(memoryCache),
                 new NullLogger<TaxonManager>());
             return taxonManager;
         }
 
         private ObservationManager CreateObservationManager(
-            ProcessedObservationRepository processedObservationRepository, 
+            ProcessedObservationRepository processedObservationRepository,
             VocabularyValueResolver vocabularyValueResolver,
             ProcessClient processClient,
             FilterManager filterManager)
@@ -187,7 +189,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
-                filterManager,  
+                filterManager,
                 new HttpContextAccessor(),
                 new NullLogger<ObservationManager>());
 
@@ -219,7 +221,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClientManager, 
+                elasticClientManager,
                 processClient,
                 elasticConfiguration,
                 processedConfigurationCache,

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -412,31 +411,6 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             return filePaths;
-        }
-
-        private async Task WriteOccurrenceHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
-               FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
-            await streamWriter.FlushAsync();
-        }
-
-        private async Task WriteEmofHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvWriter);
-            await streamWriter.FlushAsync();
-        }
-
-        private async Task WriteMultimediaHeaderRow(Stream compressedFileStream)
-        {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _simpleMultimediaCsvWriter.WriteHeaderRow(csvWriter);
-            await streamWriter.FlushAsync();
         }
     }
 }
