@@ -24,7 +24,7 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     AreaGeographic = new GeographicAreasFilter
                     {
-                        CountyIds = new[] { "5", "24", "14" },
+                        CountyIds = new List<string> { "5", "24", "14" },
                         GeometryFilter = new GeographicsFilter
                         {
                             MaxDistanceFromPoint = 50,
@@ -71,7 +71,7 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     AreaGeographic = new GeographicAreasFilter
                     {
-                        CountyIds = new[] { "14", "5", "24" },
+                        CountyIds = new List<string> { "14", "5", "24" },
                         GeometryFilter = new GeographicsFilter
                         {
                             MaxDistanceFromPoint = 50,

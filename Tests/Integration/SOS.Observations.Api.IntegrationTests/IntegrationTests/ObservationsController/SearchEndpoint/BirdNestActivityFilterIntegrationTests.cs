@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             SearchFilterDto searchFilter = new SearchFilterDto
             {
-                DataProvider = new DataProviderFilterDto { Ids = new []{1}},
+                DataProvider = new DataProviderFilterDto { Ids = new List<int>{1}},
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Aves }, IncludeUnderlyingTaxa = true },
                 BirdNestActivityLimit = 5,
                 Output = new OutputFilterDto

@@ -29,7 +29,7 @@ namespace SOS.Lib.IO.Excel
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFileService _fileService;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
-        private readonly ILogger<ExcelFileWriter> _logger;
+        private readonly ILogger<CsvFileWriter> _logger;
 
         /// <summary>
         /// Constructor
@@ -41,7 +41,7 @@ namespace SOS.Lib.IO.Excel
         public CsvFileWriter(IProcessedObservationRepository processedObservationRepository, 
             IFileService fileService,
             IVocabularyValueResolver vocabularyValueResolver,
-            ILogger<ExcelFileWriter> logger)
+            ILogger<CsvFileWriter> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
                                                     throw new ArgumentNullException(

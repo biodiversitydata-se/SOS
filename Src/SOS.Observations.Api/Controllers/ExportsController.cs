@@ -230,7 +230,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> DownloadCsv(
              [FromBody] ExportFilterDto filter,
              [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
              [FromQuery] string cultureCode = "sv-SE")
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -446,7 +446,7 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> OrderCsv([FromBody] ExportFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE")
         {
             try

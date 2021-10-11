@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> DownloadCsv(
             [FromBody] ExportFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE");
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> OrderCsv(ExportFilterDto filter,
             string description,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
-            PropertyLabelType propertyLabelType = PropertyLabelType.ShortPropertyName,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE");
 
         /// <summary>

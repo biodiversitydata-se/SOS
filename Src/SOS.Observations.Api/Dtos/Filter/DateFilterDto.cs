@@ -79,6 +79,6 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Predefined time ranges
         /// </summary>
-        public IEnumerable<TimeRangeDto> TimeRanges { get; set; }
+        public List<TimeRangeDto> TimeRanges { get; set; }
     }
 }
