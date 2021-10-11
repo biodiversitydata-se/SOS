@@ -63,7 +63,7 @@ namespace SOS.Import.Harvesters
                 foreach (var conservationList in conservationLists)
                 {
                     taxonListByTaxonListServiceId[conservationList.ListId].Taxa =
-                        conservationList.TaxonInformation.Select(ConvertToTaxonListTaxonInformation);
+                        conservationList.TaxonInformation.Select(ConvertToTaxonListTaxonInformation)?.ToList();
                 }
 
                 // Check that data seems to be correct

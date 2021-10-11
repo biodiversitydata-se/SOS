@@ -34,7 +34,7 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// The taxa in this taxon list.
         /// </summary>
-        public IEnumerable<TaxonListTaxonInformationDto> Taxa { get; set; }
+        public ICollection<TaxonListTaxonInformationDto> Taxa { get; set; }
 
         /// <summary>
         /// Creates a new TaxonListDto object.
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Dtos
                 ParentId = taxonList.ParentId,
                 TaxonListServiceId = taxonList.TaxonListServiceId,
                 Name = taxonList.Names?.Translate(cultureCode),
-                Taxa = taxonList.Taxa.Select(m => m.ToTaxonListTaxonInformationDto())
+                Taxa = taxonList.Taxa.Select(m => m.ToTaxonListTaxonInformationDto())?.ToList()
             };
         }
     }

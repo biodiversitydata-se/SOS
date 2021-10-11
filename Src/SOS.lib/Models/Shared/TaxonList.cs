@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Nest;
+﻿using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
@@ -28,11 +26,11 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     The names of the taxon list
         /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Names { get; set; }
+        public ICollection<VocabularyValueTranslation> Names { get; set; }
 
         /// <summary>
         /// The taxa in this taxon list.
         /// </summary>
-        public IEnumerable<TaxonListTaxonInformation> Taxa { get; set; }
+        public ICollection<TaxonListTaxonInformation> Taxa { get; set; }
     }
 }

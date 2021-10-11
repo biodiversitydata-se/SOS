@@ -325,8 +325,8 @@ namespace SOS.Process.Jobs
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                var success = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, copyFromActiveOnFail, cancellationToken);
-
+                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, copyFromActiveOnFail, cancellationToken);
+                var success = result.All(t => t.Value.Status == RunStatus.Success);
                 //---------------------------------
                 // 6. Create ElasticSearch index
                 //---------------------------------
@@ -390,7 +390,10 @@ namespace SOS.Process.Jobs
                 //-------------------------------
                 // 8. Return processing result
                 //-------------------------------
-                return success ? true : throw new Exception("Failed to process observations.");
+                return success ? true : throw new Exception(
+                    $@"Failed to process observations. {result
+                        .Where(r => r.Value.Status != RunStatus.Success)
+                        .Select(r => $"Provider: {r.Key} - {r.Value.Status}")}");
             }
             catch (JobAbortedException)
             {
@@ -420,7 +423,7 @@ namespace SOS.Process.Jobs
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
         {
             var processStart = DateTime.Now;
 
@@ -463,7 +466,7 @@ namespace SOS.Process.Jobs
             }
 
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
-            return success;
+            return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
         }
 
         /// <summary>
