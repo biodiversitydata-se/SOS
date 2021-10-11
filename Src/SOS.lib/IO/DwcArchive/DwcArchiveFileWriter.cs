@@ -234,8 +234,9 @@ namespace SOS.Lib.IO.DwcArchive
             var multimediaRows = processedObservations.ToSimpleMultimediaRows();
             if (multimediaRows != null && multimediaRows.Any())
             {
-                await using StreamWriter multimediaFileStream = File.AppendText(multimediaCsvFilePath);
-                await _simpleMultimediaCsvWriter.WriteHeaderlessCsvFileAsync(
+                await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
+               
+                _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
             }
@@ -320,20 +321,26 @@ namespace SOS.Lib.IO.DwcArchive
 
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
-
+            
             // Create meta.xml
             var dwcExtensions = new List<DwcaFilePart>();
 
             // Create occurrence.csv
             var occurrenceFilePaths = GetFilePaths(dwcaFilePartsInfos, "occurrence*");
             await using var occurrenceFileStream = archive.CreateEntry("occurrence.csv", CompressionLevel.Optimal).Open();
-            await WriteOccurrenceHeaderRow(occurrenceFileStream);
+
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(occurrenceFileStream, "\t");
+
+            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
                 await readStream.CopyToAsync(occurrenceFileStream);
                 readStream.Close();
             }
+            csvFileHelper.FinishWrite();
             occurrenceFileStream.Close();
 
             // Create emof.csv
@@ -342,13 +349,15 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaFilePart.Emof);
                 await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Optimal).Open();
-                await WriteEmofHeaderRow(extendedMeasurementOrFactFileStream);
+                csvFileHelper.InitializeWrite(extendedMeasurementOrFactFileStream, "\t");
+                _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvFileHelper);
                 foreach (var filePath in emofFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
                     await readStream.CopyToAsync(extendedMeasurementOrFactFileStream);
                     readStream.Close();
                 }
+                csvFileHelper.FinishWrite();
                 extendedMeasurementOrFactFileStream.Close();
             }
 
@@ -358,14 +367,15 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaFilePart.Multimedia);
                 await using var multimediaFileStream = archive.CreateEntry("multimedia.csv", CompressionLevel.Optimal).Open();
-
-                await WriteMultimediaHeaderRow(multimediaFileStream);
+                csvFileHelper.InitializeWrite(multimediaFileStream, "\t");
+                _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
                 foreach (var filePath in multimediaFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
                     await readStream.CopyToAsync(multimediaFileStream);
                     readStream.Close();
                 }
+                csvFileHelper.FinishWrite();
                 multimediaFileStream.Close();
             }
 
@@ -384,7 +394,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // Create eml.xml
                 DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
                 await using var enlFileStream = archive.CreateEntry("eml.xml", CompressionLevel.Optimal).Open();
-
+               
                 await emlFile.SaveAsync(enlFileStream, SaveOptions.None, CancellationToken.None);
                 enlFileStream.Close();
             }

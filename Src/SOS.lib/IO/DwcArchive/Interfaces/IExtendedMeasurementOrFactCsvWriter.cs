@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
-using NReco.Csv;
 using SOS.Export.Models;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -41,8 +41,8 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <summary>
         /// Write Emof header row.
         /// </summary>
-        /// <param name="csvWriter"></param>
+        /// <param name="csvFileHelper"></param>
         /// <param name="isEventCore"></param>
-        void WriteHeaderRow(CsvWriter csvWriter, bool isEventCore = false);
+        void WriteHeaderRow(CsvFileHelper csvFileHelper, bool isEventCore = false);
     }
 }

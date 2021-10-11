@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
@@ -76,13 +74,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var processConfiguration = GetProcessConfiguration();
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var uris = new Uri[elasticConfiguration.Hosts.Length];
-            for (var i = 0; i < uris.Length; i++)
-            {
-                uris[i] = new Uri(elasticConfiguration.Hosts[i]);
-            }
-
-            var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -106,7 +98,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClient, processClient,
+                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(), 
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
                     new NullLogger<ProcessedObservationRepository>());

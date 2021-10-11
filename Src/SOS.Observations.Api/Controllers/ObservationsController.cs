@@ -261,6 +261,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Application identifier making the request, used to get proper authorization</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="skip">Start index of returned observations.</param>
@@ -288,6 +289,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ObservationsBySearch(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name= "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
@@ -308,7 +310,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
-                var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -326,6 +328,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Count the number of observations matching the provided search filter.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -337,6 +340,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Count(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
@@ -349,7 +353,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
-                var matchCount = await ObservationManager.GetMatchCountAsync(authorizationApplicationIdentifier, searchFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
             }
@@ -396,6 +400,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
@@ -409,6 +414,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridAggregation(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
@@ -433,7 +439,9 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
                
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoom);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier, searchFilter, zoom);
 
                 if (result.IsFailure)
                 {
@@ -548,6 +556,7 @@ namespace SOS.Observations.Api.Controllers
         /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
         /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
@@ -562,6 +571,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregation(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = null,
@@ -587,6 +597,7 @@ namespace SOS.Observations.Api.Controllers
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(
+                    roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,
                     skip, 
@@ -613,6 +624,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Gets a single observation.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
@@ -627,12 +639,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationById(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string occurrenceId, [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,  [FromQuery] string translationCultureCode = "sv-SE", [FromQuery] bool protectedObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
                     includeInternalFields: false);
 
                 if (observation == null)
@@ -658,6 +671,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="skip">Start index of returned observations.</param>
@@ -687,6 +701,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsBySearchInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto filter,
             [FromQuery] int skip = 0,
@@ -722,7 +737,7 @@ namespace SOS.Observations.Api.Controllers
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }
@@ -768,6 +783,7 @@ namespace SOS.Observations.Api.Controllers
         ///     Get observations matching the provided search filter. This endpoint allows to retrieve up to 100 000 observations by using Elasticsearch scroll API.
         ///     Timeout between calls are two minutes.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="scrollId">The scroll id to use to get next batch. In first request scrollId should be empty.</param>
@@ -796,6 +812,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> ObservationsScroll(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterDto filter,
             [FromQuery] string scrollId,
@@ -822,7 +839,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
-                var result = await ObservationManager.GetObservationsByScrollAsync(authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
+                var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
@@ -844,6 +861,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Count matching observations using internal filter
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -856,6 +874,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> CountInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
@@ -868,7 +887,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
-                var matchCount = await ObservationManager.GetMatchCountAsync(authorizationApplicationIdentifier, searchFilter);
+                var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
             }
@@ -886,6 +905,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Aggregate observations by the specified aggregation type.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="aggregationType">The aggregation type.</param>
@@ -902,6 +922,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SearchAggregatedInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] AggregationType aggregationType,
@@ -932,7 +953,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(Result.Failure("You have to limit the time span. Use date.startDate and date.endDate to limit your request"));
                 }
 
-                var result = await ObservationManager.GetAggregatedChunkAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
+                var result = await ObservationManager.GetAggregatedChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
             }
@@ -979,6 +1000,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
@@ -993,6 +1015,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
@@ -1017,7 +1040,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoom);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1040,6 +1063,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Aggregates observations into grid cells and returns them as a GeoJSON file.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
@@ -1054,6 +1078,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int zoom = 1,
@@ -1078,7 +1103,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetGeogridTileAggregationAsync(authorizationApplicationIdentifier, searchFilter, zoomOrError.Value);
+                var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoomOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1134,6 +1159,7 @@ namespace SOS.Observations.Api.Controllers
         /// | 20         | 0.000343 |           40m |                          15m |                       22m |
         /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
@@ -1148,6 +1174,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GeogridTaxaAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int zoom = 1,
@@ -1172,7 +1199,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, false);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
+                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1194,6 +1221,7 @@ namespace SOS.Observations.Api.Controllers
         /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
         /// You can only get the first 1000 taxa by using paging. To retrieve all records, set skip and take parameters to null.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
@@ -1209,6 +1237,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = null,
@@ -1233,7 +1262,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1258,6 +1287,7 @@ namespace SOS.Observations.Api.Controllers
         /// If protectedObservations is set to false, you must be aware of that the result can include false positives
         /// since the protected observations coordinates are generalized to a grid depending on the protection level.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
@@ -1270,6 +1300,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> TaxonExistsIndicationInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
@@ -1288,7 +1319,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
-                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(authorizationApplicationIdentifier, searchFilter);
+                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(taxonFound);
             }
@@ -1310,6 +1341,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Gets a single observation, including internal fields.
         /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
@@ -1325,6 +1357,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetObservationByIdInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string occurrenceId, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
@@ -1333,7 +1366,9 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
                     includeInternalFields: true);
                 if (observation == null)
                 {
@@ -1361,6 +1396,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> SignalSearchInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SignalFilterDto filter,
             [FromQuery] bool validateSearchFilter = false,
@@ -1376,7 +1412,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal();
-                var taxonFound = await ObservationManager.SignalSearchInternalAsync(authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
+                var taxonFound = await ObservationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
 
                 return new OkObjectResult(taxonFound);
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Elasticsearch.Net;
 using Nest;
@@ -11,6 +12,11 @@ namespace SOS.Lib.Configuration.Shared
     public class ElasticSearchConfiguration
     {
         private string _indexPrefix;
+
+        /// <summary>
+        /// Elastic clusters
+        /// </summary>
+        public IEnumerable<Cluster> Clusters { get; set; }
 
         /// <summary>
         /// Enable debug mode if true
@@ -26,11 +32,6 @@ namespace SOS.Lib.Configuration.Shared
         ///     How many items to write in a time
         /// </summary>
         public int WriteBatchSize { get; set; }
-
-        /// <summary>
-        ///     Host
-        /// </summary>
-        public string[] Hosts { get; set; }
 
         /// <summary>
         /// Max number of aggregation buckets.
@@ -83,32 +84,47 @@ namespace SOS.Lib.Configuration.Shared
 
        
         /// <summary>
-        /// Get client created with cuurent configuration
+        /// Get client created with current configuration
         /// </summary>
         /// <returns></returns>
-        public ElasticClient GetClient(bool debugMode = false)
+        public IElasticClient[] GetClients(bool debugMode = false)
         {
-            var uris = Hosts.Select(u => new Uri(u));
-
-            var connectionPool = new StaticConnectionPool(uris);
-            var settings = new ConnectionSettings(connectionPool);
-
-            if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+            var clients = new List<IElasticClient>();
+            foreach (var cluster in Clusters)
             {
-                settings.BasicAuthentication(UserName, Password);
-                settings.SniffOnStartup(false);
-                settings.SniffOnConnectionFault(false);
-                settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+                var uris = cluster.Hosts.Select(u => new Uri(u));
+
+                var connectionPool = new StaticConnectionPool(uris);
+                var settings = new ConnectionSettings(connectionPool);
+
+                if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+                {
+                    settings.BasicAuthentication(UserName, Password);
+                    settings.SniffOnStartup(false);
+                    settings.SniffOnConnectionFault(false);
+                    settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+                }
+
+                //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
+                if (DebugMode || debugMode)
+                {
+                    settings.DisableDirectStreaming().EnableDebugMode();
+                }
+                clients.Add(new ElasticClient(settings));
             }
 
-            //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
-            if (DebugMode || debugMode)
-            {
-                settings.DisableDirectStreaming().EnableDebugMode();
-            }
+            return clients.ToArray();
+        }
 
-            settings.RequestTimeout(TimeSpan.FromMinutes(2));
-            return new ElasticClient(settings);
+        /// <summary>
+        /// Cluster class
+        /// </summary>
+        public class Cluster
+        {
+            /// <summary>
+            ///     Host
+            /// </summary>
+            public string[] Hosts { get; set; }
         }
     }
 }

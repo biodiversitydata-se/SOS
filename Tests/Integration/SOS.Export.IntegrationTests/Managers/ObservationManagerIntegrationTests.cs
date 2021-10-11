@@ -20,6 +20,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
 using SOS.Lib.IO.GeoJson;
+using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
@@ -36,7 +37,7 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
-            var elasticClient = elasticConfiguration.GetClient(true);
+            var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
 
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -59,15 +60,13 @@ namespace SOS.Export.IntegrationTests.Managers
                 new NullLogger<DwcArchiveFileWriter>());
 
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClient,
+                elasticClientManager,
                 processClient,
                 elasticConfiguration,
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
-            
-
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<ExcelFileWriter>());
@@ -77,7 +76,7 @@ namespace SOS.Export.IntegrationTests.Managers
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
-                    .PrepareFilter(null, new SearchFilter(), "Sighting", 0, false, false, true)
+                    .PrepareFilter(0, null, new SearchFilter(), "Sighting", 0, false, false, true)
                 );
 
             var observationManager = new ObservationManager(

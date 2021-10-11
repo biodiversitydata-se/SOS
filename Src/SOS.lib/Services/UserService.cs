@@ -121,9 +121,9 @@ namespace SOS.Lib.Services
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
                     new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&localeId=175"));
 
-                return response.Success
+                return response?.Success ?? false
                     ? response.Result
-                    : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
+                    : throw new Exception(string.Concat(response?.Messages?.Select(m => m.Text) ?? Array.Empty<string>()));
             }
             catch (Exception e)
             {

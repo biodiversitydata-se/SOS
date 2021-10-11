@@ -15,7 +15,6 @@ import { DlDateTimeDateModule, DlDateTimePickerModule } from 'angular-bootstrap-
 import { AppComponent } from './app.component';
 import { ApplicationInsightsComponent } from './application-insights/application-insights.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { HomeComponent } from './home/home.component';
 import { InvalidObservationsComponent } from './invalid-observations/invalid-observations.component';
 import { InvalidGridComponent } from './invalid-grid/invalid-grid.component';
 import { StatusComponent } from './status/status.component';
@@ -41,7 +40,6 @@ export function tokenGetter() {
     AppComponent,
     ApplicationInsightsComponent,
     NavMenuComponent,
-    HomeComponent,
     InvalidObservationsComponent,
     InvalidGridComponent,
     StatusComponent,

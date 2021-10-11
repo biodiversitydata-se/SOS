@@ -8,12 +8,13 @@ namespace SOS.Lib.Jobs.Export
     /// </summary>
     public interface IExportToDoiJob
     {
-       /// <summary>
-       /// Make a Doi of an an export file
-       /// </summary>
-       /// <param name="fileName"></param>
-       /// <param name="cancellationToken"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Make a Doi of an an export file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [Queue("medium")]
         Task<bool> RunAsync(string fileName, IJobCancellationToken cancellationToken);
     }
 }

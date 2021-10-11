@@ -48,11 +48,13 @@ namespace SOS.Process.Processors.Mvm
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.MVM}",
                 DatasetName = "MVM",
+                DynamicProperties = string.IsNullOrEmpty(verbatim.ProductName) ? null : @"{""productName"": " + verbatim.ProductName + "}",
                 Event = new Event
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
                     StartDate = verbatim.Start.ToUniversalTime(),
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End),
+                    Habitat = verbatim.Habitat
                 },
                 Identification = new Identification
                 {
@@ -62,24 +64,29 @@ namespace SOS.Process.Processors.Mvm
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    LocationRemarks = verbatim.LocationRemarks
                 },
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence
                 {
-                    CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
-                    OccurrenceId = verbatim.OccurrenceId,
+                    CatalogNumber = string.IsNullOrEmpty(verbatim.CatalogNumber) ? GetCatalogNumber(verbatim.OccurrenceId) : verbatim.CatalogNumber,
+                    IndividualCount = verbatim.IndividualCount,
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
-                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
+                    IsPositiveObservation = verbatim.IsPositiveObservation,
+                    OccurrenceId = verbatim.OccurrenceId,
                     ProtectionLevel = CalculateProtectionLevel(taxon),
+                    OrganismQuantity = verbatim.Quantity,
+                    OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
-                    ReportedDate = verbatim.Start.ToUniversalTime(),
+                    ReportedDate = verbatim.ReportedDate.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
+                Projects = verbatim.ProjectID == 0? null : new []{ new Project{ Id = verbatim.ProjectID, Name = verbatim.ProjectName} },
                 Taxon = taxon
             };
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,

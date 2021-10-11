@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;

@@ -27,6 +27,8 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
@@ -130,7 +132,7 @@ namespace SOS.Hangfire.JobServer
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
                                     Prefix = "hangfire",
-                                    CheckConnection = true
+                                    CheckConnection = true,
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
@@ -138,7 +140,10 @@ namespace SOS.Hangfire.JobServer
                     GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
 
                     // Add the processing server as IHostedService
-                    services.AddHangfireServer();
+                    services.AddHangfireServer(options =>
+                    {
+                        options.Queues = new[] { "high", "medium", "low", "default" };
+                    });
 
                     // MongoDB conventions.
                     ConventionRegistry.Register(
@@ -168,11 +173,9 @@ namespace SOS.Hangfire.JobServer
                         .Get<ApplicationInsightsConfiguration>();
                     _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration))
                         .Get<SosApiConfiguration>();
-
-                    //setup the elastic search configuration
-                    var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
-                    services.AddSingleton<IElasticClient>(_searchDbConfiguration.GetClient());
+                    
                     services.AddSingleton(_searchDbConfiguration);
+                    services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
@@ -289,7 +292,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine(
                 $"[BlobStorage].[ConnectionString]: {_blobStorageConfiguration.ConnectionString}");
             sb.AppendLine(
-                $"[MongoDb].[Servers]: {string.Join(", ", _searchDbConfiguration.Hosts.Select(x => x))}");
+                $"[MongoDb].[Servers]: {string.Join(", ", _searchDbConfiguration.Clusters.Select(c => c.Hosts.Select(h => h)))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");
             sb.AppendLine($"[FileDestination].[Path]: {_exportConfiguration.FileDestination.Path}");
             sb.AppendLine($"[DwcaFilesCreation].[FolderPath]: {_exportConfiguration.DwcaFilesCreationConfiguration.FolderPath}");

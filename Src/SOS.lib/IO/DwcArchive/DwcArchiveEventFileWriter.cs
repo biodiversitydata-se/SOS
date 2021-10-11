@@ -121,7 +121,7 @@ namespace SOS.Lib.IO.DwcArchive
             // Create Event CSV file
             string eventCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Event];
             var dwcObservations = nonProcessedObservationEvents.ToDarwinCore();
-            await using StreamWriter eventFileStream = File.AppendText(eventCsvFilePath);
+            await using var eventFileStream = File.AppendText(eventCsvFilePath);
             await _dwcArchiveEventCsvWriter.WriteHeaderlessEventCsvFileAsync(
                 dwcObservations,
                 eventFileStream,
@@ -200,14 +200,18 @@ namespace SOS.Lib.IO.DwcArchive
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions().ToList();
             var eventCoreOccurrenceFieldDescriptions =
                 FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions().ToList();
-
+           
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
             var dwcExtensions = new List<DwcaEventFilePart>();
 
             // Create event.csv
             var eventFilePaths = GetFilePaths(dwcaFilePartsInfos, "event-event*");
             await using var eventFileStream = archive.CreateEntry("event.csv", CompressionLevel.Fastest).Open();
-            await WriteEventHeaderRow(eventFileStream);
+
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(eventFileStream, "\t");
+
+            await WriteEventHeaderRow(csvFileHelper);
             foreach (var filePath in eventFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
@@ -222,7 +226,7 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaEventFilePart.Occurrence);
                 await using var occurrenceFileStream = archive.CreateEntry("occurrence.csv", CompressionLevel.Fastest).Open();
-                await WriteEventOccurrenceHeaderRow(occurrenceFileStream);
+                WriteEventOccurrenceHeaderRow(occurrenceFileStream);
                 foreach (var filePath in occurrenceFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
@@ -238,7 +242,7 @@ namespace SOS.Lib.IO.DwcArchive
             {
                 dwcExtensions.Add(DwcaEventFilePart.Emof);
                 await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Fastest).Open();
-                await WriteEmofHeaderRow(extendedMeasurementOrFactFileStream, true);
+                WriteEmofHeaderRow(extendedMeasurementOrFactFileStream, true);
                 foreach (var filePath in emofFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
@@ -297,38 +301,39 @@ namespace SOS.Lib.IO.DwcArchive
             return filePaths;
         }
 
-        private async Task WriteEventHeaderRow(Stream compressedFileStream)
+        private async Task WriteEventHeaderRow(CsvFileHelper csvFileHelper)
         {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
+            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions());
-            await streamWriter.FlushAsync();
+            await csvFileHelper.FlushAsync();
         }
 
-        private async Task WriteEventOccurrenceHeaderRow(Stream compressedFileStream)
+        private void WriteEventOccurrenceHeaderRow(Stream compressedFileStream)
         {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(compressedFileStream, "\t");
+
+            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions());
-            await streamWriter.FlushAsync();
+            csvFileHelper.FinishWrite();
         }
 
-        private async Task WriteEmofHeaderRow(Stream compressedFileStream, bool isEventCore = false)
+        private void WriteEmofHeaderRow(Stream compressedFileStream, bool isEventCore = false)
         {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvWriter, isEventCore);
-            await streamWriter.FlushAsync();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(compressedFileStream, "\t");
+
+            _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvFileHelper, isEventCore);
+            csvFileHelper.FinishWrite();
         }
 
         private async Task WriteMultimediaHeaderRow(Stream compressedFileStream)
         {
-            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
-            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
-            _simpleMultimediaCsvWriter.WriteHeaderRow(csvWriter);
-            await streamWriter.FlushAsync();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(compressedFileStream, "\t");
+
+            _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
+            csvFileHelper.FinishWrite();
         }
     }
 }

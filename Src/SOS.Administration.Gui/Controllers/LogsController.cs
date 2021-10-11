@@ -64,13 +64,13 @@ namespace SOS.Administration.Gui.Controllers
     public class LogsController : ControllerBase
     {
 
-        private readonly ElasticClient _elasticClient;
+        private readonly IElasticClient _elasticClient;
         private readonly string _indexName = "logs-*";
 
 
         public LogsController(ElasticSearchConfiguration elasticConfiguration)
         {          
-            _elasticClient = elasticConfiguration.GetClient();
+            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
         }
      
         [HttpGet]

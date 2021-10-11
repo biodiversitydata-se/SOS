@@ -163,13 +163,13 @@ namespace SOS.Lib.Extensions
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
-                //    query.AddWildcardCriteria("occurrence.associatedMedia", "http*");
+                //    query.TryAddWildcardCriteria("occurrence.associatedMedia", "http*");
             }
 
             if (internalFilter.OnlyWithNotes)
             {
                 query.AddMustExistsCriteria("occurrence.occurrenceRemarks");
-                //  query.AddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
+                //  query.TryAddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
             }
 
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
@@ -228,7 +228,7 @@ namespace SOS.Lib.Extensions
             if (internalFilter.OnlyWithBarcode)
             {
                 query.AddMustExistsCriteria("taxon.individualId");
-                // query.AddWildcardCriteria("taxon.individualId", "?*");
+                // query.TryAddWildcardCriteria("taxon.individualId", "?*");
             }
 
             switch (internalFilter.UnspontaneousFilter)
@@ -247,9 +247,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
             query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
             query.TryAddTermCriteria("event.biotope.id", internalFilter.BiotopeId);
-           
-
-
+            
             switch (internalFilter.NotPresentFilter)
             {
                 case SightingNotPresentFilter.DontIncludeNotPresent:
@@ -262,7 +260,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlySecondHandInformation)
             {
-                query.AddWildcardCriteria("occurrence.recordedBy", "Via*");
+                query.TryAddWildcardCriteria("occurrence.recordedBy", "Via*");
                 query.AddScript("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value");
             }
 
@@ -349,6 +347,8 @@ namespace SOS.Lib.Extensions
             }
 
             query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
+
+            query.TryAddWildcardCriteria("location.locality", internalFilter.Location.NameFilter);
         }
 
         /// <summary>
@@ -507,20 +507,6 @@ namespace SOS.Lib.Extensions
                     .Should(sightingTypeQuery)
                 )
             );
-        }
-
-        /// <summary>
-        /// Add wildcard criteria
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        /// <param name="wildcard"></param>
-        private static void AddWildcardCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, string wildcard)
-        {
-            query.Add(q => q
-                .Wildcard(w => w
-                    .Field(field)
-                    .Value(wildcard)));
         }
 
         /// <summary>
@@ -1015,6 +1001,27 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add wildcard criteria
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
+        /// <param name="wildcard"></param>
+        private static void TryAddWildcardCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, string wildcard)
+        {
+            if (string.IsNullOrEmpty(wildcard))
+            {
+                return;
+            }
+
+            query.Add(q => q
+                .Wildcard(w => w
+                    .Field(field)
+                    .Value(wildcard)
+                )
+            );
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="aggregationType"></param>
@@ -1130,8 +1137,8 @@ namespace SOS.Lib.Extensions
 
             query.TryAddDeterminationFilters(filter);
             query.TryAddTimeRangeFilters(filter);
-            query.TryAddGeographicFilter(filter.AreaGeographic);
-            query.TryAddGeometryFilters(filter.Geometries);
+            query.TryAddGeographicFilter(filter.Location?.AreaGeographic);
+            query.TryAddGeometryFilters(filter.Location?.Geometries);
             query.TryAddNotRecoveredFilter(filter);
             query.AddSightingTypeFilters(filter);
             query.TryAddValidationStatusFilter(filter);
@@ -1144,7 +1151,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.Taxa?.RedListCategories?.Select(m => m.ToLower()));
             query.TryAddTermsCriteria("taxon.id", filter.Taxa?.Ids);
             query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);
-            query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
+            query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.Location?.MaxAccuracy, RangeTypes.LessThanOrEquals);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals);
 
             if (filter is SearchFilterInternal)
@@ -1164,15 +1171,15 @@ namespace SOS.Lib.Extensions
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            if (filter.AreaGeographic?.GeometryFilter?.IsValid ?? false)
+            if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
             {
-                foreach (var geom in filter.AreaGeographic?.GeometryFilter.Geometries)
+                foreach (var geom in filter.Location.AreaGeographic?.GeometryFilter.Geometries)
                 {
                     switch (geom.Type.ToLower())
                     {
                         case "holepolygon":
-                            query.AddGeoShapeCriteria($"location.{(filter.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
-                            if (!filter.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
+                            query.AddGeoShapeCriteria($"location.{(filter.Location.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
+                            if (!filter.Location.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
                             {
                                 continue;
                             }

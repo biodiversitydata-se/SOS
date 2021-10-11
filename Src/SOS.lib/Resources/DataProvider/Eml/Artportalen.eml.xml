@@ -5,6 +5,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:sos="https://sos-search.artdata.slu.se/"
     xmlns:gbif="http://gbif.org/"
+    xmlns:snd="https://snd.gu.se/"
     xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
     packageId="38b4c89f-584c-41bb-bd8f-cd1def33e92f" system="https://sos-search.artdata.slu.se/"
     scope="system" xml:lang="en">
@@ -170,3 +171,4 @@
     </additionalMetadata>
   </dataset>
 </eml:eml>
+

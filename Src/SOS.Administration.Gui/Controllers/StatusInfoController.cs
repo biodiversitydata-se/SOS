@@ -19,7 +19,7 @@ namespace SOS.Administration.Gui.Controllers
     {       
         private readonly ILogger<StatusInfoController> _logger;
         private MongoClient _mongoClient;
-        private ElasticClient _elasticClient;
+        private IElasticClient _elasticClient;
         private string _mongoSuffix = "";
         private MongoDbConfiguration _mongoConfiguration;
 
@@ -32,8 +32,7 @@ namespace SOS.Administration.Gui.Controllers
             {
                 _mongoSuffix = "-st";
             }
-            _elasticClient = elasticConfiguration.GetClient();
-
+            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
         }
 
         [HttpGet]

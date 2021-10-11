@@ -31,25 +31,38 @@ namespace SOS.Lib.Managers
         }
 
         /// <summary>
-        /// Add extended authorization if any
+        ///  Add extended authorization if any
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="authorityIdentity"></param>
         /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<IEnumerable<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(UserModel user, int roleId, string authorizationApplicationIdentifier, string authorityIdentity,  int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
             if (user == null)
             {
                 return null;
             }
-            
-            // Get user authorities
-            var authorities = (await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
 
+            IEnumerable<AuthorityModel> authorities = null;
+
+            if (roleId != 0)
+            {
+                var userRoles = await _userService.GetUserRolesAsync(user.Id, authorizationApplicationIdentifier);
+                
+                var role = userRoles?.Where(r => r.Id.Equals(roleId))?.FirstOrDefault();
+                authorities = role?.Authorities;
+            }
+            else
+            {
+                // Get user authorities
+                authorities = (await _userService.GetUserAuthoritiesAsync(user.Id, authorizationApplicationIdentifier))?.Where(a => a.AuthorityIdentity.Equals(authorityIdentity));
+            }
+            
             if (authorities == null)
             {
                 return null;
@@ -59,8 +72,8 @@ namespace SOS.Lib.Managers
 
             foreach (var authority in authorities)
             {
-                // area are mandatory to get extended authorization
-                if (!authority?.Areas?.Any() ?? true)
+                // Max protection level must be greater than or equal to 3
+                if (authority.MaxProtectionLevel < 3)
                 {
                     continue;
                 }
@@ -70,37 +83,27 @@ namespace SOS.Lib.Managers
                     Identity = authority.AuthorityIdentity,
                     MaxProtectionLevel = authority.MaxProtectionLevel
                 };
-                var areaFilters = new List<AreaFilter>();
 
-                var authorizedToSweden = false;
-
-                foreach (var area in authority.Areas)
+                if (authority.Areas?.Any() ?? false)
                 {
-                    // 100 = sweden, no meaning to add since all processed observations are in sweden
-                    if (area.AreaTypeId == 18 && area.FeatureId == "100")
+                    var areaFilters = new List<AreaFilter>();
+                    
+                    foreach (var area in authority.Areas)
                     {
-                        authorizedToSweden = true;
-                        continue;
+                        // 100 = sweden, no meaning to add since all processed observations are in sweden
+                        if (area.AreaTypeId == 18 && area.FeatureId == "100")
+                        {
+                            continue;
+                        }
+
+                        areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                     }
-
-                    areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
+                    extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                 }
-                extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null)?.ToList();
-
-                // To get extended authorization, taxon id's and some area must be set 
-                if (
-                        authorizedToSweden ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.BirdValidationAreaIds?.Any() ?? false) ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.CountyIds?.Any() ?? false) ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.GeometryFilter?.Geometries?.Any() ?? false) ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.MunicipalityIds?.Any() ?? false) ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.ParishIds?.Any() ?? false) ||
-                        (extendedAuthorizationAreaFilter.GeographicAreas?.ProvinceIds?.Any() ?? false)
-                )
-                {
-                    extendedAuthorizationAreaFilters.Add(extendedAuthorizationAreaFilter);
-                }
+                
+                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
+                
+                extendedAuthorizationAreaFilters.Add(extendedAuthorizationAreaFilter);
             }
 
             return extendedAuthorizationAreaFilters;
@@ -291,7 +294,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilter(int? roleId, string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -299,7 +302,7 @@ namespace SOS.Lib.Managers
 
             if (filter.ExtendedAuthorization.ProtectedObservations)
             {
-                filter.ExtendedAuthorization.ExtendedAreas = (await GetExtendedAuthorizationAreas(user, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false))?.ToList();
+                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)
@@ -321,13 +324,17 @@ namespace SOS.Lib.Managers
                     }
                 }
             }
-            
+
             if (setDefaultProviders.HasValue && setDefaultProviders.Value)
             {
                 filter.DataProviderIds = (await GetDefaultDataProvidersIfEmptyAsync(filter.DataProviderIds))?.ToList();
             }
-           
-            filter.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Areas, areaBuffer ?? 0, filter.Geometries?.UsePointAccuracy ?? false, filter.Geometries?.UseDisturbanceRadius ?? false);
+
+            if (filter.Location?.Areas != null)
+            {
+                filter.Location.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Location.Areas, areaBuffer ?? 0, filter.Location.Geometries?.UsePointAccuracy ?? false, filter.Location.Geometries?.UseDisturbanceRadius ?? false);
+            }
+            
             PopulateTaxonFilter(filter.Taxa);
         }
     }

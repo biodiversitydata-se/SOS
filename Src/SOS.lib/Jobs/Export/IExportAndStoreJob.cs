@@ -17,6 +17,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter, string blobStorageContainer, string fileName,
             IJobCancellationToken cancellationToken);
     }
