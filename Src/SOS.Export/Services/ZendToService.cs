@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 
 namespace SOS.Export.Services
@@ -27,7 +26,7 @@ namespace SOS.Export.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> SendFile(string emailAddress, string description, string filePath)
+        public async Task<bool> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat)
         {
             using var form = new MultipartFormDataContent();
             //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
@@ -67,7 +66,7 @@ namespace SOS.Export.Services
             await using var fileStream = File.OpenRead(filePath);
             using var fileContent = new StreamContent(File.OpenRead(filePath));
             fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
-            string fileName = GetFilename(fileCreationDate);
+            string fileName = GetFilename(exportFormat, fileCreationDate);
             form.Add(fileContent, "file_1", fileName);
             
             // Post form to ZendTo
@@ -86,9 +85,9 @@ namespace SOS.Export.Services
             return str;
         }
 
-        private string GetFilename(DateTime fileCreationDate)
+        private string GetFilename(ExportFormat exportFormat, DateTime fileCreationDate)
         {
-            return FilenameHelper.CreateFilenameWithDate("records-dwca", "zip", fileCreationDate);
+            return FilenameHelper.CreateFilenameWithDate($"records-{exportFormat}", "zip", fileCreationDate);
         }
     }
 }
