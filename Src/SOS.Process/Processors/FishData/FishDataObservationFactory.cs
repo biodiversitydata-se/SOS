@@ -41,10 +41,10 @@ namespace SOS.Process.Processors.FishData
         public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
-
+            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
             var obs = new Observation
             {
-                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
+                AccessRights = accessRights,
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
@@ -75,7 +75,7 @@ namespace SOS.Process.Processors.FishData
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
