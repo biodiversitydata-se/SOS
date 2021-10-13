@@ -46,6 +46,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);
+            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var defects = new Dictionary<string, string>();
             DateTime? dateCollected = null;
@@ -60,7 +61,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
             var obs = new Observation
             {
-                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
+                AccessRights = accessRights,
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
@@ -91,7 +92,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
