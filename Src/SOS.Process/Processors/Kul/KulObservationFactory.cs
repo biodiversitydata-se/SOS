@@ -40,10 +40,11 @@ namespace SOS.Process.Processors.Kul
         public Observation CreateProcessedObservation(KulObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var obs = new Observation
             {
-                AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage },
+                AccessRights = accessRights,
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.KUL}",
@@ -74,7 +75,7 @@ namespace SOS.Process.Processors.Kul
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
