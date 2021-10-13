@@ -6,6 +6,7 @@ using Elasticsearch.Net;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -103,6 +104,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             SearchFilter filter,
             int zoom);
+
+        /// <summary>
+        /// Get a data quality report
+        /// </summary>
+        /// <returns></returns>
+        Task<DataQualityReport> GetDataQualityReportAsync();
 
         /// <summary>
         /// 
