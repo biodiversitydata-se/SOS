@@ -19,6 +19,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Lib.Models.Processed.Configuration;
@@ -26,6 +27,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Lib.Repositories.Processed
@@ -870,6 +872,104 @@ namespace SOS.Lib.Repositories.Processed
                     }).ToList()));
 
             return Result.Success(georesult);
+        }
+
+        /// <inheritdoc />
+        public async Task<DataQualityReport> GetDataQualityReportAsync()
+        {
+            var index = PublicIndexName;
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(index)
+                .Aggregations(a => a
+                    .Terms("uniqueKeyCount", f => f
+                        .Field("dataQuality.uniqueKey")
+                        .MinimumDocumentCount(2)
+                        .Size(65536)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            var duplicates = searchResponse
+                .Aggregations
+                .Terms("uniqueKeyCount")
+                .Buckets?
+                .Select(b =>
+                    new
+                    {
+                        UniqueKey = b.Key,
+                        b.DocCount
+                    }).ToArray();
+
+            var report = new DataQualityReport();
+            var rowCount = 0;
+
+            foreach (var duplicate in duplicates)
+            {
+                searchResponse = await Client.SearchAsync<dynamic>(s => s
+                    .Index(index)
+                    .Size(10000)
+                    .Source(s => s.Includes(i => i
+                        .Field("dataProviderId")
+                        .Field("occurrence.occurrenceId")
+                        .Field("location.locality")
+                        .Field("event.startDate")
+                        .Field("event.endDate")
+                        .Field("taxon.id")
+                        .Field("taxon.scientificName")
+                    ))
+                    .Query(q => q
+                        .Bool(b => b
+                            .Filter(f => f.Term(t => t
+                                .Field("dataQuality.uniqueKey")
+                                .Value(duplicate.UniqueKey)))
+                        )
+                    )
+                    .Sort(sort => sort.Field(f => f.Field("dataProviderId")))
+                );
+
+                if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                var docCount = searchResponse.Documents.Count;
+                if (docCount == 0)
+                {
+                    continue;
+                }
+
+                if (rowCount + docCount > 2000)
+                {
+                    break;
+                }
+                
+                var firstDocument = searchResponse.Documents.Cast<IDictionary<string, dynamic>>().First();
+                var locality = string.Empty;
+                if (firstDocument.TryGetValue(nameof(Observation.Location).ToLower(), out var locationDictionary))
+                {
+                    locality = (string) locationDictionary["locality"];
+                }
+
+                var record = new DataQualityReportRecord
+                {
+                    EndDate = firstDocument["event"]["endDate"],
+                    Locality = locality,
+                    Observations = searchResponse.Documents.Select(d => new DataQualityReportObservation
+                    {
+                        DataProviderId = d["dataProviderId"].ToString(),
+                        OccurrenceId = d["occurrence"]["occurrenceId"],
+                    }),
+                    StartDate = firstDocument["event"]["startDate"],
+                    TaxonId = firstDocument["taxon"]["id"].ToString(),
+                    TaxonScientificName = firstDocument["taxon"]["scientificName"],
+                    UniqueKey = duplicate.UniqueKey
+                };
+
+                report.Records.Add(record);
+                rowCount += docCount;
+            }
+
+            return report;
         }
 
         /// <inheritdoc />
