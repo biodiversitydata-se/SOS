@@ -81,6 +81,12 @@ namespace SOS.Lib.Helpers
                         field.DataTypeEnum = PropertyFieldDataType.String;
                         break;
                 }
+
+                // string data type is always nullable.
+                if (field.DataTypeEnum == PropertyFieldDataType.String)
+                {
+                    field.DataTypeNullable = true;
+                }
             }
         }
 
@@ -131,21 +137,42 @@ namespace SOS.Lib.Helpers
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
                     fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
+                    field.FieldSets = new List<OutputFieldSet>
+                    {
+                        OutputFieldSet.Minimum, OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues,
+                        OutputFieldSet.All
+                    };
+                    field.FieldSetEnum = OutputFieldSet.Minimum;
                 }
                 else if (field.FieldSet == "Extended")
                 {
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
                     fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
+                    field.FieldSets = new List<OutputFieldSet>
+                    {
+                        OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                    };
+                    field.FieldSetEnum = OutputFieldSet.Extended;
                 }
                 else if (field.FieldSet == "AllWithKnownValues")
                 {
                     fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
+                    field.FieldSets = new List<OutputFieldSet>
+                    {
+                        OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                    };
+                    field.FieldSetEnum = OutputFieldSet.AllWithKnownValues;
                 }
                 else if (field.FieldSet == "All")
                 {
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
+                    field.FieldSets = new List<OutputFieldSet>
+                    {
+                        OutputFieldSet.All
+                    };
+                    field.FieldSetEnum = OutputFieldSet.All;
                 }
             }
 

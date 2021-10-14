@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -61,6 +62,68 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting projects");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get all observation properties.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ObservationProperties")]
+        [ProducesResponseType(typeof(IEnumerable<PropertyFieldDescriptionDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetObservationProperties()
+        {
+            try
+            {
+                var fieldDescriptions = ObservationPropertyFieldDescriptionHelper.AllFields
+                    .Where(m => m.FieldSets is { Count: > 0 }).ToList();
+                
+                if (!fieldDescriptions?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                var dtos = fieldDescriptions.ToPropertyFieldDescriptionDtos();
+
+                return new OkObjectResult(dtos);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting observation properties metadata.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get observation properties that is part of a specific field set.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ObservationProperties/{fieldSet}")]
+        [ProducesResponseType(typeof(IEnumerable<PropertyFieldDescriptionDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetObservationPropertiesByFieldSet([FromRoute] OutputFieldSet fieldSet)
+        {
+            try
+            {
+                var fieldDescriptions = ObservationPropertyFieldDescriptionHelper.AllFields
+                    .Where(m => m.FieldSets is { Count: > 0 } && m.FieldSets.Contains(fieldSet)).ToList();
+
+                if (!fieldDescriptions?.Any() ?? true)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                var dtos = fieldDescriptions.ToPropertyFieldDescriptionDtos();
+
+                return new OkObjectResult(dtos);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting observation properties metadata.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

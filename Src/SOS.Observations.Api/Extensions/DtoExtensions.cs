@@ -3,6 +3,7 @@ using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -583,6 +584,33 @@ namespace SOS.Observations.Api.Extensions
                 Point = location.Point,
                 PointWithBuffer = location.PointWithBuffer,
                 PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer
+            };
+        }
+
+        public static List<PropertyFieldDescriptionDto> ToPropertyFieldDescriptionDtos(this IEnumerable<PropertyFieldDescription> fieldDescriptions)
+        {
+            return fieldDescriptions.Select(fieldDescription => fieldDescription.ToPropertyFieldDescriptionDto()).ToList();
+        }
+
+        public static PropertyFieldDescriptionDto ToPropertyFieldDescriptionDto(this PropertyFieldDescription fieldDescription)
+        {
+            if (fieldDescription == null)
+            {
+                return null;
+            }
+
+            return new PropertyFieldDescriptionDto
+            {
+                PropertyPath = fieldDescription.PropertyPath,
+                DataType = fieldDescription.DataTypeEnum,
+                DataTypeNullable = fieldDescription.DataTypeNullable.GetValueOrDefault(false),
+                DwcIdentifier = fieldDescription.DwcIdentifier,
+                DwcName = fieldDescription.DwcName,
+                EnglishTitle = fieldDescription.GetEnglishTitle(),
+                SwedishTitle = fieldDescription.GetSwedishTitle(),
+                Name = fieldDescription.Name,
+                FieldSet = fieldDescription.FieldSetEnum,
+                PartOfFieldSets = fieldDescription.FieldSets
             };
         }
     }

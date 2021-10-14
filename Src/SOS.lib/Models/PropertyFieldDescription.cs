@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models
 {
@@ -29,6 +30,10 @@ namespace SOS.Lib.Models
         public bool? IsPartOfFlatObservation { get; set; }
         public string DependsOn { get; set; }
         public string FieldSet { get; set; }
+        [JsonIgnore]
+        public OutputFieldSet FieldSetEnum { get; set; }
+        [JsonIgnore]
+        public List<OutputFieldSet> FieldSets { get; set; }
         public string Comment { get; set; }
         public PropertyFieldDataType DataTypeEnum { get; set; }
         public string GetSwedishTitle()
