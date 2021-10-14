@@ -875,13 +875,20 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<DataQualityReport> GetDataQualityReportAsync()
+        public async Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup)
         {
             var index = PublicIndexName;
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Size(0)
                 .Index(index)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(f => f.Term(t => t
+                            .Field("taxon.attributes.organismGroup")
+                            .Value(organismGroup?.ToLower())))
+                    )
+                )
                 .Aggregations(a => a
                     .Terms("uniqueKeyCount", f => f
                         .Field("dataQuality.uniqueKey")
@@ -905,68 +912,72 @@ namespace SOS.Lib.Repositories.Processed
                     }).ToArray();
 
             var report = new DataQualityReport();
-            var rowCount = 0;
 
-            foreach (var duplicate in duplicates)
+            if (duplicates?.Any() ?? false)
             {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(index)
-                    .Size(10000)
-                    .Source(s => s.Includes(i => i
-                        .Field("dataProviderId")
-                        .Field("occurrence.occurrenceId")
-                        .Field("location.locality")
-                        .Field("event.startDate")
-                        .Field("event.endDate")
-                        .Field("taxon.id")
-                        .Field("taxon.scientificName")
-                    ))
-                    .Query(q => q
-                        .Bool(b => b
-                            .Filter(f => f.Term(t => t
-                                .Field("dataQuality.uniqueKey")
-                                .Value(duplicate.UniqueKey)))
+                var rowCount = 0;
+
+                foreach (var duplicate in duplicates)
+                {
+                    searchResponse = await Client.SearchAsync<dynamic>(s => s
+                        .Index(index)
+                        .Size(10000)
+                        .Source(s => s.Includes(i => i
+                            .Field("dataProviderId")
+                            .Field("occurrence.occurrenceId")
+                            .Field("location.locality")
+                            .Field("event.startDate")
+                            .Field("event.endDate")
+                            .Field("taxon.id")
+                            .Field("taxon.scientificName")
+                        ))
+                        .Query(q => q
+                            .Bool(b => b
+                                .Filter(f => f.Term(t => t
+                                    .Field("dataQuality.uniqueKey")
+                                    .Value(duplicate.UniqueKey)))
+                            )
                         )
-                    )
-                    .Sort(sort => sort.Field(f => f.Field("dataProviderId")))
-                );
+                        .Sort(sort => sort.Field(f => f.Field("dataProviderId")))
+                    );
 
-                if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-                var docCount = searchResponse.Documents.Count;
-                if (docCount == 0)
-                {
-                    continue;
-                }
-
-                if (rowCount + docCount > 2000)
-                {
-                    break;
-                }
-                
-                var firstDocument = searchResponse.Documents.Cast<IDictionary<string, dynamic>>().First();
-                var locality = string.Empty;
-                if (firstDocument.TryGetValue(nameof(Observation.Location).ToLower(), out var locationDictionary))
-                {
-                    locality = (string) locationDictionary["locality"];
-                }
-
-                var record = new DataQualityReportRecord
-                {
-                    EndDate = firstDocument["event"]["endDate"],
-                    Locality = locality,
-                    Observations = searchResponse.Documents.Select(d => new DataQualityReportObservation
+                    if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                    var docCount = searchResponse.Documents.Count;
+                    if (docCount == 0)
                     {
-                        DataProviderId = d["dataProviderId"].ToString(),
-                        OccurrenceId = d["occurrence"]["occurrenceId"],
-                    }),
-                    StartDate = firstDocument["event"]["startDate"],
-                    TaxonId = firstDocument["taxon"]["id"].ToString(),
-                    TaxonScientificName = firstDocument["taxon"]["scientificName"],
-                    UniqueKey = duplicate.UniqueKey
-                };
+                        continue;
+                    }
 
-                report.Records.Add(record);
-                rowCount += docCount;
+                    if (rowCount + docCount > 2000)
+                    {
+                        break;
+                    }
+
+                    var firstDocument = searchResponse.Documents.Cast<IDictionary<string, dynamic>>().First();
+                    var locality = string.Empty;
+                    if (firstDocument.TryGetValue(nameof(Observation.Location).ToLower(), out var locationDictionary))
+                    {
+                        locality = (string)locationDictionary["locality"];
+                    }
+
+                    var record = new DataQualityReportRecord
+                    {
+                        EndDate = firstDocument["event"]["endDate"],
+                        Locality = locality,
+                        Observations = searchResponse.Documents.Select(d => new DataQualityReportObservation
+                        {
+                            DataProviderId = d["dataProviderId"].ToString(),
+                            OccurrenceId = d["occurrence"]["occurrenceId"],
+                        }),
+                        StartDate = firstDocument["event"]["startDate"],
+                        TaxonId = firstDocument["taxon"]["id"].ToString(),
+                        TaxonScientificName = firstDocument["taxon"]["scientificName"],
+                        UniqueKey = duplicate.UniqueKey
+                    };
+
+                    report.Records.Add(record);
+                    rowCount += docCount;
+                }
             }
 
             return report;

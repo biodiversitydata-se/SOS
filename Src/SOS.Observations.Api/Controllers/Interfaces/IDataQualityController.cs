@@ -9,9 +9,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IDataQualityController
     {
         /// <summary>
-        ///     Data quality report.
+        /// Data quality report.
         /// </summary>
+        /// <param name="organismGroup"></param>
         /// <returns>List of observations that can be duplicates</returns>
-        Task<IActionResult> GetReport();
+        Task<IActionResult> GetReport(string organismGroup);
     }
 }
