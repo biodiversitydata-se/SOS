@@ -24,9 +24,9 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task<DataQualityReport> GetReportAsync()
+        public async Task<DataQualityReport> GetReportAsync(string organismGroup)
         {
-            return await _processedObservationRepository.GetDataQualityReportAsync();
+            return await _processedObservationRepository.GetDataQualityReportAsync(organismGroup);
         }
     }
 }
