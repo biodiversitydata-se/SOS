@@ -29,14 +29,17 @@ namespace SOS.Lib.Enums
         /// Minimum of properties exported
         /// </summary>
         Minimum,
+
         /// <summary>
         /// A extended set of properties exported
         /// </summary>
         Extended,
+
         /// <summary>
         /// All properties where we know there exist at least one observation with a value.
         /// </summary>
         AllWithKnownValues,
+
         /// <summary>
         /// All properties exported
         /// </summary>
