@@ -33,14 +33,14 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("report")]
+        [HttpGet("report/{organismGroup}")]
         [ProducesResponseType(typeof(DataQualityReport), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetReport()
+        public async Task<IActionResult> GetReport([FromRoute]string organismGroup)
         {
             try
             {
-                return new OkObjectResult(await _dataQualityManager.GetReportAsync());
+                return new OkObjectResult(await _dataQualityManager.GetReportAsync(organismGroup));
             }
             catch (Exception e)
             {
