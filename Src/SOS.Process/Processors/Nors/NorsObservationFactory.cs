@@ -40,6 +40,7 @@ namespace SOS.Process.Processors.Nors
         public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var obs = new Observation
             {
@@ -74,7 +75,7 @@ namespace SOS.Process.Processors.Nors
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)

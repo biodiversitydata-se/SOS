@@ -40,6 +40,7 @@ namespace SOS.Process.Processors.Mvm
         public Observation CreateProcessedObservation(MvmObservationVerbatim verbatim)
         {
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var obs = new Observation
             {
@@ -73,7 +74,7 @@ namespace SOS.Process.Processors.Mvm
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
