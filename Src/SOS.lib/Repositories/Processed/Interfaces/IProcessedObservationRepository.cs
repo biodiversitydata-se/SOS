@@ -106,10 +106,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int zoom);
 
         /// <summary>
-        /// Get a data quality report
+        /// Get a data quality report for passed organism group
         /// </summary>
+        /// <param name="organismGroup"></param>
         /// <returns></returns>
-        Task<DataQualityReport> GetDataQualityReportAsync();
+        Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
         /// <summary>
         /// 
