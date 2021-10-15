@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
@@ -11,6 +12,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// </summary>
     public interface IObservationsController
     {
+        Task<IActionResult> BasicCountAsync(
+            int taxonId,
+            bool includeUnderlyingTaxa,
+            int? fromYear,
+            int? toYear,
+            AreaTypeDto areaType,
+            string featureId);
+
         Task<IActionResult> Count(
             int? roleId,
             string authorizationApplicationIdentifier,

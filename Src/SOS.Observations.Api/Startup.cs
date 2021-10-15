@@ -29,7 +29,6 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Lib.Cache;
@@ -128,6 +127,7 @@ namespace SOS.Observations.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+            services.AddResponseCaching();
 
             services.AddControllers()
                 .AddXmlSerializerFormatters()
@@ -486,6 +486,21 @@ namespace SOS.Observations.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseResponseCaching();
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl =
+                    new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+                    {
+                        Public = true,
+                        MaxAge = TimeSpan.FromSeconds(60)
+                    };
+                context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+                    new string[] { "Accept-Encoding" };
+
+                await next();
+            });
 
             app.UseEndpoints(endpoints =>
             {

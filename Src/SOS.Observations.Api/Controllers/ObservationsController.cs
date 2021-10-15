@@ -20,6 +20,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -254,6 +255,60 @@ namespace SOS.Observations.Api.Controllers
             _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Count the number of observations matching the provided search parameters.
+        /// </summary>
+        /// <param name="taxonId">Count observations for this taxon</param>
+        /// <param name="includeUnderlyingTaxa">Include under laying taxa if any</param>
+        /// <param name="fromYear">Count from start year</param>
+        /// <param name="toYear">Count to end year</param>
+        /// <param name="areaType">Type of area to search in</param>
+        /// <param name="featureId">Id of feature in above area type</param>
+        /// <returns></returns>
+        [HttpGet("Count")]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ResponseCache(Duration = 240, VaryByQueryKeys = new[] { "*" })]
+        public async Task<IActionResult> BasicCountAsync(
+            [FromQuery] int taxonId,
+            [FromQuery] bool includeUnderlyingTaxa = false,
+            [FromQuery] int? fromYear = null,
+            [FromQuery] int? toYear = null,
+            [FromQuery] AreaTypeDto areaType = default,
+            [FromQuery] string featureId = null)
+        {
+            try
+            {
+                var filter = new SearchFilterBaseDto
+                {
+                    Date = fromYear.HasValue || toYear.HasValue ? new DateFilterDto
+                    {
+                        StartDate = fromYear.HasValue ? new DateTime(fromYear.Value, 1, 1) : null,
+                        EndDate = toYear.HasValue ? new DateTime(toYear.Value, 12, 31) : null,
+                        DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+                    } : null,
+                    Geographics = string.IsNullOrEmpty(featureId) ? null :
+                        new GeographicsFilterDto
+                        {
+                            Areas = new[] { new AreaFilterDto { AreaType = areaType, FeatureId = featureId } }
+                        },
+                    Taxon = new TaxonFilterDto
+                    {
+                        Ids = new[] { taxonId },
+                        IncludeUnderlyingTaxa = includeUnderlyingTaxa
+                    }
+                };
+                return await Count(null, filter, true, false);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Basic count error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
