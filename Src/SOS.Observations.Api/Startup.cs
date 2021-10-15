@@ -29,6 +29,7 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Lib.Cache;

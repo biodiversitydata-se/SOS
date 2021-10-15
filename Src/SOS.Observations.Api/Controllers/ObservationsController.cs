@@ -273,12 +273,12 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ResponseCache(Duration = 240, VaryByQueryKeys = new[] { "*" })]
-        public async Task<IActionResult> BasicCountAsync(
+        public async Task<IActionResult> BasicCount(
             [FromQuery] int taxonId,
             [FromQuery] bool includeUnderlyingTaxa = false,
             [FromQuery] int? fromYear = null,
             [FromQuery] int? toYear = null,
-            [FromQuery] AreaTypeDto areaType = default,
+            [FromQuery] AreaTypeDto? areaType = null,
             [FromQuery] string featureId = null)
         {
             try
@@ -291,10 +291,10 @@ namespace SOS.Observations.Api.Controllers
                         EndDate = toYear.HasValue ? new DateTime(toYear.Value, 12, 31) : null,
                         DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
                     } : null,
-                    Geographics = string.IsNullOrEmpty(featureId) ? null :
+                    Geographics = string.IsNullOrEmpty(featureId) || areaType == null ? null :
                         new GeographicsFilterDto
                         {
-                            Areas = new[] { new AreaFilterDto { AreaType = areaType, FeatureId = featureId } }
+                            Areas = new[] { new AreaFilterDto { AreaType = areaType.Value, FeatureId = featureId } }
                         },
                     Taxon = new TaxonFilterDto
                     {
@@ -302,7 +302,7 @@ namespace SOS.Observations.Api.Controllers
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     }
                 };
-                return await Count(null, filter, true, false);
+                return await Count(null, null, filter);
             }
             catch (Exception e)
             {
