@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -54,33 +53,17 @@ namespace SOS.Import.Services
         private readonly iNaturalistServiceConfiguration _iNaturalistServiceConfiguration;
         private readonly ILogger<iNaturalistObservationService> _logger;
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="speciesObservationChangeServiceClient"></param>
-        /// <param name="iNaturalistServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public iNaturalistObservationService(
-            IHttpClientService httpClientService,
-            iNaturalistServiceConfiguration iNaturalistServiceConfiguration,
-            ILogger<iNaturalistObservationService> logger)
-        {
-            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _iNaturalistServiceConfiguration = iNaturalistServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(iNaturalistServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate)
+        private async Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate,
+            byte attempt)
         {
             try
             {
                 var observations = new List<DwcObservationVerbatim>();
-                bool endOfChunk = false;
-                int currentOffset = 0;
-                int chunkSize = _iNaturalistServiceConfiguration.MaxReturnedChangesInOnePage;
-                while (!endOfChunk) { 
+                var endOfChunk = false;
+                var currentOffset = 0;
+                var chunkSize = _iNaturalistServiceConfiguration.MaxReturnedChangesInOnePage;
+                while (!endOfChunk)
+                {
                     var gbifChunk = await _httpClientService.GetFileStreamAsync(
                         new Uri($"{_iNaturalistServiceConfiguration.BaseAddress}/v1/occurrence/search?" +
                                 $"country=SE" +
@@ -104,9 +87,9 @@ namespace SOS.Import.Services
                     serializerOptions.Converters.Add(new StringConverter());
                     var s = new StreamReader(gbifChunk);
                     var json = await s.ReadToEndAsync();
-                    var results =   JsonSerializer.Deserialize<GBIFResult>(json, serializerOptions);
+                    var results = JsonSerializer.Deserialize<GBIFResult>(json, serializerOptions);
                     observations.AddRange(results.Results);
-                    if(results.EndOfRecords)
+                    if (results.EndOfRecords)
                     {
                         endOfChunk = true;
                     }
@@ -117,9 +100,39 @@ namespace SOS.Import.Services
             }
             catch (Exception e)
             {
+                if (attempt < 3)
+                {
+                    _logger.LogWarning($"Failed to get data from iNaturalist, attempt: {attempt}", e);
+                    Thread.Sleep(attempt * 1000);
+                    return await GetAsync(fromDate, toDate, ++attempt);
+                }
+
                 _logger.LogError("Failed to get data from iNaturalist", e);
-               throw ;
+                throw;
             }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="httpClientService"></param>
+        /// <param name="iNaturalistServiceConfiguration"></param>
+        /// <param name="logger"></param>
+        public iNaturalistObservationService(
+            IHttpClientService httpClientService,
+            iNaturalistServiceConfiguration iNaturalistServiceConfiguration,
+            ILogger<iNaturalistObservationService> logger)
+        {
+            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+            _iNaturalistServiceConfiguration = iNaturalistServiceConfiguration ??
+                                       throw new ArgumentNullException(nameof(iNaturalistServiceConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate)
+        {
+            return await GetAsync(fromDate, toDate, 1);
         }
     }
 }
