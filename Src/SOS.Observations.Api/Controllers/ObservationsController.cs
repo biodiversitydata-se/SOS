@@ -300,7 +300,8 @@ namespace SOS.Observations.Api.Controllers
                     {
                         Ids = new[] { taxonId },
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
-                    }
+                    },
+                    OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
                 };
                 return await Count(null, null, filter);
             }
