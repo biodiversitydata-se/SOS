@@ -12,12 +12,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// </summary>
     public interface IObservationsController
     {
-        Task<IActionResult> BasicCountAsync(
+        Task<IActionResult> BasicCount(
             int taxonId,
             bool includeUnderlyingTaxa,
             int? fromYear,
             int? toYear,
-            AreaTypeDto areaType,
+            AreaTypeDto? areaType,
             string featureId);
 
         Task<IActionResult> Count(
