@@ -14,6 +14,16 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IObservationsController
     {
         Task<IActionResult> CachedCount(
+            int taxonId,
+            bool includeUnderlyingTaxa = false,
+            int? fromYear = null,
+            int? toYear = null,
+            AreaTypeDto? areaType = null,
+            string featureId = null,
+            IEnumerable<int> dataProviderIds = null,
+            bool validateSearchFilter = false);
+
+        Task<IActionResult> MultipleCachedCount(
             IEnumerable<int> taxonIds,
             bool includeUnderlyingTaxa = false,
             int? fromYear = null,

@@ -258,7 +258,85 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Count the number of observations matching the provided search parameters. This endpoint uses caching to improve performance.
+        /// Count the number of observations for the specified taxon. This endpoint uses caching to improve performance.
+        /// </summary>
+        /// <param name="taxonId">Count observations for this taxon.</param>
+        /// <param name="includeUnderlyingTaxa">Include underlying taxa if any.</param>
+        /// <param name="fromYear">Count from start year.</param>
+        /// <param name="toYear">Count to end year.</param>
+        /// <param name="areaType">Type of area to search in.</param>
+        /// <param name="featureId">Id of feature in above area type.</param>
+        /// <param name="dataProviderIds">Data provider ids. If null, all data providers are used.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <returns></returns>
+        [HttpGet("CachedCount")]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> CachedCount(
+            [FromQuery] int taxonId,
+            [FromQuery] bool includeUnderlyingTaxa = false,
+            [FromQuery] int? fromYear = null,
+            [FromQuery] int? toYear = null,
+            [FromQuery] AreaTypeDto? areaType = null,
+            [FromQuery] string featureId = null,
+            [FromQuery] IEnumerable<int> dataProviderIds = null,
+            [FromQuery] bool validateSearchFilter = false)
+        {
+            try
+            {
+                var filter = new SearchFilterBaseDto
+                {
+                    Date = fromYear.HasValue || toYear.HasValue ? new DateFilterDto
+                    {
+                        StartDate = fromYear.HasValue ? new DateTime(fromYear.Value, 1, 1) : null,
+                        EndDate = toYear.HasValue ? new DateTime(toYear.Value, 12, 31) : null,
+                        DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+                    } : null,
+                    Geographics = string.IsNullOrEmpty(featureId) || areaType == null ? null :
+                        new GeographicsFilterDto
+                        {
+                            Areas = new[] { new AreaFilterDto { AreaType = areaType.Value, FeatureId = featureId } }
+                        },
+                    Taxon = new TaxonFilterDto
+                    {
+                        Ids = new []{taxonId},
+                        IncludeUnderlyingTaxa = includeUnderlyingTaxa
+                    },
+                    OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                    DataProvider = dataProviderIds.HasItems() ? new DataProviderFilterDto
+                    {
+                        Ids = dataProviderIds
+                    } : null
+                };
+
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var searchFilter = filter.ToSearchFilter("sv-SE", false);
+                var taxonCountSearch = new TaxonObservationCountSearch
+                {
+                    AreaType = areaType == null ? null : (AreaType)areaType,
+                    FeatureId = featureId,
+                    TaxonIds = new[] { taxonId },
+                    IncludeUnderlyingTaxa = includeUnderlyingTaxa,
+                    FromYear = fromYear,
+                    ToYear = toYear,
+                    DataProviderIds = dataProviderIds
+                };
+
+                var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);
+                return new OkObjectResult(result.Any() ? result.First().Count : 0);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Basic count error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Count the number of observations for the specified taxa. This endpoint uses caching to improve performance.
         /// </summary>
         /// <param name="taxonIds">Count observations for these taxa.</param>
         /// <param name="includeUnderlyingTaxa">Include underlying taxa if any.</param>
@@ -274,7 +352,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CachedCount(
+        public async Task<IActionResult> MultipleCachedCount(
             [FromBody] IEnumerable<int> taxonIds,
             [FromQuery] bool includeUnderlyingTaxa = false,
             [FromQuery] int? fromYear = null,
