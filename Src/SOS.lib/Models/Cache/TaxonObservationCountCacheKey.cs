@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SOS.Lib.Cache;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Models.Cache
@@ -16,10 +19,11 @@ namespace SOS.Lib.Models.Cache
         public int? ToYear { get; set; }
         public AreaType? AreaType  { get; set; }
         public string FeatureId { get; set; }
+        public string DataProviderIds { get; set; }
 
         protected bool Equals(TaxonObservationCountCacheKey other)
         {
-            return TaxonId == other.TaxonId && IncludeUnderlyingTaxa == other.IncludeUnderlyingTaxa && FromYear == other.FromYear && ToYear == other.ToYear && AreaType == other.AreaType && FeatureId == other.FeatureId;
+            return TaxonId == other.TaxonId && IncludeUnderlyingTaxa == other.IncludeUnderlyingTaxa && FromYear == other.FromYear && ToYear == other.ToYear && AreaType == other.AreaType && FeatureId == other.FeatureId && DataProviderIds == other.DataProviderIds;
         }
 
         public override bool Equals(object obj)
@@ -32,7 +36,7 @@ namespace SOS.Lib.Models.Cache
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(TaxonId, IncludeUnderlyingTaxa, FromYear, ToYear, AreaType, FeatureId);
+            return HashCode.Combine(TaxonId, IncludeUnderlyingTaxa, FromYear, ToYear, AreaType, FeatureId, DataProviderIds);
         }
 
         public static TaxonObservationCountCacheKey Create(TaxonObservationCountSearch taxonObservationCountSearch)
@@ -43,7 +47,8 @@ namespace SOS.Lib.Models.Cache
                 FeatureId = taxonObservationCountSearch.FeatureId,
                 FromYear = taxonObservationCountSearch.FromYear,
                 ToYear = taxonObservationCountSearch.ToYear,
-                IncludeUnderlyingTaxa = taxonObservationCountSearch.IncludeUnderlyingTaxa
+                IncludeUnderlyingTaxa = taxonObservationCountSearch.IncludeUnderlyingTaxa,
+                DataProviderIds = taxonObservationCountSearch.DataProviderIds != null && taxonObservationCountSearch.DataProviderIds.Any() ? string.Join(",", taxonObservationCountSearch.DataProviderIds?.OrderBy(m => m)) : null
             };
         }
 
@@ -56,7 +61,8 @@ namespace SOS.Lib.Models.Cache
                 FeatureId = taxonObservationCountSearch.FeatureId,
                 FromYear = taxonObservationCountSearch.FromYear,
                 ToYear = taxonObservationCountSearch.ToYear,
-                IncludeUnderlyingTaxa = taxonObservationCountSearch.IncludeUnderlyingTaxa
+                IncludeUnderlyingTaxa = taxonObservationCountSearch.IncludeUnderlyingTaxa,
+                DataProviderIds = taxonObservationCountSearch.DataProviderIds != null && taxonObservationCountSearch.DataProviderIds.Any() ? string.Join(",", taxonObservationCountSearch.DataProviderIds?.OrderBy(m => m)) : null
             };
         }
     }

@@ -59,12 +59,39 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             var cachedResult = cachedResponse.GetResult<IEnumerable<TaxonObservationCountDto>>();
             cachedStopwatch.Stop();
 
+            // Get count first time. The result is not yet cached.
+            var notYetCachedStopwatch2 = Stopwatch.StartNew();
+            var notYetCachedResponse2 = await _fixture.ObservationsController.CachedCount(
+                taxonIds,
+                true,
+                null,
+                null,
+                null,
+                null,
+                new List<int> {1});
+            var notYetCachedResult2 = notYetCachedResponse2.GetResult<IEnumerable<TaxonObservationCountDto>>();
+            notYetCachedStopwatch2.Stop();
+
+            var cachedStopwatch2 = Stopwatch.StartNew();
+            var cachedResponse2 = await _fixture.ObservationsController.CachedCount(
+                taxonIds,
+                true,
+                null,
+                null,
+                null,
+                null,
+                new List<int> { 1 });
+            var cachedResult2 = cachedResponse2.GetResult<IEnumerable<TaxonObservationCountDto>>();
+            cachedStopwatch2.Stop();
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             notYetCachedResult.Should().NotBeNull();
             cachedResult.Should().BeEquivalentTo(notYetCachedResult);
             cachedStopwatch.ElapsedMilliseconds.Should().BeLessThan(notYetCachedStopwatch.ElapsedMilliseconds / 1000, "the cached result should be at least 1000 times faster than the calculated result.");
+            cachedResult2.Should().BeEquivalentTo(notYetCachedResult2);
+            cachedStopwatch2.ElapsedMilliseconds.Should().BeLessThan(notYetCachedStopwatch2.ElapsedMilliseconds / 10, "there is already a cache in Elasticsearch, but our own cache is at least 10 times faster.");
         }
 
         [Fact]
