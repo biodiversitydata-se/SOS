@@ -266,6 +266,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="toYear">Count to end year.</param>
         /// <param name="areaType">Type of area to search in.</param>
         /// <param name="featureId">Id of feature in above area type.</param>
+        /// <param name="dataProviderIds">Data provider ids. If null, all data providers are used.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <returns></returns>
         [HttpPost("CachedCount")]
@@ -280,6 +281,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? toYear = null,
             [FromQuery] AreaTypeDto? areaType = null,
             [FromQuery] string featureId = null,
+            [FromQuery] IEnumerable<int> dataProviderIds = null,
             [FromQuery] bool validateSearchFilter = false)
         {
             try
@@ -302,7 +304,11 @@ namespace SOS.Observations.Api.Controllers
                         Ids = taxonIds,
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     },
-                    OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+                    OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                    DataProvider = dataProviderIds.HasItems() ? new DataProviderFilterDto
+                    {
+                        Ids = dataProviderIds
+                    } : null
                 };
 
                 var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
@@ -316,6 +322,7 @@ namespace SOS.Observations.Api.Controllers
                     IncludeUnderlyingTaxa = includeUnderlyingTaxa,
                     FromYear = fromYear,
                     ToYear = toYear,
+                    DataProviderIds = dataProviderIds
                 };
 
                 var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);

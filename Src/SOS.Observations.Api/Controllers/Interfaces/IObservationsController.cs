@@ -20,6 +20,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? toYear = null,
             AreaTypeDto? areaType = null,
             string featureId = null,
+            IEnumerable<int> dataProviderIds = null,
             bool validateSearchFilter = false);
 
         Task<IActionResult> Count(
