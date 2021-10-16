@@ -258,28 +258,29 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Count the number of observations matching the provided search parameters.
+        /// Count the number of observations matching the provided search parameters. This endpoint uses caching to improve performance.
         /// </summary>
-        /// <param name="taxonId">Count observations for this taxon</param>
-        /// <param name="includeUnderlyingTaxa">Include under laying taxa if any</param>
-        /// <param name="fromYear">Count from start year</param>
-        /// <param name="toYear">Count to end year</param>
-        /// <param name="areaType">Type of area to search in</param>
-        /// <param name="featureId">Id of feature in above area type</param>
+        /// <param name="taxonIds">Count observations for these taxa.</param>
+        /// <param name="includeUnderlyingTaxa">Include underlying taxa if any.</param>
+        /// <param name="fromYear">Count from start year.</param>
+        /// <param name="toYear">Count to end year.</param>
+        /// <param name="areaType">Type of area to search in.</param>
+        /// <param name="featureId">Id of feature in above area type.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <returns></returns>
-        [HttpGet("Count")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [HttpPost("CachedCount")]
+        [ProducesResponseType(typeof(IEnumerable<TaxonObservationCountDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ResponseCache(Duration = 240, VaryByQueryKeys = new[] { "*" })]
-        public async Task<IActionResult> BasicCount(
-            [FromQuery] int taxonId,
+        public async Task<IActionResult> CachedCount(
+            [FromBody] IEnumerable<int> taxonIds,
             [FromQuery] bool includeUnderlyingTaxa = false,
             [FromQuery] int? fromYear = null,
             [FromQuery] int? toYear = null,
             [FromQuery] AreaTypeDto? areaType = null,
-            [FromQuery] string featureId = null)
+            [FromQuery] string featureId = null,
+            [FromQuery] bool validateSearchFilter = false)
         {
             try
             {
@@ -298,12 +299,27 @@ namespace SOS.Observations.Api.Controllers
                         },
                     Taxon = new TaxonFilterDto
                     {
-                        Ids = new[] { taxonId },
+                        Ids = taxonIds,
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     },
                     OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
                 };
-                return await Count(null, filter);
+
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var searchFilter = filter.ToSearchFilter("sv-SE", false);
+                var taxonCountSearch = new TaxonObservationCountSearch
+                {
+                    AreaType = areaType == null ? null : (AreaType)areaType,
+                    FeatureId = featureId,
+                    TaxonIds = taxonIds,
+                    IncludeUnderlyingTaxa = includeUnderlyingTaxa,
+                    FromYear = fromYear,
+                    ToYear = toYear,
+                };
+
+                var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);
+                return new OkObjectResult(result);
             }
             catch (Exception e)
             {

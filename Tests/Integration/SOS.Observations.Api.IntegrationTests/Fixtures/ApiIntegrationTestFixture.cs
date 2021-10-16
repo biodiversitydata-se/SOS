@@ -182,11 +182,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             FilterManager filterManager)
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
+            MemoryCacheOptions memoryCacheOptions = new MemoryCacheOptions { SizeLimit = null};
+            
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
-                filterManager,  
+                filterManager,
                 new HttpContextAccessor(),
+                new TaxonObservationCountCache(),
                 new NullLogger<ObservationManager>());
 
             return observationsManager;

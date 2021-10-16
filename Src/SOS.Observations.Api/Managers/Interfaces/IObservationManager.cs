@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using SOS.Lib.Cache;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -121,6 +122,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="locationIds"></param>
         /// <returns></returns>
         Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds);
+
+        Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
 
         /// <summary>
         /// Get number of matching observations
