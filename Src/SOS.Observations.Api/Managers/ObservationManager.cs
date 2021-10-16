@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Constants;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.Observation;
@@ -32,6 +33,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IFilterManager _filterManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
+        private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly ILogger<ObservationManager> _logger;
         
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
@@ -97,6 +99,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="filterManager"></param>
         /// <param name="httpContextAccessor"></param>
+        /// <param name="taxonObservationCountCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -104,6 +107,7 @@ namespace SOS.Observations.Api.Managers
             IVocabularyValueResolver vocabularyValueResolver,
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
+            ITaxonObservationCountCache taxonObservationCountCache,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -113,8 +117,9 @@ namespace SOS.Observations.Api.Managers
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
 
-             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
@@ -288,6 +293,41 @@ namespace SOS.Observations.Api.Managers
         {
             await _filterManager.PrepareFilter(authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
+        }
+
+        public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
+        {
+            TaxonObservationCountCacheKey taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
+            Dictionary<int, int> countByTaxonId = new Dictionary<int, int>();
+            HashSet<int> notCachedTaxonIds = new HashSet<int>();
+            foreach (var taxonId in taxonObservationCountSearch.TaxonIds)
+            {
+                taxonObservationCountCacheKey.TaxonId = taxonId;
+                if (_taxonObservationCountCache.TryGetCount(taxonObservationCountCacheKey, out var count))
+                {
+                    countByTaxonId.Add(taxonId, count);
+                }
+                else
+                {
+                    notCachedTaxonIds.Add(taxonId);
+                }
+            }
+
+            if (notCachedTaxonIds.Any())
+            {
+                foreach (var notCachedTaxonId in notCachedTaxonIds)
+                {
+                    filter.Taxa.Ids = new[] { notCachedTaxonId };
+                    int count = Convert.ToInt32(await GetMatchCountAsync(null, filter));
+                    countByTaxonId.Add(notCachedTaxonId, count);
+                    var cacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch, notCachedTaxonId);
+                    _taxonObservationCountCache.Add(cacheKey, count);
+                }
+            }
+
+            var taxonCountDtos = countByTaxonId
+                .Select(m => new TaxonObservationCountDto { Count = m.Value, TaxonId = m.Key });
+            return taxonCountDtos;
         }
 
         /// <inheritdoc />
