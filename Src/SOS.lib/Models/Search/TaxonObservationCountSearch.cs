@@ -14,6 +14,7 @@ namespace SOS.Lib.Models.Search
         public int? ToYear { get; set; }
         public AreaType? AreaType { get; set; }
         public string FeatureId { get; set; }
-        public IEnumerable<int> DataProviderIds { get; set; }
+        public int? DataProviderId { get; set; }
+        //public IEnumerable<int> DataProviderIds { get; set; }
     }
 }
