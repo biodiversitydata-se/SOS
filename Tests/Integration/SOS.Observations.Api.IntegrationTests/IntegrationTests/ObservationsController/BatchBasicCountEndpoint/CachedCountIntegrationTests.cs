@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Cache;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Cache;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
-using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.CountEndpoint
+namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsController.BatchBasicCountEndpoint
 {
     [Collection(Collections.ApiIntegrationTestsCollection)]
     public class CachedCountIntegrationTests
@@ -45,7 +42,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             
             // Get count first time. The result is not yet cached.
             var notYetCachedStopwatch = Stopwatch.StartNew();
-            var notYetCachedResponse = await _fixture.ObservationsController.CachedCount(
+            var notYetCachedResponse = await _fixture.ObservationsController.MultipleCachedCount(
                 taxonIds,
                 true);
             var notYetCachedResult = notYetCachedResponse.GetResult<IEnumerable<TaxonObservationCountDto>>();
@@ -53,7 +50,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
             // Get count second time. The result is cached
             var cachedStopwatch = Stopwatch.StartNew();
-            var cachedResponse = await _fixture.ObservationsController.CachedCount(
+            var cachedResponse = await _fixture.ObservationsController.MultipleCachedCount(
                 taxonIds,
                 true);
             var cachedResult = cachedResponse.GetResult<IEnumerable<TaxonObservationCountDto>>();
@@ -61,7 +58,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
             // Get count first time. The result is not yet cached.
             var notYetCachedStopwatch2 = Stopwatch.StartNew();
-            var notYetCachedResponse2 = await _fixture.ObservationsController.CachedCount(
+            var notYetCachedResponse2 = await _fixture.ObservationsController.MultipleCachedCount(
                 taxonIds,
                 true,
                 null,
@@ -73,7 +70,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             notYetCachedStopwatch2.Stop();
 
             var cachedStopwatch2 = Stopwatch.StartNew();
-            var cachedResponse2 = await _fixture.ObservationsController.CachedCount(
+            var cachedResponse2 = await _fixture.ObservationsController.MultipleCachedCount(
                 taxonIds,
                 true,
                 null,
@@ -96,126 +93,26 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task Count_wolf_without_permissions()
+        public void Cached_count_cache_memory_test()
         {
-            // To test with a specific user, change SOS.Lib.Managers.FilterManager.AddAuthorizationAsync() to use:
-            // Remove: var user = await _userService.GetUserAsync();
-            // Add:    var user = await _userService.GetUserByIdAsync([userId]);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var authorityBuilder = new UserAuthorizationTestBuilder();
-            var authority = authorityBuilder
-                .WithAuthorityIdentity("Sighting")
-                .WithMaxProtectionLevel(5)
-                .WithTaxonIdsAccess(TestData.TaxonIds.Otter)
-                .WithAreaAccess(TestData.AreaAuthority.Sweden)
-                .Build();
-            _fixture.UseMockUserService(authority);
-            SearchFilterDto searchFilter = new SearchFilterDto
+            const int nrRequests = 100000;
+            var cache = new TaxonObservationCountCache();
+            double memBeforeCache = GC.GetTotalMemory(true);
+            for (int i = 0; i < nrRequests; i++)
             {
-                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.Count(
-                null,
-                searchFilter,
-                false,
-                true);
-
-            var result = response.GetResult<long>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().Be(0,"because wolf is protected and you have no permissions.");
-        }
-
-        [Fact]
-        [Trait("Category", "ApiIntegrationTest")]
-        public async Task Count_wolf_with_permissions()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var authorityBuilder = new UserAuthorizationTestBuilder();
-            var authority = authorityBuilder
-                .WithAuthorityIdentity("Sighting")
-                .WithMaxProtectionLevel(5)
-                .WithTaxonIdsAccess(TestData.TaxonIds.Wolf)
-                .WithAreaAccess(TestData.AreaAuthority.Sweden)
-                .Build();
-            _fixture.UseMockUserService(authority);
-            SearchFilterDto searchFilter = new SearchFilterDto
-            {
-                Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.Count(
-                null,
-                searchFilter,
-                false,
-                true);
-
-            var result = response.GetResult<long>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeGreaterThan(0, "because the search is executed with permissions.");
-        }
-
-
-        [Fact]
-        [Trait("Category", "ApiIntegrationTest")]
-        public async Task Count_protected_species_in_Jonkoping_county()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var authorityBuilder = new UserAuthorizationTestBuilder();
-            var authority = authorityBuilder
-                .WithAuthorityIdentity("Sighting")
-                .WithMaxProtectionLevel(3)
-                .WithAreaAccess(TestData.AreaAuthority.JonkopingCounty)
-                .Build();
-            _fixture.UseMockUserService(authority);
-            var searchFilter = new SearchFilterInternalDto
-            {
-                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                Geographics = new GeographicsFilterDto
+                var key = new TaxonObservationCountCacheKey
                 {
-                    Areas = new List<AreaFilterDto>
-                    {
-                        TestData.Areas.JonkopingCounty,
-                        TestData.Areas.OstergotlandCounty,
-                    }
-                }
-            };
+                    TaxonId = i
+                };
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.CountInternal(
-                "CountyAdministrationObservation",
-                searchFilter,
-                false,
-                true);
-            var result = response.GetResult<long>();
+                cache.Add(key, i);
+                bool success = cache.TryGetCount(key, out var count);
+                success.Should().BeTrue();
+            }
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeGreaterThan(0);
+            double memAfterCache = GC.GetTotalMemory(true);
+            double bytesPerItem = (memAfterCache - memBeforeCache) / nrRequests;
+            bytesPerItem.Should().BeLessThan(150, "less than 150 bytes should be used to store cache item");
         }
     }
 }
