@@ -43,7 +43,7 @@ namespace SOS.Import.Factories.Harvest
             IDictionary<int, Project[]> sightingsProjects,
             IDictionary<int, ICollection<Media>> sightingMedias)
         {
-            int sightingId = -1;
+            var sightingId = -1;
 
             try
             {
@@ -185,7 +185,7 @@ namespace SOS.Import.Factories.Harvest
             }
         }
 
-        private static List<int> ConvertCsvStringToListOfIntegers(string s)
+        private static IEnumerable<int> ConvertCsvStringToListOfIntegers(string s)
         {
             if (string.IsNullOrEmpty(s))
             {
@@ -193,7 +193,7 @@ namespace SOS.Import.Factories.Harvest
             }
 
             var stringIds = s.Split(",");
-            var ids = new List<int>();
+            var ids = new HashSet<int>();
 
             foreach (var stringId in stringIds)
             {
@@ -284,7 +284,7 @@ namespace SOS.Import.Factories.Harvest
             };
         }
 
-        private async Task<IDictionary<int, Project[]>> GetSightingsProjects(IEnumerable<int> sightingIds, bool live = false)
+        private async Task<IDictionary<int, Project[]>> GetSightingsProjects(IEnumerable<int> sightingIds, bool live)
         {
             if (!_artportalenMetadataContainer?.Projects?.Any() ?? true)
             {
@@ -669,7 +669,7 @@ namespace SOS.Import.Factories.Harvest
 
             var sightingsMedias = await GetSightingMediaAsync(sightingIds, IncrementalMode);
 
-            var verbatims = new List<ArtportalenObservationVerbatim>();
+            var verbatims = new HashSet<ArtportalenObservationVerbatim>();
             for (var i = 0; i < entities.Length; i++)
             {
                 verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias));
