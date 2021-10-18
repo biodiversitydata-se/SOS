@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? toYear = null,
             AreaTypeDto? areaType = null,
             string featureId = null,
-            IEnumerable<int> dataProviderIds = null,
+            int? dataProviderId = null,
             bool validateSearchFilter = false);
 
         Task<IActionResult> MultipleCachedCount(
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? toYear = null,
             AreaTypeDto? areaType = null,
             string featureId = null,
-            IEnumerable<int> dataProviderIds = null,
+            int? dataProviderId = null,
             bool validateSearchFilter = false);
 
         Task<IActionResult> Count(

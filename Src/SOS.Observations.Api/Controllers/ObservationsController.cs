@@ -258,15 +258,15 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Count the number of observations for the specified taxon. This endpoint uses caching to improve performance.
+        /// Count the number of present observations for the specified taxon. This endpoint uses caching to improve performance.
         /// </summary>
-        /// <param name="taxonId">Count observations for this taxon.</param>
+        /// <param name="taxonId">Count present observations for this taxon.</param>
         /// <param name="includeUnderlyingTaxa">Include underlying taxa if any.</param>
         /// <param name="fromYear">Count from start year.</param>
         /// <param name="toYear">Count to end year.</param>
         /// <param name="areaType">Type of area to search in.</param>
         /// <param name="featureId">Id of feature in above area type.</param>
-        /// <param name="dataProviderIds">Data provider ids. If null, all data providers are used.</param>
+        /// <param name="dataProviderId">Data provider id. If null, all data providers are used.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <returns></returns>
         [HttpGet("CachedCount")]
@@ -281,7 +281,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? toYear = null,
             [FromQuery] AreaTypeDto? areaType = null,
             [FromQuery] string featureId = null,
-            [FromQuery] IEnumerable<int> dataProviderIds = null,
+            [FromQuery] int? dataProviderId = null,
             [FromQuery] bool validateSearchFilter = false)
         {
             try
@@ -305,9 +305,9 @@ namespace SOS.Observations.Api.Controllers
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     },
                     OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                    DataProvider = dataProviderIds.HasItems() ? new DataProviderFilterDto
+                    DataProvider = dataProviderId.HasValue ? new DataProviderFilterDto
                     {
-                        Ids = dataProviderIds
+                        Ids = new List<int> { dataProviderId.Value }
                     } : null
                 };
 
@@ -322,7 +322,7 @@ namespace SOS.Observations.Api.Controllers
                     IncludeUnderlyingTaxa = includeUnderlyingTaxa,
                     FromYear = fromYear,
                     ToYear = toYear,
-                    DataProviderIds = dataProviderIds
+                    DataProviderId = dataProviderId
                 };
 
                 var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);
@@ -336,15 +336,15 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Count the number of observations for the specified taxa. This endpoint uses caching to improve performance.
+        /// Count the number of present observations for the specified taxa. This endpoint uses caching to improve performance.
         /// </summary>
-        /// <param name="taxonIds">Count observations for these taxa.</param>
+        /// <param name="taxonIds">Count present observations for these taxa.</param>
         /// <param name="includeUnderlyingTaxa">Include underlying taxa if any.</param>
         /// <param name="fromYear">Count from start year.</param>
         /// <param name="toYear">Count to end year.</param>
         /// <param name="areaType">Type of area to search in.</param>
         /// <param name="featureId">Id of feature in above area type.</param>
-        /// <param name="dataProviderIds">Data provider ids. If null, all data providers are used.</param>
+        /// <param name="dataProviderId">Data provider id. If null, all data providers are used.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <returns></returns>
         [HttpPost("CachedCount")]
@@ -359,7 +359,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? toYear = null,
             [FromQuery] AreaTypeDto? areaType = null,
             [FromQuery] string featureId = null,
-            [FromQuery] IEnumerable<int> dataProviderIds = null,
+            [FromQuery] int? dataProviderId = null,
             [FromQuery] bool validateSearchFilter = false)
         {
             try
@@ -383,9 +383,9 @@ namespace SOS.Observations.Api.Controllers
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     },
                     OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                    DataProvider = dataProviderIds.HasItems() ? new DataProviderFilterDto
+                    DataProvider = dataProviderId.HasValue ? new DataProviderFilterDto
                     {
-                        Ids = dataProviderIds
+                        Ids = new List<int> { dataProviderId.Value }
                     } : null
                 };
 
@@ -400,7 +400,7 @@ namespace SOS.Observations.Api.Controllers
                     IncludeUnderlyingTaxa = includeUnderlyingTaxa,
                     FromYear = fromYear,
                     ToYear = toYear,
-                    DataProviderIds = dataProviderIds
+                    DataProviderId = dataProviderId
                 };
 
                 var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);

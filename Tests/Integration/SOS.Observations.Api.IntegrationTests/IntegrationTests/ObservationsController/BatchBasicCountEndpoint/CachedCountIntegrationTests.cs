@@ -65,7 +65,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 null,
                 null,
                 null,
-                new List<int> {1});
+                1);
             var notYetCachedResult2 = notYetCachedResponse2.GetResult<IEnumerable<TaxonObservationCountDto>>();
             notYetCachedStopwatch2.Stop();
 
@@ -77,7 +77,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 null,
                 null,
                 null,
-                new List<int> { 1 });
+                1);
             var cachedResult2 = cachedResponse2.GetResult<IEnumerable<TaxonObservationCountDto>>();
             cachedStopwatch2.Stop();
 
