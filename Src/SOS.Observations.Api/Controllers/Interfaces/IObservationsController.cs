@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Observations.Api.Dtos;
@@ -12,13 +13,25 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// </summary>
     public interface IObservationsController
     {
-        Task<IActionResult> BasicCount(
+        Task<IActionResult> CachedCount(
             int taxonId,
-            bool includeUnderlyingTaxa,
-            int? fromYear,
-            int? toYear,
-            AreaTypeDto? areaType,
-            string featureId);
+            bool includeUnderlyingTaxa = false,
+            int? fromYear = null,
+            int? toYear = null,
+            AreaTypeDto? areaType = null,
+            string featureId = null,
+            int? dataProviderId = null,
+            bool validateSearchFilter = false);
+
+        Task<IActionResult> MultipleCachedCount(
+            IEnumerable<int> taxonIds,
+            bool includeUnderlyingTaxa = false,
+            int? fromYear = null,
+            int? toYear = null,
+            AreaTypeDto? areaType = null,
+            string featureId = null,
+            int? dataProviderId = null,
+            bool validateSearchFilter = false);
 
         Task<IActionResult> Count(
             int? roleId,

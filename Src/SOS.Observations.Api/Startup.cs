@@ -367,6 +367,7 @@ namespace SOS.Observations.Api
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddSingleton<ITaxonObservationCountCache, TaxonObservationCountCache>();
             services.AddSingleton<IDataProviderCache, DataProviderCache>();
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
