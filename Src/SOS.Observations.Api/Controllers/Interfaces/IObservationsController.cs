@@ -67,7 +67,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
             bool protectedObservations = false,
-            OutputFormatDto outputFormat = OutputFormatDto.Json);
+            OutputFormatDto outputFormat = OutputFormatDto.Json,
+            bool useSwedishDates = false);
 
         Task<IActionResult> SearchAggregatedInternal(
             int? roleId,

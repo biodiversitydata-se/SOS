@@ -30,9 +30,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="take"></param>
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
+        /// <param name="useSwedishDates"></param>
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder);
+            SearchSortOrder sortOrder, bool useSwedishDates = false);
 
         /// <summary>
         /// Get observations by scroll
