@@ -896,7 +896,7 @@ namespace SOS.Observations.Api.Controllers
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder, useSwedishDates);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }
