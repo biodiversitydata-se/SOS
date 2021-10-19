@@ -57,30 +57,9 @@ This filter will return observations only from Artportalen and MVM.
 
 ## Date filter
 
-### BetweenStartDateAndEndDate filter type
-This filter will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDate` is less than or equal to `endDate`.
-```json
-{        
-  "date": {
-    "startDate": "2021-02-02",
-    "endDate": "2021-02-04",
-    "dateFilterType": "BetweenStartDateAndEndDate"    
-  }
-}
-```
-
-| Observation date | Match filter? |
-|-|-|
-| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-03 | Yes |
-| obs.event.startDate=2021-02-03<br>obs.event.endDate=2021-02-04 | Yes |
-| obs.event.startDate=2021-02-04<br>obs.event.endDate=2021-02-05 | No |
-| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-04 | Yes |
-| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-05 | No |
-| obs.event.startDate=2021-02-01<br>obs.event.endDate=2021-02-04 | No |
-
 ### OverlappingStartDateAndEndDate filter type
 
-This filter will return observations where `observation.event.startDate` is less than or equal to `endDate` and `observation.event.endDateDate` is greater than or equal to `startDate`.
+This filter will return observations where `observation.event.startDate` is less than or equal to `endDate` and `observation.event.endDateDate` is greater than or equal to `startDate`. This is the **default** filter type used when no filter type is specified.
 ```json
 {        
   "date": {
@@ -101,6 +80,27 @@ This filter will return observations where `observation.event.startDate` is less
 | obs.event.startDate=2021-02-01<br>obs.event.endDate=2021-02-04 | Yes |
 | obs.event.startDate=2021-02-01<br>obs.event.endDate=2021-02-01 | No |
 | obs.event.startDate=2021-02-05<br>obs.event.endDate=2021-02-05 | No |
+
+### BetweenStartDateAndEndDate filter type
+This filter will return observations where `observation.event.startDate` is greater than or equal to `startDate` and `observation.event.endDate` is less than or equal to `endDate`.
+```json
+{        
+  "date": {
+    "startDate": "2021-02-02",
+    "endDate": "2021-02-04",
+    "dateFilterType": "BetweenStartDateAndEndDate"    
+  }
+}
+```
+
+| Observation date | Match filter? |
+|-|-|
+| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-03 | Yes |
+| obs.event.startDate=2021-02-03<br>obs.event.endDate=2021-02-04 | Yes |
+| obs.event.startDate=2021-02-04<br>obs.event.endDate=2021-02-05 | No |
+| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-04 | Yes |
+| obs.event.startDate=2021-02-02<br>obs.event.endDate=2021-02-05 | No |
+| obs.event.startDate=2021-02-01<br>obs.event.endDate=2021-02-04 | No |
 
 ### OnlyStartDate filter type
 
