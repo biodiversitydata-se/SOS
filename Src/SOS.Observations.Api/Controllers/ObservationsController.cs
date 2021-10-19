@@ -839,6 +839,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
         /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>
+        /// <param name="useSwedishDates">True if observation dates should use local Swedish time; otherwise they will be represented as UTC dates.</param>
         /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -868,7 +869,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false,
-            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
+            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json,
+            [FromQuery] bool useSwedishDates = false)
         {
             try
             {
