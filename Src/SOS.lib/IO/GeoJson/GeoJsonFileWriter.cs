@@ -86,7 +86,6 @@ namespace SOS.Lib.IO.GeoJson
 
                     if (flatOut)
                     {
-                        // todo - improve performance by remove casting to observations.
                         var processedObservations = CastDynamicsToObservations(scrollResult.Records);
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         foreach (var observation in processedObservations)
