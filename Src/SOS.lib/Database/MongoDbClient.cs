@@ -33,6 +33,10 @@ namespace SOS.Lib.Database
         /// <inheritdoc />
         public int WriteBatchSize { get; }
 
+        /// <inheritdoc />
+        public string DatabaseName => _databaseName;
+
+        /// <inheritdoc />
         public IMongoDatabase GetDatabase()
         {
             return base.GetDatabase(_databaseName);
