@@ -9,26 +9,26 @@ namespace SOS.Lib.Helpers
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="indexPrefix"></param>
-        /// <param name="toogleable"></param>
+        /// <param name="toggleable"></param>
         /// <param name="instance"></param>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        public static string GetIndexName<TEntity>(string indexPrefix, bool toogleable, byte instance,
+        public static string GetIndexName<TEntity>(string indexPrefix, bool toggleable, byte instance,
             bool protectedObservations) =>
-            $"{(string.IsNullOrEmpty(indexPrefix) ? "" : $"{indexPrefix}-")}{GetInstanceName<TEntity>(toogleable, instance, protectedObservations)}"
+            $"{(string.IsNullOrEmpty(indexPrefix) ? "" : $"{indexPrefix}-")}{GetInstanceName<TEntity>(toggleable, instance, protectedObservations)}"
                 .ToLower();
 
         /// <summary>
         /// Get name of index
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        /// <param name="toogleable"></param>
+        /// <param name="toggleable"></param>
         /// <param name="instance"></param>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
         public static string
-            GetIndexName<TEntity>(bool toogleable, byte instance, bool protectedObservations) =>
-            GetIndexName<TEntity>(null, toogleable, instance, protectedObservations);
+            GetIndexName<TEntity>(bool toggleable, byte instance, bool protectedObservations) =>
+            GetIndexName<TEntity>(null, toggleable, instance, protectedObservations);
 
         /// <summary>
         /// Get name of index
@@ -53,11 +53,11 @@ namespace SOS.Lib.Helpers
         /// Get name of instance
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        /// <param name="toogleable"></param>
+        /// <param name="toggleable"></param>
         /// <param name="instance"></param>
         /// <param name="protectedObservations"></param>
         /// <returns></returns>
-        public static string GetInstanceName<TEntity>(bool toogleable, byte instance, bool protectedObservations)
+        public static string GetInstanceName<TEntity>(bool toggleable, byte instance, bool protectedObservations)
         {
             var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
             if (protectedObservations)
@@ -65,7 +65,7 @@ namespace SOS.Lib.Helpers
                 instanceName += "-protected";
             }
 
-            instanceName += $"{(toogleable ? $"-{instance}" : string.Empty)}";
+            instanceName += $"{(toggleable ? $"-{instance}" : string.Empty)}";
             return instanceName;
         }
     }
