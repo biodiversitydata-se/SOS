@@ -17,7 +17,7 @@ namespace SOS.Lib.Repositories.Processed
     public class MongoDbProcessedRepositoryBase<TEntity, TKey> : ProcessRepositoryBase<TEntity>, IMongoDbProcessedRepositoryBase<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
-        private readonly IProcessClient _client;
+        protected readonly IProcessClient _client;
 
         /// <summary>
         ///     Mongo db

@@ -35,7 +35,8 @@ namespace SOS.Lib.Repositories.Processed
                 elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
         }
 
-        private string GetProcessInfoId(byte instance) => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, instance, false);
+        //private string GetProcessInfoId(byte instance) => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, instance, false);
+        private string GetProcessInfoId(byte instance) => IndexHelper.GetIndexName<Observation>(_client.DatabaseName, true, instance, false);
 
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)

@@ -18,6 +18,11 @@ namespace SOS.Lib.Database.Interfaces
         public int WriteBatchSize { get; }
 
         /// <summary>
+        /// Database name.
+        /// </summary>
+        public string DatabaseName { get; }
+
+        /// <summary>
         ///     Get database
         /// </summary>
         /// <returns></returns>
