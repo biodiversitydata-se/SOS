@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -98,6 +99,7 @@ namespace SOS.Lib.IO.Excel
                                 PropertyFieldDataType.Double => ((double) value).ToString(CultureInfo.InvariantCulture),
                                 PropertyFieldDataType.Int32 => ((int)value).ToString(),
                                 PropertyFieldDataType.Int64 => ((long)value).ToString(),
+                                PropertyFieldDataType.String => ((string)value).RemoveNewLineTabs(),
                                 _ => (string)value
                             };
 
