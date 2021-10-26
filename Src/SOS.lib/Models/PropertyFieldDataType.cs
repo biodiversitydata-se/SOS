@@ -41,6 +41,11 @@
         /// <summary>
         /// A String value.
         /// </summary>
-        String = 5
+        String = 5,
+        
+        /// <summary>
+        /// A TimeSpan value.
+        /// </summary>
+        TimeSpan = 6
     }
 }

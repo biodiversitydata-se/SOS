@@ -68,6 +68,9 @@ namespace SOS.Lib.Helpers
                     case "DateTime":
                         field.DataTypeEnum = PropertyFieldDataType.DateTime;
                         break;
+                    case "TimeSpan":
+                        field.DataTypeEnum = PropertyFieldDataType.TimeSpan;
+                        break;
                     case "Double":
                         field.DataTypeEnum = PropertyFieldDataType.Double;
                         break;
