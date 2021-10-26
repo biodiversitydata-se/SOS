@@ -55,6 +55,8 @@ namespace SOS.Process.Processors.Shark
                 {
                     EndDate = verbatim.SampleDate?.ToUniversalTime(),
                     StartDate = verbatim.SampleDate?.ToUniversalTime(),
+                    StartTime = null,
+                    EndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
                 },
                 Identification = new Identification

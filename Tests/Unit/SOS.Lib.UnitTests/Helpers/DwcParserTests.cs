@@ -33,6 +33,35 @@ namespace SOS.Lib.UnitTests.Helpers
         }
 
         [Theory]
+        [MemberData(nameof(DwcEventDateWithTimeTestData))]
+        public void Parse_DwC_EventDateWithTime_fields(
+            string eventDate,
+            string year,
+            string month,
+            string day,
+            string eventTime,
+            bool expected,
+            DateTime? expectedStartDate,
+            DateTime? expectedEndDate,
+            TimeSpan? expextedStartTime,
+            TimeSpan? expectedEndtime)
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = DwcParser.TryParseEventDate(eventDate, year, month, day, eventTime, out var startDate, out var endDate, out var startTime, out var endTime);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().Be(expected);
+            startDate.Should().Be(expectedStartDate);
+            endDate.Should().Be(expectedEndDate);
+            startTime.Should().Be(expextedStartTime);
+            endTime.Should().Be(expectedEndtime);
+        }
+
+        [Theory]
         [MemberData(nameof(DwcEventIntervalDateTestData))]
         public void Parse_DwC_IntervalEventDate_fields(
             string strStartDate,
@@ -58,8 +87,8 @@ namespace SOS.Lib.UnitTests.Helpers
         public static IEnumerable<object[]> DwcEventDateTestData =>
             new List<object[]>
             {
-                new object[] {null, null, null, null, false, null, null},
-                new object[] {"a", "b", "c", "d", false, null, null},
+                new object[] { null, null, null, null, false, null, null },
+                new object[] { "a", "b", "c", "d", false, null, null },
                 new object[]
                 {
                     "1971", "1971", "", "", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31)
@@ -131,6 +160,59 @@ namespace SOS.Lib.UnitTests.Helpers
                 } // 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC).
             };
 
+        public static IEnumerable<object[]> DwcEventDateWithTimeTestData =>
+            new List<object[]>
+            {
+                new object[]
+                {
+                    "2009-02-20", null, null, null, null, true,
+                    new DateTime(2009, 2, 20),
+                    new DateTime(2009, 2, 20),
+                    null,
+                    null
+                },
+                new object[]
+                {
+                    "2009-02-20T08:40Z", "2009", "2", "20", null, true,
+                    new DateTime(2009, 2, 20, 9, 40, 0),
+                    new DateTime(2009, 2, 20, 9, 40, 0),
+                    new TimeSpan( 9, 40, 0),
+                    new TimeSpan( 9, 40, 0)
+                }, 
+                new object[]
+                {
+                    "2021-10-23T09:04:12.000Z", null, null, null, "09:04:12.000Z", true,
+                    new DateTime(2021, 10, 23, 11, 4, 12),
+                    new DateTime(2021, 10, 23, 11, 4, 12),
+                    new TimeSpan(11, 4, 12),
+                    new TimeSpan(11, 4, 12)
+                },
+                new object[]
+                {
+                    "2021-10-01T13:12:31", null, null, null, "11:12:31Z", true,
+                    new DateTime(2021, 10, 1, 13, 12, 31),
+                    new DateTime(2021, 10, 1, 13, 12, 31),
+                    new TimeSpan(13, 12, 31),
+                    new TimeSpan(13, 12, 31)
+                },
+                new object[]
+                {
+                    "2020-06-18", null, null, null, "08:00/10:40", true,
+                    new DateTime(2020, 6, 18, 8, 0, 0),
+                    new DateTime(2020, 6, 18, 10, 40, 0),
+                    new TimeSpan( 8, 0, 0),
+                    new TimeSpan(10, 40, 0)
+                },
+                new object[]
+                {
+                    "2020-06-18", null, null, null, "00:00:00", true,
+                    new DateTime(2020, 6, 18, 0, 0, 0),
+                    new DateTime(2020, 6, 18, 0, 0, 0),
+                    new TimeSpan(0, 0, 0),
+                    new TimeSpan(0, 0, 0)
+                }
+            };
+
         public static IEnumerable<object[]> DwcEventIntervalDateTestData =>
             new List<object[]>
             {
@@ -146,7 +228,7 @@ namespace SOS.Lib.UnitTests.Helpers
                 {
                     "2007-11-13", "15", true, new DateTime(2007, 11, 13), new DateTime(2007, 11, 15)
                 }, // 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).
-                new object[] {"2007-11-13", "31", false, null, null}, // 2007-11-13/31 There is only 30 days in november
+                new object[] { "2007-11-13", "31", false, null, null }, // 2007-11-13/31 There is only 30 days in november
                 new object[]
                 {
                     "2007-11-13", "2007-11-15", true, new DateTime(2007, 11, 13), new DateTime(2007, 11, 15)
@@ -207,7 +289,7 @@ namespace SOS.Lib.UnitTests.Helpers
                     .Add(TimeSpan.FromHours(6)).ToLocalTime());
             DwcParser.ParseDate("1995-09-13 00:00:00.0").Should().Be(new DateTime(1995, 9, 13));
             DwcParser.ParseDate("1900-01-01 00:00:00.0").Should().Be(new DateTime(1900, 1, 1));
-            DwcParser.ParseDate("2009-08-06 18:25:01.0000000").Should().Be(new DateTime(2009, 8, 6,18,25,1));
+            DwcParser.ParseDate("2009-08-06 18:25:01.0000000").Should().Be(new DateTime(2009, 8, 6, 18, 25, 1));
             DwcParser.ParseDate("2019-03-18T08:13:26.000Z").Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18, 8, 13, 26), DateTimeKind.Utc).ToLocalTime());
         }
     }

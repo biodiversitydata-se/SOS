@@ -10,10 +10,15 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Event
     {
         /// <summary>
-        ///    DiscoveryMethod from Artportalen.
+        ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
         /// </summary>
-        [Object]
-        public VocabularyValue DiscoveryMethod { get; set; }
+        public string EventId { get; set; }
+
+        /// <summary>
+        ///     Start date/time of the event (UTC).
+        /// </summary>
+        [Date]
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         ///     End date/time of the event (UTC).
@@ -22,9 +27,20 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
+        ///     Start time of the event in W. Europe Standard Time. The data type will probably change to TimeOnly? when .Net 6 is released.
         /// </summary>
-        public string EventId { get; set; }
+        public TimeSpan? StartTime { get; set; }
+
+        /// <summary>
+        ///     End time of the event in W. Europe Standard Time. The data type will probably change to TimeOnly? when .Net 6 is released.
+        /// </summary>
+        public TimeSpan? EndTime { get; set; }
+
+        /// <summary>
+        ///    DiscoveryMethod from Artportalen.
+        /// </summary>
+        [Object]
+        public VocabularyValue DiscoveryMethod { get; set; }
 
         /// <summary>
         ///     Comments or notes about the Event.
@@ -86,12 +102,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     5 for sampleSizeValue with metre for sampleSizeUnit.
         /// </example>
         public string SampleSizeValue { get; set; }
-
-        /// <summary>
-        ///     Start date/time of the event (UTC).
-        /// </summary>
-        [Date]
-        public DateTime? StartDate { get; set; }
 
         /// <summary>
         ///     The verbatim original representation of the date and time information for an Event.

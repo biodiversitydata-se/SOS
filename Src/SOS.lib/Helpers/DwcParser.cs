@@ -12,6 +12,8 @@ namespace SOS.Lib.Helpers
     /// </summary>
     public static class DwcParser
     {
+        private static TimeZoneInfo swedenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+
         /// <summary>
         ///     Default date formats used by ParseDate().
         ///     At least Year, Month and Day must be specified.
@@ -33,6 +35,7 @@ namespace SOS.Lib.Helpers
                     "yyyy-MM-dd'T'HH:mmK",
                     "yyyy-MM-dd'T'HHK",
                     "yyyy-MM-dd",
+                    "yyyy-0MM-dd", // special case for the TUVA dataset that contains multiple observations in this format.
                     "dddd, dd MMMM yyyy",
                     "dddd, dd MMMM yyyy HH:mm",
                     "dddd, dd MMMM yyyy hh:mm tt",
@@ -127,6 +130,72 @@ namespace SOS.Lib.Helpers
 
             startDate = ParseTime(eventTime, startDate.Value);
             endDate = ParseTime(eventTime, endDate.Value);
+            return true;
+        }
+
+
+        public static bool TryParseEventDate(
+            string eventDate,
+            string year,
+            string month,
+            string day,
+            string eventTime,
+            out DateTime? startDate,
+            out DateTime? endDate,
+            out TimeSpan? startTime,
+            out TimeSpan? endTime)
+        {
+            if (string.IsNullOrWhiteSpace(eventTime))
+            {
+                if (TryParseEventDate(eventDate, year, month, day, out startDate, out endDate))
+                {
+                    startTime = startDate != null && startDate.Value.TimeOfDay.Ticks > 0 ? startDate.Value.TimeOfDay : null;
+                    endTime = endDate != null && endDate.Value.TimeOfDay.Ticks > 0 ? endDate.Value.TimeOfDay : null;
+                    return true;
+                }
+
+                startTime = endTime = null;
+                return false;
+            }
+
+            if (!TryParseEventDate(eventDate, year, month, day, out startDate, out endDate))
+            {
+                startTime = endTime = null;
+                return false;
+            }
+
+            if (startDate == null || endDate == null)
+            {
+                startTime = endTime = null;
+                return false;
+            }
+
+            var timeParts = eventTime.Split("/");
+            if (timeParts.Length == 2) // Interval
+            {
+                startDate = ParseTime(timeParts[0], startDate.Value);
+                endDate = ParseTime(timeParts[1], endDate ?? endDate.Value);
+                if (startDate == null || endDate == null)
+                {
+                    startTime = endTime = null;
+                    return false;
+                }
+
+                startTime = startDate.Value.TimeOfDay;
+                endTime = endDate.Value.TimeOfDay;
+                return true;
+            }
+
+            startDate = ParseTime(eventTime, startDate.Value);
+            endDate = ParseTime(eventTime, endDate.Value);
+            if (startDate == null || endDate == null)
+            {
+                startTime = endTime = null;
+                return false;
+            }
+
+            startTime = startDate.Value.TimeOfDay;
+            endTime = endDate.Value.TimeOfDay;
             return true;
         }
 

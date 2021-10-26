@@ -105,7 +105,7 @@ namespace SOS.Process.Processors.Artportalen
                 var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
-               
+
                 var taxonId = verbatimObservation.TaxonId ?? -1;
                 _taxa.TryGetValue(taxonId, out var taxon);
                
@@ -142,6 +142,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
                 obs.Event.StartDate = startDate?.ToUniversalTime();
+                obs.Event.StartTime = verbatimObservation.StartTime;
+                obs.Event.EndTime = verbatimObservation.EndTime;
                 obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);
                 obs.Event.SamplingProtocol = (verbatimObservation.DiscoveryMethod?.Id ?? 0) == 0
                     ? null
