@@ -273,10 +273,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatim.Day,
                 verbatim.EventTime,
                 out var startDate,
-                out var endDate);
+                out var endDate,
+                out var startTime,
+                out var endTime);
 
             processedEvent.StartDate = startDate?.ToUniversalTime();
             processedEvent.EndDate = endDate?.ToUniversalTime();
+            processedEvent.StartTime = startTime;
+            processedEvent.EndTime = endTime;
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatim.EventMultimedia,

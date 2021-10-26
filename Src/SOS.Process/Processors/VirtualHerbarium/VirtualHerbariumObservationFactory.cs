@@ -71,6 +71,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 {
                     EndDate = dateCollected?.ToUniversalTime(),
                     StartDate = dateCollected?.ToUniversalTime(),
+                    StartTime = null,
+                    EndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected)
                 },
                 Identification = new Identification
