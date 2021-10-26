@@ -15,31 +15,10 @@ namespace SOS.Lib.Models.Processed.Observation
             _observation = observation;
         }
 
-        public string EventStartTimeString
-        {
-            get
-            {
-                var date = _observation?.Event?.StartDate;
-                if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                if (swedenDate.Hour == 0 && swedenDate.Minute == 0) return null;
-                string format = "HH:mm";
-                return swedenDate.ToString(format, CultureInfo.InvariantCulture);
-            }
-        }
+        public TimeSpan? EventStartTimeString => _observation?.Event?.StartTime;
+        public TimeSpan? EventEndTimeString => _observation?.Event?.EndTime;
 
-        public string EventEndTimeString
-        {
-            get
-            {
-                var date = _observation?.Event?.EndDate;
-                if (date == null) return null;
-                var swedenDate = TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-                if (swedenDate.Hour == 0 && swedenDate.Minute == 0) return null;
-                string format = "HH:mm";
-                return swedenDate.ToString(format, CultureInfo.InvariantCulture);
-            }
-        }
+      
         public string OccurrenceId => _observation?.Occurrence?.OccurrenceId;
         public string EventDiscoveryMethod => _observation?.Event?.DiscoveryMethod?.ToString();
         public int? EventDiscoveryMethodId => _observation?.Event?.DiscoveryMethod?.Id;

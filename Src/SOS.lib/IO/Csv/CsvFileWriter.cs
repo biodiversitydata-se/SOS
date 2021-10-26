@@ -99,6 +99,7 @@ namespace SOS.Lib.IO.Excel
                                 PropertyFieldDataType.Double => ((double) value).ToString(CultureInfo.InvariantCulture),
                                 PropertyFieldDataType.Int32 => ((int)value).ToString(),
                                 PropertyFieldDataType.Int64 => ((long)value).ToString(),
+                                PropertyFieldDataType.TimeSpan => ((TimeSpan?)value)?.ToString("hh\\:mm"),
                                 PropertyFieldDataType.String => ((string)value).RemoveNewLineTabs(),
                                 _ => (string)value
                             };
