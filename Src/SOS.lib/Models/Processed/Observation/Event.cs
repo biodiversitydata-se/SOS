@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Nest;
+using SOS.Lib.JsonConverters;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -27,14 +29,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        ///     Start time of the event in W. Europe Standard Time. The data type will probably change to TimeOnly? when .Net 6 is released.
+        ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
         /// </summary>
-        public TimeSpan? StartTime { get; set; }
+        public string StartTime { get; set; }
 
         /// <summary>
-        ///     End time of the event in W. Europe Standard Time. The data type will probably change to TimeOnly? when .Net 6 is released.
+        ///     End time of the event in W. Europe Standard Time formatted as hh:mm. 
         /// </summary>
-        public TimeSpan? EndTime { get; set; }
+        public string EndTime { get; set; }
 
         /// <summary>
         ///    DiscoveryMethod from Artportalen.

@@ -15,10 +15,8 @@ namespace SOS.Lib.Models.Processed.Observation
             _observation = observation;
         }
 
-        public TimeSpan? EventStartTimeString => _observation?.Event?.StartTime;
-        public TimeSpan? EventEndTimeString => _observation?.Event?.EndTime;
-
-      
+        public string EventStartTimeString => _observation?.Event?.StartTime;
+        public string EventEndTimeString => _observation?.Event?.EndTime;
         public string OccurrenceId => _observation?.Occurrence?.OccurrenceId;
         public string EventDiscoveryMethod => _observation?.Event?.DiscoveryMethod?.ToString();
         public int? EventDiscoveryMethodId => _observation?.Event?.DiscoveryMethod?.Id;

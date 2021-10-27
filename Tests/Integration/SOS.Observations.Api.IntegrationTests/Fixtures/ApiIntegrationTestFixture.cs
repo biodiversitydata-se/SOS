@@ -26,6 +26,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
@@ -45,6 +46,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public ExportsController ExportsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
+        public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
+        public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         private IFilterManager _filterManager { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
@@ -80,6 +83,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
             var elasticConfiguration = config.GetSection($"{configPrefix}:SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            return elasticConfiguration;
+        }
+
+        protected ElasticSearchConfiguration GetCustomSearchDbConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var elasticConfiguration = config.GetSection($"{configPrefix}:CustomSearchDbConfiguration").Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
         }
 
@@ -145,6 +156,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             TaxonManager = taxonManager;
+            ProcessedObservationRepository = processedObservationRepository;
+            ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
+            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)

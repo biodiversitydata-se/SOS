@@ -279,8 +279,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             processedEvent.StartDate = startDate?.ToUniversalTime();
             processedEvent.EndDate = endDate?.ToUniversalTime();
-            processedEvent.StartTime = startTime;
-            processedEvent.EndTime = endTime;
+            processedEvent.StartTime = startTime?.ToString("hh\\:mm");
+            processedEvent.EndTime = endTime?.ToString("hh\\:mm");
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatim.EventMultimedia,
