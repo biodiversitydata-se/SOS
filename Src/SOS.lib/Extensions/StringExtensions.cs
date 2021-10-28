@@ -354,5 +354,15 @@ namespace SOS.Lib.Extensions
             var hash = sha1.ComputeHash(buf, 0, buf.Length);
             return BitConverter.ToString(hash).Replace("-", "");
         }
+
+        /// <summary>
+        /// Remove white spaces.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static string RemoveWhiteSpace(this string self)
+        {
+            return new string(self.Where(c => !Char.IsWhiteSpace(c)).ToArray());
+        }
     }
 }

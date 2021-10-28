@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -43,7 +44,8 @@ namespace SOS.Process.Processors.Shark
         {
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-            var sharkSampleId = verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId;
+            var sharkSampleId = $"{verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId}-{verbatim.DyntaxaId}-{verbatim.Parameter}-{verbatim.Value}".RemoveWhiteSpace();
+            
             var obs = new Observation
             {
                 AccessRights = accessRights,
