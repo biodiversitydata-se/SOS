@@ -195,7 +195,7 @@ namespace SOS.Process.Processors.Artportalen
                 // Occurrence
                 obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
-                    ? $"http://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
+                    ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}"
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
@@ -236,7 +236,7 @@ namespace SOS.Process.Processors.Artportalen
                     obs.Occurrence.Substrate.SpeciesScientificName = substratTaxon.ScientificName;
                 }
 
-                obs.Occurrence.Url = $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
+                obs.Occurrence.Url = $"https://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
 
