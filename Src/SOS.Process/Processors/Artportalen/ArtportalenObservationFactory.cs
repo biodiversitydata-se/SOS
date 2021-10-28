@@ -142,6 +142,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
                 obs.Event.StartDate = startDate?.ToUniversalTime();
+                obs.Event.PlainStartDate = startDate?.ToString("yyyy-MM-dd");
+                obs.Event.PlainEndDate = endDate?.ToString("yyyy-MM-dd");
                 obs.Event.StartTime = verbatimObservation.StartTime?.ToString("hh\\:mm");
                 obs.Event.EndTime = verbatimObservation.EndTime?.ToString("hh\\:mm");
                 obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);

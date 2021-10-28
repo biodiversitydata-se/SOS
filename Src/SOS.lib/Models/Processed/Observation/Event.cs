@@ -29,6 +29,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        ///     Start date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainStartDate { get; set; }
+
+        /// <summary>
+        ///     End date of the event in the format yyyy-MM-dd.
+        /// </summary>
+        public string PlainEndDate { get; set; }
+
+        /// <summary>
         ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
         /// </summary>
         public string StartTime { get; set; }

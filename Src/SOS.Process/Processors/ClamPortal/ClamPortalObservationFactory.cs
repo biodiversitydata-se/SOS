@@ -56,6 +56,8 @@ namespace SOS.Process.Processors.ClamPortal
                     EndDate = verbatim.ObservationDate.ToUniversalTime(),
                     SamplingProtocol = verbatim.SurveyMethod,
                     StartDate = verbatim.ObservationDate.ToUniversalTime(),
+                    PlainStartDate = verbatim.ObservationDate.ToString("yyyy-MM-dd"),
+                    PlainEndDate = verbatim.ObservationDate.ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.ObservationDate)
