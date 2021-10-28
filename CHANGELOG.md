@@ -1,6 +1,26 @@
 # Changelog
 
-## [1.0.3]
+## [1.4]
+**Test**: 2021-10-28
+
+**Prod**: 
+
+### `Added`
+- New date and time properties : `Event.StartTime`, `Event.EndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
+- Export to CSV.
+- New endpoint for observation count that uses caching for improved performance.
+- Support for Elasticsearch clusters.
+
+### `Changed`
+- Hangfire jobs now uses two queues. One with high priority (observation processing) and one with normal priority (file orders).
+- Limit the number of simultaneous file orders per user to 5.
+
+### `Fixed`
+- Added a new date format in order to parse the TUVA dataset.
+- Changed SHARK OccurrenceId value in order to get unique keys.
+- 
+
+## [1.3]
 **Test**: 2021-10-05 
 
 **Prod**: 2021-10-05
@@ -19,7 +39,7 @@
 ### `Fixed`
 - DwC-A time parsing bug in the harvest step.
 
-## [1.0.2]
+## [1.2]
 
 ### Releases
 
@@ -49,7 +69,7 @@
 - Areas => Geographics.Areas
 - OnlyValidated => ValidationStatus (enum)
 
-## [1.0.1]
+## [1.1]
 
 ### Releases
 
