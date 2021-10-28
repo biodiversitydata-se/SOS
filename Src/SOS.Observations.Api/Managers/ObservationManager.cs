@@ -37,7 +37,7 @@ namespace SOS.Observations.Api.Managers
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly ILogger<ObservationManager> _logger;
         
-        private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode, bool useSwedishDates = false)
+        private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -48,12 +48,8 @@ namespace SOS.Observations.Api.Managers
             {
                 var occurenceIds = new HashSet<string>();
                 var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
+                LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode, true);
-                if (useSwedishDates)
-                {
-                    LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
-                }
-
                 foreach (var obs in observations)
                 {
                     if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
@@ -134,14 +130,14 @@ namespace SOS.Observations.Api.Managers
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter, int skip, int take, string sortBy,
-            SearchSortOrder sortOrder, bool useSwedishDates = false)
+            SearchSortOrder sortOrder)
         {
             try
             {
                 await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
-                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode, useSwedishDates);
+                PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }

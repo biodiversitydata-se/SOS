@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using SOS.Import.Factories.Validation.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
@@ -100,6 +101,7 @@ namespace SOS.Import.Factories.Validation
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = await CreateProcessedObservationAsync(verbatimObservation, dataProvider);
                     nrProcessedObservations++;
+                    LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                             {processedObservation}, true);
                     ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
