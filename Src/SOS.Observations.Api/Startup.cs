@@ -182,7 +182,7 @@ namespace SOS.Observations.Api
             services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.DefaultApiVersion = new ApiVersion(1, 4);
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
             });

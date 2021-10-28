@@ -19,7 +19,6 @@ namespace SOS.Observations.Api.Controllers
     /// <summary>
     /// Data providers controller.
     /// </summary>
-    [ApiVersion("1.0")]
     [Route("[controller]")]
     [ApiController]
     public class DataProvidersController : ControllerBase, IDataProviderController
