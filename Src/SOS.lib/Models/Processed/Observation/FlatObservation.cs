@@ -43,6 +43,9 @@ namespace SOS.Lib.Models.Processed.Observation
                 //return _observation?.Event?.EndDate;
             }
         }
+
+        public string EventPlainStartDate => _observation?.Event?.PlainStartDate;
+        public string EventPlainEndDate => _observation?.Event?.PlainEndDate;
         public string EventEventId => _observation?.Event?.EventId;
         public string EventEventRemarks => _observation?.Event?.EventRemarks;
         public string EventFieldNotes => _observation?.Event?.FieldNotes;

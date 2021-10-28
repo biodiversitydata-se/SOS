@@ -53,6 +53,8 @@ namespace SOS.Process.Processors.FishData
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
                     StartDate = verbatim.Start.ToUniversalTime(),
+                    PlainStartDate = verbatim.Start.ToString("yyyy-MM-dd"),
+                    PlainEndDate = verbatim.End.ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)

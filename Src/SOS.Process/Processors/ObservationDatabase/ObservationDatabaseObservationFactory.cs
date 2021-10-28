@@ -59,6 +59,8 @@ namespace SOS.Process.Processors.ObservationDatabase
                     FieldNotes = verbatim.Origin, // Is there any better field for this?
                     Habitat = verbatim.Habitat,
                     StartDate = verbatim.StartDate.ToUniversalTime(),
+                    PlainStartDate = verbatim.StartDate.ToString("yyyy-MM-dd"),
+                    PlainEndDate = verbatim.EndDate.ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
                     // Substrate = verbatim.Substrate, Todo map 

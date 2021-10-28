@@ -71,6 +71,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 {
                     EndDate = dateCollected?.ToUniversalTime(),
                     StartDate = dateCollected?.ToUniversalTime(),
+                    PlainStartDate = dateCollected?.ToString("yyyy-MM-dd"),
+                    PlainEndDate = dateCollected?.ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected)
