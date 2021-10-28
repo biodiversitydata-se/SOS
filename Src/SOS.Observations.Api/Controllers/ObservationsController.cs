@@ -869,8 +869,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool protectedObservations = false,
-            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json,
-            [FromQuery] bool useSwedishDates = false)
+            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
             try
             {
@@ -896,7 +895,7 @@ namespace SOS.Observations.Api.Controllers
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder, useSwedishDates);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }

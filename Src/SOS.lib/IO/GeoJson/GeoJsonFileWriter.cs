@@ -98,6 +98,7 @@ namespace SOS.Lib.IO.GeoJson
                     {
                         var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+                        LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                         foreach (var record in processedRecords)
                         {
                             await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);

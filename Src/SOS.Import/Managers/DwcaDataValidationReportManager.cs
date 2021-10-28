@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
@@ -119,6 +120,7 @@ namespace SOS.Import.Managers
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
+                    LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation}, true);
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);

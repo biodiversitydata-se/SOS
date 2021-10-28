@@ -39,7 +39,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private static void ConvertToLocalTime(Observation obs)
+        public static void ConvertToLocalTime(Observation obs)
         {
             obs.Created = obs.Created.ToLocalTime();
             obs.Modified = obs.Modified?.ToLocalTime();

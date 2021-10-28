@@ -9,6 +9,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -235,6 +236,7 @@ namespace SOS.Process.Processors
         {
 
             Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
+            LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
             vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
             var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
 
