@@ -333,6 +333,7 @@ namespace SOS.Lib.IO.DwcArchive
 
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvFileHelper,
                 FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
+            await csvFileHelper.FlushAsync();
             foreach (var filePath in occurrenceFilePaths)
             {
                 await using var readStream = File.OpenRead(filePath);
@@ -350,6 +351,7 @@ namespace SOS.Lib.IO.DwcArchive
                 await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Optimal).Open();
                 csvFileHelper.InitializeWrite(extendedMeasurementOrFactFileStream, "\t");
                 _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvFileHelper);
+                await csvFileHelper.FlushAsync();
                 foreach (var filePath in emofFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
@@ -368,6 +370,7 @@ namespace SOS.Lib.IO.DwcArchive
                 await using var multimediaFileStream = archive.CreateEntry("multimedia.csv", CompressionLevel.Optimal).Open();
                 csvFileHelper.InitializeWrite(multimediaFileStream, "\t");
                 _simpleMultimediaCsvWriter.WriteHeaderRow(csvFileHelper);
+                await csvFileHelper.FlushAsync();
                 foreach (var filePath in multimediaFilePaths)
                 {
                     await using var readStream = File.OpenRead(filePath);
