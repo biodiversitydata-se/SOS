@@ -27,7 +27,6 @@ namespace SOS.Process.Processors.Shark
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
@@ -38,7 +37,7 @@ namespace SOS.Process.Processors.Shark
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
         /// <returns></returns>
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
@@ -57,11 +56,11 @@ namespace SOS.Process.Processors.Shark
                 {
                     EndDate = verbatim.SampleDate?.ToUniversalTime(),
                     StartDate = verbatim.SampleDate?.ToUniversalTime(),
-                    PlainStartDate = verbatim.SampleDate?.ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.SampleDate?.ToString("yyyy-MM-dd"),
+                    PlainStartDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
+                    PlainEndDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
+                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate?.ToLocalTime())
                 },
                 Identification = new Identification
                 {
