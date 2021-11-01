@@ -279,8 +279,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             processedEvent.StartDate = startDate?.ToUniversalTime();
             processedEvent.EndDate = endDate?.ToUniversalTime();
-            processedEvent.PlainStartDate = startDate?.ToString("yyyy-MM-dd");
-            processedEvent.PlainEndDate = endDate?.ToString("yyyy-MM-dd");
+            processedEvent.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
+            processedEvent.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
             processedEvent.StartTime = startTime?.ToString("hh\\:mm");
             processedEvent.EndTime = endTime?.ToString("hh\\:mm");
 

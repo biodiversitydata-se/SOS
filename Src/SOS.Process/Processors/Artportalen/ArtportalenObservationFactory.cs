@@ -142,11 +142,11 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
                 obs.Event.StartDate = startDate?.ToUniversalTime();
-                obs.Event.PlainStartDate = startDate?.ToString("yyyy-MM-dd");
-                obs.Event.PlainEndDate = endDate?.ToString("yyyy-MM-dd");
+                obs.Event.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
+                obs.Event.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
                 obs.Event.StartTime = verbatimObservation.StartTime?.ToString("hh\\:mm");
                 obs.Event.EndTime = verbatimObservation.EndTime?.ToString("hh\\:mm");
-                obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);
+                obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
                 obs.Event.SamplingProtocol = (verbatimObservation.DiscoveryMethod?.Id ?? 0) == 0
                     ? null
                     : verbatimObservation.DiscoveryMethod.Translate(Cultures.en_GB, Cultures.sv_SE);

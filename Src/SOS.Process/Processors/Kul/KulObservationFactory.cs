@@ -53,11 +53,11 @@ namespace SOS.Process.Processors.Kul
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
                     StartDate = verbatim.Start.ToUniversalTime(),
-                    PlainStartDate = verbatim.Start.ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.End.ToString("yyyy-MM-dd"),
+                    PlainStartDate = verbatim.Start.ToLocalTime().ToString("yyyy-MM-dd"),
+                    PlainEndDate = verbatim.End.ToLocalTime().ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start.ToLocalTime(), verbatim.End.ToLocalTime())
                 },
                 Identification = new Identification
                 {

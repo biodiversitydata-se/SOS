@@ -25,7 +25,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="geometryManager"></param>
         public VirtualHerbariumObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
@@ -36,7 +35,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
         /// <returns></returns>
         public Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -71,11 +70,11 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 {
                     EndDate = dateCollected?.ToUniversalTime(),
                     StartDate = dateCollected?.ToUniversalTime(),
-                    PlainStartDate = dateCollected?.ToString("yyyy-MM-dd"),
-                    PlainEndDate = dateCollected?.ToString("yyyy-MM-dd"),
+                    PlainStartDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
+                    PlainEndDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
                     StartTime = null,
                     EndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected)
+                    VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected?.ToLocalTime())
                 },
                 Identification = new Identification
                 {
