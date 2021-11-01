@@ -48,6 +48,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
+        public DwcArchiveFileWriter DwcArchiveFileWriter { get; set; }
         private IFilterManager _filterManager { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
@@ -159,6 +160,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
+            DwcArchiveFileWriter = dwcArchiveFileWriter;
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)

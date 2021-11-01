@@ -310,7 +310,7 @@ namespace SOS.Lib.IO.DwcArchive
             await CreateDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
         }
 
-        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
+        public async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
             IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
             if (dataProvider.UseVerbatimFileInExport)
