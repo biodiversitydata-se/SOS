@@ -81,22 +81,24 @@ namespace SOS.Lib.Helpers
         public IEnumerable<T> GetRecords<T>(IVariableLengthReaderBuilder<T> mapping)
         { 
             var parser = mapping.Build(";");
-
+            var builder = new StringBuilder();
             var records = new List<T>();
             _csvReader.Read();
 
             while (_csvReader.Read())
             {
-                var row = string.Empty;
+                builder.Clear();
                 for (var i = 0; i < _csvReader.FieldsCount; i++)
                 {
                     if (i > 0)
                     {
-                        row += ";";
+                        builder.Append(";");
                     }
 
-                    row += GetField(i);
+                    builder.Append(GetField(i));
                 }
+
+                var row = builder.ToString();
                 records.Add(parser.Parse(row));
             }
 
