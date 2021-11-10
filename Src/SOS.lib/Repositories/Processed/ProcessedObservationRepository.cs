@@ -1791,10 +1791,11 @@ namespace SOS.Lib.Repositories.Processed
         {
             // Save user extended authorization to use later
             var extendedAuthorizations = filter.ExtendedAuthorization?.ExtendedAreas;
-
-            // Reset extended authorization so it not will affect query
+            // Authorization is handled different in signal search, reset some values before we get core queries
             filter.ExtendedAuthorization.ExtendedAreas = null;
-           
+            filter.ExtendedAuthorization.UserId = 0;
+            filter.ExtendedAuthorization.ProtectedObservations = false;
+
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
             
