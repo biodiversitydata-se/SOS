@@ -305,15 +305,6 @@ namespace SOS.Lib.Managers
                 filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(user, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
-                if (filter is SearchFilter searchFilter)
-                {
-                    if ((searchFilter.OutputFields?.Any() ?? false) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        searchFilter.OutputFields.Add("occurrence.occurrenceId");
-                    }
-                }
                 if (filter is SearchFilterInternal searchFilterInternal)
                 {
                     if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
@@ -321,6 +312,15 @@ namespace SOS.Lib.Managers
                         !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
                         searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
+                    }
+                }
+                else if (filter is SearchFilter searchFilter)
+                {
+                    if ((searchFilter.OutputFields?.Any() ?? false) &&
+                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
+                        !searchFilter.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        searchFilter.OutputFields.Add("occurrence.occurrenceId");
                     }
                 }
             }
