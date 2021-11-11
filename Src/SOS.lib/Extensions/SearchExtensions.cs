@@ -245,7 +245,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTermCriteria("privateCollection.keyword", internalFilter.PrivateCollection);
             query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
             query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
-            query.TryAddTermCriteria("event.biotope.id", internalFilter.BiotopeId);
+            query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
             
             switch (internalFilter.NotPresentFilter)
             {
