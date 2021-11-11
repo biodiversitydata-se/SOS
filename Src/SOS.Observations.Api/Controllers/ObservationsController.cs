@@ -80,19 +80,19 @@ namespace SOS.Observations.Api.Controllers
                 return;
             }
 
-            if (!bboxLeft.HasValue || envelope.MinX > bboxLeft)
+            if (!bboxLeft.HasValue || envelope.MinX < bboxLeft)
             {
                 bboxLeft = envelope.MinX;
             }
-            if (!bboxRight.HasValue || envelope.MaxX < bboxRight)
+            if (!bboxRight.HasValue || envelope.MaxX > bboxRight)
             {
                 bboxRight = envelope.MaxX;
             }
-            if (!bboxBottom.HasValue || envelope.MinY > bboxBottom)
+            if (!bboxBottom.HasValue || envelope.MinY < bboxBottom)
             {
                 bboxBottom = envelope.MinY;
             }
-            if (!bboxTop.HasValue || envelope.MaxY < bboxTop)
+            if (!bboxTop.HasValue || envelope.MaxY > bboxTop)
             {
                 bboxTop = envelope.MaxY;
             }
