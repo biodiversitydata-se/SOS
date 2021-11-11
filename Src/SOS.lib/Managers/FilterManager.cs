@@ -314,15 +314,6 @@ namespace SOS.Lib.Managers
                         searchFilter.OutputFields.Add("occurrence.occurrenceId");
                     }
                 }
-                if (filter is SearchFilterInternal searchFilterInternal)
-                {
-                    if ((searchFilterInternal.OutputFields?.Any() ?? false) &&
-                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
-                        !searchFilterInternal.OutputFields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        searchFilterInternal.OutputFields.Add("occurrence.occurrenceId");
-                    }
-                }
             }
 
             if (setDefaultProviders.HasValue && setDefaultProviders.Value)
