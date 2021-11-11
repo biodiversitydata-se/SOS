@@ -227,8 +227,7 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlyWithBarcode)
             {
-                query.AddMustExistsCriteria("taxon.individualId");
-                // query.TryAddWildcardCriteria("taxon.individualId", "?*");
+                query.AddMustExistsCriteria("artportalenInternal.sightingBarcodeURL");
             }
 
             switch (internalFilter.UnspontaneousFilter)
