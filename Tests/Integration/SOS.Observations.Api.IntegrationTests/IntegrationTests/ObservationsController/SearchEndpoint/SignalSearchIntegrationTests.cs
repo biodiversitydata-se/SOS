@@ -27,6 +27,67 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task Test_SignalSearch_with_bounding_box()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _fixture.UseUserServiceWithToken(_fixture.UserAuthenticationToken);
+
+            var searchFilter = new SignalFilterDto()
+            {
+                Geographics = new GeographicsFilterDto()
+                {
+                    BoundingBox = new LatLonBoundingBoxDto()
+                    {
+                        BottomRight = new LatLonCoordinateDto()
+                        {
+                            Latitude = -90, Longitude = 180
+                        },
+                        TopLeft = new LatLonCoordinateDto()
+                        {
+                            Latitude = 90, Longitude = -180
+                        }
+                    },
+                    ConsiderObservationAccuracy = true,
+                    ConsiderDisturbanceRadius = true,
+                    MaxAccuracy = 5000
+                },
+                Taxon = new TaxonFilterBaseDto()
+                {
+                    TaxonListIds = new[]
+                    {
+                        (int)TaxonListId.RedlistedSpecies,
+                        (int)TaxonListId.HabitatsDirective,
+                        (int)TaxonListId.ProtectedByLaw,
+                        (int)TaxonListId.ActionPlan,
+                        (int)TaxonListId.SwedishForestAgencyNatureConservationSpecies
+                    }
+                },
+                StartDate = new DateTime(1950, 1, 1)
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.SignalSearchInternal(
+                0,
+                "CountyAdministrationObservation",
+                searchFilter,
+                false,
+                0,
+                true);
+            var result = response.GetResult<bool>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
+        }
+
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Test_SignalSearch_in_Tranas_municipality_when_having_access_to_Jonkoping_county()
         {
             //-----------------------------------------------------------------------------------------------------------
