@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
@@ -28,6 +26,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
@@ -50,6 +49,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public DwcArchiveFileWriter DwcArchiveFileWriter { get; set; }
         private IFilterManager _filterManager { get; set; }
+        public string UserAuthenticationToken { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
 
@@ -70,6 +70,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         }
 
         public void Dispose() { }
+
+        protected string GetUserAuthenticationToken()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var userAuthenticationToken = config.GetSection($"{configPrefix}:UserAuthenticationToken").Get<string>();
+            return userAuthenticationToken;
+        }
 
         protected MongoDbConfiguration GetMongoDbConfiguration()
         {
@@ -113,6 +121,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         private void Initialize()
         {
+            UserAuthenticationToken = GetUserAuthenticationToken();
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
@@ -223,6 +232,18 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return userService;
         }
 
+        protected virtual IUserService CreateUserService(string token)
+        {
+            var userServiceConfiguration = GetUserServiceConfiguration();
+            IHttpContextAccessor contextAccessor = new HttpContextAccessor();
+            contextAccessor.HttpContext = new DefaultHttpContext();
+            contextAccessor.HttpContext.Request.Headers.Add("Authorization", token);
+            IAuthorizationProvider authorizationProvider = new CurrentUserAuthorization(contextAccessor);
+            var userService = new UserService(authorizationProvider,
+                new HttpClientService(new NullLogger<HttpClientService>()), userServiceConfiguration, new NullLogger<UserService>());
+            return userService;
+        }
+        
         private VocabularyManager CreateVocabularyManager(ProcessClient processClient, VocabularyRepository vocabularyRepository)
         {
             var vocabularyCache = new VocabularyCache(vocabularyRepository);
@@ -253,6 +274,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public void UseMockUserService(params AuthorityModel[] authorities)
         {
             UserModel user = new UserModel();
+            user.Id = 15;
             var userServiceMock = new Moq.Mock<IUserService>();
             userServiceMock.Setup(userService => userService.GetUserAsync())
                 .ReturnsAsync(user);
@@ -260,6 +282,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                     userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(authorities);
             _filterManager.UserService = userServiceMock.Object;
+        }
+
+
+        public void UseUserServiceWithToken(string token)
+        {
+            var userService = CreateUserService(token);
+            _filterManager.UserService = userService;
         }
     }
 }
