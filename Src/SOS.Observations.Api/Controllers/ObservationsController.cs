@@ -286,29 +286,37 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                if (fromYear is <= 0) return BadRequest("fromYear must be larger than 0");
+                if (toYear is <= 0) return BadRequest("toYear must be larger than 0");
+                
                 var filter = new SearchFilterBaseDto
                 {
-                    Date = fromYear.HasValue || toYear.HasValue ? new DateFilterDto
-                    {
-                        StartDate = fromYear.HasValue ? new DateTime(fromYear.Value, 1, 1) : null,
-                        EndDate = toYear.HasValue ? new DateTime(toYear.Value, 12, 31) : null,
-                        DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
-                    } : null,
-                    Geographics = string.IsNullOrEmpty(featureId) || areaType == null ? null :
-                        new GeographicsFilterDto
+                    Date = fromYear.HasValue || toYear.HasValue
+                        ? new DateFilterDto
+                        {
+                            StartDate = fromYear.HasValue ? new DateTime(fromYear.Value, 1, 1) : null,
+                            EndDate = toYear.HasValue ? new DateTime(toYear.Value, 12, 31) : null,
+                            DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+                        }
+                        : null,
+                    Geographics = string.IsNullOrEmpty(featureId) || areaType == null
+                        ? null
+                        : new GeographicsFilterDto
                         {
                             Areas = new[] { new AreaFilterDto { AreaType = areaType.Value, FeatureId = featureId } }
                         },
                     Taxon = new TaxonFilterDto
                     {
-                        Ids = new []{taxonId},
+                        Ids = new[] { taxonId },
                         IncludeUnderlyingTaxa = includeUnderlyingTaxa
                     },
                     OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                    DataProvider = dataProviderId.HasValue ? new DataProviderFilterDto
-                    {
-                        Ids = new List<int> { dataProviderId.Value }
-                    } : null
+                    DataProvider = dataProviderId.HasValue
+                        ? new DataProviderFilterDto
+                        {
+                            Ids = new List<int> { dataProviderId.Value }
+                        }
+                        : null
                 };
 
                 var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
