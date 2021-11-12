@@ -478,19 +478,19 @@ namespace SOS.Lib.Extensions
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             // Default DoNotShowMerged
-            var sightingTypeSearchGroupFilter = new[] { 0, 1, 4, 16, 32, 128 };
+            var sightingTypeSearchGroupFilter = new[] { 1, 4, 16, 32, 128 };
 
             if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
             {
-                sightingTypeSearchGroupFilter = new[] { 0, 1, 2, 4, 16, 32, 128 };
+                sightingTypeSearchGroupFilter = new[] { 1, 2, 4, 16, 32, 128 };
             }
             else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
             {
-                sightingTypeSearchGroupFilter = new[] { 0, 2 };
+                sightingTypeSearchGroupFilter = new[] { 2 };
             }
             else if (filter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
             {
-                sightingTypeSearchGroupFilter = new[] { 0, 1, 2, 4, 32, 128 };
+                sightingTypeSearchGroupFilter = new[] { 1, 2, 4, 32, 128 };
             }
 
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
