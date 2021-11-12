@@ -26,7 +26,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         // Todo arguments for protected sightings
         private string SightingWhereBasics => @$" 
             s.SightingTypeId IN (0,3,8)
-            AND s.SightingTypeSearchGroupId IN (1,16,32,256) 
+            AND s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128) 
 	        AND s.ValidationStatusId <> 50
             AND ss.IsActive = 1
 	        AND ss.SightingStateTypeId = 30 
