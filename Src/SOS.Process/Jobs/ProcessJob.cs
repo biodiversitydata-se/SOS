@@ -222,10 +222,20 @@ namespace SOS.Process.Jobs
             var observationsCount = 1000;
 
             // Get 1000 random observations from protected index
-            var protectedObservations = (await _processedObservationRepository.GetRandomObservationsAsync(observationsCount, true))?
-                .Where(o => o.Occurrence != null)
-                .Distinct()
-                .ToDictionary(o => o.Occurrence.OccurrenceId, o => o);
+            var rndProObservations = (await _processedObservationRepository.GetRandomObservationsAsync(observationsCount, true))?.ToArray();
+            if (!rndProObservations?.Any() ?? true)
+            {
+                return true;
+            }
+
+            var protectedObservations = new Dictionary<string, Observation>();
+            foreach (var rndProObs in rndProObservations)
+            {
+                if (!string.IsNullOrEmpty(rndProObs.Occurrence?.OccurrenceId) && !protectedObservations.ContainsKey(rndProObs.Occurrence.OccurrenceId))
+                {
+                    protectedObservations.Add(rndProObs.Occurrence?.OccurrenceId, rndProObs);
+                }
+            }
 
             if (protectedObservations?.Any() ?? false)
             {
