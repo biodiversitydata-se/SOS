@@ -1595,14 +1595,10 @@ namespace SOS.Lib.Repositories.Processed
 
         public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
 
-        /// <summary>
-        /// Name of public index 
-        /// </summary>
+        /// <inheritdoc />
         public string PublicIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
 
-        /// <summary>
-        /// Name of protected index 
-        /// </summary>
+        /// <inheritdoc />
         public string ProtectedIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, true);
 
         /// <inheritdoc />
@@ -1816,6 +1812,13 @@ namespace SOS.Lib.Repositories.Processed
 
             return searchResponse.Count > 0;
         }
+
+        /// <inheritdoc />
+        public string UniquePublicIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+
+        /// <inheritdoc />
+        public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
+
 
         /// <inheritdoc />
         public async Task<bool> ValidateProtectionLevelAsync(bool protectedIndex)

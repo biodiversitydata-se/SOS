@@ -12,6 +12,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         ///     Get process information
         /// </summary>
         /// <returns></returns>
-        Task<ProcessInfoDto> GetProcessInfoAsync(bool active);
+        Task<ProcessInfoDto> GetProcessInfoAsync(string id);
     }
 }

@@ -500,7 +500,7 @@ namespace SOS.Process.Jobs
             }
 
             // Try to get process info for current instance
-            var processInfo = await GetObservationProcessInfoAsync(mode == JobRunModes.IncrementalActiveInstance);
+            var processInfo = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
 
             if (processInfo == null || mode == JobRunModes.Full)
             {
@@ -536,12 +536,13 @@ namespace SOS.Process.Jobs
                 }
 
                 var metaDataProcessInfo = await GetProcessInfoAsync(new[]
-                {
+                    {
                         nameof(Lib.Models.Processed.Observation.Area),
                         nameof(Taxon)
-                    });
+                    }
+                );
 
-                processInfo = new ProcessInfo(_processedObservationRepository.PublicIndexName, processStart)
+                processInfo = new ProcessInfo(_processedObservationRepository.UniquePublicIndexName, processStart)
                 {
                     PublicCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.PublicCount),
                     ProtectedCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.ProtectedCount),

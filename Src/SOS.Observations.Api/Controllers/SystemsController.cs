@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -19,15 +20,22 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly ILogger<SystemsController> _logger;
         private readonly IProcessInfoManager _processInfoManager;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="processInfoManager"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
-        public SystemsController(IProcessInfoManager processInfoManager, ILogger<SystemsController> logger)
+        /// <exception cref="ArgumentNullException"></exception>
+        public SystemsController(IProcessInfoManager processInfoManager,
+            IProcessedObservationRepository processedObservationRepository,
+            ILogger<SystemsController> logger)
         {
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -40,7 +48,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(active));
+                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.PublicIndexName));
             }
             catch (Exception e)
             {
