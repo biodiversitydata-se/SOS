@@ -296,6 +296,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             bool onlyAboveMyClearance);
 
         /// <summary>
+        /// Unique name of public index 
+        /// </summary>
+        string UniquePublicIndexName { get; }
+
+        /// <summary>
+        /// Unique name of protected index 
+        /// </summary>
+        string UniqueProtectedIndexName { get; }
+
+        /// <summary>
         ///  Make sure no protected observations are in public index or no public observations are in protected index
         /// </summary>
         /// <param name="protectedIndex"></param>

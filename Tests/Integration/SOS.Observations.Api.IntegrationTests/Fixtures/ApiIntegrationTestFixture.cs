@@ -140,7 +140,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processInfoRepository = new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
-            var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, new NullLogger<DataProviderManager>());
+            var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, processedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
             VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
             var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,

@@ -226,7 +226,7 @@ namespace SOS.Import.Harvesters.Observations
 
             var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
 
-            // Try to get DwcA file from IPT and store it locally
+            // Try to get DwcA file from IPT and store it locall
             if (!await _fileDownloadService.GetFileAndStoreAsync(provider.DownloadUrl, path))
             {
                 return harvestInfo;
