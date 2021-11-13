@@ -81,10 +81,7 @@ namespace SOS.Observations.Api.Managers
                 }
                 else
                 {
-                    if (includeProvidersWithNoObservations)
-                    {
-                        dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
-                    }
+                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
                 }
             }
 
