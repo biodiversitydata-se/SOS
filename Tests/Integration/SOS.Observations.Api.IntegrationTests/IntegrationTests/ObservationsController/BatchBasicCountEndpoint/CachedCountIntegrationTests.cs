@@ -6,6 +6,7 @@ using FluentAssertions;
 using SOS.Lib.Cache;
 using SOS.Lib.Models.Cache;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
@@ -113,6 +114,37 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             double memAfterCache = GC.GetTotalMemory(true);
             double bytesPerItem = (memAfterCache - memBeforeCache) / nrRequests;
             bytesPerItem.Should().BeLessThan(150, "less than 150 bytes should be used to store cache item");
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task Cached_count_multiple_requests_with_different_featureId_should_result_in_different_result()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var firstCachedResponse = await _fixture.ObservationsController.CachedCount(
+                103151,
+                true,
+                1900,
+                2021,
+                AreaTypeDto.Province,
+                "1");
+            int firstCount = firstCachedResponse.GetResult<int>();
+
+            var secondCachedResponse = await _fixture.ObservationsController.CachedCount(
+                103151,
+                true,
+                1900,
+                2021,
+                AreaTypeDto.Province,
+                "2");
+            int secondCount = secondCachedResponse.GetResult<int>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            firstCount.Should().NotBe(secondCount);
         }
     }
 }
