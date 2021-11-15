@@ -12,7 +12,6 @@
         <DocumentationFile>bin\Release\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.Hangfire" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.Network" Version="5.0.4" />

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
@@ -339,7 +338,6 @@ namespace SOS.Observations.Api
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
 
-
             services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
                     x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
@@ -352,13 +350,7 @@ namespace SOS.Observations.Api
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
-                .AddElasticsearch(a => a
-                        .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => string.Join(';', c.Hosts.Select(h => h)))))
-                        .UseBasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
-                        .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
-                        .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null,
-                    tags: new[] { "database", "elasticsearch", "system" });
+                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
