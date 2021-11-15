@@ -46,7 +46,7 @@ namespace SOS.Observations.Api.HealthChecks
             var result = await _observationManager.GetChunkAsync(0, null,serachFilter, 0, 2, "", SearchSortOrder.Asc);
             sw.Stop();
 
-            return result.TotalCount > 0 ? sw.ElapsedMilliseconds < 500 ? HealthStatus.Healthy : HealthStatus.Degraded : HealthStatus.Unhealthy;
+            return result.TotalCount > 0 ? sw.ElapsedMilliseconds < 750 ? HealthStatus.Healthy : HealthStatus.Degraded : HealthStatus.Unhealthy;
         }
 
         private async Task<HealthStatus> SearchByProviderAsync()
