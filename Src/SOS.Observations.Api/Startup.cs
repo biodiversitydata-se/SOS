@@ -354,7 +354,7 @@ namespace SOS.Observations.Api
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
                 .AddElasticsearch(a => a
-                        .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => c.Hosts)))
+                        .UseServer(string.Join(';', elasticConfiguration.Clusters.Select(c => string.Join(';', c.Hosts.Select(h => h)))))
                         .UseBasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
                         .UseCertificateValidationCallback((o, certificate, arg3, arg4) => true)
                         .UseCertificateValidationCallback(CertificateValidations.AllowAll), "ElasticSearch", null,
