@@ -151,12 +151,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             // Location
             obs.Location = CreateProcessedLocation(verbatim);
-            if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))
+            if (!GISExtensions.TryParseCoordinateSystem(string.IsNullOrEmpty(verbatim.GeodeticDatum) ? verbatim.VerbatimSRS : verbatim.GeodeticDatum, out var coordinateSystem))
             {
                 coordinateSystem = CoordinateSys.WGS84;
             }
-            AddPositionData(obs.Location, verbatim.DecimalLongitude.ParseDouble(), verbatim.DecimalLatitude.ParseDouble(),
-                    coordinateSystem, verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, obs.Taxon?.Attributes?.DisturbanceRadius);
+            AddPositionData(obs.Location, 
+                verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble(), 
+                verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble(),
+                coordinateSystem, 
+                verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 
+                obs.Taxon?.Attributes?.DisturbanceRadius);
            
             // MaterialSample
             obs.MaterialSample = CreateProcessedMaterialSample(verbatim);
