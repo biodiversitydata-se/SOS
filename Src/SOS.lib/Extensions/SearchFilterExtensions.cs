@@ -29,7 +29,7 @@ namespace SOS.Lib.Extensions
             if (filter.OutputFields?.Any() == true && outputFieldSet == null) return;
             const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
             var fieldSet = outputFieldSet == null ? defaultFieldSet : (OutputFieldSet)outputFieldSet;
-            if (fieldSet == OutputFieldSet.AllWithKnownValues || fieldSet == OutputFieldSet.All)
+            if (fieldSet == OutputFieldSet.AllWithValues || fieldSet == OutputFieldSet.All)
             {
                 filter.OutputFields = null;
                 return;

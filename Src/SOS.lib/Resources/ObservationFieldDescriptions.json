@@ -91,7 +91,7 @@
 		"FlatPropertyName": "Protected",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Protected",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -148,7 +148,7 @@
 		"FlatPropertyName": "AccessRightsId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "AccessRights.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -167,7 +167,7 @@
 		"FlatPropertyName": "AccessRightsValue",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "AccessRights",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -205,7 +205,7 @@
 		"FlatPropertyName": "BasisOfRecordId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "BasisOfRecord.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -300,7 +300,7 @@
 		"FlatPropertyName": "InstitutionCodeId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "InstitutionCode.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -528,7 +528,7 @@
 		"FlatPropertyName": "EventEventId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Event.EventId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -604,7 +604,7 @@
 		"FlatPropertyName": "EventDiscoveryMethodId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Event.DiscoveryMethod.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1345,7 +1345,7 @@
 		"FlatPropertyName": "EventVerbatimEventDate",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Event.VerbatimEventDate",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1421,7 +1421,7 @@
 		"FlatPropertyName": "IdentificationValidationStatusId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.ValidationStatus.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1554,7 +1554,7 @@
 		"FlatPropertyName": "IdentificationConfirmedDate",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.ConfirmedDate",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -1592,7 +1592,7 @@
 		"FlatPropertyName": "IdentificationDateIdentified",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.DateIdentified",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -1649,7 +1649,7 @@
 		"FlatPropertyName": "IdentificationDeterminationMethodId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.DeterminationMethod.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1706,7 +1706,7 @@
 		"FlatPropertyName": "IdentificationIdentificationQualifier",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.IdentificationQualifier",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1725,7 +1725,7 @@
 		"FlatPropertyName": "IdentificationTypeStatus",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Identification.TypeStatus",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1934,7 +1934,7 @@
 		"FlatPropertyName": "LocationLocationRemarks",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.LocationRemarks",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -1972,7 +1972,7 @@
 		"FlatPropertyName": "LocationMunicipalityFeatureId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Municipality.FeatureId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2029,7 +2029,7 @@
 		"FlatPropertyName": "LocationCountyFeatureId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.County.FeatureId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2086,7 +2086,7 @@
 		"FlatPropertyName": "LocationParishFeatureId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Parish.FeatureId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2143,7 +2143,7 @@
 		"FlatPropertyName": "LocationProvinceFeatureId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Province.FeatureId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2200,7 +2200,7 @@
 		"FlatPropertyName": "LocationContinentId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Continent.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2219,7 +2219,7 @@
 		"FlatPropertyName": "LocationContinentValue",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Continent",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2257,7 +2257,7 @@
 		"FlatPropertyName": "LocationCountryId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Country.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2276,7 +2276,7 @@
 		"FlatPropertyName": "LocationCountryValue",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Country",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2295,7 +2295,7 @@
 		"FlatPropertyName": "LocationCountryCode",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.CountryCode",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2314,7 +2314,7 @@
 		"FlatPropertyName": "LocationGeoreferencedBy",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.GeoreferencedBy",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2333,7 +2333,7 @@
 		"FlatPropertyName": "LocationGeoreferencedDate",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.GeoreferencedDate",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2352,7 +2352,7 @@
 		"FlatPropertyName": "LocationGeoreferenceRemarks",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.GeoreferenceRemarks",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2371,7 +2371,7 @@
 		"FlatPropertyName": "LocationHigherGeography",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.HigherGeography",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2390,7 +2390,7 @@
 		"FlatPropertyName": "LocationIsland",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.Island",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2409,7 +2409,7 @@
 		"FlatPropertyName": "LocationMaximumDepthInMeters",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.MaximumDepthInMeters",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2428,7 +2428,7 @@
 		"FlatPropertyName": "LocationMaximumElevationInMeters",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.MaximumElevationInMeters",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2447,7 +2447,7 @@
 		"FlatPropertyName": "LocationMinimumDepthInMeters",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.MinimumDepthInMeters",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2466,7 +2466,7 @@
 		"FlatPropertyName": "LocationMinimumElevationInMeters",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.MinimumElevationInMeters",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2485,7 +2485,7 @@
 		"FlatPropertyName": "LocationVerbatimCoordinateSystem",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.VerbatimCoordinateSystem",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2504,7 +2504,7 @@
 		"FlatPropertyName": "LocationVerbatimLatitude",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.VerbatimLatitude",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2523,7 +2523,7 @@
 		"FlatPropertyName": "LocationVerbatimLongitude",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.VerbatimLongitude",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2542,7 +2542,7 @@
 		"FlatPropertyName": "LocationVerbatimSRS",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.VerbatimSRS",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -2561,7 +2561,7 @@
 		"FlatPropertyName": "LocationWaterBody",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Location.WaterBody",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3074,7 +3074,7 @@
 		"FlatPropertyName": "OccurrenceOccurrenceStatusId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.OccurrenceStatus.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3188,7 +3188,7 @@
 		"FlatPropertyName": "OccurrenceOrganismQuantityUnitId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.OrganismQuantityUnit.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3378,7 +3378,7 @@
 		"FlatPropertyName": "OccurrenceActivityId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Activity.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3435,7 +3435,7 @@
 		"FlatPropertyName": "OccurrenceBehaviorId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Behavior.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3492,7 +3492,7 @@
 		"FlatPropertyName": "OccurrenceBiotopeId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Biotope.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3587,7 +3587,7 @@
 		"FlatPropertyName": "OccurrenceLifeStageId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.LifeStage.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3644,7 +3644,7 @@
 		"FlatPropertyName": "OccurrenceReproductiveConditionId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.ReproductiveCondition.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3701,7 +3701,7 @@
 		"FlatPropertyName": "OccurrenceSexId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Sex.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3815,7 +3815,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateDescription",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.Description",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3834,7 +3834,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3872,7 +3872,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateNameId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.Name.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3910,7 +3910,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateQuantity",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.Quantity",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3929,7 +3929,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateSpeciesDescription",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.SpeciesDescription",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3948,7 +3948,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateSpeciesId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.SpeciesId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3967,7 +3967,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateSpeciesScientificName",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.SpeciesScientificName",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -3986,7 +3986,7 @@
 		"FlatPropertyName": "OccurrenceSubstrateSpeciesVernacularName",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Substrate.SpeciesVernacularName",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4005,7 +4005,7 @@
 		"FlatPropertyName": "OccurrenceBirdNestActivityId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.BirdNestActivityId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -4024,7 +4024,7 @@
 		"FlatPropertyName": "OccurrenceCatalogNumber",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.CatalogNumber",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -4043,7 +4043,7 @@
 		"FlatPropertyName": "OccurrenceCatalogId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.CatalogId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -4062,7 +4062,7 @@
 		"FlatPropertyName": "OccurrenceAssociatedReferences",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.AssociatedReferences",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4081,7 +4081,7 @@
 		"FlatPropertyName": "OccurrenceIndividualId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.IndividualId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4100,7 +4100,7 @@
 		"FlatPropertyName": "OccurrenceMedia",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Media",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4404,7 +4404,7 @@
 		"FlatPropertyName": "OccurrencePreparations",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.Preparations",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4423,7 +4423,7 @@
 		"FlatPropertyName": "OccurrenceRecordNumber",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.RecordNumber",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4442,7 +4442,7 @@
 		"FlatPropertyName": "OccurrenceReportedDate",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Occurrence.ReportedDate",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4651,7 +4651,7 @@
 		"FlatPropertyName": "TaxonAcceptedNameUsageId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.AcceptedNameUsageId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4670,7 +4670,7 @@
 		"FlatPropertyName": "TaxonBirdDirective",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.BirdDirective",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -4689,7 +4689,7 @@
 		"FlatPropertyName": "TaxonHigherClassification",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.HigherClassification",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -4746,7 +4746,7 @@
 		"FlatPropertyName": "TaxonScientificNameAuthorship",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.ScientificNameAuthorship",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5031,7 +5031,7 @@
 		"FlatPropertyName": "TaxonNomenclaturalStatus",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.NomenclaturalStatus",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5069,7 +5069,7 @@
 		"FlatPropertyName": "TaxonOriginalNameUsageId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.OriginalNameUsageId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5107,7 +5107,7 @@
 		"FlatPropertyName": "TaxonParentNameUsageId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.ParentNameUsageId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5145,7 +5145,7 @@
 		"FlatPropertyName": "TaxonSecondaryParentDyntaxaTaxonIds",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.SecondaryParentDyntaxaTaxonIds",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5240,7 +5240,7 @@
 		"FlatPropertyName": "TaxonTaxonomicStatus",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.TaxonomicStatus",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5278,7 +5278,7 @@
 		"FlatPropertyName": "TaxonTaxonRemarks",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.TaxonRemarks",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5335,7 +5335,7 @@
 		"FlatPropertyName": "TaxonAttributesActionPlan",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.ActionPlan",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5354,7 +5354,7 @@
 		"FlatPropertyName": "TaxonAttributesDisturbanceRadius",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.DisturbanceRadius",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5373,7 +5373,7 @@
 		"FlatPropertyName": "TaxonAttributesDyntaxaTaxonId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.DyntaxaTaxonId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Remove?"
 	},
 	{
@@ -5392,7 +5392,7 @@
 		"FlatPropertyName": "TaxonAttributesNatura2000HabitatsDirectiveArticle2",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.Natura2000HabitatsDirectiveArticle2",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5411,7 +5411,7 @@
 		"FlatPropertyName": "TaxonAttributesNatura2000HabitatsDirectiveArticle4",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.Natura2000HabitatsDirectiveArticle4",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5430,7 +5430,7 @@
 		"FlatPropertyName": "TaxonAttributesNatura2000HabitatsDirectiveArticle5",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.Natura2000HabitatsDirectiveArticle5",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Extended?"
 	},
 	{
@@ -5468,7 +5468,7 @@
 		"FlatPropertyName": "TaxonAttributesParentDyntaxaTaxonId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.ParentDyntaxaTaxonId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Remove?"
 	},
 	{
@@ -5525,7 +5525,7 @@
 		"FlatPropertyName": "TaxonAttributesProtectionLevelId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.ProtectionLevel.Id",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5639,7 +5639,7 @@
 		"FlatPropertyName": "TaxonAttributesSortOrder",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.SortOrder",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": "Remove?"
 	},
 	{
@@ -5658,7 +5658,7 @@
 		"FlatPropertyName": "TaxonAttributesSwedishHistory",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.SwedishHistory",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5677,7 +5677,7 @@
 		"FlatPropertyName": "TaxonAttributesSwedishOccurrence",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.SwedishOccurrence",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5696,7 +5696,7 @@
 		"FlatPropertyName": "TaxonAttributesSynonyms",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.Synonyms",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5791,7 +5791,7 @@
 		"FlatPropertyName": "TaxonAttributesVernacularNames",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Taxon.Attributes.VernacularNames",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5886,7 +5886,7 @@
 		"FlatPropertyName": "DatasetId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "DatasetId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5905,7 +5905,7 @@
 		"FlatPropertyName": "DynamicProperties",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "DynamicProperties",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5924,7 +5924,7 @@
 		"FlatPropertyName": "InstitutionId",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "InstitutionId",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -5981,7 +5981,7 @@
 		"FlatPropertyName": "Language",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "Language",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -6000,7 +6000,7 @@
 		"FlatPropertyName": "License",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "License",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -6019,7 +6019,7 @@
 		"FlatPropertyName": "PrivateCollection",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "PrivateCollection",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -6038,7 +6038,7 @@
 		"FlatPropertyName": "PublicCollection",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "PublicCollection",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{
@@ -6057,7 +6057,7 @@
 		"FlatPropertyName": "SpeciesCollectionLabel",
 		"IsPartOfFlatObservation": true,
 		"DependsOn": "SpeciesCollectionLabel",
-		"FieldSet": "AllWithKnownValues",
+		"FieldSet": "AllWithValues",
 		"Comment": ""
 	},
 	{

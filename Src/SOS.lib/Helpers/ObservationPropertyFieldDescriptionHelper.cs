@@ -127,7 +127,7 @@ namespace SOS.Lib.Helpers
             {
                 {OutputFieldSet.Minimum, new List<PropertyFieldDescription>()},
                 {OutputFieldSet.Extended, new List<PropertyFieldDescription>()},
-                {OutputFieldSet.AllWithKnownValues, new List<PropertyFieldDescription>()},
+                {OutputFieldSet.AllWithValues, new List<PropertyFieldDescription>()},
                 {OutputFieldSet.All, new List<PropertyFieldDescription>()}
             };
             
@@ -138,11 +138,11 @@ namespace SOS.Lib.Helpers
                 {
                     fieldsByFieldSet[OutputFieldSet.Minimum].Add(field);
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.Minimum, OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues,
+                        OutputFieldSet.Minimum, OutputFieldSet.Extended, OutputFieldSet.AllWithValues,
                         OutputFieldSet.All
                     };
                     field.FieldSetEnum = OutputFieldSet.Minimum;
@@ -150,23 +150,23 @@ namespace SOS.Lib.Helpers
                 else if (field.FieldSet == "Extended")
                 {
                     fieldsByFieldSet[OutputFieldSet.Extended].Add(field);
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.Extended, OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                        OutputFieldSet.Extended, OutputFieldSet.AllWithValues, OutputFieldSet.All
                     };
                     field.FieldSetEnum = OutputFieldSet.Extended;
                 }
-                else if (field.FieldSet == "AllWithKnownValues")
+                else if (field.FieldSet == "AllWithValues")
                 {
-                    fieldsByFieldSet[OutputFieldSet.AllWithKnownValues].Add(field);
+                    fieldsByFieldSet[OutputFieldSet.AllWithValues].Add(field);
                     fieldsByFieldSet[OutputFieldSet.All].Add(field);
                     field.FieldSets = new List<OutputFieldSet>
                     {
-                        OutputFieldSet.AllWithKnownValues, OutputFieldSet.All
+                        OutputFieldSet.AllWithValues, OutputFieldSet.All
                     };
-                    field.FieldSetEnum = OutputFieldSet.AllWithKnownValues;
+                    field.FieldSetEnum = OutputFieldSet.AllWithValues;
                 }
                 else if (field.FieldSet == "All")
                 {
@@ -189,13 +189,13 @@ namespace SOS.Lib.Helpers
             {
                 {OutputFieldSet.Minimum, new List<string>()},
                 {OutputFieldSet.Extended, new List<string>()},
-                {OutputFieldSet.AllWithKnownValues, new List<string>()},
+                {OutputFieldSet.AllWithValues, new List<string>()},
                 {OutputFieldSet.All, new List<string>()}
             };
 
             foreach (var pair in fieldsByFieldSet)
             {
-                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithKnownValues)
+                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithValues)
                 {
                     continue; // retrieve all fields from Elasticsearch
                 }
