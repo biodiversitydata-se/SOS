@@ -61,8 +61,8 @@ namespace SOS.Process.Processors.ObservationDatabase
                     StartDate = verbatim.StartDate.ToUniversalTime(),
                     PlainStartDate = verbatim.StartDate.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = verbatim.EndDate.ToLocalTime().ToString("yyyy-MM-dd"),
-                    StartTime = null,
-                    EndTime = null,
+                    PlainStartTime = null,
+                    PlainEndTime = null,
                     // Substrate = verbatim.Substrate, Todo map 
                     VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.StartDate.ToLocalTime(), verbatim.EndDate.ToLocalTime())
                 },
@@ -70,7 +70,9 @@ namespace SOS.Process.Processors.ObservationDatabase
                 {
                     UncertainIdentification = false,
                     Validated = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
+                    Verified = false,
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
+                    VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 InstitutionId = verbatim.SCI_code,
                 Location = new Location
@@ -97,6 +99,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                     OccurrenceRemarks = verbatim.OccurrenceRemarks,
                     OccurrenceStatus = new VocabularyValue { Id = (int)(verbatim.TaxonId == 0 ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
                     ProtectionLevel = verbatim.ProtectionLevel,
+                    SensitivityCategory = verbatim.ProtectionLevel,
                     RecordedBy = verbatim.Observers,
                     ReportedDate = verbatim.StartDate.ToUniversalTime()
                 },

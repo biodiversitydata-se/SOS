@@ -15,8 +15,8 @@ namespace SOS.Lib.Models.Processed.Observation
             _observation = observation;
         }
 
-        public string EventStartTimeString => _observation?.Event?.StartTime;
-        public string EventEndTimeString => _observation?.Event?.EndTime;
+        public string EventStartTimeString => _observation?.Event?.PlainStartTime;
+        public string EventEndTimeString => _observation?.Event?.PlainEndTime;
         public string OccurrenceId => _observation?.Occurrence?.OccurrenceId;
         public string EventDiscoveryMethod => _observation?.Event?.DiscoveryMethod?.ToString();
         public int? EventDiscoveryMethodId => _observation?.Event?.DiscoveryMethod?.Id;
@@ -87,9 +87,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IdentificationIdentificationReferences => _observation?.Identification?.IdentificationReferences;
         public string IdentificationIdentificationRemarks => _observation?.Identification?.IdentificationRemarks;
         public bool? IdentificationValidated => _observation?.Identification?.Validated;
+        public bool? IdentificationVerified => _observation?.Identification?.Verified;
+        [Obsolete]
         public string IdentificationValidationStatus => _observation?.Identification?.ValidationStatus?.ToString();
+        [Obsolete]
         public int? IdentificationValidationStatusId => _observation?.Identification?.ValidationStatus?.Id;
+        [Obsolete]
         public string IdentificationValidationStatusValue => _observation?.Identification?.ValidationStatus?.Value;
+        public string IdentificationVerificationStatus => _observation?.Identification?.VerificationStatus?.ToString();
+        public int? IdentificationVerificationStatusId => _observation?.Identification?.VerificationStatus?.Id;
+        public string IdentificationVerificationStatusValue => _observation?.Identification?.VerificationStatus?.Value;
         public string IdentificationIdentifiedBy => _observation?.Identification?.IdentifiedBy;
         public string IdentificationTypeStatus => _observation?.Identification?.TypeStatus;
         public bool? IdentificationUncertainIdentification => _observation?.Identification?.UncertainIdentification;
@@ -131,7 +138,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationGeoreferenceSources => _observation?.Location?.GeoreferenceSources;
         public string LocationGeoreferenceVerificationStatus => _observation?.Location?.GeoreferenceVerificationStatus;
         public string LocationHigherGeography => _observation?.Location?.HigherGeography;
-        public string LocationHigherGeographyID => _observation?.Location?.HigherGeographyID;
+        public string LocationHigherGeographyId => _observation?.Location?.HigherGeographyId;
         public string LocationIsland => _observation?.Location?.Island;
         public string LocationIslandGroup => _observation?.Location?.IslandGroup;
         public string LocationLocality => _observation?.Location?.Locality;
@@ -178,7 +185,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceEstablishmentMeansId => _observation?.Occurrence?.EstablishmentMeans?.Id;
         public string OccurrenceEstablishmentMeansValue => _observation?.Occurrence?.EstablishmentMeans?.Value;
         public string OccurrenceIndividualCount => _observation?.Occurrence?.IndividualCount;
-        public string OccurrenceIndividualID => _observation?.Occurrence?.IndividualID;
+        public string OccurrenceIndividualId => _observation?.Occurrence?.IndividualId;
         public bool? OccurrenceIsNaturalOccurrence => _observation?.Occurrence?.IsNaturalOccurrence;
         public bool? OccurrenceIsNeverFoundObservation => _observation?.Occurrence?.IsNeverFoundObservation;
         public bool? OccurrenceIsNotRediscoveredObservation => _observation?.Occurrence?.IsNotRediscoveredObservation;
@@ -199,7 +206,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? OccurrenceOrganismQuantityUnitId => _observation?.Occurrence?.OrganismQuantityUnit?.Id;
         public string OccurrenceOrganismQuantityUnitValue => _observation?.Occurrence?.OrganismQuantityUnit?.Value;
         public string OccurrencePreparations => _observation?.Occurrence?.Preparations;
+        [Obsolete]
         public int? OccurrenceProtectionLevel => _observation?.Occurrence?.ProtectionLevel;
+        public int? OccurrenceSensitivityCategory => _observation?.Occurrence?.SensitivityCategory;
         public string OccurrenceRecordedBy => _observation?.Occurrence?.RecordedBy;
         public string OccurrenceRecordNumber => _observation?.Occurrence?.RecordNumber;
         public string OccurrenceReportedBy => _observation?.Occurrence?.ReportedBy;
@@ -240,7 +249,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OrganismPreviousIdentifications => _observation?.Organism?.PreviousIdentifications;
         public string OrganismOrganismRemarks => _observation?.Organism?.OrganismRemarks;
         public string TaxonAcceptedNameUsage => _observation?.Taxon?.AcceptedNameUsage;
-        public string TaxonAcceptedNameUsageID => _observation?.Taxon?.AcceptedNameUsageID;
+        public string TaxonAcceptedNameUsageId => _observation?.Taxon?.AcceptedNameUsageId;
         public string TaxonAttributesActionPlan => _observation?.Taxon?.Attributes?.ActionPlan;
         public int? TaxonAttributesDisturbanceRadius => _observation?.Taxon?.Attributes?.DisturbanceRadius;
         public int? TaxonAttributesDyntaxaTaxonId => _observation?.Taxon?.Attributes?.DyntaxaTaxonId;
@@ -250,9 +259,15 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonAttributesOrganismGroup => _observation?.Taxon?.Attributes?.OrganismGroup;
         public int? TaxonAttributesParentDyntaxaTaxonId => _observation?.Taxon?.Attributes?.ParentDyntaxaTaxonId;
         public bool? TaxonAttributesProtectedByLaw => _observation?.Taxon?.Attributes?.ProtectedByLaw;
+        [Obsolete]
         public string TaxonAttributesProtectionLevel => _observation?.Taxon?.Attributes?.ProtectionLevel?.ToString();
+        [Obsolete]
         public int? TaxonAttributesProtectionLevelId => _observation?.Taxon?.Attributes?.ProtectionLevel?.Id;
+        [Obsolete]
         public string TaxonAttributesProtectionLevelValue => _observation?.Taxon?.Attributes?.ProtectionLevel?.Value;
+        public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.ProtectionLevel?.ToString();
+        public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.ProtectionLevel?.Id;
+        public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.ProtectionLevel?.Value;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
         public string TaxonAttributesSwedishHistory => _observation?.Taxon?.Attributes?.SwedishHistory;
@@ -268,7 +283,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonInfraspecificEpithet => _observation?.Taxon?.InfraspecificEpithet;
         public string TaxonKingdom => _observation?.Taxon?.Kingdom;
         public string TaxonNameAccordingTo => _observation?.Taxon?.NameAccordingTo;
-        public string TaxonNameAccordingToID => _observation?.Taxon?.NameAccordingToID;
+        public string TaxonNameAccordingToId => _observation?.Taxon?.NameAccordingToId;
         public string TaxonNamePublishedIn => _observation?.Taxon?.NamePublishedIn;
         public string TaxonNamePublishedInId => _observation?.Taxon?.NamePublishedInId;
         public string TaxonNamePublishedInYear => _observation?.Taxon?.NamePublishedInYear;
@@ -328,7 +343,9 @@ namespace SOS.Lib.Models.Processed.Observation
         }
         public string OwnerInstitutionCode => _observation?.OwnerInstitutionCode;
         public string PrivateCollection => _observation?.PrivateCollection;
+        [Obsolete]
         public bool? Protected => _observation?.Protected;
+        public bool? Sensitive => _observation?.Sensitive;
         public string PublicCollection => _observation?.PublicCollection;
         public string References => _observation?.References;
         public string RightsHolder => _observation?.RightsHolder;
@@ -356,6 +373,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return Modified;
                 case "Protected":
                     return Protected;
+                case "Sensitive":
+                    return Sensitive;
                 case "AccessRights":
                     return AccessRights;
                 case "AccessRights.Id":
@@ -386,9 +405,9 @@ namespace SOS.Lib.Models.Processed.Observation
                     return EventStartDate;
                 case "Event.EndDate":
                     return EventEndDate;
-                case "Event.StartTime":
+                case "Event.PlainStartTime":
                     return EventStartTimeString;
-                case "Event.EndTime":
+                case "Event.PlainEndTime":
                     return EventEndTimeString;
                 case "Event.EventId":
                     return EventEventId;
@@ -424,12 +443,20 @@ namespace SOS.Lib.Models.Processed.Observation
                     return EventVerbatimEventDate;
                 case "Identification.Validated":
                     return IdentificationValidated;
+                case "Identification.Verified":
+                    return IdentificationVerified;
                 case "Identification.ValidationStatus":
                     return IdentificationValidationStatus;
                 case "Identification.ValidationStatus.Id":
                     return IdentificationValidationStatusId;
                 case "Identification.ValidationStatus.Value":
                     return IdentificationValidationStatusValue;
+                case "Identification.VerificationStatus":
+                    return IdentificationVerificationStatus;
+                case "Identification.VerificationStatus.Id":
+                    return IdentificationVerificationStatusId;
+                case "Identification.VerificationStatus.Value":
+                    return IdentificationVerificationStatusValue;
                 case "Identification.ConfirmedBy":
                     return IdentificationConfirmedBy;
                 case "Identification.ConfirmedDate":
@@ -552,8 +579,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return LocationGeoreferenceSources;
                 case "Location.GeoreferenceVerificationStatus":
                     return LocationGeoreferenceVerificationStatus;
-                case "Location.HigherGeographyID":
-                    return LocationHigherGeographyID;
+                case "Location.HigherGeographyId":
+                    return LocationHigherGeographyId;
                 case "Location.IslandGroup":
                     return LocationIslandGroup;
                 case "Location.LocationAccordingTo":
@@ -606,6 +633,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return OccurrenceOccurrenceRemarks;
                 case "Occurrence.ProtectionLevel":
                     return OccurrenceProtectionLevel;
+                case "Occurrence.SensitivityCategory":
+                    return OccurrenceSensitivityCategory;
                 case "Occurrence.Activity":
                     return OccurrenceActivity;
                 case "Occurrence.Activity.Id":
@@ -680,8 +709,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return OccurrenceCatalogId;
                 case "Occurrence.AssociatedReferences":
                     return OccurrenceAssociatedReferences;
-                case "Occurrence.IndividualID":
-                    return OccurrenceIndividualID;
+                case "Occurrence.IndividualId":
+                    return OccurrenceIndividualId;
                 case "Occurrence.Media":
                     return OccurrenceMedia;
                 case "Occurrence.Preparations":
@@ -708,8 +737,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return OccurrenceOtherCatalogNumbers;
                 case "Taxon.AcceptedNameUsage":
                     return TaxonAcceptedNameUsage;
-                case "Taxon.AcceptedNameUsageID":
-                    return TaxonAcceptedNameUsageID;
+                case "Taxon.AcceptedNameUsageId":
+                    return TaxonAcceptedNameUsageId;
                 case "Taxon.BirdDirective":
                     return TaxonBirdDirective;
                 case "Taxon.HigherClassification":
@@ -738,8 +767,8 @@ namespace SOS.Lib.Models.Processed.Observation
                     return TaxonInfraspecificEpithet;
                 case "Taxon.NameAccordingTo":
                     return TaxonNameAccordingTo;
-                case "Taxon.NameAccordingToID":
-                    return TaxonNameAccordingToID;
+                case "Taxon.NameAccordingToId":
+                    return TaxonNameAccordingToId;
                 case "Taxon.NamePublishedIn":
                     return TaxonNamePublishedIn;
                 case "Taxon.NamePublishedInId":
@@ -802,6 +831,12 @@ namespace SOS.Lib.Models.Processed.Observation
                     return TaxonAttributesProtectionLevelId;
                 case "Taxon.Attributes.ProtectionLevel.Value":
                     return TaxonAttributesProtectionLevelValue;
+                case "Taxon.Attributes.SensitivityCategory":
+                    return TaxonAttributesSensitivityCategory;
+                case "Taxon.Attributes.SensitivityCategory.Id":
+                    return TaxonAttributesSensitivityCategoryId;
+                case "Taxon.Attributes.SensitivityCategory.Value":
+                    return TaxonAttributesSensitivityCategoryValue;
                 case "Taxon.Attributes.RedlistCategory":
                     return TaxonAttributesRedlistCategory;
                 case "Taxon.Attributes.SortOrder":

@@ -72,15 +72,17 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     StartDate = dateCollected?.ToUniversalTime(),
                     PlainStartDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    StartTime = null,
-                    EndTime = null,
+                    PlainStartTime = null,
+                    PlainEndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected?.ToLocalTime())
                 },
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
                     Validated = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
+                    Verified = false,
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
+                    VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location
                 {
@@ -96,6 +98,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
                     ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },

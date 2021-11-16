@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Observations.Api.Dtos;
@@ -23,6 +24,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.DataProvidersCo
         [Trait("Category", "ApiIntegrationTest")]
         public async Task Get_all_active_data_providers_except_the_ones_with_no_observations()
         {
+            DateTime d = DateTime.Parse("2008-07-07T09:00:00Z");
+            var s = d.ToLocalTime().ToString();
+
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

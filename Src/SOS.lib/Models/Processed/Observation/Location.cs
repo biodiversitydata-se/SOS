@@ -232,7 +232,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     such as the Getty Thesaurus of Geographic Names.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string HigherGeographyID { get; set; }
+        public string HigherGeographyId { get; set; }
 
         /// <summary>
         ///     The name of the island on or near which the Location occurs.

@@ -58,8 +58,8 @@ namespace SOS.Process.Processors.Shark
                     StartDate = verbatim.SampleDate?.ToUniversalTime(),
                     PlainStartDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    StartTime = null,
-                    EndTime = null,
+                    PlainStartTime = null,
+                    PlainEndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate?.ToLocalTime())
                 },
                 Identification = new Identification
@@ -67,7 +67,9 @@ namespace SOS.Process.Processors.Shark
                     IdentifiedBy = verbatim.AnalysedBy,
                     UncertainIdentification = false,
                     Validated = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
+                    Verified = false,
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
+                    VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location
                 {
@@ -83,6 +85,7 @@ namespace SOS.Process.Processors.Shark
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.Taxonomist,
                     ReportedBy = verbatim.ReportedStationName,
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)

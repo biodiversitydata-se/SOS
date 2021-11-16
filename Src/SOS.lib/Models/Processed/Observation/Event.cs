@@ -17,13 +17,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public string EventId { get; set; }
 
         /// <summary>
-        ///     Start date/time of the event (UTC).
+        ///     Start date/time of the event in W. Europe Standard Time.
         /// </summary>
         [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        ///     End date/time of the event (UTC).
+        ///     End date/time of the event in W. Europe Standard Time.
         /// </summary>
         [Date]
         public DateTime? EndDate { get; set; }
@@ -41,12 +41,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Start time of the event in W. Europe Standard Time formatted as hh:mm.
         /// </summary>
-        public string StartTime { get; set; }
+        public string PlainStartTime { get; set; }
 
         /// <summary>
         ///     End time of the event in W. Europe Standard Time formatted as hh:mm. 
         /// </summary>
-        public string EndTime { get; set; }
+        public string PlainEndTime { get; set; }
 
         /// <summary>
         ///    DiscoveryMethod from Artportalen.

@@ -26,7 +26,7 @@ namespace SOS.Import.Factories.Vocabularies
                                              throw new ArgumentNullException(nameof(artportalenMetadataRepository));
         }
 
-        protected override VocabularyId FieldId => VocabularyId.ValidationStatus;
+        protected override VocabularyId FieldId => VocabularyId.VerificationStatus;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()

@@ -30,7 +30,7 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.ValidationStatus);
+            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.VerificationStatus);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

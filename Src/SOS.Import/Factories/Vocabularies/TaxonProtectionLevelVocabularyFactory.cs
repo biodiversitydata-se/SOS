@@ -15,7 +15,7 @@ namespace SOS.Import.Factories.Vocabularies
     /// </summary>
     public class TaxonProtectionLevelVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
-        protected override VocabularyId FieldId => VocabularyId.TaxonProtectionLevel;
+        protected override VocabularyId FieldId => VocabularyId.TaxonSensitivityCategory;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
