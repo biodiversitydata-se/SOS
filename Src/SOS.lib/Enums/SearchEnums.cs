@@ -38,7 +38,7 @@ namespace SOS.Lib.Enums
         /// <summary>
         /// All properties where we know there exist at least one observation with a value.
         /// </summary>
-        AllWithKnownValues,
+        AllWithValues,
 
         /// <summary>
         /// All properties exported

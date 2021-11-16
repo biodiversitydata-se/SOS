@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 },
                 ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-                Output = new OutputFilterDto {FieldSet = OutputFieldSet.AllWithKnownValues}
+                Output = new OutputFilterDto {FieldSet = OutputFieldSet.AllWithValues}
             };
 
             //-----------------------------------------------------------------------------------------------------------
