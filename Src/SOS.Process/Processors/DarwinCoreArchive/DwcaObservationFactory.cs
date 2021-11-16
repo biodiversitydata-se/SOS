@@ -281,8 +281,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedEvent.EndDate = endDate?.ToUniversalTime();
             processedEvent.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
             processedEvent.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
-            processedEvent.StartTime = startTime?.ToString("hh\\:mm");
-            processedEvent.EndTime = endTime?.ToString("hh\\:mm");
+            processedEvent.PlainStartTime = startTime?.ToString("hh\\:mm");
+            processedEvent.PlainEndTime = endTime?.ToString("hh\\:mm");
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatim.EventMultimedia,
@@ -309,9 +309,10 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedIdentification.IdentificationQualifier = verbatim.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks;
-            processedIdentification.ValidationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.ValidationStatus]);
+            processedIdentification.ValidationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
+            processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
             processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
-            //processedIdentification.UncertainDetermination = !processedIdentification.Validated; // todo - is this correct?
+            processedIdentification.Verified = GetIsValidated(processedIdentification.ValidationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy;
             processedIdentification.TypeStatus = verbatim.TypeStatus;
             return processedIdentification;
@@ -365,7 +366,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.GeoreferenceSources = verbatim.GeoreferenceSources;
             processedLocation.GeoreferenceVerificationStatus = verbatim.GeoreferenceVerificationStatus;
             processedLocation.HigherGeography = verbatim.HigherGeography;
-            processedLocation.HigherGeographyID = verbatim.HigherGeographyID;
+            processedLocation.HigherGeographyId = verbatim.HigherGeographyID;
             processedLocation.Island = verbatim.Island;
             processedLocation.IslandGroup = verbatim.IslandGroup;
             processedLocation.Locality = verbatim.Locality;
@@ -437,6 +438,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
 
             // todo - handle the following fields:
             // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),

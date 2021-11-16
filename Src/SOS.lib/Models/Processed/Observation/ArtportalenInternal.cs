@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Nest;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
@@ -43,12 +44,24 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
+        [Obsolete("Replaced by HasTriggeredVerificationRules")]
         public bool HasTriggeredValidationRules { get; set; }
+
+        /// <summary>
+        ///     Has Triggered Verification Rules
+        /// </summary>
+        public bool HasTriggeredVerificationRules { get; set; }
 
         /// <summary>
         ///     Has any Triggered Validation Rule with Warning
         /// </summary>
+        [Obsolete("Replaced by HasAnyTriggeredVerificationRuleWithWarning")]
         public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
+
+        /// <summary>
+        ///     Has any Triggered Verification Rule with Warning
+        /// </summary>
+        public bool HasAnyTriggeredVerificationRuleWithWarning { get; set; }
 
         /// <summary>
         ///     ExternalId of Site in Artportalen.

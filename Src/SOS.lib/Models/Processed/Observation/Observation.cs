@@ -273,8 +273,15 @@ namespace SOS.Lib.Models.Processed.Observation
 
         /// <summary>
         /// Indicates whether the observation is protected.
+        /// This property is deprecated and replaced by the Sensitive property.
         /// </summary>
+        [Obsolete("Replaced by Sensitive")]
         public bool Protected { get; set; }
+
+        /// <summary>
+        /// Indicates whether the observation is sensitive and therefore protected.
+        /// </summary>
+        public bool Sensitive { get; set; }
 
         /// <summary>
         ///     Public Collection.

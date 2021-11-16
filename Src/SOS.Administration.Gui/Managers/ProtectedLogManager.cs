@@ -57,6 +57,7 @@ namespace SOS.Administration.Gui.Managers
                     TaxonCommonName = o.Taxon?.VernacularName,
                     TaxonId = o.Taxon?.Id,
                     TaxonProtectionLevel = o.Taxon?.Attributes?.ProtectionLevel?.Id,
+                    TaxonSensitivityCategory = o.Taxon?.Attributes?.ProtectionLevel?.Id,
                     TaxonScientificName = o.Taxon?.ScientificName
                 }),
                 User = log.User,

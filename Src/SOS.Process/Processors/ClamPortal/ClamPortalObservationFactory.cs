@@ -58,15 +58,19 @@ namespace SOS.Process.Processors.ClamPortal
                     StartDate = verbatim.ObservationDate.ToUniversalTime(),
                     PlainStartDate = verbatim.ObservationDate.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = verbatim.ObservationDate.ToLocalTime().ToString("yyyy-MM-dd"),
-                    StartTime = null,
-                    EndTime = null,
+                    PlainStartTime = null,
+                    PlainEndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.ObservationDate.ToLocalTime())
                 },
                 Identification = new Identification
                 {
                     Validated = verbatim.IdentificationVerificationStatus.Equals(
                         ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
+                    Verified = verbatim.IdentificationVerificationStatus.Equals(
+                        ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
                     ValidationStatus =
+                        GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
+                    VerificationStatus = 
                         GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
                     UncertainIdentification = verbatim.UncertainDetermination != 0
                 },
@@ -97,6 +101,7 @@ namespace SOS.Process.Processors.ClamPortal
                     OrganismQuantity = verbatim.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
                     ProtectionLevel = CalculateProtectionLevel(taxon, accessRights != null ? (AccessRightsId)accessRights.Id : null),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, accessRights != null ? (AccessRightsId)accessRights.Id : null),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate.ToUniversalTime(),

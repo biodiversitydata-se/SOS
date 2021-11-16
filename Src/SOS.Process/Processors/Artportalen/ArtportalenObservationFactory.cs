@@ -144,8 +144,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.StartDate = startDate?.ToUniversalTime();
                 obs.Event.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
                 obs.Event.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
-                obs.Event.StartTime = verbatimObservation.StartTime?.ToString("hh\\:mm");
-                obs.Event.EndTime = verbatimObservation.EndTime?.ToString("hh\\:mm");
+                obs.Event.PlainStartTime = verbatimObservation.StartTime?.ToString("hh\\:mm");
+                obs.Event.PlainEndTime = verbatimObservation.EndTime?.ToString("hh\\:mm");
                 obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
                 obs.Event.SamplingProtocol = (verbatimObservation.DiscoveryMethod?.Id ?? 0) == 0
                     ? null
@@ -159,6 +159,15 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
                 obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy;
                 obs.Identification.Validated = new[]
+                {
+                    (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
+                    (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator,
+                    (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
+                    (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm,
+                    (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
+                    (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
+                }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
+                obs.Identification.Verified = new[]
                 {
                     (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
                     (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator,
@@ -212,6 +221,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                obs.Occurrence.SensitivityCategory = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
@@ -264,7 +274,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;
                 obs.ArtportalenInternal.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
+                obs.ArtportalenInternal.HasTriggeredVerificationRules = verbatimObservation.HasTriggeredValidationRules;
                 obs.ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
+                obs.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.ArtportalenInternal.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
                 obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
@@ -296,7 +308,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);
                 obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Activity);
                 
-                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.ValidationStatus);
+                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.VerificationStatus);
+                obs.Identification.VerificationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, VocabularyId.VerificationStatus);
                 obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, VocabularyId.LifeStage);
                 obs.Occurrence.ReproductiveCondition = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.ReproductiveCondition, null, true);
                 obs.Occurrence.Behavior = GetSosIdFromMetadata(verbatimObservation?.Activity, VocabularyId.Behavior, null, true);

@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using System;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -55,8 +56,15 @@ namespace SOS.Lib.Models.Processed.Observation
 
         /// <summary>
         ///     True if sighting is validated.
+        /// This property is deprecated and replaced by the Verified property.
         /// </summary>
+        [Obsolete("Replaced by Verified")]
         public bool Validated { get; set; }
+
+        /// <summary>
+        ///     True if sighting is verified (validated).
+        /// </summary>
+        public bool Verified { get; set; }
 
         /// <summary>
         ///     A categorical indicator of the extent to which the taxonomic
@@ -66,7 +74,18 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This field uses a controlled vocabulary.
         /// </remarks>
         [Object]
+        [Obsolete("Replaced by VerificationStatus")]
         public VocabularyValue ValidationStatus { get; set; }
+        
+        /// <summary>
+        ///     A categorical indicator of the extent to which the taxonomic
+        ///     identification has been verified to be correct.
+        /// </summary>
+        /// <remarks>
+        ///     This field uses a controlled vocabulary.
+        /// </remarks>
+        [Object]
+        public VocabularyValue VerificationStatus { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of names of people,

@@ -134,6 +134,7 @@ namespace SOS.Process.Managers
 
             // Diffused observations is not protected
             observation.Protected = false;
+            observation.Sensitive = false;
             observation.Occurrence.ReportedBy = string.Empty;
             
             if (observation.Modified.HasValue)

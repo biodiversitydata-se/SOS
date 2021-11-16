@@ -1,6 +1,20 @@
 # Observation object
 All fields that are part of an observation are listed on this page.
 
+##### Deprecated fields
+These fields are deprecated and should not be used.
+
+| Field 	| Replaced by 	| Preliminary removal date 	|
+|:---	|:---	|:---	|
+| protected 	| sensitive 	| 2021-12-16 	|
+| occurrence.protectionLevel 	| occurrence.sensitivityCategory 	| 2021-12-16 	|
+| taxon.attributes.protectionLevel 	| taxon.attributes.sensitivityCategory 	| 2021-12-16 	|
+| identification.validated 	| identification.verified 	| 2021-12-16 	|
+| identification.validationStatus 	| identification.verificationStatus 	| 2021-12-16 	|
+
+
+### Valid fields
+
 | Field 	| Type 	| Example 	| Description | Darwin Core 	|
 |:---	|:---	|:---	|:---	|:---	|  
 | **Record level** 	| 	|  	|  	|  	|
@@ -17,7 +31,8 @@ All fields that are part of an observation are listed on this page.
 | license 	| string 	| "CC BY-NC 4.0" 	| A legal document giving official permission to do something with the resource. 	| https://dwc.tdwg.org/terms/#dwc:license 	|
 | rightsHolder 	| string 	| "Landsorts fågelstation" 	| A person or organization owning or managing rights over the resource. 	| https://dwc.tdwg.org/terms/#dwc:rightsHolder 	|
 | modified 	| DateTime? 	| "2008-07-18T13:19:00Z" 	| The most recent date-time on which the resource was changed (UTC). 	| https://dwc.tdwg.org/terms/#dwc:modified 	|
-| protected 	| boolean 	| false 	| Indicates whether the observation is protected. 	|  	|
+| ~~protected~~ **(Deprecated)** 	| boolean 	| false 	| Indicates whether the observation is protected. 	| This property is replaced by *sensitive* 	|
+| sensitive 	| boolean 	| false 	| Indicates whether the observation is sensitive and therefore protected. 	|  	|
 | publicCollection 	| string 	| "Uppsala-Evolutionsmuseet" 	| Public collection name. 	|  	|
 | privateCollection 	| string 	| "Lennart Lasseman" 	| Private collection name. 	|  	|
 | speciesCollectionLabel 	| string 	| "FA5361-3" 	| Species collection label. 	|  	|
@@ -78,7 +93,8 @@ All fields that are part of an observation are listed on this page.
 | occurrence.isPositiveObservation 	| boolean 	| true 	| Indicates if this observation is a   positive observation. "Positive observation" is a normal   observation indicating that a species has been seen at a specified location.    	|  	|
 | occurrence.media 	| Collection[\<Multimedia\>](https://tools.gbif.org/dwca-validator/extension.do?id=gbif:Multimedia)	| [\{<br/>&nbsp;"type":"StillImage",<br/>&nbsp;"format":"image/jpeg",<br/>&nbsp;"identifier":"https://www.artportalen.se/MediaLibrary/2020/11/a268a815-67cc-4a97-8636-c18c6826f397_image.jpg",<br/>&nbsp;"references":"https://www.artportalen.se/Image/3139311",<br/>&nbsp;"created":"2020-11-03 16:15",<br/>&nbsp;"license":"© all rights reserved",<br/>&nbsp;"rightsHolder":"Tom Volgers"<br/>\}]	| Media associated with the observation. 	| https://tools.gbif.org/dwca-validator/extension.do?id=gbif:Multimedia 	|
 | occurrence.preparations 	| string 	| "alcohol" 	| A list of preparations and preservation methods for a specimen.    	| https://dwc.tdwg.org/terms/#dwc:preparations 	|
-| occurrence.protectionLevel 	| int32    	| 1 	| Occurrence protection level. This is   a value between 1 to 5. 1 indicates public access and 5 is the highest used   security level.    	|  	|
+| ~~occurrence.protectionLevel~~ **(Deprecated)** 	| int32    	| 1 	| Occurrence protection level. This is   a value between 1 to 5. 1 indicates public access and 5 is the highest used   security level.    	| This property is replaced by *occurrence.sensitivityCategory* 	|
+| occurrence.sensitivityCategory 	| int32    	| 1 	| Occurrence protection level. This is   a value between 1 to 5. 1 indicates public access and 5 is the highest used   security level.    	|  	|
 | occurrence.recordNumber 	| string 	| "200240" 	| An identifier given to the Occurrence at the time it was recorded. Often   serves as a link between field notes and an Occurrence record, such as a   specimen collector's number.    	| https://dwc.tdwg.org/terms/#dwc:recordNumber 	|
 | occurrence.substrate.description 	| string 	| "2 substratenheter # Dead tree stem # Grov granlåga # Picea   abies" 	| Description of substrate. 	|  	|
 | occurrence.substrate.id 	| int32? 	| 84 	| Substrate id. 	|  	|
@@ -105,8 +121,10 @@ All fields that are part of an observation are listed on this page.
 | identification.identifiedBy 	| string 	| "Mårten Ilidasch" 	| A list of names of people, groups, or organizations who assigned the   Taxon to the subject.    	| https://dwc.tdwg.org/terms/#dwc:identifiedBy 	|
 | identification.dateIdentified 	| string 	| "2016" 	| The date on which the subject was identified as representing the Taxon.    	| https://dwc.tdwg.org/terms/#dwc:dateIdentified 	|
 | identification.verifiedBy 	| string 	| "Lennart Lasseman" 	| A list of names of people, who verified the observation.    	|  	|
-| identification.validated 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  	|
-| identification.validationStatus 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  	|
+| ~~identification.validated~~ **(Deprecated)** 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  This property is replaced by *identification.verified*	|
+| identification.verified 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  	|
+| ~~identification.validationStatus~~ **(Deprecated)** 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  This property is replaced by *identification.verificationStatus*	|
+| identification.verificationStatus 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  	|
 | identification.determinationMethod 	| VocabularyValue[\<determinationMethod\>](Vocabularies.md#determinationMethod) 	| \{ "id":3, "value":"stereolupp" \} | Method used in species determination. 	|  	|
 | identification.uncertainIdentification 	| boolean    	| false 	| True if determination is uncertain.    	|  	|
 | identification.identificationQualifier 	| string 	| "Andersson, 1976" 	| A brief phrase or a standard term ("cf.", "aff.") to   express the determiner's doubts about the Identification.    	| https://dwc.tdwg.org/terms/#dwc:identificationQualifier 	|
@@ -197,7 +215,8 @@ All fields that are part of an observation are listed on this page.
 | taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 5.    	|  	|
 | taxon.attributes.organismGroup 	| string 	| "Kärlväxter" 	| Common name of the organism group   that observed species belongs to. Classification of species groups is the   same as used in latest 'Red List of Swedish Species'.    	|  	|
 | taxon.attributes.protectedByLaw 	| boolean? 	| true 	| Indicates whether the species is protected by the law in Sweden.    	|  	|
-| taxon.attributes.protectionLevel 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  	|
+| ~~taxon.attributes.protectionLevel~~ **(Deprecated)** 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  This property is replaced by *taxon.attributes.sensitivityCategory*	|
+| taxon.attributes.sensitivityCategory 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  	|
 | taxon.attributes.redlistCategory 	| string 	| "LC" 	| Redlist category for redlisted   species. Possible redlist values are DD (Data Deficient), EX (Extinct), RE   (Regionally Extinct), CR (Critically Endangered), EN (Endangered), VU   (Vulnerable), NT (Near Threatened). Not redlisted species has no value in   this property.    	|  	|
 | taxon.attributes.sortOrder 	| int32    	| 91415 	| Systematic sort order.    	|  	|
 | taxon.attributes.swedishHistory 	| string 	| "Spontan" 	| This property contains information about the species immigration history.    	|  	|

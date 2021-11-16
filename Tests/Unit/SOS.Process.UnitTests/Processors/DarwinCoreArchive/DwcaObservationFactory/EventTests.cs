@@ -92,8 +92,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2014, 4, 24, 14, 30, 0), DateTimeKind.Utc)
                 .Subtract(TimeSpan.FromHours(2)));
-            result.Event.StartTime.Should().Be("14:30");
-            result.Event.EndTime.Should().Be("14:30");
+            result.Event.PlainStartTime.Should().Be("14:30");
+            result.Event.PlainEndTime.Should().Be("14:30");
             result.Event.PlainStartDate.Should().Be("2014-04-24");
             result.Event.PlainEndDate.Should().Be("2014-04-24");
         }

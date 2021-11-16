@@ -172,6 +172,7 @@ namespace SOS.Process.Processors
                     if (observation.Occurrence.ProtectionLevel > 2)
                     {
                         observation.Protected = true;
+                        observation.Sensitive = true;
                         protectedObservations.Add(observation);
 
                         //If it is a protected sighting, public users should not be possible to find it in the current month 

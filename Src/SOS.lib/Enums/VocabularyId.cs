@@ -10,7 +10,7 @@
         LifeStage = 6,
         Biotope = 7,
         Substrate = 8,
-        ValidationStatus = 9,
+        VerificationStatus = 9,
         Institution = 10,
         Unit = 11,
         BasisOfRecord = 12,
@@ -25,7 +25,7 @@
         DeterminationMethod = 21,
         ReproductiveCondition = 22,
         Behavior = 23,
-        TaxonProtectionLevel = 24,
+        TaxonSensitivityCategory = 24,
         BirdNestActivity = 25
     }
 }

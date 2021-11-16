@@ -30,7 +30,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (zoological) or accepted (botanical) taxon.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string AcceptedNameUsageID { get; set; }
+        public string AcceptedNameUsageId { get; set; }
 
         /// <summary>
         /// Taxon attributes.
@@ -104,7 +104,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     See nameAccordingTo.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string NameAccordingToID { get; set; }
+        public string NameAccordingToId { get; set; }
 
         /// <summary>
         ///     A reference for the publication in which the

@@ -55,15 +55,17 @@ namespace SOS.Process.Processors.FishData
                     StartDate = verbatim.Start.ToUniversalTime(),
                     PlainStartDate = verbatim.Start.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = verbatim.End.ToLocalTime().ToString("yyyy-MM-dd"),
-                    StartTime = null,
-                    EndTime = null,
+                    PlainStartTime = null,
+                    PlainEndTime = null,
                     VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start.ToLocalTime(), verbatim.End.ToLocalTime())
                 },
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
                     Validated = false,
-                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
+                    Verified = false,
+                    ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
+                    VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location
                 {
@@ -74,12 +76,13 @@ namespace SOS.Process.Processors.FishData
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
-                    IndividualID = verbatim.IndividualId?.ToString(),
+                    IndividualId = verbatim.IndividualId?.ToString(),
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),

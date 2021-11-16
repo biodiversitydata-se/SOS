@@ -55,7 +55,13 @@ namespace SOS.Administration.Gui.Models
         /// <summary>
         /// Protection level of taxa
         /// </summary>
+        [Obsolete("Replaced by TaxonSensitivityCategory")]
         public int? TaxonProtectionLevel { get; set; }
+
+        /// <summary>
+        /// Protection level of taxa
+        /// </summary>
+        public int? TaxonSensitivityCategory { get; set; }
 
         /// <summary>
         /// Scientific name of taxon

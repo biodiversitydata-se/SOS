@@ -96,7 +96,7 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.Sex, sexVocabularyFactory},
                 {VocabularyId.Biotope, biotopeVocabularyFactory},
                 {VocabularyId.Substrate, substrateVocabularyFactory},
-                {VocabularyId.ValidationStatus, validationStatusVocabularyFactory},
+                {VocabularyId.VerificationStatus, validationStatusVocabularyFactory},
                 {VocabularyId.Institution, institutionVocabularyFactory},
                 {VocabularyId.Unit, unitVocabularyFactory},
                 {VocabularyId.BasisOfRecord, basisOfRecordVocabularyFactory},
@@ -111,7 +111,7 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory},
                 {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
                 {VocabularyId.Behavior, behaviorVocabularyFactory},
-                {VocabularyId.TaxonProtectionLevel, taxonProtectionLevelVocabularyFactory},
+                {VocabularyId.TaxonSensitivityCategory, taxonProtectionLevelVocabularyFactory},
                 {VocabularyId.BirdNestActivity, birdNestActivityVocabularyFactory}
             };
         }
