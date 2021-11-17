@@ -6,12 +6,13 @@
 **Prod**: 
 
 ### `Added`
-- New date and time properties : `Event.StartTime`, `Event.EndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
+- New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
 - Export to CSV.
 - New endpoint for observation count that uses caching for improved performance.
 - Support for Elasticsearch clusters.
 
 ### `Changed`
+- Changed time format to use W. Europe Standard Time with time zone included. Example: "2016-01-17T11:00:00+01:00".
 - Hangfire jobs now uses two queues. One with high priority (observation processing) and one with normal priority (file orders).
 - Limit the number of simultaneous file orders per user to 5.
 
