@@ -39,6 +39,7 @@ namespace SOS.Lib.Extensions
             {
                 "DatasetName",
                 "Identification.Validated",
+                "Identification.Verified",
                 "Identification.UncertainIdentification",
                 "Location.County",
                 "Location.Municipality",
@@ -79,8 +80,8 @@ namespace SOS.Lib.Extensions
                     "MeasurementOrFacts.MeasurementUnit",
                     "Event.PlainStartDate",
                     "Event.PlainEndDate",
-                    "Event.StartTime",
-                    "Event.EndTime",
+                    "Event.PlainStartTime",
+                    "Event.PlainEndTime",
                     "Event.Habitat",
                     "Event.EventRemarks",
                     "Event.SamplingEffort",
@@ -107,6 +108,7 @@ namespace SOS.Lib.Extensions
                     "Occurrence.Biotope",
                     "Occurrence.BiotopeDescription",
                     "Occurrence.ProtectionLevel",
+                    "Occurrence.SensitivityCategory",
                     "Occurrence.IsNeverFoundObservation",
                     "Occurrence.IsNotRediscoveredObservation",
                     "Occurrence.IsNaturalOccurrence",
@@ -115,6 +117,7 @@ namespace SOS.Lib.Extensions
                     "Occurrence.Length",
                     "Occurrence.Weight",
                     "Identification.ValidationStatus",
+                    "Identification.VerificationStatus",
                     "Identification.ConfirmedBy",
                     "Identification.IdentifiedBy",
                     "Identification.VerifiedBy",
@@ -127,6 +130,7 @@ namespace SOS.Lib.Extensions
                     "Taxon.Genus",
                     "Taxon.TaxonId",
                     "Taxon.Attributes.ProtectionLevel",
+                    "Taxon.Attributes.SensitivityCategory",
                     "Taxon.Attributes.RedlistCategory",
                     "Taxon.Attributes.ProtectedByLaw"
                 });
