@@ -18,10 +18,10 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 - [reproductiveCondition](#reproductivecondition)
 - [sex](#sex)
 - [substrate](#substrate)
-- [protectionLevel](#protectionlevel)
+- [sensitivityCategory](#sensitivityCategory)
 - [type](#type)
 - [unit](#unit)
-- [validationStatus](#validationstatus)
+- [verificationStatus](#verificationstatus)
 
 ## accessRights
 | Id | Value |
@@ -1916,7 +1916,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 116 | Kompost | Compost |
 | 117 | Sågspån | Sawdust |
 
-## protectionLevel
+## sensitivityCategory
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 1 | 1. Fullständig åtkomst och fri användning för alla | 1. Full access and free use for all |
@@ -1966,7 +1966,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 20 | observationer | observations |
 | 21 | registreringar | registrations |
 
-## validationStatus
+## verificationStatus
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 0 | Validerad | Verified |
