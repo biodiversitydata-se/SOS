@@ -1,9 +1,10 @@
 # Changelog
 
 ## [1.4]
-**Test**: 2021-10-28
 
-**Prod**: 
+**Prod**: 2021-11-15
+
+**Test**: 2021-11-16
 
 ### `Added`
 - New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
@@ -13,6 +14,14 @@
 
 ### `Changed`
 - Changed time format to use W. Europe Standard Time with time zone included. Example: "2016-01-17T11:00:00+01:00".
+- Change property names (the replaced names will still be available until next version, 1.5, of the API)
+  - `Sensitive` (replaces `Protected`)
+  - `Occurrence.SensitiviyCategory` (replaces `Occurrence.ProtectionLevel`)
+  - `Taxon.Attributes.SensitivityCategory` (replaces `Taxon.Attributes.ProtectionLevel`)
+  - `Identification.Verified` (replaces `Identification.Validated`)
+  - `Identification.VerificationStatus` (replaces `Identification.ValidationStatus`)
+  - `ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning` (replaces `ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning`)
+  - `ArtportalenInternal.HasTriggeredVerificationRules` (replaces `ArtportalenInternal.HasTriggeredValidationRules`)
 - Hangfire jobs now uses two queues. One with high priority (observation processing) and one with normal priority (file orders).
 - Limit the number of simultaneous file orders per user to 5.
 
@@ -22,7 +31,6 @@
 - 
 
 ## [1.3]
-**Test**: 2021-10-05 
 
 **Prod**: 2021-10-05
 
@@ -43,8 +51,6 @@
 ## [1.2]
 
 ### Releases
-
-**Test**:  2021-06-08
 
 **Prod**: 2021-06-17
 
@@ -74,10 +80,7 @@
 
 ### Releases
 
-**Test**: 2021-03-23
-
 **Prod**: 2021-04-08
-
 
 ### `Changed`
 
@@ -182,8 +185,6 @@ Ex. `/SearchInternal` -> `/Internal/Search`
 ## [1.0.0] - 2021-01-21
 
 ### Releases
-
-**Test**: 2021-01-21
 
 **Prod**: 2021-01-21
 
