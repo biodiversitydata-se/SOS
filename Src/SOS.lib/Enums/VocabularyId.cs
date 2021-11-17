@@ -25,7 +25,7 @@
         DeterminationMethod = 21,
         ReproductiveCondition = 22,
         Behavior = 23,
-        TaxonSensitivityCategory = 24,
+        SensitivityCategory = 24,
         BirdNestActivity = 25
     }
 }

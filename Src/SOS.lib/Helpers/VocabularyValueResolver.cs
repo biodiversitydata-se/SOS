@@ -93,9 +93,9 @@ namespace SOS.Lib.Helpers
                 ResolveVocabularyMappedValue(observation.Identification?.DeterminationMethod,
                     valueMappingDictionaries[VocabularyId.DeterminationMethod]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.ProtectionLevel,
-                    valueMappingDictionaries[VocabularyId.TaxonSensitivityCategory]);
+                    valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
-                    valueMappingDictionaries[VocabularyId.TaxonSensitivityCategory]);
+                    valueMappingDictionaries[VocabularyId.SensitivityCategory]);
             }
         }
 
@@ -233,8 +233,8 @@ namespace SOS.Lib.Helpers
                     out var taxonAttributesObject))
                 {
                     var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
-                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.TaxonSensitivityCategory]);
-                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.TaxonSensitivityCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 }
             }
         }

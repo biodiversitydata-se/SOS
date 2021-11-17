@@ -39,7 +39,7 @@ namespace SOS.Import.Harvesters
         /// <param name="lifeStageVocabularyFactory"></param>
         /// <param name="biotopeVocabularyFactory"></param>
         /// <param name="substrateVocabularyFactory"></param>
-        /// <param name="validationStatusVocabularyFactory"></param>
+        /// <param name="verificationStatusVocabularyFactory"></param>
         /// <param name="institutionVocabularyFactory"></param>
         /// <param name="unitVocabularyFactory"></param>
         /// <param name="basisOfRecordVocabularyFactory"></param>
@@ -54,7 +54,7 @@ namespace SOS.Import.Harvesters
         /// <param name="determinationMethodVocabularyFactory"></param>
         /// <param name="reproductiveConditionVocabularyFactory"></param>
         /// <param name="behaviorVocabularyFactory"></param>
-        /// <param name="taxonProtectionLevelVocabularyFactory"></param>
+        /// <param name="sensitivityCategoryVocabularyFactory"></param>
         /// <param name="birdNestActivityVocabularyFactory"></param>
         /// <param name="cacheManager"></param>
         /// <param name="logger"></param>
@@ -65,7 +65,7 @@ namespace SOS.Import.Harvesters
             LifeStageVocabularyFactory lifeStageVocabularyFactory,
             BiotopeVocabularyFactory biotopeVocabularyFactory,
             SubstrateVocabularyFactory substrateVocabularyFactory,
-            ValidationStatusVocabularyFactory validationStatusVocabularyFactory,
+            VerificationStatusVocabularyFactory verificationStatusVocabularyFactory,
             InstitutionVocabularyFactory institutionVocabularyFactory,
             UnitVocabularyFactory unitVocabularyFactory,
             BasisOfRecordVocabularyFactory basisOfRecordVocabularyFactory,
@@ -80,7 +80,7 @@ namespace SOS.Import.Harvesters
             DeterminationMethodVocabularyFactory determinationMethodVocabularyFactory,
             ReproductiveConditionVocabularyFactory reproductiveConditionVocabularyFactory,
             BehaviorVocabularyFactory behaviorVocabularyFactory,
-            TaxonProtectionLevelVocabularyFactory taxonProtectionLevelVocabularyFactory,
+            SensitivityCategoryVocabularyFactory sensitivityCategoryVocabularyFactory,
             BirdNestActivityVocabularyFactory birdNestActivityVocabularyFactory,
             ICacheManager cacheManager,
             ILogger<VocabularyHarvester> logger)
@@ -96,7 +96,7 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.Sex, sexVocabularyFactory},
                 {VocabularyId.Biotope, biotopeVocabularyFactory},
                 {VocabularyId.Substrate, substrateVocabularyFactory},
-                {VocabularyId.VerificationStatus, validationStatusVocabularyFactory},
+                {VocabularyId.VerificationStatus, verificationStatusVocabularyFactory},
                 {VocabularyId.Institution, institutionVocabularyFactory},
                 {VocabularyId.Unit, unitVocabularyFactory},
                 {VocabularyId.BasisOfRecord, basisOfRecordVocabularyFactory},
@@ -111,7 +111,7 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.DeterminationMethod, determinationMethodVocabularyFactory},
                 {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
                 {VocabularyId.Behavior, behaviorVocabularyFactory},
-                {VocabularyId.TaxonSensitivityCategory, taxonProtectionLevelVocabularyFactory},
+                {VocabularyId.SensitivityCategory, sensitivityCategoryVocabularyFactory},
                 {VocabularyId.BirdNestActivity, birdNestActivityVocabularyFactory}
             };
         }

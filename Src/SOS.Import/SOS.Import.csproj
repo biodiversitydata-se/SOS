@@ -96,7 +96,7 @@
     <Compile Update="Factories\Vocabularies\UnitVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\Vocabularies\ValidationStatusVocabularyFactory.cs">
+    <Compile Update="Factories\Vocabularies\VerificationStatusVocabularyFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
@@ -156,7 +156,7 @@
     <None Update="Resources\Vocabularies\SubstrateVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Vocabularies\TaxonProtectionLevelVocabulary.json">
+    <None Update="Resources\Vocabularies\SensitivityCategoryVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vocabularies\TypeVocabulary.json">
@@ -165,7 +165,7 @@
     <None Update="Resources\Vocabularies\UnitVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Vocabularies\ValidationStatusVocabulary.json">
+    <None Update="Resources\Vocabularies\VerificationStatusVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Sweden-grids\Sweden_Grid_10km_Wgs84.geojson">
