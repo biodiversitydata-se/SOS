@@ -405,6 +405,10 @@ namespace SOS.Lib.Models.Processed.Observation
                     return EventStartDate;
                 case "Event.EndDate":
                     return EventEndDate;
+                case "Event.PlainStartDate":
+                    return EventPlainStartDate;
+                case "Event.PlainEndDate":
+                    return EventPlainEndDate;
                 case "Event.PlainStartTime":
                     return EventStartTimeString;
                 case "Event.PlainEndTime":
