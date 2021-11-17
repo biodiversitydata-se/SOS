@@ -47,8 +47,12 @@ These fields are deprecated and should not be used.
 | type 	| VocabularyValue[\<type\>](Vocabularies.md#type)	|  	| The nature or genre of the resource. 	| https://dwc.tdwg.org/terms/#dwc:type 	|
 | &nbsp;  	|  	|  	|  	|  	|
 | **Event** 	| 	|  	|  	|  	|  
-| event.startDate 	| DateTime? 	| "2008-07-07T09:00:00Z" 	| Start date and time of the event (UTC).    	|  	|
-| event.endDate 	| DateTime? 	| "2008-07-07T10:30:00Z" 	| End date and time of the event (UTC).    	|  	|
+| event.startDate 	| DateTime? 	| "2008-07-07T11:00:00+02:00" 	| Start date/time of the event in W. Europe Standard Time.    	|  	|
+| event.endDate 	| DateTime? 	| "2008-07-07T12:30:00+02:00" 	| End date/time of the event in W. Europe Standard Time.    	|  	|
+| event.plainStartDate 	| string 	| "2008-07-07" 	| Start date of the event in the format yyyy-MM-dd.    	|  	|
+| event.plainEndDate 	| string 	| "2008-07-07" 	| End date of the event in the format yyyy-MM-dd.    	|  	|
+| event.plainStartTime 	| string 	| "11:00" 	| Start time of the event in W. Europe Standard Time formatted as hh:mm.    	|  	|
+| event.plainEndTime 	| string 	| "12:30" 	| End time of the event in W. Europe Standard Time formatted as hh:mm.    	|  	|
 | event.eventId 	| string 	| "1A474222-F49B-46C4-A7AB-BCD798A04A36" 	| An identifier   for the set of information associated with an Event (something that occurs at   a place and time).  	| https://dwc.tdwg.org/terms/#dwc:eventID 	|
 | event.eventRemarks 	| string 	| "Tall herbs and young trees mixed with old oaks." 	| Comments or notes about the Event.    	| https://dwc.tdwg.org/terms/#dwc:eventRemarks 	|
 | event.discoveryMethod | VocabularyValue[\<discoveryMethod\>](Vocabularies.md#discoveryMethod)	| \{ "id": 3, "value":"binoculars" \} 	| DiscoveryMethod from Artportalen 	|  	|

@@ -589,8 +589,8 @@ If you specify `fields` without specifying `fieldSet`, you will retrieve only th
             "occurrenceId": "urn:lsid:artportalen.se:Sighting:15959565"
         },
         "event": {
-            "endDate": "2014-06-06T22:00:00Z",
-            "startDate": "2014-06-06T22:00:00Z"
+            "endDate": "2014-06-07T00:00:00+02:00",
+            "startDate": "2014-06-07T00:00:00+02:00"
         }
     }]
 }
