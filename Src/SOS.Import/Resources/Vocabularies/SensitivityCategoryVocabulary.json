@@ -1,6 +1,6 @@
 {
   "Id": 24,
-  "Name": "TaxonProtectionLevel",
+  "Name": "SensitivityCategory",
   "Localized": true,
   "Values": [
     {

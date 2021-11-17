@@ -11,11 +11,11 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating TaxonProtectionLevel vocabulary.
+    ///     Class for creating sensitivity category vocabulary.
     /// </summary>
-    public class TaxonProtectionLevelVocabularyFactory : ArtportalenVocabularyFactoryBase
+    public class SensitivityCategoryVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
-        protected override VocabularyId FieldId => VocabularyId.TaxonSensitivityCategory;
+        protected override VocabularyId FieldId => VocabularyId.SensitivityCategory;
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()

@@ -10,9 +10,9 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.Vocabularies
 {
     /// <summary>
-    ///     Class for creating validation status vocabulary.
+    ///     Class for creating verification status vocabulary.
     /// </summary>
-    public class ValidationStatusVocabularyFactory : ArtportalenVocabularyFactoryBase
+    public class VerificationStatusVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
 
@@ -20,7 +20,7 @@ namespace SOS.Import.Factories.Vocabularies
         ///     Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
-        public ValidationStatusVocabularyFactory(IMetadataRepository artportalenMetadataRepository)
+        public VerificationStatusVocabularyFactory(IMetadataRepository artportalenMetadataRepository)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ??
                                              throw new ArgumentNullException(nameof(artportalenMetadataRepository));

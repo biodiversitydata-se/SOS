@@ -164,7 +164,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\taxonProtectionLevelVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\sensitivityCategoryVocabulary.json"),
                     Title = "protectionLevel"
                 },
                 new VocabularyFile
@@ -179,7 +179,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 },
                 new VocabularyFile
                 {
-                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\validationStatusVocabulary.json"),
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\verificationStatusVocabulary.json"),
                     Title = "validationStatus"
                 }
             };
