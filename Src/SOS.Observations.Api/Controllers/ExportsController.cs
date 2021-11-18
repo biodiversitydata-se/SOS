@@ -75,7 +75,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="email"></param>
         /// <param name="userExport"></param>
         /// <returns></returns>
-        private async Task<IActionResult> OrderValidateAsync(ExportFilterDto filter, string email, UserExport userExport)
+        private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(ExportFilterDto filter, string email, UserExport userExport)
         {
             var validationResults = Result.Combine(
                 ValidateSearchFilter(filter),
@@ -84,7 +84,7 @@ namespace SOS.Observations.Api.Controllers
 
             if (validationResults.IsFailure)
             {
-                return BadRequest(validationResults.Error);
+                return (Result: BadRequest(validationResults.Error), Count: null);
             }
 
             var exportFilter = filter.ToSearchFilter("en-GB", false);
@@ -92,15 +92,15 @@ namespace SOS.Observations.Api.Controllers
 
             if (matchCount == 0)
             {
-                return NoContent();
+                return (Result: NoContent(), Count: 0);
             }
 
             if (matchCount > _orderExportObservationsLimit)
             {
-                return BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations.");
+                return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
             }
-            
-            return new OkObjectResult(exportFilter);
+
+            return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
         }
 
         /// <summary>
@@ -455,9 +455,9 @@ namespace SOS.Observations.Api.Controllers
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
-                if (validateResult is not OkObjectResult okResult)
+                if (validateResult.Result is not OkObjectResult okResult)
                 {
-                    return validateResult;
+                    return validateResult.Result;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
@@ -467,6 +467,18 @@ namespace SOS.Observations.Api.Controllers
                         outputFieldSet, propertyLabelType, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.Csv,
+                    Description = description,
+                    OutputFieldSet = outputFieldSet
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
@@ -493,9 +505,9 @@ namespace SOS.Observations.Api.Controllers
                 var userExports = await GetUserExportsAsync();
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
-                if (validateResult is not OkObjectResult okResult)
+                if (validateResult.Result is not OkObjectResult okResult)
                 {
-                    return validateResult;
+                    return validateResult.Result;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
@@ -504,6 +516,17 @@ namespace SOS.Observations.Api.Controllers
                         OutputFieldSet.All, PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.DwC,
+                    Description = description                    
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
@@ -535,9 +558,9 @@ namespace SOS.Observations.Api.Controllers
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
-                if (validateResult is not OkObjectResult okResult)
+                if (validateResult.Result is not OkObjectResult okResult)
                 {
-                    return validateResult;
+                    return validateResult.Result;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
@@ -547,6 +570,18 @@ namespace SOS.Observations.Api.Controllers
                         outputFieldSet, propertyLabelType, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.Excel,
+                    Description = description,
+                    OutputFieldSet = outputFieldSet                    
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
@@ -580,9 +615,9 @@ namespace SOS.Observations.Api.Controllers
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
 
-                if (validateResult is not OkObjectResult okResult)
+                if (validateResult.Result is not OkObjectResult okResult)
                 {
-                    return validateResult;
+                    return validateResult.Result;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
@@ -592,6 +627,18 @@ namespace SOS.Observations.Api.Controllers
                         flat, outputFieldSet, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
+                var exportJobInfo = new ExportJobInfo
+                {
+                    Id = jobId,
+                    Status = ExportJobStatus.Queued,
+                    CreatedDate = DateTime.UtcNow,
+                    NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                    Format = ExportFormat.GeoJson,
+                    Description = description,
+                    OutputFieldSet = outputFieldSet                    
+                };
+
+                userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
                 return new OkObjectResult(jobId);
