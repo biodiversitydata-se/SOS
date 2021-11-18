@@ -99,6 +99,7 @@ namespace SOS.Lib.Configuration.Shared
 
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
+                    settings.RequestTimeout(TimeSpan.FromSeconds(300));
                     settings.BasicAuthentication(UserName, Password);
                     settings.SniffOnStartup(false);
                     settings.SniffOnConnectionFault(false);
