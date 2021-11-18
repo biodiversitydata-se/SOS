@@ -387,7 +387,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
-            [FromQuery] bool flatOut = true,
+            [FromQuery] bool flat = true,
             bool excludeNullValues = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
@@ -415,7 +415,7 @@ namespace SOS.Observations.Api.Controllers
                         ExportFormat.GeoJson, 
                         _exportPath, 
                         cultureCode, 
-                        flatOut, 
+                        flat, 
                         outputFieldSet,
                         propertyLabelType,
                         excludeNullValues,
@@ -571,7 +571,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
-            [FromQuery] bool flatOut = true,
+            [FromQuery] bool flat = true,
             bool excludeNullValues = true)
         {
             try
@@ -589,7 +589,7 @@ namespace SOS.Observations.Api.Controllers
                 exportFilter.PopulateOutputFields(outputFieldSet);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.GeoJson, cultureCode,
-                        flatOut, outputFieldSet, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
+                        flat, outputFieldSet, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
                 await UpdateUserExportsAsync(userExports);

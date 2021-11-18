@@ -57,14 +57,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet">The observation property field set.</param>
         /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
-        /// <param name="flatOut">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
-            bool flatOut = true,
+            bool flat = true,
             bool excludeNullValues = true);
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet">The observation property field set.</param>
         /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
-        /// <param name="flatOut">If true, the observations will be serialized as a flat JSON structure.</param>
+        /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
         /// <returns></returns>
         Task<IActionResult> OrderGeoJson(ExportFilterDto filter,
@@ -133,7 +133,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
-            bool flatOut = true,
+            bool flat = true,
             bool excludeNullValues = true);
     }
 }
