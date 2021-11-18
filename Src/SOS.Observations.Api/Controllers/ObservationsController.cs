@@ -274,6 +274,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> CachedCount(
             [FromQuery] int taxonId,
             [FromQuery] bool includeUnderlyingTaxa = false,
@@ -360,6 +361,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public async Task<IActionResult> MultipleCachedCount(
             [FromBody] IEnumerable<int> taxonIds,
             [FromQuery] bool includeUnderlyingTaxa = false,
