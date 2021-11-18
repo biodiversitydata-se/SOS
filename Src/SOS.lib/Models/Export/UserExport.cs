@@ -14,6 +14,7 @@ namespace SOS.Lib.Models.Export
         public UserExport()
         {
             OnGoingJobIds = new List<string>();
+            Jobs = new List<ExportJobInfo>();
         }
 
         /// <summary>
