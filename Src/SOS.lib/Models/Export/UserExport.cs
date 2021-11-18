@@ -30,5 +30,8 @@ namespace SOS.Lib.Models.Export
         /// On going export jobs
         /// </summary>
         public ICollection<string> OnGoingJobIds { get; set; }
-    }
+
+
+        public ICollection<ExportJobInfo> Jobs { get; set; }
+    }   
 }
