@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SOS.Observations.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Dtos.Filter
@@ -22,11 +23,19 @@ namespace SOS.Observations.Api.Dtos.Filter
             DontIncludeNotRecovered
         }
 
+        [Obsolete]
         public enum StatusValidationDto
         {
             BothValidatedAndNotValidated,
             Validated,
             NotValidated
+        }
+
+        public enum StatusVerificationDto
+        {
+            BothVerifiedAndNotVerified,
+            Verified,
+            NotVerified
         }
 
         /// <summary>
@@ -71,9 +80,15 @@ namespace SOS.Observations.Api.Dtos.Filter
         public List<int> ProjectIds { get; set; }
 
         /// <summary>
-        /// Requested validation status
+        /// Requested validation status. Deprecated and replaced by VerificationStatus.
         /// </summary>
-        public StatusValidationDto ValidationStatus { get; set; }
+        [Obsolete]
+        public StatusValidationDto? ValidationStatus { get; set; }
+
+        /// <summary>
+        /// Requested verification status.
+        /// </summary>
+        public StatusVerificationDto VerificationStatus { get; set; }
 
         /// <summary>
         /// Limit returned observations based on bird nest activity level.

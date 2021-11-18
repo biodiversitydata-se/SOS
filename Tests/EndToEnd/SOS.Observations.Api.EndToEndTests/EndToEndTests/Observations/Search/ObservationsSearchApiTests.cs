@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -73,7 +73,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
                     EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
                 },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 
@@ -99,7 +99,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             SearchFilterDto searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Wolf }, IncludeUnderlyingTaxa = true },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 

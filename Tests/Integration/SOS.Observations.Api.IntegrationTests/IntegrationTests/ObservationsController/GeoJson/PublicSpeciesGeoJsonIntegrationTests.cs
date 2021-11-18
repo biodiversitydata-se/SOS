@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterInternalDto
             {
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {

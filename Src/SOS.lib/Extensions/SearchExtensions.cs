@@ -204,8 +204,8 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
             query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
 
-            query.TryAddTermCriteria("artportalenInternal.hasTriggeredValidationRules", internalFilter.HasTriggerdValidationRule, true);
-            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning", internalFilter.HasTriggerdValidationRuleWithWarning, true);
+            query.TryAddTermCriteria("artportalenInternal.hasTriggeredValidationRules", internalFilter.HasTriggeredVerificationRule, true);
+            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
 
 
             if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
@@ -223,7 +223,7 @@ namespace SOS.Lib.Extensions
                 AddNumericFilterWithRelationalOperator(query, "occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
             }
 
-            query.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ValidationStatusIds);
+            query.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.VerificationStatusIds);
 
             if (internalFilter.OnlyWithBarcode)
             {
@@ -361,7 +361,7 @@ namespace SOS.Lib.Extensions
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeValidationStatusIds);
+            excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
         /// <summary>
@@ -988,12 +988,12 @@ namespace SOS.Lib.Extensions
 
         private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
         {
-            switch (filter.ValidationStatus)
+            switch (filter.VerificationStatus)
             {
-                case FilterBase.StatusValidation.Validated:
+                case FilterBase.StatusVerification.Verified:
                     query.TryAddTermCriteria("identification.validated", true, true);
                     break;
-                case FilterBase.StatusValidation.NotValidated:
+                case FilterBase.StatusVerification.NotVerified:
                     query.TryAddTermCriteria("identification.validated", false, false);
                     break;
             }

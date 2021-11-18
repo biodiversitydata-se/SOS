@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {
@@ -95,7 +95,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             _fixture.UseMockUserService(authority);
             var searchFilter = new SearchFilterInternalDto
             {
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
                 Geographics = new GeographicsFilterDto
                 {

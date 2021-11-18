@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                     },
                     ConsiderObservationAccuracy = true
                 },
-                ValidationStatus = SearchFilterBaseDto.StatusValidationDto.BothValidatedAndNotValidated,
+                VerificationStatus = SearchFilterBaseDto.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
             };
 

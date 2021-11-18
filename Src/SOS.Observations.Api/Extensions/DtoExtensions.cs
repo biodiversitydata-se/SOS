@@ -11,12 +11,27 @@ using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
+using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
 
 namespace SOS.Observations.Api.Extensions
 {
     public static class DtoExtensions
     {
-        private static FilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode, bool protectedObservations)
+        public static StatusVerificationDto ToStatusVerification(this StatusValidationDto statusValidationDto)
+        {            
+            switch(statusValidationDto)
+            {
+                case StatusValidationDto.NotValidated:
+                    return StatusVerificationDto.NotVerified;
+                case StatusValidationDto.Validated:
+                    return StatusVerificationDto.Verified;
+                case StatusValidationDto.BothValidatedAndNotValidated:
+                    return StatusVerificationDto.BothVerifiedAndNotVerified;
+                default: return StatusVerificationDto.BothVerifiedAndNotVerified;
+            }
+        }
+
+        private static FilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode, bool sensitiveObservations)
         {
             if (searchFilterBaseDto == null) return default;
 
@@ -31,7 +46,7 @@ namespace SOS.Observations.Api.Extensions
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
-            filter.ValidationStatus = (FilterBase.StatusValidation) searchFilterBaseDto.ValidationStatus;
+            filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (FilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (FilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
             filter.Location.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
@@ -47,7 +62,7 @@ namespace SOS.Observations.Api.Extensions
                     UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
                 };
 
-            filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
+            filter.ExtendedAuthorization.ProtectedObservations = sensitiveObservations;
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
             filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
 
@@ -115,17 +130,17 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
                 internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
                 internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;
-                internalFilter.HasTriggerdValidationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule;
-                internalFilter.HasTriggerdValidationRuleWithWarning =
-                    searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning;
+                internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
+                internalFilter.HasTriggeredVerificationRuleWithWarning =
+                    searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;
                 internalFilter.Length = searchFilterInternalDto.ExtendedFilter.Length;
                 internalFilter.LengthOperator = searchFilterInternalDto.ExtendedFilter.LengthOperator;
                 internalFilter.Weight = searchFilterInternalDto.ExtendedFilter.Weight;
                 internalFilter.WeightOperator = searchFilterInternalDto.ExtendedFilter.WeightOperator;
                 internalFilter.Quantity = searchFilterInternalDto.ExtendedFilter.Quantity;
                 internalFilter.QuantityOperator = searchFilterInternalDto.ExtendedFilter.QuantityOperator;
-                internalFilter.ValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds;
-                internalFilter.ExcludeValidationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds;
+                internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ValidationStatusIds : searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
+                internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds : searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
                 internalFilter.UnspontaneousFilter =
                     (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
                         .UnspontaneousFilter;
@@ -354,41 +369,41 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilter) PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto,
-            string translationCultureCode, bool protectedObservations)
+            string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
-            string translationCultureCode, bool protectedObservations)
+            string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
-        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
-        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
-        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode, bool protectedObservations)
+        public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, protectedObservations);
+            return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto)

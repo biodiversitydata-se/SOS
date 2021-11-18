@@ -435,7 +435,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortOrder">Sort order (Asc, Desc).</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -463,7 +463,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -474,7 +474,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
@@ -497,7 +497,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="protectedObservations">If true only protected observations will be searched (this requires authentication and authorization). If false, default, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, default, public available observations will be searched.</param>
         /// <returns>The number of observations matching the provided search filter.</returns>
         [HttpPost("Count")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
@@ -509,7 +509,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -517,7 +517,7 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var searchFilter = filter.ToSearchFilter("sv-SE", protectedObservations);
+                var searchFilter = filter.ToSearchFilter("sv-SE", sensitiveObservations);
                 var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
@@ -571,7 +571,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -585,7 +585,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -601,7 +601,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
                
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(
@@ -728,7 +728,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -743,7 +743,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -758,7 +758,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(
@@ -794,9 +794,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">
-        /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
-        /// If false, and the requested observation is protected, then diffused data will be returned.
+        /// <param name="sensitiveObservations">
+        /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
+        /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
         [HttpGet("{occurrenceId}")]
@@ -806,11 +806,14 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GetObservationById(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string occurrenceId, [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,  [FromQuery] string translationCultureCode = "sv-SE", [FromQuery] bool protectedObservations = false)
+            [FromRoute] string occurrenceId, 
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,  
+            [FromQuery] string translationCultureCode = "sv-SE", 
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
-                var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
+                var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false);
 
                 if (observation == null)
@@ -845,9 +848,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortOrder">Sort order (Asc, Desc).</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>
-        /// <param name="useSwedishDates">True if observation dates should use local Swedish time; otherwise they will be represented as UTC dates.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>        
         /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -876,7 +878,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false,
+            [FromQuery] bool sensitiveObservations = false,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
             try
@@ -903,7 +905,7 @@ namespace SOS.Observations.Api.Controllers
                         filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                     }
                 }
-                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take, sortBy, sortOrder);
+                var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take, sortBy, sortOrder);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }
@@ -958,7 +960,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sortOrder">Sort order (Asc, Desc).</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns>List of observations matching the provided search filter.</returns>
         /// <example>
         ///     Get all observations within 100m of provided point
@@ -987,7 +989,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1004,7 +1006,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, sortBy, sortOrder, scrollId);
                 if (result.TotalCount > maxTotalCount)
                 {
@@ -1031,7 +1033,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">Filter used to limit the search.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/Count")]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
@@ -1044,7 +1046,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalBaseDto filter,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1052,7 +1054,7 @@ namespace SOS.Observations.Api.Controllers
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", sensitiveObservations);
                 var matchCount = await ObservationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(matchCount);
@@ -1079,7 +1081,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Max number of records to return.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/SearchAggregated")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
@@ -1096,7 +1098,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int take = 100,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1119,7 +1121,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(Result.Failure("You have to limit the time span. Use date.startDate and date.endDate to limit your request"));
                 }
 
-                var result = await ObservationManager.GetAggregatedChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), aggregationType, skip, take);
+                var result = await ObservationManager.GetAggregatedChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), aggregationType, skip, take);
                 PagedResultDto<dynamic> dto = result.ToPagedResultDto(result?.Records);
                 return new OkObjectResult(dto);
             }
@@ -1172,7 +1174,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -1187,7 +1189,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1203,7 +1205,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
+                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
@@ -1235,7 +1237,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
@@ -1250,7 +1252,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1266,7 +1268,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilter(translationCultureCode, protectedObservations);
+                var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoomOrError.Value);
@@ -1394,7 +1396,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1410,7 +1412,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1425,10 +1427,10 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, protectedObservations);
+                var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(bboxValidation.Value));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, protectedObservations), skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1457,7 +1459,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="protectedObservations">If true, only protected observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonExistsIndication")]
         [ProducesResponseType(typeof(IEnumerable<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1470,7 +1472,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] bool validateSearchFilter = false,
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
@@ -1484,7 +1486,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var searchFilter = filter.ToSearchFilterInternal("sv-SE", protectedObservations);
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", sensitiveObservations);
                 var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(taxonFound);
@@ -1512,9 +1514,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="protectedObservations">
-        /// If true, and the requested observation is protected, then the original data will be returned (this requires authentication and authorization).
-        /// If false, and the requested observation is protected, then diffused data will be returned.
+        /// <param name="sensitiveObservations">
+        /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
+        /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
         [HttpGet("Internal/{occurrenceId}")]
@@ -1528,13 +1530,13 @@ namespace SOS.Observations.Api.Controllers
             [FromRoute] string occurrenceId, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool protectedObservations = false)
+            [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
                 var observation = await ObservationManager.GetObservationAsync(
                     roleId,
-                    authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, protectedObservations,
+                    authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: true);
                 if (observation == null)
                 {
