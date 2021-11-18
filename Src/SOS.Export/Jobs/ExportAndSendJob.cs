@@ -75,7 +75,7 @@ namespace SOS.Export.Jobs
             {
                 await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
                 _logger.LogError(ex, "Export failure.");
-                return false;
+                throw ex;
             }
             finally
             {
