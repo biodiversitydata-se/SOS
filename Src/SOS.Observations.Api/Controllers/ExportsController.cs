@@ -478,6 +478,7 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = outputFieldSet
                 };
 
+                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -526,6 +527,7 @@ namespace SOS.Observations.Api.Controllers
                     Description = description                    
                 };
 
+                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -581,6 +583,7 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = outputFieldSet                    
                 };
 
+                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
@@ -638,6 +641,7 @@ namespace SOS.Observations.Api.Controllers
                     OutputFieldSet = outputFieldSet                    
                 };
 
+                if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
 
