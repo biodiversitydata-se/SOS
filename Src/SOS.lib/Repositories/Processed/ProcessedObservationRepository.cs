@@ -38,7 +38,7 @@ namespace SOS.Lib.Repositories.Processed
     public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
     {
-        private const string ScrollTimeOut = "240s";
+        private const string ScrollTimeOut = "300s";
         private readonly int _scrollBatchSize;
         private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClientManager _elasticClientManager;
