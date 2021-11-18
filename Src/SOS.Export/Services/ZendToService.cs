@@ -71,7 +71,7 @@ namespace SOS.Export.Services
             
             // Post form to ZendTo
             using var client = new HttpClient();
-            using var response = await client.PostAsync("https://zendto.artdata.slu.se/dropoff.php", form);
+            using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
 
             return response.IsSuccessStatusCode && (response.ReasonPhrase?.Equals("OK", StringComparison.CurrentCultureIgnoreCase) ?? false);
         }
