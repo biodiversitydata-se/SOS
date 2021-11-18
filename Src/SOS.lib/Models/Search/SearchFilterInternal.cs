@@ -34,7 +34,7 @@ namespace SOS.Lib.Models.Search
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             Location = searchFilter.Location;
             Taxa = searchFilter.Taxa;
-            ValidationStatus = searchFilter.ValidationStatus;
+            VerificationStatus = searchFilter.VerificationStatus;
             PositiveSightings = searchFilter.PositiveSightings;
             StartDate = searchFilter.StartDate;
         }
@@ -86,8 +86,8 @@ namespace SOS.Lib.Models.Search
 
         public IEnumerable<int> ActivityIds { get; set; }
 
-        public bool HasTriggerdValidationRule { get; set; }
-        public bool HasTriggerdValidationRuleWithWarning { get; set; }
+        public bool HasTriggeredVerificationRule { get; set; }
+        public bool HasTriggeredVerificationRuleWithWarning { get; set; }
 
         public int? Length { get; set; }
         public string LengthOperator { get; set; }
@@ -97,8 +97,8 @@ namespace SOS.Lib.Models.Search
         public int? Quantity { get; set; }
         public string QuantityOperator { get; set; }
 
-        public IEnumerable<int> ValidationStatusIds { get; set; }
-        public IEnumerable<int> ExcludeValidationStatusIds { get; set; }
+        public IEnumerable<int> VerificationStatusIds { get; set; }
+        public IEnumerable<int> ExcludeVerificationStatusIds { get; set; }
 
         public SightingUnspontaneousFilter UnspontaneousFilter { get; set; }
 

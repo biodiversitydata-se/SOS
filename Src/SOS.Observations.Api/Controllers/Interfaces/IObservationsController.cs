@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilterBaseDto filter,
             bool validateSearchFilter = false,
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> ObservationsBySearch(
             int? roleId,
@@ -47,14 +47,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder, 
             bool validateSearchFilter, 
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> CountInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterInternalBaseDto filter,
             bool validateSearchFilter = false,
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> ObservationsBySearchInternal(
             int? roleId,
@@ -66,7 +66,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false,
+            bool sensitiveObservations = false,
             OutputFormatDto outputFormat = OutputFormatDto.Json);
 
         Task<IActionResult> SearchAggregatedInternal(
@@ -78,7 +78,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregation(
             int? roleId,
@@ -87,7 +87,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregationInternal(
             int? roleId,
@@ -96,7 +96,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
             int? roleId,
@@ -105,7 +105,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int zoom,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> TaxonAggregation(
             int? roleId,
@@ -115,7 +115,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         Task<IActionResult> TaxonAggregationInternal(
             int? roleId,
@@ -125,19 +125,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? take,
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
-
-        //Task<IActionResult> TaxonExistsIndication(
-        //    SearchFilterDto filter,
-        //    bool validateSearchFilter = false,
-        //    bool protectedObservations = false);
+            bool sensitiveObservations = false);        
 
         Task<IActionResult> TaxonExistsIndicationInternal(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilterAggregationInternalDto filter,
            bool validateSearchFilter = false,
-           bool protectedObservations = false);
+           bool sensitiveObservations = false);
 
         /// <summary>
         ///  Signal search
@@ -163,14 +158,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="occurrenceId"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationById(
             int? roleId,
             string authorizationApplicationIdentifier,
             string occurrenceId, OutputFieldSet fieldSet, 
             string translationCultureCode = "sv-SE", 
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
 
         /// <summary>
         /// Get observation by occurrence id, include internal data
@@ -179,7 +174,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="occurrenceId"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
-        /// <param name="protectedObservations"></param>
+        /// <param name="sensitiveObservations"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationByIdInternal(
             int? roleId,
@@ -187,6 +182,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string occurrenceId,
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
-            bool protectedObservations = false);
+            bool sensitiveObservations = false);
     }
 }

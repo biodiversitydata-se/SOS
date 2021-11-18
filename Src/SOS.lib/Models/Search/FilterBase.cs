@@ -80,11 +80,11 @@ namespace SOS.Lib.Models.Search
             Night
         }
 
-        public enum StatusValidation
+        public enum StatusVerification
         {
-            BothValidatedAndNotValidated,
-            Validated,
-            NotValidated
+            BothVerifiedAndNotVerified,
+            Verified,
+            NotVerified
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     True to return only validated sightings.
         /// </summary>
-        public StatusValidation ValidationStatus { get; set; }
+        public StatusVerification VerificationStatus { get; set; }
 
         /// <summary>
         /// Filter by uncertain determination
