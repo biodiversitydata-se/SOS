@@ -14,58 +14,26 @@ using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
 {
-    public class SearchHealthCheck : IHealthCheck
+    public class SearchDataProvidersHealthCheck : IHealthCheck
     {
         private readonly IObservationManager _observationManager;
-        private readonly IDataProviderCache _dataProviderCache;
+        private readonly IDataProviderCache _dataProviderCache;      
 
-        /// <summary>
-        /// Search for otters
-        /// </summary>
-        /// <returns></returns>
-        private async Task<HealthStatus> SearchPicaPicaAsync()
-        {
-            var serachFilter = new SearchFilter()
-            {
-                Taxa = new TaxonFilter
-                {
-                    Ids = new[] { 103032 },
-                    IncludeUnderlyingTaxa = true
-                },
-                VerificationStatus = FilterBase.StatusVerification.BothVerifiedAndNotVerified,
-                PositiveSightings = true,
-                OutputFields = new List<string>
-                {
-                    "taxon.id"
-                }
-            };
-
-            // Warm up
-            await _observationManager.GetChunkAsync(0, null, serachFilter, 0, 2, "", SearchSortOrder.Asc);
-            
-            var sw = new Stopwatch();
-            sw.Start();            
-            var result = await _observationManager.GetChunkAsync(0, null,serachFilter, 0, 2, "", SearchSortOrder.Asc);
-            sw.Stop();
-
-            return result.TotalCount > 0 ? sw.ElapsedMilliseconds < 750 ? HealthStatus.Healthy : HealthStatus.Degraded : HealthStatus.Unhealthy;
-        }
-
-        private async Task<HealthStatus> SearchByProviderAsync()
+        private async Task<(int NumberOfProviders, int SuccessfulProviders, string Msg, HealthStatus Status)> SearchByProviderAsync()
         {
             var providers = (await _dataProviderCache.GetAllAsync())?.
                 Where(p => p.IsActive && p.IncludeInHealthCheck);
 
             if (!providers?.Any() ?? true)
             {
-                return HealthStatus.Unhealthy;
+                return (NumberOfProviders: 0, SuccessfulProviders: 0, Msg: "No providers found", Status: HealthStatus.Unhealthy);
             }
             
             var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<dynamic>>>();
 
             foreach (var provider in providers)
             {
-                var serachFilter = new SearchFilter()
+                var searchFilter = new SearchFilter()
                 {
                     DataProviderIds = new List<int>{ provider.Id },
                     OutputFields = new List<string>
@@ -73,7 +41,7 @@ namespace SOS.Observations.Api.HealthChecks
                         "taxon.id"
                     }
                 };
-                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, serachFilter, 0, 1, "", SearchSortOrder.Asc));
+                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1, "", SearchSortOrder.Asc));
             }
 
             await Task.WhenAll(providerSearchTasks.Values);
@@ -84,16 +52,16 @@ namespace SOS.Observations.Api.HealthChecks
             // More than 75% successful. Allow some data providers to contain zero observations.
             if (successfulProviders > providerCount * 0.75)
             {
-                return HealthStatus.Healthy;
+                return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Healthy);
             }
 
             // More than 50% successful
             if (successfulProviders > providerCount * 0.50)
             {
-                return HealthStatus.Degraded;
+                return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Degraded);
             }
 
-            return HealthStatus.Unhealthy;
+            return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Unhealthy);
         }
 
         /// <summary>
@@ -101,7 +69,7 @@ namespace SOS.Observations.Api.HealthChecks
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="dataProviderCache"></param>
-        public SearchHealthCheck(IObservationManager observationManager,
+        public SearchDataProvidersHealthCheck(IObservationManager observationManager,
             IDataProviderCache dataProviderCache)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -120,29 +88,19 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                var healthTasks = new[]
-                {
-                    SearchPicaPicaAsync(),
-                    SearchByProviderAsync()
-                };
-
-                await Task.WhenAll(healthTasks);
-
-                if (healthTasks.All(t => t.Result.Equals(HealthStatus.Healthy)))
-                {
-                    return new HealthCheckResult(HealthStatus.Healthy, "Everything is alright");
-                }
-
-                if (healthTasks.None(t => t.Result.Equals(HealthStatus.Unhealthy)))
-                {
-                    return new HealthCheckResult(HealthStatus.Degraded, "System working, but not perfect");
-                }
-
-                return new HealthCheckResult(HealthStatus.Unhealthy, "System not working as suspected");
+                var result = await SearchByProviderAsync();
+                return new HealthCheckResult(
+                    result.Status, 
+                    result.Msg,
+                    null, 
+                    new Dictionary<string, object> {
+                        { "SuccessfulProviders", result.SuccessfulProviders },
+                        { "NumberOfProviders", result.NumberOfProviders }                        
+                    });
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "Health check failed");
+                return new HealthCheckResult(HealthStatus.Unhealthy, "Health check failed", e);
             }
         }
     }
