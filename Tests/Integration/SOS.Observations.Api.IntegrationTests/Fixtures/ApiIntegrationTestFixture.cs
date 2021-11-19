@@ -44,6 +44,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
+        public SystemsController SystemsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
@@ -176,6 +177,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(observationManager, dataProviderCache);
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
+            SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
