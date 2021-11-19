@@ -348,7 +348,8 @@ namespace SOS.Observations.Api
                 .AddHangfire(a => a
                     .MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
-                .AddCheck<SearchHealthCheck>("Search", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
 

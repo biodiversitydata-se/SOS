@@ -54,7 +54,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         public TaxonManager TaxonManager { get; private set; }
 
-        public SearchHealthCheck SearchHealthCheck { get; set; }
+        public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
+        public SearchPerformanceHealthCheck SearchPerformanceHealthCheck { get; set; }
 
         public ApiIntegrationTestFixture()
         {
@@ -173,7 +174,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
-            SearchHealthCheck = new SearchHealthCheck(observationManager, dataProviderCache);
+            SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(observationManager, dataProviderCache);
+            SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
