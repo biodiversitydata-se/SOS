@@ -225,8 +225,7 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpPost("Download/Csv")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadCsv(
              [FromBody] ExportFilterDto filter,
              [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
@@ -278,8 +277,7 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
         {
             var filePath = string.Empty;
@@ -328,8 +326,7 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpPost("Download/Excel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadExcel(
             [FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
@@ -381,8 +378,7 @@ namespace SOS.Observations.Api.Controllers
         /// <inheritdoc />
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
@@ -441,8 +437,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderCsv([FromBody] ExportFilterDto filter,
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
@@ -497,8 +492,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderDwC([FromBody] ExportFilterDto filter, [FromQuery] string description)
         {
             try
@@ -546,8 +540,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, 
             [FromQuery] string description, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
@@ -602,8 +595,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, 
             [FromQuery] string description,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,

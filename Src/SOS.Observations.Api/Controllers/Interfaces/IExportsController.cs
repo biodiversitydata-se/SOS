@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="outputFieldSet">The observation property field set.</param>
-        /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
@@ -123,7 +123,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">The search filter.</param>
         /// <param name="description">A description of your download. Will be displayed in the email.</param>
         /// <param name="outputFieldSet">The observation property field set.</param>
-        /// <param name="propertyLabelType">The label type to use if flatOut=false.</param>
+        /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
