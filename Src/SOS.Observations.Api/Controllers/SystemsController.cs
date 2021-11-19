@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.PublicIndexName));
+                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName));
             }
             catch (Exception e)
             {
