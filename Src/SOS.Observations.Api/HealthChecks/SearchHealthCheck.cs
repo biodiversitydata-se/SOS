@@ -40,9 +40,11 @@ namespace SOS.Observations.Api.HealthChecks
                 }
             };
 
-            var sw = new Stopwatch();
-            sw.Start();
+            // Warm up
+            await _observationManager.GetChunkAsync(0, null, serachFilter, 0, 2, "", SearchSortOrder.Asc);
             
+            var sw = new Stopwatch();
+            sw.Start();            
             var result = await _observationManager.GetChunkAsync(0, null,serachFilter, 0, 2, "", SearchSortOrder.Asc);
             sw.Stop();
 
@@ -78,15 +80,15 @@ namespace SOS.Observations.Api.HealthChecks
 
             var providerCount = providers.Count();
             var successfulProviders = providerSearchTasks.Count(t => (t.Value.Result?.TotalCount ?? 0) > 0);
-
-            // All providers successful
-            if (successfulProviders == providerCount)
+            
+            // More than 75% successful. Allow some data providers to contain zero observations.
+            if (successfulProviders > providerCount * 0.75)
             {
                 return HealthStatus.Healthy;
             }
 
-            // More than 75% successful
-            if (successfulProviders > providerCount * 0.75)
+            // More than 50% successful
+            if (successfulProviders > providerCount * 0.50)
             {
                 return HealthStatus.Degraded;
             }

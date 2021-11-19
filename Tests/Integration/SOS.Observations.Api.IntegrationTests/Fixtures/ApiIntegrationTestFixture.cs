@@ -31,6 +31,7 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Controllers;
+using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.TestHelpers;
@@ -52,6 +53,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public string UserAuthenticationToken { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
+
+        public SearchHealthCheck SearchHealthCheck { get; set; }
 
         public ApiIntegrationTestFixture()
         {
@@ -170,6 +173,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
+            SearchHealthCheck = new SearchHealthCheck(observationManager, dataProviderCache);
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
