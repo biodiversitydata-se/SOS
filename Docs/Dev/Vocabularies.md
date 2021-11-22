@@ -18,7 +18,7 @@ public enum VocabularyId
     LifeStage = 6,
     Biotope = 7,
     Substrate = 8,
-    ValidationStatus = 9,
+    VerificationStatus = 9,
     Institution = 10,
     Unit = 11,
     BasisOfRecord = 12,

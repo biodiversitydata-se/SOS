@@ -100,8 +100,8 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;~~identification.validated~~ **(Deprecated)** | boolean | true |
 | &nbsp;&nbsp;identification.verified | boolean | true |
 | &nbsp;&nbsp;identification.uncertainIdentification | boolean | false |
-| &nbsp;&nbsp;~~identification.validationStatus~~ **(Deprecated)** | VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
-| &nbsp;&nbsp;identification.verificationStatus | VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
+| &nbsp;&nbsp;~~identification.validationStatus~~ **(Deprecated)** | VocabularyValue[\<validationStatus\>](Vocabularies.md#verificationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
+| &nbsp;&nbsp;identification.verificationStatus | VocabularyValue[\<verificationStatus\>](Vocabularies.md#verificationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
 | &nbsp;&nbsp;identification.confirmedBy | string | "Gerhard Boré" |
 | &nbsp;&nbsp;identification.identifiedBy | string | "Mårten Ilidasch" |
 | &nbsp;&nbsp;identification.verifiedBy | string | "Lennart Lasseman" |
