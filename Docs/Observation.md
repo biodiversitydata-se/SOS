@@ -4,7 +4,7 @@ All fields that are part of an observation are listed on this page.
 ##### Deprecated fields
 These fields are deprecated and should not be used.
 
-| Field 	| Replaced by 	| Preliminary removal date 	|
+| Deprecated field 	| Replaced by 	| Preliminary removal date 	|
 |:---	|:---	|:---	|
 | protected 	| sensitive 	| 2021-12-16 	|
 | occurrence.protectionLevel 	| occurrence.sensitivityCategory 	| 2021-12-16 	|
