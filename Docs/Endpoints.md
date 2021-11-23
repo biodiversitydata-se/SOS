@@ -16,10 +16,10 @@ The following endpoints exists in Species Observation System API (SOS):
 | /Exports/Download/GeoJson 	| Exports_DownloadGeoJson 	| POST 	| Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint. 	|
 | /Exports/Download/Excel 	| Exports_DownloadExcel 	| POST 	| Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint. 	|
 | /Exports/Download/DwC 	| Exports_DownloadDwC 	| POST 	| Download Darwin Core Archive (DwC-A) export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint. 	|
-| /Exports/Order/Csv 	| Exports_OrderCsv 	| POST 	| Starts Csv aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 000 000 observations. |
-| /Exports/Order/GeoJson 	| Exports_OrderGeoJson 	| POST 	| Starts GeoJSON aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 000 000 observations. |
-| /Exports/Order/Excel 	| Exports_OrderExcel 	| POST 	| Starts Excel aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 000 000 observations. |
-| /Exports/Order/DwC 	| Exports_OrderDwC 	| POST 	| Starts Darwin Core Archive (DwC-A) aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 000 000 observations. |
+| /Exports/Order/Csv 	| Exports_OrderCsv 	| POST 	| Starts Csv aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
+| /Exports/Order/GeoJson 	| Exports_OrderGeoJson 	| POST 	| Starts GeoJSON aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
+| /Exports/Order/Excel 	| Exports_OrderExcel 	| POST 	| Starts Excel aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
+| /Exports/Order/DwC 	| Exports_OrderDwC 	| POST 	| Starts Darwin Core Archive (DwC-A) aynchronous file order. When the file is ready, you will receive an email containing a download link. The limit is 2 million observations. |
 | &nbsp;  	|  	|  	|  	|  	|
 | **Jobs** 	| 	|  	|  	|  	|  
 | /Jobs/\{jobId\}/Status 	| Jobs_GetStatus 	| GET 	| Get status of a job. Using this endpoint you can check the status of a file order. 	|

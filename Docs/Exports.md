@@ -40,4 +40,4 @@ The supported file formats in exports are: CSV, GeoJSON, Excel and Darwin Core A
 6. You can use the /Jobs/\{jobId\}/Status endpoint to check the status of your file order.
 7. When the file is ready you will get a mail with the following subject:<br/>
    ![File order ZendTo mail subject](Images/ZendTo-mail-title-small.png "File order ZendTo mail subject")<br/>
-   The mail contains a download link.
+   The mail contains a download link to your file.
