@@ -11,7 +11,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IExportsController
     {
         /// <summary>
-        /// Returns a list of datasets available for download. A DwC-A file is usually created once a day for each dataset.
+        /// Returns a list of data provider datasets (DwC-A) available for download. A file is usually created once a day for each dataset.
         /// </summary>
         /// <returns></returns>
         Task<IActionResult> GetDatasetsList();
