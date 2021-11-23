@@ -57,6 +57,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 
         public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
         public SearchPerformanceHealthCheck SearchPerformanceHealthCheck { get; set; }
+        public AzureSearchHealthCheck AzureSearchHealthCheck { get; set; }
 
         public ApiIntegrationTestFixture()
         {
@@ -82,6 +83,22 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
             var userAuthenticationToken = config.GetSection($"{configPrefix}:UserAuthenticationToken").Get<string>();
             return userAuthenticationToken;
+        }
+
+        protected string GetAzureApiUrl()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var azureApiUrl = config.GetSection($"{configPrefix}:AzureApiUrl").Get<string>();
+            return azureApiUrl;
+        }
+
+        protected string GetAzureApiSubscriptionKey()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var azureApiUrl = config.GetSection($"{configPrefix}:AzureApiSubscriptionKey").Get<string>();
+            return azureApiUrl;
         }
 
         protected MongoDbConfiguration GetMongoDbConfiguration()
@@ -175,8 +192,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
+            var healthCheckConfiguration = new HealthCheckConfiguration
+            {
+                AzureApiUrl = GetAzureApiUrl(),
+                AzureSubscriptionKey = GetAzureApiSubscriptionKey()
+            };
             SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(observationManager, dataProviderCache);
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
+            AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration);
             SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
         }
 
