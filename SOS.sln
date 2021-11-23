@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Hangfire.JobServer", "Src\SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj", "{A0CC7353-2D06-4E8F-8265-73F3D01B004D}"
 EndProject
@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-8
 		CHANGELOG.md = CHANGELOG.md
 		Docs\DataProviders.md = Docs\DataProviders.md
 		Docs\Endpoints.md = Docs\Endpoints.md
+		Docs\Exports.md = Docs\Exports.md
 		Docs\FAQ.md = Docs\FAQ.md
 		Docs\FieldSets.md = Docs\FieldSets.md
 		Docs\Harvest.md = Docs\Harvest.md
