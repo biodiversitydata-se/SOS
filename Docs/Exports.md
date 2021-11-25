@@ -1,5 +1,6 @@
 ﻿# Exports
-The supported file formats in exports are: CSV, GeoJSON, Excel and Darwin Core Archive (DwC-A).
+The supported file formats in exports are: CSV, GeoJSON, Excel and Darwin Core Archive (DwC-A). 
+The observations will use a [flat observation structure](FlatObservation.md) in the formats CSV, GeoJSON and Excel (_In GeoJSON, the structure can be hierachical if the parameter flat=false_).
 
 ## Endpoints
 | Resource URL | Name | Method | Description |

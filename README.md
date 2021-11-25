@@ -1,5 +1,6 @@
 ﻿# Species Observation System (SOS)
 Species Observation System collects species observations from a number of data sources and gives the user an opportunity to search for those observations using a single API. The system contains over 100 million species observations.
+
 ![SOS overview](Docs/Images/sos-overview.png "Species Observation System overview")
 
 ## How do I access the API?
@@ -13,7 +14,8 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [FAQ](Docs/FAQ.md)
 
 ## Data types and vocabularies
-- [Observation](Docs/Observation.md)
+- [Observation (hierarchical structure)](Docs/Observation.md)
+- [Observation (flat structure)](Docs/FlatObservation.md)
 - [Field sets](Docs/FieldSets.md)
 - [Data providers](Docs/DataProviders.md)
 - [Vocabularies](Docs/Vocabularies.md)
