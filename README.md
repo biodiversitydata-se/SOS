@@ -14,7 +14,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [FAQ](Docs/FAQ.md)
 
 ## Data types and vocabularies
-- [Observation (hierarchical structure)](Docs/Observation.md)
+- [Observation](Docs/Observation.md)
 - [Observation (flat structure)](Docs/FlatObservation.md)
 - [Field sets](Docs/FieldSets.md)
 - [Data providers](Docs/DataProviders.md)
