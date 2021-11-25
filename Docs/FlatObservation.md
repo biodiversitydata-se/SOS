@@ -7,7 +7,7 @@ You can also specify the kind of label (column header) you want to use: Property
 
 ### Minimum
 | Property Name | Property Path | Swedish | English | Data type | Field set |
-|:---	|:---	|:--- |---:	|
+|:--- |:---	|:--- |:---	|:--- | :--- |
 | OccurrenceId | Occurrence.OccurrenceId | Observation GUID | Occurrence Id | String | Minimum |
 | DatasetName | DatasetName | Datakälla | Dataset | String | Minimum |
 | StartDate | Event.StartDate | Startdatum | Start date | DateTime | Minimum |
@@ -35,7 +35,7 @@ You can also specify the kind of label (column header) you want to use: Property
 All fields in the Minimum field set, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
-|:---	|:---	|:--- |---:	|
+|:--- |:---	|:--- |:---	|:--- | :--- |
 | DataProviderId | DataProviderId | DataProviderId | DataProviderId | Int32 | Extended |
 | Modified | Modified | Modifierad datum | Modified date | DateTime | Extended |
 | BasisOfRecord | BasisOfRecord.Value | basisOfRecord | basisOfRecord | String | Extended |
@@ -102,7 +102,7 @@ All fields in the Minimum field set, and also the following fields:
 All fields in the Minimum and Extended field sets, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
-|:---	|:---	|:--- |---:	|
+|:--- |:---	|:--- |:---	|:--- | :--- |
 | Protected | Protected | Skyddad | Protected | Boolean | AllWithValues |
 | AccessRightsId | AccessRights.Id | Åtkomsträttigheter Id | Access rights Id | Int32 | AllWithValues |
 | AccessRights | AccessRights.Value | Åtkomsträttigheter | Access rights | String | AllWithValues |
@@ -202,7 +202,7 @@ All fields in the Minimum and Extended field sets, and also the following fields
 All fields in the Minimum, Extended and AllWithValues field sets, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
-|:---	|:---	|:--- |---:	|
+|:--- |:---	|:--- |:---	|:--- | :--- |
 | CollectionId | CollectionId | CollectionId | CollectionId | String | All |
 | FieldNotes | Event.FieldNotes | Fältanteckningar | Field notes | String | All |
 | FieldNumber | Event.FieldNumber | FieldNumber | FieldNumber | String | All |

@@ -74,7 +74,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
             var sb = new StringBuilder();
             sb.AppendLine("## Minimum");
             sb.AppendLine("| Name | PropertyPath | Swedish | English | Data type | Field set |");
-            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            sb.AppendLine("|:--- |:---	|:--- |:---	|:--- | :--- |");
             foreach (var property in observationProperties.Where(m => m.FieldSet == OutputFieldSet.Minimum))
             {
                 sb.AppendLine($"| {property.Name} | {property.PropertyPath} | {property.SwedishTitle} | {property.EnglishTitle} | {property.DataType} | {property.FieldSet} |");
@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 
             sb.AppendLine("## Extended");
             sb.AppendLine("| Name | PropertyPath | Swedish | English | Data type | Field set |");
-            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            sb.AppendLine("|:--- |:---	|:--- |:---	|:--- | :--- |");
             foreach (var property in observationProperties.Where(m => m.FieldSet == OutputFieldSet.Extended))
             {
                 sb.AppendLine($"| {property.Name} | {property.PropertyPath} | {property.SwedishTitle} | {property.EnglishTitle} | {property.DataType} | {property.FieldSet} |");
@@ -90,7 +90,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 
             sb.AppendLine("## AllWithValues");
             sb.AppendLine("| Name | PropertyPath | Swedish | English | Data type | Field set |");
-            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            sb.AppendLine("|:--- |:---	|:--- |:---	|:--- | :--- |");
             foreach (var property in observationProperties.Where(m => m.FieldSet == OutputFieldSet.AllWithValues))
             {
                 sb.AppendLine($"| {property.Name} | {property.PropertyPath} | {property.SwedishTitle} | {property.EnglishTitle} | {property.DataType} | {property.FieldSet} |");
@@ -98,7 +98,7 @@ namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 
             sb.AppendLine("## All");
             sb.AppendLine("| Name | PropertyPath | Swedish | English | Data type | Field set |");
-            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            sb.AppendLine("|:--- |:---	|:--- |:---	|:--- | :--- |");
             foreach (var property in observationProperties.Where(m => m.FieldSet == OutputFieldSet.All))
             {
                 sb.AppendLine($"| {property.Name} | {property.PropertyPath} | {property.SwedishTitle} | {property.EnglishTitle} | {property.DataType} | {property.FieldSet} |");
