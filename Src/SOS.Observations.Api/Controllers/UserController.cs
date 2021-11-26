@@ -45,7 +45,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="applicationIdentifier">Application identifier making the request, used for retrieve roles and authorizations for the application you use.</param>
         /// <param name="cultureCode">The culture code used for translating role descriptions.</param>
         /// <returns></returns>
-        [HttpGet("")]
+        [HttpGet("Information")]
         [ProducesResponseType(typeof(IEnumerable<UserInformationDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
