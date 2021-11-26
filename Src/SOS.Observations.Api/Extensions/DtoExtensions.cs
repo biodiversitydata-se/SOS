@@ -8,9 +8,11 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
+using static SOS.Lib.Models.UserService.UserInformation;
 using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
 
 namespace SOS.Observations.Api.Extensions
@@ -626,6 +628,40 @@ namespace SOS.Observations.Api.Extensions
                 Name = fieldDescription.Name,
                 FieldSet = fieldDescription.FieldSetEnum,
                 PartOfFieldSets = fieldDescription.FieldSets
+            };
+        }
+
+
+        public static UserInformationDto ToUserInformationDto(this UserInformation userInformation)
+        {
+            if (userInformation == null)
+            {
+                return null;
+            }
+
+            return new UserInformationDto
+            {
+                Id = userInformation.Id,
+                UserName = userInformation.UserName,
+                FirstName = userInformation.FirstName,
+                LastName = userInformation.LastName,
+                Email = userInformation.Email,
+                HasSensitiveSpeciesAuthority = userInformation.HasSensitiveSpeciesAuthority,
+                HasSightingIndicationAuthority = userInformation.HasSightingIndicationAuthority,
+                Roles = userInformation.Roles.Select(role => role.ToUserRoleDto()).ToArray()
+            };            
+        }
+
+        public static UserRoleDto ToUserRoleDto(this UserRole userRole)
+        {
+            if (userRole == null) return null;
+
+            return new UserRoleDto
+            {
+                Id = userRole.Id,
+                Name = userRole.Name,
+                ShortName = userRole.ShortName,
+                Description = userRole.Description
             };
         }
     }

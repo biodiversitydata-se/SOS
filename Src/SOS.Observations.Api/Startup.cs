@@ -373,6 +373,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<IObservationManager, ObservationManager>();

@@ -27,15 +27,25 @@ namespace SOS.Lib.Services.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null);
+        Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE");
 
         /// <summary>
         /// Get user roles
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="cultureCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null);
+        Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE");
+
+        /// <summary>
+        /// Get person information.
+        /// </summary>
+        /// <param name="personId"></param>        
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        Task<PersonModel> GetPersonAsync(int personId, string cultureCode = "sv-SE");
     }
 }
