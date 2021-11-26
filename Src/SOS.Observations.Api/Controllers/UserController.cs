@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.UserService;
@@ -40,7 +41,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get user information.
+        /// Get user information. Add an authorization header to get information about the user.
         /// </summary>
         /// <param name="applicationIdentifier">Application identifier making the request, used for retrieve roles and authorizations for the application you use.</param>
         /// <param name="cultureCode">The culture code used for translating role descriptions.</param>
@@ -61,6 +62,10 @@ namespace SOS.Observations.Api.Controllers
                 var userInfo = await _userManager.GetUserInformationAsync(applicationIdentifier, cultureCode);
                 var dto = userInfo.ToUserInformationDto();
                 return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             }
             catch (Exception e)
             {

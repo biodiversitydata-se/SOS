@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
@@ -39,6 +40,7 @@ namespace SOS.Lib.Managers
         public async Task<UserInformation> GetUserInformationAsync(string applicationIdentifier, string cultureCode)
         {            
             var user = await UserService.GetUserAsync();
+            if (user == null) throw new AuthenticationRequiredException("User is null, probably due to missing authentication header.");
             var userRoles = await UserService.GetUserRolesAsync(user.Id, applicationIdentifier, cultureCode);
             var authorities = await UserService.GetUserAuthoritiesAsync(user.Id, applicationIdentifier, cultureCode);
             var userInformation = new UserInformation
