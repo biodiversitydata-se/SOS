@@ -72,6 +72,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
                 new NullLogger<GeoJsonFileWriter>());
+            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,
+                new NullLogger<CsvFileWriter>());
 
             var filterManager = new Mock<IFilterManager>();
             filterManager
@@ -83,6 +85,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 dwcArchiveFileWriter,
                 excelWriter,
                 geoJsonlWriter,
+                csvWriter,
                 processedObservationRepository,
                 new ProcessInfoRepository(processClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
