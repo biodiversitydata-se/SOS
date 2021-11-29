@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.Extensions
             filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (FilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (FilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
-            filter.Location.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType });
+            filter.Location.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList();
             filter.Location.MaxAccuracy = searchFilterBaseDto.Geographics?.MaxAccuracy;
             filter.Location.Geometries = searchFilterBaseDto.Geographics == null
                 ? null
@@ -421,7 +421,7 @@ namespace SOS.Observations.Api.Extensions
                 DataProviderIds = searchFilterDto.DataProvider?.Ids,
                 Location = new LocationFilter
                 {
-                    Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }),
+                    Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
                     Geometries = searchFilterDto.Geographics == null
                         ? null
                         : new GeographicsFilter
