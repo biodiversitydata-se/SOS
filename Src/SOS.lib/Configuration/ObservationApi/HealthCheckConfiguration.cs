@@ -19,5 +19,15 @@
         /// Minimum local disk storage available (GB)
         /// </summary>
         public double MinimumLocalDiskStorage { get; set; }
+
+        /// <summary>
+        /// Azure API URL.
+        /// </summary>
+        public string AzureApiUrl { get; set; }
+
+        /// <summary>
+        /// Azure API Subscription key.
+        /// </summary>
+        public string AzureSubscriptionKey { get; set; }
     }
 }

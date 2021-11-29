@@ -45,6 +45,7 @@ namespace SOS.Export.Managers
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
+        /// <param name="csvWriter"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
@@ -57,6 +58,7 @@ namespace SOS.Export.Managers
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IExcelFileWriter excelWriter,
             IGeoJsonFileWriter geoJsonWriter,
+            ICsvFileWriter csvWriter,
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
@@ -72,7 +74,8 @@ namespace SOS.Export.Managers
                 excelWriter ?? throw new ArgumentNullException(nameof(excelWriter));
             _geoJsonWriter =
                 geoJsonWriter ?? throw new ArgumentNullException(nameof(geoJsonWriter));
-
+            _csvWriter =
+                csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository =

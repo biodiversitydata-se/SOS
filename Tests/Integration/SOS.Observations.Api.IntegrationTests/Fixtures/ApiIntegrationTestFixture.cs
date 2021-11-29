@@ -46,17 +46,20 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
         public VocabulariesController VocabulariesController { get; private set; }
+        public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public DwcArchiveFileWriter DwcArchiveFileWriter { get; set; }
-        private IFilterManager _filterManager { get; set; }
+        private IFilterManager _filterManager;
+        private IUserManager _userManager;
         public string UserAuthenticationToken { get; set; }
 
         public TaxonManager TaxonManager { get; private set; }
 
         public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
         public SearchPerformanceHealthCheck SearchPerformanceHealthCheck { get; set; }
+        public AzureSearchHealthCheck AzureSearchHealthCheck { get; set; }
 
         public ApiIntegrationTestFixture()
         {
@@ -82,6 +85,22 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
             var userAuthenticationToken = config.GetSection($"{configPrefix}:UserAuthenticationToken").Get<string>();
             return userAuthenticationToken;
+        }
+
+        protected string GetAzureApiUrl()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var azureApiUrl = config.GetSection($"{configPrefix}:AzureApiUrl").Get<string>();
+            return azureApiUrl;
+        }
+
+        protected string GetAzureApiSubscriptionKey()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var azureApiUrl = config.GetSection($"{configPrefix}:AzureApiSubscriptionKey").Get<string>();
+            return azureApiUrl;
         }
 
         protected MongoDbConfiguration GetMongoDbConfiguration()
@@ -175,9 +194,17 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
+            var healthCheckConfiguration = new HealthCheckConfiguration
+            {
+                AzureApiUrl = GetAzureApiUrl(),
+                AzureSubscriptionKey = GetAzureApiSubscriptionKey()
+            };
             SearchDataProvidersHealthCheck = new SearchDataProvidersHealthCheck(observationManager, dataProviderCache);
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
+            AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration);
             SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
+            _userManager = new UserManager(userService, new NullLogger<UserManager>());
+            UserController = new UserController(_userManager, new NullLogger<UserController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
@@ -287,7 +314,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             userServiceMock.Setup(userService => userService.GetUserAsync())
                 .ReturnsAsync(user);
             userServiceMock.Setup(userService =>
-                    userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>()))
+                    userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(authorities);
             _filterManager.UserService = userServiceMock.Object;
         }
@@ -297,6 +324,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var userService = CreateUserService(token);
             _filterManager.UserService = userService;
+            _userManager.UserService = userService;
         }
     }
 }
