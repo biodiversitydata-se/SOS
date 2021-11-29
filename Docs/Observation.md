@@ -4,7 +4,7 @@ All fields that are part of an observation are listed on this page.
 ##### Deprecated fields
 These fields are deprecated and should not be used.
 
-| Field 	| Replaced by 	| Preliminary removal date 	|
+| Deprecated field 	| Replaced by 	| Preliminary removal date 	|
 |:---	|:---	|:---	|
 | protected 	| sensitive 	| 2021-12-16 	|
 | occurrence.protectionLevel 	| occurrence.sensitivityCategory 	| 2021-12-16 	|
@@ -13,7 +13,7 @@ These fields are deprecated and should not be used.
 | identification.validationStatus 	| identification.verificationStatus 	| 2021-12-16 	|
 
 
-### Valid fields
+### Fields
 
 | Field 	| Type 	| Example 	| Description | Darwin Core 	|
 |:---	|:---	|:---	|:---	|:---	|  
@@ -126,9 +126,9 @@ These fields are deprecated and should not be used.
 | identification.dateIdentified 	| string 	| "2016" 	| The date on which the subject was identified as representing the Taxon.    	| https://dwc.tdwg.org/terms/#dwc:dateIdentified 	|
 | identification.verifiedBy 	| string 	| "Lennart Lasseman" 	| A list of names of people, who verified the observation.    	|  	|
 | ~~identification.validated~~ **(Deprecated)** 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  This property is replaced by *identification.verified*	|
-| identification.verified 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  	|
+| identification.verified 	| boolean    	| true 	| Indicates whether the occurrence is verified.    	|  	|
 | ~~identification.validationStatus~~ **(Deprecated)** 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  This property is replaced by *identification.verificationStatus*	|
-| identification.verificationStatus 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  	|
+| identification.verificationStatus 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Verification status. 	|  	|
 | identification.determinationMethod 	| VocabularyValue[\<determinationMethod\>](Vocabularies.md#determinationMethod) 	| \{ "id":3, "value":"stereolupp" \} | Method used in species determination. 	|  	|
 | identification.uncertainIdentification 	| boolean    	| false 	| True if determination is uncertain.    	|  	|
 | identification.identificationQualifier 	| string 	| "Andersson, 1976" 	| A brief phrase or a standard term ("cf.", "aff.") to   express the determiner's doubts about the Identification.    	| https://dwc.tdwg.org/terms/#dwc:identificationQualifier 	|

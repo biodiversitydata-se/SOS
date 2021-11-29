@@ -25,7 +25,7 @@ This page provides information about how to use the search filter parameters.
   * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
 - [Projects filter](#projects-filter)
 - [Occurrence status filter](#occurrence-status-filter)
-- [Validation status filter](#validation-status-filter)
+- [Verification status filter](#verification-status-filter)
 - [Determination filter](#determination-filter)
 - [NotRecovered filter](#notrecovered-filter)
 - [BirdNestActivityLimit filter](#birdnestactivitylimit-filter)
@@ -459,18 +459,18 @@ This filter will return observations with occurrenceStatus "absent"
 }
 ```
 
-## Validation status filter
-This filter will return only validated observations.
+## Verification status filter
+This filter will return only verified observations.
 ```json
 {
-    "validationStatus": "Validated"
+    "verificationStatus": "Verified"
 }
 ```
 
-This filter will return only non validated observations.
+This filter will return only non verified observations.
 ```json
 {
-    "validationStatus": "NotValidated"
+    "verificationStatus": "NotVerified"
 }
 ```
 

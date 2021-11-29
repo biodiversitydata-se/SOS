@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services.Interfaces;
@@ -80,7 +81,7 @@ namespace SOS.Lib.Services
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{userId}"));
-
+                
                 return response.Success
                     ? response.Result
                     : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
@@ -94,12 +95,12 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null)
+        public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
             try
             {
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/authorities?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&lang=sv-SE"));
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/authorities?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&lang={cultureCode}"));
 
                 return response.Success
                     ? response.Result
@@ -114,12 +115,13 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null)
+        public async Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
             try
             {
+                var cultureId = CultureCodeHelper.GetCultureId(cultureCode);
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
-                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&localeId=175"));
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/User/{ userId }/roles?applicationIdentifier={ authorizationApplicationIdentifier ?? "artportalen" }&localeId={cultureId}"));
 
                 return response?.Success ?? false
                     ? response.Result
@@ -128,6 +130,26 @@ namespace SOS.Lib.Services
             catch (Exception e)
             {
                 _logger.LogError("Failed to get user roles", e);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc />
+        public async Task<PersonModel> GetPersonAsync(int personId, string cultureCode = "sv-SE")
+        {
+            try
+            {                
+                var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
+                    new Uri($"{ _userServiceConfiguration.BaseAddress }/Person/{personId}?lang={cultureCode}"));
+
+                return response?.Success ?? false
+                    ? response.Result
+                    : throw new Exception(string.Concat(response?.Messages?.Select(m => m.Text) ?? Array.Empty<string>()));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to get person information", e);
             }
 
             return null;

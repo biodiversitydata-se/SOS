@@ -57,5 +57,20 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.HealthCheck
             //-----------------------------------------------------------------------------------------------------------
             result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy);
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task AzureSearchHealthCheck()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await _fixture.AzureSearchHealthCheck.CheckHealthAsync(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext());
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy);
+        }
     }
 }

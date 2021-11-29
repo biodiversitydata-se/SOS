@@ -336,7 +336,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
             services.AddSingleton(healthCheckConfiguration);
-            services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
+            services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());            
 
             services.AddHealthChecks()
                 .AddDiskStorageHealthCheck(
@@ -350,6 +350,7 @@ namespace SOS.Observations.Api
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
                 .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
+                .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
 
@@ -372,6 +373,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
+            services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
