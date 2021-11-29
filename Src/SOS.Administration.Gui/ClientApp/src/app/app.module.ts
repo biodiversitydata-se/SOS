@@ -67,7 +67,7 @@ export function tokenGetter() {
       { path: 'observation-viewer', component: ObservationViewerComponent, canActivate: [AuthGuard] },
       { path: 'application-insights', component: ApplicationInsightsComponent },
       { path: 'protected-log', component: ProtectedLogComponent, canActivate: [AuthGuard] },
-      { path: 'login', component: LoginComponent },
+      { path: 'login', component: LoginComponent }
     ]),
     LeafletModule,
     LeafletMarkerClusterModule,
