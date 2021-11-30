@@ -37,9 +37,7 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
-    {
-        private const string ScrollTimeOut = "300s";
-        private readonly int _scrollBatchSize;
+    {                
         private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
@@ -358,14 +356,14 @@ namespace SOS.Lib.Repositories.Processed
                     .SearchAsync<Observation>(s => s
                         .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
-                        .Scroll(ScrollTimeOut)
-                        .Size(_scrollBatchSize)
+                        .Scroll(_elasticConfiguration.ScrollTimeout)
+                        .Size(_elasticConfiguration.ScrollBatchSize)
                     );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             return new ScrollResult<Observation>
@@ -451,8 +449,7 @@ namespace SOS.Lib.Repositories.Processed
             LiveMode = true;
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
-            _scrollBatchSize = client.ReadBatchSize;
+            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));            
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
@@ -478,7 +475,6 @@ namespace SOS.Lib.Repositories.Processed
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
-            _scrollBatchSize = client.ReadBatchSize;
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
@@ -1328,7 +1324,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Index(indexNames)
                     .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                     .Size(take)
-                    .Scroll(ScrollTimeOut)
+                    .Scroll(_elasticConfiguration.ScrollTimeout)
                     .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -1341,7 +1337,7 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1621,14 +1617,14 @@ namespace SOS.Lib.Repositories.Processed
                             .Filter(filter.ToMeasurementOrFactsQuery())
                         )
                     )
-                    .Scroll(ScrollTimeOut)
-                    .Size(BatchSize)
+                    .Scroll(_elasticConfiguration.ScrollTimeout)
+                    .Size(_elasticConfiguration.ScrollBatchSize)
                 );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1661,14 +1657,14 @@ namespace SOS.Lib.Repositories.Processed
                             .Filter(filter.ToMultimediaQuery())
                         )
                     )
-                    .Scroll(ScrollTimeOut)
-                    .Size(BatchSize)
+                    .Scroll(_elasticConfiguration.ScrollTimeout)
+                    .Size(_elasticConfiguration.ScrollBatchSize)
                 );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1710,15 +1706,15 @@ namespace SOS.Lib.Repositories.Processed
                                 .Filter(query)
                             )
                         )
-                        .Scroll(ScrollTimeOut)
-                        .Size(BatchSize)
+                        .Scroll(_elasticConfiguration.ScrollTimeout)
+                        .Size(_elasticConfiguration.ScrollBatchSize)
                     );
 
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1759,15 +1755,15 @@ namespace SOS.Lib.Repositories.Processed
                                 .Filter(query)
                             )
                         )
-                        .Scroll(ScrollTimeOut)
-                        .Size(BatchSize)
+                        .Scroll(_elasticConfiguration.ScrollTimeout)
+                        .Size(_elasticConfiguration.ScrollBatchSize)
                     );
 
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);

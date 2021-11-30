@@ -34,6 +34,16 @@ namespace SOS.Lib.Configuration.Shared
         public int WriteBatchSize { get; set; }
 
         /// <summary>
+        /// How many items to retrieve in each scroll request.
+        /// </summary>
+        public int ScrollBatchSize { get; set; } = 5000;
+
+        /// <summary>
+        /// Scroll timeout.
+        /// </summary>
+        public string ScrollTimeout { get; set; } = "300s";
+
+        /// <summary>
         /// Max number of aggregation buckets.
         /// </summary>
         public int MaxNrAggregationBuckets { get; set; } = 65535;
