@@ -107,13 +107,10 @@ namespace SOS.Observations.Api.Controllers
         /// Validate input for download request
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="userExport"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(ExportFilterDto filter, UserExport userExport)
+        private async Task<IActionResult> DownloadValidateAsync(ExportFilterDto filter)
         {
-            var validationResults = Result.Combine(
-                ValidateSearchFilter(filter),
-                ValidateUserExport(userExport));
+            var validationResults = ValidateSearchFilter(filter);
 
             if (validationResults.IsFailure)
             {
@@ -233,20 +230,15 @@ namespace SOS.Observations.Api.Controllers
              [FromQuery] string cultureCode = "sv-SE")
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-            var filePath = string.Empty;
-            var jobId = Guid.NewGuid().ToString();
-            var userExports = await GetUserExportsAsync();
+            var filePath = string.Empty;            
             try
             {
-                var validateResult = await DownloadValidateAsync(filter, userExports);
+                var validateResult = await DownloadValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
-
-                userExports.OnGoingJobIds.Add(jobId);
-                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateExportOutputFields(outputFieldSet);
@@ -268,9 +260,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                _fileService.DeleteFile(filePath);
-                userExports.OnGoingJobIds.Remove(jobId);
-                await UpdateUserExportsAsync(userExports);
+                _fileService.DeleteFile(filePath);                
             }
         }
 
@@ -280,21 +270,15 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
         {
-            var filePath = string.Empty;
-            var jobId = Guid.NewGuid().ToString();
-            var userExports = await GetUserExportsAsync();
+            var filePath = string.Empty;            
             try
-            {
-               
-                var validateResult = await DownloadValidateAsync(filter, userExports);
+            {               
+                var validateResult = await DownloadValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
-
-                userExports.OnGoingJobIds.Add(jobId);
-                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
 
@@ -317,9 +301,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                _fileService.DeleteFile(filePath);
-                userExports.OnGoingJobIds.Remove(jobId);
-                await UpdateUserExportsAsync(userExports);
+                _fileService.DeleteFile(filePath);                
             }
         }
 
@@ -334,20 +316,15 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string cultureCode = "sv-SE")
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-            var filePath = string.Empty;
-            var jobId = Guid.NewGuid().ToString();
-            var userExports = await GetUserExportsAsync();
+            var filePath = string.Empty;                      
             try
             {
-                var validateResult = await DownloadValidateAsync(filter, userExports);
+                var validateResult = await DownloadValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
-
-                userExports.OnGoingJobIds.Add(jobId);
-                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateExportOutputFields(outputFieldSet);
@@ -369,9 +346,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                _fileService.DeleteFile(filePath);
-                userExports.OnGoingJobIds.Remove(jobId);
-                await UpdateUserExportsAsync(userExports);
+                _fileService.DeleteFile(filePath);                
             }
         }
 
@@ -387,20 +362,16 @@ namespace SOS.Observations.Api.Controllers
             bool excludeNullValues = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-            var filePath = string.Empty;
-            var jobId = Guid.NewGuid().ToString();
-            var userExports = await GetUserExportsAsync();
+            var filePath = string.Empty;            
+            
             try
             {
-                var validateResult = await DownloadValidateAsync(filter, userExports);
+                var validateResult = await DownloadValidateAsync(filter);
 
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
-
-                userExports.OnGoingJobIds.Add(jobId);
-                await UpdateUserExportsAsync(userExports);
 
                 var exportFilter = (SearchFilter)okResult.Value;
                 exportFilter.PopulateExportOutputFields(outputFieldSet);
@@ -425,9 +396,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                _fileService.DeleteFile(filePath);
-                userExports.OnGoingJobIds.Remove(jobId);
-                await UpdateUserExportsAsync(userExports);
+                _fileService.DeleteFile(filePath);                
             }
         }
 
