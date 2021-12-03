@@ -6,12 +6,14 @@
          xmlns:gbif="http://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
-         packageId="33fed775-bbc5-caf0-456d-009175df4ebb" system="https://sos-search.artdata.slu.se/" scope="system"
+         packageId="1b7e83a0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
 	<dataset>
-		<identifier>33fed775-bbc5-caf0-456d-009175df4ebb</identifier>
+		<identifier>1b7e83a0-0c61-11dd-84ce-b8a03c50a862</identifier>
+		<alternateIdentifier>1b7e83a0-0c61-11dd-84ce-b8a03c50a862</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-icr</alternateIdentifier>		
         <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:KUL</alternateIdentifier>
-        <title>The database for coastal fish (KUL)</title>
+		<title xml:lang="eng">SLU Aqua Institute of Coastal Research Database for Coastal Fish - KUL</title>
 		<creator>
 			<organizationName>"Department of Aquatic Resources, Institute of Coastal Research, SLU</organizationName>
 			<address>
@@ -36,7 +38,7 @@
 		<language>ENGLISH</language>
         <licenseName></licenseName>
 		<abstract>
-			<para>KUL provides quality assured catch data of coastal fish.</para>
+			<para>The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs on behalf of the Swedish Agency for Marine and Water Management. The test fishing is performed with standardized methods. SLU Aqua also collect test-fishing data from several other types of investigations (e g recipient monitoring). The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. Data is available for the public on http://www.slu.se/kul.</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
@@ -46,32 +48,45 @@
 			<keyword>Observation</keyword>
 			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
+		<keywordSet>
+			<keyword>Sweden</keyword>
+			<keyword>Coastal fish</keyword>
+			<keyword>pisces</keyword>
+			<keywordThesaurus>Not Applicable</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
-				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
 		</intellectualRights>
+		<distribution scope="document">
+			<online>
+				<url function="information">http://www.slu.se/en/departments/aquatic-resources/databases/database-for-coastal-fish-kul/</url>
+			</online>
+		</distribution>
 		<coverage>
 			<geographicCoverage>
-				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<geographicDescription>Sweden</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>11.274</westBoundingCoordinate>
+					<eastBoundingCoordinate>22.5</eastBoundingCoordinate>
+					<northBoundingCoordinate>65.833</northBoundingCoordinate>
+					<southBoundingCoordinate>55.57</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
-            <temporalCoverage>
-                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
-                <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
-                <sos:EndDate></sos:EndDate>
-            </temporalCoverage>
-            <taxonomicCoverage>
-                <sos:TaxonomicDescription>Fish</sos:TaxonomicDescription>
-                <taxonId>6000995</taxonId>
-                <sos:TaxonList></sos:TaxonList>
-            </taxonomicCoverage>
+			<taxonomicCoverage>
+				<generalTaxonomicCoverage>Pisces</generalTaxonomicCoverage>
+				<taxonomicClassification>
+					<taxonRankName>class</taxonRankName>
+					<taxonRankValue>Pisces</taxonRankValue>
+				</taxonomicClassification>
+			</taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -114,6 +129,13 @@
         </samplingMethods>
         <additionalMetadata>
             <metadata>
+				<gbif>
+					<dateStamp>2015-09-14T04:49:23.027+02:00</dateStamp>
+					<hierarchyLevel>dataset</hierarchyLevel>
+					<citation>Database for Coastal Fish - KUL. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. http://slu.se/kul [yyyy-mm-dd].</citation>
+					<formationPeriod>1987-current</formationPeriod>
+					<livingTimePeriod>1987-current</livingTimePeriod>					
+				</gbif>
                 <gettingStarted></gettingStarted>
                 <purpose></purpose>
                 <sos>
