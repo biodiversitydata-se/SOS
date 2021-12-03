@@ -11,11 +11,9 @@
     scope="system" xml:lang="en">
   <dataset>
     <identifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</identifier>
-    <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:Artportalen</alternateIdentifier>
-    <alternateIdentifier>10.15468/kllkyl</alternateIdentifier>
-    <alternateIdentifier>https://www.gbif.se/ipt/resource?r=artdata</alternateIdentifier>
-    <alternateIdentifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</alternateIdentifier>
-    <alternateIdentifier>14567</alternateIdentifier>
+	<alternateIdentifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</alternateIdentifier>
+	<alternateIdentifier>https://www.gbif.se/ipt/resource?r=artdata</alternateIdentifier>
+    <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:Artportalen</alternateIdentifier>	  
     <title>Artportalen (Swedish Species Observation System)</title>
     <creator>
       <individualName>
@@ -64,14 +62,18 @@
         Artportalen is developed and operated by the SLU Swedish Species Information Centre (SLU Artdatabanken) at the Swedish University of Agricultural Sciences, on behalf of the Swedish Environmental Protection Agency
       </para>
     </abstract>
-    <keywordSet>
-      <keyword>Occurrence</keyword>
-      <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
-    </keywordSet>
-    <keywordSet>
-      <keyword>Observation</keyword>
-      <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
-    </keywordSet>
+	  <keywordSet>
+		  <keyword>Occurrence</keyword>
+		  <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+	  </keywordSet>
+	  <keywordSet>
+		  <keyword>Observation</keyword>
+		  <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+	  </keywordSet>
+	  <keywordSet>
+		  <keyword>Occurrence</keyword>
+		  <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type_2015-07-10.xml</keywordThesaurus>
+	  </keywordSet>
     <intellectualRights>
       <para>
         To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
@@ -158,6 +160,7 @@
       <metadata>
         <gbif>
           <dateStamp>2021-10-07T08:59:17Z</dateStamp>
+		  <hierarchyLevel>dataset</hierarchyLevel>
           <citation>Shah M, Liljeblad J (2021). Artportalen (Swedish Species Observation System). Version 92.254. SLU Artdatabanken. Occurrence dataset https://doi.org/10.15468/kllkyl accessed via GBIF.org on 2021-10-07.</citation>
         </gbif>
       </metadata>
