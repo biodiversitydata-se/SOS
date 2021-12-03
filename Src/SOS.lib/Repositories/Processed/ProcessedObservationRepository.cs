@@ -356,6 +356,7 @@ namespace SOS.Lib.Repositories.Processed
                     .SearchAsync<Observation>(s => s
                         .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
+                        .Sort(s => s.Ascending(new Field("_doc")))
                         .Scroll(_elasticConfiguration.ScrollTimeout)
                         .Size(_elasticConfiguration.ScrollBatchSize)
                     );
@@ -1617,6 +1618,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Filter(filter.ToMeasurementOrFactsQuery())
                         )
                     )
+                    .Sort(s => s.Ascending(new Field("_doc")))
                     .Scroll(_elasticConfiguration.ScrollTimeout)
                     .Size(_elasticConfiguration.ScrollBatchSize)
                 );
@@ -1657,6 +1659,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Filter(filter.ToMultimediaQuery())
                         )
                     )
+                    .Sort(s => s.Ascending(new Field("_doc")))
                     .Scroll(_elasticConfiguration.ScrollTimeout)
                     .Size(_elasticConfiguration.ScrollBatchSize)
                 );
@@ -1706,6 +1709,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Filter(query)
                             )
                         )
+                        .Sort(s => s.Ascending(new Field("_doc")))
                         .Scroll(_elasticConfiguration.ScrollTimeout)
                         .Size(_elasticConfiguration.ScrollBatchSize)
                     );
@@ -1748,13 +1752,13 @@ namespace SOS.Lib.Repositories.Processed
                 searchResponse = await Client
                     .SearchAsync<dynamic>(s => s
                         .Index(indexNames)
-                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
-                        //.Source(p => projection)
+                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))                        
                         .Query(q => q
                             .Bool(b => b
                                 .Filter(query)
                             )
                         )
+                        .Sort(s => s.Ascending(new Field("_doc")))
                         .Scroll(_elasticConfiguration.ScrollTimeout)
                         .Size(_elasticConfiguration.ScrollBatchSize)
                     );
@@ -1763,7 +1767,7 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
