@@ -50,5 +50,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Vernacular name of substrate species.
         /// </summary>
         public string SpeciesVernacularName { get; set; }
+
+        /// <summary>
+        /// Description of substrate
+        /// </summary>
+        public string SubstrateDescription { get; set; }
     }
 }
