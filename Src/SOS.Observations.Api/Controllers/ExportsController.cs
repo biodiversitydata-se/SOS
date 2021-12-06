@@ -359,7 +359,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
-            bool excludeNullValues = true)
+            [FromQuery] bool excludeNullValues = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;            
