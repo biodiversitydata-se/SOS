@@ -1,10 +1,20 @@
 # Changelog
 
+## [1.4.1]
+
+**Prod**: 
+
+**Test**: 2021-12-06
+
+### `Added`
+- Support for response compression. Use header : `Accept-Encoding: br` for Brotli compression or `Accept-Encoding: gzip` for GZIP compression. Brotli compression is usually the faster than GZIP.
+- New parameter `gzip=true` or `gzip=false` to the `/Exports/Download` endpoints to enable retrieving Excel, GeoJSON and CSV files without GZIP compression.
+
 ## [1.4]
 
-**Prod**: 2021-11-15
+**Prod**: 2021-12-02
 
-**Test**: 2021-11-16
+**Test**: 2021-12-06
 
 ### `Added`
 - New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
