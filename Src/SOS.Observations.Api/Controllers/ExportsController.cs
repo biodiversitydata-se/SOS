@@ -153,11 +153,12 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="fileName"></param>
+        /// <param name="contentType"></param>
         /// <returns></returns>
-        private IActionResult GetFile(string filePath, string fileName)
+        private IActionResult GetFile(string filePath, string fileName, string contentType)
         {
             var bytes = System.IO.File.ReadAllBytes(filePath);
-            return File(bytes, "application/zip", fileName);
+            return File(bytes, contentType, fileName);
         }
 
         /// <summary>
@@ -227,7 +228,8 @@ namespace SOS.Observations.Api.Controllers
              [FromBody] ExportFilterDto filter,
              [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
              [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-             [FromQuery] string cultureCode = "sv-SE")
+             [FromQuery] string cultureCode = "sv-SE",
+             [FromQuery] bool gzip = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;            
@@ -250,8 +252,13 @@ namespace SOS.Observations.Api.Controllers
                         outputFieldSet,
                         propertyLabelType,
                         false,
+                        gzip,
                         JobCancellationToken.Null);
-                return GetFile(filePath, "Observations_Csv.zip");
+
+                if (gzip)
+                    return GetFile(filePath, "Observations_Csv.zip", "application/zip");
+                else
+                    return GetFile(filePath, "Observations.csv", "text/tab-separated-values"); // or "text/csv"?                
             }
             catch (Exception e)
             {
@@ -291,8 +298,9 @@ namespace SOS.Observations.Api.Controllers
                         OutputFieldSet.All,
                         PropertyLabelType.PropertyPath,
                         false,
+                        true,
                         JobCancellationToken.Null);
-                return GetFile(filePath, "Observations_DwC.zip");
+                return GetFile(filePath, "Observations_DwC.zip", "application/zip");
             }
             catch (Exception e)
             {
@@ -313,7 +321,8 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] ExportFilterDto filter, 
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
-            [FromQuery] string cultureCode = "sv-SE")
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool gzip = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;                      
@@ -336,8 +345,13 @@ namespace SOS.Observations.Api.Controllers
                         outputFieldSet,
                         propertyLabelType,
                         false,
+                        gzip,
                         JobCancellationToken.Null);
-                return GetFile(filePath, "Observations_Excel.zip");
+
+                if (gzip)
+                    return GetFile(filePath, "Observations_Excel.zip", "application/zip");
+                else
+                    return GetFile(filePath, "Observations.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
             catch (Exception e)
             {
@@ -359,7 +373,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
-            [FromQuery] bool excludeNullValues = true)
+            [FromQuery] bool excludeNullValues = true,
+            [FromQuery] bool gzip = true)
         {
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var filePath = string.Empty;            
@@ -386,8 +401,13 @@ namespace SOS.Observations.Api.Controllers
                         outputFieldSet,
                         propertyLabelType,
                         excludeNullValues,
+                        gzip,
                         JobCancellationToken.Null);
-                return GetFile(filePath, "Observations_GeoJson.zip");
+
+                if (gzip)                
+                    return GetFile(filePath, "Observations_GeoJson.zip", "application/zip");
+                else                
+                    return GetFile(filePath, "Observations.geojson", "application/geo+json");
             }
             catch (Exception e)
             {

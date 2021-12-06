@@ -52,14 +52,20 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
-        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath,
-            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+        public async Task<string> CreateFileAync(SearchFilter filter, 
+            string exportPath,
+            string fileName, 
+            string culture, 
+            OutputFieldSet outputFieldSet, 
+            PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
 
             try
             {
+                string excelFilePath = null;
                 var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -104,7 +110,8 @@ namespace SOS.Lib.IO.Excel
 
                             // Create new file
                             fileCount++;
-                            var file = new FileInfo(Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx"));
+                            excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileCount}-Observations.xlsx");
+                            var file = new FileInfo(excelFilePath);
                             package = new ExcelPackage(file);
                             sheet = package.Workbook.Worksheets.Add("Observations");
                             rowIndex = 1;
@@ -131,7 +138,7 @@ namespace SOS.Lib.IO.Excel
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
-
+                
                 // If we have a package, save it
                 if (package != null)
                 {
@@ -143,11 +150,18 @@ namespace SOS.Lib.IO.Excel
                     package.Dispose();
                 }
 
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-
-                var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-
-                return zipFilePath;
+                if (gzip)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    return zipFilePath;
+                }
+                else
+                {
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
+                    File.Move(excelFilePath, destinationFilePath);
+                    return destinationFilePath;
+                }
             }
             catch (Exception e)
             {

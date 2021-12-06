@@ -23,12 +23,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet">The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadCsv(
             [FromBody] ExportFilterDto filter,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-            [FromQuery] string cultureCode = "sv-SE");
+            [FromQuery] string cultureCode = "sv-SE",
+            [FromQuery] bool gzip = true);
 
         /// <summary>
         /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
@@ -44,11 +46,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="outputFieldSet">The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadExcel(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
-            string cultureCode = "sv-SE");
+            string cultureCode = "sv-SE",
+            bool gzip = true);
 
         /// <summary>
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
@@ -59,13 +63,15 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
+        /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
             OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
-            bool excludeNullValues = true);
+            bool excludeNullValues = true,
+            bool gzip = true);
 
         /// <summary>
         /// Starts the process of creating a Csv file with observations based on provided filter.

@@ -53,8 +53,13 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
-        public async Task<string> CreateFileAync(SearchFilter filter, string exportPath,
-            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+        public async Task<string> CreateFileAync(SearchFilter filter, 
+            string exportPath,
+            string fileName, 
+            string culture, 
+            OutputFieldSet outputFieldSet, 
+            PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
@@ -68,7 +73,8 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
 
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "Observations.csv"));
+                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.csv");
+                await using var fileStream = File.Create(observationsFilePath);                
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
@@ -114,11 +120,18 @@ namespace SOS.Lib.IO.Excel
                 }
                 csvFileHelper.FinishWrite();
 
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-
-                var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-
-                return zipFilePath;
+                if (gzip)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    return zipFilePath;
+                }
+                else
+                {
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.csv");
+                    File.Move(observationsFilePath, destinationFilePath);
+                    return destinationFilePath;
+                }
             }
             catch (Exception e)
             {

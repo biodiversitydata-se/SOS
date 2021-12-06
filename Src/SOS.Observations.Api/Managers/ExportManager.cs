@@ -38,25 +38,32 @@ namespace SOS.Observations.Api.Managers
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateCsvExportAsync(SearchFilter filter, string exportPath,
-            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+        private async Task<string> CreateCsvExportAsync(SearchFilter filter, 
+            string exportPath,
+            string fileName, 
+            string culture, 
+            OutputFieldSet outputFieldSet, 
+            PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var zipFilePath = await _csvWriter.CreateFileAync(
+                var filePath = await _csvWriter.CreateFileAync(
                     filter,
                     exportPath,
                     fileName,
                     culture,
                     outputFieldSet,
                     propertyLabelType,
+                    gzip,
                     cancellationToken);
 
-                return zipFilePath;
+                return filePath;
             }
             catch (JobAbortedException)
             {
@@ -118,25 +125,32 @@ namespace SOS.Observations.Api.Managers
         /// <param name="fileName"></param>
         /// <param name="culture"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, string exportPath, 
-            string fileName, string culture, OutputFieldSet outputFieldSet, PropertyLabelType propertyLabelType,
+        private async Task<string> CreateExcelExportAsync(SearchFilter filter, 
+            string exportPath, 
+            string fileName, 
+            string culture, 
+            OutputFieldSet outputFieldSet, 
+            PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                var zipFilePath = await _excelWriter.CreateFileAync(
+                var filePath = await _excelWriter.CreateFileAync(
                     filter, 
                     exportPath,
                     fileName,
                     culture,
                     outputFieldSet,
                     propertyLabelType,
+                    gzip,
                     cancellationToken);
 
-                return zipFilePath;
+                return filePath;
             }
             catch (JobAbortedException)
             {
@@ -160,6 +174,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="flatOut"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
@@ -171,11 +186,12 @@ namespace SOS.Observations.Api.Managers
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken) 
         {
             try
             {
-                var zipFilePath = await _geoJsonWriter.CreateFileAync(
+                var filePath = await _geoJsonWriter.CreateFileAync(
                    filter,
                    exportPath,
                    fileName,
@@ -184,9 +200,10 @@ namespace SOS.Observations.Api.Managers
                    outputFieldSet, 
                    propertyLabelType, 
                    excludeNullValues,
+                   gzip,
                    cancellationToken);
 
-                return zipFilePath;
+                return filePath;
             }
             catch (JobAbortedException)
             {
@@ -203,6 +220,7 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="csvWriter"></param>
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="excelWriter"></param>
         /// <param name="geoJsonWriter"></param>
@@ -246,22 +264,22 @@ namespace SOS.Observations.Api.Managers
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 await _filterManager.PrepareFilter(0,null, filter);
 
-                var zipFilePath = exportFormat switch
+                var filePath = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, gzip, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, gzip, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, gzip, cancellationToken)
                 };
-
-                // zend file to user
-                return zipFilePath;
+                
+                return filePath;
             }
             catch (Exception e)
             {

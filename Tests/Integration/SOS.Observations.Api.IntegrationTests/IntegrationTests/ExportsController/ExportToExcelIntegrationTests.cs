@@ -107,6 +107,48 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
+        public async Task Export_to_Excel_No_gzip()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            ExportFilterDto searchFilter = new ExportFilterDto
+            {
+                DataProvider = new DataProviderFilterDto()
+                {
+                    Ids = new List<int> { 1 }
+                },
+                Date = new DateFilterDto()
+                {
+                    StartDate = new DateTime(2021, 4, 23),
+                    EndDate = new DateTime(2021, 4, 23),
+                }
+            };
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ExportsController.DownloadExcel(
+                searchFilter, 
+                OutputFieldSet.AllWithValues, 
+                PropertyLabelType.Swedish, 
+                "sv-SE", 
+                false);                
+            var bytes = response.GetFileContentResult();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            bytes.Length.Should().BeGreaterThan(0);
+
+            var filename = FilenameHelper.CreateFilenameWithDate("excel_export", "xlsx");
+            var filePath = System.IO.Path.Combine(@"C:\temp\", filename);
+            await System.IO.File.WriteAllBytesAsync(filePath, bytes);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
         public async Task Export_to_Excel_bug()
         {
             //-----------------------------------------------------------------------------------------------------------

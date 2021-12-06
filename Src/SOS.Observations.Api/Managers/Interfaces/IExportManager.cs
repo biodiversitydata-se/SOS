@@ -21,6 +21,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<string> CreateExportFileAsync(SearchFilter filter,
@@ -31,6 +32,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken);
     }
 }
