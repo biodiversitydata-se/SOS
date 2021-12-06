@@ -230,22 +230,26 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new VocabularyValue {Id = (int) OccurrenceStatusId.Absent}
                     : new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
+
+                Lib.Models.Processed.Observation.Taxon substrateTaxon = null;
+                if (verbatimObservation.SubstrateSpeciesId.HasValue)
+                {
+                    _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon);
+                }
+
                 obs.Occurrence.Substrate = new Substrate
                 {
-                    Description = GetSubstrateDescription(verbatimObservation, _taxa),
+                    Description = GetSubstrateDescription(verbatimObservation, substrateTaxon),
                     Id = verbatimObservation?.Substrate?.Id,
                     Name = GetSosIdFromMetadata(verbatimObservation?.Substrate, VocabularyId.Substrate),
                     Quantity = verbatimObservation.QuantityOfSubstrate,
-                    SpeciesDescription = verbatimObservation.SubstrateSpeciesDescription
+                    SpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
+                    SpeciesId = verbatimObservation.SubstrateSpeciesId,
+                    SpeciesScientificName = substrateTaxon?.ScientificName,
+                    SpeciesVernacularName = substrateTaxon?.VernacularName,
+                    SubstrateDescription = verbatimObservation.SubstrateDescription
                 };
                 
-                if (verbatimObservation.SubstrateSpeciesId.HasValue && _taxa != null && _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var substratTaxon))
-                {
-                    obs.Occurrence.Substrate.SpeciesId = verbatimObservation.SubstrateSpeciesId.Value;
-                    obs.Occurrence.Substrate.SpeciesVernacularName = substratTaxon.VernacularName;
-                    obs.Occurrence.Substrate.SpeciesScientificName = substratTaxon.ScientificName;
-                }
-
                 obs.Occurrence.Url = $"https://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
@@ -562,10 +566,10 @@ namespace SOS.Process.Processors.Artportalen
         ///     Build the substrate description string
         /// </summary>
         /// <param name="verbatimObservation"></param>
-        /// <param name="taxa"></param>
+        /// <param name="substrateTaxon"></param>
         /// <returns></returns>
         private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+            Lib.Models.Processed.Observation.Taxon substrateTaxon)
         {
             if (verbatimObservation == null)
             {
@@ -591,11 +595,9 @@ namespace SOS.Process.Processors.Artportalen
                     $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateDescription}");
             }
 
-            if (verbatimObservation.SubstrateSpeciesId.HasValue &&
-                taxa != null &&
-                taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var taxon))
+            if (substrateTaxon != null)
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{taxon.ScientificName}");
+                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{substrateTaxon.ScientificName}");
             }
 
             if (!string.IsNullOrEmpty(verbatimObservation.SubstrateSpeciesDescription))
