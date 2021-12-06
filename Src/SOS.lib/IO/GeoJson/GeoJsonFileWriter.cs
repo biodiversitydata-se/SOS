@@ -58,6 +58,7 @@ namespace SOS.Lib.IO.GeoJson
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
@@ -71,7 +72,8 @@ namespace SOS.Lib.IO.GeoJson
                 {
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "Observations.geojson"), 1048576);
+                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.geojson");
+                await using var fileStream = File.Create(observationsFilePath, 1048576);
                 await using var jsonWriter = new Utf8JsonWriter(fileStream);
                 jsonWriter.WriteStartObject();
                 jsonWriter.WriteString("type", "FeatureCollection");
@@ -113,9 +115,18 @@ namespace SOS.Lib.IO.GeoJson
                 await jsonWriter.FlushAsync();
                 await jsonWriter.DisposeAsync();
                 fileStream.Close();
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                return zipFilePath;
+                if (gzip)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                    var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
+                    return zipFilePath;
+                }
+                else
+                {                                        
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.geojson");
+                    File.Move(observationsFilePath, destinationFilePath);
+                    return destinationFilePath;
+                }                
             }
             catch (Exception e)
             {

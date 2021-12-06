@@ -19,6 +19,7 @@ namespace SOS.Lib.IO.GeoJson.Interfaces
         /// <returns></returns>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         Task<string> CreateFileAync(SearchFilter filter, 
             string exportPath,
@@ -28,6 +29,7 @@ namespace SOS.Lib.IO.GeoJson.Interfaces
             OutputFieldSet outputFieldSet, 
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
+            bool gzip,
             IJobCancellationToken cancellationToken);
     }
 }

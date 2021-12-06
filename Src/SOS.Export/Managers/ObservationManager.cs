@@ -107,7 +107,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
+                await _filterManager.PrepareFilter(0,null, filter);                
 
                 zipFilePath = exportFormat switch
                 {
@@ -210,6 +210,7 @@ namespace SOS.Export.Managers
         {
             try
             {
+                bool gzip = true;
                 var zipFilePath = await _csvWriter.CreateFileAync(
                     filter,
                     _exportPath,
@@ -217,6 +218,7 @@ namespace SOS.Export.Managers
                     culture,
                     outputFieldSet,
                     propertyLabelType,
+                    gzip,
                     cancellationToken);
 
                 return zipFilePath;
@@ -281,6 +283,7 @@ namespace SOS.Export.Managers
         {
             try
             {
+                bool gzip = true;
                 var zipFilePath = await _excelWriter.CreateFileAync(
                     filter,
                     _exportPath,
@@ -288,6 +291,7 @@ namespace SOS.Export.Managers
                     culture,
                     outputFieldSet,
                     propertyLabelType,
+                    gzip,
                     cancellationToken);
 
                 return zipFilePath;
@@ -315,6 +319,7 @@ namespace SOS.Export.Managers
         {
             try
             {
+                bool gzip = true;
                 var zipFilePath = await _geoJsonWriter.CreateFileAync(
                    filter,
                    _exportPath,
@@ -324,6 +329,7 @@ namespace SOS.Export.Managers
                    outputFieldSet, 
                    propertyLabelType, 
                    excludeNullValues,
+                   gzip,
                    cancellationToken);
                 
                 return zipFilePath;

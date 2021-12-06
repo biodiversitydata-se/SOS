@@ -19,6 +19,7 @@ namespace SOS.Lib.IO.Excel.Interfaces
         /// <param name="culture"></param>
         /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
+        /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<string> CreateFileAync(SearchFilter filter, 
@@ -27,6 +28,7 @@ namespace SOS.Lib.IO.Excel.Interfaces
             string culture, 
             OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
+            bool gzip,
             IJobCancellationToken cancellationToken);
     }
 }
