@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -124,7 +125,7 @@ namespace SOS.Observations.Api
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
-        {
+        {           
             services.AddMemoryCache();
 
             services.AddControllers()
@@ -289,6 +290,20 @@ namespace SOS.Observations.Api
             var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
                 .Get<ObservationApiConfiguration>();
 
+            // Response compression
+            if (observationApiConfiguration.EnableResponseCompression)
+            {
+                services.AddResponseCompression(o => o.EnableForHttps = true);
+                services.Configure<BrotliCompressionProviderOptions>(options =>
+                {
+                    options.Level = observationApiConfiguration.ResponseCompressionLevel;
+                });
+                services.Configure<GzipCompressionProviderOptions>(options =>
+                {
+                    options.Level = observationApiConfiguration.ResponseCompressionLevel;
+                });
+            }
+
             // Hangfire
             var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
             
@@ -425,9 +440,21 @@ namespace SOS.Observations.Api
         /// <param name="apiVersionDescriptionProvider"></param>
         /// <param name="configuration"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, TelemetryConfiguration configuration, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration, IProtectedLogRepository protectedLogRepository)
+        /// <param name="observationApiConfiguration"></param>
+        /// <param name="protectedLogRepository"></param>
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
+            TelemetryConfiguration configuration, 
+            Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration, 
+            ObservationApiConfiguration observationApiConfiguration,
+            IProtectedLogRepository protectedLogRepository)
         {
-
+            if (observationApiConfiguration.EnableResponseCompression)
+            {
+                app.UseResponseCompression();
+            }
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (_isDevelopment)
             {
