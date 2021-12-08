@@ -28,7 +28,8 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisplayName("Export observations. Email={1}, Description={2}, ExportFormat={3}")]
+        [DisplayName("Export observations. Email={2}, Description={3}, ExportFormat={4}")]        
+        [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter,
             int userId,
