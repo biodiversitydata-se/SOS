@@ -29,6 +29,7 @@ namespace SOS.Import.Containers.Interfaces
         ConcurrentDictionary<int, Project> Projects { get; }
         ConcurrentDictionary<int, Metadata> Stages { get; }
         ConcurrentDictionary<int, Metadata> Substrates { get; }
+        ConcurrentDictionary<int, int?> TaxonSpeciesGroups { get; }
         ConcurrentDictionary<int, Metadata> Units { get; }
         ConcurrentDictionary<int, Metadata> ValidationStatus { get; }
 
@@ -46,6 +47,7 @@ namespace SOS.Import.Containers.Interfaces
         /// <param name="projectEntities"></param>
         /// <param name="stages"></param>
         /// <param name="substrates"></param>
+        /// <param name="taxa"></param>
         /// <param name="units"></param>
         /// <param name="validationStatus"></param>
         void Initialize(
@@ -60,6 +62,7 @@ namespace SOS.Import.Containers.Interfaces
             IEnumerable<ProjectEntity> projectEntities,
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
+            IEnumerable<TaxonEntity> taxa,
             IEnumerable<MetadataEntity> units,
             IEnumerable<MetadataEntity> validationStatus);
     }

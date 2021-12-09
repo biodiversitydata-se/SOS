@@ -18,6 +18,7 @@ using SOS.Import.Containers.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using ITaxonRepository = SOS.Import.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
 
 namespace SOS.Import.Harvesters.Observations
 {
@@ -31,16 +32,17 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IMetadataRepository _metadataRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IPersonRepository _personRepository;
-        private readonly IProjectRepository _projectRepository;
-        private readonly SemaphoreSlim _semaphore;
+        private readonly IProjectRepository _projectRepository;        
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly ITaxonRepository _taxonRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IAreaHelper _areaHelper;
+        private readonly SemaphoreSlim _semaphore;
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
 
@@ -343,6 +345,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="taxonRepository"></param>
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
@@ -359,6 +362,7 @@ namespace SOS.Import.Harvesters.Observations
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
             IProcessedObservationRepository processedObservationRepository,
+            ITaxonRepository taxonRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
             ILogger<ArtportalenObservationHarvester> logger)
@@ -380,6 +384,7 @@ namespace SOS.Import.Harvesters.Observations
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _taxonRepository = taxonRepository ?? throw new ArgumentNullException(nameof(taxonRepository));
             _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -415,6 +420,7 @@ namespace SOS.Import.Harvesters.Observations
                         validationStatus,
                         discoveryMethods,
                         determinationMethods) = await GetMetadataAsync();
+                    var taxa = await _taxonRepository.GetAsync();
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     _logger.LogDebug("Finish getting metadata");
@@ -438,6 +444,7 @@ namespace SOS.Import.Harvesters.Observations
                         projectEntities,
                         stages,
                         substrates,
+                        taxa,
                         units,
                         validationStatus);
 
