@@ -60,6 +60,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
+            var taxonRepository = new TaxonRepository(artportalenDataService, new Mock<ILogger<TaxonRepository>>().Object);
 
             var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>())).ReturnsAsync(new List<SiteEntity>());
@@ -83,6 +84,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
+                taxonRepository,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
@@ -129,6 +131,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()));
             var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            var taxonRepositoryMock = new Mock<ITaxonRepository>().Object;
 
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
@@ -148,6 +151,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
+                taxonRepositoryMock,
                 new ArtportalenMetadataContainer(),
                 areaHelper,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);

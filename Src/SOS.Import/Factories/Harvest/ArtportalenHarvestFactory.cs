@@ -65,6 +65,9 @@ namespace SOS.Import.Factories.Harvest
                     }
                 }
 
+                _artportalenMetadataContainer.TaxonSpeciesGroups.TryGetValue(entity.TaxonId ?? 0,
+                    out var speciesGroupId);
+
                 var observation = new ArtportalenObservationVerbatim();
                 observation.Activity = entity.ActivityId.HasValue && _artportalenMetadataContainer.Activities.ContainsKey(entity.ActivityId.Value)
                     ? _artportalenMetadataContainer.Activities[entity.ActivityId.Value]
@@ -117,6 +120,7 @@ namespace SOS.Import.Factories.Harvest
                 observation.ReportedDate = entity.RegisterDate;
                 observation.RightsHolder = entity.RightsHolder;
                 observation.Site = site;
+                observation.SpeciesGroupId = speciesGroupId;
                 observation.SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId;
                 observation.Stage = entity.StageId.HasValue && _artportalenMetadataContainer.Stages.ContainsKey(entity.StageId.Value)
                     ? _artportalenMetadataContainer.Stages[entity.StageId.Value]

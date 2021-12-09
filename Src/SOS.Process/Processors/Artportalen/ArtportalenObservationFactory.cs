@@ -291,6 +291,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;
                 obs.ArtportalenInternal.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
+                obs.ArtportalenInternal.SpeciesGroupId = verbatimObservation.SpeciesGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;

@@ -8,6 +8,7 @@ using Moq;
 using SOS.Import.Containers.Interfaces;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
+using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Constants;
@@ -42,6 +43,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sightingRelationRepository = new Mock<ISightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<ISpeciesCollectionItemRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
+            _taxonRepositoryMock = new Mock<TaxonRepository>();
             _artportalenMetadataContainerMock = new Mock<IArtportalenMetadataContainer>();
             _areaHelperMock = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationHarvester>>();
@@ -59,6 +61,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<ISpeciesCollectionItemRepository> _speciesCollectionItemRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
+        private readonly Mock<TaxonRepository> _taxonRepositoryMock;
         private readonly Mock<IArtportalenMetadataContainer> _artportalenMetadataContainerMock;
         private readonly Mock<IAreaHelper> _areaHelperMock;
         private readonly Mock<ILogger<ArtportalenObservationHarvester>> _loggerMock;
@@ -76,6 +79,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sightingRelationRepository.Object,
             _speciesCollectionItemRepository.Object,
             _processedObservationRepositoryMock.Object,
+            _taxonRepositoryMock.Object,
             _artportalenMetadataContainerMock.Object,
             _areaHelperMock.Object,
             _loggerMock.Object);

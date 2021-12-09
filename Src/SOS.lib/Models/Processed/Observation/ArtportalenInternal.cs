@@ -94,6 +94,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int SightingTypeSearchGroupId { get; set; }
 
         /// <summary>
+        /// Species group id.
+        /// </summary>
+        public int? SpeciesGroupId { get; set; }
+
+        /// <summary>
         ///     Id of sightings RegionalSightingState
         /// </summary>
         public int? RegionalSightingStateId { get; set; }
