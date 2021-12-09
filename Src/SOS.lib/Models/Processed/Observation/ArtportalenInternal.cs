@@ -158,5 +158,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///  Sighting barcode url
         /// </summary>
         public string SightingBarcodeURL { get; set; }
+
+        /// <summary>
+        /// Second hand information flag
+        /// </summary>
+        public bool SecondHandInformation { get; set; }
     }
 }
