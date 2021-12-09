@@ -256,7 +256,7 @@ namespace SOS.Process.Processors.Artportalen
                     SubstrateDescription = verbatimObservation.SubstrateDescription
                 };
                 
-                obs.Occurrence.Url = $"https://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
+                obs.Occurrence.Url = $"{_artPortalenUrl}/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
 
@@ -473,7 +473,7 @@ namespace SOS.Process.Processors.Artportalen
                 return url;
             }
 
-            return $"{_artPortalenUrl}{(url.StartsWith('/') ? string.Empty : "/")}{url}";
+            return $"{_artPortalenUrl}{(url.StartsWith('/') ? string.Empty : "/")}{url.Replace("//", "/")}";
         }
 
         /// <summary>
