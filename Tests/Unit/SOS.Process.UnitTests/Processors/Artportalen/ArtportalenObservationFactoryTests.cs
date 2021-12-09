@@ -27,7 +27,8 @@ namespace SOS.Process.UnitTests.Processors.Artportalen
                 dataProvider, 
                 new Dictionary<int, Taxon>(),
                 new Dictionary<VocabularyId, IDictionary<object, int>>(),
-                false);
+                false,
+                "https://artportalen-st.artdata.slu.se");
             ArtportalenObservationVerbatim verbatimObservation = new ArtportalenObservationVerbatim();
             verbatimObservation.Activity = new MetadataWithCategory(1, 1);
             Taxon taxon = new Taxon();
