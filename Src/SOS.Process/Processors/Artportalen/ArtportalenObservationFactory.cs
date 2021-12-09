@@ -32,6 +32,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
+        private readonly string _artPortalenUrl;
 
         /// <summary>
         ///     Calculate protection level
@@ -60,27 +61,32 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
         /// <param name="incrementalMode"></param>
+        /// <param name="artPortalenUrl"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            bool incrementalMode) 
+            bool incrementalMode,
+            string artPortalenUrl) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
+            _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            bool incrementalMode)
+            bool incrementalMode,
+            string artPortalenUrl)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl);
         }
 
         /// <summary>
@@ -260,9 +266,9 @@ namespace SOS.Process.Processors.Artportalen
                     {
                         Created = m.UploadDateTime?.ToShortDateString(),
                         Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.')): string.Empty,
-                        Identifier = $"https://www.artportalen.se/{m.FileUri}",
+                        Identifier = GetMediaUrl(m.FileUri),
                         License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText,
-                        References = $"https://www.artportalen.se/Image/{m.Id}",
+                        References = $"{_artPortalenUrl}/Image/{m.Id}",
                         RightsHolder = m.RightsHolder,
                         Type = m.FileType
                     }).ToList();
@@ -453,6 +459,21 @@ namespace SOS.Process.Processors.Artportalen
             {
                 return $"{projectParameter.Description}. Artportalen project=\"{project.Name}\"";
             }
+        }
+
+        /// <summary>
+        /// Get media url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private string GetMediaUrl(string url)
+        {
+            if (url.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return url;
+            }
+
+            return $"{_artPortalenUrl}{(url.StartsWith('/') ? string.Empty : "/")}{url}";
         }
 
         /// <summary>

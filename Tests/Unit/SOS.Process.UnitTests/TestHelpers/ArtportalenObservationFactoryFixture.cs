@@ -37,7 +37,8 @@ namespace SOS.Process.UnitTests.TestHelpers
                 dataProviderDummy,
                 new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
-                false).Result;
+                false,
+                "https://artportalen-st.artdata.slu.se").Result;
             return factory;
         }
     }
