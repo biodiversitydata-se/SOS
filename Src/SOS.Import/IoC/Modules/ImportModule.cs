@@ -209,6 +209,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<Repositories.Source.Artportalen.TaxonRepository>().As<Repositories.Source.Artportalen.Interfaces.ITaxonRepository>()
+               .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>()
                 .InstancePerLifetimeScope();
 
