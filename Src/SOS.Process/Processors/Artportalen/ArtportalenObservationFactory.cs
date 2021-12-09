@@ -473,7 +473,7 @@ namespace SOS.Process.Processors.Artportalen
                 return url;
             }
 
-            return $"{_artPortalenUrl}{(url.StartsWith('/') ? string.Empty : "/")}{url}";
+            return $"{_artPortalenUrl}{(url.StartsWith('/') ? string.Empty : "/")}{url.Replace("//", "/")}";
         }
 
         /// <summary>
