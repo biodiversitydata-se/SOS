@@ -6,6 +6,11 @@
     public class ProcessConfiguration
     {
         /// <summary>
+        /// URL to Artportalen
+        /// </summary>
+        public string ArtportalenUrl { get; set; }
+
+        /// <summary>
         /// True if diffusion should be enabled
         /// </summary>
         public bool Diffusion { get; set; }
