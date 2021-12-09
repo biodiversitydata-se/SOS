@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums.Artportalen;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
@@ -23,19 +25,30 @@ namespace SOS.Import.Repositories.Source.Artportalen
             SearchableSightings s WITH(NOLOCK)
             INNER JOIN SightingState ss ON s.SightingId = ss.SightingId";
 
-        // Todo arguments for protected sightings
+        // Todo arguments for protected sightings       
         private string SightingWhereBasics => @$" 
-            s.SightingTypeId IN (0,3,8)
-            AND s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128) 
-	        AND s.ValidationStatusId <> 50
+            s.SightingTypeId IN ({string.Join(",", // s.SightingTypeId IN (0,3,8)
+                (int)SightingType.NormalSighting,
+                (int)SightingType.ReplacementSighting,
+                (int)SightingType.CorrectionSighting)}) 
+            AND s.SightingTypeSearchGroupId IN ({string.Join(",", // s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128) 
+                (int)SightingTypeSearchGroup.Ordinary,
+                (int)SightingTypeSearchGroup.Assessment,
+                (int)SightingTypeSearchGroup.Aggregated,
+                (int)SightingTypeSearchGroup.AssessmentChild,
+                (int)SightingTypeSearchGroup.Replacement,
+                (int)SightingTypeSearchGroup.OwnBreedingAssessment)})
+	        AND s.ValidationStatusId <> { // s.ValidationStatusId <> 50
+            (int)ValidationStatusId.Rejected} 
             AND ss.IsActive = 1
-	        AND ss.SightingStateTypeId = 30 
+            AND ss.SightingStateTypeId = { // SightingStateTypeId = 30
+            (int)SightingStateType.Published}
             AND s.TaxonId IS NOT NULL 
              {((DataService?.Configuration?.HarvestStartDate.HasValue ?? false) ?
-            $"AND s.StartDate >= '{DataService.Configuration.HarvestStartDate}'" 
+            $"AND s.StartDate >= '{DataService.Configuration.HarvestStartDate}'"
             :
             "")}";
-        
+
         /// <summary>
         /// Create sighting query
         /// </summary>
