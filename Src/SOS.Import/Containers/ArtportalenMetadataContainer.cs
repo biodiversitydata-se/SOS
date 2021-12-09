@@ -176,10 +176,10 @@ namespace SOS.Import.Containers
         public ConcurrentDictionary<int, Organization> OrganizationById { get; private set; }
         public ConcurrentDictionary<int, Metadata> Organizations { get; private set; }
         public ConcurrentDictionary<int, Person> PersonByUserId { get; private set; }
-        public ConcurrentDictionary<int, Project> Projects { get; private set; }
-        public ConcurrentBag<SpeciesCollectionItem> SpeciesCollections { get; private set; }
+        public ConcurrentDictionary<int, Project> Projects { get; private set; }        
         public ConcurrentDictionary<int, Metadata> Stages { get; private set; }
         public ConcurrentDictionary<int, Metadata> Substrates { get; private set; }
+        public ConcurrentDictionary<int, int?> TaxonSpeciesGroups { get; private set; }
         public ConcurrentDictionary<int, Metadata> Units { get; private set; }
         public ConcurrentDictionary<int, Metadata> ValidationStatus { get; private set; }
 
@@ -196,6 +196,7 @@ namespace SOS.Import.Containers
             IEnumerable<ProjectEntity> projectEntities,
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
+            IEnumerable<TaxonEntity> taxa,
             IEnumerable<MetadataEntity> units,
             IEnumerable<MetadataEntity> validationStatus
         )
@@ -211,6 +212,7 @@ namespace SOS.Import.Containers
             Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p);
             Stages = CastMetdataEntityToVerbatim(stages)?.ToConcurrentDictionary(s => s.Id, s => s);
             Substrates = CastMetdataEntityToVerbatim(substrates)?.ToConcurrentDictionary(s => s.Id, s => s);
+            TaxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId);
             Units = CastMetdataEntityToVerbatim(units)?.ToConcurrentDictionary(u => u.Id, u => u);
             ValidationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs);
 
