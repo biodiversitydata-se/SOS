@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums.Artportalen
 {
     /// <summary>
     /// All possible values in table SightingTypeSearchGroup
@@ -58,7 +52,8 @@ namespace SOS.Lib.Enums
         ReplacementChild = 64,
 
         /// <summary>
-        /// Gets sighting type search group id for a sighting of type own assessment. (Underliggande fynd...)
+        /// Gets sighting type search group id for a sighting of type own assessment.
+        /// Artportalen: (Underliggande fynd...)
         /// </summary>
         OwnBreedingAssessment = 128,
 
