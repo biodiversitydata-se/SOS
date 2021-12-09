@@ -26,6 +26,7 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly string _artPortalenUrl;
 
         /// <summary>
         /// Constructor
@@ -56,11 +57,8 @@ namespace SOS.Process.Processors.Artportalen
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
-          
-            if (processConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(processConfiguration));
-            }
+            
+            _artPortalenUrl = processConfiguration?.ArtportalenUrl ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
 
         /// <inheritdoc />
@@ -71,7 +69,7 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository,  mode != JobRunModes.Full);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository,  mode != JobRunModes.Full, _artPortalenUrl);
             _artportalenVerbatimRepository.Mode = mode;
 
             return await base.ProcessObservationsAsync(
