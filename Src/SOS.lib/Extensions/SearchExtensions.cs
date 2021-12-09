@@ -259,10 +259,8 @@ namespace SOS.Lib.Extensions
 
             if (internalFilter.OnlySecondHandInformation)
             {
-                query.TryAddWildcardCriteria("occurrence.recordedBy", "Via*");
-                query.AddScript("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value");
-            }
-
+                query.TryAddTermCriteria("artportalenInternal.secondHandInformation", true);
+            }            
             query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
             query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
 

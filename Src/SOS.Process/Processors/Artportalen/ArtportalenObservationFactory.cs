@@ -301,6 +301,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.OccurrenceVerifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
                 obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.URL;
+                obs.ArtportalenInternal.SecondHandInformation =
+                    (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
+                    (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false);
 
                 // Set dependent properties
                 var biotope = obs.Occurrence.Biotope?.Value;
