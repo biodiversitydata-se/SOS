@@ -20,6 +20,7 @@ namespace SOS.Lib.Cache
         private readonly IAreaRepository _areaRepository;
 
         protected readonly ConcurrentDictionary<(AreaType, string), IGeoShape> _geometryCache;
+        private const int NumberOfEntriesCleanupLimit = 10000;
 
         /// <summary>
         /// Constructor
@@ -61,7 +62,7 @@ namespace SOS.Lib.Cache
                 if (areas != null)
                 {
                     foreach (var area in areas)
-                    {
+                    {                        
                         Cache.TryAdd(area.Id, area);
                     }
                 }
@@ -91,6 +92,10 @@ namespace SOS.Lib.Cache
 
             if (geometry != null)
             {
+                if (_geometryCache.Count > NumberOfEntriesCleanupLimit) // prevent too large geometry cache
+                {
+                    _geometryCache.Clear();
+                }
                 _geometryCache.TryAdd((areaType, featureId), geometry);
             }
 
