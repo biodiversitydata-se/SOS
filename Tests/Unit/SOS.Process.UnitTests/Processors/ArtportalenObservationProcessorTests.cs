@@ -36,7 +36,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
-            _processConfiguration = new ProcessConfiguration();
+            _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _processManagerMock = new Mock<IProcessManager>();
