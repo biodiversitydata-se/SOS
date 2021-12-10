@@ -19,8 +19,13 @@ namespace SOS.Lib.Helpers
 {
     public class AreaHelper : IAreaHelper
     {
-        private readonly AreaType[] _areaTypes =
-            {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
+        private readonly AreaType[] _areaTypesInStrTree = {
+            AreaType.County, 
+            AreaType.Province, 
+            AreaType.Municipality, 
+            AreaType.Parish, 
+            AreaType.EconomicZoneOfSweden
+        };
 
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
@@ -128,7 +133,7 @@ namespace SOS.Lib.Helpers
             
             ClearCache();
 
-            var areas = await _processedAreaRepository.GetAsync(_areaTypes);
+            var areas = await _processedAreaRepository.GetAsync(_areaTypesInStrTree);
             foreach (var area in areas)
             {
                 var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
