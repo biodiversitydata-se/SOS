@@ -12,6 +12,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -119,21 +120,21 @@ namespace SOS.Lib.IO.DwcArchive
             CsvFileHelper csvFileHelper,
             SimpleMultimediaRow multimediaRow)
         {
-            csvFileHelper.WriteField(multimediaRow.OccurrenceId);
-            csvFileHelper.WriteField(multimediaRow.Type);
-            csvFileHelper.WriteField(multimediaRow.Format);
-            csvFileHelper.WriteField(multimediaRow.Identifier);
-            csvFileHelper.WriteField(multimediaRow.References);
-            csvFileHelper.WriteField(multimediaRow.Title);
-            csvFileHelper.WriteField(multimediaRow.Description);
-            csvFileHelper.WriteField(multimediaRow.Source);
-            csvFileHelper.WriteField(multimediaRow.Audience);
-            csvFileHelper.WriteField(multimediaRow.Created);
-            csvFileHelper.WriteField(multimediaRow.Creator);
-            csvFileHelper.WriteField(multimediaRow.Contributor);
-            csvFileHelper.WriteField(multimediaRow.Publisher);
-            csvFileHelper.WriteField(multimediaRow.License);
-            csvFileHelper.WriteField(multimediaRow.RightsHolder);
+            csvFileHelper.WriteField(multimediaRow.OccurrenceId.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Type.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Format.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Identifier.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.References.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Title.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Description.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Source.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Audience.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Created.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Creator.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Contributor.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.Publisher.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.License.RemoveNewLineTabs());
+            csvFileHelper.WriteField(multimediaRow.RightsHolder.RemoveNewLineTabs());
 
             csvFileHelper.NextRecord();
         }

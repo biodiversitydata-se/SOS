@@ -100,5 +100,14 @@ namespace SOS.Lib.Helpers
         {
             return str == null ? "" : RxNewLineTab.Replace(str, replacement);
         }
+
+        public static string RemoveInvalidCharacters(string str, string newLineTabReplacement = " ", string otherCharReplacement="")
+        {
+            //return str == null ? "" : RxIllegalCharacters.Replace(str, replacement);
+            return str == null ? "" : RxIllegalCharacters.Replace(RxNewLineTab.Replace(str, newLineTabReplacement), otherCharReplacement).Trim();
+        }
+
+        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled);
+        //private static readonly Regex RxIllegalCharacters = new Regex(@"\p{Cc}+", RegexOptions.Compiled);
     }
 }
