@@ -144,17 +144,17 @@ namespace SOS.Lib.IO.DwcArchive
                 return;
             }
 
-            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
-            csvFileHelper.WriteField(emofRow.OccurrenceID);
-            csvFileHelper.WriteField(emofRow.MeasurementID);
+            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.OccurrenceID.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementID.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementTypeID);
+            csvFileHelper.WriteField(emofRow.MeasurementTypeID.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementValue.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementValueID);
+            csvFileHelper.WriteField(emofRow.MeasurementValueID.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementAccuracy.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementUnit.RemoveNewLineTabs());
-            csvFileHelper.WriteField(emofRow.MeasurementUnitID);
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
+            csvFileHelper.WriteField(emofRow.MeasurementUnitID.RemoveNewLineTabs());
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementRemarks.RemoveNewLineTabs());
             csvFileHelper.WriteField(emofRow.MeasurementMethod.RemoveNewLineTabs());

@@ -12,7 +12,13 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static string RemoveNewLineTabs(this string str, string replacement = " ")
         {
-            return DwcFormatter.RemoveNewLineTabs(str, replacement);
+            return RemoveInvalidCharacters(str);
+            //return DwcFormatter.RemoveNewLineTabs(str, replacement);
+        }
+
+        public static string RemoveInvalidCharacters(this string str, string newLineTabReplacement = " ", string otherCharReplacement = "")
+        {
+            return DwcFormatter.RemoveInvalidCharacters(str, newLineTabReplacement, otherCharReplacement);
         }
     }
 }
