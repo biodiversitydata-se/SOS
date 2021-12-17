@@ -103,8 +103,8 @@ namespace SOS.Lib.Helpers
 
         public static string RemoveInvalidCharacters(string str, string newLineTabReplacement = " ", string otherCharReplacement="")
         {
-            //return str == null ? "" : RxIllegalCharacters.Replace(str, replacement);
-            return str == null ? "" : RxIllegalCharacters.Replace(RxNewLineTab.Replace(str, newLineTabReplacement), otherCharReplacement).Trim();
+            return str == null ? "" : RxIllegalCharacters.Replace(str, otherCharReplacement);
+            //return str == null ? "" : RxIllegalCharacters.Replace(RxNewLineTab.Replace(str, newLineTabReplacement), otherCharReplacement).Trim();
         }
 
         private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled);
