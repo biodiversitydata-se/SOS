@@ -215,7 +215,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             if (val != null && replaceNewLines)
             {
-                csvFileHelper.WriteField(val.RemoveNewLineTabs());
+                csvFileHelper.WriteField(val.RemoveIllegalCharacters());
             }
             else
             {

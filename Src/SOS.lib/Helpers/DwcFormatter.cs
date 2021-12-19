@@ -86,9 +86,7 @@ namespace SOS.Lib.Helpers
                 "{0}/{1}",
                 date1.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
                 date2.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
-        }
-
-        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+        }        
 
         /// <summary>
         /// Replace new line and tabs with the specified string.
@@ -101,13 +99,27 @@ namespace SOS.Lib.Helpers
             return str == null ? "" : RxNewLineTab.Replace(str, replacement);
         }
 
-        public static string RemoveInvalidCharacters(string str, string newLineTabReplacement = " ", string otherCharReplacement="")
+        /// <summary>
+        /// Remove control characters and other non-printable characters.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="newLineTabReplacement"></param>
+        /// <param name="otherCharReplacement"></param>
+        /// <returns></returns>
+        public static string RemoveIllegalCharacters(string str, string newLineTabReplacement = " ", string otherCharReplacement="")
         {
-            return str == null ? "" : RxIllegalCharacters.Replace(str, otherCharReplacement);
-            //return str == null ? "" : RxIllegalCharacters.Replace(RxNewLineTab.Replace(str, newLineTabReplacement), otherCharReplacement).Trim();
+            //return str == null ? "" : RxIllegalCharacters.Replace(str, otherCharReplacement); // Fastest, but doesn't handle new line and tab correctly.            
+            return str == null ? "" : RxIllegalCharacters.Replace(str, match => // Slower, but handles new line and tab correctly.
+            {
+                if (RxNewLineTab.IsMatch(match.Value))
+                    return newLineTabReplacement;
+                else
+                    return otherCharReplacement;
+            }).Trim();
         }
 
-        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled);
-        //private static readonly Regex RxIllegalCharacters = new Regex(@"\p{Cc}+", RegexOptions.Compiled);
+        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
+        //private static readonly Regex RxIllegalCharacters = new Regex(@"\p{Cc}+", RegexOptions.Compiled); // Match all basic control characters (65 chars)
     }
 }
