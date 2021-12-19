@@ -8,7 +8,7 @@ namespace SOS.Lib.UnitTests.Helpers
 {
     public class DwcFormatterTests
     {        
-        [Theory]
+        [Theory]     
         [InlineData("EKALLN", "EKALLN")] //DCS
         [InlineData("TvetaValsta", "TvetaValsta")] //STX
         [InlineData("Lövskog  SÖ", "Lövskog  SÖ")] //DEL
@@ -18,6 +18,10 @@ namespace SOS.Lib.UnitTests.Helpers
         [InlineData("sen 🤣 Efter", "sen  Efter")] //Emoji        
         [InlineData("Testar\tTab och\nnyrad", "Testar Tab och nyrad")]
         [InlineData("Testarnyrad\r\n", "Testarnyrad")]
+        [InlineData("Testarnyrad\r\n\n", "Testarnyrad")]
+        [InlineData("Testarnyrad\r\n\r\n", "Testarnyrad")]
+        [InlineData("Testarnyrad\n", "Testarnyrad")]
+        [InlineData("Testar\nnyrad\n", "Testar nyrad")]
         [InlineData("Testar\"citation\"", "Testar\"citation\"")]
         public void TestRemoveInvalidCharacters(
            string str,           
@@ -26,7 +30,7 @@ namespace SOS.Lib.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = DwcFormatter.RemoveInvalidCharacters(str);                
+            var result = DwcFormatter.RemoveIllegalCharacters(str);                
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
