@@ -1,42 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
          xmlns:dc="http://purl.org/dc/terms/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:sos="https://sos-search.artdata.slu.se/"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
          xmlns:gbif="http://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="5f501df0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
-         xml:lang="en">
+         xml:lang="eng">
+
 	<dataset>
-		<identifier>5f501df0-0c61-11dd-84ce-b8a03c50a862</identifier>
 		<alternateIdentifier>5f501df0-0c61-11dd-84ce-b8a03c50a862</alternateIdentifier>
 		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-nors</alternateIdentifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:NORS</alternateIdentifier>
-		<title>SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS</title>
+		<title xml:lang="eng">SLU Aqua Institute of Freshwater Research National register of survey test-fishing - NORS</title>
 		<creator>
-			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Database Developer</positionName>
 			<address>
-				<city>Drottningholm</city>
+				<city>Stockholm</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
-			<organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Kinnerbäck</surName>
+			</individualName>
+			<organizationName>SLU Aqua</organizationName>
+			<positionName>Research Assistant</positionName>
 			<address>
 				<city>Drottningholm</city>
 				<country>SE</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
-            <onlineUrl></onlineUrl>
-		</metadataProvider>		
-		<pubDate>      
+			<electronicMailAddress>anders.kinnerback@slu.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Database Developer</positionName>
+			<address>
+				<city>Stockholm</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<role></role>
+		</associatedParty>
+		<pubDate>
+			
 		</pubDate>
-		<language>ENGLISH</language>
-        <licenseName></licenseName>
+		<language>eng</language>
 		<abstract>
 			<para>
 				Standardized test-fishing with Nordic multi-mesh gillnets is a widely used method in Sweden to investigate the fish fauna in a lake. In 2005 the method became an European standard (EN 14757). Standardized test-fishing catch most of the Swedish species in a representative way, giving a good estimate of species abundance and size distribution. The results are generally used for purposes of environmental protection and fishery management.
@@ -75,7 +95,7 @@
 			<online>
 				<url function="information">http://www.slu.se/en/departments/aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</url>
 			</online>
-		</distribution>		
+		</distribution>
 		<coverage>
 			<geographicCoverage>
 				<geographicDescription>Sweden</geographicDescription>
@@ -96,63 +116,36 @@
 		</coverage>
 		<maintenance>
 			<description>
-				<para/>
+				<para></para>
 			</description>
 			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
 		</maintenance>
+
 		<contact>
-            <individualName>
-                <givenName>Anders</givenName>
-                <surName>Kinnerbäck</surName>
-            </individualName>
-            <electronicMailAddress>anders.kinnerback@slu.se</electronicMailAddress>
-            <organizationName>Department of Aquatic Resources, SLU</organizationName>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Telenius</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Node manager</positionName>
 			<address>
-				<city>Drottningholm</city>
+				<city>Stockholm</city>
 				<country>SE</country>
 			</address>
-            <onlineUrl>http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+			<electronicMailAddress>anders.telenius@nrm.se</electronicMailAddress>
 		</contact>
-        <sos:resourceType>occurrence data</sos:resourceType>
-        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
-        <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
-        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
-        <project>
-            <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
-            <funderIdentifier></funderIdentifier>
-            <dc:funderIdentifierType></dc:funderIdentifierType>
-            <designDescription></designDescription>
-        </project>
-        <samplingMethods>
-            <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
-            <methodStep></methodStep>
-            <qualityControl></qualityControl>
-        </samplingMethods>
-        <additionalMetadata>
-            <metadata>
-				<gbif>
-					<dateStamp>2015-07-15T02:11:55.647+02:00</dateStamp>
-					<hierarchyLevel>dataset</hierarchyLevel>
-					<citation>National Register of Survey test-fishing - NORS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources.  http://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
-					<formationPeriod>1952-current</formationPeriod>
-					<livingTimePeriod>1952-current</livingTimePeriod>					
-				</gbif>
-                <gettingStarted></gettingStarted>
-                <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
-                <snd:dataFormat></snd:dataFormat>
-            </metadata>
-        </additionalMetadata>
-        <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
-        </citations>
+		<sos:resourceType>occurrence data</sos:resourceType>		
+		<sos:datsetSubtype>census data</sos:datsetSubtype>
 	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-07-15T02:11:55.647+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>National Register of Survey test-fishing - NORS. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources.  http://www.slu.se/sjoprovfiskedatabasen [yyyy-mm-dd].</citation>
+				<formationPeriod>1952-current</formationPeriod>
+				<livingTimePeriod>1952-current</livingTimePeriod>				
+			</gbif>
+		</metadata>
+	</additionalMetadata>
 </eml:eml>
