@@ -192,11 +192,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Birds"
+                "Value": "Birds Directive"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Fåglar"
+                "Value": "Fågeldirektivet"
             }
         ],
         "TaxonIds": []

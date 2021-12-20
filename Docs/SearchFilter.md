@@ -400,7 +400,7 @@ The following taxon lists exists:
 | 10 	| 8 	| Habitats directive Annex 2, priority species 	| Habitatdirektivets bilaga 2 (prioriterad art) 	|
 | 11 	| 8 	| Habitats directive Annex 4 	| Habitatdirektivets bilaga 4 	|
 | 12 	| 8 	| Habitats directive Annex 5 	| Habitatdirektivets bilaga 5 	|
-| 13 	|  	| Birds 	| Fåglar 	|
+| 13 	|  	| Birds Directive	| Fågeldirektivet 	|
 | 14 	| 13 	| Priority birds 	| Prioriterade fåglar 	|
 | 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	|
 | 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|
