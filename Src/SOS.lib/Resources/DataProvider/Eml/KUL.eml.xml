@@ -1,42 +1,61 @@
-<?xml version="1.0" encoding="utf-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
          xmlns:dc="http://purl.org/dc/terms/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:sos="https://sos-search.artdata.slu.se/"
-         xmlns:gbif="http://gbif.org/"
+		 xmlns:sos="https://sos-search.artdata.slu.se/"
+		 xmlns:gbif="http://gbif.org/"
          xmlns:snd="https://snd.gu.se/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="1b7e83a0-0c61-11dd-84ce-b8a03c50a862" system="https://sos-search.artdata.slu.se/" scope="system"
-         xml:lang="en">
+         xml:lang="eng">
+
 	<dataset>
-		<identifier>1b7e83a0-0c61-11dd-84ce-b8a03c50a862</identifier>
 		<alternateIdentifier>1b7e83a0-0c61-11dd-84ce-b8a03c50a862</alternateIdentifier>
-		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-icr</alternateIdentifier>		
-        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:KUL</alternateIdentifier>
+		<alternateIdentifier>https://www.gbif.se/ipt/resource?r=fiv-icr</alternateIdentifier>
+		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:KUL</alternateIdentifier>
 		<title xml:lang="eng">SLU Aqua Institute of Coastal Research Database for Coastal Fish - KUL</title>
 		<creator>
-			<organizationName>"Department of Aquatic Resources, Institute of Coastal Research, SLU</organizationName>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Database Developer</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Stockholm</city>
 				<country>SE</country>
 			</address>
-			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>https://www.slu.se/kul/</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
 		</creator>
 		<metadataProvider>
-			<organizationName>"Department of Aquatic Resources, Institute of Coastal Research, SLU</organizationName>
+			<individualName>
+				<givenName>Ylva</givenName>
+				<surName>Ericson</surName>
+			</individualName>
+			<organizationName>SLU Aqua</organizationName>
+			<positionName>Research Assistant</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Öregrund</city>
 				<country>SE</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
-            <onlineUrl></onlineUrl>
-		</metadataProvider>		
-		<pubDate>      
+			<electronicMailAddress>ylva.ericson@slu.se</electronicMailAddress>
+		</metadataProvider>
+		<associatedParty>
+			<individualName>
+				<givenName>Manash</givenName>
+				<surName>Shah</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Database Developer</positionName>
+			<address>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>manash.shah@nrm.se</electronicMailAddress>
+			<role>user</role>
+		</associatedParty>
+		<pubDate>
+			
 		</pubDate>
-		<language>ENGLISH</language>
-        <licenseName></licenseName>
+		<language>eng</language>
 		<abstract>
 			<para>The Department of Aquatic Resources (SLU Aqua) at the Swedish University of Agricultural Sciences is responsible of collecting and checking test-fishing data generated in national and regional environmental programs on behalf of the Swedish Agency for Marine and Water Management. The test fishing is performed with standardized methods. SLU Aqua also collect test-fishing data from several other types of investigations (e g recipient monitoring). The purpose is to facilitate obtaining data of high quality for research, national investigations and reports. The database also serves as a reference for local and regional investigations. Data is available for the public on http://www.slu.se/kul.</para>
 		</abstract>
@@ -90,64 +109,37 @@
 		</coverage>
 		<maintenance>
 			<description>
-				<para/>
+				<para></para>
 			</description>
 			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
 		</maintenance>
+
 		<contact>
-            <individualName>
-                <givenName>Peter</givenName>
-                <surName>Ljungberg</surName>
-            </individualName>
-            <electronicMailAddress>peter.ljungberg@slu.se</electronicMailAddress>
-            <organizationName>"Department of Aquatic Resources, Institute of Coastal Research, SLU</organizationName>
+			<individualName>
+				<givenName>Anders</givenName>
+				<surName>Telenius</surName>
+			</individualName>
+			<organizationName>Swedish Museum of Natural History</organizationName>
+			<positionName>Node manager</positionName>
 			<address>
-				<city>Lysekil</city>
+				<city>Stockholm</city>
 				<country>SE</country>
 			</address>
-            <onlineUrl>https://www.slu.se/kul/</onlineUrl>
-            <sos:contactNameType>Personal</sos:contactNameType>
+			<electronicMailAddress>anders.telenius@nrm.se</electronicMailAddress>
 		</contact>
-        <sos:resourceType>occurrence data</sos:resourceType>
-        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
-        <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <sos:resourceHomepage>https://www.slu.se/kul/</sos:resourceHomepage>
-        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
-        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
-        <project>
-            <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
-            <funderIdentifier></funderIdentifier>
-            <dc:funderIdentifierType></dc:funderIdentifierType>
-            <designDescription></designDescription>
-        </project>
-        <samplingMethods>
-            <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
-            <methodStep></methodStep>
-            <qualityControl></qualityControl>
-        </samplingMethods>
-        <additionalMetadata>
-            <metadata>
-				<gbif>
-					<dateStamp>2015-09-14T04:49:23.027+02:00</dateStamp>
-					<hierarchyLevel>dataset</hierarchyLevel>
-					<citation>Database for Coastal Fish - KUL. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. http://slu.se/kul [yyyy-mm-dd].</citation>
-					<formationPeriod>1987-current</formationPeriod>
-					<livingTimePeriod>1987-current</livingTimePeriod>					
-				</gbif>
-                <gettingStarted></gettingStarted>
-                <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
-                <snd:dataFormat></snd:dataFormat>
-            </metadata>
-        </additionalMetadata>
-        <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
-        </citations>
+		<sos:resourceType>occurrence data</sos:resourceType>		
+		<sos:datsetSubtype>census data</sos:datsetSubtype>
+		<sos:resourceHomepage>https://www.slu.se/kul/</sos:resourceHomepage>
 	</dataset>
+	<additionalMetadata>
+		<metadata>
+			<gbif>
+				<dateStamp>2015-09-14T04:49:23.027+02:00</dateStamp>
+				<hierarchyLevel>dataset</hierarchyLevel>
+				<citation>Database for Coastal Fish - KUL. yyyy. Swedish University of Agricultural Sciences, Department of Aquatic Resources. http://slu.se/kul [yyyy-mm-dd].</citation>
+				<formationPeriod>1987-current</formationPeriod>
+				<livingTimePeriod>1987-current</livingTimePeriod>				
+			</gbif>
+		</metadata>
+	</additionalMetadata>
 </eml:eml>
