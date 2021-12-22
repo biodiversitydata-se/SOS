@@ -142,9 +142,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                {SightingsFromBasics}
                     {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
-	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
-                    
-	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
+	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId                    
+                    LEFT JOIN (SELECT * FROM SightingSpeciesCollectionItem WHERE Id IN (SELECT MAX(Id) FROM SightingSpeciesCollectionItem GROUP BY SightingId)) ssci ON s.SightingId = ssci.SightingId	                
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
