@@ -249,7 +249,7 @@ namespace SOS.Lib.Extensions
                 Event = processedObservation.Event?.ToDarwinCore(),
                 Identification = processedObservation.Identification?.ToDarwinCore(),
                 InformationWithheld = processedObservation.InformationWithheld,
-                InstitutionCode = processedObservation.InstitutionCode?.Value,
+                InstitutionCode = string.IsNullOrEmpty(processedObservation.InstitutionCode?.Value) ? "SLU Artdatabanken" : processedObservation.InstitutionCode?.Value,
                 InstitutionID = processedObservation.InstitutionId,
                 Language = processedObservation.Language,
                 Location = processedObservation.Location?.ToDarwinCore(),
