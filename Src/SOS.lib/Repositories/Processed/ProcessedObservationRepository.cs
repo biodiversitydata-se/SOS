@@ -29,6 +29,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
+using Area = SOS.Lib.Models.Processed.Observation.Area;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -61,15 +62,61 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                .Map<Observation>(p => p
+                .Map<Observation>(m => m
                     .AutoMap()
                     .Properties(ps => ps
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.Point))
-                        .GeoPoint(gp => gp
-                            .Name(nn => nn.Location.PointLocation))
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.PointWithBuffer)))));
+                        .Object<Location>(l => l
+                            .Name(nm => nm.Location)
+                            .Properties(ps => ps
+                                .GeoShape(gs => gs
+                                    .Name(nn => nn.Point)
+                                )
+                                .GeoPoint(gp => gp
+                                    .Name(nn => nn.PointLocation)
+                                )
+                                .GeoShape(gs => gs
+                                    .Name(nn => nn.PointWithBuffer)
+                                )
+                                .GeoShape(gs => gs
+                                    .Name(nn => nn.PointWithDisturbanceBuffer)
+                                )
+                                .Object<Area>(c => c
+                                    .Name(nm => nm.County)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Name)
+                                        )
+                                    )
+                                )
+                                .Object<Area>(c => c
+                                    .Name(nm => nm.Municipality)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Name)
+                                        )
+                                    )
+                                )
+                                .Object<Area>(c => c
+                                    .Name(nm => nm.Parish)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Name)
+                                        )
+                                    )
+                                )
+                                .Object<Area>(c => c
+                                    .Name(nm => nm.Province)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Name)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
 
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid;
         }
