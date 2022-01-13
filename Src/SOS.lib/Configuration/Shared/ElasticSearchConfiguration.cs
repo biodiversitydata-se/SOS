@@ -116,7 +116,6 @@ namespace SOS.Lib.Configuration.Shared
                     settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
                 }
 
-                //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
                 if (DebugMode || debugMode)
                 {
                     settings.DisableDirectStreaming().EnableDebugMode();

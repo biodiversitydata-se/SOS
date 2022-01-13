@@ -71,14 +71,18 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finish empty collection for iNaturalist verbatim collection");
 
                 var nrSightingsHarvested = 0;
-                var currentMonthOffset = 0;
+       
                 var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
-                var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, startDate.AddMonths(1));
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+                var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
 
                 var id = 0;
                 // Loop until all sightings are fetched.
                 do
                 {
+                    _logger.LogDebug(
+                        $"Fetching iNaturalist observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}");
+
                     foreach (var observation in gBIFResult)
                     {
                         observation.Id = ++id;
@@ -99,13 +103,12 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    _logger.LogDebug(
-                        $"Fetching iNaturalist observations between dates {startDate.AddMonths(currentMonthOffset).ToString("yyyy-MM-dd")} and {startDate.AddMonths(currentMonthOffset + 1).ToString("yyyy-MM-dd")}");
+                    startDate = endDate.AddDays(1);
+                    endDate = startDate.AddMonths(1).AddDays(-1);
 
-                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate.AddMonths(currentMonthOffset),
-                        startDate.AddMonths(currentMonthOffset + 1));
-                    currentMonthOffset++;
-                } while (gBIFResult != null && startDate.AddMonths(currentMonthOffset) <= DateTime.Now);
+                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
+
+                } while (gBIFResult != null && endDate <= DateTime.Now);
 
                 _logger.LogInformation("Finished harvesting sightings for iNaturalist data provider");
 

@@ -468,7 +468,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         private string GetMediaUrl(string url)
         {
-            if (url.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
+            if (url?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true)
             {
                 return url;
             }

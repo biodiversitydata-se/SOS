@@ -49,9 +49,21 @@ namespace SOS.Lib.Services
         /// </summary>
         private bool _disposed;
 
-        private HttpClient GetClient(Dictionary<string, string> headerData = null)
+        private HttpClient GetClient(Dictionary<string, string> headerData = null, bool disableCertificateValidation = false)
         {
-            var httpClient = new HttpClient
+            HttpClientHandler handler = null;
+
+            if (disableCertificateValidation)
+            {
+                handler = new HttpClientHandler
+                {
+                    ClientCertificateOptions = ClientCertificateOption.Manual,
+                    ServerCertificateCustomValidationCallback =
+                        (httpRequestMessage, cert, cetChain, policyErrors) => true
+                };
+            }
+
+            var httpClient = new HttpClient(handler)
             {
                 Timeout = TimeSpan.FromMinutes(30)
             };
@@ -159,8 +171,8 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null)
         {
-            var httpClient = GetClient(headerData);
-
+            var httpClient = GetClient(headerData, true);
+         
             var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
            
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
