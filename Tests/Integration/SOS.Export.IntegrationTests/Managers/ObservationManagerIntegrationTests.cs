@@ -87,7 +87,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 geoJsonlWriter,
                 csvWriter,
                 processedObservationRepository,
-                new ProcessInfoRepository(processClient, elasticConfiguration, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                new ProcessInfoRepository(processClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,

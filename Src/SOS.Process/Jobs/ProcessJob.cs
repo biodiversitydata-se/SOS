@@ -202,11 +202,12 @@ namespace SOS.Process.Jobs
             {
                 _processedObservationRepository.ValidateProtectionLevelAsync(false),
                 _processedObservationRepository.ValidateProtectionLevelAsync(true),
-                ValidateRandomObservations(),
-                ValidateRandomObservations(),
-                ValidateRandomObservations(),
-                ValidateRandomObservations(),
-                ValidateRandomObservations()
+                ValidateDuplicatesAsync(),
+                ValidateRandomObservationsAsync(),
+                ValidateRandomObservationsAsync(),
+                ValidateRandomObservationsAsync(),
+                ValidateRandomObservationsAsync(),
+                ValidateRandomObservationsAsync()
             };
 
             // Make sure no protected observations exists in public index and vice versa
@@ -214,10 +215,31 @@ namespace SOS.Process.Jobs
         }
 
         /// <summary>
+        /// Validate document duplicates
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> ValidateDuplicatesAsync()
+        {
+            if (await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(false, false))
+            {
+                _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId.");
+                return false;
+            }
+
+            if (await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(false, true))
+            {
+                _logger.LogError($"Protected index ({_processedObservationRepository.ProtectedIndexName}) contains multiple documents with same occurrenceId.");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Validate 1000 random observations
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> ValidateRandomObservations()
+        private async Task<bool> ValidateRandomObservationsAsync()
         {
             var observationsCount = 1000;
 
@@ -342,7 +364,6 @@ namespace SOS.Process.Jobs
                 //---------------------------------
                 if (success)
                 {
-                  
                     // Enable indexing for public and protected index
                     await EnableIndexingAsync();
 

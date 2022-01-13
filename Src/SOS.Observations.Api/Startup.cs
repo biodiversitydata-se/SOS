@@ -367,7 +367,8 @@ namespace SOS.Observations.Api
                 .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })
                 .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
-                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
+                .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" });
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();

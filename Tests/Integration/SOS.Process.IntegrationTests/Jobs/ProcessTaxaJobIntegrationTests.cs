@@ -35,7 +35,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
 
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonProcessor,
                 harvestInfoRepository,
