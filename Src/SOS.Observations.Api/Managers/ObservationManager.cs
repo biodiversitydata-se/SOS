@@ -123,6 +123,13 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc />
+        public async Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex)
+        {
+            return await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(activeInstance,
+                protectedIndex);
+        }
+
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
         /// <inheritdoc />

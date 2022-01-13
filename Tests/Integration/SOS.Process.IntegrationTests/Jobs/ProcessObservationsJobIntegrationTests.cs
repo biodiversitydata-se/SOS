@@ -36,7 +36,10 @@ using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.ObservationDatabase;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
+using SOS.Process.Processors.Taxon;
 using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Services;
+using SOS.Process.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Jobs
@@ -92,7 +95,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             }
             
             var processInfoRepository =
-                new ProcessInfoRepository(processClient, elasticConfiguration, new NullLogger<ProcessInfoRepository>());
+                new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var vocabularyRepository =
@@ -225,8 +228,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
-            
-            var processTaxaJob = new ProcessTaxaJob(null, // todo
+
+            // todo
+            var taxonProcessor = new TaxonProcessor(new Mock<ITaxonService>().Object, new Mock<ITaxonAttributeService>().Object, new TaxonRepository(processClient, new NullLogger<TaxonRepository>()), processConfiguration, new NullLogger<TaxonProcessor>());
+
+            var processTaxaJob = new ProcessTaxaJob(taxonProcessor, 
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
                 verbatimClient,

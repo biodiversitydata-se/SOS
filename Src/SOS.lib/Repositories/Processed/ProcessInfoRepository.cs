@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
@@ -17,22 +16,16 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessInfoRepository : MongoDbProcessedRepositoryBase<ProcessInfo, string>, IProcessInfoRepository
     {
-        private readonly ElasticSearchConfiguration _elasticConfiguration;
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
             IProcessClient client,
-            ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessInfoRepository> logger
         ) : base(client, false, logger)
         {
-            _elasticConfiguration =
-                elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
         }
 
         //private string GetProcessInfoId(byte instance) => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, instance, false);

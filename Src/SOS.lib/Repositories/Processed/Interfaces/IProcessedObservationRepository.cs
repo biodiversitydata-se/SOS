@@ -27,6 +27,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex);
 
         /// <summary>
+        ///  Look for duplicates
+        /// </summary>
+        /// <param name="activeInstance"></param>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex);
+
+        /// <summary>
         /// Clear the collection
         /// </summary>
         /// <param name="protectedIndex"></param>

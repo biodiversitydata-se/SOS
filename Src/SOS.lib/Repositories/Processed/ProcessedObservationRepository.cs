@@ -47,6 +47,8 @@ namespace SOS.Lib.Repositories.Processed
 
         private IElasticClient Client => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
 
+        private IElasticClient InActiveClient => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
+
         /// <summary>
         /// Add the collection
         /// </summary>
@@ -535,6 +537,30 @@ namespace SOS.Lib.Repositories.Processed
             Logger.LogDebug("Finished indexing batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex)
+        {
+            var searchResponse = await (activeInstance ? Client : InActiveClient).SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                .Source(s => s.ExcludeAll())
+                .Aggregations(a => a
+                    .Terms("OccurrenceIdDuplicatesExists", f => f
+                        .Field("occurrence.occurrenceId")
+                        .MinimumDocumentCount(2)
+                        .Size(1)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return (searchResponse.Aggregations.Terms("OccurrenceIdDuplicatesExists").Buckets?.Count ?? 0) != 0;
         }
 
         /// <inheritdoc />
