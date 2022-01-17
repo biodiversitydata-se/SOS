@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Hangfire;
@@ -67,46 +68,62 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finish empty collection for NORS verbatim collection");
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var changeId = 0L;
-                var nrSightingsHarvested = 0;
-                var xmlDocument = await _norsObservationService.GetAsync(changeId);
-                var dataLastModified = DateTime.MinValue;
                 var verbatimFactory = new AquaSupportHarvestFactory<NorsObservationVerbatim>();
 
+                var nrSightingsHarvested = 0;
+                var startDate = new DateTime(_norsServiceConfiguration.StartHarvestYear, 1, 1);
+                var endDate = startDate.AddYears(1).AddDays(-1);
+                var changeId = 0L;
+                var dataLastModified = DateTime.MinValue;
+                
                 // Loop until all sightings are fetched.
-                while (xmlDocument != null)
+                while(startDate < DateTime.Now)
                 {
-                    changeId = long.Parse(xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault()?.Value ?? "0");
+                    var lastRequesetTime = DateTime.Now;
+                    var xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
+                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
+                    // Change id equals 0 => nothing more to fetch for this year
                     if (changeId.Equals(0))
                     {
-                        break;
+                        startDate = endDate.AddDays(1);
+                        endDate = startDate.AddYears(1).AddDays(-1);
                     }
-
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-
-                    // Add sightings to MongoDb
-                    await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
-
-                    nrSightingsHarvested += verbatims.Count();
-
-                    _logger.LogDebug($"{nrSightingsHarvested} NORS observations harvested");
-
-                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    else
                     {
-                        dataLastModified = batchDataLastModified.Value;
+                        _logger.LogDebug(
+                            $"Fetching NORS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+
+                        var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
+
+                        // Add sightings to MongoDb
+                        await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
+
+                        nrSightingsHarvested += verbatims.Count();
+
+                        _logger.LogDebug($"{nrSightingsHarvested} NORS observations harvested");
+
+                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+
+                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                        {
+                            dataLastModified = batchDataLastModified.Value;
+                        }
+
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            _logger.LogInformation("Max NORS observations reached");
+                            break;
+                        }
                     }
 
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
+                    if (timeSinceLastCall < 2000)
                     {
-                        _logger.LogInformation("Max NORS observations reached");
-                        break;
+                        Thread.Sleep(2000 - timeSinceLastCall);
                     }
-
-                    xmlDocument = await _norsObservationService.GetAsync(changeId + 1);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
@@ -154,9 +171,13 @@ namespace SOS.Import.Harvesters.Observations
         {
             var sb = new StringBuilder();
             sb.AppendLine("NORS Harvest settings:");
+            sb.AppendLine($"  Start Harvest Year: {_norsServiceConfiguration.StartHarvestYear}");
             sb.AppendLine($"  Page size: {_norsServiceConfiguration.MaxReturnedChangesInOnePage}");
-            sb.AppendLine(
-                $"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            if(_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
+            {
+                sb.AppendLine(
+                    $"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            }
             return sb.ToString();
         }
     }

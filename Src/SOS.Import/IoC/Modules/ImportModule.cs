@@ -247,8 +247,10 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
 
             // Add Services
-            builder.RegisterType<GeoRegionApiService>().As<IGeoRegionApiService>().InstancePerLifetimeScope();
+            builder.RegisterType<AquaSupportRequestService>().As<IAquaSupportRequestService>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<GeoRegionApiService>().As<IGeoRegionApiService>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationService>().As<IFishDataObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<FileDownloadService>().As<IFileDownloadService>().InstancePerLifetimeScope();

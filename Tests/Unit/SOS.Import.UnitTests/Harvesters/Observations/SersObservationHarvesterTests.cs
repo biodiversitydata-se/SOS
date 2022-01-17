@@ -51,7 +51,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(new XDocument());
 
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())

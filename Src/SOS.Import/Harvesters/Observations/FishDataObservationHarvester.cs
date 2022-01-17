@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Hangfire;
@@ -67,43 +68,69 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finish empty collection for Fish Data verbatim collection");
 
                 var ns = (XNamespace) "http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var changeId = 0L;
-                var nrSightingsHarvested = 0;
-                var xmlDocument = await _fishDataObservationService.GetAsync(changeId);
                 var verbatimFactory = new AquaSupportHarvestFactory<FishDataObservationVerbatim>();
 
+                var nrSightingsHarvested = 0;
+                var startDate = new DateTime(_fishDataServiceConfiguration.StartHarvestYear, 1, 1);
+                var endDate = startDate.AddYears(1).AddDays(-1);
+                var changeId = 0L;
+                var dataLastModified = DateTime.MinValue;
+
                 // Loop until all sightings are fetched.
-                while (xmlDocument != null)
+                while (startDate < DateTime.Now)
                 {
-                    changeId = long.Parse(xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault()?.Value ?? "0");
+                    var lastRequesetTime = DateTime.Now;
+                    var xmlDocument = await _fishDataObservationService.GetAsync(startDate, endDate, changeId);
+                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
+                    // Change id equals 0 => nothing more to fetch for this year
                     if (changeId.Equals(0))
                     {
-                        break;
+                        startDate = endDate.AddDays(1);
+                        endDate = startDate.AddYears(1).AddDays(-1);
                     }
-
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
-
-                    // Add sightings to MongoDb
-                    await _fishDataObservationVerbatimRepository.AddManyAsync(verbatims);
-
-                    nrSightingsHarvested += verbatims.Count();
-
-                    _logger.LogDebug($"{nrSightingsHarvested} Fish Data observations harvested");
-
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    else
                     {
-                        _logger.LogInformation("Max Fish Data observations reached");
-                        break;
+                        _logger.LogDebug(
+                            $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+
+                        var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
+
+                        // Add sightings to MongoDb
+                        await _fishDataObservationVerbatimRepository.AddManyAsync(verbatims);
+
+                        nrSightingsHarvested += verbatims.Count();
+
+                        _logger.LogDebug($"{nrSightingsHarvested} Fish data observations harvested");
+
+                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+
+                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                        {
+                            dataLastModified = batchDataLastModified.Value;
+                        }
+
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                            nrSightingsHarvested >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
+                        {
+                            _logger.LogInformation("Max Fish data observations reached");
+                            break;
+                        }
                     }
 
-                    xmlDocument = await _fishDataObservationService.GetAsync(changeId + 1);
+                    var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
+                    if (timeSinceLastCall < 2000)
+                    {
+                        Thread.Sleep(2000 - timeSinceLastCall);
+                    }
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for Fish Data data provider");
 
                 // Update harvest info
+                harvestInfo.DataLastModified =
+                    dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -144,8 +171,11 @@ namespace SOS.Import.Harvesters.Observations
             var sb = new StringBuilder();
             sb.AppendLine("Fish Data Harvest settings:");
             sb.AppendLine($"  Start Harvest Year: {_fishDataServiceConfiguration.StartHarvestYear}");
-            sb.AppendLine(
-                $"  Max Number Of Sightings Harvested: {_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
+            {
+                sb.AppendLine(
+                    $"  Max Number Of Sightings Harvested: {_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            }
             return sb.ToString();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Import.Services.Interfaces
@@ -6,10 +7,12 @@ namespace SOS.Import.Services.Interfaces
     public interface IKulObservationService
     {
         /// <summary>
-        ///  Get KUL observations 
+        /// Get KUL observations from specified id.
         /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
         /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<XDocument> GetAsync(long changeId);
+        Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId);
     }
 }

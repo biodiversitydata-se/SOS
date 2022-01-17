@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Import.Services.Interfaces
@@ -6,11 +7,12 @@ namespace SOS.Import.Services.Interfaces
     public interface ISersObservationService
     {
         /// <summary>
-        ///     Get Nors observations between changedFrom and changedTo.
+        /// Get SERS observations from specified id.
         /// </summary>
-        /// <param name="changedFrom">From date.</param>
-        /// <param name="changedTo">To date.</param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<XDocument> GetAsync(long changeId);
+        Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId);
     }
 }
