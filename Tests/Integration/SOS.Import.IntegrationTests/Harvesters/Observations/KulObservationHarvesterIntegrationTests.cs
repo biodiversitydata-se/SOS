@@ -29,7 +29,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationService = new KulObservationService(
-                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
+                new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()), 
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
 
@@ -72,7 +72,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var kulObservationHarvester = new KulObservationHarvester(
                 new KulObservationService(
-                    new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
+                    new AquaSupportRequestService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<AquaSupportRequestService>()),
                     importConfiguration.KulServiceConfiguration,
                     new NullLogger<KulObservationService>()),
                 new Mock<IKulObservationVerbatimRepository>().Object,

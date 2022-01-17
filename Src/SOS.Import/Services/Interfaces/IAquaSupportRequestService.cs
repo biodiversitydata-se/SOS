@@ -4,15 +4,16 @@ using System.Xml.Linq;
 
 namespace SOS.Import.Services.Interfaces
 {
-    public interface INorsObservationService
+    public interface IAquaSupportRequestService
     {
         /// <summary>
-        /// Get Nors observations from specified id.
+        /// Get data from AquaSupport
         /// </summary>
+        /// <param name="baseUrl"></param>
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
         /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId);
+        Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId);
     }
 }
