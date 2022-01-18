@@ -162,7 +162,7 @@ namespace SOS.Import.Factories.Harvest
                 observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
                 observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 
-                if (personSightings.TryGetValue(entity.Id, out var personSighting))
+                if (personSightings?.TryGetValue(entity.Id, out var personSighting) ?? false)
                 {
                     observation.VerifiedBy = personSighting.VerifiedBy;
                     observation.VerifiedByInternal = personSighting.VerifiedByInternal;
@@ -175,7 +175,7 @@ namespace SOS.Import.Factories.Harvest
                     observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
                 }
 
-                if (sightingMedias.TryGetValue(entity.Id, out var media))
+                if (sightingMedias?.TryGetValue(entity.Id, out var media) ?? false)
                 {
                     observation.Media = media;
                 }
@@ -212,7 +212,7 @@ namespace SOS.Import.Factories.Harvest
 
         #region Media
 
-        private async Task<Media> CastMediaEntityToVerbatimAsync(MediaEntity entity)
+        private Media CastMediaEntityToVerbatim(MediaEntity entity)
         {
             if (entity == null)
             {
@@ -239,16 +239,21 @@ namespace SOS.Import.Factories.Harvest
                 return sightingsMedias;
             }
 
-            var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds, live);
+            var sightingMediaEntities = (await _mediaRepository.GetAsync(sightingIds, live))?.ToArray();
 
-            if (sightingMediaEntities == null)
+            if (!sightingMediaEntities?.Any() ?? true)
             {
                 return sightingsMedias;
             }
 
             foreach (var sightingMediaEntity in sightingMediaEntities)
             {
-                var media = await CastMediaEntityToVerbatimAsync(sightingMediaEntity);
+                var media = CastMediaEntityToVerbatim(sightingMediaEntity);
+
+                if (media == null)
+                {
+                    continue;
+                }
 
                 if (!sightingsMedias.TryGetValue(sightingMediaEntity.SightingId, out var sightingMedia))
                 {
@@ -604,6 +609,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="artportalenMetadataContainer"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenHarvestFactory(
             IMediaRepository mediaRepository,
             IProjectRepository projectRepository,
@@ -676,7 +682,14 @@ namespace SOS.Import.Factories.Harvest
             var verbatims = new HashSet<ArtportalenObservationVerbatim>();
             for (var i = 0; i < entities.Length; i++)
             {
-                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias));
+                var verbatim = CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias);
+
+                if (verbatim == null)
+                {
+                    continue;
+                }
+
+                verbatims.Add(verbatim);
             }
 
             return verbatims;

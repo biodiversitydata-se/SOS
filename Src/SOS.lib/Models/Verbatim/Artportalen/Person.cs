@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿using System;
+
+namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     /// <summary>
     ///     Represents a person
@@ -38,6 +40,6 @@
         /// <summary>
         ///     The full name of the person.
         /// </summary>
-        public string FullName => $"{FirstName} {LastName}";
+        public string FullName => $"{FirstName ?? string.Empty} {LastName ?? string.Empty}";
     }
 }
