@@ -74,6 +74,7 @@ namespace SOS.Process.Processors.Nors
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = 0,
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
                     IsNaturalOccurrence = true,

@@ -170,7 +170,6 @@ namespace SOS.Import.Harvesters.Observations
             var sb = new StringBuilder();
             sb.AppendLine("SERS Harvest settings:");
             sb.AppendLine($"  Start Harvest Year: {_sersServiceConfiguration.StartHarvestYear}");
-            sb.AppendLine($"  Page size: {_sersServiceConfiguration.MaxReturnedChangesInOnePage}");
             if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
             {
                 sb.AppendLine(

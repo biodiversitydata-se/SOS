@@ -223,13 +223,11 @@ namespace SOS.Hangfire.JobServer
 
             sb.AppendLine($"[FishDataServiceConfiguration].[BaseAddress]: {_importConfiguration.FishDataServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[FishDataServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.FishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[FishDataServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.FishDataServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[FishDataServiceConfiguration].[StartHarvestYear]: {_importConfiguration.FishDataServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
             sb.AppendLine($"[KulServiceConfiguration].[BaseAddress]: {_importConfiguration.KulServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[KulServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[KulServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.KulServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[KulServiceConfiguration].[StartHarvestYear]: {_importConfiguration.KulServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
@@ -239,13 +237,11 @@ namespace SOS.Hangfire.JobServer
 
             sb.AppendLine($"[NorsServiceConfiguration].[BaseAddress]: {_importConfiguration.NorsServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[NorsServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.NorsServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[NorsServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.NorsServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[NorsServiceConfiguration].[StartHarvestYear]: {_importConfiguration.NorsServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 
             sb.AppendLine($"[SersServiceConfiguration].[BaseAddress]: {_importConfiguration.SersServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[SersServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SersServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[SersServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.SersServiceConfiguration.MaxReturnedChangesInOnePage}");
             sb.AppendLine($"[SersServiceConfiguration].[StartHarvestYear]: {_importConfiguration.SersServiceConfiguration.StartHarvestYear}");
             sb.AppendLine("");
 

@@ -74,6 +74,7 @@ namespace SOS.Process.Processors.FishData
                 Modified = verbatim.Start,
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = 0,
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
                     IndividualId = verbatim.IndividualId?.ToString(),

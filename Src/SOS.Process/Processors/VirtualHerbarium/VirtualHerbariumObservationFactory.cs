@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -90,6 +91,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 },
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogNumber = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}",
                     OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:Sighting:{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}",
                     IsNaturalOccurrence = true,

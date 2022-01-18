@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -88,6 +89,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 Modified = verbatim.EditDate,
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogId = verbatim.Id,
                     CatalogNumber = verbatim.Id.ToString(),
                     IndividualCount = verbatim.IndividualCount,

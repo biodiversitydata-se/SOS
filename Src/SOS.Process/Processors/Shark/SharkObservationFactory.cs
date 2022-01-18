@@ -78,6 +78,7 @@ namespace SOS.Process.Processors.Shark
                 },
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = 0,
                     CatalogNumber = sharkSampleId,
                     OccurrenceId = $"urn:lsid:shark:Sighting:{sharkSampleId}",
                     IsNaturalOccurrence = true,
