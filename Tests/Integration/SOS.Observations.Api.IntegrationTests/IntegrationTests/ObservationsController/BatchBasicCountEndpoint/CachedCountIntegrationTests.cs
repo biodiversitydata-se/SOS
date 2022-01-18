@@ -106,7 +106,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                     TaxonId = i
                 };
 
-                cache.Add(key, i);
+                cache.Add(key, new TaxonCount { ObservationCount = i });
                 bool success = cache.TryGetCount(key, out var count);
                 success.Should().BeTrue();
             }

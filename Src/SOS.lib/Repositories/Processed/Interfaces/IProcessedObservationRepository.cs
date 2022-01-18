@@ -159,6 +159,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<long> GetMatchCountAsync(FilterBase filter);
 
         /// <summary>
+        /// Get number of provinces matching the provided filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<int> GetProvinceCountAsync(FilterBase filter);
+
+        /// <summary>
         /// Gets a single observation
         /// </summary>
         /// <param name="occurrenceId"></param>

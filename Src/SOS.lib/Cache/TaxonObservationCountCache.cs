@@ -19,23 +19,23 @@ namespace SOS.Lib.Cache
         private const string CacheKey = "TaxonObservationCountCache";
         private readonly object _lockObject = new object();
 
-        private ConcurrentDictionary<TaxonObservationCountCacheKey, int> Cache
+        private ConcurrentDictionary<TaxonObservationCountCacheKey, TaxonCount> Cache
         {
             get
             {
-                ConcurrentDictionary<TaxonObservationCountCacheKey, int> dictionary;
+                ConcurrentDictionary<TaxonObservationCountCacheKey, TaxonCount> dictionary;
                 if (_memoryCache.TryGetValue(CacheKey, out dictionary))
                 {
                     return dictionary;
                 }
 
-                dictionary = new ConcurrentDictionary<TaxonObservationCountCacheKey, int>();
+                dictionary = new ConcurrentDictionary<TaxonObservationCountCacheKey, TaxonCount>();
                 _memoryCache.Set(CacheKey, dictionary, _cacheEntryOptions);
                 return dictionary;
             }
         }
 
-        public void Add(TaxonObservationCountCacheKey taxonObservationCountCacheKey, int count)
+        public void Add(TaxonObservationCountCacheKey taxonObservationCountCacheKey, TaxonCount taxonCount)
         {
             lock(_lockObject)
             {
@@ -45,15 +45,15 @@ namespace SOS.Lib.Cache
                     _entriesCounter = 0;
                     CleanUp();
                 }
-                Cache.AddOrUpdate(taxonObservationCountCacheKey, count, (key, oldValue) => count);
+                Cache.AddOrUpdate(taxonObservationCountCacheKey, taxonCount, (key, oldValue) => taxonCount);
             }
         }
 
-        public bool TryGetCount(TaxonObservationCountCacheKey taxonObservationCountCacheKey, out int count)
+        public bool TryGetCount(TaxonObservationCountCacheKey taxonObservationCountCacheKey, out TaxonCount taxonCount)
         {
             lock (_lockObject)
             {
-                return Cache.TryGetValue(taxonObservationCountCacheKey, out count);
+                return Cache.TryGetValue(taxonObservationCountCacheKey, out taxonCount);
             }
         }
 
