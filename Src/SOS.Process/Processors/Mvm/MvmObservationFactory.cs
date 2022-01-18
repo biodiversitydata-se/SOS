@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -77,6 +78,7 @@ namespace SOS.Process.Processors.Mvm
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogNumber = string.IsNullOrEmpty(verbatim.CatalogNumber) ? GetCatalogNumber(verbatim.OccurrenceId) : verbatim.CatalogNumber,
                     IndividualCount = verbatim.IndividualCount,
                     IsNaturalOccurrence = true,

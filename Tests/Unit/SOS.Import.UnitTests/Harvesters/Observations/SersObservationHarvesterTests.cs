@@ -26,7 +26,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
             _sersObservationServiceMock = new Mock<ISersObservationService>();
             _sersServiceConfiguration = new SersServiceConfiguration
-                {MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1};
+                { MaxNumberOfSightingsHarvested = 1};
             _loggerMock = new Mock<ILogger<SersObservationHarvester>>();
         }
 

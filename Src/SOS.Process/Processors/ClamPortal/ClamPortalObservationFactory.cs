@@ -89,6 +89,7 @@ namespace SOS.Process.Processors.ClamPortal
                 Modified = verbatim.Modified?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = 0,
                     CatalogNumber = verbatim.CatalogNumber.ToString(),
                     OccurrenceId = verbatim.OccurrenceId?.Trim(),
                     IndividualCount = verbatim.IndividualCount,

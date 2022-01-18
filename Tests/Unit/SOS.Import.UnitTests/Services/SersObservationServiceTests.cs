@@ -20,7 +20,7 @@ namespace SOS.Import.UnitTests.Services
         {
             _aquaSupportRequestServiceMock = new Mock<IAquaSupportRequestService>();
             _sersServiceConfiguration = new SersServiceConfiguration
-                {MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10};
+                {MaxNumberOfSightingsHarvested = 10 };
             _loggerMock = new Mock<ILogger<SersObservationService>>();
         }
 

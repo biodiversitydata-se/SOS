@@ -220,6 +220,13 @@ namespace SOS.Lib.Extensions
             };
         }
 
+        /// <summary>
+        /// Return true if taxon is a bird
+        /// </summary>
+        /// <param name="taxon"></param>
+        /// <returns></returns>
+        public static bool IsBird(this Taxon taxon) => taxon?.Attributes?.OrganismGroup?.ToLower() == "fåglar";
+
         #endregion Taxon
 
         #region Sighting

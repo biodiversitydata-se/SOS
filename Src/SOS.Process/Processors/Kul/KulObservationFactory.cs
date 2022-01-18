@@ -74,6 +74,7 @@ namespace SOS.Process.Processors.Kul
                 Modified = verbatim.Start,
                 Occurrence = new Occurrence
                 {
+                    BirdNestActivityId = 0,
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
                     IndividualCount = verbatim.IndividualCount?.ToString(),

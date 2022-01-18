@@ -21,7 +21,7 @@ namespace SOS.Process.UnitTests.Services
             _aquaSupportRequestServiceMock = new Mock<IAquaSupportRequestService>();
             _clamServiceConfiguration = new KulServiceConfiguration
             {
-                MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10,
+                MaxNumberOfSightingsHarvested = 10,
                 StartHarvestYear = DateTime.Now.Year
             };
             _loggerMock = new Mock<ILogger<KulObservationService>>();

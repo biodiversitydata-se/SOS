@@ -400,6 +400,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatim, Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
         {
             var processedOccurrence = new Occurrence();
+            processedOccurrence.BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0;
             processedOccurrence.AssociatedMedia = verbatim.AssociatedMedia;
             processedOccurrence.AssociatedReferences = verbatim.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatim.AssociatedSequences;
