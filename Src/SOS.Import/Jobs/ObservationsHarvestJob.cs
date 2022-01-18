@@ -85,7 +85,8 @@ namespace SOS.Import.Jobs
             if (!success)
             {
                 _logger.LogInformation($"Harvest job ({mode}) failed");
-                return false;
+
+                throw new Exception($"Harvest job ({mode}) failed");
             }
             
             if (processOnSuccess)
