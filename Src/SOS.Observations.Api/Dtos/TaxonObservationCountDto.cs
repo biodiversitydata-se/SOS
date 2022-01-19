@@ -10,13 +10,7 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// The Taxon Id.
         /// </summary>
-        public int TaxonId { get; set; }
-
-        /// <summary>
-        /// Observation Count.
-        /// </summary>
-        [Obsolete("Replaced by ObservationCount")]
-        public int Count { get; set; }
+        public int TaxonId { get; set; }        
 
         /// <summary>
         /// Observation count.
