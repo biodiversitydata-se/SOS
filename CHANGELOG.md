@@ -9,6 +9,7 @@
 ### `Added`
 - Support for response compression. Use header : `Accept-Encoding: br` for Brotli compression or `Accept-Encoding: gzip` for GZIP compression. Brotli compression is usually the faster than GZIP.
 - New parameter `gzip=true` or `gzip=false` to the `/Exports/Download` endpoints to enable retrieving Excel, GeoJSON and CSV files without GZIP compression.
+- `ProvinceCount` property to `CachedCount` endpoint.
 
 ## [1.4]
 
