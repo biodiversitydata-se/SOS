@@ -270,7 +270,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <returns></returns>
         [HttpGet("CachedCount")]
-        [ProducesResponseType(typeof(int), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaxonObservationCountDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -335,7 +335,10 @@ namespace SOS.Observations.Api.Controllers
                 };
 
                 var result = await ObservationManager.GetCachedCountAsync(searchFilter, taxonCountSearch);
-                return new OkObjectResult(result.Any() ? result.First().Count : 0);
+                if (!result.Any())
+                    return NoContent();
+
+                return new OkObjectResult(result.First());
             }
             catch (Exception e)
             {
