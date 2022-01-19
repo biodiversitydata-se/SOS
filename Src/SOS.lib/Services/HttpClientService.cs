@@ -51,22 +51,17 @@ namespace SOS.Lib.Services
 
         private HttpClient GetClient(Dictionary<string, string> headerData = null, bool disableCertificateValidation = false)
         {
-            HttpClientHandler handler = null;
 
-            if (disableCertificateValidation)
-            {
-                handler = new HttpClientHandler
-                {
-                    ClientCertificateOptions = ClientCertificateOption.Manual,
-                    ServerCertificateCustomValidationCallback =
-                        (httpRequestMessage, cert, cetChain, policyErrors) => true
-                };
-            }
+            var httpClient = disableCertificateValidation ?
+                    new HttpClient(new HttpClientHandler
+                    {
+                        ClientCertificateOptions = ClientCertificateOption.Manual,
+                        ServerCertificateCustomValidationCallback =
+                            (httpRequestMessage, cert, cetChain, policyErrors) => true
+                    }) : 
+                    new HttpClient();
 
-            var httpClient = new HttpClient(handler)
-            {
-                Timeout = TimeSpan.FromMinutes(30)
-            };
+            httpClient.Timeout = TimeSpan.FromMinutes(30);
 
             if (!headerData?.Any() ?? true)
             {
