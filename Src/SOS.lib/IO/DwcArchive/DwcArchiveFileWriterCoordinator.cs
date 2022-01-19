@@ -5,7 +5,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SharpCompress.Common.Zip;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Database.Interfaces;
@@ -68,7 +67,6 @@ namespace SOS.Lib.IO.DwcArchive
             try
             {
                 await using var stream = emlZipEntry.Open();
-                stream.Position = 0;
                 var size = await DwCArchiveEmlFileFactory.GetEmlSizeWithoutPubDateAsync(stream);
                 return size;
             }
