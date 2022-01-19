@@ -11,15 +11,15 @@ namespace SOS.Lib.Cache.Interfaces
         /// Add taxon observation count value.
         /// </summary>
         /// <param name="cacheKey"></param>
-        /// <param name="count"></param>
-        public void Add(TaxonObservationCountCacheKey cacheKey, int count);
+        /// <param name="taxonCount"></param>
+        public void Add(TaxonObservationCountCacheKey cacheKey, TaxonCount taxonCount);
         
         /// <summary>
         /// Try get cached count.
         /// </summary>
         /// <param name="cacheKey"></param>
-        /// <param name="count"></param>
+        /// <param name="taxonCount"></param>
         /// <returns></returns>
-        public bool TryGetCount(TaxonObservationCountCacheKey cacheKey, out int count);
+        public bool TryGetCount(TaxonObservationCountCacheKey cacheKey, out TaxonCount taxonCount);
     }
 }

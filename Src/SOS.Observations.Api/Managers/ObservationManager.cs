@@ -309,11 +309,17 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
+        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
+        {
+            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+            return await _processedObservationRepository.GetProvinceCountAsync(filter);
+        }
+
         public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
         {
-            TaxonObservationCountCacheKey taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
-            Dictionary<int, int> countByTaxonId = new Dictionary<int, int>();
-            HashSet<int> notCachedTaxonIds = new HashSet<int>();
+            var taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
+            var countByTaxonId = new Dictionary<int, TaxonCount>();
+            var notCachedTaxonIds = new HashSet<int>();
             foreach (var taxonId in taxonObservationCountSearch.TaxonIds)
             {
                 taxonObservationCountCacheKey.TaxonId = taxonId;
@@ -332,15 +338,24 @@ namespace SOS.Observations.Api.Managers
                 foreach (var notCachedTaxonId in notCachedTaxonIds)
                 {
                     filter.Taxa.Ids = new[] { notCachedTaxonId };
-                    int count = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));
-                    countByTaxonId.Add(notCachedTaxonId, count);
+                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));
+                    int provinceCount = Convert.ToInt32(await GetProvinceCountAsync(null, null, filter));
+                    var taxonCount = new TaxonCount { ObservationCount = observationCount, ProvinceCount = provinceCount };
                     var cacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch, notCachedTaxonId);
-                    _taxonObservationCountCache.Add(cacheKey, count);
+                    countByTaxonId.Add(notCachedTaxonId, taxonCount);
+                    _taxonObservationCountCache.Add(cacheKey, taxonCount);
                 }
             }
 
             var taxonCountDtos = countByTaxonId
-                .Select(m => new TaxonObservationCountDto { Count = m.Value, TaxonId = m.Key });
+                .Select(m => new TaxonObservationCountDto
+                {
+                    TaxonId = m.Key,
+                    Count = m.Value.ObservationCount,
+                    ObservationCount = m.Value.ObservationCount,
+                    ProvinceCount = m.Value.ProvinceCount
+                });
+
             return taxonCountDtos;
         }
 

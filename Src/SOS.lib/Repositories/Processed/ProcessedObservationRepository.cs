@@ -1288,6 +1288,29 @@ namespace SOS.Lib.Repositories.Processed
             return countResponse.Count;
         }
 
+        /// <inheritdoc />
+        public async Task<int> GetProvinceCountAsync(FilterBase filter)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Size(0)
+                .Aggregations(a => a.Cardinality("provinceCount", c => c
+                    .Field("location.province.featureId.keyword")))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                ));
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            int provinceCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("provinceCount").Value);
+            return provinceCount;
+        }
+
         public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
