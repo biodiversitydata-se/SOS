@@ -615,7 +615,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(result.Error);
                 }
 
-                GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
+                var dto = result.Value.ToGeoGridResultDto();
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
