@@ -220,15 +220,23 @@ namespace SOS.Process.Jobs
         /// <returns></returns>
         private async Task<bool> ValidateDuplicatesAsync()
         {
-            if (await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(false, false))
+            const int maxItems = 20;
+
+            var publicIndexDuplicates =
+                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, false, maxItems))?.ToArray();
+            if (publicIndexDuplicates?.Any() ?? false)
             {
-                _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId.");
+                _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId. " + 
+                                 $"{string.Concat(publicIndexDuplicates, ", ")}{(publicIndexDuplicates.Count() == maxItems ? "..." : "")}");
                 return false;
             }
 
-            if (await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(false, true))
+            var protectedIndexDuplicates =
+                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, true, maxItems))?.ToArray();
+            if (protectedIndexDuplicates?.Any() ?? false)
             {
-                _logger.LogError($"Protected index ({_processedObservationRepository.ProtectedIndexName}) contains multiple documents with same occurrenceId.");
+                _logger.LogError($"Protected index ({_processedObservationRepository.ProtectedIndexName}) contains multiple documents with same occurrenceId. " +
+                $"{string.Concat(protectedIndexDuplicates, ", ")}{(protectedIndexDuplicates.Count() == maxItems ? "..." : "")}");
                 return false;
             }
 
