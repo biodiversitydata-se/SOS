@@ -87,14 +87,14 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
-        protected Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
+        protected Result ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
         {
             if (zoom < minLimit || zoom > maxLimit)
             {
-                return Result.Failure<int>($"Zoom must be between {minLimit} and {maxLimit}");
+                return Result.Failure($"Zoom must be between {minLimit} and {maxLimit}");
             }
 
-            return Result.Success(zoom);
+            return Result.Success();
         }
 
         protected Result ValidateAggregationPagingArguments(int skip, int? take, bool handleInfinityTake = false)
