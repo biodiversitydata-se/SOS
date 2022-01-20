@@ -151,6 +151,11 @@ namespace SOS.Observations.Api.Controllers
                 errors.Add(areaValidationResult.Error);
             }
 
+            if (searchFilter?.ModifiedDate?.From > searchFilter?.ModifiedDate?.To)
+            {
+                errors.Add("Modified from date can't be greater tha to date");
+            }
+
             if (searchFilter?.Output?.Fields?.Any() ?? false)
             {
                 errors.AddRange(searchFilter.Output.Fields

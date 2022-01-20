@@ -126,6 +126,11 @@ namespace SOS.Lib.Models.Search
         public LocationFilter Location { get; set; }
 
         /// <summary>
+        /// Observation modified filter
+        /// </summary>
+        public ModifiedDateFilter ModifiedDate { get; set; }
+
+        /// <summary>
         /// Filter for observation not recovered
         /// </summary>
         public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }

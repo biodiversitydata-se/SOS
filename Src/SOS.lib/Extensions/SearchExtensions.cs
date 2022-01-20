@@ -6,6 +6,7 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -661,15 +662,22 @@ namespace SOS.Lib.Extensions
             }
         }
 
+        private static void TryAddModifiedDateFilter(this
+                ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ModifiedDateFilter filter)
+        {
+            query.TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals);
+            query.TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals);
+        }
+
         /// <summary>
-        /// Try to add nested term criteria
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="nestedPath"></param>
-        /// <param name="field"></param>
-        /// <param name="value"></param>
-        private static void TryAddNestedTermCriteria<T>(this
+            /// Try to add nested term criteria
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="query"></param>
+            /// <param name="nestedPath"></param>
+            /// <param name="field"></param>
+            /// <param name="value"></param>
+            private static void TryAddNestedTermCriteria<T>(this
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath, string field, T value)
         {
             query.Add(q => q
@@ -1153,6 +1161,7 @@ namespace SOS.Lib.Extensions
             query.TryAddTimeRangeFilters(filter);
             query.TryAddGeographicFilter(filter.Location?.AreaGeographic);
             query.TryAddGeometryFilters(filter.Location?.Geometries);
+            query.TryAddModifiedDateFilter(filter.ModifiedDate);
             query.TryAddNotRecoveredFilter(filter);
             query.AddSightingTypeFilters(filter);
             query.TryAddValidationStatusFilter(filter);
