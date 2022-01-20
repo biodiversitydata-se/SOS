@@ -63,6 +63,13 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = searchFilterBaseDto.Geographics.ConsiderDisturbanceRadius,
                     UsePointAccuracy = searchFilterBaseDto.Geographics.ConsiderObservationAccuracy
                 };
+            filter.ModifiedDate = searchFilterBaseDto.ModifiedDate == null
+                ? null
+                : new ModifiedDateFilter
+                {
+                    From = searchFilterBaseDto.ModifiedDate.From,
+                    To = searchFilterBaseDto.ModifiedDate.To
+                };
 
             filter.ExtendedAuthorization.ProtectedObservations = sensitiveObservations;
             filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
