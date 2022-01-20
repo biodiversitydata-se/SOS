@@ -27,14 +27,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex);
 
         /// <summary>
-        ///  Look for duplicates
-        /// </summary>
-        /// <param name="activeInstance"></param>
-        /// <param name="protectedIndex"></param>
-        /// <returns></returns>
-        Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex);
-
-        /// <summary>
         /// Clear the collection
         /// </summary>
         /// <param name="protectedIndex"></param>
@@ -309,6 +301,15 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> SignalSearchInternalAsync(
             SearchFilter filter,
             bool onlyAboveMyClearance);
+
+        /// <summary>
+        /// Look for duplicates
+        /// </summary>
+        /// <param name="activeInstance"></param>
+        /// <param name="protectedIndex"></param>
+        /// <param name="maxReturnedItems"></param>
+        /// <returns></returns>
+        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems);
 
         /// <summary>
         /// Unique name of public index 

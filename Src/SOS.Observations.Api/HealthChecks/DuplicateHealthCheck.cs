@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,40 +36,41 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
+                const int maxItems = 20;
                 var healthTasks = new[]
                 {
-                    _observationManager.CheckForOccurenceIdDuplicatesAsync(true, false),
-                    _observationManager.CheckForOccurenceIdDuplicatesAsync(true, true),
-                    _observationManager.CheckForOccurenceIdDuplicatesAsync(false, false),
-                    _observationManager.CheckForOccurenceIdDuplicatesAsync(false, true)
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(true, false, maxItems),
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(true, true, maxItems),
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(false, false, maxItems),
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(false, true, maxItems)
                 };
 
                 await Task.WhenAll(healthTasks);
 
-                var activePublicIndexHasDuplicates = healthTasks[0].Result;
-                var activePublicprotectedIndexHasDuplicates = healthTasks[1].Result;
-                var inActivePublicIndexHasDuplicates = healthTasks[2].Result;
-                var inActivePublicprotectedIndexHasDuplicates = healthTasks[3].Result;
+                var activePublicIndexDuplicates = healthTasks[0].Result;
+                var activePublicprotectedIndexDuplicates = healthTasks[1].Result;
+                var inActivePublicIndexDuplicates = healthTasks[2].Result;
+                var inActivePublicprotectedIndexDuplicates = healthTasks[3].Result;
 
                 var errors = new StringBuilder();
-                if (activePublicIndexHasDuplicates)
+                if (activePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append("Duplicates found in active public index");
+                    errors.Append($"Duplicates found in active public index: {string.Concat(activePublicIndexDuplicates, ",")}...");
                 }
 
-                if (activePublicprotectedIndexHasDuplicates)
+                if (activePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append("Duplicates found in active protected index");
+                    errors.Append($"Duplicates found in active protected index: {string.Concat(activePublicprotectedIndexDuplicates, ",")}...");
                 }
 
-                if (inActivePublicIndexHasDuplicates)
+                if (inActivePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append("Duplicates found in inactive public index");
+                    errors.Append($"Duplicates found in inactive public index: {string.Concat(inActivePublicIndexDuplicates, ",")}...");
                 }
 
-                if (inActivePublicprotectedIndexHasDuplicates)
+                if (inActivePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append("Duplicates found in inactive protected index");
+                    errors.Append($"Duplicates found in inactive protected index: {string.Concat(inActivePublicprotectedIndexDuplicates, ",")}...");
                 }
 
                 if (errors.Length != 0)

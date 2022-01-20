@@ -123,12 +123,6 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex)
-        {
-            return await _processedObservationRepository.CheckForOccurenceIdDuplicatesAsync(activeInstance,
-                protectedIndex);
-        }
 
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
@@ -428,6 +422,13 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Signal search failed");
                 throw;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems)
+        {
+            return await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(activeInstance,
+                protectedIndex, maxReturnedItems);
         }
 
         public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)

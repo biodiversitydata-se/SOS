@@ -540,30 +540,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex)
-        {
-            var searchResponse = await (activeInstance ? Client : InActiveClient).SearchAsync<dynamic>(s => s
-                .Size(0)
-                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
-                .Source(s => s.ExcludeAll())
-                .Aggregations(a => a
-                    .Terms("OccurrenceIdDuplicatesExists", f => f
-                        .Field("occurrence.occurrenceId")
-                        .MinimumDocumentCount(2)
-                        .Size(1)
-                    )
-                )
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return (searchResponse.Aggregations.Terms("OccurrenceIdDuplicatesExists").Buckets?.Count ?? 0) != 0;
-        }
-
-        /// <inheritdoc />
         public async Task<bool> ClearCollectionAsync(bool protectedIndex)
         {
             await DeleteCollectionAsync(protectedIndex);
@@ -1907,6 +1883,30 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             return searchResponse.Count > 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems)
+        {
+            var searchResponse = await (activeInstance ? Client : InActiveClient).SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                .Source(s => s.ExcludeAll())
+                .Aggregations(a => a
+                    .Terms("OccurrenceIdDuplicatesExists", f => f
+                        .Field("occurrence.occurrenceId")
+                        .MinimumDocumentCount(2)
+                        .Size(maxReturnedItems)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse.Aggregations.Terms("OccurrenceIdDuplicatesExists").Buckets?.Select(b => b.Key);
         }
 
         /// <inheritdoc />

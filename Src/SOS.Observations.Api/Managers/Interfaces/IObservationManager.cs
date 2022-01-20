@@ -16,12 +16,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IObservationManager
     {
         /// <summary>
-        ///  Look for duplicates
+        /// Look for duplicates
         /// </summary>
         /// <param name="activeInstance"></param>
         /// <param name="protectedIndex"></param>
+        /// <param name="maxReturnedItems"></param>
         /// <returns></returns>
-        Task<bool> CheckForOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex);
+        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex,
+            int maxReturnedItems);
 
         /// <summary>
         /// Max number of aggregation buckets in ElasticSearch.
