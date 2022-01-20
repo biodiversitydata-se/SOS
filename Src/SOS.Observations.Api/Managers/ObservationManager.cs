@@ -351,7 +351,6 @@ namespace SOS.Observations.Api.Managers
                 .Select(m => new TaxonObservationCountDto
                 {
                     TaxonId = m.Key,
-                    Count = m.Value.ObservationCount,
                     ObservationCount = m.Value.ObservationCount,
                     ProvinceCount = m.Value.ProvinceCount
                 });
