@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Utilities;
-using Org.BouncyCastle.Utilities.Collections;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
@@ -21,6 +21,8 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class GISExtensions
     {
+        private static IDictionary<string, Point> _transformPointCache = new ConcurrentDictionary<string, Point>();
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -741,10 +743,26 @@ namespace SOS.Lib.Extensions
             CoordinateSys fromCoordinateSystem,
             CoordinateSys toCoordinateSystem)
         {
+            if (geometry == null)
+            {
+                return null;
+            }
+
             if (fromCoordinateSystem == toCoordinateSystem)
             {
                 geometry.SRID = (int)toCoordinateSystem;
                 return geometry;
+            }
+
+            var key = string.Empty;
+            if (geometry is Point point)
+            {
+                key = $"{fromCoordinateSystem}:{toCoordinateSystem}:{point.Coordinate.X}:{point.Coordinate.Y}";
+
+                if (_transformPointCache.TryGetValue(key, out var cachedPoint))
+                {
+                    return cachedPoint;
+                }
             }
 
             var mathTransformFilter =
@@ -753,6 +771,13 @@ namespace SOS.Lib.Extensions
             var transformedGeometry = geometry.Copy();
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int) toCoordinateSystem;
+
+            // If we got this far and key is set, try add point to cache
+            if (!string.IsNullOrEmpty(key))
+            {
+                _transformPointCache.TryAdd(key, transformedGeometry as Point);
+            }
+
             return transformedGeometry;
         }
 
