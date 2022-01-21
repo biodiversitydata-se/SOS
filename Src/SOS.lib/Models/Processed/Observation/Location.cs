@@ -370,6 +370,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PointRadiusSpatialFit { get; set; }
 
         /// <summary>
+        /// X coordinate in Swe ref 99
+        /// </summary>
+        public double? Sweref99TmX { get; set; }
+
+        /// <summary>
+        /// Y coordinate in Swe ref 99
+        /// </summary>
+        public double? Sweref99TmY { get; set; }
+
+        /// <summary>
         ///     The verbatim original spatial coordinates of the Location.
         ///     The coordinate ellipsoid, geodeticDatum, or full
         ///     Spatial Reference System (SRS) for these coordinates

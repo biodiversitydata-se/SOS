@@ -23,7 +23,6 @@ using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
-
 namespace SOS.Process.Processors.Artportalen
 {
     public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
