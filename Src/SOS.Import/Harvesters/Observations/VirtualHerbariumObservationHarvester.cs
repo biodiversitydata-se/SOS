@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -11,6 +12,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -54,6 +56,7 @@ namespace SOS.Import.Harvesters.Observations
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
+            var occurrenceIdsSet = new HashSet<string>();
 
             try
             {
@@ -88,8 +91,20 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
+                    // Remove duplicates
+                    var distinctVerbatims = new List<VirtualHerbariumObservationVerbatim>();
+                    foreach (var verbatim in verbatims)
+                    {
+                        string occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
+                        if (!occurrenceIdsSet.Contains(occurrenceId))
+                        {
+                            occurrenceIdsSet.Add(occurrenceId);
+                            distinctVerbatims.Add(verbatim);
+                        }
+                    }
+
                     // Add sightings to MongoDb
-                    await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(verbatims);
+                    await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(distinctVerbatims);
 
                     if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
