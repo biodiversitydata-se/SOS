@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -46,6 +45,10 @@ namespace SOS.Process.Processors
             location.PointLocation = point.ToGeoLocation();
             location.PointWithBuffer = pointWithBuffer;
             location.PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
+
+            var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+            location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
+            location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
 
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
 
