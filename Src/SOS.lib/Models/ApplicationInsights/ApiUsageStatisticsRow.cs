@@ -43,6 +43,11 @@ namespace SOS.Lib.Models.ApplicationInsights
         public long RequestCount { get; set; }
 
         /// <summary>
+        /// Sum of observations returned
+        /// </summary>
+        public long SumResponseCount { get; set; }
+
+        /// <summary>
         /// User making the request
         /// </summary>
         public string UserId { get; set; }
