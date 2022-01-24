@@ -665,6 +665,11 @@ namespace SOS.Lib.Extensions
         private static void TryAddModifiedDateFilter(this
                 ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ModifiedDateFilter filter)
         {
+            if (filter == null)
+            {
+                return;
+            }
+
             query.TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals);
         }

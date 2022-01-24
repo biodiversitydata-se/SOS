@@ -246,6 +246,17 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
+        public static GeoGridMetricResultDto ToGeoGridMetricResult(this GeoGridMetricResult geoGridMetricResult)
+        {
+            return new GeoGridMetricResultDto
+            {
+                BoundingBox = geoGridMetricResult.BoundingBox.ToLatLonBoundingBoxDto(),
+                GridCellCount = geoGridMetricResult.GridCellCount,
+                GridCellSizeInMeters = geoGridMetricResult.GridCellSizeInMeters,
+                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto())
+            };
+        }
+
         /// <summary>
         /// Cast lat lon bounding box dto 
         /// </summary>
@@ -308,6 +319,16 @@ namespace SOS.Observations.Api.Extensions
                 ObservationsCount = gridCellTile.ObservationsCount,
                 Zoom = gridCellTile.Zoom,
                 BoundingBox = gridCellTile.BoundingBox.ToLatLonBoundingBoxDto()
+            };
+        }
+
+        public static GridCellDto ToGridCellDto(this GridCell gridCell)
+        {
+            return new GridCellDto
+            {
+                BoundingBox = gridCell.BoundingBox.ToLatLonBoundingBoxDto(),
+                ObservationsCount = gridCell.ObservationsCount,
+                TaxaCount = gridCell.TaxaCount
             };
         }
 

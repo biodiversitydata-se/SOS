@@ -97,6 +97,18 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision);
 
         /// <summary>
+        /// Get metric tiles aggregation
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="gridCellSizeInMeters"></param>
+        /// <returns></returns>
+        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter, int gridCellSizeInMeters);
+
+        /// <summary>
         /// A compleate geo tile taxa aggregation
         /// </summary>
         /// <param name="roleId"></param>

@@ -1,9 +1,9 @@
-﻿namespace SOS.Lib.Models.Gis
+﻿namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
     /// 
     /// </summary>
-    public class GridCell
+    public class GridCellDto
     {
         /// <summary>
         /// Number of observations in cell
@@ -18,6 +18,6 @@
         /// <summary>
         /// Cell coordinates
         /// </summary>
-        public LatLonBoundingBox BoundingBox { get; set; }
+        public LatLonBoundingBoxDto BoundingBox { get; set; }
     }
 }

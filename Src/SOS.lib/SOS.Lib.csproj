@@ -22,7 +22,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.13.1" />
-    <PackageReference Include="NEST" Version="7.15.0" />
+    <PackageReference Include="NEST" Version="7.16.0" />
     <PackageReference Include="NetTopologySuite" Version="2.3.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
