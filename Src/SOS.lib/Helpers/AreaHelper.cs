@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -30,6 +31,7 @@ namespace SOS.Lib.Helpers
         private IDictionary<string, PositionLocation> _featureCache;
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
+        private SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         /// <summary>
         ///     Constructor
@@ -126,29 +128,37 @@ namespace SOS.Lib.Helpers
         public async Task InitializeAsync()
         {
             // If tree already initialized, return
-            if (IsInitialized)
+            if (IsInitialized) return;
+                       
+            try
             {
-                return;
-            }
-            
-            ClearCache();
+                await _initializeSemaphoreSlim.WaitAsync();
+                if (!IsInitialized)
+                {
+                    ClearCache();
 
-            var areas = await _processedAreaRepository.GetAsync(_areaTypesInStrTree);
-            foreach (var area in areas)
+                    var areas = await _processedAreaRepository.GetAsync(_areaTypesInStrTree);
+                    foreach (var area in areas)
+                    {
+                        var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+
+                        var attributes = new Dictionary<string, object>();
+                        attributes.Add("name", area.Name);
+                        attributes.Add("areaType", area.AreaType);
+                        attributes.Add("featureId", area.FeatureId);
+
+                        var feature = geometry.ToFeature(attributes);
+                        _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
+                    }
+
+                    _strTree.Build();
+                    IsInitialized = true;
+                }
+            }
+            finally
             {
-                var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
-
-                var attributes = new Dictionary<string, object>();
-                attributes.Add("name", area.Name);
-                attributes.Add("areaType", area.AreaType);
-                attributes.Add("featureId", area.FeatureId);
-
-                var feature = geometry.ToFeature(attributes);
-                _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
+                _initializeSemaphoreSlim.Release();
             }
-
-            _strTree.Build();
-            IsInitialized = true;
         }
 
         /// <inheritdoc />
