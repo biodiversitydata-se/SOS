@@ -35,7 +35,7 @@ namespace SOS.Lib.Repositories.Resource
             {
                 return null;
             }
-            
+
             var list = MongoCollection
                 .Find(Builders<ApiUsageStatistics>.Filter.Empty)
                 .SortByDescending(e => e.Date)
