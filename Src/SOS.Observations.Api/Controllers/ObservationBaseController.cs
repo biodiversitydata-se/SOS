@@ -97,6 +97,16 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        protected Result ValidateGridCellSizeInMetersArgument(int gridCellSizeInMeters, int minLimit, int maxLimit)
+        {
+            if (gridCellSizeInMeters < minLimit || gridCellSizeInMeters > maxLimit)
+            {
+                return Result.Failure($"Grid cell size in meters must be between {minLimit} and {maxLimit}");
+            }
+
+            return Result.Success();
+        }
+
         protected Result ValidateAggregationPagingArguments(int skip, int? take, bool handleInfinityTake = false)
         {
             if (skip < 0) return Result.Failure("Skip must be 0 or greater.");

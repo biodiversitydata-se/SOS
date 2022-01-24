@@ -123,6 +123,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
 
         /// <summary>
+        /// Get aggregation in metric tiles 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="gridCellSizeInMeters"></param>
+        /// <returns></returns>
+        Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
+            SearchFilter filter, int gridCellSizeInMeters);
+        /// <summary>
         /// Get index health status
         /// </summary>
         /// <param name="waitForStatus"></param>

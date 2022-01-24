@@ -107,6 +107,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false);
 
+        Task<IActionResult> GetMetricGridAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilterAggregationDto filter,
+            int gridCellSizeInMeters = 10000,
+            bool validateSearchFilter = false,
+            bool sensitiveObservations = false);
+
         Task<IActionResult> TaxonAggregation(
             int? roleId,
             string authorizationApplicationIdentifier,

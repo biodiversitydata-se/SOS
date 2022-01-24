@@ -243,6 +243,22 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
+        public async Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(int? roleId, string authorizationApplicationIdentifier,
+                SearchFilter filter, int gridCellSizeInMeters)
+        {
+            try
+            {
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                return await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles.");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,

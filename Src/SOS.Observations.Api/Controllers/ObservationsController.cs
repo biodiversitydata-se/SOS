@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -174,14 +175,10 @@ namespace SOS.Observations.Api.Controllers
         /// Validate bounding box
         /// </summary>
         /// <param name="boundingBox"></param>
-        /// <param name="zoom"></param>
-        /// <param name="checkNrTilesLimit"></param>
         /// <param name="failOnNull"></param>
         /// <returns></returns>
         private Result ValidateBoundingBox(
             LatLonBoundingBoxDto boundingBox,
-            int zoom,
-            bool checkNrTilesLimit = true,
             bool failOnNull = true)
         {
             if (boundingBox == null)
@@ -202,24 +199,6 @@ namespace SOS.Observations.Api.Controllers
             if (boundingBox.BottomRight.Latitude >= boundingBox.TopLeft.Latitude)
             {
                 return Result.Failure("Bounding box bottom latitude value is >= top latitude value.");
-            }
-
-            if (checkNrTilesLimit)
-            {
-                var tileWidthInDegrees = 360 / Math.Pow(2, zoom);
-                var latCentre = (boundingBox.TopLeft.Latitude + boundingBox.BottomRight.Latitude) / 2;
-                var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
-
-                var lonDiff = Math.Abs(boundingBox.BottomRight.Longitude - boundingBox.TopLeft.Longitude);
-                var latDiff = Math.Abs(boundingBox.TopLeft.Latitude - boundingBox.BottomRight.Latitude);
-                var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
-                var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
-                var maxTilesTot = maxLonTiles * maxLatTiles;
-
-                if (maxTilesTot > _tilesLimit)
-                {
-                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using lower zoom or a smaller bounding box.");
-                }
             }
 
             return Result.Success();
@@ -262,21 +241,85 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        /// Validate metric tiles limit
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="gridCellSizeInMeters "></param>
+        /// <returns></returns>
+        private Result ValidateMetricTilesLimit(
+            Envelope envelope,
+            int gridCellSizeInMeters)
+        {
+
+            if (envelope == null)
+            {
+                return Result.Success();
+            }
+
+            var maxLonTiles = Math.Ceiling((envelope.MaxX - envelope.MinX) / gridCellSizeInMeters);
+            var maxLatTiles = Math.Ceiling((envelope.MaxY - envelope.MinY) / gridCellSizeInMeters);
+            var maxTilesTot = maxLonTiles * maxLatTiles;
+
+            if (maxTilesTot > _tilesLimit)
+            {
+                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using higher grid cell size or a smaller bounding box.");
+            }
+
+            return Result.Success();
+        }
+
+        /// <summary>
+        /// Validate tiles limit
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="zoom"></param>
+        /// <returns></returns>
+        private Result ValidateTilesLimit(
+            Envelope envelope,
+            int zoom)
+        {
+            if (envelope == null)
+            {
+                return Result.Success();
+            }
+            
+            var tileWidthInDegrees = 360 / Math.Pow(2, zoom);
+            var latCentre = (envelope.MaxY + envelope.MinY) / 2;
+            var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
+
+            var lonDiff = Math.Abs(envelope.MaxX - envelope.MinX);
+            var latDiff = Math.Abs(envelope.MaxY - envelope.MinY);
+            var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
+            var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
+            var maxTilesTot = maxLonTiles * maxLatTiles;
+
+            if (maxTilesTot > _tilesLimit)
+            {
+                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using lower zoom or a smaller bounding box.");
+            }
+
+            return Result.Success();
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="taxonManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="observationApiConfiguration"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
             IObservationManager observationManager,
             ITaxonManager taxonManager,
             IAreaManager areaManager,
             ObservationApiConfiguration observationApiConfiguration,
+            ElasticSearchConfiguration elasticConfiguration,
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager)
         {
-            _tilesLimit = observationApiConfiguration?.TilesLimit ??
+            _tilesLimit = elasticConfiguration?.MaxNrAggregationBuckets ??
                           throw new ArgumentNullException(nameof(observationApiConfiguration));
 
             _signalSearchTaxonListIds = (observationApiConfiguration?.SignalSearchTaxonListIds?.Any() ?? false) ? observationApiConfiguration.SignalSearchTaxonListIds : Array.Empty<int>();
@@ -505,7 +548,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox,false));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
@@ -549,7 +592,7 @@ namespace SOS.Observations.Api.Controllers
                 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter("sv-SE", sensitiveObservations);
@@ -567,6 +610,7 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
         /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
         /// of observations and the number of unique taxa (usually species) in the grid cell.
@@ -624,12 +668,14 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, zoom));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
                 {
@@ -637,7 +683,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
                
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(
@@ -663,7 +708,71 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Aggregates observations into grid cells. Each grid cell contains the number
+        /// of observations and the number of unique taxa (usually species) in the grid cell.
+        /// The grid cells are squares in SWEREF 99 TM coordinate system 
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="gridCellSizeInMeters">Size of grid cell in meters</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <returns></returns>
+        [HttpPost("MetricGridAggregation")]
+        [ProducesResponseType(typeof(GeoGridMetricResultDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetMetricGridAggregationAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationDto filter,
+            [FromQuery] int gridCellSizeInMeters = 100000,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            try
+            {
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
 
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilter("en-GB", sensitiveObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
+
+                var result = await ObservationManager.GetMetricGridAggregationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                var dto = result.Value.ToGeoGridMetricResult();
+                return new OkObjectResult(dto);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Metric grid aggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+       
         ///// <summary>
         ///// Aggregates observations into grid cells. Each grid cell contains a list of all taxa (usually species)
         ///// in the grid cell and the number of observations.
@@ -784,12 +893,14 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 1));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
                 {
@@ -797,7 +908,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+               
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(
@@ -928,7 +1039,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateSearchPagingArgumentsInternal(skip, take),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
@@ -1040,7 +1151,7 @@ namespace SOS.Observations.Api.Controllers
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1090,7 +1201,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1147,7 +1258,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 0, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)
                 {
@@ -1235,12 +1346,14 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, zoom));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
                 {
@@ -1248,7 +1361,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
@@ -1300,11 +1412,13 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, zoom));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
                 {
@@ -1312,7 +1426,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+                
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
@@ -1398,11 +1512,13 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, zoom, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
                 {
@@ -1410,7 +1526,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, false);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+                
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
@@ -1463,12 +1579,13 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 1));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
                 {
@@ -1476,7 +1593,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
-                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
                 var result = await ObservationManager.GetTaxonAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take);
@@ -1529,7 +1645,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTaxonExists(filter),
                     ValidateGeographicalAreaExists(filter?.Geographics),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 1, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox,  false));
 
                 if (validationResult.IsFailure)
                 {
@@ -1625,7 +1741,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSignalSearch(filter, validateSearchFilter, areaBuffer) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, 1, false, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)
                 {

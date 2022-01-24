@@ -8,6 +8,6 @@ namespace SOS.Lib.Models.Search
         public LatLonBoundingBox BoundingBox { get; set; }
         public int Precision { get; set; }
         public int GridCellCount { get; set; }
-        public IEnumerable<GridCell> GridCells { get; set; }
+        public IEnumerable<GridCellGeohash> GridCells { get; set; }
     }
 }
