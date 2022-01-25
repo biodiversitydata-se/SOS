@@ -43,8 +43,8 @@ namespace SOS.Lib.Repositories.Resource
                 .ToList();
 
             if (list.Count == 1)
-            {
-                return list.First().Date;
+            {                
+                return list.First().Date.ToLocalTime();
             }
 
             return null;
