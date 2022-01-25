@@ -34,6 +34,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Process.IoC.Modules;
+using SOS.Lib.Configuration.ObservationApi;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -43,6 +44,7 @@ namespace SOS.Hangfire.JobServer
     public class Program
     {
         private static string _env;
+        private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
         private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
@@ -54,6 +56,7 @@ namespace SOS.Hangfire.JobServer
         private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
+        private static UserServiceConfiguration _userServiceConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -156,6 +159,7 @@ namespace SOS.Hangfire.JobServer
                         t => true);
 
                     // Get configuration
+                    _apiManagementServiceConfiguration = hostContext.Configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                     _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                     _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -173,7 +177,9 @@ namespace SOS.Hangfire.JobServer
                         .Get<ApplicationInsightsConfiguration>();
                     _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration))
                         .Get<SosApiConfiguration>();
-                    
+                    _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration))
+                        .Get<UserServiceConfiguration>();
+
                     services.AddSingleton(_searchDbConfiguration);
                     services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
                 })
@@ -181,13 +187,13 @@ namespace SOS.Hangfire.JobServer
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration) })
+                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
                                 .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
                         );
                     }
                 )
-                .UseNLog();
+                .UseNLog();            
         }
 
         private static void LogStartupSettings(ILogger<Program> logger)
