@@ -53,7 +53,7 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                await _apiUsageStatisticsRepository.VerifyCollection();
+                await _apiUsageStatisticsRepository.VerifyCollection();                
                 var dayToProcess = (await GetLastHarvestDate()).AddDays(1).Date;
 
                 var usageStatisticsFactory = new UsageStatisticsFactory(_apiManagementUserService, _userService);
@@ -128,7 +128,7 @@ namespace SOS.Lib.Managers
         public async Task<DateTime> GetLastHarvestDate()
         {
             DateTime? latestHarvestDate = await _apiUsageStatisticsRepository.GetLatestHarvestDate();
-            if (latestHarvestDate.HasValue) return latestHarvestDate.Value;
+            if (latestHarvestDate.HasValue) return latestHarvestDate.Value;            
             return DateTime.Now.AddDays(-91).Date;
         }
 
@@ -150,9 +150,9 @@ namespace SOS.Lib.Managers
             private const int UserEmailColumnIndex = 11;
             private const int UserEmailDomainColumnIndex = 12;
             private const int RequestCountColumnIndex = 13;
-            private const int FailureCountColumnIndex = 15;
-            private const int AverageDurationColumnIndex = 16;
-            private const int SumResponseCountColumnIndex = 17;
+            private const int FailureCountColumnIndex = 14;
+            private const int AverageDurationColumnIndex = 15;
+            private const int SumResponseCountColumnIndex = 16;
 
             public ApiUsageStatisticsExcelWriter(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
             {
