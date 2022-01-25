@@ -16,6 +16,9 @@ namespace SOS.Lib.Services
         private readonly ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private readonly ILogger<ApplicationInsightsService> _logger;
 
+        private string Filter => @"strlen(name) > 6 and indexof(name, 'swagger') == -1 and indexof(name, 'health' ) == -1 and indexof(name, '.') == -1 
+                                   and indexof(name, 'console') == -1  and indexof(name, '_ignition') == -1  and indexof(name, 'api') == -1";
+
         /// <summary>
         /// Post a query to application insights
         /// </summary>
@@ -30,11 +33,13 @@ namespace SOS.Lib.Services
             headerData.Add("x-api-key", _applicationInsightsConfiguration.ApiKey);
 
             var result = await _httpClientService.PostDataAsync<T>(
-                new Uri($"{_applicationInsightsConfiguration.BaseAddress}/apps/{_applicationInsightsConfiguration.ApplicationId }/query"), new { query = query?
+                new Uri($"{_applicationInsightsConfiguration.BaseAddress}/apps/{_applicationInsightsConfiguration.ApplicationId }/query"), new
+                {
+                    query = query?
                     .Replace("\n", "")
                     .Replace("\r", "")
                     .Replace("\t", "")
-                }, 
+                },
                 headerData);
 
             return result;
@@ -55,26 +60,28 @@ namespace SOS.Lib.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        
+
         /// <inheritdoc />
         public async Task<IEnumerable<ApiUsageStatisticsRow>> GetUsageStatisticsForSpecificDayAsync(DateTime date)
         {
             var query = $@"requests 
                     | where 
-                        timestamp >= datetime('{date.ToString("yyyy-MM-dd")} 00:00:00.0')  
+                        {Filter} 
+                        and timestamp >= datetime('{date.ToString("yyyy-MM-dd")} 00:00:00.0')  
                         and timestamp < datetime('{date.AddDays(1).ToString("yyyy-MM-dd")} 00:00:00.0')
                     | project 
-                        timestamp, 
                         method = substring(name, 0, indexof(name, ' ' )), 
-                        endpoint = substring(name, indexof(name, ' ')+1, strlen(name)-indexof(name, ' ' )-1),  
+                        endpoint = substring(name, indexof(name, ' ')+1), 
                         user_AccountId,
                         user_AuthenticatedId, 
                         duration, 
-                        success
+                        success,
+                        responseCount = toint(customDimensions['Response-count'])
                     | summarize 
                         requestCount = count(), 
                         failureCount = count(success == false), 
-                        averageDuration = toint(avg(duration)) 
+                        averageDuration = toint(avg(duration)),
+                        sumResponseCount = sum(responseCount)
                         by 
                             method, 
                             endpoint,
@@ -93,7 +100,8 @@ namespace SOS.Lib.Services
                     UserId = ((JsonElement)r[3]).GetString(),
                     RequestCount = ((JsonElement)r[4]).GetInt64(),
                     FailureCount = ((JsonElement)r[5]).GetInt64(),
-                    AverageDuration = ((JsonElement)r[6]).GetInt64()
+                    AverageDuration = ((JsonElement)r[6]).GetInt64(),
+                    SumResponseCount = ((JsonElement)r[7]).GetInt32(),
                 });
         }
 
@@ -102,7 +110,8 @@ namespace SOS.Lib.Services
             var query = $@"requests 
                     | limit {top} 
                     | where 
-                        timestamp >= datetime('{from.ToString("yyyy-MM-dd HH:mm:00")}') 
+                        {Filter} 
+                        and timestamp >= datetime('{from.ToString("yyyy-MM-dd HH:mm:00")}') 
                         and timestamp < datetime('{to.ToString("yyyy-MM-dd HH:mm:00")}') 
                     | order by 
                         timestamp desc 
