@@ -796,9 +796,12 @@ namespace SOS.Lib.Extensions
             transformedGeometry.SRID = (int) toCoordinateSystem;
 
             // If we got this far and key is set, try add point to cache
-            if (!string.IsNullOrEmpty(key))
+            lock (_transformPointCache)
             {
-                _transformPointCache.TryAdd(key, transformedGeometry as Point);
+                if (!string.IsNullOrEmpty(key))
+                {
+                    _transformPointCache.TryAdd(key, transformedGeometry as Point);
+                }
             }
 
             return transformedGeometry;

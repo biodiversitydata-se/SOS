@@ -45,7 +45,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact (Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestNorsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
@@ -66,10 +66,10 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         /// <summary>
-        ///     Make a successful norss harvest
+        ///     Make a successful nors harvest
         /// </summary>
         /// <returns></returns>
-        [Fact]
+        [Fact(Skip = "too slow for being a unit test. Todo - move to integration test.")]
         public async Task HarvestNorsAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
