@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,18 +17,22 @@ namespace SOS.Observations.Api.Middleware
             var match  = Regex.Match(context.Request.Path.Value, @"([^\/]+)$");
             switch (match?.Value?.ToLower())
             {
+                case "cachedcount":
+                case "taxonexistsindication":
+                    return JsonDocument.Parse(responseBody).RootElement.EnumerateArray()
+                        .Sum(i => double.Parse(i.GetProperty("observationCount").ToString()));
                 case "count":
-                case "countinternal":
                     return responseBody;
                 case "search":
-                case "searchinternal":
-                case "searchaggregatedinternal":
+                case "searchscroll":
+                case "searchaggregated":
                 case "taxonaggregation":
-                case "taxonaggregationinternal":
-                    return JsonDocument.Parse(responseBody).RootElement.GetProperty("totalCount").ToString();
+                    return JsonDocument.Parse(responseBody).RootElement.GetProperty("records").GetArrayLength();
                 case "geogridaggregation":
-                case "geogridaggregationinternal":
+                case "metricgridaggregation":
                     return JsonDocument.Parse(responseBody).RootElement.GetProperty("gridCellCount").ToString();
+                case "geogridtaxaaggregation":
+                    return JsonDocument.Parse(responseBody).RootElement.GetProperty("gridCells").GetArrayLength();
             }
           
             return null;

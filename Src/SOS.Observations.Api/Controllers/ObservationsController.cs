@@ -179,7 +179,7 @@ namespace SOS.Observations.Api.Controllers
         /// <returns></returns>
         private Result ValidateBoundingBox(
             LatLonBoundingBoxDto boundingBox,
-            bool failOnNull = true)
+            bool failOnNull = false)
         {
             if (boundingBox == null)
             {
@@ -262,7 +262,7 @@ namespace SOS.Observations.Api.Controllers
 
             if (maxTilesTot > _tilesLimit)
             {
-                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using higher grid cell size or a smaller bounding box.");
+                return Result.Failure($"The number of cells that can be returned is too large. The limit is {_tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
             }
 
             return Result.Success();
@@ -548,7 +548,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox,false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
@@ -592,7 +592,7 @@ namespace SOS.Observations.Api.Controllers
                 
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter("sv-SE", sensitiveObservations);
@@ -674,7 +674,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
@@ -1039,7 +1039,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateSearchPagingArgumentsInternal(skip, take),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
@@ -1151,7 +1151,7 @@ namespace SOS.Observations.Api.Controllers
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1201,7 +1201,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1258,7 +1258,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure)
                 {
@@ -1645,7 +1645,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTaxonExists(filter),
                     ValidateGeographicalAreaExists(filter?.Geographics),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox,  false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure)
                 {
@@ -1741,7 +1741,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSignalSearch(filter, validateSearchFilter, areaBuffer) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure)
                 {
