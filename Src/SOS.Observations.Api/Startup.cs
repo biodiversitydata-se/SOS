@@ -357,9 +357,8 @@ namespace SOS.Observations.Api
                     name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
                     failureStatus: HealthStatus.Degraded,
                     tags: new[] { "disk" })
-                .AddMongoDb(processedDbConfiguration.GetConnectionString())
-                .AddHangfire(a => a
-                    .MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
+                .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new [] { "database", "mongodb" })
+                .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                 .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                 .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
                 .AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })

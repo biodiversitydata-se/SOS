@@ -848,9 +848,8 @@ namespace SOS.Lib.Repositories.Processed
 
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
-            if (filter is SearchFilterInternal)
+            if (filter is SearchFilterInternal internalFilter)
             {
-                var internalFilter = filter as SearchFilterInternal;
                 includeRealCount = internalFilter.IncludeRealCount;
             }
 
