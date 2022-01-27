@@ -132,6 +132,7 @@ namespace SOS.Observations.Api
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
                 });
 
             // MongoDB conventions.

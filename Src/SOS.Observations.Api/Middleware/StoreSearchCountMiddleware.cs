@@ -12,8 +12,29 @@ namespace SOS.Observations.Api.Middleware
     {
         private readonly RequestDelegate _next;
 
+        private int TryGetPagedResultCount(JsonElement root)
+        {
+            if (root.TryGetProperty("records", out var records))
+            {
+                return records.GetArrayLength();
+            }
+
+            if (root.TryGetProperty("geoJson", out var geoJsonString))
+            {
+                var geoJson = JsonDocument.Parse(geoJsonString.GetString()).RootElement;
+                return geoJson.GetProperty("features").GetArrayLength();
+            }
+
+            return 0;
+        }
+
         private object TryGetResponseCount(HttpContext context, string responseBody)
         {
+            if (string.IsNullOrEmpty(responseBody))
+            {
+                return null;
+            }
+
             var match  = Regex.Match(context.Request.Path.Value, @"([^\/]+)$");
             switch (match?.Value?.ToLower())
             {
@@ -27,9 +48,14 @@ namespace SOS.Observations.Api.Middleware
                 case "searchscroll":
                 case "searchaggregated":
                 case "taxonaggregation":
-                    return JsonDocument.Parse(responseBody).RootElement.GetProperty("records").GetArrayLength();
+                    return TryGetPagedResultCount(JsonDocument.Parse(responseBody).RootElement);
                 case "geogridaggregation":
                 case "metricgridaggregation":
+                    if (responseBody.Contains("FeatureCollection", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        return JsonDocument.Parse(responseBody).RootElement.GetProperty("features").GetArrayLength();
+                    }
+
                     return JsonDocument.Parse(responseBody).RootElement.GetProperty("gridCellCount").ToString();
                 case "geogridtaxaaggregation":
                     return JsonDocument.Parse(responseBody).RootElement.GetProperty("gridCells").GetArrayLength();

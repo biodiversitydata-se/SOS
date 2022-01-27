@@ -154,7 +154,6 @@ namespace SOS.Lib.JsonConverters
                 return;
             }
 
-            ;
             writer.WriteStartObject();
 
             var type = value.Type;

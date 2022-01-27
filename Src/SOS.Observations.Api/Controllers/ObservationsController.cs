@@ -725,7 +725,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMetricGridAggregationAsync(
+        public async Task<IActionResult> MetricGridAggregationAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
@@ -759,7 +759,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(result.Error);
                 }
 
-                var dto = result.Value.ToGeoGridMetricResult();
+                var dto = result.Value.ToDto();
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1379,6 +1379,71 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Aggregates observations into grid cells. Each grid cell contains the number
+        /// of observations and the number of unique taxa (usually species) in the grid cell.
+        /// The grid cells are squares in SWEREF 99 TM coordinate system 
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="gridCellSizeInMeters">Size of grid cell in meters</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/MetricGridAggregation")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> MetricGridAggregationInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] int gridCellSizeInMeters = 10000,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
+        {
+            try
+            {
+                var boundingBox = await GetBoundingBoxAsync(filter?.Geographics);
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
+                    ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
+                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
+                    ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilter("en-GB", sensitiveObservations);
+                searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
+
+                var result = await ObservationManager.GetMetricGridAggregationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier, searchFilter, gridCellSizeInMeters);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                var dto = result.Value.ToDto();
+                return new OkObjectResult(outputFormat == OutputFormatDto.Json ? dto : dto.ToGeoJson());
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Metric grid aggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -248,7 +249,7 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static GeoGridMetricResultDto ToGeoGridMetricResult(this GeoGridMetricResult geoGridMetricResult)
+        public static GeoGridMetricResultDto ToDto(this GeoGridMetricResult geoGridMetricResult)
         {
             return new GeoGridMetricResultDto
             {
@@ -258,6 +259,47 @@ namespace SOS.Observations.Api.Extensions
                 GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto()),
                 Sweref99TmBoundingBox = geoGridMetricResult.BoundingBox.ToXYBoundingBoxDto()
             };
+        }
+
+        public static FeatureCollection ToGeoJson(this GeoGridMetricResultDto geoGridMetricResult)
+        {
+            var featureCollection = new FeatureCollection
+            {
+                BoundingBox = new Envelope(
+                    geoGridMetricResult.BoundingBox.BottomRight.Longitude,
+                    geoGridMetricResult.BoundingBox.TopLeft.Longitude,
+                    geoGridMetricResult.BoundingBox.BottomRight.Latitude,
+                    geoGridMetricResult.BoundingBox.TopLeft.Latitude)
+            };
+
+            foreach (var gridCell in geoGridMetricResult.GridCells)
+            {
+                var feature = new Feature
+                {
+                    Attributes = new AttributesTable(new[]
+                    {
+                        new KeyValuePair<string, object>("gridCellSizeInMeters", geoGridMetricResult.GridCellSizeInMeters),
+                        new KeyValuePair<string, object>("observationsCount", gridCell.ObservationsCount),
+                        new KeyValuePair<string, object>("taxaCount", gridCell.TaxaCount)
+                    }),
+                    BoundingBox = new Envelope(
+                       gridCell.BoundingBox.BottomRight.Longitude,
+                       gridCell.BoundingBox.TopLeft.Longitude,
+                       gridCell.BoundingBox.BottomRight.Latitude,
+                       gridCell.BoundingBox.TopLeft.Latitude),
+                    Geometry = new LinearRing(new []
+                    {
+                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.BottomRight.Latitude),
+                        new Coordinate(gridCell.BoundingBox.BottomRight.Longitude, gridCell.BoundingBox.BottomRight.Latitude),
+                        new Coordinate(gridCell.BoundingBox.BottomRight.Longitude, gridCell.BoundingBox.TopLeft.Latitude),
+                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.TopLeft.Latitude),
+                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.BottomRight.Latitude)
+                    })
+                };
+                featureCollection.Add(feature);
+            }
+            
+            return featureCollection;
         }
 
         /// <summary>
