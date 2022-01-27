@@ -1252,10 +1252,10 @@ namespace SOS.Lib.Repositories.Processed
                 GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b => 
                     new GridCell
                     {
-                        BoundingBox = new LatLonBoundingBox
+                        Sweref99TmBoundingBox = new XYBoundingBox
                         {
-                            BottomRight = new LatLonCoordinate(double.Parse(b.Key["sweref99tm_y"].ToString()), double.Parse(b.Key["sweref99tm_x"].ToString()) + gridCellSizeInMeters),
-                            TopLeft = new LatLonCoordinate(double.Parse(b.Key["sweref99tm_y"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["sweref99tm_x"].ToString()))
+                            BottomRight = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()) + gridCellSizeInMeters, double.Parse(b.Key["sweref99tm_y"].ToString())),
+                            TopLeft = new XYCoordinate(double.Parse(b.Key["sweref99tm_x"].ToString()), double.Parse(b.Key["sweref99tm_y"].ToString()) + gridCellSizeInMeters)
                         },
                         ObservationsCount = b.DocCount,
                         TaxaCount = (long?)b.Cardinality("taxa_count").Value

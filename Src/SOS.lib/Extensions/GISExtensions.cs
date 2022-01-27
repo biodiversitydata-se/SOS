@@ -755,16 +755,18 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///     Transform coordinates
+        ///  Transform coordinates
         /// </summary>
         /// <param name="geometry"></param>
         /// <param name="fromCoordinateSystem"></param>
         /// <param name="toCoordinateSystem"></param>
+        /// <param name="usePointCache"></param>
         /// <returns></returns>
         public static Geometry Transform(
             this Geometry geometry,
             CoordinateSys fromCoordinateSystem,
-            CoordinateSys toCoordinateSystem)
+            CoordinateSys toCoordinateSystem,
+            bool usePointCache = true)
         {
             if (geometry == null)
             {
@@ -778,7 +780,7 @@ namespace SOS.Lib.Extensions
             }
 
             var key = string.Empty;
-            if (geometry is Point point)
+            if (usePointCache && geometry is Point point)
             {
                 key = $"{fromCoordinateSystem}:{toCoordinateSystem}:{point.Coordinate.X}:{point.Coordinate.Y}";
 
@@ -795,10 +797,10 @@ namespace SOS.Lib.Extensions
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int) toCoordinateSystem;
 
-            // If we got this far and key is set, try add point to cache
-            lock (_transformPointCache)
+            if (!string.IsNullOrEmpty(key))
             {
-                if (!string.IsNullOrEmpty(key))
+                // If we got this far and key is set, try add point to cache
+                lock (_transformPointCache)
                 {
                     _transformPointCache.TryAdd(key, transformedGeometry as Point);
                 }

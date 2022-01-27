@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -14,6 +15,7 @@ using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using static SOS.Lib.Models.UserService.UserInformation;
 using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Observations.Api.Extensions
 {
@@ -253,7 +255,8 @@ namespace SOS.Observations.Api.Extensions
                 BoundingBox = geoGridMetricResult.BoundingBox.ToLatLonBoundingBoxDto(),
                 GridCellCount = geoGridMetricResult.GridCellCount,
                 GridCellSizeInMeters = geoGridMetricResult.GridCellSizeInMeters,
-                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto())
+                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto()),
+                Sweref99TmBoundingBox = geoGridMetricResult.BoundingBox.ToXYBoundingBoxDto()
             };
         }
 
@@ -300,12 +303,70 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
+        public static LatLonBoundingBoxDto ToLatLonBoundingBoxDto(this XYBoundingBox xyBoundingBox)
+        {
+            return new LatLonBoundingBoxDto
+            {
+                TopLeft = xyBoundingBox.TopLeft.ToLatLonCoordinateDto(),
+                BottomRight = xyBoundingBox.BottomRight.ToLatLonCoordinateDto()
+            };
+        }
+
+        public static XYBoundingBoxDto ToXYBoundingBoxDto(this LatLonBoundingBox latLonBoundingBox)
+        {
+            return new XYBoundingBoxDto
+            {
+                TopLeft = latLonBoundingBox.TopLeft.ToXYCoordinateDto(),
+                BottomRight = latLonBoundingBox.BottomRight.ToXYCoordinateDto()
+            };
+        }
+
         public static LatLonCoordinateDto ToLatLonCoordinateDto(this LatLonCoordinate latLonCoordinate)
         {
             return new LatLonCoordinateDto
             {
                 Latitude = latLonCoordinate.Latitude,
                 Longitude = latLonCoordinate.Longitude
+            };
+        }
+
+        public static LatLonCoordinateDto ToLatLonCoordinateDto(this XYCoordinate xyCoordinate)
+        {
+            var point = new Point(xyCoordinate.X, xyCoordinate.Y).Transform(CoordinateSys.SWEREF99_TM,
+                CoordinateSys.WGS84, false) as Point;
+            return new LatLonCoordinateDto
+            {
+                Latitude = point.Y,
+                Longitude = point.X
+            };
+        }
+
+        public static XYCoordinateDto ToXYCoordinateDto(this LatLonCoordinate latLonCoordinate)
+        {
+            var point = new Point(latLonCoordinate.Longitude, latLonCoordinate.Latitude).Transform(CoordinateSys.WGS84,
+                CoordinateSys.SWEREF99_TM, false) as Point;
+            return new XYCoordinateDto
+            {
+                X = point.X,
+                Y = point.Y
+            };
+        }
+
+        public static XYBoundingBoxDto ToXYBoundingBoxDto(this XYBoundingBox xyBoundingBox)
+        {
+            return new XYBoundingBoxDto
+            {
+                BottomRight = xyBoundingBox.BottomRight.ToXYCoordinateDto(),
+                TopLeft = xyBoundingBox.TopLeft.ToXYCoordinateDto()
+            };
+        }
+
+        public static XYCoordinateDto ToXYCoordinateDto(this XYCoordinate xyCoordinate)
+        {
+            return new XYCoordinateDto
+            {
+                X = xyCoordinate.X,
+                Y = xyCoordinate.Y
             };
         }
 
@@ -326,8 +387,9 @@ namespace SOS.Observations.Api.Extensions
         {
             return new GridCellDto
             {
-                BoundingBox = gridCell.BoundingBox.ToLatLonBoundingBoxDto(),
+                BoundingBox = gridCell.Sweref99TmBoundingBox.ToLatLonBoundingBoxDto(),
                 ObservationsCount = gridCell.ObservationsCount,
+                Sweref99TmBoundingBox = gridCell.Sweref99TmBoundingBox.ToXYBoundingBoxDto(),
                 TaxaCount = gridCell.TaxaCount
             };
         }

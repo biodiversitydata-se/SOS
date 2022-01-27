@@ -95,12 +95,15 @@ namespace SOS.Import.Harvesters.Observations
                     var distinctVerbatims = new List<VirtualHerbariumObservationVerbatim>();
                     foreach (var verbatim in verbatims)
                     {
-                        string occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
-                        if (!occurrenceIdsSet.Contains(occurrenceId))
+                        var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
+                        if (occurrenceIdsSet.Contains(occurrenceId))
                         {
-                            occurrenceIdsSet.Add(occurrenceId);
-                            distinctVerbatims.Add(verbatim);
+                           _logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
+                            continue;
                         }
+
+                        occurrenceIdsSet.Add(occurrenceId);
+                        distinctVerbatims.Add(verbatim);
                     }
 
                     // Add sightings to MongoDb

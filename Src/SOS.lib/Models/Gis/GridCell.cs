@@ -18,6 +18,6 @@
         /// <summary>
         /// Cell coordinates
         /// </summary>
-        public LatLonBoundingBox BoundingBox { get; set; }
+        public XYBoundingBox Sweref99TmBoundingBox { get; set; }
     }
 }
