@@ -209,7 +209,17 @@ namespace SOS.Observations.Api.Controllers
         {
             var errors = new List<string>();
 
-            if (skip < 0 || take <= 0 || take > MaxBatchSize)
+            if (skip < 0)
+            {
+                errors.Add("Skip must be positive.");
+            }
+
+            if (take <= 0)
+            {
+                errors.Add("You must take at least 1 observation.");
+            }
+
+            if (take > MaxBatchSize)
             {
                 errors.Add($"You can't take more than {MaxBatchSize} at a time.");
             }

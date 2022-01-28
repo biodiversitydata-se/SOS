@@ -68,7 +68,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId 
                     LEFT JOIN StatusValidationRule svr ON svr.Id = tvr.StatusValidationRuleId ";
             
-            if (DataService.Configuration.UseTriggeredObservationRule)
+            if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
             {
                 triggerRuleSelect = @"tor.FrequencyId,
                 tor.ReproductionId";
