@@ -52,5 +52,10 @@ namespace SOS.Lib.Configuration.Import
         /// Time to sleep after a batch has run (ms) 
         /// </summary>
         public int SleepAfterBatch { get; set; }
+
+        /// <summary>
+        /// Use triggered observation rule if set
+        /// </summary>
+        public bool UseTriggeredObservationRule { get; set; }
     }
 }

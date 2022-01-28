@@ -14,7 +14,6 @@ using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos.Vocabulary;
-using static SOS.Lib.Models.UserService.UserInformation;
 using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
@@ -168,6 +167,10 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.PublishTypeIdsFilter = searchFilterInternalDto.ExtendedFilter.PublishTypeIdsFilter;
                 internalFilter.RegionalSightingStateIdsFilter =
                     searchFilterInternalDto.ExtendedFilter.RegionalSightingStateIdsFilter;
+                internalFilter.TriggeredObservationRuleFrequencyIds =
+                    searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleFrequencyIds;
+                internalFilter.TriggeredObservationRuleReproductionIds =
+                    searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleReproductionIds;
                 internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
                 internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds?.ToList();
@@ -175,7 +178,6 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
                 internalFilter.Location.NameFilter = searchFilterInternalDto.ExtendedFilter.LocationNameFilter;
             }
-
         }
 
         private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)

@@ -132,6 +132,10 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public IEnumerable<int> RegionalSightingStateIdsFilter { get; set; }
 
+        public IEnumerable<int> TriggeredObservationRuleFrequencyIds { get; set; }
+
+        public IEnumerable<int> TriggeredObservationRuleReproductionIds { get; set; }
+
         public IEnumerable<int> SiteIds { get; set; }
 
         public IEnumerable<int> SpeciesFactsIds { get; set; }

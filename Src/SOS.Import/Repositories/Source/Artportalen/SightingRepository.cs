@@ -64,6 +64,17 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 topCount = $"TOP {top}";
             }
 
+            var triggerRuleSelect = "svr.RegionalSightingStateId";
+            var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId 
+                    LEFT JOIN StatusValidationRule svr ON svr.Id = tvr.StatusValidationRuleId ";
+            
+            if (DataService.Configuration.UseTriggeredObservationRule)
+            {
+                triggerRuleSelect = @"tor.FrequencyId,
+                tor.ReproductionId";
+                triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = s.SightingId";
+            }
+
             var query = $@"
                 SELECT DISTINCT {topCount} 
                     s.ActivityId,
@@ -134,7 +145,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srDeterminer.DeterminationYear AS DeterminationYear,
 	                srConfirmator.UserId AS ConfirmatorUserId,
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
-	                svr.RegionalSightingStateId as RegionalSightingStateId,
+	                {triggerRuleSelect},
                     (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) AS SightingPublishTypeIds,
                     (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds,
                     sdc.DatasourceId
@@ -153,8 +164,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
-                    LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId
-                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId 
+                    {triggerRuleFrom}
                     LEFT JOIN SightingDatasource sdc ON s.SightingId = sdc.SightingId
                 WHERE
 	                {SightingWhereBasics}

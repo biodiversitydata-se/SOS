@@ -32,16 +32,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? DeterminationYear { get; set; }
 
         /// <summary>
-        ///     Ids of Species Facts connected to Taxon
-        /// </summary>
-        public IEnumerable<int> SpeciesFactsIds { get; set; }
-
-        /// <summary>
-        ///     Id of SightingSpeciesCollectionItem in Artportalen.
-        /// </summary>
-        public int? SightingSpeciesCollectionItemId { get; set; }
-
-        /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
         [Obsolete("Replaced by HasTriggeredVerificationRules")]
@@ -64,6 +54,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool HasAnyTriggeredVerificationRuleWithWarning { get; set; }
 
         /// <summary>
+        ///     HasUserComments
+        /// </summary>
+        public bool HasUserComments { get; set; }
+
+        /// <summary>
         ///     ExternalId of Site in Artportalen.
         /// </summary>
         public string LocationExternalId { get; set; }
@@ -74,14 +69,14 @@ namespace SOS.Lib.Models.Processed.Observation
         public bool NoteOfInterest { get; set; }
 
         /// <summary>
-        ///     HasUserComments
-        /// </summary>
-        public bool HasUserComments { get; set; }
-
-        /// <summary>
         /// Sighting Id.
         /// </summary>
         public int SightingId { get; set; }
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem in Artportalen.
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
         ///     Sighting type.
@@ -94,6 +89,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int SightingTypeSearchGroupId { get; set; }
 
         /// <summary>
+        ///     Ids of Species Facts connected to Taxon
+        /// </summary>
+        public IEnumerable<int> SpeciesFactsIds { get; set; }
+
+        /// <summary>
         /// Species group id.
         /// </summary>
         public int? SpeciesGroupId { get; set; }
@@ -101,6 +101,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Id of sightings RegionalSightingState
         /// </summary>
+        [Obsolete("This is too be deleted")]
         public int? RegionalSightingStateId { get; set; }
 
         /// <summary>
@@ -168,5 +169,15 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Second hand information flag
         /// </summary>
         public bool SecondHandInformation { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule frequency id
+        /// </summary>
+        public int? TriggeredObservationRuleFrequencyId { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule reproduction id
+        /// </summary>
+        public int? TriggeredObservationRuleReproductionId { get; set; }
     }
 }

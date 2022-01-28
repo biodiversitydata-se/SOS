@@ -310,6 +310,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SecondHandInformation =
                     (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
                     (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false);
+                obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.FrequencyId;
+                obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.ReproductionId;
 
                 // Set dependent properties
                 var biotope = obs.Occurrence.Biotope?.Value;

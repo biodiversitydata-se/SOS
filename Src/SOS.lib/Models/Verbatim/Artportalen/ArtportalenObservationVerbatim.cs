@@ -66,6 +66,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public TimeSpan? EndTime { get; set; }
 
         /// <summary>
+        /// Triggered observation rule frequency id
+        /// </summary>
+        public int? FrequencyId { get; set; }
+
+        /// <summary>
         ///     Taxon gender id
         /// </summary>
         public Metadata Gender { get; set; }
@@ -180,6 +185,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Quality of substrate
         /// </summary>
         public int? QuantityOfSubstrate { get; set; }
+
+        /// <summary>
+        /// Triggered observation rule reproduction id
+        /// </summary>
+        public int? ReproductionId { get; set; }
 
         /// <summary>
         ///     Date sighting was added
@@ -308,6 +318,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int SightingTypeSearchGroupId { get; set; }
         public int SightingTypeId { get; set; }
 
+        [Obsolete("This is too be deleted")]
         public int? RegionalSightingStateId { get; set; }
         public IEnumerable<int> SightingPublishTypeIds { get; set; }
 

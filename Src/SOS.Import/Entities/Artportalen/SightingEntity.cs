@@ -291,8 +291,13 @@ namespace SOS.Import.Entities.Artportalen
         public int? ConfirmatorUserId { get; set; }
 
         public int? ConfirmationYear { get; set; }
-        
+
+        [Obsolete("This is too be deleted")]
         public int? RegionalSightingStateId { get; set; }
+
+        public int? FrequencyId { get; set; }
+
+        public int? ReproductionId { get; set; }
 
         public string SightingPublishTypeIds { get; set; }
 

@@ -262,8 +262,10 @@ namespace SOS.Lib.Extensions
             if (internalFilter.OnlySecondHandInformation)
             {
                 query.TryAddTermCriteria("artportalenInternal.secondHandInformation", true);
-            }            
+            }
             query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
+            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
+            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
             query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
 
             //search by locationId, but include child-locations observations aswell

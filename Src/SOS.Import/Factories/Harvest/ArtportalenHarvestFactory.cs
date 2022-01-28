@@ -88,11 +88,12 @@ namespace SOS.Import.Factories.Harvest
                 observation.EditDate = entity.EditDate;
                 observation.EndDate = entity.EndDate;
                 observation.EndTime = entity.EndTime;
+                observation.FirstImageId = entity.FirstImageId;
+                observation.FrequencyId = entity.FrequencyId;
                 observation.Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
                     ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
                     : null;
                 observation.HasImages = entity.HasImages;
-                observation.FirstImageId = entity.FirstImageId;
                 observation.HasTriggeredValidationRules = entity.HasTriggeredValidationRules;
                 observation.HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning;
                 observation.HiddenByProvider = entity.HiddenByProvider;
@@ -118,6 +119,7 @@ namespace SOS.Import.Factories.Harvest
                 observation.Quantity = entity.Quantity;
                 observation.QuantityOfSubstrate = entity.QuantityOfSubstrate;
                 observation.ReportedDate = entity.RegisterDate;
+                observation.ReproductionId = entity.ReproductionId;
                 observation.RightsHolder = entity.RightsHolder;
                 observation.Site = site;
                 observation.SpeciesGroupId = speciesGroupId;
