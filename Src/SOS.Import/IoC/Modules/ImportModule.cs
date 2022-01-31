@@ -38,6 +38,8 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using ITaxonRepository = SOS.Lib.Repositories.Resource.Interfaces.ITaxonRepository;
+using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 
 namespace SOS.Import.IoC.Modules
 {
@@ -196,7 +198,8 @@ namespace SOS.Import.IoC.Modules
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories resource
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();            
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
 
             // Add harvesters observations
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
