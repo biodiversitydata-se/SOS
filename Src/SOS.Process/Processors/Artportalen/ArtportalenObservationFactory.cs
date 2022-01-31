@@ -90,7 +90,6 @@ namespace SOS.Process.Processors.Artportalen
             string artPortalenUrl) : base(taxa) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            //_taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
@@ -160,8 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Language = Language.Swedish;
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
-                obs.PrivateCollection = verbatimObservation.PrivateCollection;
-                //obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
+                obs.PrivateCollection = verbatimObservation.PrivateCollection;                
                 obs.Projects = verbatimObservation.Projects?.Select(ArtportalenFactoryHelper.CreateProcessedProject);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";

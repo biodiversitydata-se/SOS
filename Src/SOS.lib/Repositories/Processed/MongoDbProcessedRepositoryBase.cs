@@ -13,7 +13,7 @@ using SOS.Lib.Helpers;
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
-    ///     Base class for cosmos db repositories
+    ///     Base class MongoDB repositories
     /// </summary>
     public class MongoDbProcessedRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
@@ -32,7 +32,22 @@ namespace SOS.Lib.Repositories.Processed
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(IndexName);
         private string IndexName => IndexHelper.GetIndexName<TEntity>();
 
-
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="toggleable"></param>
+        /// <param name="logger"></param>
+        public MongoDbProcessedRepositoryBase(
+            IProcessClient client,
+            bool toggleable,
+            ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> logger
+        )
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Database = _client.GetDatabase();
+        }
         private async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection, byte attempt)
         {
             try
@@ -134,36 +149,7 @@ namespace SOS.Lib.Repositories.Processed
         protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
         {
             return await AddBatchAsync(batch, 1);
-        }
-
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="toggleable"></param>
-        /// <param name="logger"></param>
-        public MongoDbProcessedRepositoryBase(
-            IProcessClient client,
-            bool toggleable,
-            ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> logger
-        )
-        {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Database = _client.GetDatabase();
-        }
-
-        ///// <inheritdoc />
-        //public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
-
-        ///// <inheritdoc />
-        //public string CurrentInstanceName => GetInstanceName(CurrentInstance, Protected);
-
-        ///// <inheritdoc />
-        //public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
-
-        ///// <inheritdoc />
-        //public bool Protected { get; set; }
+        }        
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
