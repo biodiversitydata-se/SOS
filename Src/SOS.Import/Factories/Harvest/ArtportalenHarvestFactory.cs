@@ -17,17 +17,14 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    internal class ArtportalenHarvestFactory : HarvestBaseFactory, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
+    internal class ArtportalenHarvestFactory : ArtportalenHarvestFactoryBase, IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private readonly IMediaRepository _mediaRepository;
         private readonly IProjectRepository _projectRepository;
-        private readonly ISightingRepository _sightingRepository;
-        private readonly ISiteRepository _siteRepository;
+        private readonly ISightingRepository _sightingRepository;        
         private readonly ISightingRelationRepository _sightingRelationRepository;
-        private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-        private readonly IAreaHelper _areaHelper;
-        private readonly ConcurrentDictionary<int, Site> _sites;
+        private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;        
         private readonly ILogger<ArtportalenObservationHarvester> _logger;
 
         /// <summary>
@@ -53,12 +50,12 @@ namespace SOS.Import.Factories.Harvest
                 }
 
                 sightingId = entity.Id;
-                if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
+                if (Sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
                 {
                     // Try to set parent site name if empty
                     if (site?.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
                     {
-                        if (_sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
+                        if (Sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
                         {
                             site.ParentSiteName = parentSite.Name;
                         }
@@ -139,7 +136,7 @@ namespace SOS.Import.Factories.Harvest
                     : null;
                 observation.Unspontaneous = entity.Unspontaneous;
                 observation.UnsureDetermination = entity.UnsureDetermination;
-                observation.URL = entity.URL;
+                observation.SightingBarcodeURL = entity.SightingBarcodeURL;
                 observation.ValidationStatus = _artportalenMetadataContainer.ValidationStatus.ContainsKey(entity.ValidationStatusId)
                     ? _artportalenMetadataContainer.ValidationStatus[entity.ValidationStatusId]
                     : null;
@@ -212,7 +209,7 @@ namespace SOS.Import.Factories.Harvest
 
         #region Media
 
-        private Media CastMediaEntityToVerbatim(MediaEntity entity)
+        private async Task<Media> CastMediaEntityToVerbatimAsync(MediaEntity entity)
         {
             if (entity == null)
             {
@@ -239,21 +236,16 @@ namespace SOS.Import.Factories.Harvest
                 return sightingsMedias;
             }
 
-            var sightingMediaEntities = (await _mediaRepository.GetAsync(sightingIds, live))?.ToArray();
+            var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds, live);
 
-            if (!sightingMediaEntities?.Any() ?? true)
+            if (sightingMediaEntities == null)
             {
                 return sightingsMedias;
             }
 
             foreach (var sightingMediaEntity in sightingMediaEntities)
             {
-                var media = CastMediaEntityToVerbatim(sightingMediaEntity);
-
-                if (media == null)
-                {
-                    continue;
-                }
+                var media = await CastMediaEntityToVerbatimAsync(sightingMediaEntity);
 
                 if (!sightingsMedias.TryGetValue(sightingMediaEntity.SightingId, out var sightingMedia))
                 {
@@ -385,153 +377,7 @@ namespace SOS.Import.Factories.Harvest
 
             return sightingsProjects.Any() ? sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray()) : null;
         }
-        #endregion Project
-
-        #region Site
-        /// <summary>
-        /// Try to add missing sites from live data
-        /// </summary>
-        /// <param name="siteIds"></param>
-        /// <returns></returns>
-        private async Task AddMissingSitesAsync(IEnumerable<int> siteIds)
-        {
-            if (!siteIds?.Any() ?? true)
-            {
-                return;
-            }
-
-            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
-            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
-
-            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
-
-            if (sites?.Any() ?? false)
-            {
-                foreach (var site in sites)
-                {
-                    _sites.TryAdd(site.Id, site);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
-        ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
-        /// </summary>
-        /// <param name="siteEntities"></param>
-        /// <param name="sitesAreas"></param>
-        /// <param name="sitesGeometry"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<Site>> CastSiteEntitiesToVerbatimAsync(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<AreaEntityBase>> sitesAreas, IDictionary<int, string> sitesGeometry)
-        {
-            var sites = new List<Site>();
-
-            if (!siteEntities?.Any() ?? true)
-            {
-                return sites;
-            }
-
-            // Make sure metadata are initialized
-            sitesAreas ??= new Dictionary<int, ICollection<AreaEntityBase>>();
-            sitesGeometry ??= new Dictionary<int, string>();
-
-            foreach (var siteEntity in siteEntities)
-            {
-                sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
-                sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
-
-                var site = await CastSiteEntityToVerbatimAsync(siteEntity, siteAreas, geometryWkt);
-
-                if (site != null)
-                {
-                    sites.Add(site);
-                }
-            }
-          
-            return sites;
-        }
-
-        /// <summary>
-        /// Cast site itemEntity to aggregate
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="areas"></param>
-        /// <param name="geometryWkt"></param>
-        /// <returns></returns>
-        private async Task<Site> CastSiteEntityToVerbatimAsync(SiteEntity entity, ICollection<AreaEntityBase> areas, string geometryWkt)
-        {
-            if (entity == null)
-            {
-                return null;
-            }
-
-            Point wgs84Point = null;
-            const int defaultAccuracy = 100;
-
-            if (entity.XCoord > 0 && entity.YCoord > 0)
-            {
-                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
-                // doing it here we only have to convert the point once
-                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            }
-
-            Geometry siteGeometry = null;
-            if (!string.IsNullOrEmpty(geometryWkt))
-            {
-                siteGeometry = geometryWkt.ToGeometry()
-                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).TryMakeValid();
-            }
-
-            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
-            var site = new Site
-            {
-                Accuracy = accuracy,
-                ExternalId = entity.ExternalId,
-                Id = entity.Id,
-                PresentationNameParishRegion = entity.PresentationNameParishRegion,
-                Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
-                Name = entity.Name,
-                XCoord = entity.XCoord,
-                YCoord = entity.YCoord,
-                VerbatimCoordinateSystem = CoordinateSys.WebMercator,
-                ParentSiteId = entity.ParentSiteId
-            };
-
-            if (!areas?.Any() ?? true)
-            {
-                return site;
-            }
-
-            foreach (var area in areas)
-            {
-                switch ((AreaType)area.AreaDatasetId)
-                {
-                    case AreaType.BirdValidationArea:
-                        (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
-                        break;
-                    case AreaType.County:
-                        site.County = new GeographicalArea{FeatureId = area.FeatureId, Name = area.Name};
-                        break;
-                    case AreaType.Municipality:
-                        site.Municipality = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case AreaType.Parish:
-                        site.Parish = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case AreaType.Province:
-                        site.Province = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                }
-            }
-
-            _areaHelper.AddAreaDataToSite(site);
-
-            return site;
-        }
-        #endregion Site
+        #endregion Project        
 
         #region SightingRelations
         /// <summary>
@@ -550,6 +396,7 @@ namespace SOS.Import.Factories.Harvest
                    select new SightingRelation
                    {
                        DeterminationYear = e.DeterminationYear,
+                       Discover = e.Discover,
                        EditDate = e.EditDate,
                        Id = e.Id,
                        IsPublic = e.IsPublic,
@@ -619,18 +466,15 @@ namespace SOS.Import.Factories.Harvest
             ISpeciesCollectionItemRepository speciesCollectionRepository,
             IArtportalenMetadataContainer artportalenMetadataContainer,
             IAreaHelper areaHelper,
-            ILogger<ArtportalenObservationHarvester> logger) : base()
+            ILogger<ArtportalenObservationHarvester> logger) : base(siteRepository, areaHelper)
         {
             _mediaRepository = mediaRepository ?? throw new ArgumentNullException(nameof(mediaRepository));
             _projectRepository = projectRepository;
             _sightingRepository = sightingRepository;
-            _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
             _speciesCollectionRepository = speciesCollectionRepository;
             _artportalenMetadataContainer = artportalenMetadataContainer;
-            _areaHelper = areaHelper;
             _logger = logger;
-            _sites = new ConcurrentDictionary<int, Site>();
         }
 
         public bool IncrementalMode { get; set; }
@@ -653,7 +497,7 @@ namespace SOS.Import.Factories.Harvest
                 var siteId = entity.SiteId ?? 0;
 
                 // Check for new sites since we already lopping the array 
-                if (siteId == 0 || newSiteIds.Contains(siteId) || _sites.ContainsKey(siteId))
+                if (siteId == 0 || newSiteIds.Contains(siteId) || Sites.ContainsKey(siteId))
                 {
                     continue;
                 }
@@ -682,14 +526,7 @@ namespace SOS.Import.Factories.Harvest
             var verbatims = new HashSet<ArtportalenObservationVerbatim>();
             for (var i = 0; i < entities.Length; i++)
             {
-                var verbatim = CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias);
-
-                if (verbatim == null)
-                {
-                    continue;
-                }
-
-                verbatims.Add(verbatim);
+                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects, sightingsMedias));
             }
 
             return verbatims;

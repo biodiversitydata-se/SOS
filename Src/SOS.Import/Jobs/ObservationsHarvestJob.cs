@@ -92,7 +92,7 @@ namespace SOS.Import.Jobs
             if (processOnSuccess)
             {
                 // If harvest was successful, go on with enqueuing processing job to Hangfire
-                var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
+                var jobId = BackgroundJob.Enqueue<IProcessObservationsJob>(job => job.RunAsync(
                     processProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
                     mode,
                     cancellationToken));

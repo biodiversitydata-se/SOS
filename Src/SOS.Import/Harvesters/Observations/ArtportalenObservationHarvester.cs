@@ -18,7 +18,6 @@ using SOS.Import.Containers.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using ITaxonRepository = SOS.Import.Repositories.Source.Artportalen.Interfaces.ITaxonRepository;
 
 namespace SOS.Import.Harvesters.Observations
 {

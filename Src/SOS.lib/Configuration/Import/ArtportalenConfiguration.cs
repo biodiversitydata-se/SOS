@@ -26,11 +26,25 @@ namespace SOS.Lib.Configuration.Import
         public int ChunkSize { get; set; } = 1000000;
 
         /// <summary>
+        ///     The number of check lists that will be fetched in each loop.
+        /// </summary>
+        public int ChunkSizeCheckLists { get; set; } = 100;
+
+        /// <summary>
         ///     The number of sightings that should be harvested.
         ///     If set to null all sightings will be fetched.
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
 
+        /// <summary>
+        ///     The number of check lists that should be harvested.
+        ///     If set to null all check lists will be fetched.
+        /// </summary>
+        public int? MaxNumberOfCheckListsHarvested { get; set; } = null;
+
+        /// <summary>
+        /// No of threads to run
+        /// </summary>
         public int NoOfThreads { get; set; } = 2;
 
         /// <summary>

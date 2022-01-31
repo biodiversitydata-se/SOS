@@ -35,7 +35,7 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="cancellationToken"></param>
         /// <returns>True if any records is written to the file; otherwise false.</returns>
         public async Task<bool> CreateCsvFileAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,

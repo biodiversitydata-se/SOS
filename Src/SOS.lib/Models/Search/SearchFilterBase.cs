@@ -9,12 +9,12 @@ namespace SOS.Lib.Models.Search
     /// <summary>
     ///     Base filter class
     /// </summary>
-    public class FilterBase
+    public class SearchFilterBase
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public FilterBase()
+        public SearchFilterBase()
         {
             ExtendedAuthorization = new ExtendedAuthorizationFilter();
             Location = new LocationFilter();
@@ -91,6 +91,11 @@ namespace SOS.Lib.Models.Search
         ///     Only get data from these providers
         /// </summary>
         public List<int> DataProviderIds { get; set; }
+
+        /// <summary>
+        ///     Which type of date filtering that should be used
+        /// </summary>
+        public DateFilter Date { get; set; }
 
         /// <summary>
         ///     Which type of date filtering that should be used
@@ -188,9 +193,9 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public int? BirdNestActivityLimit { get; set; }
 
-        public FilterBase Clone()
+        public SearchFilterBase Clone()
         {
-            var searchFilter = (FilterBase) MemberwiseClone();
+            var searchFilter = (SearchFilterBase) MemberwiseClone();
             return searchFilter;
         }
 

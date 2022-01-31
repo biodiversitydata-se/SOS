@@ -8,17 +8,17 @@ namespace SOS.Lib.Helpers.Interfaces
     public interface IAreaHelper
     {
         /// <summary>
-        ///     Add area data to processed observation models
+        ///     Add area data to processed location model
         /// </summary>
-        /// <param name="processedObservations"></param>
-        /// <returns></returns>
-        void AddAreaDataToProcessedObservations(IEnumerable<Observation> processedObservations);
+        /// <param name="processedLocation"></param>
+        void AddAreaDataToProcessedLocation(Location processedLocation);
 
         /// <summary>
-        ///     Add area data to processed observation model
+        ///     Add area data to processed observation models
         /// </summary>
-        /// <param name="processedObservation"></param>
-        void AddAreaDataToProcessedObservation(Observation processedObservation);
+        /// <param name="processedLocations"></param>
+        /// <returns></returns>
+        void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations);
 
         /// <summary>
         /// Add area data to site

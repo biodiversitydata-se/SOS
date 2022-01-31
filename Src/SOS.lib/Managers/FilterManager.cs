@@ -100,9 +100,9 @@ namespace SOS.Lib.Managers
                     }
                     extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                 }
-                
-                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null);
-                
+
+                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null)?.ToList();
+
                 extendedAuthorizationAreaFilters.Add(extendedAuthorizationAreaFilter);
             }
 
@@ -126,7 +126,7 @@ namespace SOS.Lib.Managers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private void PopulateTaxonFilter(TaxonFilter filter)
+        public void PrepareTaxonFilter(TaxonFilter filter)
         {
             if (filter == null)
             {
@@ -135,7 +135,7 @@ namespace SOS.Lib.Managers
 
             filter.Ids = GetTaxonIds(filter.Ids, filter.IncludeUnderlyingTaxa, filter.ListIds,
                 filter.TaxonListOperator);
-        }
+        }       
 
         private List<int> GetTaxonIds(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge)
         {
@@ -294,7 +294,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(int? roleId, string authorizationApplicationIdentifier, FilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilter(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -326,7 +326,7 @@ namespace SOS.Lib.Managers
                 filter.Location.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Location.Areas, areaBuffer ?? 0, filter.Location.Geometries?.UsePointAccuracy ?? false, filter.Location.Geometries?.UseDisturbanceRadius ?? false);
             }
             
-            PopulateTaxonFilter(filter.Taxa);
-        }
+            PrepareTaxonFilter(filter.Taxa);
+        }        
     }
 }

@@ -72,10 +72,5 @@ namespace SOS.Process.Jobs
 
             return processInfos;
         }
-
-        protected async Task<ProcessInfo> GetObservationProcessInfoAsync(bool active)
-        {
-            return await _processInfoRepository.GetProcessInfoAsync(active);
-        }
     }
 }

@@ -45,7 +45,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
             vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation> {processedObservation});
             var compareResult = new CompareObservation
             {

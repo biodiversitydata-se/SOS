@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Harvesters.CheckLists.Interfaces;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -16,24 +17,29 @@ namespace SOS.Import.Jobs
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IDwcObservationHarvester _dwcObservationHarvester;
+        private readonly IDwcCheckListHarvester _dwcCheckListHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<DwcArchiveHarvestJob> _logger;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dwcObservationHarvester"></param>
+        /// <param name="dwcCheckListHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public DwcArchiveHarvestJob(
             IDwcObservationHarvester dwcObservationHarvester,
+            IDwcCheckListHarvester dwcCheckListHarvester,
             IHarvestInfoRepository harvestInfoRepository,
             IDataProviderManager dataProviderManager,
             ILogger<DwcArchiveHarvestJob> logger)
         {
             _dwcObservationHarvester = dwcObservationHarvester ??
                                        throw new ArgumentNullException(nameof(dwcObservationHarvester));
+            _dwcCheckListHarvester =
+                dwcCheckListHarvester ?? throw new ArgumentNullException(nameof(dwcCheckListHarvester));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
@@ -41,10 +47,11 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest observations from a DwC-A file")]
+        [DisplayName("Harvest from a DwC-A file")]
         public async Task<bool> RunAsync(
             int dataProviderId,
             string archivePath,
+            DwcaTarget target,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -71,25 +78,28 @@ namespace SOS.Import.Jobs
                 }
                 _logger.LogInformation($"DwC-A file is ready to be opened: {archivePath}");
 
-                var harvestInfoResult =
+                var harvestInfoResult = target.Equals(DwcaTarget.Checklist) ?
+                    await _dwcCheckListHarvester.HarvestCheckListsAsync(archivePath, dataProvider, cancellationToken) :
                     await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
 
                 try
                 {
-                    var emlDocument = _dwcObservationHarvester.GetEmlXmlDocument(archivePath);
+                    var emlDocument = target.Equals(DwcaTarget.Checklist) ?
+                        _dwcCheckListHarvester.GetEmlXmlDocument(archivePath) :
+                        _dwcObservationHarvester.GetEmlXmlDocument(archivePath);
                     await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, emlDocument);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e, $"Error when writing EML file for {dataProvider}");
                 }
-                
+
                 _logger.LogInformation($"End DwC-A Harvest Job. Status: {harvestInfoResult.Status}");
 
                 // Save harvest info
                 await _harvestInfoRepository
                     .AddOrUpdateAsync(
-                        harvestInfoResult); 
+                        harvestInfoResult);
 
                 return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
                     ? true

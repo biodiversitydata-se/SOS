@@ -12,10 +12,9 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     {
         /// <summary>
         ///     Run process job
-        /// </summary>
-        /// <param name="copyFromActiveOnFail"></param>
+        /// </summary>        
         /// <returns></returns>
-        Task<IActionResult> RunProcessJob(bool copyFromActiveOnFail);
+        Task<IActionResult> RunProcessJob();
 
         /// <summary>
         /// Run process job for selected data providers
@@ -31,5 +30,18 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunProcessTaxaJob();
+
+        /// <summary>
+        /// Run taxon area aggregation job
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunProcessTaxonAreaAggregationJob();
+
+        /// <summary>
+        /// Schedule taxon area aggregation job
+        /// </summary>
+        /// <param name="runIntervalInMinutes"></param>
+        /// <returns></returns>
+        IActionResult ScheduleProcessTaxonAreaAggregationJob(byte runIntervalInHours);
     }
 }

@@ -34,12 +34,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18,8,13,26), DateTimeKind.Utc));
+            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18, 8, 13, 26), DateTimeKind.Utc));
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -85,7 +85,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

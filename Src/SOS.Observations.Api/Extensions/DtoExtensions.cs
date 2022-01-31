@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -33,7 +34,7 @@ namespace SOS.Observations.Api.Extensions
             }
         }
 
-        private static FilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode, bool sensitiveObservations)
+        private static SearchFilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, string translationCultureCode, bool sensitiveObservations)
         {
             if (searchFilterBaseDto == null) return default;
 
@@ -43,12 +44,12 @@ namespace SOS.Observations.Api.Extensions
 
             filter.StartDate = searchFilterBaseDto.Date?.StartDate;
             filter.EndDate = searchFilterBaseDto.Date?.EndDate;
-            filter.DateFilterType = (FilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
-            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (FilterBase.TimeRange)tr).ToList();
+            filter.DateFilterType = (SearchFilterBase.DateRangeFilterType)(searchFilterBaseDto.Date?.DateFilterType).GetValueOrDefault();
+            filter.TimeRanges = searchFilterBaseDto.Date?.TimeRanges?.Select(tr => (SearchFilterBase.TimeRange)tr).ToList();
             filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids;
             filter.FieldTranslationCultureCode = translationCultureCode;
             filter.NotRecoveredFilter = (SightingNotRecoveredFilter)searchFilterBaseDto.NotRecoveredFilter;
-            filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (FilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (FilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
+            filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
             filter.ProjectIds = searchFilterBaseDto.ProjectIds;
             filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
             filter.Location.Areas = searchFilterBaseDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList();
@@ -166,13 +167,61 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.RegionalSightingStateIdsFilter =
                     searchFilterInternalDto.ExtendedFilter.RegionalSightingStateIdsFilter;
                 internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
-                internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
-                internalFilter.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds?.ToList();
+                internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;                
                 internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
-                internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
-                internalFilter.Location.NameFilter = searchFilterInternalDto.ExtendedFilter.LocationNameFilter;
+                internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;                
+
+                if (searchFilterInternalDto?.ExtendedFilter?.LocationNameFilter != null)
+                {
+                    if (internalFilter.Location == null) internalFilter.Location = new LocationFilter();
+                    internalFilter.Location.NameFilter = searchFilterInternalDto.ExtendedFilter.LocationNameFilter;
+                }
+
+                if (searchFilterInternalDto.ExtendedFilter.SexIds?.Any() ?? false)
+                {
+                    internalFilter.Taxa ??= new TaxonFilter();
+                    internalFilter.Taxa.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
+                }
+            }
+        }
+        private static DateFilter PopulateDateFilter(DateFilterDto filter)
+        {
+            if (filter == null)
+            {
+                return null;
             }
 
+            return new DateFilter
+            {
+                StartDate = filter.StartDate,
+                EndDate = filter.EndDate,
+                DateFilterType = (DateFilter.DateRangeFilterType)(filter?.DateFilterType).GetValueOrDefault(),
+                TimeRanges = filter.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr)
+            };
+        }
+
+        private static LocationFilter PopulateLocationFilter(GeographicsFilterDto filter, string locationNameFilter = null)
+        {
+            if (filter == null)
+            {
+                return null;
+            }
+
+            return new LocationFilter
+            {
+                Areas = filter.Areas?.Select(a => new AreaFilter
+                { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }),
+                Geometries = new GeographicsFilter
+                {
+                    BoundingBox = filter.BoundingBox?.ToLatLonBoundingBox(),
+                    Geometries = filter.Geometries?.ToList(),
+                    MaxDistanceFromPoint = filter.MaxDistanceFromPoint,
+                    UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
+                    UsePointAccuracy = filter.ConsiderObservationAccuracy,
+                },
+                MaxAccuracy = filter.MaxAccuracy,
+                NameFilter = locationNameFilter
+            };
         }
 
         private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)
@@ -434,6 +483,34 @@ namespace SOS.Observations.Api.Extensions
         public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
+        }
+
+        public static (SearchFilter, CheckListSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)
+        {
+            var observationFilter = new SearchFilter
+            {
+                DataProviderIds = searchFilterDto.Observation?.DataProvider?.Ids,
+                Date = PopulateDateFilter(searchFilterDto.Date),
+                ProjectIds = searchFilterDto.ProjectIds,
+                Taxa = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } },
+                VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
+            };
+            observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
+            var checkListFilter = new CheckListSearchFilter
+            {
+                DataProviderIds = searchFilterDto.CheckList?.DataProvider?.Ids,
+                Date = observationFilter.Date as CheckListDateFilter,
+                Location = observationFilter.Location,
+                Taxa = observationFilter.Taxa
+            };
+
+            if (TimeSpan.TryParse(searchFilterDto.CheckList?.MinEffortTime, out var minEffortTime))
+            {
+                checkListFilter.Date ??= new CheckListDateFilter();
+                checkListFilter.Date.MinEffortTime = minEffortTime;
+            }
+
+            return (observationFilter, checkListFilter);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto)

@@ -13,6 +13,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Repositories
@@ -73,7 +74,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                     new ElasticClientManager(elasticConfiguration, true),
                     exportClient,
                     elasticConfiguration,
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;

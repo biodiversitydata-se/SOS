@@ -15,6 +15,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -66,7 +67,10 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult(parsedDataProvidersCombinedResult.Error);
                 }
 
-                if (parsedDataProvidersResult.Any(providerResult => providerResult.Value.Type == DataProviderType.DwcA && string.IsNullOrEmpty(providerResult.Value.DownloadUrl)))
+                if (parsedDataProvidersResult.Any(providerResult =>
+                    providerResult.Value.Type == DataProviderType.DwcA &&
+                    string.IsNullOrEmpty(providerResult.Value.DownloadUrls?.FirstOrDefault(u => u.Type.Equals(DownloadUrl.DownloadType.Observations))?.Url))
+                )
                 {
                     return new BadRequestObjectResult(
                         "One or more DwC-A data provider/s with missing download url was included in the list. Harvesting of these providers is only supported by providing a file using the Administration API.");
@@ -172,9 +176,9 @@ namespace SOS.Administration.Api.Controllers
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
 
-                // process uploaded file
+                // process uploaded file                
                 BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job =>
-                    job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
+                    job.RunAsync(dataProvider.Id, filePath, DwcaTarget.Observation, JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"DwC-A harvest job for data provider: {dataProvider} was enqueued to Hangfire.");
             }

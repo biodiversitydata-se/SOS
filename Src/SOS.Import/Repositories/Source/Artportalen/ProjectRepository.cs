@@ -78,7 +78,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = $@"{SelectSql} WHERE p.Id = @ProjectId";
 
-                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }, live)).FirstOrDefault();
+                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }, live))?.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -131,7 +131,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		            AND p.IsHideAll = 0";
 
                 return await QueryAsync<ProjectParameterEntity>(
-                    query, 
+                    query,
                     new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)

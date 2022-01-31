@@ -52,6 +52,9 @@ using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Services;
 using SOS.Process.Services.Interfaces;
+using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Process.Processors.DarwinCoreArchive.Interfaces;
 
 namespace SOS.Process.IoC.Modules
 {
@@ -86,6 +89,7 @@ namespace SOS.Process.IoC.Modules
             // Caches
             builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
             builder.RegisterType<DataProviderCache>().As<IDataProviderCache>().SingleInstance();
+            builder.RegisterType<ProcessedConfigurationCache>().As<ICache<string, ProcessedConfiguration>>().SingleInstance();
             builder.RegisterType<TaxonCache>().As<ICache<int, Taxon>>().SingleInstance();
             builder.RegisterType<TaxonListCache>().As<ICache<int, TaxonList>>().SingleInstance();
             builder.RegisterType<VocabularyCache>().As<ICache<VocabularyId, Vocabulary>>().SingleInstance();
@@ -102,6 +106,8 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>()
@@ -123,8 +129,14 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>()
                 .InstancePerLifetimeScope();
 
+            // Repositories verbatim check lists
+            builder.RegisterType<ArtportalenCheckListVerbatimRepository>().As<IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int>>()
+                .InstancePerLifetimeScope();
+
             // Repositories destination 
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedCheckListRepository>().As<IProcessedCheckListRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>()
                 .InstancePerLifetimeScope();
@@ -151,8 +163,13 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationProcessor>().As<IVirtualHerbariumObservationProcessor>()
                 .InstancePerLifetimeScope();
-
             builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
+                .InstancePerLifetimeScope();
+
+            // Add check list processors
+            builder.RegisterType<ArtportalenCheckListProcessor>().As<IArtportalenCheckListProcessor>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<DwcaCheckListProcessor>().As<IDwcaCheckListProcessor>()
                 .InstancePerLifetimeScope();
 
             // Add managers
@@ -163,9 +180,9 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ValidationManager>().As<IValidationManager>().InstancePerLifetimeScope();
 
             // Add jobs
-            builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
-            builder.RegisterType<CopyProviderDataJob>().As<ICopyProviderDataJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();            
+            builder.RegisterType<ProcessCheckListsJob>().As<IProcessCheckListsJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessObservationsJob>().As<IProcessObservationsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
 
             // Add services

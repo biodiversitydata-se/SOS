@@ -80,8 +80,15 @@ namespace SOS.Process.Managers
             var coordinateUncertaintyInMeters = location.CoordinateUncertaintyInMeters ?? 0;
             var newCoordinateUncertaintyInMeters = coordinateUncertaintyInMeters > mod ? coordinateUncertaintyInMeters : mod;
             var diffusedPoint =
-                diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-            var diffusedPolygon = ((NetTopologySuite.Geometries.Point) diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
+                diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);            
+            var diffusedPointWithBuffer = ((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
+            PolygonGeoShape diffusedPointWithDisturbanceBuffer = null;
+
+            var taxonDisturbanceRadius = observation.Taxon?.Attributes?.DisturbanceRadius ?? 0;
+            if (taxonDisturbanceRadius > 0)
+            {
+                diffusedPointWithDisturbanceBuffer = (PolygonGeoShape)((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(taxonDisturbanceRadius).ToGeoShape();
+            }
 
             // Set location diffused geographical data
             location.DecimalLongitude = diffusedPoint.Coordinate.X;
@@ -89,9 +96,10 @@ namespace SOS.Process.Managers
             location.CoordinateUncertaintyInMeters = newCoordinateUncertaintyInMeters;
             location.Point = (PointGeoShape) diffusedPoint.ToGeoShape();
             location.PointLocation = location.Point.ToGeoLocation();
-            location.PointWithBuffer = (PolygonGeoShape) diffusedPolygon.ToGeoShape();
+            location.PointWithBuffer = (PolygonGeoShape)diffusedPointWithBuffer.ToGeoShape();
+            location.PointWithDisturbanceBuffer = diffusedPointWithDisturbanceBuffer;
 
-            _areaHelper.AddAreaDataToProcessedObservation(observation);
+            _areaHelper.AddAreaDataToProcessedLocation(observation.Location);
         }
 
         /// <summary>

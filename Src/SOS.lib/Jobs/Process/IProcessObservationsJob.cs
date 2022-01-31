@@ -6,7 +6,7 @@ using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Process
 {
-    public interface IProcessJob
+    public interface IProcessObservationsJob
     {
         /// <summary>
         /// Run process job
@@ -24,13 +24,10 @@ namespace SOS.Lib.Jobs.Process
 
         /// <summary>
         /// Run full process job
-        /// </summary>
-        /// <param name="copyFromActiveOnFail"></param>
+        /// </summary>        
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [Queue("high")]
-        Task<bool> RunAsync(
-            bool copyFromActiveOnFail,
-            IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Cronos;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -31,14 +32,14 @@ namespace SOS.Lib.Models.Shared
         public string DownloadUrl { get; set; }
 
         /// <summary>
-        ///     Descriptions of the data provider 
+        ///     Download URL's
         /// </summary>
-        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }
+        public IEnumerable<DownloadUrl> DownloadUrls { get; set; }
 
         /// <summary>
-        ///    URL to data provider EML file
+        ///     Descriptions of the data provider 
         /// </summary>
-        public string DownloadUrlEml { get; set; }
+        public IEnumerable<VocabularyValueTranslation> Descriptions { get; set; }        
 
         /// <summary>
         /// Indicates that failure in harvest for this provider will stop job from processing
@@ -100,6 +101,17 @@ namespace SOS.Lib.Models.Shared
         /// Time stamp according to data source, used to see if data set has changed
         /// </summary>
         public DateTime? SourceDate { get; set; }
+
+        /// <summary>
+        /// True if check list harvest is supported
+        /// </summary>
+        public bool SupportCheckLists { get; set; } = false;
+
+        /// <summary>
+        /// Get identifier used for check lists
+        /// </summary>
+        [JsonIgnore]
+        public string CheckListIdentifier => $"{Identifier}-CheckList";
 
         /// <summary>
         /// Support dynamic update of eml meta data
@@ -218,7 +230,8 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = ""
+                DownloadUrl = "",
+                DownloadUrls = null
             };
 
         /// <summary>
@@ -246,7 +259,8 @@ namespace SOS.Lib.Models.Shared
                     Email = ""
                 },
                 Url = "",
-                DownloadUrl = ""
+                DownloadUrl = "",
+                DownloadUrls = null
             };
     }
 }

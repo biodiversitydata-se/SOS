@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Process.UnitTests.TestHelpers;
@@ -33,7 +32,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -48,7 +47,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var builder = new DwcObservationVerbatimBuilder();
-            var date = new DateTime(2019, 5, 29,0,0,0, DateTimeKind.Utc);
+            var date = new DateTime(2019, 5, 29, 0, 0, 0, DateTimeKind.Utc);
             var dwcaObservation = builder
                 .WithDefaultValues()
                 .WithDateIdentified(date)
@@ -57,7 +56,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -85,7 +84,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

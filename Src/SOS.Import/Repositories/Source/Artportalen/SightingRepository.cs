@@ -119,7 +119,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.UnsureDetermination,
 	                s.Unspontaneous,
 	                s.UnitId,
-	                sb.URL,
+	                sb.URL AS SightingBarcodeURL,
                     s.ValidationStatusId,
 	                s.[Weight], 
 	                s.HasTriggeredValidationRules, 
@@ -321,6 +321,41 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 Logger.LogError(e, "Error getting sighting/project connections");
                 return null;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForCheckListsAsync(IEnumerable<int> checkListIds)
+        {
+            var query = $@"
+	        SELECT 
+		        s.ChecklistId,
+		        s.[Id] AS SightingId,
+		        s.[TaxonId]
+	        FROM 
+		        Sighting s
+                INNER JOIN @tvp t ON s.ChecklistId = t.Id";
+
+            var result = await QueryAsync<(int checklistId, int sightingId, int taxonId)>(query,
+                new { tvp = checkListIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
+
+            if (!result?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var checkListsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
+
+            foreach (var item in result)
+            {
+                if (!checkListsData.TryGetValue(item.checklistId, out var checkListData))
+                {
+                    checkListData = new List<(int sightingId, int taxonId)>();
+                    checkListsData.Add(item.checklistId, checkListData);
+                }
+                checkListData.Add((item.sightingId, item.taxonId));
+            }
+
+            return checkListsData;
         }
 
         /// <inheritdoc />

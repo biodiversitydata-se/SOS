@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using NetTopologySuite.Geometries;
+
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
@@ -11,13 +10,15 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// </summary>
     public class Site
     {
-        private GeoJsonGeometry _point;
-        private GeoJsonGeometry _pointWithBuffer;
-
         /// <summary>
         ///     Accuracy in meters
         /// </summary>
         public int Accuracy { get; set; }
+
+        /// <summary>
+        /// Bird validation areas
+        /// </summary>
+        public ICollection<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
         ///     County of site
@@ -35,9 +36,19 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea CountryRegion { get; set; }
 
         /// <summary>
-        /// Bird validation areas
+        ///     Diffused Point (WGS84)
         /// </summary>
-        public ICollection<string> BirdValidationAreaIds { get; set; }
+        public GeoJsonGeometry DiffusedPoint { get; set; }
+
+        /// <summary>
+        ///   Diffused Point with accuracy buffer (WGS84)
+        /// </summary>
+        public GeoJsonGeometry DiffusedPointWithBuffer { get; set; }
+
+        /// <summary>
+        ///     Id of diffusion, 0 if no diffusion
+        /// </summary>
+        public int DiffusionFactor { get; set; }
 
         /// <summary>
         ///     External Id of site
@@ -72,36 +83,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Point (WGS84)
         /// </summary>
-        public GeoJsonGeometry Point
-        {
-            get
-            {
-                if (_point == null)
-                {
-                    InitGeometries();
-                }
-
-                return _point;
-            }
-            set => _point = value;
-        }
+        public GeoJsonGeometry Point { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry PointWithBuffer
-        {
-            get
-            {
-                if (_pointWithBuffer == null)
-                {
-                    InitGeometries();
-                }
-
-                return _pointWithBuffer;
-            }
-            set => _pointWithBuffer = value;
-        }
+        public GeoJsonGeometry PointWithBuffer { get; set; }
 
         /// <summary>
         ///     Protected Nature
@@ -124,10 +111,19 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea SpecialProtectionArea { get; set; }
 
         /// <summary>
+        ///     Ensured not diffused X coordinate of site
+        /// </summary>
+        public int TrueXCoord { get; set; }
+
+        /// <summary>
+        ///     Ensured not diffused Y coordinate of site
+        /// </summary>
+        public int TrueYCoord { get; set; }
+
+        /// <summary>
         ///     X coordinate of site
         /// </summary>
         public int XCoord { get; set; }
-
 
         /// <summary>
         ///     Y coordinate of site
@@ -150,16 +146,5 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Name of the parent site
         /// </summary>
         public string ParentSiteName { get; set; }
-
-        private void InitGeometries()
-        {
-            if (XCoord > 0 && YCoord > 0)
-            {
-                var webMercatorPoint = new Point(XCoord, YCoord);
-                var wgs84Point = (Point) webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
-                _point = wgs84Point?.ToGeoJson();
-                _pointWithBuffer = wgs84Point?.ToCircle(Accuracy)?.ToGeoJson();
-            }
-        }
     }
 }

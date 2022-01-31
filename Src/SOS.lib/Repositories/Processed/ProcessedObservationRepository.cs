@@ -30,20 +30,30 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
+using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
+    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation, string>,
         IProcessedObservationRepository
     {                
         private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private IHttpContextAccessor _httpContextAccessor;
+
+        /// <summary>
+        /// Http context accessor.
+        /// </summary>
+        public IHttpContextAccessor HttpContextAccessor
+        {
+            get => _httpContextAccessor;
+            set => _httpContextAccessor = value;
+        }
 
         private IElasticClient Client => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
 
@@ -204,7 +214,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <returns></returns>
         private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, 
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(SearchFilterBase filter)
         {
             var query = filter.ToQuery();
             var excludeQuery = filter.ToExcludeQuery();
@@ -341,7 +351,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private string GetCurrentIndex(FilterBase filter)
+        private string GetCurrentIndex(SearchFilterBase filter)
         {
             if (((filter?.ExtendedAuthorization.ObservedByMe ?? false) || (filter?.ExtendedAuthorization.ReportedByMe ?? false) || (filter?.ExtendedAuthorization.ProtectedObservations ?? false)) &&
                 (filter?.ExtendedAuthorization.UserId ?? 0) == 0)
@@ -491,10 +501,10 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<ProcessedConfiguration> processedConfigurationCache,
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, logger, processedConfigurationCache)
+            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
         {
             LiveMode = true;
 
@@ -517,9 +527,8 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedObservationRepository> logger
-            ) : base(client, true, logger, processedConfigurationCache)
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
         {
             LiveMode = false;
 
@@ -823,7 +832,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = SearchExtensions.ToSortDescriptor<Observation>(sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1331,7 +1340,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(FilterBase filter)
+        public async Task<long> GetMatchCountAsync(SearchFilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1351,7 +1360,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<int> GetProvinceCountAsync(FilterBase filter)
+        public async Task<int> GetProvinceCountAsync(SearchFilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1471,7 +1480,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = SearchExtensions.ToSortDescriptor<Observation>(sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1726,6 +1735,28 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex)
+        {
+            var searchResponse = await Client.SearchAsync<Observation>(s => s
+                .Size(0)
+                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                .Aggregations(a => a
+                    .Terms("uniqueOccurrenceIdCount", t => t
+                        .Field(f => f.Occurrence.OccurrenceId)
+                        .MinimumDocumentCount(2)
+                        .Size(1)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return searchResponse.Aggregations
+                .Terms("uniqueOccurrenceIdCount")
+                .Buckets.Count > 0;
+        }
+
+        /// <inheritdoc />
         public async Task<long> IndexCountAsync(bool protectedIndex)
         {
             try
@@ -1758,7 +1789,7 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public async Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId)
         {
             ISearchResponse<dynamic> searchResponse;
@@ -1799,7 +1830,7 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public async Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId)
         {
             ISearchResponse<dynamic> searchResponse;
@@ -1841,7 +1872,7 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public async Task<ScrollResult<Observation>> ScrollObservationsAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId)
         {
             ISearchResponse<dynamic> searchResponse;
@@ -2001,18 +2032,36 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
 
-
         /// <inheritdoc />
         public async Task<bool> ValidateProtectionLevelAsync(bool protectedIndex)
         {
             try
             {
-                var countResponse = await Client.CountAsync<Observation>(s => s
-                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                var countResponse = protectedIndex ?
+                    await Client.CountAsync<Observation>(s => s
+                    .Index(ProtectedIndexName)
                     .Query(q => q
-                        .Term(t => t.Field(f => f.Protected).Value(!protectedIndex))
-                    )
-                );
+                        .Bool(b => b
+                            .MustNot(mn => mn.Term(t => t
+                                .Field(f => f.DiffusionStatus).Value(DiffusionStatus.NotDiffused))
+                            )
+                        )
+                    ))
+                    :
+                    await Client.CountAsync<Observation>(s => s
+                    .Index(PublicIndexName)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Filter(f => f
+                                .Term(t => t
+                                    .Field(f => f.AccessRights.Id).Value((int)AccessRightsId.NotForPublicUsage)
+                                ), f => f
+                                .Term(t => t
+                                    .Field(f => f.DiffusionStatus).Value(DiffusionStatus.NotDiffused)
+                                )
+                            )
+                        )
+                    ));
 
                 if (!countResponse.IsValid)
                 {

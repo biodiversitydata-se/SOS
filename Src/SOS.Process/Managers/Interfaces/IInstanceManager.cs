@@ -9,13 +9,6 @@ namespace SOS.Process.Managers.Interfaces
     public interface IInstanceManager
     {
         /// <summary>
-        ///     Copy data from active to inactive instance.
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(DataProvider dataProvider);
-
-        /// <summary>
         ///     Activate passed instance
         /// </summary>
         /// <param name="instance"></param>

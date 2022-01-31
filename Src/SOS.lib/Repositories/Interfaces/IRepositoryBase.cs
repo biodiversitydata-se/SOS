@@ -43,6 +43,13 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<bool> AddCollectionAsync(string collectionName);
 
         /// <summary>
+        /// Create indexes
+        /// </summary>
+        /// <param name="indexModels"></param>
+        /// <returns></returns>
+        Task AddIndexes(IEnumerable<CreateIndexModel<TEntity>> indexModels);
+
+        /// <summary>
         ///     Add many items
         /// </summary>
         /// <param name="items"></param>
@@ -242,6 +249,13 @@ namespace SOS.Lib.Repositories.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
+        /// Query collection
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> QueryAsync(FilterDefinition<TEntity> filter);
 
         /// <summary>
         /// Set run mode

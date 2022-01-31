@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
@@ -18,7 +16,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Jobs
 {
@@ -115,7 +112,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
@@ -139,7 +136,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver()
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)

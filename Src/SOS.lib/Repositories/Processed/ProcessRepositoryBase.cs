@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -14,12 +14,12 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessRepositoryBase<TEntity> : IProcessRepositoryBase<TEntity>
+    public class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         private readonly IProcessClient _client;
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-        private IClassCache<ProcessedConfiguration> _processedConfigurationCache;
+        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly bool _toggleable;
+        private readonly string _id = typeof(TEntity).Name;
 
         /// <summary>
         ///     Disposed
@@ -39,26 +39,9 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                // Cache is only used in public API
-                if (_processedConfigurationCache != null)
-                {
-                    var processedConfig = _processedConfigurationCache.Get();
+                var processedConfig = _processedConfigurationCache.GetAsync(_id)?.Result;
 
-                    if (processedConfig == null)
-                    {
-                        processedConfig = MongoCollectionConfiguration
-                            .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                            .FirstOrDefault();
-
-                        _processedConfigurationCache.Set(processedConfig);
-                    }
-
-                    return processedConfig;
-                }
-
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
+                return processedConfig ?? new ProcessedConfiguration { Id = _id };
             }
             catch (Exception e)
             {
@@ -67,44 +50,6 @@ namespace SOS.Lib.Repositories.Processed
                 return default;
             }
         }
-
-        /// <summary>
-        ///     Make sure configuration collection exists
-        /// </summary>
-        private void InitializeConfiguration()
-        {
-            if (_database == null)
-            {
-                return;
-            }
-
-            //filter by collection name
-            var exists = _database
-                .ListCollectionNames(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", _collectionNameConfiguration)
-                })
-                .Any();
-
-            //check for existence
-            if (!exists)
-            {
-                // Create the collection
-                _database.CreateCollection(_collectionNameConfiguration);
-
-                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
-                {
-                    ActiveInstance = 1
-                });
-            }
-        }
-
-        /// <summary>
-        ///     Configuration collection
-        /// </summary>
-        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => _database
-            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
-            .WithWriteConcern(new WriteConcern(1, journal: true));
 
         /// <summary>
         ///     Dispose
@@ -127,7 +72,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         ///     Logger
         /// </summary>
-        protected readonly ILogger<ProcessRepositoryBase<TEntity>> Logger;
+        protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
 
         /// <summary>
         /// Get name of instance
@@ -148,19 +93,18 @@ namespace SOS.Lib.Repositories.Processed
         public ProcessRepositoryBase(
             IProcessClient client,
             bool toggleable,
-            ILogger<ProcessRepositoryBase<TEntity>> logger,
-            IClassCache<ProcessedConfiguration> processedConfigurationCache = null
+            ICache<string, ProcessedConfiguration> processedConfigurationCache = null,
+            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger = null
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _toggleable = toggleable;
+            _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
+
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _processedConfigurationCache = processedConfigurationCache;
 
             _database = _client.GetDatabase();
             BatchSize = _client.WriteBatchSize;
-            // Init config
-            InitializeConfiguration();
 
             // Default use non live instance
             LiveMode = false;
@@ -182,7 +126,7 @@ namespace SOS.Lib.Repositories.Processed
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
 
         /// <inheritdoc />
-        public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
+        public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
         public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
@@ -199,12 +143,7 @@ namespace SOS.Lib.Repositories.Processed
 
                 config.ActiveInstance = instance;
 
-                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
-                    x => x.Id.Equals(config.Id),
-                    config,
-                    new ReplaceOptions { IsUpsert = true });
-
-                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+                return await _processedConfigurationCache.AddOrUpdateAsync(config);
             }
             catch (Exception e)
             {

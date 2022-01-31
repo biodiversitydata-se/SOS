@@ -81,7 +81,7 @@ namespace SOS.Lib.Repositories
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                throw ;
+                throw;
             }
         }
 
@@ -127,12 +127,26 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         protected RepositoryBase(
             IMongoDbClient client,
+            ILogger logger
+        ) : this(client, typeof(TEntity).Name, logger)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="logger"></param>
+        protected RepositoryBase(
+            IMongoDbClient client,
+            string collectionName,
             ILogger logger
         )
         {
@@ -145,8 +159,9 @@ namespace SOS.Lib.Repositories
             BatchSizeWrite = client.WriteBatchSize;
 
             // Clean name from non alfa numeric chats
-            _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();
+            _collectionName = collectionName.UntilNonAlfanumeric();
         }
+
 
         /// <summary>
         ///     Get client
@@ -155,13 +170,13 @@ namespace SOS.Lib.Repositories
         protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(CollectionName);
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(TEntity item)
+        public virtual async Task<bool> AddAsync(TEntity item)
         {
             return await AddAsync(item, MongoCollection);
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
+        public virtual async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
@@ -182,7 +197,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddCollectionAsync()
+        public virtual async Task<bool> AddCollectionAsync()
         {
             return await AddCollectionAsync(CollectionName);
         }
@@ -205,7 +220,13 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
+        public async Task AddIndexes(IEnumerable<CreateIndexModel<TEntity>> indexModels)
+        {
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
         {
             return await AddManyAsync(items, MongoCollection);
         }
@@ -234,9 +255,8 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        public virtual async Task<bool> AddOrUpdateAsync(TEntity item)
         {
-            
             return await AddOrUpdateAsync(item, MongoCollection);
         }
 
@@ -261,7 +281,7 @@ namespace SOS.Lib.Repositories
         public int BatchSizeWrite { get; set; }
 
         /// <inheritdoc />
-        public async Task<bool> CheckIfCollectionExistsAsync()
+        public virtual async Task<bool> CheckIfCollectionExistsAsync()
         {
             return await CheckIfCollectionExistsAsync(CollectionName);
         }
@@ -281,7 +301,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteAsync(TKey id)
+        public virtual async Task<bool> DeleteAsync(TKey id)
         {
             return await DeleteAsync(id, MongoCollection);
         }
@@ -305,7 +325,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteCollectionAsync()
+        public virtual async Task<bool> DeleteCollectionAsync()
         {
             return await DeleteCollectionAsync(CollectionName);
         }
@@ -328,7 +348,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<long> CountAllDocumentsAsync()
+        public virtual async Task<long> CountAllDocumentsAsync()
         {
             return await CountAllDocumentsAsync(MongoCollection);
         }
@@ -340,7 +360,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
+        public virtual async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
         {
             return await DeleteManyAsync(ids, MongoCollection);
         }
@@ -379,7 +399,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<TEntity> GetAsync(TKey id)
+        public virtual async Task<TEntity> GetAsync(TKey id)
         {
             try
             {
@@ -394,11 +414,11 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids)
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> ids)
         {
             try
             {
-               return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
+                return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
             }
             catch (Exception e)
             {
@@ -409,7 +429,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
+        public virtual async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
         {
             return await GetBatchAsync(skip, MongoCollection);
         }
@@ -465,7 +485,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
+        public virtual async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
         {
             return await GetBatchAsync(startId, endId, MongoCollection);
         }
@@ -497,7 +517,7 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<TKey> GetMaxIdAsync()
+        public virtual async Task<TKey> GetMaxIdAsync()
         {
             return await GetMaxIdAsync(MongoCollection);
         }
@@ -528,7 +548,23 @@ namespace SOS.Lib.Repositories
         public JobRunModes Mode { get; set; }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateAsync(TKey id, TEntity entity)
+        public virtual async Task<IEnumerable<TEntity>> QueryAsync(FilterDefinition<TEntity> filter)
+        {
+            try
+            {
+                return await MongoCollection
+                    .Find(filter)
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return default;
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual async Task<bool> UpdateAsync(TKey id, TEntity entity)
         {
             return await UpdateAsync(id, entity, MongoCollection);
         }
@@ -550,7 +586,5 @@ namespace SOS.Lib.Repositories
                 return false;
             }
         }
-
-       
     }
 }

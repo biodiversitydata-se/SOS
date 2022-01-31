@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -10,6 +11,10 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <returns></returns>
         [Queue("high")]
-        Task<bool> RunAsync(int dataProviderId, string archivePath, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(
+            int dataProviderId,
+            string archivePath,
+            DwcaTarget target,
+            IJobCancellationToken cancellationToken);
     }
 }

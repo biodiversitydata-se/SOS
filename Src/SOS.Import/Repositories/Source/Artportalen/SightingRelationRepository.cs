@@ -27,6 +27,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                sr.SightingId,
 	                sr.UserId,
 	                sr.SightingRelationTypeId,
+                    sr.Discover,
 	                sr.Sort,
 	                sr.IsPublic,	                
 	                sr.DeterminationYear
@@ -35,7 +36,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     INNER JOIN @tvp t ON sr.SightingId = t.Id AND sr.IsPublic = 1";
 
                 return await QueryAsync<SightingRelationEntity>(query,
-                    new {tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable")}, live);
+                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {

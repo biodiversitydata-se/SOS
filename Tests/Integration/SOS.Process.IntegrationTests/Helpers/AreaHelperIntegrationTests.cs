@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -38,7 +39,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocations(observations.Select(o => o.Location));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -68,7 +69,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocations(observations.Select(o => o.Location));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -97,7 +98,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedObservation(observation);
+            _fixture.AreaHelper.AddAreaDataToProcessedLocation(observation.Location);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -43,7 +43,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
             int? parsedTaxonId = observation.Taxon?.Id;
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,12 +77,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Taxon.Should().BeNull();
+            observation.Taxon.Id.Should().Be(-1, "because -1 means that the taxon was not found");
         }
     }
 }

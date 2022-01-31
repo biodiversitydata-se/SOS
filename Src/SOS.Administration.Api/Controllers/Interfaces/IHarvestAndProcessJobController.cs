@@ -45,5 +45,19 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="runIntervalInMinutes"></param>
         /// <returns></returns>
         IActionResult ScheduleIncrementalObservationHarvestAndProcessJob(byte runIntervalInMinutes);
+
+        /// <summary>
+        ///     Schedule check lists harvest and process job
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyCheckListHarvestAndProcessJob(int hour, int minute);
+
+        /// <summary>
+        ///     Run check lists harvest and process job
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunCheckListHarvestAndProcessJob();
     }
 }

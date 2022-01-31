@@ -15,8 +15,7 @@ namespace SOS.Process.Processors.FishData
     public class FishDataObservationFactory : ObservationFactoryBase, IObservationFactory<FishDataObservationVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
-        private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
+        private readonly DataProvider _dataProvider;        
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -26,21 +25,21 @@ namespace SOS.Process.Processors.FishData
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
         public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper) : base(taxa)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));            
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        /// Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
             var obs = new Observation
             {
@@ -49,6 +48,7 @@ namespace SOS.Process.Processors.FishData
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
                 DatasetName = "Fish data",
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
@@ -94,7 +94,7 @@ namespace SOS.Process.Processors.FishData
             };
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             return obs;
         }

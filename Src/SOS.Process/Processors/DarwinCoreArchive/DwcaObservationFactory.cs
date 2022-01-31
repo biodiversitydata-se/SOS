@@ -32,9 +32,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
-
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;        
 
         /// <summary>
         /// Constructor
@@ -47,17 +45,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper) 
+            IAreaHelper areaHelper) : base(taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
-            foreach (var processedTaxon in _taxonByTaxonId.Values)
+            foreach (var processedTaxon in taxa.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
                 _taxonByScientificNameAuthor.Add(processedTaxon.ScientificName.ToLower() + " " + processedTaxon.ScientificNameAuthorship.ToLower(), processedTaxon);
@@ -87,34 +84,38 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        ///  Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             if (verbatim == null)
             {
                 return null;
             }
 
-            var obs = new Observation();
-            obs.DataProviderId = _dataProvider.Id;
-            //AddVerbatimObservationAsJson(obs, verbatim); // todo - this could be used to store the original verbatim observation
+            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);
+            if (accessRights?.Id.Equals((int)VocabularyConstants.NoMappingFoundCustomValueIsUsedId) ?? true)
+            {
+                accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
+            }
 
-            // Other
-            //obs.Id = verbatim.Id;
-            // todo - handle properties below.
-            //obs.DataProviderId = verbatim.DataProviderId;
-            //obs.DataProviderIdentifier = verbatim.DataProviderIdentifier;
+            var obs = new Observation
+            {
+                AccessRights = accessRights,
+                DataProviderId = _dataProvider.Id,
+                DiffusionStatus = DiffusionStatus.NotDiffused,
+            };
+                        
+            //AddVerbatimObservationAsJson(obs, verbatim); // todo - this could be used to store the original verbatim observation
 
             // Record level
             if (verbatim.ObservationMeasurementOrFacts.HasItems())
                 obs.MeasurementOrFacts = verbatim.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             else if (verbatim.ObservationExtendedMeasurementOrFacts.HasItems())
-                obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
-            obs.AccessRights = GetSosId(verbatim.AccessRights,
-                _vocabularyById[VocabularyId.AccessRights]);
+                obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();            
             obs.BasisOfRecord = GetSosId(verbatim.BasisOfRecord,
                 _vocabularyById[VocabularyId.BasisOfRecord]);
             obs.BibliographicCitation = verbatim.BibliographicCitation;
@@ -171,11 +172,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // Organism
             obs.Organism = CreateProcessedOrganism(verbatim);
 
-           
+
 
             // Temporarily remove
             //obs.IsInEconomicZoneOfSweden = true;
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
             return obs;
         }
 
@@ -454,110 +455,88 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(DwcObservationVerbatim verbatim)
         {
-            // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
-            var processedTaxon = TryGetTaxonInformation(
-                verbatim.TaxonID,
-                verbatim.ScientificName,
-                verbatim.ScientificNameAuthorship,
-                verbatim.VernacularName,
-                verbatim.Kingdom,
-                verbatim.TaxonRank,
-                verbatim.Species);
-
-            return processedTaxon;
-        }
-
-        private Lib.Models.Processed.Observation.Taxon TryGetTaxonInformation(
-            string taxonId,
-            string scientificName,
-            string scientificNameAuthorship,
-            string vernacularName,
-            string kingdom,
-            string taxonRank,
-            string species)
-        {
-            List<Lib.Models.Processed.Observation.Taxon> result;
-            
             // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
-            if (!string.IsNullOrEmpty(taxonId))
+            if (!string.IsNullOrEmpty(verbatim.TaxonID))
             {
-               
                 var parsedTaxonId = -1;
-                if (!int.TryParse(taxonId, out parsedTaxonId))
+                if (!int.TryParse(verbatim.TaxonID, out parsedTaxonId))
                 {
-                    if (taxonId.StartsWith("urn:lsid:dyntaxa"))
+                    if (verbatim.TaxonID.StartsWith("urn:lsid:dyntaxa"))
                     {
-                        var lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
-                        if(!int.TryParse(lastInteger, out parsedTaxonId))
+                        var lastInteger = Regex.Match(verbatim.TaxonID, @"\d+", RegexOptions.RightToLeft).Value;
+                        if (!int.TryParse(lastInteger, out parsedTaxonId))
                         {
                             parsedTaxonId = -1;
                         }
-
                     }
                 }
 
-                if (parsedTaxonId != -1 &&_taxonByTaxonId.TryGetValue(parsedTaxonId, out var taxon))
+                if (parsedTaxonId != -1)
                 {
-                    return taxon;
+                    var taxon = GetTaxon(parsedTaxonId);
+
+                    if ((taxon?.Id ?? -1) != -1)
+                    {
+                        return taxon;
+                    }
                 }
             }
 
             // Get by scientific name
-            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out result))
+            if (_taxonByScientificName.TryGetValues(verbatim.ScientificName?.ToLower(), out var taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
             // Get by scientific name + author
-            if (_taxonByScientificNameAuthor.TryGetValues(scientificName?.ToLower(), out result))
+            if (_taxonByScientificNameAuthor.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
             // Get by species
-            if (_taxonByScientificName.TryGetValues(species?.ToLower(), out result))
+            if (_taxonByScientificName.TryGetValues(verbatim.Species?.ToLower(), out taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
             // Get by synonyme
-            if (_taxonBySynonymName.TryGetValues(scientificName?.ToLower(), out result))
+            if (_taxonBySynonymName.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
             // Get by synonyme + author
-            if (_taxonBySynonymNameAuthor.TryGetValues(scientificName?.ToLower(), out result))
+            if (_taxonBySynonymNameAuthor.TryGetValues(verbatim.ScientificName?.ToLower(), out taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
             // Get by species (synonyme)
-            if (_taxonBySynonymName.TryGetValues(species?.ToLower(), out result))
+            if (_taxonBySynonymName.TryGetValues(verbatim.Species?.ToLower(), out taxa))
             {
-                if (result.Count == 1)
+                if (taxa.Count == 1)
                 {
-                    return result.First();
+                    return taxa.First();
                 }
             }
 
-            // If not match, return null.
-            return null;
+            return new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = verbatim.TaxonID };
         }
 
         private VocabularyValue GetSosId(string val,

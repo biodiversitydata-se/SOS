@@ -16,7 +16,6 @@ namespace SOS.Process.Processors.Sers
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -25,21 +24,21 @@ namespace SOS.Process.Processors.Sers
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public SersObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public SersObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        ///  Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(SersObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(SersObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var obs = new Observation
@@ -49,6 +48,7 @@ namespace SOS.Process.Processors.Sers
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SERS}",
                 DatasetName = "SERS",
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
@@ -93,7 +93,7 @@ namespace SOS.Process.Processors.Sers
             };
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             return obs;
         }

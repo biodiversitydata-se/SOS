@@ -13,6 +13,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
@@ -73,7 +74,7 @@ namespace SOS.Import.Managers
         public async Task<DwcaDataValidationReport<DwcObservationVerbatim, Observation>>
         CreateDataValidationSummary(ArchiveReader archiveReader,
                 int maxNrObservationsToRead = 100000,
-                int nrValidObservationsInReport = 100, 
+                int nrValidObservationsInReport = 100,
                 int nrInvalidObservationsInReport = 100,
                 int nrTaxaInSummary = 20)
         {
@@ -101,7 +102,7 @@ namespace SOS.Import.Managers
             int nrValidObservations = 0;
             int nrInvalidObservations = 0;
             var validationRemarksBuilder = new DwcaValidationRemarksBuilder();
-            var observationDefects = new Dictionary<string, int>();
+            var observationDefects = new Dictionary<ObservationDefect.ObservationDefectType, int>();
             var processedFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, int>>();
             var verbatimFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>>();
             var taxaStatistics = new TaxaStatistics();
@@ -118,7 +119,7 @@ namespace SOS.Import.Managers
                 foreach (var verbatimObservation in observationsBatch)
                 {
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
-                    var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
+                    var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation, true);
                     nrProcessedObservations++;
                     LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
@@ -159,23 +160,23 @@ namespace SOS.Import.Managers
                             invalidObservations.Add(new InvalidObservationTuple<DwcObservationVerbatim>
                             {
                                 VerbatimObservation = verbatimObservation,
-                                ProcessedObservationDefects = observationValidation.Defects
+                                ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
                             });
                         }
 
                         foreach (var validationDefect in observationValidation.Defects)
                         {
-                            if (validationDefect == "Taxon not found")
+                            if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
                             {
                                 nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
                                 nonMatchingTaxonIds.Add(verbatimObservation.TaxonID);
                             }
-                            if (!observationDefects.ContainsKey(validationDefect))
+                            if (!observationDefects.ContainsKey(validationDefect.DefectType))
                             {
-                                observationDefects.Add(validationDefect, 0);
+                                observationDefects.Add(validationDefect.DefectType, 0);
                             }
 
-                            observationDefects[validationDefect]++;
+                            observationDefects[validationDefect.DefectType]++;
                         }
                     }
 
@@ -191,7 +192,7 @@ namespace SOS.Import.Managers
 
             return new DwcaDataValidationReport<DwcObservationVerbatim, Observation>
             {
-                Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport},
+                Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport },
                 Summary = new DwcaDataValidationReportSummary
                 {
                     ReportCreatedDate = DateTime.Now.ToString("yyyy-MM-dd"),
@@ -200,7 +201,7 @@ namespace SOS.Import.Managers
                     NrValidObservations = nrValidObservations,
                     NrInvalidObservations = nrInvalidObservations,
                     Remarks = remarks,
-                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key, Count = m.Value}).ToList(),
+                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key.ToString(), Count = m.Value }).ToList(),
                     NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList(),
                     NonMatchingTaxonIds = nonMatchingTaxonIds.Count == 0 ? null : nonMatchingTaxonIds.ToList()
                 },
@@ -237,7 +238,7 @@ namespace SOS.Import.Managers
                                 "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
                         }).ToList(),
                     SosVocabulary = _vocabularyById[pair.Key].Values
-                        .Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
+                        .Select(v => new VocabularyValue() { Id = v.Id, Value = v.Value }).ToList()
                 }).ToList();
             return distinctValuesSummaries;
         }

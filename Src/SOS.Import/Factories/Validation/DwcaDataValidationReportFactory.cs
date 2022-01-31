@@ -63,8 +63,8 @@ namespace SOS.Import.Factories.Validation
 
         protected override async Task<Observation> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation);
-            _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
+            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
             return processedObservation;
         }
 

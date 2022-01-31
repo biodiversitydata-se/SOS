@@ -18,7 +18,6 @@ namespace SOS.Process.Processors.Shark
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -27,21 +26,21 @@ namespace SOS.Process.Processors.Shark
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        ///  Cast verbatim observations to processed data model
         /// </summary>
         /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
+            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1);
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
             var sharkSampleId = $"{verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId}-{verbatim.DyntaxaId}-{verbatim.Parameter}-{verbatim.Value}".RemoveWhiteSpace();
             
@@ -52,6 +51,7 @@ namespace SOS.Process.Processors.Shark
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = verbatim.SampleDate?.ToUniversalTime(),
@@ -96,7 +96,7 @@ namespace SOS.Process.Processors.Shark
             };
             AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, 
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             /*
             DataType

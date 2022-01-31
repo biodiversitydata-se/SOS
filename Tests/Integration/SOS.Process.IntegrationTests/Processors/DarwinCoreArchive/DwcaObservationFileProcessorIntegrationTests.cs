@@ -50,7 +50,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private DwcaObservationProcessor CreateDwcaObservationProcessor(
             bool storeProcessedObservations,
-            List<DwcObservationVerbatim> dwcObservationVerbatims)
+            IEnumerable<DwcObservationVerbatim> dwcObservationVerbatims)
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -95,8 +95,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             if (storeProcessedObservations)
             {
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(),  
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new ElasticSearchConfiguration(),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>());
             }
             else

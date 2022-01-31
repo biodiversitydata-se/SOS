@@ -151,7 +151,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <returns></returns>
         private static void AddInternalFilters(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             var internalFilter = filter as SearchFilterInternal;
 
@@ -298,19 +298,19 @@ namespace SOS.Lib.Extensions
             {
                 var selector = "";
                
-                if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+                if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
                     selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
                 }
-                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+                else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OnlyStartDate)
                 {
                     selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (startMonth < toMonth || (startMonth == toMonth && startDay <= toDay)))";
                 }
-                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+                else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OnlyEndDate)
                 {
                     selector = "((endMonth > fromMonth || (endMonth == fromMonth && endDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
                 }
-                else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
                 {
                     selector = "((startMonth > fromMonth || (startMonth == fromMonth && startDay >= fromDay)) && (startMonth < toMonth || (startMonth == toMonth && startDay <= toDay))) || " +
                                "((endMonth > fromMonth || (endMonth == fromMonth && endDay >= fromDay)) && (endMonth < toMonth || (endMonth == toMonth && endDay <= toDay)))";
@@ -357,7 +357,7 @@ namespace SOS.Lib.Extensions
         /// <param name="excludeQuery"></param>
         /// <returns></returns>
         private static void AddInternalExcludeFilters(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> excludeQuery, FilterBase filter)
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> excludeQuery, SearchFilterBase filter)
         {
             var internalFilter = filter as SearchFilterInternal;
 
@@ -473,7 +473,7 @@ namespace SOS.Lib.Extensions
             );
         }
 
-        private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -485,7 +485,7 @@ namespace SOS.Lib.Extensions
                 (int)SightingTypeSearchGroup.Replacement,
                 (int)SightingTypeSearchGroup.OwnBreedingAssessment }; 
 
-            if (filter.TypeFilter == FilterBase.SightingTypeFilter.ShowBoth)
+            if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.ShowBoth)
             {
                 sightingTypeSearchGroupFilter = new[] { // 1, 2, 4, 16, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
@@ -495,11 +495,11 @@ namespace SOS.Lib.Extensions
                     (int)SightingTypeSearchGroup.Replacement,
                     (int)SightingTypeSearchGroup.OwnBreedingAssessment }; 
             }
-            else if (filter.TypeFilter == FilterBase.SightingTypeFilter.ShowOnlyMerged)
+            else if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
             {
                 sightingTypeSearchGroupFilter = new[] { (int)SightingTypeSearchGroup.Assessment }; // 2
             }
-            else if (filter.TypeFilter == FilterBase.SightingTypeFilter.DoNotShowSightingsInMerged)
+            else if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged)
             {
                 sightingTypeSearchGroupFilter = new[] { // 1, 2, 4, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
@@ -511,7 +511,7 @@ namespace SOS.Lib.Extensions
 
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
-            if (filter.TypeFilter != FilterBase.SightingTypeFilter.ShowOnlyMerged)
+            if (filter.TypeFilter != SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
             {
                 // Get observations from other than Artportalen too
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
@@ -567,7 +567,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.DeterminationFilter)
             {
@@ -842,20 +842,20 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void TryAddDateRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void TryAddDateRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
-            if (filter.DateFilterType == FilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
+            if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.BetweenStartDateAndEndDate)
             {
                 query.TryAddDateRangeCriteria("event.startDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
                 query.TryAddDateRangeCriteria("event.endDate", filter.EndDate, RangeTypes.LessThanOrEquals);
             }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
+            else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OverlappingStartDateAndEndDate)
             {
                 query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
                 query.TryAddDateRangeCriteria("event.endDate", filter.StartDate, RangeTypes.GreaterThanOrEquals);
 
             }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyStartDate)
+            else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OnlyStartDate)
             {
                 if (filter.StartDate.HasValue && filter.EndDate.HasValue)
                 {
@@ -863,7 +863,7 @@ namespace SOS.Lib.Extensions
                     query.TryAddDateRangeCriteria("event.startDate", filter.EndDate, RangeTypes.LessThanOrEquals);
                 }
             }
-            else if (filter.DateFilterType == FilterBase.DateRangeFilterType.OnlyEndDate)
+            else if (filter.DateFilterType == SearchFilterBase.DateRangeFilterType.OnlyEndDate)
             {
                 if (filter.StartDate.HasValue && filter.EndDate.HasValue)
                 {
@@ -903,7 +903,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <param name="filter"></param>
         private static void TryAddNotRecoveredFilter(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.NotRecoveredFilter)
             {
@@ -977,7 +977,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void TryAddTimeRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void TryAddTimeRangeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             if (!filter.TimeRanges?.Any() ?? true)
             {
@@ -989,16 +989,16 @@ namespace SOS.Lib.Extensions
             {
                 switch (timeRange)
                 {
-                    case FilterBase.TimeRange.Morning:
+                    case SearchFilterBase.TimeRange.Morning:
                         timeRangeContainers.AddScript($@"[4, 5, 6, 7, 8].contains(doc['event.startDate'].value.getHour())");
                         break;
-                    case FilterBase.TimeRange.Forenoon:
+                    case SearchFilterBase.TimeRange.Forenoon:
                         timeRangeContainers.AddScript($@"[9, 10, 11, 12].contains(doc['event.startDate'].value.getHour())");
                         break;
-                    case FilterBase.TimeRange.Afternoon:
+                    case SearchFilterBase.TimeRange.Afternoon:
                         timeRangeContainers.AddScript($@"[13, 14, 15, 16, 17].contains(doc['event.startDate'].value.getHour())");
                         break;
-                    case FilterBase.TimeRange.Evening:
+                    case SearchFilterBase.TimeRange.Evening:
                         timeRangeContainers.AddScript($@"[18, 19, 20, 21, 22].contains(doc['event.startDate'].value.getHour())");
                         break;
                     default:
@@ -1014,14 +1014,14 @@ namespace SOS.Lib.Extensions
             );
         }
 
-        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, FilterBase filter)
+        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.VerificationStatus)
             {
-                case FilterBase.StatusVerification.Verified:
+                case SearchFilterBase.StatusVerification.Verified:
                     query.TryAddTermCriteria("identification.validated", true, true);
                     break;
-                case FilterBase.StatusVerification.NotVerified:
+                case SearchFilterBase.StatusVerification.NotVerified:
                     query.TryAddTermCriteria("identification.validated", false, false);
                     break;
             }
@@ -1083,7 +1083,7 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         /// <returns></returns>
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
-            this FilterBase filter)
+            this SearchFilterBase filter)
         {
             var query = filter.ToQuery();
             query.AddNestedMustExistsCriteria("occurrence.media");
@@ -1091,7 +1091,7 @@ namespace SOS.Lib.Extensions
         }
 
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
-            this FilterBase filter)
+            this SearchFilterBase filter)
         {
             var query = filter.ToQuery();
             query.AddNestedMustExistsCriteria("measurementOrFacts");
@@ -1145,7 +1145,7 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         /// <returns></returns>
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
-            this FilterBase filter)
+            this SearchFilterBase filter)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -1195,7 +1195,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this FilterBase filter)
+        public static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this SearchFilterBase filter)
         {
             var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
@@ -1263,7 +1263,7 @@ namespace SOS.Lib.Extensions
 
             if (properties?.Any() ?? false)
             {
-                projection.Includes(i => i.Fields(properties.Select(p => p.ToField())));
+                projection.Includes(i => i.Fields(properties.Select(p => ToField(p))));
             }
 
             return p => projection;

@@ -135,7 +135,7 @@ namespace SOS.Hangfire.JobServer
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
                                     Prefix = "hangfire",
-                                    CheckConnection = true,
+                                    CheckConnection = true
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
@@ -189,7 +189,7 @@ namespace SOS.Hangfire.JobServer
                             builder
                                 .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }
                 )

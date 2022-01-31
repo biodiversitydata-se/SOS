@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Nest;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -292,5 +294,12 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
+        /// <summary>
+        /// Verbatim id used only in validation
+        /// </summary>
+        [JsonIgnore]
+        [SwaggerExclude]
+        public string VerbatimId { get; set; }
     }
 }

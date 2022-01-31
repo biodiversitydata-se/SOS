@@ -19,7 +19,6 @@ namespace SOS.Process.Processors.ObservationDatabase
     public class ObservationDatabaseObservationFactory : ObservationFactoryBase, IObservationFactory<ObservationDatabaseVerbatim>
     {
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -29,21 +28,21 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
         /// <param name="geometryManager"></param>
-        public ObservationDatabaseObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public ObservationDatabaseObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        /// Cast verbatim observations to processed data model
         /// </summary>
-        /// <param name="verbatimObservation"></param>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim)
+        public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim, bool diffuseIfSupported)
         {
-            _taxa.TryGetValue(verbatim.TaxonId, out var taxon);
+            var taxon = GetTaxon(verbatim.TaxonId);
 
             var obs = new Observation
             {
@@ -54,6 +53,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                 CollectionId = verbatim.CollectionId,
                 DatasetId = $"urn:lsid:observationsdatabasen.se:dataprovider:{DataProviderIdentifiers.ObservationDatabase}",
                 DatasetName = "Observation database",
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = verbatim.EndDate.ToUniversalTime(),
@@ -113,7 +113,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, 
                 verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             return obs;
         }

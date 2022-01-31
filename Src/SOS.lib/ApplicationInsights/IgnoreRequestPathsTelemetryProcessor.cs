@@ -1,8 +1,9 @@
-﻿using Microsoft.ApplicationInsights.Channel;
+﻿using System;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace SOS.Observations.Api.ApplicationInsights
+namespace SOS.Lib.ApplicationInsights
 {
     public class IgnoreRequestPathsTelemetryProcessor : ITelemetryProcessor
     {
@@ -19,8 +20,9 @@ namespace SOS.Observations.Api.ApplicationInsights
 
         public void Process(ITelemetry item)
         {
+
             if (item is RequestTelemetry request &&
-                (request.Url.AbsolutePath.StartsWith("/swagger/")))
+                (request.Url.AbsolutePath.Contains("swagger", StringComparison.CurrentCultureIgnoreCase) || request.Url.AbsolutePath.Contains(".")))
             {
                 return;
             }
