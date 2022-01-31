@@ -138,50 +138,6 @@ namespace SOS.Administration.Api.Controllers
                 _logger.LogError(e, "Enqueuing process taxa job failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("Taxa/AreaAggregation/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunProcessTaxonAreaAggregationJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IProcessTaxonAreaAggregationJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Process taxon area aggregation job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing process taxon area aggregation job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        [HttpPost("Taxa/AreaAggregation/Schedule")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleProcessTaxonAreaAggregationJob(byte runIntervalInHours)
-        {
-            try
-            {
-                if (runIntervalInHours <= 0 || runIntervalInHours > 6)
-                {
-
-                    return new BadRequestObjectResult("Run interval must be between 1 and 6");
-                }
-
-                RecurringJob.AddOrUpdate<IProcessTaxonAreaAggregationJob>(
-                    nameof(IProcessTaxonAreaAggregationJob), job => job.RunAsync(JobCancellationToken.Null),
-                    $"* */{runIntervalInHours} * * *", TimeZoneInfo.Local);
-
-                return new OkObjectResult("Process taxon area aggregation job scheduled");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Scheduling process taxon area aggregation job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        }        
     }
 }

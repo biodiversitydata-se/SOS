@@ -30,18 +30,5 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunProcessTaxaJob();
-
-        /// <summary>
-        /// Run taxon area aggregation job
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunProcessTaxonAreaAggregationJob();
-
-        /// <summary>
-        /// Schedule taxon area aggregation job
-        /// </summary>
-        /// <param name="runIntervalInMinutes"></param>
-        /// <returns></returns>
-        IActionResult ScheduleProcessTaxonAreaAggregationJob(byte runIntervalInHours);
     }
 }
