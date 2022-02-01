@@ -101,7 +101,7 @@ namespace SOS.Lib.Services
                     RequestCount = ((JsonElement)r[4]).GetInt64(),
                     FailureCount = ((JsonElement)r[5]).GetInt64(),
                     AverageDuration = ((JsonElement)r[6]).GetInt64(),
-                    SumResponseCount = ((JsonElement)r[7]).GetInt32(),
+                    SumResponseCount = ((JsonElement)r[7]).GetInt64()
                 });
         }
 

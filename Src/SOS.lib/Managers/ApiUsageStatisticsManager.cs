@@ -235,7 +235,7 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, SumResponseCountColumnIndex].Value = "SummaryOfResponseCount";
 
                 // Format style by columns in first row
-                using (var range = worksheet.Cells[1, 1, 1, AverageDurationColumnIndex])
+                using (var range = worksheet.Cells[1, 1, 1, SumResponseCountColumnIndex])
                 {
                     range.Style.Font.Bold = false;
                     range.Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
