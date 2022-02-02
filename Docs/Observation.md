@@ -47,8 +47,8 @@ These fields are deprecated and should not be used.
 | type 	| VocabularyValue[\<type\>](Vocabularies.md#type)	|  	| The nature or genre of the resource. 	| https://dwc.tdwg.org/terms/#dwc:type 	|
 | &nbsp;  	|  	|  	|  	|  	|
 | **Event** 	| 	|  	|  	|  	|  
-| event.startDate 	| DateTime? 	| "2008-07-07T11:00:00+02:00" 	| Start date/time of the event in W. Europe Standard Time.    	|  	|
-| event.endDate 	| DateTime? 	| "2008-07-07T12:30:00+02:00" 	| End date/time of the event in W. Europe Standard Time.    	|  	|
+| event.startDate 	| DateTime? 	| "2008-07-07T11:00:00+02:00" 	| Start date/time of the event in ISO8601 Date format including time zone.    	|  	|
+| event.endDate 	| DateTime? 	| "2008-07-07T12:30:00+02:00" 	| End date/time of the event in ISO8601 Date format including time zone.    	|  	|
 | event.plainStartDate 	| string 	| "2008-07-07" 	| Start date of the event in the format yyyy-MM-dd.    	|  	|
 | event.plainEndDate 	| string 	| "2008-07-07" 	| End date of the event in the format yyyy-MM-dd.    	|  	|
 | event.plainStartTime 	| string 	| "11:00" 	| Start time of the event in W. Europe Standard Time formatted as hh:mm.    	|  	|
