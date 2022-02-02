@@ -406,6 +406,11 @@ The following taxon lists exists:
 | 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|
 | 17 	|  	| Action plan 	| Åtgärdsprogram 	|
 | 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|
+| 19 	| 6	| Risk assessment - Severe impact 	| Risklista - Mycket hög risk (SE) 	|
+| 20 	| 6	| Risk assessment - High impact 	| Risklista - Hög risk (HI) 	|
+| 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|
+| 22 	| 6	| Risk assessment - Low impact 	| Risklista - Låg risk (LO) 	|
+| 23 	| 6	| Risk assessment - No known impact 	| Risklista - Ingen känd risk (NK) 	|
 
 ### Search for observations with taxon lists - merge
 
