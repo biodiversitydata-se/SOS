@@ -88,7 +88,7 @@ namespace SOS.Lib.Factories
                     try
                     {
                         await _userServiceUserSemaphore.WaitAsync();
-                        if (!!_users.TryGetValue(userId, out user))
+                        if (!_users.TryGetValue(userId, out user))
                         {
                             user = await _userService.GetUserByIdAsync(userId);
                             _users.TryAdd(userId, user);
