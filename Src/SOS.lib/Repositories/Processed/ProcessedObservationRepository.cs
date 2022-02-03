@@ -1378,10 +1378,11 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
-            
+            _telemetry.Context.GlobalProperties["custom_property_test3"] = "25";
+            _telemetry.Context.Properties["custom_property_test4"] = "25";
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");            
             _telemetry.Context.GlobalProperties["custom_property_test1"] = "25";
-            _telemetry.Context.Properties["custom_property_test2"] = "25";            
+            _telemetry.Context.Properties["custom_property_test2"] = "25";
             var httpContext = _httpContextAccessor?.HttpContext;
             if (httpContext != null && !httpContext.Items.ContainsKey("Response-Count"))
             {
