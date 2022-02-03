@@ -220,12 +220,12 @@ namespace SOS.Observations.Api.Controllers
                     return Result.Failure("You have to provide at least one taxon list id");
                 }
 
-                var errors = filter.TaxonListIds.Where(tlid => !_signalSearchTaxonListIds.Contains(tlid))
-                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this search");
-                if (errors?.Any() ?? false)
+                var containsMandatoryTaxonList = filter.TaxonListIds.Any(tlid => _signalSearchTaxonListIds.Contains(tlid));
+                if (!containsMandatoryTaxonList)
                 {
-                    return Result.Failure(string.Join(",", errors));
+                    return Result.Failure("You have to provide at least one mandatory signal search taxon list");
                 }
+                
                 return Result.Success();
             }
 
@@ -1798,14 +1798,14 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SignalFilterDto filter,
-            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true)
         {
             try
             {
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSignalSearch(filter, validateSearchFilter, areaBuffer) : Result.Success(),
+                    ValidateSignalSearch(filter, validateSearchFilter, areaBuffer),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure)
