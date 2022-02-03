@@ -1379,13 +1379,13 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
             
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
-            
-            _telemetry.SetProperty("custom_property_test", 25);
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");            
+            _telemetry.Context.GlobalProperties["custom_property_test1"] = "25";
+            _telemetry.Context.Properties["custom_property_test2"] = "25";            
             var httpContext = _httpContextAccessor?.HttpContext;
             if (httpContext != null && !httpContext.Items.ContainsKey("Response-Count"))
             {
-                httpContext.Items.Add("Response-Count", 1);
+                httpContext.Items.Add("Response-count", 1);
             }
 
             operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
