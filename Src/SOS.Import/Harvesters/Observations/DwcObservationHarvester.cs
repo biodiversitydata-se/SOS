@@ -192,6 +192,7 @@ namespace SOS.Import.Harvesters.Observations
                 Status = RunStatus.Failed
             };
             XDocument emlDocument = null;
+            _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo.Status}");
 
             if (!string.IsNullOrEmpty(provider.DownloadUrlEml))
             {
@@ -248,6 +249,7 @@ namespace SOS.Import.Harvesters.Observations
                 File.Delete(path);
             }
 
+            _logger.LogInformation($"Finish harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
     }

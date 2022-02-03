@@ -139,7 +139,8 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed to harvest KUL");
                 harvestInfo.Status = RunStatus.Failed;
             }
-            
+
+            _logger.LogInformation($"Finish harvesting sightings for KUL data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
 

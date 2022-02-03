@@ -42,7 +42,7 @@ namespace SOS.Import.UnitTests.Services
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>()))
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
                 .Throws(new Exception("Exception"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -66,7 +66,7 @@ namespace SOS.Import.UnitTests.Services
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             //TODO fix test file
-            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>()))
+            _aquaSupportRequestServiceMock.Setup(s => s.GetAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<long>(), It.IsAny<int>()))
                 .ReturnsAsync(new XDocument());
 
             //-----------------------------------------------------------------------------------------------------------
