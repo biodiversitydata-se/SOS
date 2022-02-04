@@ -18,6 +18,7 @@ using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Export;
 
 namespace SOS.Export.Managers
 {
@@ -104,12 +105,12 @@ namespace SOS.Export.Managers
             bool excludeNullValues,
             IJobCancellationToken cancellationToken)
         {
-            var zipFilePath = "";
+            FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);                
+                await _filterManager.PrepareFilter(0,null, filter);
 
-                zipFilePath = exportFormat switch
+                fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
@@ -118,7 +119,7 @@ namespace SOS.Export.Managers
                 };
                 
                 // zend file to user
-                return await _zendToService.SendFile(emailAddress, description, zipFilePath, exportFormat);
+                return await _zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, exportFormat);
             }
             catch (Exception e)
             {
@@ -127,7 +128,7 @@ namespace SOS.Export.Managers
             }
             finally
             {
-                _fileService.DeleteFile(zipFilePath);
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
             }
         }
 
@@ -149,11 +150,11 @@ namespace SOS.Export.Managers
             string description,
             IJobCancellationToken cancellationToken)
         {
-            var zipFilePath = "";
+            FileExportResult fileExportResult = null;
             try
             {
                 await _filterManager.PrepareFilter(0,null, filter);
-                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                fileExportResult = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer?.ToLower();
@@ -164,13 +165,13 @@ namespace SOS.Export.Managers
                 var tasks = new List<Task<bool>>
                 {
                     // Upload file to blob storage
-                    _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer),
+                    _blobStorageService.UploadBlobAsync(fileExportResult.FilePath, blobStorageContainer),
                 };
 
                 if (!string.IsNullOrEmpty(emailAddress))
                 {
                     // Send file to user
-                    tasks.Add(_zendToService.SendFile(emailAddress, description, zipFilePath, ExportFormat.DwC));
+                    tasks.Add(_zendToService.SendFile(emailAddress, description, fileExportResult.FilePath, ExportFormat.DwC));
                 }
 
                 await Task.WhenAll(tasks);
@@ -187,7 +188,7 @@ namespace SOS.Export.Managers
             finally
             {
                 // Remove local file
-                _fileService.DeleteFile(zipFilePath);
+                if (fileExportResult != null) _fileService.DeleteFile(fileExportResult.FilePath);
             }
         }
 
@@ -201,7 +202,7 @@ namespace SOS.Export.Managers
         /// <param name="propertyLabelType"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<string> CreateCsvExportAsync(SearchFilter filter,
+        private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter,
             string fileName,
             string culture,
             OutputFieldSet outputFieldSet,
@@ -211,7 +212,7 @@ namespace SOS.Export.Managers
             try
             {
                 bool gzip = true;
-                var zipFilePath = await _csvWriter.CreateFileAync(
+                var fileExportResult = await _csvWriter.CreateFileAync(
                     filter,
                     _exportPath,
                     fileName,
@@ -221,7 +222,7 @@ namespace SOS.Export.Managers
                     gzip,
                     cancellationToken);
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -242,14 +243,14 @@ namespace SOS.Export.Managers
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>Path to created file</returns>
-        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string fileName,
+        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-                var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                var fileExportResult = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
@@ -260,7 +261,7 @@ namespace SOS.Export.Managers
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -274,7 +275,7 @@ namespace SOS.Export.Managers
             }
         }
 
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
             string fileName, 
             string culture,
             OutputFieldSet outputFieldSet,
@@ -284,7 +285,7 @@ namespace SOS.Export.Managers
             try
             {
                 bool gzip = true;
-                var zipFilePath = await _excelWriter.CreateFileAync(
+                var fileExportResult = await _excelWriter.CreateFileAync(
                     filter,
                     _exportPath,
                     fileName,
@@ -294,7 +295,7 @@ namespace SOS.Export.Managers
                     gzip,
                     cancellationToken);
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -308,7 +309,7 @@ namespace SOS.Export.Managers
             }
         }
 
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter, 
             string fileName, 
             string culture, 
             bool flatOut,
@@ -320,7 +321,7 @@ namespace SOS.Export.Managers
             try
             {
                 bool gzip = true;
-                var zipFilePath = await _geoJsonWriter.CreateFileAync(
+                var fileExportResult = await _geoJsonWriter.CreateFileAync(
                    filter,
                    _exportPath,
                    fileName,
@@ -332,7 +333,7 @@ namespace SOS.Export.Managers
                    gzip,
                    cancellationToken);
                 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {

@@ -22,6 +22,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Factories;
+using SOS.Lib.Models.Export;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -63,7 +64,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateDwcArchiveFileAsync(
+        public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
             FilterBase filter,
             string fileName,
@@ -86,7 +87,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateDwcArchiveFileAsync(
+        public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
             FilterBase filter,
             string fileName,
@@ -110,11 +111,12 @@ namespace SOS.Lib.IO.DwcArchive
                 var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
                 bool emofFileCreated = false;
                 bool multimediaFileCreated = false;
+                int nrObservations = 0;
 
                 // Create Occurrence.csv
                 using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
                 {
-                    await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                    nrObservations = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                         filter,
                         fileStream,
                         fieldDescriptions,
@@ -179,7 +181,11 @@ namespace SOS.Lib.IO.DwcArchive
 
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
-                return zipFilePath;
+                return new FileExportResult
+                {
+                    FilePath = zipFilePath,
+                    NrObservations = nrObservations
+                };                
             }
             catch (JobAbortedException)
             {

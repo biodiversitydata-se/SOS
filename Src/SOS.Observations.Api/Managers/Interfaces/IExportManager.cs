@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -24,7 +25,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<string> CreateExportFileAsync(SearchFilter filter,
+        Task<FileExportResult> CreateExportFileAsync(SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
             string culture,

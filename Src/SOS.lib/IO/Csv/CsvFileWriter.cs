@@ -19,6 +19,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Export;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -53,7 +54,7 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
-        public async Task<string> CreateFileAync(SearchFilter filter, 
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath,
             string fileName, 
             string culture, 
@@ -63,9 +64,10 @@ namespace SOS.Lib.IO.Excel
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
-
+            
             try
             {
+                int nrObservations = 0;
                 var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -115,6 +117,7 @@ namespace SOS.Lib.IO.Excel
                         csvFileHelper.NextRecord();
                     }
 
+                    nrObservations += processedObservations.Length;
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
@@ -124,13 +127,21 @@ namespace SOS.Lib.IO.Excel
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
                     var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                    return zipFilePath;
+                    return new FileExportResult
+                    {
+                        NrObservations = nrObservations,
+                        FilePath = zipFilePath
+                    };
                 }
                 else
                 {
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.csv");
                     File.Move(observationsFilePath, destinationFilePath);
-                    return destinationFilePath;
+                    return new FileExportResult
+                    {
+                        NrObservations = nrObservations,
+                        FilePath = destinationFilePath
+                    };
                 }
             }
             catch (Exception e)

@@ -935,7 +935,7 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-
+        
         /// <summary>
         /// Gets a single observation.
         /// </summary>
@@ -962,7 +962,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             try
-            {
+            {                                
                 var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false);
 
@@ -971,6 +971,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
+                HttpContext.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)

@@ -13,6 +13,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Models;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -50,7 +51,7 @@ namespace SOS.Lib.IO.GeoJson
 
 
         /// <inheritdoc />
-        public async Task<string> CreateFileAync(SearchFilter filter,
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
             string exportPath,
             string fileName,
             string culture,
@@ -65,6 +66,7 @@ namespace SOS.Lib.IO.GeoJson
 
             try
             {
+                int nrObservations = 0;
                 var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
@@ -107,6 +109,7 @@ namespace SOS.Lib.IO.GeoJson
                         }
                     }
 
+                    nrObservations += scrollResult.Records.Count();
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsDynamicAsync(filter, scrollResult.ScrollId);
                 }
@@ -119,13 +122,21 @@ namespace SOS.Lib.IO.GeoJson
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
                     var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                    return zipFilePath;
+                    return new FileExportResult
+                    {
+                        FilePath = zipFilePath,
+                        NrObservations = nrObservations
+                    };
                 }
                 else
                 {                                        
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.geojson");
                     File.Move(observationsFilePath, destinationFilePath);
-                    return destinationFilePath;
+                    return new FileExportResult
+                    {
+                        FilePath = destinationFilePath,
+                        NrObservations = nrObservations
+                    };
                 }                
             }
             catch (Exception e)

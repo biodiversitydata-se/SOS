@@ -18,6 +18,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Export;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -52,7 +53,7 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         
-        public async Task<string> CreateFileAync(SearchFilter filter, 
+        public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath,
             string fileName, 
             string culture, 
@@ -66,6 +67,7 @@ namespace SOS.Lib.IO.Excel
             try
             {
                 string excelFilePath = null;
+                int nrObservations = 0;
                 var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -135,6 +137,7 @@ namespace SOS.Lib.IO.Excel
                         rowIndex++;
                     }
 
+                    nrObservations += processedObservations.Length;
                     // Get next batch of observations.
                     scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
@@ -154,13 +157,21 @@ namespace SOS.Lib.IO.Excel
                 {
                     await StoreFilterAsync(temporaryZipExportFolderPath, filter);
                     var zipFilePath = _fileService.CompressFolder(exportPath, fileName);
-                    return zipFilePath;
+                    return new FileExportResult
+                    {
+                        FilePath = zipFilePath,
+                        NrObservations = nrObservations
+                    };
                 }
                 else
                 {
                     var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
                     File.Move(excelFilePath, destinationFilePath);
-                    return destinationFilePath;
+                    return new FileExportResult
+                    {
+                        FilePath = destinationFilePath,
+                        NrObservations = nrObservations
+                    };
                 }
             }
             catch (Exception e)

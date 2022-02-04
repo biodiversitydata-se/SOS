@@ -9,6 +9,7 @@ using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -42,7 +43,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateCsvExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter, 
             string exportPath,
             string fileName, 
             string culture, 
@@ -53,7 +54,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var filePath = await _csvWriter.CreateFileAync(
+                var fileExportResult = await _csvWriter.CreateFileAync(
                     filter,
                     exportPath,
                     fileName,
@@ -63,7 +64,7 @@ namespace SOS.Observations.Api.Managers
                     gzip,
                     cancellationToken);
 
-                return filePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -85,14 +86,14 @@ namespace SOS.Observations.Api.Managers
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<string> CreateDWCExportAsync(SearchFilter filter, string exportPath, string fileName,
+        private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string exportPath, string fileName,
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-                var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                var fileExportResult = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
@@ -103,7 +104,7 @@ namespace SOS.Observations.Api.Managers
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                return zipFilePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -129,7 +130,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateExcelExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
             string exportPath, 
             string fileName, 
             string culture, 
@@ -140,7 +141,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var filePath = await _excelWriter.CreateFileAync(
+                var fileExportResult = await _excelWriter.CreateFileAync(
                     filter, 
                     exportPath,
                     fileName,
@@ -150,7 +151,7 @@ namespace SOS.Observations.Api.Managers
                     gzip,
                     cancellationToken);
 
-                return filePath;
+                return fileExportResult;
             }
             catch (JobAbortedException)
             {
@@ -178,7 +179,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="cancellationToken"></param>
         /// <param name="outputFieldSet"></param>
         /// <returns></returns>
-        private async Task<string> CreateGeoJsonExportAsync(SearchFilter filter, 
+        private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter, 
             string exportPath, 
             string fileName, 
             string culture, 
@@ -256,7 +257,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<string> CreateExportFileAsync(SearchFilter filter,
+        public async Task<FileExportResult> CreateExportFileAsync(SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
             string culture,
@@ -271,7 +272,7 @@ namespace SOS.Observations.Api.Managers
             {
                 await _filterManager.PrepareFilter(0,null, filter);
 
-                var filePath = exportFormat switch
+                var fileExportResult = exportFormat switch
                 {
                     ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, gzip, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
@@ -279,7 +280,7 @@ namespace SOS.Observations.Api.Managers
                     ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, gzip, cancellationToken)
                 };
                 
-                return filePath;
+                return fileExportResult;
             }
             catch (Exception e)
             {

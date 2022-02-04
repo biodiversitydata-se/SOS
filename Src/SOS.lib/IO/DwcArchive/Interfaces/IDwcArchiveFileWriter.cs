@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
@@ -26,7 +27,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
+        Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
@@ -49,7 +50,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
+        Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
             FilterBase filter,
             string fileName,

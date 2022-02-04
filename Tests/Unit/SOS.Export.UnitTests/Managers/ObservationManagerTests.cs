@@ -18,6 +18,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 using Xunit;
+using SOS.Lib.Models.Export;
 
 namespace SOS.Export.UnitTests.Managers
 {
@@ -96,7 +97,7 @@ namespace SOS.Export.UnitTests.Managers
                     It.IsAny<string>(),
                     JobCancellationToken.Null
                 )
-            ).ReturnsAsync("filePath");
+            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
 
             _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
                 .ReturnsAsync(false);
@@ -136,7 +137,7 @@ namespace SOS.Export.UnitTests.Managers
                     It.IsAny<string>(),
                     JobCancellationToken.Null
                 )
-            ).ReturnsAsync("filePath");
+            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
 
             _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
                 .ReturnsAsync(true);
@@ -202,7 +203,7 @@ namespace SOS.Export.UnitTests.Managers
                     It.IsAny<string>(),
                     JobCancellationToken.Null
                 )
-            ).ReturnsAsync("filePath");
+            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
 
             _blobStorageServiceMock.Setup(bss => bss.CreateContainerAsync(It.IsAny<string>()));
             _blobStorageServiceMock.Setup(bss => bss.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>()))
@@ -245,7 +246,7 @@ namespace SOS.Export.UnitTests.Managers
                     It.IsAny<string>(),
                     JobCancellationToken.Null
                 )
-            ).ReturnsAsync("filePath");
+            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
 
             _blobStorageServiceMock.Setup(bss => bss.CreateContainerAsync(It.IsAny<string>()));
             _blobStorageServiceMock.Setup(bss => bss.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>()))
