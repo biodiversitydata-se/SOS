@@ -471,11 +471,7 @@ namespace SOS.Observations.Api
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
                 app.UseMiddleware<StoreRequestBodyMiddleware>();
-            }
-            if (applicationInsightsConfiguration.EnableSearchResponseCountLogging)
-            {
-                app.UseMiddleware<StoreSearchCountMiddleware>();
-            }
+            }            
 
             app.UseHangfireDashboard();
 
