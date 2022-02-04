@@ -115,46 +115,6 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         /// <summary>
-        ///     Make a successful test of export all
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async Task ExportAndSendAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
-
-            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
-                    DataProvider.FilterSubsetDataProvider, 
-                    It.IsAny<FilterBase>(),
-                    It.IsAny<string>(),
-                    _processedObservationRepositoryMock.Object,
-                    It.IsAny<ProcessInfo>(),
-                    It.IsAny<string>(),
-                    JobCancellationToken.Null
-                )
-            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
-
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat> ()))
-                .ReturnsAsync(true);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndSendAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), "", ExportFormat.DwC, "en-GB", false, OutputFieldSet.All, PropertyLabelType.PropertyPath, false,
-                JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }
-
-        /// <summary>
         ///     Test export all throws
         /// </summary>
         /// <returns></returns>
@@ -221,49 +181,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeFalse();
-        }
-
-        /// <summary>
-        ///     Make a successful test of export all
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async Task ExportAndStoreAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
-
-            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
-                    DataProvider.FilterSubsetDataProvider, 
-                    It.IsAny<FilterBase>(),
-                    It.IsAny<string>(),
-                    _processedObservationRepositoryMock.Object,
-                    It.IsAny<ProcessInfo>(),
-                    It.IsAny<string>(),
-                    JobCancellationToken.Null
-                )
-            ).ReturnsAsync(new FileExportResult { FilePath = "filePath" });
-
-            _blobStorageServiceMock.Setup(bss => bss.CreateContainerAsync(It.IsAny<string>()));
-            _blobStorageServiceMock.Setup(bss => bss.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(true);
-
-            _fileServiceMock.Setup(blss => blss.DeleteFile(It.IsAny<string>()));
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "", JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }
+        }             
 
         /// <summary>
         ///     Test export all throws

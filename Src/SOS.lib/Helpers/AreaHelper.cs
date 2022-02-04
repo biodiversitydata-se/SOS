@@ -32,6 +32,7 @@ namespace SOS.Lib.Helpers
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
         private SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
+        private static readonly object _lockObject = new object();
 
         /// <summary>
         ///     Constructor
@@ -196,46 +197,50 @@ namespace SOS.Lib.Helpers
             // Try to get areas from cache. If areas not found for that position, try to get from repository
             if (!_featureCache.TryGetValue(key, out var positionLocation))
             {
-                var features = GetPointFeatures(decimalLongitude, decimalLatitude);
-                positionLocation = new PositionLocation();
-
-                if (features != null)
+                lock (_lockObject)
                 {
-                    foreach (var feature in features)
+                    if (_featureCache.TryGetValue(key, out var calculatedPositionLocation)) return calculatedPositionLocation;
+                    var features = GetPointFeatures(decimalLongitude, decimalLatitude);
+                    positionLocation = new PositionLocation();
+
+                    if (features != null)
                     {
-                        if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
-                            out var areaType))
+                        foreach (var feature in features)
                         {
-                            var area = new Area
+                            if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
+                                out var areaType))
                             {
-                                FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
-                                Name = feature.Attributes.GetOptionalValue("name")?.ToString()
-                            };
-                            switch ((AreaType)areaType)
-                            {
-                                case AreaType.County:
-                                    positionLocation.County = area;
-                                    break;
-                                case AreaType.Municipality:
-                                    positionLocation.Municipality = area;
-                                    break;
-                                case AreaType.Parish:
-                                    positionLocation.Parish = area;
-                                    break;
-                                case AreaType.Province:
-                                    positionLocation.Province = area;
-                                    break;
-                                case AreaType.EconomicZoneOfSweden:
-                                    positionLocation.EconomicZoneOfSweden = true;
-                                    break;
+                                var area = new Area
+                                {
+                                    FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
+                                    Name = feature.Attributes.GetOptionalValue("name")?.ToString()
+                                };
+                                switch ((AreaType)areaType)
+                                {
+                                    case AreaType.County:
+                                        positionLocation.County = area;
+                                        break;
+                                    case AreaType.Municipality:
+                                        positionLocation.Municipality = area;
+                                        break;
+                                    case AreaType.Parish:
+                                        positionLocation.Parish = area;
+                                        break;
+                                    case AreaType.Province:
+                                        positionLocation.Province = area;
+                                        break;
+                                    case AreaType.EconomicZoneOfSweden:
+                                        positionLocation.EconomicZoneOfSweden = true;
+                                        break;
+                                }
                             }
                         }
                     }
-                }
 
-                if (!_featureCache.ContainsKey(key))
-                {
-                    _featureCache.TryAdd(key, positionLocation);
+                    if (!_featureCache.ContainsKey(key))
+                    {
+                        _featureCache.TryAdd(key, positionLocation);
+                    }
                 }
             }
 
