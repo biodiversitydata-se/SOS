@@ -97,7 +97,9 @@ namespace SOS.Process.Processors.Taxon
                                     taxon.DynamicProperties.ActionPlan =
                                         factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
-                                case FactorEnum.BirdDirective:
+                                case FactorEnum.BirdDirectiveAnnex1:
+                                case FactorEnum.BirdDirectiveAnnex2:
+                                case FactorEnum.PriorityBirds:
                                     taxon.DynamicProperties.BirdDirective = factor.Attributes
                                         ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
                                             StringComparison.CurrentCultureIgnoreCase);
