@@ -15,9 +15,7 @@ namespace SOS.Import.Services
         private readonly IHttpClientService _httpClientService;
         private readonly ILogger<AquaSupportRequestService> _logger;
         private readonly SemaphoreSlim _semaphore;
-
-        private DateTime? _lastRequestTime;
-        private int _maxReturnedChanges;
+        private DateTime? _lastRequestTime;        
         private const int TimeBetweenCalls = 2000;
 
         /// <summary>
@@ -31,54 +29,16 @@ namespace SOS.Import.Services
             ILogger<AquaSupportRequestService> logger)
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _maxReturnedChanges = 10000;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
             _semaphore = new SemaphoreSlim(1);
         }
 
-        public async Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId)
+        public async Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges = 10000)
         {
             try
             {
                 await _semaphore.WaitAsync();
-                
-                var timeSinceLastCall = (DateTime.Now - (_lastRequestTime ?? DateTime.MinValue)).Milliseconds;
-                if (timeSinceLastCall < TimeBetweenCalls)
-                {
-                    var sleepTime = TimeBetweenCalls - timeSinceLastCall;
-                    Thread.Sleep(sleepTime);
-                }
-
-                _lastRequestTime = DateTime.Now;
-                var xmlStream = await _httpClientService.GetFileStreamAsync(
-                    new Uri($"{baseUrl}" +
-                            $"&changedFrom={startDate.ToString("yyyy-MM-dd")}" +
-                            $"&isChangedFromSpecified=true" +
-                            $"&changedTo={endDate.ToString("yyyy-MM-dd")}" +
-                            $"&isChangedToSpecified=true" +
-                            $"&changeId={changeId}" +
-                            $"&isChangedIdSpecified=true" +
-                            $"&maxReturnedChanges={_maxReturnedChanges}"),
-                    new Dictionary<string, string>(new[]
-                        {
-                            new KeyValuePair<string, string>("Accept", "application/xml"),
-                        }
-                    )
-                );
-
-                // If get stream failed, try to decrease max returned observations and try again
-                if (xmlStream == null && _maxReturnedChanges > 1000)
-                {
-                    _maxReturnedChanges -= 1000;
-                    return await GetAsync(baseUrl, startDate, endDate, changeId);
-                }
-
-                xmlStream.Seek(0, SeekOrigin.Begin);
-
-                var xDocument = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
-
-                return xDocument;
+                return await GetDocumentAsync(baseUrl, startDate, endDate, changeId, maxReturnedChanges);                
             }
             catch (Exception e)
             {
@@ -90,6 +50,48 @@ namespace SOS.Import.Services
                 // Release semaphore in order to let next thread start getting data 
                 _semaphore.Release();
             }
+        }
+
+        private async Task<XDocument> GetDocumentAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges)
+        {
+            if (maxReturnedChanges <= 0)
+            {
+                throw new Exception($"Failed harvesting observations from url {baseUrl}");
+            }
+            var timeSinceLastCall = (DateTime.Now - (_lastRequestTime ?? DateTime.MinValue)).Milliseconds;
+            if (timeSinceLastCall < TimeBetweenCalls)
+            {
+                var sleepTime = TimeBetweenCalls - timeSinceLastCall;
+                Thread.Sleep(sleepTime);
+            }
+
+            _lastRequestTime = DateTime.Now;
+            var xmlStream = await _httpClientService.GetFileStreamAsync(
+                new Uri($"{baseUrl}" +
+                        $"&changedFrom={startDate.ToString("yyyy-MM-dd")}" +
+                        $"&isChangedFromSpecified=true" +
+                        $"&changedTo={endDate.ToString("yyyy-MM-dd")}" +
+                        $"&isChangedToSpecified=true" +
+                        $"&changeId={changeId}" +
+                        $"&isChangedIdSpecified=true" +
+                        $"&maxReturnedChanges={maxReturnedChanges}"),
+                new Dictionary<string, string>(new[]
+                    {
+                            new KeyValuePair<string, string>("Accept", "application/xml"),
+                    }
+                )
+            );
+
+            // If get stream failed, try to decrease max returned observations and try again
+            if (xmlStream == null)
+            {                
+                return await GetDocumentAsync(baseUrl, startDate, endDate, changeId, maxReturnedChanges - 2000);
+            }
+
+            xmlStream.Seek(0, SeekOrigin.Begin);
+            var xDocument = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
+
+            return xDocument;
         }
     }
 }

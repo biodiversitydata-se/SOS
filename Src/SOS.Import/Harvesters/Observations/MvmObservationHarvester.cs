@@ -125,6 +125,7 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.Status = RunStatus.Failed;
             }
 
+            _logger.LogInformation($"Finish harvesting sightings for MVM data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
 

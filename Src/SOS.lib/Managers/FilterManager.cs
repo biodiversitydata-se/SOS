@@ -73,7 +73,7 @@ namespace SOS.Lib.Managers
             foreach (var authority in authorities)
             {
                 // Max protection level must be greater than or equal to 3
-                if (authority.MaxProtectionLevel < 3)
+                if (authority.MaxProtectionLevel < 3 && authority.AuthorityIdentity != "SightingIndication")
                 {
                     continue;
                 }

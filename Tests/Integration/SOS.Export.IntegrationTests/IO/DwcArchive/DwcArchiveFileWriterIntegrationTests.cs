@@ -102,7 +102,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+            var fileExportResult = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 filter,
                 filename,
@@ -114,7 +114,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            var fileExists = File.Exists(zipFilePath);
+            var fileExists = File.Exists(fileExportResult.FilePath);
             fileExists.Should().BeTrue("because the zip file should have been generated");
         }
 
@@ -142,7 +142,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+            var fileExportResult = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 new SearchFilter(),
                 filename,
@@ -154,7 +154,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            var fileExists = File.Exists(zipFilePath);
+            var fileExists = File.Exists(fileExportResult.FilePath);
             fileExists.Should().BeTrue("because the zip file should have been generated");
         }
     }

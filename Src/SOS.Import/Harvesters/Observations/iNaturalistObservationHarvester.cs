@@ -131,7 +131,8 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed to harvest iNaturalist");
                 harvestInfo.Status = RunStatus.Failed;
             }
-
+            
+            _logger.LogInformation($"Finish harvesting sightings for iNaturalist data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
 

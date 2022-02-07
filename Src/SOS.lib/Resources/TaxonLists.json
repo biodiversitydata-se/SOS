@@ -286,11 +286,11 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "Severe impact"
+        "Value": "Risk assessment - Severe impact"
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Mycket hög risk (SE)"
+        "Value": "Risklista - Mycket hög risk (SE)"
       }
     ],
     "TaxonIds": []
@@ -302,11 +302,11 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "High impact"
+        "Value": "Risk assessment - High impact"
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Hög risk (HI)"
+        "Value": "Risklista - Hög risk (HI)"
       }
     ],
     "TaxonIds": []
@@ -318,11 +318,11 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "Potentially high impact"
+        "Value": "Risk assessment - Potentially high impact"
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Potentiellt hög risk (PH)"
+        "Value": "Risklista - Potentiellt hög risk (PH)"
       }
     ],
     "TaxonIds": []
@@ -334,11 +334,11 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "Low impact"
+        "Value": "Risk assessment - Low impact"
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Låg risk (LO)"
+        "Value": "Risklista - Låg risk (LO)"
       }
     ],
     "TaxonIds": []
@@ -350,11 +350,11 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "No known impact"
+        "Value": "Risk assessment - No known impact"
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Ingen känd risk (NK)"
+        "Value": "Risklista - Ingen känd risk (NK)"
       }
     ],
     "TaxonIds": []

@@ -14,6 +14,6 @@ namespace SOS.Import.Services.Interfaces
         /// <param name="endDate"></param>
         /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId);
+        Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges = 10000);
     }
 }

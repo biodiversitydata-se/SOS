@@ -34,7 +34,7 @@ namespace SOS.Lib.IO.DwcArchive
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<bool> CreateOccurrenceCsvFileAsync(
+        public async Task<int> CreateOccurrenceCsvFileAsync(
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
@@ -46,6 +46,7 @@ namespace SOS.Lib.IO.DwcArchive
                 var stopwatch = Stopwatch.StartNew();
                 var elasticRetrievalStopwatch = new Stopwatch();
                 var csvWritingStopwatch = new Stopwatch();
+                int nrObservations = 0;
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
                 processedObservationRepository.LiveMode = true;
@@ -78,6 +79,7 @@ namespace SOS.Lib.IO.DwcArchive
                     {
                         WriteOccurrenceRow(csvFileHelper, dwcObservation, fieldsToWriteArray);
                     }
+                    nrObservations += dwcObservations.Length;
                     await csvFileHelper.FlushAsync();
                     csvWritingStopwatch.Stop();
 
@@ -90,7 +92,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                 stopwatch.Stop();
                 _logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
-                return true;
+                return nrObservations;
             }
             catch (JobAbortedException)
             {

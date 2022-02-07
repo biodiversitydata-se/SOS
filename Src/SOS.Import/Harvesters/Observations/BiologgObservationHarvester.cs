@@ -61,6 +61,7 @@ namespace SOS.Import.Harvesters.Observations
             {
                 Status = RunStatus.Failed
             };
+            _logger.LogInformation($"Start harvesting sightings for Biologg data provider.");
 
             try
             {
@@ -120,6 +121,7 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.Status = RunStatus.Failed;
             }
 
+            _logger.LogInformation($"Finish harvesting sightings for Biologg data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
 

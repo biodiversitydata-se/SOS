@@ -20,8 +20,8 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<bool> CreateOccurrenceCsvFileAsync(
+        /// <returns>Number of observations.</returns>
+        Task<int> CreateOccurrenceCsvFileAsync(
             FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,

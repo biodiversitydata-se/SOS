@@ -1378,8 +1378,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
-
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");            
 
             operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
             operation.Telemetry.Properties["Filter"] = filter.ToString();

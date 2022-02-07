@@ -220,12 +220,12 @@ namespace SOS.Observations.Api.Controllers
                     return Result.Failure("You have to provide at least one taxon list id");
                 }
 
-                var errors = filter.TaxonListIds.Where(tlid => !_signalSearchTaxonListIds.Contains(tlid))
-                    .Select(tlid => $"{tlid} is NOT a allowed taxon list for this search");
-                if (errors?.Any() ?? false)
+                var containsMandatoryTaxonList = filter.TaxonListIds.Any(tlid => _signalSearchTaxonListIds.Contains(tlid));
+                if (!containsMandatoryTaxonList)
                 {
-                    return Result.Failure(string.Join(",", errors));
+                    return Result.Failure("You have to provide at least one mandatory signal search taxon list");
                 }
+                
                 return Result.Success();
             }
 
@@ -552,7 +552,8 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
-                PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
+                HttpContext.LogObservationCount(result.Records.Count());
+                PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);                
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -935,7 +936,7 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-
+        
         /// <summary>
         /// Gets a single observation.
         /// </summary>
@@ -962,7 +963,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             try
-            {
+            {                                
                 var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false);
 
@@ -971,6 +972,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
+                HttpContext.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -1057,7 +1059,8 @@ namespace SOS.Observations.Api.Controllers
                     }
                 }
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take, sortBy, sortOrder);
-                GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
+                HttpContext.LogObservationCount(result.Records.Count());
+                GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);                
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1161,6 +1164,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
+                HttpContext.LogObservationCount(result.Records.Count());
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -1774,6 +1778,7 @@ namespace SOS.Observations.Api.Controllers
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
+                HttpContext.LogObservationCount(1);
                 return new OkObjectResult(observation);
             }
             catch (AuthenticationRequiredException e)
@@ -1798,14 +1803,14 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SignalFilterDto filter,
-            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true)
         {
             try
             {
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSignalSearch(filter, validateSearchFilter, areaBuffer) : Result.Success(),
+                    ValidateSignalSearch(filter, validateSearchFilter, areaBuffer),
                     ValidateBoundingBox(filter?.Geographics?.BoundingBox));
 
                 if (validationResult.IsFailure)

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.IO.GeoJson.Interfaces
@@ -21,7 +22,7 @@ namespace SOS.Lib.IO.GeoJson.Interfaces
         /// <param name="excludeNullValues"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
-        Task<string> CreateFileAync(SearchFilter filter, 
+        Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath,
             string fileName, 
             string culture, 

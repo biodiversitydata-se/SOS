@@ -150,6 +150,7 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.Status = RunStatus.Failed;
             }
 
+            _logger.LogInformation($"Finish harvesting sightings for Fish Data data provider. Status={harvestInfo.Status}");
             return harvestInfo;
         }
 

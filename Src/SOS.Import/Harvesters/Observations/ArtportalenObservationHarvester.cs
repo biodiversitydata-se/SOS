@@ -403,6 +403,7 @@ namespace SOS.Import.Harvesters.Observations
             IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _logger.LogInformation($"Start harvesting sightings for Artportalen data provider. Status={harvestInfo.Status}, Mode={mode}");
 
             try
             {
@@ -505,6 +506,7 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.Status = RunStatus.Failed;
             }
 
+            _logger.LogInformation($"Finish harvesting sightings for Artportalen data provider. Status={harvestInfo.Status}, Mode={mode}");
             return harvestInfo;
         }
 
