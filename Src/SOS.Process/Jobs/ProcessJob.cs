@@ -227,7 +227,7 @@ namespace SOS.Process.Jobs
             if (publicIndexDuplicates?.Any() ?? false)
             {
                 _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId. " + 
-                                 $"{string.Concat(publicIndexDuplicates, ", ")}{(publicIndexDuplicates.Count() == maxItems ? "..." : "")}");
+                                 $"{string.Join(", ", publicIndexDuplicates)}{(publicIndexDuplicates.Count() == maxItems ? "..." : "")}");
                 return false;
             }
 
@@ -236,7 +236,7 @@ namespace SOS.Process.Jobs
             if (protectedIndexDuplicates?.Any() ?? false)
             {
                 _logger.LogError($"Protected index ({_processedObservationRepository.ProtectedIndexName}) contains multiple documents with same occurrenceId. " +
-                $"{string.Concat(protectedIndexDuplicates, ", ")}{(protectedIndexDuplicates.Count() == maxItems ? "..." : "")}");
+                $"{string.Join(", ", protectedIndexDuplicates)}{(protectedIndexDuplicates.Count() == maxItems ? "..." : "")}");
                 return false;
             }
 
