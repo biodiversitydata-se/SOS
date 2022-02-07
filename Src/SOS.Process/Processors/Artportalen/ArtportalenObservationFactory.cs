@@ -187,7 +187,7 @@ namespace SOS.Process.Processors.Artportalen
                 // Location
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
-                obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site.ProvincePartIdByCoordinate;
+                obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";

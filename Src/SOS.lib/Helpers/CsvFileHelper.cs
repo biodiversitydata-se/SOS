@@ -97,6 +97,7 @@ namespace SOS.Lib.Helpers
 
                     row += GetField(i);
                 }
+                row = row.Replace("\"", "'");
                 records.Add(parser.Parse(row));
             }
 
