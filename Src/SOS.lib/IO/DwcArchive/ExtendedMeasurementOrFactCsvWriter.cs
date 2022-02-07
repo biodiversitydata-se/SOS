@@ -111,7 +111,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create Emof CSV file.");
+                _logger.LogError(e, "Failed to create Emof txt file.");
                 throw;
             }
         }

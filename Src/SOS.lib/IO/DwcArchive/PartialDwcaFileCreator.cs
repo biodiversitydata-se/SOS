@@ -43,7 +43,7 @@ namespace SOS.Lib.IO.DwcArchive
             Directory.CreateDirectory(destinationFolder);
             File.WriteAllText(Path.Join(destinationFolder, "meta.xml"), dwcaFileComponents.Meta);
             File.WriteAllText(Path.Join(destinationFolder, "eml.xml"), dwcaFileComponents.Eml);
-            File.WriteAllLines(Path.Join(destinationFolder, "occurrence.csv"), dwcaFileComponents.OccurrenceComponent.GetRowsWithHeader());
+            File.WriteAllLines(Path.Join(destinationFolder, "occurrence.txt"), dwcaFileComponents.OccurrenceComponent.GetRowsWithHeader());
             foreach (var extensionComponent in dwcaFileComponents.Extensions)
             {
                 File.WriteAllLines(Path.Join(destinationFolder, extensionComponent.Filename), extensionComponent.GetRowsWithHeader());

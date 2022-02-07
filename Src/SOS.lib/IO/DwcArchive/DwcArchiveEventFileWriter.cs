@@ -204,9 +204,9 @@ namespace SOS.Lib.IO.DwcArchive
             using var archive = ZipFile.Open(tempFilePath, ZipArchiveMode.Create);
             var dwcExtensions = new List<DwcaEventFilePart>();
 
-            // Create event.csv
+            // Create event.txt
             var eventFilePaths = GetFilePaths(dwcaFilePartsInfos, "event-event*");
-            await using var eventFileStream = archive.CreateEntry("event.csv", CompressionLevel.Fastest).Open();
+            await using var eventFileStream = archive.CreateEntry("event.txt", CompressionLevel.Fastest).Open();
 
             using var csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeWrite(eventFileStream, "\t");
@@ -220,12 +220,12 @@ namespace SOS.Lib.IO.DwcArchive
             }
             eventFileStream.Close();
 
-            // Create occurrence.csv
+            // Create occurrence.txt
             var occurrenceFilePaths = GetFilePaths(dwcaFilePartsInfos, "event-occurrence*");
             if (occurrenceFilePaths.Any())
             {
                 dwcExtensions.Add(DwcaEventFilePart.Occurrence);
-                await using var occurrenceFileStream = archive.CreateEntry("occurrence.csv", CompressionLevel.Fastest).Open();
+                await using var occurrenceFileStream = archive.CreateEntry("occurrence.txt", CompressionLevel.Fastest).Open();
                 WriteEventOccurrenceHeaderRow(occurrenceFileStream);
                 foreach (var filePath in occurrenceFilePaths)
                 {
@@ -236,12 +236,12 @@ namespace SOS.Lib.IO.DwcArchive
                 occurrenceFileStream.Close();
             }
 
-            // Create emof.csv
+            // Create emof.txt
             var emofFilePaths = GetFilePaths(dwcaFilePartsInfos, "event-emof*");
             if (emofFilePaths.Any())
             {
                 dwcExtensions.Add(DwcaEventFilePart.Emof);
-                await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.csv", CompressionLevel.Fastest).Open();
+                await using var extendedMeasurementOrFactFileStream = archive.CreateEntry("extendedMeasurementOrFact.txt", CompressionLevel.Fastest).Open();
                 WriteEmofHeaderRow(extendedMeasurementOrFactFileStream, true);
                 foreach (var filePath in emofFilePaths)
                 {
@@ -252,12 +252,12 @@ namespace SOS.Lib.IO.DwcArchive
                 extendedMeasurementOrFactFileStream.Close();
             }
 
-            // Create multimedia.csv
+            // Create multimedia.txt
             var multimediaFilePaths = GetFilePaths(dwcaFilePartsInfos, "event-multimedia*");
             if (multimediaFilePaths.Any())
             {
                 dwcExtensions.Add(DwcaEventFilePart.Multimedia);
-                await using var multimediaFileStream = archive.CreateEntry("multimedia.csv", CompressionLevel.Fastest).Open();
+                await using var multimediaFileStream = archive.CreateEntry("multimedia.txt", CompressionLevel.Fastest).Open();
                 await WriteMultimediaHeaderRow(multimediaFileStream);
                 foreach (var filePath in multimediaFilePaths)
                 {

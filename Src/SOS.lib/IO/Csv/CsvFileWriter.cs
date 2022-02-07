@@ -75,7 +75,7 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
 
-                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.csv");
+                var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, "Observations.txt");
                 await using var fileStream = File.Create(observationsFilePath);                
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");

@@ -266,9 +266,9 @@ namespace SOS.Lib.IO.DwcArchive
             }
             else
             {
-                // Empty folder from CSV files before we start to create new ones.
-                foreach (string file in Directory.GetFiles(dwcaFilePartsInfo.ExportFolder, "*.csv")
-                    .Where(item => item.EndsWith(".csv")))
+                // Empty folder from txt files before we start to create new ones.
+                foreach (string file in Directory.GetFiles(dwcaFilePartsInfo.ExportFolder, "*.txt")
+                    .Where(item => item.EndsWith(".txt")))
                 {
                     File.Delete(file);
                 }

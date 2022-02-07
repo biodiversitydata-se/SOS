@@ -32,7 +32,6 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.21.1" />
     <PackageReference Include="NGeoHash" Version="1.2.0" />
     <PackageReference Include="RecordParser" Version="1.2.0" />
-    <PackageReference Include="Sylvan.Data.Csv" Version="1.1.8" />
   </ItemGroup>
 
   <ItemGroup>

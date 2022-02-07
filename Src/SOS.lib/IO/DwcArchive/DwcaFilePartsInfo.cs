@@ -58,9 +58,9 @@ namespace SOS.Lib.IO.DwcArchive
 
         private Dictionary<DwcaFilePart, string> CreateFilePathByFilePart(string batchId)
         {
-            string occurrenceCsvFilename = batchId == "" ? "Occurrence.csv" : $"Occurrence-{batchId}.csv";
-            string emofCsvFilename = batchId == "" ? "Emof.csv" : $"Emof-{batchId}.csv";
-            string multimediaCsvFilename = batchId == "" ? "Multimedia.csv" : $"Multimedia-{batchId}.csv";
+            string occurrenceCsvFilename = batchId == "" ? "Occurrence.csv" : $"Occurrence-{batchId}.txt";
+            string emofCsvFilename = batchId == "" ? "Emof.csv" : $"Emof-{batchId}.txt";
+            string multimediaCsvFilename = batchId == "" ? "Multimedia.csv" : $"Multimedia-{batchId}.txt";
 
             var filePathByFilePart = new Dictionary<DwcaFilePart, string>
             {
@@ -74,10 +74,10 @@ namespace SOS.Lib.IO.DwcArchive
 
         private Dictionary<DwcaEventFilePart, string> CreateEventFilePathByFilePart(string batchId)
         {
-            string occurrenceCsvFilename = batchId == "" ? "Event-occurrence.csv" : $"Event-occurrence-{batchId}.csv";
-            string emofCsvFilename = batchId == "" ? "Event-emof.csv" : $"Event-emof-{batchId}.csv";
-            string multimediaCsvFilename = batchId == "" ? "Event-multimedia.csv" : $"Event-multimedia-{batchId}.csv";
-            string eventCsvFilename = batchId == "" ? "Event-event.csv" : $"Event-event-{batchId}.csv";
+            string occurrenceCsvFilename = batchId == "" ? "Event-occurrence.csv" : $"Event-occurrence-{batchId}.txt";
+            string emofCsvFilename = batchId == "" ? "Event-emof.csv" : $"Event-emof-{batchId}.txt";
+            string multimediaCsvFilename = batchId == "" ? "Event-multimedia.csv" : $"Event-multimedia-{batchId}.txt";
+            string eventCsvFilename = batchId == "" ? "Event-event.csv" : $"Event-event-{batchId}.txt";
 
             var eventFilePathByFilePart = new Dictionary<DwcaEventFilePart, string>
             {

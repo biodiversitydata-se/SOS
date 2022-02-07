@@ -50,7 +50,7 @@ namespace SOS.Lib.IO.DwcArchive
             private static ExtensionMetadata CreateOccurrenceEmof()
             {
                 var extension = new ExtensionMetadata("http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact",
-                    "extendedMeasurementOrFact.csv");
+                    "extendedMeasurementOrFact.txt");
                 
                 extension.Fields.Add(new ExtensionMetadataField(0, "http://rs.tdwg.org/dwc/terms/occurrenceID",
                     "occurrenceID"));
@@ -85,7 +85,7 @@ namespace SOS.Lib.IO.DwcArchive
             private static ExtensionMetadata CreateEventEmof()
             {
                 var extension = new ExtensionMetadata("http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact",
-                    "extendedMeasurementOrFact.csv");
+                    "extendedMeasurementOrFact.txt");
                 extension.Fields.Add(new ExtensionMetadataField(0, "",
                     "eventID", true));
                 extension.Fields.Add(new ExtensionMetadataField(1, "http://rs.tdwg.org/dwc/terms/occurrenceID",
@@ -124,7 +124,7 @@ namespace SOS.Lib.IO.DwcArchive
             public static ExtensionMetadata Create()
             {
                 var extension = new ExtensionMetadata("http://rs.gbif.org/terms/1.0/Multimedia",
-                    "multimedia.csv");
+                    "multimedia.txt");
                 extension.Fields.Add(new ExtensionMetadataField(0, "",
                     "occurrenceID", true));
                 extension.Fields.Add(new ExtensionMetadataField(1, "http://purl.org/dc/terms/type",
@@ -164,7 +164,7 @@ namespace SOS.Lib.IO.DwcArchive
             public static ExtensionMetadata Create(IEnumerable<FieldDescription> fieldDescriptions)
             {
                 var extension = new ExtensionMetadata("http://rs.tdwg.org/dwc/terms/Occurrence",
-                    "occurrence.csv");
+                    "occurrence.txt");
                 int index = 0;
                 foreach (var fieldDescription in fieldDescriptions)
                 {
