@@ -6,6 +6,11 @@
     public class GridCellDto
     {
         /// <summary>
+        /// Grid cell Id.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Cell coordinates in WGS84
         /// </summary>
         public LatLonBoundingBoxDto BoundingBox { get; set; }

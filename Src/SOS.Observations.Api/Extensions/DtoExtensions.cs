@@ -259,7 +259,7 @@ namespace SOS.Observations.Api.Extensions
                 BoundingBox = geoGridMetricResult.BoundingBox.ToLatLonBoundingBoxDto(),
                 GridCellCount = geoGridMetricResult.GridCellCount,
                 GridCellSizeInMeters = geoGridMetricResult.GridCellSizeInMeters,
-                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto()),
+                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto(geoGridMetricResult.GridCellSizeInMeters)),
                 Sweref99TmBoundingBox = geoGridMetricResult.BoundingBox.ToXYBoundingBoxDto()
             };
         }
@@ -291,6 +291,7 @@ namespace SOS.Observations.Api.Extensions
                 {                    
                     Attributes = new AttributesTable(new[]
                     {
+                        new KeyValuePair<string, object>("id", gridCell.Id),
                         new KeyValuePair<string, object>("cellSizeInMeters", geoGridMetricResult.GridCellSizeInMeters),
                         new KeyValuePair<string, object>("observationsCount", gridCell.ObservationsCount),
                         new KeyValuePair<string, object>("taxaCount", gridCell.TaxaCount),
@@ -431,10 +432,11 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static GridCellDto ToGridCellDto(this GridCell gridCell)
+        public static GridCellDto ToGridCellDto(this GridCell gridCell, int gridCellSizeInMeters)
         {
             return new GridCellDto
             {
+                Id = GeoJsonHelper.GetGridCellId(gridCellSizeInMeters, Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.X), Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.Y)),
                 BoundingBox = gridCell.Sweref99TmBoundingBox.ToLatLonBoundingBoxDto(),
                 ObservationsCount = gridCell.ObservationsCount,
                 Sweref99TmBoundingBox = gridCell.Sweref99TmBoundingBox.ToXYBoundingBoxDto(),
