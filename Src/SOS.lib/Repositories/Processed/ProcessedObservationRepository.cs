@@ -823,7 +823,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1308,13 +1308,13 @@ namespace SOS.Lib.Repositories.Processed
                     .Bool(b => b
                         .Filter(f => f
                             .Terms(t => t
-                                .Field("location.locationId")
+                                .Field("location.locationId.keyword")
                                 .Terms(locationIds)
                             )
                         )
                     )
                 )
-                .Collapse(c => c.Field("location.locationId"))
+                .Collapse(c => c.Field("location.locationId.keyword"))
                .Source(s => s
                     .Includes(i => i
                         .Field("location")
@@ -1470,7 +1470,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();

@@ -134,6 +134,7 @@ namespace SOS.Hangfire.JobServer
                                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                         BackupStrategy = new CollectionMongoBackupStrategy()
                                     },
+                                    CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     Prefix = "hangfire",
                                     CheckConnection = true,
                                 })

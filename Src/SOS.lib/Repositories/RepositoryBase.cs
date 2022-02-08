@@ -45,7 +45,7 @@ namespace SOS.Lib.Repositories
             var items = batch?.ToArray();
             try
             {
-                await mongoCollection.InsertManyAsync(batch,
+                await mongoCollection.InsertManyAsync(items,
                     new InsertManyOptions { IsOrdered = false, BypassDocumentValidation = true });
                 return true;
             }
@@ -55,15 +55,15 @@ namespace SOS.Lib.Repositories
                 {
                     case 16500: //Request Rate too Large
                         // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
+                        var batchCount = items.Count() / 2;
 
                         // If we are down to less than 10 items something must be wrong
                         if (batchCount > 5)
                         {
                             var addTasks = new List<Task<bool>>
                             {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
+                                AddBatchAsync(items.Take(batchCount)),
+                                AddBatchAsync(items.Skip(batchCount))
                             };
 
                             // Run all tasks async

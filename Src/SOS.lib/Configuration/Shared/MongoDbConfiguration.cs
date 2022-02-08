@@ -87,11 +87,14 @@ namespace SOS.Lib.Configuration.Shared
                 mongoSettings.Server =
                     Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).FirstOrDefault();
                 mongoSettings.ConnectionMode = ConnectionMode.Standalone;
+                
+               // mongoSettings.DirectConnection = true;
             }
             else
             {
                 mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray();
                 mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
+              //  mongoSettings.DirectConnection = false;
                 mongoSettings.ReplicaSetName = ReplicaSetName;
                 mongoSettings.ReadPreference = ReadPreference.PrimaryPreferred;
             }
