@@ -191,18 +191,21 @@ namespace SOS.Import.Harvesters.Observations
         #endregion Incremental
 
         /// <summary>
-        ///  Harvest a batch of sightings
+        /// Harvest a batch of sightings
         /// </summary>
         /// <param name="harvestFactory"></param>
         /// <param name="getChunkTask"></param>
         /// <param name="batchIndex"></param>
         /// <param name="incremenatlMode"></param>
+        /// <param name="attempt"></param>
         /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private async Task<int> HarvestBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
             Task<IEnumerable<SightingEntity>> getChunkTask,
             int batchIndex,
-            bool incremenatlMode
+            bool incremenatlMode,
+            byte attempt = 1
         )
         {
             try
@@ -238,7 +241,6 @@ namespace SOS.Import.Harvesters.Observations
 
                 _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
-
                 await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
@@ -253,8 +255,26 @@ namespace SOS.Import.Harvesters.Observations
             catch (Exception e)
             {
                 _logger.LogError(e,
-                    $"Harvest Artportalen sightings ({batchIndex})");
+                    $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
+
+               /* if (attempt > 2)
+                {
+                    _logger.LogError(e,
+                        $"Harvest Artportalen sightings ({batchIndex}) failed");
+                    throw new Exception("Harvest Artportalen batch failed");
+                }
+
+                Thread.Sleep(attempt * 1000);
+
+                _logger.LogInformation(e,
+                    $"Harvest Artportalen sightings ({batchIndex}) attempt: {attempt} failed, retrying");
+                
+                _semaphore.Release();
+      
+                await _semaphore.WaitAsync();
+                attempt++;
+                return await HarvestBatchAsync(harvestFactory, getChunkTask, batchIndex, incremenatlMode, attempt);*/
             }
             finally
             {
@@ -389,7 +409,8 @@ namespace SOS.Import.Harvesters.Observations
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
+            //_semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(1);
         }
 
         /// inheritdoc />

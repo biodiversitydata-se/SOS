@@ -1308,13 +1308,13 @@ namespace SOS.Lib.Repositories.Processed
                     .Bool(b => b
                         .Filter(f => f
                             .Terms(t => t
-                                .Field("location.locationId")
+                                .Field("location.locationId.keyword")
                                 .Terms(locationIds)
                             )
                         )
                     )
                 )
-                .Collapse(c => c.Field("location.locationId"))
+                .Collapse(c => c.Field("location.locationId.keyword"))
                .Source(s => s
                     .Includes(i => i
                         .Field("location")
