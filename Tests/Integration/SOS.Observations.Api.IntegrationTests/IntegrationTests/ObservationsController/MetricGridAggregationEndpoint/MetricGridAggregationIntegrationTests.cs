@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public async Task MetricGeoGridAggregation_with_Mammalia_and_bbox_filter()
+        public async Task MetricGeoGridAggregation_as_GeoJSON_with_Mammalia_and_bbox_filter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -70,12 +70,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 false, 
                 false, 
                 OutputFormatDto.GeoJson);
-            var result = response.GetResult<FeatureCollection>();
+            var result = response.GetResultObject<FeatureCollection>();            
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().NotBeNull();            
+            result.Should().NotBeNull();
+            result.Count().Should().Be(9);
         }
     }
 }
