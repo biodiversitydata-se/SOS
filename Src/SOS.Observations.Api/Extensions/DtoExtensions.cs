@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -275,28 +276,31 @@ namespace SOS.Observations.Api.Extensions
             };
 
             foreach (var gridCell in geoGridMetricResult.GridCells)
-            {
+            {                
+                var polygon = new Polygon(new LinearRing(new[]
+                    {
+                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y),
+                        new Coordinate(gridCell.Sweref99TmBoundingBox.BottomRight.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y),
+                        new Coordinate(gridCell.Sweref99TmBoundingBox.BottomRight.X, gridCell.Sweref99TmBoundingBox.TopLeft.Y),
+                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.TopLeft.Y),
+                        new Coordinate(gridCell.Sweref99TmBoundingBox.TopLeft.X, gridCell.Sweref99TmBoundingBox.BottomRight.Y)
+                    }));
+                var wgs84Polygon = polygon.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+                
                 var feature = new Feature
-                {
+                {                    
                     Attributes = new AttributesTable(new[]
                     {
-                        new KeyValuePair<string, object>("gridCellSizeInMeters", geoGridMetricResult.GridCellSizeInMeters),
+                        new KeyValuePair<string, object>("cellSizeInMeters", geoGridMetricResult.GridCellSizeInMeters),
                         new KeyValuePair<string, object>("observationsCount", gridCell.ObservationsCount),
-                        new KeyValuePair<string, object>("taxaCount", gridCell.TaxaCount)
-                    }),
-                    BoundingBox = new Envelope(
-                       gridCell.BoundingBox.BottomRight.Longitude,
-                       gridCell.BoundingBox.TopLeft.Longitude,
-                       gridCell.BoundingBox.BottomRight.Latitude,
-                       gridCell.BoundingBox.TopLeft.Latitude),
-                    Geometry = new LinearRing(new []
-                    {
-                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.BottomRight.Latitude),
-                        new Coordinate(gridCell.BoundingBox.BottomRight.Longitude, gridCell.BoundingBox.BottomRight.Latitude),
-                        new Coordinate(gridCell.BoundingBox.BottomRight.Longitude, gridCell.BoundingBox.TopLeft.Latitude),
-                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.TopLeft.Latitude),
-                        new Coordinate(gridCell.BoundingBox.TopLeft.Longitude, gridCell.BoundingBox.BottomRight.Latitude)
-                    })
+                        new KeyValuePair<string, object>("taxaCount", gridCell.TaxaCount),
+                        new KeyValuePair<string, object>("sweref99TmLeft", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.X)),
+                        new KeyValuePair<string, object>("sweref99TmTop", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.TopLeft.Y)),
+                        new KeyValuePair<string, object>("sweref99TmRight", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.X)),
+                        new KeyValuePair<string, object>("sweref99TmBottom", Convert.ToInt32(gridCell.Sweref99TmBoundingBox.BottomRight.Y))
+                    }),                    
+                    Geometry = wgs84Polygon,
+                    BoundingBox = wgs84Polygon.EnvelopeInternal
                 };
                 featureCollection.Add(feature);
             }
