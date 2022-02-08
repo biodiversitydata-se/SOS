@@ -20,12 +20,7 @@ namespace SOS.Lib.Extensions
         /// <param name="nrObservations"></param>
         public static void LogObservationCount(this HttpContext httpContext, int nrObservations)
         {
-            if (httpContext == null) return;
-
-            if (!httpContext.Items.ContainsKey("Response-count"))
-            {
-                httpContext.Items.Add("Response-count", nrObservations);
-            }
+            if (httpContext == null) return;            
 
             if (!httpContext.Items.ContainsKey("Observation-count"))
             {

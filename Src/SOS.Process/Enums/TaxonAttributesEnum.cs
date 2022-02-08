@@ -4,7 +4,9 @@
     {
         ActionPlan = 2017,
         DisturbanceRadius = 2471,
-        BirdDirective = 961,
+        BirdDirectiveAnnex1 = 961,
+        BirdDirectiveAnnex2 = 2731,
+        PriorityBirds = 2647,
         Natura2000HabitatsDirectiveArticle2 = 958,
         Natura2000HabitatsDirectiveArticle4 = 960,
         Natura2000HabitatsDirectiveArticle5 = 979,

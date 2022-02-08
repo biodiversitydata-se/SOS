@@ -27,7 +27,7 @@ export class ApplicationInsightsComponent {
     { prop: 'success', name: 'Sucess' },
     { prop: 'httpResponseCode', name: 'Http response code' },
     { prop: 'duration', name: 'Duration' },
-    { prop: 'responseCount', name: 'Count' },
+    { prop: 'observationCount', name: 'Count' },
     { prop: 'accountId', name: 'APIM account id' },
     { prop: 'userId', name: 'User admin id' }
   ];
@@ -75,7 +75,7 @@ interface ILogRow {
   method: string;
   protectedObservations: string;
   requestBody: string;
-  responseCount: string;
+  observationCount: string;
   success: boolean;
   userId: string;
 }

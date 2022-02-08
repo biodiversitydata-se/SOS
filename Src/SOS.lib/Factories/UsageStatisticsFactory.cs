@@ -111,7 +111,7 @@ namespace SOS.Lib.Factories
                     FailureCount = apiUsageStatisticsRow.FailureCount,
                     Method = apiUsageStatisticsRow.Method,
                     RequestCount = apiUsageStatisticsRow.RequestCount,
-                    SumResponseCount = apiUsageStatisticsRow.SumResponseCount,
+                    SumObservationCount = apiUsageStatisticsRow.SumObservationCount,
                     UserEmail = user?.EmailAddress,
                     UserId = apiUsageStatisticsRow.UserId,
                     UserName = user?.UserName

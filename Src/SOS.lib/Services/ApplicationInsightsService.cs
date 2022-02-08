@@ -76,7 +76,7 @@ namespace SOS.Lib.Services
                         user_AuthenticatedId, 
                         duration, 
                         success,
-                        responseCount = toint(customDimensions['Response-count'])
+                        observationCount = toint(customDimensions['Observation-count'])
                     | summarize 
                         requestCount = count(), 
                         failureCount = count(success == false), 
@@ -101,7 +101,7 @@ namespace SOS.Lib.Services
                     RequestCount = ((JsonElement)r[4]).GetInt64(),
                     FailureCount = ((JsonElement)r[5]).GetInt64(),
                     AverageDuration = ((JsonElement)r[6]).GetInt64(),
-                    SumResponseCount = ((JsonElement)r[7]).GetInt64()
+                    SumObservationCount = ((JsonElement)r[7]).GetInt64()
                 });
         }
 
@@ -126,7 +126,7 @@ namespace SOS.Lib.Services
                         resultCode, 
                         requestBody = customDimensions['Request-body'], 
                         protectedObservations = customDimensions['Protected-observations'], 
-                        responseCount = customDimensions['Response-count']";
+                        observationCount = customDimensions['Observation-count']";
 
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
@@ -143,7 +143,7 @@ namespace SOS.Lib.Services
                     HttpResponseCode = r[7] == null ? null : ((JsonElement)r[7]).GetString(),
                     RequestBody = r[8] == null ? null : ((JsonElement)r[8]).GetString(),
                     ProtectedObservations = r[9] == null ? null : ((JsonElement)r[9]).GetString(),
-                    ResponseCount = r[10] == null ? null : ((JsonElement)r[10]).GetString()
+                    ObservationCount = r[10] == null ? null : ((JsonElement)r[10]).GetString()
                 });
         }
     }
