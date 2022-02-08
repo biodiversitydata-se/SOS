@@ -38,11 +38,11 @@ namespace SOS.Observations.Api.ApplicationInsights
                     }
                 }
 
-                if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Response-count", out var count))
+                if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
                 {
-                    if (int.TryParse(count?.ToString(), out var responseCount) && !telemetry.Context.Properties.ContainsKey("Response-count"))
+                    if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.Properties.ContainsKey("Observation-count"))
                     {
-                        telemetry.Context.Properties.Add("Response-count", responseCount.ToString());
+                        telemetry.Context.Properties.Add("Observation-count", obsCount.ToString());
                     }
                 }
             }
