@@ -823,7 +823,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1470,7 +1470,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Observation>(indexNames, sortBy, sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();

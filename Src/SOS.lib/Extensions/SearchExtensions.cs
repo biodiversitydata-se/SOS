@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
@@ -1275,52 +1276,73 @@ namespace SOS.Lib.Extensions
         /// Create a sort descriptor
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="client"></param>
+        /// <param name="indexNames"></param>
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        public static SortDescriptor<dynamic> ToSortDescriptor<T>(this string sortBy, SearchSortOrder sortOrder)
+        public static async Task<SortDescriptor<dynamic>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, string sortBy, SearchSortOrder sortOrder)
         {
+            if (string.IsNullOrEmpty(sortBy))
+            {
+                return null;
+            }
+
             var sortDescriptor = new SortDescriptor<dynamic>();
 
-            if (!string.IsNullOrEmpty(sortBy))
+            // Split sort string 
+            var propertyNames = sortBy.Split('.');
+            // Create a object of current class
+            var parent = Activator.CreateInstance(typeof(T));
+            var targetProperty = (PropertyInfo)null;
+
+            // Loop throw all levels in passed sort string
+            for (var i = 0; i < propertyNames.Length; i++)
             {
-                // Split sort string 
-                var propertyNames = sortBy.Split('.');
-                // Create a object of current class
-                var parent = Activator.CreateInstance(typeof(T));
-                var targetProperty = (PropertyInfo)null;
+                // Get property info for current property
+                targetProperty = parent?.GetProperty(propertyNames[i]);
 
-                // Loop throw all levels in passed sort string
-                for (var i = 0; i < propertyNames.Length; i++)
+                // Update property name to make sure it's in the correct case
+                if (targetProperty != null)
                 {
-                    // Get property info for current property
-                    targetProperty = parent?.GetProperty(propertyNames[i]);
-
-                    // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
-                    if (i != propertyNames.Length - 1)
-                    {
-                        parent = Activator.CreateInstance(targetProperty.GetPropertyType());
-                    }
+                    propertyNames[i] = targetProperty.Name.ToCamelCase();
                 }
 
-                // Target property found, get it's type
-                var propertyType = targetProperty?.GetPropertyType();
-
-                // If it's a string, add keyword in order to make the sorting work
-                if (propertyType == typeof(string))
+                // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
+                if (i != propertyNames.Length - 1)
                 {
-                    //check if the string property already has the keyword attribute, if it does, we do not need the .keyword
-                    KeywordAttribute isKeywordAttribute =
-                        (KeywordAttribute)Attribute.GetCustomAttribute(targetProperty, typeof(KeywordAttribute));
-                    if (isKeywordAttribute == null)
+                    parent = Activator.CreateInstance(targetProperty.GetPropertyType());
+                }
+            }
+
+            // Target property found, get it's type
+            var propertyType = targetProperty?.GetPropertyType();
+
+            // If it's a string, add keyword in order to make the sorting work
+            if (propertyType == typeof(string))
+            {
+                // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
+                sortBy = string.Join('.', propertyNames);
+                var response =
+                    await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexNames, sortBy));
+
+                if (response.IsValid)
+                {
+                    var hasKeyword = response.Indices
+                        .FirstOrDefault().Value.Mappings
+                        .FirstOrDefault().Value?.Mapping?.Values?
+                        .Select(s => s as TextProperty)?
+                        .Where(p => p?.Fields?.ContainsKey("keyword") ?? false)?
+                        .Any() ?? false;
+                    if (hasKeyword)
                     {
                         sortBy = $"{sortBy}.keyword";
                     }
                 }
-
-                sortDescriptor.Field(sortBy,
-                    sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
             }
+
+            sortDescriptor.Field(sortBy,
+                sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
 
             return sortDescriptor;
         }
