@@ -41,7 +41,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	        AND s.ValidationStatusId <> { // s.ValidationStatusId <> 50
             (int)ValidationStatusId.Rejected} 
             AND ss.IsActive = 1
-            AND ss.SightingStateTypeId = { // SightingStateTypeId = 30
+            AND ss.SightingStateTypeId = { // ss.SightingStateTypeId = 30
             (int)SightingStateType.Published}
             AND s.TaxonId IS NOT NULL 
              {((DataService?.Configuration?.HarvestStartDate.HasValue ?? false) ?
@@ -191,7 +191,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery("AND s.SightingId BETWEEN @StartId AND @EndId");
 
-                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live);
+                var result = await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live);
+                if (result != null && result.Count() == 0)
+                {
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(int startId, int maxRows) returned no sightings. startId={startId}, maxRows={maxRows}, Query: {query}");
+                }
+
+                return result;
             }
             catch (Exception e)
             {
@@ -208,7 +214,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery("INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                return await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);
+                var result = await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);                
+                if (result != null && result.Count() == 0)
+                {
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}");
+                }
+
+                return result;                
             }
             catch (Exception e)
             {
@@ -225,7 +237,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
 
-                return await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
+                var result = await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
+                if (result != null && result.Count() == 0)
+                {
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(DateTime modifiedSince, int maxRows) returned no sightings. modifiedSince={modifiedSince}, maxRows={maxRows}, Query: {query}");
+                }
+
+                return result;
             }
             catch (Exception e)
             {

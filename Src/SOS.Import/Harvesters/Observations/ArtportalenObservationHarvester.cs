@@ -137,6 +137,8 @@ namespace SOS.Import.Harvesters.Observations
         private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory, 
             IJobCancellationToken cancellationToken)
         {
+            _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
+
             // Make sure incremental mode is true to get max id from live instance
             _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             harvestFactory.IncrementalMode = true;
@@ -147,15 +149,14 @@ namespace SOS.Import.Harvesters.Observations
             
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
+            _logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest.Length}, lastModifiedQuery={lastModified} ({mode})");
 
             if (!idsToHarvest?.Any() ?? true)
             {
                 return 0;
             }
 
-            var harvestBatchTasks = new List<Task<int>>();
-
-            _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
+            var harvestBatchTasks = new List<Task<int>>();            
 
             var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.ChunkSize);
             var batchCount = 0;
@@ -184,7 +185,7 @@ namespace SOS.Import.Harvesters.Observations
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen sightings ({mode}) ({ nrSightingsHarvested })");
+            _logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
 
             return nrSightingsHarvested;
         }
@@ -209,11 +210,11 @@ namespace SOS.Import.Harvesters.Observations
             try
             {
                 _logger.LogDebug(
-                    $"Start getting Artportalen sightings ({batchIndex})");
+                    $"Start getting Artportalen sightings (BatchIndex={batchIndex})");
                 // Get chunk of sightings
                 var sightings = (await getChunkTask)?.ToArray();
                 _logger.LogDebug(
-                    $"Finish getting Artportalen sightings ({batchIndex})");
+                    $"Finish getting Artportalen sightings (BatchIndex={batchIndex})");
 
                 if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false) && !incremenatlMode && !_hasAddedTestSightings)
                 {
@@ -226,7 +227,7 @@ namespace SOS.Import.Harvesters.Observations
                 if (!sightings?.Any() ?? true)
                 {
                     _logger.LogDebug(
-                    $"No sightings found ({batchIndex})");
+                    $"No sightings found (BatchIndex={batchIndex})");
                     return 0;
                 }
 
