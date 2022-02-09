@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using Nest;
@@ -130,6 +131,23 @@ namespace SOS.Lib.Helpers
             var feature = GetFeature(geometry, attributesTable);
             string strGeoJson = GeoJsonWriter.Write(feature);
             return strGeoJson;
+        }
+
+        public static string GetGridCellId(int gridCellSizeInMeters, int left, int bottom)
+        {            
+            var gridSizeInKm = gridCellSizeInMeters / 1000.0;
+            var gridSizesInM = gridCellSizeInMeters.ToString();
+            var noOfZeros = gridSizesInM.Length - gridSizesInM.TrimEnd('0').Length;
+            string lowLeftX = left.ToString();
+            string lowLeftY = bottom.ToString();
+            var strLowerLeftY = lowLeftX.Remove(lowLeftX.ToString().Length - noOfZeros, noOfZeros);
+            var strLowerLeftX = lowLeftY.Remove(lowLeftY.ToString().Length - noOfZeros, noOfZeros);
+            string id;
+            if (gridCellSizeInMeters < 1000)
+                id = $"{gridCellSizeInMeters}mN{strLowerLeftY}E{strLowerLeftX}";
+            else
+                id = $"{gridSizeInKm.ToString(CultureInfo.InvariantCulture)}kmN{strLowerLeftY}E{strLowerLeftX}";            
+            return id;
         }
     }
 }
