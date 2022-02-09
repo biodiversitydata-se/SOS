@@ -81,13 +81,13 @@ namespace SOS.Lib.Services
                         requestCount = count(), 
                         failureCount = count(success == false), 
                         averageDuration = toint(avg(duration)),
-                        sumResponseCount = sum(responseCount)
+                        sumObservationCount = sum(observationCount)
                         by 
                             method, 
                             endpoint,
                             user_AccountId,
                             user_AuthenticatedId";
-
+            
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
             return result?.Tables.FirstOrDefault()?.Rows?.Select(r =>
