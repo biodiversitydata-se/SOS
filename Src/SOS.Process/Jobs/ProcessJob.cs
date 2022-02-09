@@ -377,9 +377,13 @@ namespace SOS.Process.Jobs
 
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
+                    
+                    if (mode == JobRunModes.Full)
+                    {
+                        Thread.Sleep(TimeSpan.FromMinutes(1)); // Try wait for Elasticsearch index.
+                    }
 
                     _logger.LogInformation($"Start validate indexes");
-                    Thread.Sleep(TimeSpan.FromMinutes(1)); // Try wait for Elasticsearch index.
                     if (!await ValidateIndexesAsync())
                     {
                         throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");

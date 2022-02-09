@@ -153,11 +153,13 @@ namespace SOS.Import.Harvesters.Observations
                 return 0;
             }
 
+            // Decrease chunk size for incremental harvest since the SQL query is slower 
+            var chunkSize = _artportalenConfiguration.ChunkSize / 4;
             var harvestBatchTasks = new List<Task<int>>();
 
             _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
-            var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.ChunkSize);
+            var idBatch = idsToHarvest.Skip(0).Take(chunkSize);
             var batchCount = 0;
 
             // Loop until all sightings are fetched
@@ -175,7 +177,7 @@ namespace SOS.Import.Harvesters.Observations
                     batchCount,
                     true));
 
-                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.ChunkSize).Take(_artportalenConfiguration.ChunkSize);
+                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.ChunkSize).Take(chunkSize);
             }
 
             // Execute harvest tasks, no of parallel threads running is handled by semaphore

@@ -88,12 +88,10 @@ namespace SOS.Import.Factories.Harvest
                 observation.EditDate = entity.EditDate;
                 observation.EndDate = entity.EndDate;
                 observation.EndTime = entity.EndTime;
-                observation.FirstImageId = entity.FirstImageId;
                 observation.FrequencyId = entity.FrequencyId;
                 observation.Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
                     ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
                     : null;
-                observation.HasImages = entity.HasImages;
                 observation.HasTriggeredValidationRules = entity.HasTriggeredValidationRules;
                 observation.HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning;
                 observation.HiddenByProvider = entity.HiddenByProvider;
@@ -177,9 +175,11 @@ namespace SOS.Import.Factories.Harvest
                     observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
                 }
 
+                observation.HasImages = entity.HasImages;
                 if (sightingMedias?.TryGetValue(entity.Id, out var media) ?? false)
                 {
                     observation.Media = media;
+                    observation.FirstImageId = media?.FirstOrDefault(m => m.FileType?.Equals("image", StringComparison.CurrentCultureIgnoreCase) ?? false)?.Id ?? 0;
                 }
 
                 return observation;
