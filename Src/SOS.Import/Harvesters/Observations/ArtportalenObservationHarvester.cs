@@ -197,15 +197,13 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="getChunkTask"></param>
         /// <param name="batchIndex"></param>
         /// <param name="incremenatlMode"></param>
-        /// <param name="attempt"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         private async Task<int> HarvestBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
             Task<IEnumerable<SightingEntity>> getChunkTask,
             int batchIndex,
-            bool incremenatlMode,
-            byte attempt = 1
+            bool incremenatlMode
         )
         {
             try
@@ -257,24 +255,6 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e,
                     $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
-
-               /* if (attempt > 2)
-                {
-                    _logger.LogError(e,
-                        $"Harvest Artportalen sightings ({batchIndex}) failed");
-                    throw new Exception("Harvest Artportalen batch failed");
-                }
-
-                Thread.Sleep(attempt * 1000);
-
-                _logger.LogInformation(e,
-                    $"Harvest Artportalen sightings ({batchIndex}) attempt: {attempt} failed, retrying");
-                
-                _semaphore.Release();
-      
-                await _semaphore.WaitAsync();
-                attempt++;
-                return await HarvestBatchAsync(harvestFactory, getChunkTask, batchIndex, incremenatlMode, attempt);*/
             }
             finally
             {

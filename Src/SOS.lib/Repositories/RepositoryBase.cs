@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -36,11 +37,13 @@ namespace SOS.Lib.Repositories
         }
 
         /// <summary>
+        /// Add batch of items to mongodb
         /// </summary>
         /// <param name="batch"></param>
         /// <param name="mongoCollection"></param>
+        /// <param name="attempt"></param>
         /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection, byte attempt = 1)
         {
             var items = batch?.ToArray();
             try
@@ -55,7 +58,7 @@ namespace SOS.Lib.Repositories
                 {
                     case 16500: //Request Rate too Large
                         // If attempt failed, try split items in half and try again
-                        var batchCount = items.Count() / 2;
+                        var batchCount = items.Length / 2;
 
                         // If we are down to less than 10 items something must be wrong
                         if (batchCount > 5)
@@ -80,6 +83,14 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
+                if (attempt < 3)
+                {
+                    Logger.LogWarning($"Add batch to mongodb ({nameof(TEntity)}) attempt {attempt} failed. Tries again...");
+                    Thread.Sleep(attempt * 1000);
+                    attempt++;
+                    return await AddBatchAsync(items, mongoCollection, attempt);
+                }
+
                 Logger.LogError(e.ToString());
                 throw ;
             }
