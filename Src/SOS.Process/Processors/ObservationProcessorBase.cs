@@ -184,6 +184,8 @@ namespace SOS.Process.Processors
 
                         // Recreate observation to make a new object
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                        // Populate data quality property
+                        PopulateDataQuality(observation);
                         // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
                         _diffusionManager.DiffuseObservation(observation);
                     }
