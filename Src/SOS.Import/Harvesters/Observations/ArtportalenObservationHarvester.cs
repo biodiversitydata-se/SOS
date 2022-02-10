@@ -392,8 +392,7 @@ namespace SOS.Import.Harvesters.Observations
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            //_semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
-            _semaphore = new SemaphoreSlim(1);
+            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
         }
 
         /// inheritdoc />

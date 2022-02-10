@@ -180,8 +180,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(maxRows, "AND s.SightingId BETWEEN @StartId AND @EndId");
 
-                var result = await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live);
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live))?.ToArray();
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(int startId, int maxRows) returned no sightings. startId={startId}, maxRows={maxRows}, Query: {query}");
                 }
@@ -203,8 +203,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                var result = await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);                
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}");
                 }
@@ -226,8 +226,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
 
-                var result = await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live))?.ToArray();
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(DateTime modifiedSince, int maxRows) returned no sightings. modifiedSince={modifiedSince}, maxRows={maxRows}, Query: {query}");
                 }
