@@ -141,17 +141,19 @@ namespace SOS.Process.Processors
         {
             try
             {
+                var batchId = $"{startId}-{endId}";
+
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
                 var verbatimObservationsBatch = await observationVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({batchId})");
 
                 if (!verbatimObservationsBatch?.Any() ?? true)
                 {
                     return (0, 0);
                 }
        
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
                 
                 var publicObservations = new HashSet<Observation>();
                 var protectedObservations = new HashSet<Observation>();
@@ -194,12 +196,31 @@ namespace SOS.Process.Processors
                     publicObservations.Add(observation);
                 }
 
-                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
 
+                // If incremental harvest
+                if (mode != JobRunModes.Full)
+                {
+                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data {batchId}");
+                    var occurrenceIds = publicObservations.Select(o => o.Occurrence.OccurrenceId).ToHashSet();
+                    occurrenceIds.UnionWith(protectedObservations.Select(o => o.Occurrence.OccurrenceId));
+
+                    // Make sure no old data exists in elastic
+                    var deleteTasks = new[]
+                    {
+                        DeleteBatchAsync(false, occurrenceIds),
+                        DeleteBatchAsync(true, occurrenceIds)
+                    };
+                    var deleteResult = await Task.WhenAll(deleteTasks);
+
+                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
+                }
+
+                // Store observations
                 var validateAndStoreTasks = new[]
                 {
-                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, $"{startId}-{endId}"),
-                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, $"{startId}-{endId}")
+                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, $"{batchId}"),
+                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, $"{batchId}")
                 };
                 
                 await Task.WhenAll(validateAndStoreTasks);
@@ -344,23 +365,6 @@ namespace SOS.Process.Processors
             {
                 return 0;
             }
-
-            if (mode != JobRunModes.Full)
-            {
-                Logger.LogDebug($"Start deleting {dataProvider.Identifier} live data {batchId}");
-                var occurrenceIds = observations.Select(o => o.Occurrence.OccurrenceId).ToArray();
-                var success = await DeleteBatchAsync(protectedObservations, occurrenceIds);
-
-                // If diffusion is disabled,
-                // make sure the observation don't exists in both public and protected index
-                if (!EnableDiffusion)
-                {
-                    success = await DeleteBatchAsync(!protectedObservations, occurrenceIds);
-                }
-
-                Logger.LogDebug($"Finish deleting {dataProvider.Identifier} live data {batchId}: {success}");
-            }
-
             var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
 
             if (mode == JobRunModes.Full && !protectedObservations)

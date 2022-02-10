@@ -178,7 +178,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var query = GetSightingQuery(maxRows, "AND s.SightingId BETWEEN @StartId AND @EndId");
+                var query = GetSightingQuery(0, "AND s.SightingId BETWEEN @StartId AND @EndId");
 
                 var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
