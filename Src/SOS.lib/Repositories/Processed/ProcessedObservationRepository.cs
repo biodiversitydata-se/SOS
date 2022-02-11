@@ -1287,7 +1287,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
             var publicLatestModifiedDate = await GetLatestModifiedDateForProviderAsync(providerId, false);
-            var protectedLatestModifiedDate = await GetLatestModifiedDateForProviderAsync(providerId, false);
+            var protectedLatestModifiedDate = await GetLatestModifiedDateForProviderAsync(providerId, true);
 
             return protectedLatestModifiedDate > publicLatestModifiedDate
                 ? protectedLatestModifiedDate
