@@ -936,13 +936,14 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        
+
         /// <summary>
         /// Gets a single observation.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
-        /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="occurrenceId">The occurrence id of the observation to fetch.</param>
+        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in path if any</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">
@@ -950,7 +951,7 @@ namespace SOS.Observations.Api.Controllers
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
-        [HttpGet("{occurrenceId}")]
+        [HttpGet("{occurrenceId?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -958,12 +959,15 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromRoute] string occurrenceId, 
+            [FromQuery] string id,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,  
             [FromQuery] string translationCultureCode = "sv-SE", 
             [FromQuery] bool sensitiveObservations = false)
         {
             try
-            {                                
+            {
+                occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
+
                 var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false);
 
@@ -1746,7 +1750,8 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
-        /// <param name="occurrenceId">The occurence id of the observation to fetch.</param>
+        /// <param name="occurrenceId">The occurrence id of the observation to fetch.</param>
+        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in path if any</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">
@@ -1754,7 +1759,7 @@ namespace SOS.Observations.Api.Controllers
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
-        [HttpGet("Internal/{occurrenceId}")]
+        [HttpGet("Internal/{occurrenceId?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1762,13 +1767,15 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GetObservationByIdInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string occurrenceId, 
+            [FromRoute] string occurrenceId,
+            [FromQuery] string id,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
+                occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
                 var observation = await ObservationManager.GetObservationAsync(
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,

@@ -169,10 +169,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool onlyAboveMyClearance = true);
 
         /// <summary>
-        /// Get observation by occurrence id
+        ///  Get observation by occurrence id
         /// </summary>
+        /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
+        /// <param name="id"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="sensitiveObservations"></param>
@@ -180,15 +182,19 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GetObservationById(
             int? roleId,
             string authorizationApplicationIdentifier,
-            string occurrenceId, OutputFieldSet fieldSet, 
+            string occurrenceId, 
+            string id, 
+            OutputFieldSet fieldSet, 
             string translationCultureCode = "sv-SE", 
             bool sensitiveObservations = false);
 
         /// <summary>
         /// Get observation by occurrence id, include internal data
         /// </summary>
+        /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="occurrenceId"></param>
+        /// <param name="id"></param>
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="sensitiveObservations"></param>
@@ -197,6 +203,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             int? roleId,
             string authorizationApplicationIdentifier,
             string occurrenceId,
+            string id,
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false);
