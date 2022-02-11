@@ -480,21 +480,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             
             // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
             if (!string.IsNullOrEmpty(taxonId))
-            {
-               
-                var parsedTaxonId = -1;
-                if (!int.TryParse(taxonId, out parsedTaxonId))
+            {               
+                var parsedTaxonId = -1;                
+                if (taxonId.StartsWith("urn:lsid:dyntaxa"))
                 {
-                    if (taxonId.StartsWith("urn:lsid:dyntaxa"))
+                    string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
+                    if(!int.TryParse(lastInteger, out parsedTaxonId))
                     {
-                        var lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
-                        if(!int.TryParse(lastInteger, out parsedTaxonId))
-                        {
-                            parsedTaxonId = -1;
-                        }
-
+                        parsedTaxonId = -1;
                     }
-                }
+                }                
 
                 if (parsedTaxonId != -1 &&_taxonByTaxonId.TryGetValue(parsedTaxonId, out var taxon))
                 {
