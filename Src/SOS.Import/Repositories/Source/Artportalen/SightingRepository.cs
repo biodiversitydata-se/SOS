@@ -15,12 +15,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
     {
-        private string GetSightingQuery(string where) => GetSightingQuery(0, null, where);
-
-        private string GetSightingQuery(int top, string where) => GetSightingQuery(0, null, where);
-
-        private string GetSightingQuery(string join, string where) => GetSightingQuery(0, join, where);
-
         private string SightingsFromBasics => @$"
             SearchableSightings s WITH(NOLOCK)
             INNER JOIN SightingState ss ON s.SightingId = ss.SightingId AND ss.IsActive=1";
@@ -49,6 +43,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
             :
             "")}";
 
+        private string GetSightingQuery(int top, string where) => GetSightingQuery(top, null, where);
+
+
         /// <summary>
         /// Create sighting query
         /// </summary>
@@ -59,6 +56,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             var topCount = "";
 
+            // Adding TOP increases the performance
             if (top > 0)
             {
                 topCount = $"TOP {top}";
@@ -106,19 +104,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.Quantity,
 					s.QuantityOfSubstrate,
                     s.RegisterDate,
-                    CASE
-                        WHEN s.HasImages = 1 THEN (SELECT TOP 1 Id FROM MediaFile mf WHERE s.SightingId = mf.SightingId )
-                        ELSE 0
-                    END AS FirstImageId,
-	                CASE 
-						WHEN p.Id IS NULL THEN null
-						ELSE p.FirstName + ' ' + p.LastName 
-					END AS RightsHolder,
+	                CASE WHEN p.Id IS NULL THEN null ELSE p.FirstName + ' ' + p.LastName END AS RightsHolder,
                     si.SiteId,
-                    CASE 
-                        WHEN (SELECT TOP 1 Id FROM  SightingComment sic WHERE s.SightingId = sic.SightingId ) IS NULL THEN 0 
-                        ELSE 1 
-                    END AS HasUserComments,
+                    CASE WHEN sic.SightingId IS NULL THEN 0 ELSE 1 END AS HasUserComments,
 	                s.StageId,
 	                s.StartDate,
 	                s.StartTime,
@@ -154,7 +142,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId                    
-                    LEFT JOIN (SELECT * FROM SightingSpeciesCollectionItem WHERE Id IN (SELECT MAX(Id) FROM SightingSpeciesCollectionItem GROUP BY SightingId)) ssci ON s.SightingId = ssci.SightingId	                
+                    LEFT JOIN (SELECT Id, Label, SightingId, OrganizationId, CollectorId FROM SightingSpeciesCollectionItem WITH(NOLOCK) WHERE Id IN (SELECT MAX(Id) FROM SightingSpeciesCollectionItem WITH(NOLOCK) GROUP BY SightingId)) ssci ON s.SightingId = ssci.SightingId	                
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
@@ -166,6 +154,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     {triggerRuleFrom}
                     LEFT JOIN SightingDatasource sdc ON s.SightingId = sdc.SightingId
+                    LEFT JOIN (SELECT SightingId FROM SightingComment WITH(NOLOCK) GROUP BY SightingId) sic ON s.SightingId = sic.SightingId
                 WHERE
 	                {SightingWhereBasics}
                     {where} ";
@@ -189,10 +178,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var query = GetSightingQuery("AND s.SightingId BETWEEN @StartId AND @EndId");
+                var query = GetSightingQuery(0, "AND s.SightingId BETWEEN @StartId AND @EndId");
 
-                var result = await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live);
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live))?.ToArray();
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(int startId, int maxRows) returned no sightings. startId={startId}, maxRows={maxRows}, Query: {query}");
                 }
@@ -212,10 +201,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var query = GetSightingQuery("INNER JOIN @tvp t ON s.SightingId = t.Id", null);
+                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                var result = await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);                
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}");
                 }
@@ -237,8 +226,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
 
-                var result = await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
-                if (result != null && result.Count() == 0)
+                var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live))?.ToArray();
+                if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(DateTime modifiedSince, int maxRows) returned no sightings. modifiedSince={modifiedSince}, maxRows={maxRows}, Query: {query}");
                 }

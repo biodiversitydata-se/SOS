@@ -77,10 +77,6 @@ namespace SOS.Import.Entities.Artportalen
         /// </summary>
         public bool HasImages { get; set; }
         /// <summary>
-        /// First image Id
-        /// </summary>
-        public int FirstImageId { get; set; }
-        /// <summary>
         ///     Has Triggered Validation Rules
         /// </summary>
         public bool HasTriggeredValidationRules { get; set; }

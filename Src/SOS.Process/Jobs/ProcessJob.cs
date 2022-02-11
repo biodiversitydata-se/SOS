@@ -377,18 +377,24 @@ namespace SOS.Process.Jobs
 
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
-
-                    _logger.LogInformation($"Start validate indexes");
-                    Thread.Sleep(TimeSpan.FromMinutes(1)); // Try wait for Elasticsearch index.
-                    if (!await ValidateIndexesAsync())
+                    
+                    if (mode == JobRunModes.Full)
                     {
-                        throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                        Thread.Sleep(TimeSpan.FromMinutes(1)); // Wait for Elasticsearch indexing to finish.
                     }
-                    _logger.LogInformation($"Finish validate indexes");
 
-                    // Toggle active instance if we are done
-                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
+                    // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
+                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
+                        mode == JobRunModes.IncrementalInactiveInstance)
                     {
+                        _logger.LogInformation($"Start validate indexes");
+                        if (!await ValidateIndexesAsync())
+                        {
+                            throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                        }
+                        _logger.LogInformation($"Finish validate indexes");
+
+                        // Toggle active instance if we are done
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
