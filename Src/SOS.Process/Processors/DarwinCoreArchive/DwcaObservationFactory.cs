@@ -480,8 +480,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             
             // If dataprovider uses Dyntaxa Taxon Id, try parse TaxonId.
             if (!string.IsNullOrEmpty(taxonId))
-            {               
-                var parsedTaxonId = -1;                
+            {
+                var parsedTaxonId = -1;
+
+                // Biologg fix. They should use urn:lsid:dyntaxa prefix.
+                if (_dataProvider.Identifier == "Biologg")
+                {
+                    if (!int.TryParse(taxonId, out parsedTaxonId))
+                    {
+                        parsedTaxonId = -1;
+                    }
+                }
+                
                 if (taxonId.StartsWith("urn:lsid:dyntaxa"))
                 {
                     string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
@@ -491,7 +501,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     }
                 }                
 
-                if (parsedTaxonId != -1 &&_taxonByTaxonId.TryGetValue(parsedTaxonId, out var taxon))
+                if (parsedTaxonId != -1 && _taxonByTaxonId.TryGetValue(parsedTaxonId, out var taxon))
                 {
                     return taxon;
                 }
