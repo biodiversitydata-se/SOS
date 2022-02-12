@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Import.Containers;
 using SOS.Import.Entities.Artportalen;
@@ -33,7 +34,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.ArtportalenConfiguration.ChunkSize = 125000;
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var importClient = new VerbatimClient(
@@ -110,7 +111,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var importConfiguration = GetImportConfiguration();
             importConfiguration.ArtportalenConfiguration.ChunkSize = 125000;
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
-            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration, new NullLogger<ArtportalenDataService>());
             var sightingVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
             var mediadataRepository =
                 new MediaRepository(artportalenDataService, new Mock<ILogger<MediaRepository>>().Object);

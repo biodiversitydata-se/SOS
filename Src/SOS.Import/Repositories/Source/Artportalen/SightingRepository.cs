@@ -206,7 +206,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}\n,The first five ids used in tvp are: {string.Join(", ", sightingIds.Take(5))}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
                 }
 
                 return result;                
