@@ -157,7 +157,7 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             // Decrease chunk size for incremental harvest since the SQL query is slower 
-            var chunkSize = _artportalenConfiguration.ChunkSize / 4;
+            var chunkSize = _artportalenConfiguration.ChunkSize / 40;
             var harvestBatchTasks = new List<Task<int>>();
 
             var idBatch = idsToHarvest.Skip(0).Take(chunkSize);
