@@ -206,7 +206,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
                 }
 
                 return result;                
@@ -304,7 +304,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 ORDER BY
                     s.EditDate";
 
-                return await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
+                var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);                
+                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count())} sightingIds");
+                return result;
             }
             catch (Exception e)
             {

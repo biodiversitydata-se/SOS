@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Logging;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 
@@ -21,14 +22,16 @@ namespace SOS.Import.Services
         /// <param name="live"></param>
         /// <returns></returns>
         private IDbConnection Connection(bool live) => new SqlConnection(live ? Configuration.ConnectionStringLive : Configuration.ConnectionStringBackup);
+        private readonly ILogger<ArtportalenDataService> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration)
+        public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration, ILogger<ArtportalenDataService> logger)
         {
             Configuration = artportalenConfiguration ??
                             throw new ArgumentNullException(nameof(artportalenConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
@@ -71,6 +74,7 @@ namespace SOS.Import.Services
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Error when executing QueryAsync(...)");
                 transaction.Rollback();
             }
 

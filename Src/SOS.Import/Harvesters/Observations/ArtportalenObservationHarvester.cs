@@ -177,7 +177,7 @@ namespace SOS.Import.Harvesters.Observations
                     batchCount,
                     true));
 
-                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.ChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
+                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.IncrementalChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
             }
 
             // Execute harvest tasks, no of parallel threads running is handled by semaphore
