@@ -23,7 +23,12 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         ///     The number of observations that will be fetched in each loop.
         /// </summary>
-        public int ChunkSize { get; set; } = 1000000;
+        public int ChunkSize { get; set; } = 100000;
+
+        /// <summary>
+        ///     The number of observations that will be fetched in each loop.
+        /// </summary>
+        public int IncrementalChunkSize { get; set; } = 25000;
 
         /// <summary>
         ///     The number of sightings that should be harvested.
