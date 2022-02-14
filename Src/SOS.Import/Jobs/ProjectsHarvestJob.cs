@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Interfaces;
@@ -41,7 +40,6 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest projects from Artportalen db")]
         public async Task<bool> RunHarvestProjectsAsync()
         {
             _logger.LogInformation("Start harvest projects job");

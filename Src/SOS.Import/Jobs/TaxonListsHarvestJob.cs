@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Interfaces;
@@ -36,7 +35,6 @@ namespace SOS.Import.Jobs
         }
         
         /// <inheritdoc />
-        [DisplayName("Harvest taxon lists from TaxonListService")]
         public async Task<bool> RunHarvestTaxonListsAsync()
         {
             _logger.LogInformation("Start harvest taxon lists job");

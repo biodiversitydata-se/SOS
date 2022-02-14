@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
@@ -36,7 +35,6 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Process taxa")]
         public async Task<bool> RunAsync()
         {
             var start = DateTime.Now;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Jobs.Import;
@@ -29,7 +28,6 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest API usage statistics")]
         public async Task<bool> RunHarvestStatisticsAsync()
         {
             _logger.LogInformation("Start API usage statistics harvest Job");
@@ -42,7 +40,6 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Create API usage statistics Excel file, Id: \"{0}\"")]
         public async Task<bool> RunCreateExcelFileReportAsync(string reportId, string createdBy)
         {
             _logger.LogInformation("Start Create API usage statistics Excel file Job");

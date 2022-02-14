@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -319,26 +318,22 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Full Observations Harvest")]
         public async Task<bool> RunFullAsync(IJobCancellationToken cancellationToken)
         {
             return await RunAsync(JobRunModes.Full, cancellationToken);
         }
 
-        [DisplayName("Incremental Harvest Observations, active instance")]
         public async Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken)
         {
             return await RunAsync(JobRunModes.IncrementalActiveInstance, cancellationToken);
         }
 
-        [DisplayName("Incremental Harvest Observations, active instance")]
         public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
         {
             return await RunAsync(JobRunModes.IncrementalInactiveInstance, cancellationToken);
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest and process observations from passed provides")]
         public async Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             List<string> processDataProviderIdOrIdentifiers,
@@ -382,7 +377,6 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest and process observations from passed provides")]
         public async Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)

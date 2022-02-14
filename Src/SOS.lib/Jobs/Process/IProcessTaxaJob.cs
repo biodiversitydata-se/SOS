@@ -9,6 +9,7 @@ namespace SOS.Lib.Jobs.Process
         ///     Read taxonomy from verbatim database, do some conversions and adds it to processed database.
         /// </summary>
         /// <returns></returns>
+        [JobDisplayName("Process taxa")]
         [Queue("high")]
         Task<bool> RunAsync();
     }
