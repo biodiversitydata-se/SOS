@@ -157,10 +157,9 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             // Decrease chunk size for incremental harvest since the SQL query is slower 
-            var chunkSize = _artportalenConfiguration.ChunkSize / 40;
             var harvestBatchTasks = new List<Task<int>>();
 
-            var idBatch = idsToHarvest.Skip(0).Take(chunkSize);
+            var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.IncrementalChunkSize);
             var batchCount = 0;
 
             // Loop until all sightings are fetched
@@ -178,7 +177,7 @@ namespace SOS.Import.Harvesters.Observations
                     batchCount,
                     true));
 
-                idBatch = idsToHarvest.Skip(batchCount * chunkSize).Take(chunkSize);
+                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.IncrementalChunkSize).Take(_artportalenConfiguration.IncrementalChunkSize);
             }
 
             // Execute harvest tasks, no of parallel threads running is handled by semaphore

@@ -132,7 +132,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return await QueryAsync<ProjectParameterEntity>(
                     query, 
-                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {

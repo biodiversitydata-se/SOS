@@ -74,7 +74,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
 
             var query = $@"
-                SELECT DISTINCT {topCount} 
+                SELECT {topCount} 
+                    si.Id, 
                     s.ActivityId,
                     s.DiscoveryMethodId,
 					s.BiotopeId,
@@ -88,7 +89,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.GenderId,
                     s.HasImages,
 	                s.HiddenByProvider,
-	                s.SightingId AS Id, 
 	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
@@ -203,7 +203,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
+                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
@@ -321,7 +321,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                string query = $@"
+                var query = $@"
                 SELECT 
                     ps.SightingId AS SightingId,
 	                ps.ProjectId AS ProjectId
@@ -333,7 +333,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return await QueryAsync<(int SightingId, int ProjectId)>(
                     query,
-                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, Live);
             }
             catch (Exception e)
             {

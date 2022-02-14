@@ -42,7 +42,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 FROM [SightingSpeciesCollectionItem] ssci
                 INNER JOIN @tvp t ON ssci.SightingId = t.Id";
 
-                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {
