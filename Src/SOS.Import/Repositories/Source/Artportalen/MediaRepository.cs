@@ -53,7 +53,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                       INNER JOIN @tvp tvp ON mf.SightingID = tvp.Id";
 
                 return await QueryAsync<MediaEntity>(query,
-                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
 
             }
             catch (Exception e)

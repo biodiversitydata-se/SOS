@@ -47,7 +47,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     INNER JOIN @tvp t ON a.AreaDatasetId = t.Id";
 
                 return await QueryAsync<AreaEntity>(query,
-                    new { tvp = areaTypes.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
+                    new { tvp = areaTypes.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {

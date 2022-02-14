@@ -45,7 +45,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 return await QueryAsync<SiteEntity>(GetSiteQuery(
                         $"INNER JOIN @tvp t ON s.Id = t.Id"),
-                    new { tvp = ids.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = ids.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {
@@ -94,7 +94,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     a.AreaDatasetId IN (1, 16, 18, 19, 21)";
 
                 var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
+                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
 
                 var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
                 if (siteAreaEntities?.Any() ?? false)
@@ -150,7 +150,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					sg.SiteId";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
-                    new { sid = siteIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
+                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
 
                 return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
             }

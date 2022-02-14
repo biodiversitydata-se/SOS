@@ -1,25 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.SqlServer.Server;
 
 namespace SOS.Lib.Extensions
 {
     public static class SqlExtensions
     {
-        public static DataTable ToDataTable(this IEnumerable<int> ids)
+        /// <summary>
+        /// Cast list of integers to list of SqlDataRecords
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static IEnumerable<SqlDataRecord> ToSqlRecords(this IEnumerable<int> list)
         {
-            var tvpTable = new DataTable();
-            tvpTable.Columns.Add(new DataColumn("Id", typeof(int)));
-
-            if (ids?.Any() ?? false)
+            if (!list?.Any() ?? true)
             {
-                foreach (var id in ids)
-                {
-                    tvpTable.Rows.Add(id);
-                }
+                yield break;
             }
+            var record = new SqlDataRecord(new SqlMetaData("Value", SqlDbType.Int));
 
-            return tvpTable;
+            foreach (var item in list)
+            {
+                record.SetInt32(0, item);
+                yield return record;
+            }
         }
     }
 }
