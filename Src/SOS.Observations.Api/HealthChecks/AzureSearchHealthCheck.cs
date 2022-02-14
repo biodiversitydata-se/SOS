@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.HealthChecks
                 var dataproviders = await _sosAzureClient.GetDataProviders("sv-SE");
                 if (dataproviders == null || dataproviders.Count <= 10)
                 {
-                    return new HealthCheckResult(HealthStatus.Unhealthy, $"Couldn't retrieve data providers using Azure API.");
+                    return new HealthCheckResult(HealthStatus.Degraded, $"Couldn't retrieve data providers using Azure API.");
                 }
 
                 var searchResult = await SearchPicaPicaAsync();
@@ -88,9 +88,9 @@ namespace SOS.Observations.Api.HealthChecks
                     return new HealthCheckResult(HealthStatus.Unhealthy, $"No observations returned. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
                 }
 
-                if (searchResult.Duration.TotalMilliseconds > 2000)
+                if (searchResult.Duration.TotalMilliseconds > 5000)
                 {
-                    return new HealthCheckResult(HealthStatus.Degraded, $"Duration is > 2000ms. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
+                    return new HealthCheckResult(HealthStatus.Degraded, $"Duration is > 5000ms. Duration: {searchResult.Duration.TotalMilliseconds:N0}ms");
                 }
 
                 return new HealthCheckResult(HealthStatus.Healthy, $"Duration is {searchResult.Duration.TotalMilliseconds:N0}ms");
@@ -98,7 +98,7 @@ namespace SOS.Observations.Api.HealthChecks
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "Health check failed", e);
+                return new HealthCheckResult(HealthStatus.Degraded, "Health check failed", e);
             }
         }
     }
