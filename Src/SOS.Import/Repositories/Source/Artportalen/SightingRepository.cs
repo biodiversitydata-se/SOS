@@ -74,7 +74,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
 
             var query = $@"
-                SELECT DISTINCT {topCount} 
+                SELECT {topCount} 
+                    si.Id, 
                     s.ActivityId,
                     s.DiscoveryMethodId,
 					s.BiotopeId,
@@ -88,7 +89,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.GenderId,
                     s.HasImages,
 	                s.HiddenByProvider,
-	                s.SightingId AS Id, 
 	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
