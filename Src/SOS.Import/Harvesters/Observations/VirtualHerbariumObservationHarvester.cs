@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -23,6 +25,52 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IVirtualHerbariumObservationService _virtualHerbariumObservationService;
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
         private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
+        private ConcurrentBag<string> _occurrenceIdsSet;
+
+
+        private async Task<int> HarvestBatchAsync(VirtualHerbariumHarvestFactory verbatimFactory, DateTime fromDate, int pageIndex, IJobCancellationToken cancellationToken)
+        {
+            _logger.LogDebug($"Start getting Virtual Herbarium observations page: {pageIndex}");
+            var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
+            _logger.LogDebug($"Finish getting Virtual Herbarium observations page: {pageIndex}");
+
+            cancellationToken?.ThrowIfCancellationRequested();
+
+            _logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
+            var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
+            _logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
+
+            cancellationToken?.ThrowIfCancellationRequested();
+
+            if ((verbatims?.Length ?? 0) == 0)
+            {
+                return 0;
+            }
+            
+            // Remove duplicates
+            var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
+            foreach (var verbatim in verbatims)
+            {
+                var occurrenceId = $"{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{verbatim.DyntaxaId}";
+                if (_occurrenceIdsSet.Contains(occurrenceId))
+                {
+                    _logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
+                    continue;
+                }
+
+                _occurrenceIdsSet.Add(occurrenceId);
+                distinctVerbatims.Add(verbatim);
+            }
+
+            cancellationToken?.ThrowIfCancellationRequested();
+
+            _logger.LogDebug($"Start storing Virtual Herbarium observations page: {pageIndex}");
+            // Add sightings to MongoDb
+            await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(distinctVerbatims);
+            _logger.LogDebug($"Finish storing Virtual Herbarium observations page: {pageIndex}");
+
+            return verbatims.Count();
+        }
 
         /// <summary>
         ///     Constructor
@@ -68,64 +116,50 @@ namespace SOS.Import.Harvesters.Observations
                 await _virtualHerbariumObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for Virtual Herbarium verbatim collection");
 
+                _logger.LogInformation("Start getting localities for Virtual Herbarium");
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
                 var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
+                _logger.LogInformation("Finish getting localities for Virtual Herbarium");
 
                 var pageIndex = 1;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);
-                _logger.LogDebug($"Start getting observations page: {pageIndex}");
-                var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
-                _logger.LogDebug($"Finish getting observations page: {pageIndex}");
-
-                while (true)
+                var keepHarvesting = true;
+                _occurrenceIdsSet = new ConcurrentBag<string>();
+ 
+                while (keepHarvesting)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-
-                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
-
-                    if ((verbatims?.Length ?? 0) == 0)
+                    var harvestTasks = new List<Task<int>>();
+                    for (var i = 0; i < 10; i++)
                     {
-                        break;
-                    }
-
-                    nrSightingsHarvested += verbatims.Count();
-
-                    // Remove duplicates
-                    var distinctVerbatims = new List<VirtualHerbariumObservationVerbatim>();
-                    foreach (var verbatim in verbatims)
-                    {
-                        var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
-                        if (occurrenceIdsSet.Contains(occurrenceId))
+                        if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue && pageIndex > 1 &&
+                            _virtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage * pageIndex >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
                         {
-                           _logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
-                            continue;
+                            keepHarvesting = false;
+                            break;
                         }
 
-                        occurrenceIdsSet.Add(occurrenceId);
-                        distinctVerbatims.Add(verbatim);
+                        harvestTasks.Add(HarvestBatchAsync(verbatimFactory, fromDate, pageIndex, cancellationToken));
+                        pageIndex++;
                     }
 
-                    // Add sightings to MongoDb
-                    await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(distinctVerbatims);
-
-                    if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    // Run 10 tasks in parallel 
+                    Parallel.ForEach(harvestTasks, harvestTask =>
                     {
-                        break;
-                    }
+                        if (harvestTask.Result.Equals(0))
+                        {
+                            keepHarvesting = false;
+                            cancellationToken = new JobCancellationToken(true);
+                        }
 
-                    pageIndex++;
-                    _logger.LogDebug($"Start getting observations page: {pageIndex}");
-                    observations =
-                        await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
-                    _logger.LogDebug($"Finish getting observations page: {pageIndex}");
+                        nrSightingsHarvested += harvestTask.Result;
+                    });
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for Virtual Herbarium data provider");
 
                 // Update harvest info
-                harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
 
@@ -136,14 +170,16 @@ namespace SOS.Import.Harvesters.Observations
             catch (JobAbortedException)
             {
                 _logger.LogInformation("Virtual Herbarium harvest was cancelled.");
-                harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to harvest Virtual Herbarium");
-                harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                harvestInfo.End = DateTime.Now;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for Virtual Herbarium data provider. Status={harvestInfo.Status}");
