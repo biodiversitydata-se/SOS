@@ -56,10 +56,10 @@ namespace SOS.Import.Services
             conn.Open();
             var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
-            IEnumerable<T> result = null;
+           
             try
             {
-                result = (await conn.QueryAsync<T>(
+                var result = (await conn.QueryAsync<T>(
                     new CommandDefinition(
                         query,
                         parameters,
@@ -71,14 +71,14 @@ namespace SOS.Import.Services
                 )).ToArray();
 
                 transaction.Commit();
+                return result;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error when executing QueryAsync(...)");
                 transaction.Rollback();
+                throw;
             }
-
-            return result;
         }
     }
 }
