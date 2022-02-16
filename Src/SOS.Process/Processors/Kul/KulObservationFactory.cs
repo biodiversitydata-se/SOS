@@ -62,8 +62,8 @@ namespace SOS.Process.Processors.Kul
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = false,
-                    Verified = false,
+                    Validated = true,
+                    Verified = true,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
