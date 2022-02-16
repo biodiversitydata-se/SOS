@@ -951,22 +951,22 @@ namespace SOS.Observations.Api.Controllers
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
-        [HttpGet("{occurrenceId?}")]
+        [HttpGet("{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationById(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string occurrenceId, 
-            [FromQuery] string id,
+            [FromRoute] string id,
+            [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,  
             [FromQuery] string translationCultureCode = "sv-SE", 
             [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
-                occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
+                occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
 
                 var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                     includeInternalFields: false);
@@ -1759,7 +1759,7 @@ namespace SOS.Observations.Api.Controllers
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
         /// <returns></returns>
-        [HttpGet("Internal/{occurrenceId?}")]
+        [HttpGet("Internal/{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1767,15 +1767,15 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> GetObservationByIdInternal(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-            [FromRoute] string occurrenceId,
-            [FromQuery] string id,
+            [FromRoute] string id,
+            [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
             try
             {
-                occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
+                occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
                 var observation = await ObservationManager.GetObservationAsync(
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,

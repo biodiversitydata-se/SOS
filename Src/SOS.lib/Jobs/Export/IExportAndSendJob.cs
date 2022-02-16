@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using SOS.Lib.Enums;
@@ -28,7 +27,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisplayName("Export observations. Email={2}, Description={3}, ExportFormat={4}")]        
+        [JobDisplayName("Export observations. Email={2}, Description={3}, ExportFormat={4}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("medium")]
         Task<bool> RunAsync(SearchFilter filter,

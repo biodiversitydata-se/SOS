@@ -10,6 +10,7 @@ namespace SOS.Lib.Jobs.Process
         /// </summary>
         /// <param name="dataProviderId"></param>
         /// <returns></returns>
+        [JobDisplayName("Copy provider data from active to inactive instance")]
         [Queue("high")]
         Task<bool> RunAsync(int dataProviderId);
     }

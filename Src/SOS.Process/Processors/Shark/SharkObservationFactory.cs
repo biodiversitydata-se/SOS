@@ -80,7 +80,7 @@ namespace SOS.Process.Processors.Shark
                 {
                     BirdNestActivityId = 0,
                     CatalogNumber = sharkSampleId,
-                    OccurrenceId = $"urn:lsid:shark:Sighting:{sharkSampleId}",
+                    OccurrenceId = $"urn:lsid:shark:observation:{sharkSampleId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,

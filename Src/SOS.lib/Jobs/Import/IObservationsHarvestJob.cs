@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -15,7 +13,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Full Harvest Observations")]
+        [JobDisplayName("Full Observations Harvest")]
         [Queue("high")]
         Task<bool> RunFullAsync(IJobCancellationToken cancellationToken);
 
@@ -26,7 +24,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Incremental Harvest Observations, active instance")]
+        [JobDisplayName("Incremental Harvest Observations, active instance")]
         [Queue("high")]
         Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken);
 
@@ -37,7 +35,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Incremental Harvest Observations, inactive instance")]
+        [JobDisplayName("Incremental Harvest Observations, inactive instance")]
         [Queue("high")]
         Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken);
 
@@ -49,6 +47,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
+        [JobDisplayName("Harvest and process observations from passed provides")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
@@ -62,6 +61,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
+        [JobDisplayName("Harvest observations from passed provides")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunHarvestObservationsAsync(

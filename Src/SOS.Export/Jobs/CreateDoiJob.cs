@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -57,7 +56,6 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Create a DwC-A file using passed filter and give it a DOI")]
         public async Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
         {
             try

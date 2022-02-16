@@ -68,21 +68,25 @@ namespace SOS.Import.Harvesters.Observations
                 await _virtualHerbariumObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for Virtual Herbarium verbatim collection");
 
+                _logger.LogDebug($"Start getting Localities for Virtual Herbarium");
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
                 var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
+                _logger.LogDebug($"Finish getting Localities for Virtual Herbarium");
 
                 var pageIndex = 1;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);
-                _logger.LogDebug($"Start getting observations page: {pageIndex}");
-                var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
-                _logger.LogDebug($"Finish getting observations page: {pageIndex}");
-
+                
                 while (true)
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                    _logger.LogDebug($"Start getting Virtual Herbarium observations page: {pageIndex}");
+                    var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, _virtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage);
+                    _logger.LogDebug($"Finish getting Virtual Herbarium observations page: {pageIndex}");
 
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    _logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
+                    _logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
 
                     if ((verbatims?.Length ?? 0) == 0)
                     {
@@ -92,22 +96,23 @@ namespace SOS.Import.Harvesters.Observations
                     nrSightingsHarvested += verbatims.Count();
 
                     // Remove duplicates
-                    var distinctVerbatims = new List<VirtualHerbariumObservationVerbatim>();
+                    var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
                     foreach (var verbatim in verbatims)
                     {
                         var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId}";
                         if (occurrenceIdsSet.Contains(occurrenceId))
                         {
-                           _logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
+                            _logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
                             continue;
                         }
 
                         occurrenceIdsSet.Add(occurrenceId);
                         distinctVerbatims.Add(verbatim);
                     }
-
+                    _logger.LogDebug($"Start storing Virtual Herbarium observations page: {pageIndex}");
                     // Add sightings to MongoDb
                     await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(distinctVerbatims);
+                    _logger.LogDebug($"Finish storing Virtual Herbarium observations page: {pageIndex}");
 
                     if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
@@ -116,10 +121,6 @@ namespace SOS.Import.Harvesters.Observations
                     }
 
                     pageIndex++;
-                    _logger.LogDebug($"Start getting observations page: {pageIndex}");
-                    observations =
-                        await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
-                    _logger.LogDebug($"Finish getting observations page: {pageIndex}");
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for Virtual Herbarium data provider");

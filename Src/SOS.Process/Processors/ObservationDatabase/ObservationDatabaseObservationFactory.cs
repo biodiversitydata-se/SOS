@@ -97,7 +97,7 @@ namespace SOS.Process.Processors.ObservationDatabase
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.TaxonId != 0,
-                    OccurrenceId = $"urn:lsid:observationsdatabasen.se:Observation:{verbatim.Id}",
+                    OccurrenceId = $"urn:lsid:observationsdatabasen.se:observation:{verbatim.Id}",
                     OccurrenceRemarks = verbatim.OccurrenceRemarks,
                     OccurrenceStatus = new VocabularyValue { Id = (int)(verbatim.TaxonId == 0 ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
                     ProtectionLevel = verbatim.ProtectionLevel,

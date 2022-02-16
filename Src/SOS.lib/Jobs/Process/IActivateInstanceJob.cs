@@ -10,6 +10,7 @@ namespace SOS.Lib.Jobs.Process
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
+        [JobDisplayName("Activate passed ElasticSearch instance")]
         [Queue("high")]
         Task<bool> RunAsync(byte instance);
     }

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hangfire;
 
 namespace SOS.Lib.Jobs.Export
@@ -17,7 +16,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="deleteSourceOnSuccess"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [DisplayName("Upload file to Azure Blob Storage [Src=\"{0}\"]")]
+        [JobDisplayName("Upload file to Azure Blob Storage [Src=\"{0}\"]")]
         [Queue("medium")]
         Task<bool> RunAsync(string sourcePath, string blobStorageContainer, bool deleteSourceOnSuccess,
             IJobCancellationToken cancellationToken);

@@ -773,7 +773,6 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Process Observations [Mode={1}]")]
         public async Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             JobRunModes mode,
@@ -810,7 +809,6 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        [DisplayName("Process verbatim observations for all active providers")]
         public async Task<bool> RunAsync(
             bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
