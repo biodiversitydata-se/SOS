@@ -49,12 +49,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var defects = new Dictionary<string, string>();
-            DateTime? dateCollected = null;
-            if (DateTime.TryParse(verbatim.DateCollected, out var date))
-            {
-                dateCollected = date;
-            }
-            else // In correct date, add it to defects
+            DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected);
+            if (dateCollected == null)
             {
                 defects.Add("DateCollected", verbatim.DateCollected);
             }
