@@ -217,7 +217,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.SightingId.ToString();
                 obs.Occurrence.CatalogId = verbatimObservation.SightingId;
-                obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.SightingId}";
+                obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:sighting:{verbatimObservation.SightingId}";
                 obs.Occurrence.IndividualCount = verbatimObservation.Quantity?.ToString() ?? "";
                 obs.Occurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous;
                 obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
