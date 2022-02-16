@@ -93,7 +93,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 {
                     BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogNumber = $"{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{verbatim.DyntaxaId}",
-                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}-{verbatim.AccessionNo}-{verbatim.DyntaxaId}",
+                    OccurrenceId =  $"urn:lsid:herbarium.emg.umu.se:observation:{verbatim.InstitutionCode}*{verbatim.AccessionNo}*{verbatim.DyntaxaId}",
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,

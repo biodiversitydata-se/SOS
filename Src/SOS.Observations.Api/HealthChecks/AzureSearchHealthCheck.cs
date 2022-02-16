@@ -51,6 +51,7 @@ namespace SOS.Observations.Api.HealthChecks
             // Warm up
             await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 2);            
 
+            Thread.Sleep(1100);
             var sw = new Stopwatch();
             sw.Start();
             var result = await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 2);
@@ -81,6 +82,8 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     return new HealthCheckResult(HealthStatus.Degraded, $"Couldn't retrieve data providers using Azure API.");
                 }
+
+                Thread.Sleep(1100);
 
                 var searchResult = await SearchPicaPicaAsync();
                 if (searchResult.TotalCount == 0)
