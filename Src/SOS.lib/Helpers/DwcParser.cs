@@ -35,7 +35,9 @@ namespace SOS.Lib.Helpers
                     "yyyy-MM-dd'T'HH:mmK",
                     "yyyy-MM-dd'T'HHK",
                     "yyyy-MM-dd",
+                    "yyyy-MM-d",
                     "yyyy-M-dd",
+                    "yyyy-M-d",                    
                     "yyyy-M",
                     "yyyy-0MM-dd", // special case for the TUVA dataset that contains multiple observations in this format.
                     "dddd, dd MMMM yyyy",
