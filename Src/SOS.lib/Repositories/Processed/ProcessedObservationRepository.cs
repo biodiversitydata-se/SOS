@@ -1725,6 +1725,9 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public Uri HostUrl => Client.ConnectionSettings.ConnectionPool.Nodes.FirstOrDefault().Uri;
+
+        /// <inheritdoc />
         public async Task<long> IndexCountAsync(bool protectedIndex)
         {
             try

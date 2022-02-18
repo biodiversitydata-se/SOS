@@ -245,6 +245,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter);
 
         /// <summary>
+        /// Returns url to first host
+        /// </summary>
+        Uri HostUrl { get; }
+
+        /// <summary>
         /// Count documents in index
         /// </summary>
         /// <param name="protectedIndex"></param>

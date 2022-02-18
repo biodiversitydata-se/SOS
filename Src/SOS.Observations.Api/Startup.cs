@@ -6,7 +6,6 @@ using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Hangfire;
-using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
@@ -558,22 +557,6 @@ namespace SOS.Observations.Api
                 ? actionApiVersionModel.DeclaredApiVersions
                 : actionApiVersionModel.ImplementedApiVersions;
             return apiVersions;
-        }
-    }
-
-    /// <summary>
-    /// </summary>
-    public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
-    {
-        /// <summary>
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public bool Authorize(DashboardContext context)
-        {
-            // Allow outside. You need an authentication scenario for this part.
-            // DON'T GO PRODUCTION WITH THIS LINES.
-            return true;
         }
     }
 }
