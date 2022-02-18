@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOS.Lib.Models.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -6,7 +7,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessRepositoryBase<TEntity> : IDisposable
+    public interface IProcessRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Batch size

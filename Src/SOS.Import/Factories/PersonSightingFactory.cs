@@ -207,10 +207,17 @@ namespace SOS.Import.Factories
             {
                 var persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId))
                     .OrderBy(ob => ob.Sort)
-                    .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0 ));
+                    .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0, discover: v.Discover));
                 var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
-                    (observers, persons.Select(g => new UserInternal {Id = g.person.Id, UserServiceUserId = g.person.UserServiceUserId, UserAlias = g.person.Alias, ViewAccess = g.viewAccess })));
+                    (observers, persons.Select(g => new UserInternal
+                    {
+                        Discover = g.discover,
+                        Id = g.person.Id,
+                        UserServiceUserId = g.person.UserServiceUserId,
+                        UserAlias = g.person.Alias,
+                        ViewAccess = g.viewAccess
+                    })));
             }
 
             return observersBySightingId;

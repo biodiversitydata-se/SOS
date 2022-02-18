@@ -29,7 +29,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
-            FilterBase filter,
+            SearchFilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
@@ -52,7 +52,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider, 
-            FilterBase filter,
+            SearchFilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,

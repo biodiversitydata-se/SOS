@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -78,6 +79,11 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         }
 
         public void Dispose() { }
+
+        public void InitControllerHttpContext()
+        {
+            ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
+        }
 
         protected string GetUserAuthenticationToken()
         {
@@ -189,6 +195,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());
+            ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
@@ -299,7 +306,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 elasticClientManager,
                 processClient,
                 elasticConfiguration,
-                processedConfigurationCache,
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
                 new NullLogger<ProcessedObservationRepository>());
@@ -317,6 +324,13 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                     userService.GetUserAuthoritiesAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(authorities);
             _filterManager.UserService = userServiceMock.Object;
+
+            var contextAccessor = new HttpContextAccessor() { HttpContext = new DefaultHttpContext() };
+            var claimsIdentity = new ClaimsIdentity();
+            var claim = new Claim("scope", "SOS.Observations.Protected");
+            claimsIdentity.AddClaim(claim);
+            contextAccessor.HttpContext.User.AddIdentity(claimsIdentity);
+            ProcessedObservationRepository.HttpContextAccessor = contextAccessor;
         }
 
 

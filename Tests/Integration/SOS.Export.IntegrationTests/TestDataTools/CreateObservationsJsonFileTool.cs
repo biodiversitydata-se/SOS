@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Lib.Cache;
@@ -13,6 +14,7 @@ using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
@@ -42,7 +44,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 new ElasticClientManager(elasticSearchConfiguration, true),
                 exportClient,
                 new ElasticSearchConfiguration(),
-                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

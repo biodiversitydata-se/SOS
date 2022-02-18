@@ -34,33 +34,6 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Copy")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunCopyDataProviderData([FromQuery] string dataProviderIdOrIdentifier)
-        {
-            try
-            {
-                var dataProvider =
-                    await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
-                if (dataProvider == null)
-                {
-                    return new BadRequestObjectResult(
-                        $"No data provider exist with Id or Identifier={dataProviderIdOrIdentifier}");
-                }
-
-                BackgroundJob.Enqueue<ICopyProviderDataJob>(job => job.RunAsync(dataProvider.Id));
-                return new OkObjectResult($"Copy provider data job for {dataProvider} was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing copy provider data failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
         [HttpPost("Activate")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]

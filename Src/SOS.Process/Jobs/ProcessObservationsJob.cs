@@ -26,9 +26,9 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
@@ -44,14 +44,13 @@ namespace SOS.Process.Jobs
     /// <summary>
     ///     Artportalen harvest
     /// </summary>
-    public class ProcessJob : ProcessJobBase, IProcessJob
+    public class ProcessObservationsJob : ProcessJobBase, IProcessObservationsJob
     {
         private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
         private readonly IDataProviderCache _dataProviderCache;
-        private readonly IInstanceManager _instanceManager;
         private readonly IValidationManager _validationManager;
-        private readonly ILogger<ProcessJob> _logger;
+        private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
@@ -93,9 +92,9 @@ namespace SOS.Process.Jobs
 
             var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
             taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
-            
+
             _logger.LogInformation($"Finish getting processed taxa ({taxaDictonary.Count})");
-            
+
             return taxaDictonary;
         }
 
@@ -113,7 +112,7 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation(
                     $"Start clear ElasticSearch index: {_processedObservationRepository.PublicIndexName}");
                 await _processedObservationRepository.ClearCollectionAsync(false);
-               
+
                 _logger.LogInformation(
                     $"Finish clear ElasticSearch index: {_processedObservationRepository.PublicIndexName}");
 
@@ -308,14 +307,12 @@ namespace SOS.Process.Jobs
         ///  Run process job
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
-        /// <param name="mode"></param>
-        /// <param name="copyFromActiveOnFail"></param>
+        /// <param name="mode"></param>        
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<bool> RunAsync(
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
-            bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -364,9 +361,10 @@ namespace SOS.Process.Jobs
 
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
-                //------------------------------------------------------------------------
-                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, copyFromActiveOnFail, cancellationToken);
+                //------------------------------------------------------------------------                
+                var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cancellationToken);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
+
                 //---------------------------------
                 // 6. Create ElasticSearch index
                 //---------------------------------
@@ -401,7 +399,7 @@ namespace SOS.Process.Jobs
                     }
 
                     if (mode == JobRunModes.Full)
-                    {
+                    {                        
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
@@ -410,7 +408,7 @@ namespace SOS.Process.Jobs
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
                         }
-                        
+
                         //----------------------------------------------------------------------------
                         // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
@@ -464,18 +462,21 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
         /// <param name="mode"></param>
-        /// <param name="taxonById"></param>
-        /// <param name="copyFromActiveOnFail"></param>
+        /// <param name="taxonById"></param>        
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatim(IEnumerable<DataProvider> dataProvidersToProcess, JobRunModes mode, IDictionary<int, Taxon> taxonById, bool copyFromActiveOnFail, IJobCancellationToken cancellationToken)
+        private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatim(
+            IEnumerable<DataProvider> dataProvidersToProcess,
+            JobRunModes mode,
+            IDictionary<int, Taxon> taxonById,
+            IJobCancellationToken cancellationToken)
         {
             var processStart = DateTime.Now;
 
             var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
             foreach (var dataProvider in dataProvidersToProcess)
             {
-                if (!dataProvider.IsActive || 
+                if (!dataProvider.IsActive ||
                     (mode != JobRunModes.Full && !dataProvider.SupportIncrementalHarvest))
                 {
                     continue;
@@ -487,28 +488,6 @@ namespace SOS.Process.Jobs
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
-            
-            if (mode == JobRunModes.Full)
-            {
-                //----------------------------------------------------------------------------
-                //  If a data provider failed to process and it was not Artportalen,
-                //     then try to copy that data from the active instance.
-                //----------------------------------------------------------------------------
-
-                var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
-                    pair.Key.Type == DataProviderType.ArtportalenObservations &&
-                    pair.Value.Result.Status == RunStatus.Failed);
-
-                if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
-                {
-                    var copyTasks = processTaskByDataProvider
-                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
-
-                    await Task.WhenAll(copyTasks);
-                    success = copyTasks.All(t => t.Result);
-                }
-            }
 
             await UpdateProcessInfoAsync(mode, processStart, processTaskByDataProvider, success);
             return processTaskByDataProvider.ToDictionary(pt => pt.Key, pt => pt.Value.Result);
@@ -522,9 +501,9 @@ namespace SOS.Process.Jobs
         /// <param name="processTaskByDataProvider"></param>
         /// <param name="success"></param>
         /// <returns></returns>
-        private async Task UpdateProcessInfoAsync(JobRunModes mode, 
-            DateTime processStart, 
-            IDictionary<DataProvider, 
+        private async Task UpdateProcessInfoAsync(JobRunModes mode,
+            DateTime processStart,
+            IDictionary<DataProvider,
                 Task<ProcessingStatus>> processTaskByDataProvider,
             bool success)
         {
@@ -667,7 +646,7 @@ namespace SOS.Process.Jobs
                 {
                     metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
                 }
-                
+
                 DwCArchiveEmlFileFactory.UpdateDynamicMetaData(eml, metadata.firstSpotted, metadata.lastSpotted, metadata.geographicCoverage);
                 await _dataProviderCache.StoreEmlAsync(provider.Id, eml);
             }
@@ -692,14 +671,14 @@ namespace SOS.Process.Jobs
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
         /// <param name="dataProviderCache"></param>
-        /// <param name="instanceManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        public ProcessJob(IProcessedObservationRepository processedObservationRepository,
+        /// <exception cref="ArgumentNullException"></exception>
+        public ProcessObservationsJob(IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IArtportalenObservationProcessor artportalenObservationProcessor,
@@ -715,13 +694,12 @@ namespace SOS.Process.Jobs
             IDwcaObservationProcessor dwcaObservationProcessor,
             ICache<int, Taxon> taxonCache,
             IDataProviderCache dataProviderCache,
-            IInstanceManager instanceManager,
             IValidationManager validationManager,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
-            ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
+            ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
@@ -729,7 +707,6 @@ namespace SOS.Process.Jobs
             _taxonCache = taxonCache ??
                           throw new ArgumentNullException(nameof(taxonCache));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
-            _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -788,8 +765,8 @@ namespace SOS.Process.Jobs
             if (dataProviderIdOrIdentifiers?.Any() ?? false)
             {
                 dataProvidersToProcess = allDataProviders.Where(dataProvider =>
-                        dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier) && 
-                        dataProvider.IsActive && 
+                        dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier) &&
+                        dataProvider.IsActive &&
                         (mode == JobRunModes.Full || dataProvider.SupportIncrementalHarvest))
                     .ToList();
             }
@@ -804,13 +781,11 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 mode,
-                false,
                 cancellationToken);
         }
 
         /// <inheritdoc />
         public async Task<bool> RunAsync(
-            bool copyFromActiveOnFail,
             IJobCancellationToken cancellationToken)
         {
             _dataProviderCache.Clear();
@@ -820,7 +795,6 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 JobRunModes.Full,
-                copyFromActiveOnFail,
                 cancellationToken);
         }
     }

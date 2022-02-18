@@ -95,7 +95,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<Observation>(obs => obs.Defects)
                 .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
@@ -116,7 +116,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver()
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
             var jsonSettings = new JsonSerializerSettings()

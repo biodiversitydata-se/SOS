@@ -6,7 +6,7 @@
 
         public CoreFileMetaData(CoreFileType coreFileType) :
             base(coreFileType)
-        {
+        {            
             this.coreFileType = coreFileType ?? new CoreFileType();
             Fields = new FieldMetaData(this.coreFileType?.Id, this.coreFileType?.Field);
         }

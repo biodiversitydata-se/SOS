@@ -3,6 +3,11 @@
     public class UserInternal
     {
         /// <summary>
+        /// User discovered the observation
+        /// </summary>
+        public bool Discover { get; set; }
+
+        /// <summary>
         ///     User Id
         /// </summary>
         public int Id { get; set; }

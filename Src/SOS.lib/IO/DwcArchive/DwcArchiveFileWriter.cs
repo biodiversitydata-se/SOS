@@ -66,7 +66,7 @@ namespace SOS.Lib.IO.DwcArchive
         /// <inheritdoc />
         public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
-            FilterBase filter,
+            SearchFilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
@@ -89,7 +89,7 @@ namespace SOS.Lib.IO.DwcArchive
         /// <inheritdoc />
         public async Task<FileExportResult> CreateDwcArchiveFileAsync(
             DataProvider dataProvider,
-            FilterBase filter,
+            SearchFilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,

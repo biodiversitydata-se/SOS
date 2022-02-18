@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Elasticsearch.Net;
+using Microsoft.AspNetCore.Http;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
@@ -16,8 +17,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
+    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation, string>
     {
+        /// <summary>
+        /// Http context accessor.
+        /// </summary>
+        IHttpContextAccessor HttpContextAccessor { get; set; }
+
         /// <summary>
         ///  Add many items
         /// </summary>
@@ -156,14 +162,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<long> GetMatchCountAsync(FilterBase filter);
+        Task<long> GetMatchCountAsync(SearchFilterBase filter);
 
         /// <summary>
         /// Get number of provinces matching the provided filter.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<int> GetProvinceCountAsync(FilterBase filter);
+        Task<int> GetProvinceCountAsync(SearchFilterBase filter);
 
         /// <summary>
         /// Gets a single observation
@@ -245,6 +251,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter);
 
         /// <summary>
+        /// Check if index have observations with same occurrence id
+        /// </summary>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex);
+
+        /// <summary>
         /// Returns url to first host
         /// </summary>
         Uri HostUrl { get; }
@@ -278,7 +291,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId);
 
         /// <summary>
@@ -288,7 +301,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId);
 
         /// <summary>
@@ -298,7 +311,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="scrollId"></param>
         /// <returns></returns>
         Task<ScrollResult<Observation>> ScrollObservationsAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             string scrollId);
 
         Task<ScrollResult<dynamic>> ScrollObservationsAsDynamicAsync(

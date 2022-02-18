@@ -32,11 +32,6 @@ namespace SOS.Lib.Configuration.Export
         /// <summary>
         /// Vocabulary Configuration
         /// </summary>
-        public VocabularyConfiguration VocabularyConfiguration { get; set; }
-
-        /// <summary>
-        /// User service config
-        /// </summary>
-        public UserServiceConfiguration UserServiceConfiguration { get; set; }
+        public VocabularyConfiguration VocabularyConfiguration { get; set; }        
     }
 }

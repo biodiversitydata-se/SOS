@@ -5,7 +5,7 @@ namespace SOS.Lib.Models.Search
     /// <summary>
     /// 
     /// </summary>
-    public class SearchFilter : FilterBase
+    public class SearchFilter : SearchFilterBase
     {
         /// <summary>
         /// Constructor

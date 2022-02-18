@@ -8,16 +8,46 @@ using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
-    ///     Base class for cosmos db repositories
+    ///     Base class MongoDB repositories
     /// </summary>
-    public class MongoDbProcessedRepositoryBase<TEntity, TKey> : ProcessRepositoryBase<TEntity>, IMongoDbProcessedRepositoryBase<TEntity, TKey>
-        where TEntity : IEntity<TKey>
+    public class MongoDbProcessedRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
+        protected readonly IProcessClient _client;
+        protected ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> Logger;
+        
+        /// <summary>
+        ///     Mongo db
+        /// </summary>
+        protected IMongoDatabase Database;
 
+        /// <summary>
+        ///     Get collection
+        /// </summary>
+        /// <returns></returns>
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(IndexName);
+        private string IndexName => IndexHelper.GetIndexName<TEntity>();
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="toggleable"></param>
+        /// <param name="logger"></param>
+        public MongoDbProcessedRepositoryBase(
+            IProcessClient client,
+            bool toggleable,
+            ILogger<MongoDbProcessedRepositoryBase<TEntity, TKey>> logger
+        )
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Database = _client.GetDatabase();
+        }
         private async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection, byte attempt)
         {
             try
@@ -119,49 +149,7 @@ namespace SOS.Lib.Repositories.Processed
         protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
         {
             return await AddBatchAsync(batch, 1);
-        }
-
-        protected readonly IProcessClient _client;
-
-        /// <summary>
-        ///     Mongo db
-        /// </summary>
-        protected IMongoDatabase Database;
-
-        /// <summary>
-        ///     Get collection
-        /// </summary>
-        /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentInstanceName);
-
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="toggleable"></param>
-        /// <param name="logger"></param>
-        public MongoDbProcessedRepositoryBase(
-            IProcessClient client,
-            bool toggleable,
-            ILogger<ProcessRepositoryBase<TEntity>> logger
-        ) : base (client, toggleable, logger, null)
-        {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            
-            Database = _client.GetDatabase();
-        }
-
-        /// <inheritdoc />
-        public string ActiveInstanceName => GetInstanceName(ActiveInstance, Protected);
-
-        /// <inheritdoc />
-        public string CurrentInstanceName => GetInstanceName(CurrentInstance, Protected);
-
-        /// <inheritdoc />
-        public string InactiveInstanceName => GetInstanceName(InActiveInstance, Protected);
-
-        /// <inheritdoc />
-        public bool Protected { get; set; }
+        }        
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
@@ -214,7 +202,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentInstanceName);
+                await Database.CreateCollectionAsync(IndexName);
 
                 return true;
             }
@@ -273,7 +261,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                await Database.DropCollectionAsync(CurrentInstanceName);
+                await Database.DropCollectionAsync(IndexName);
 
                 return true;
             }
@@ -309,7 +297,7 @@ namespace SOS.Lib.Repositories.Processed
             var exists = (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", CurrentInstanceName)
+                        Filter = new BsonDocument("name", IndexName)
                     }))
                 .Any();
 
@@ -317,7 +305,7 @@ namespace SOS.Lib.Repositories.Processed
             if (!exists)
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentInstanceName);
+                await Database.CreateCollectionAsync(IndexName);
 
                 return true;
             }

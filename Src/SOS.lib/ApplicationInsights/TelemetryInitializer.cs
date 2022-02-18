@@ -5,7 +5,7 @@ using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 
-namespace SOS.Observations.Api.ApplicationInsights
+namespace SOS.Lib.ApplicationInsights
 {
     /// <summary>
     /// 
@@ -25,7 +25,7 @@ namespace SOS.Observations.Api.ApplicationInsights
         {
             if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
             {
-                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.Properties.ContainsKey("Protected-observations") )
+                if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.Properties.ContainsKey("Protected-observations"))
                 {
                     telemetry.Context.Properties.Add("Protected-observations", value);
                 }
@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.ApplicationInsights
                 telemetry.Context.User.AuthenticatedUserId = nameidentifier;
             }
 
-            // If it's a call from Azure API management, we should have APU user id in header 
+            // If it's a call from Azure API management, we should have Azure user id in header 
             if (platformContext.Request.Headers.TryGetValue("request-user-id", out var accountId))
             {
                 telemetry.Context.User.AccountId = accountId;
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.ApplicationInsights
         /// </summary>
         /// <param name="httpContextAccessor"></param>
         /// <param name="applicationInsightsConfiguration"></param>
-        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
+        public TelemetryInitializer(IHttpContextAccessor httpContextAccessor, Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration) : base(httpContextAccessor)
         {
             _loggRequestBody = applicationInsightsConfiguration.EnableRequestBodyLogging;
             _loggSearchResponseCount = applicationInsightsConfiguration.EnableSearchResponseCountLogging;

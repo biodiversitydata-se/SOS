@@ -27,6 +27,7 @@ using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
@@ -68,7 +69,7 @@ namespace SOS.Process.UnitTests.Jobs
             _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _areaHelper = new Mock<IAreaHelper>();
-            _loggerMock = new Mock<ILogger<ProcessJob>>();
+            _loggerMock = new Mock<ILogger<ProcessObservationsJob>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderCache = new Mock<IDataProviderCache>();
@@ -96,10 +97,10 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
-        private readonly Mock<ILogger<ProcessJob>> _loggerMock;
+        private readonly Mock<ILogger<ProcessObservationsJob>> _loggerMock;
         private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
-        private ProcessJob TestObject => new ProcessJob(
+        private ProcessObservationsJob TestObject => new ProcessObservationsJob(
             _processedObservationRepositoryMock.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
@@ -115,8 +116,7 @@ namespace SOS.Process.UnitTests.Jobs
             _virtualHerbariumProcessor.Object,
             _dwcaObservationProcessor.Object,
             _taxonCache.Object,
-            _dataProviderCache.Object,
-            _instanceManager.Object,
+            _dataProviderCache.Object,            
             _validationManager.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,

@@ -22,7 +22,7 @@ namespace SOS.Lib.Models.Processed.Validation
         {
             DatasetID = datasetID;
             DatasetName = datasetName;
-            Defects = new List<string>();
+            Defects = new List<ObservationDefect>();
             OccurrenceID = occurrenceID;
             ModifiedDate = DateTime.Now;
         }
@@ -52,7 +52,7 @@ namespace SOS.Lib.Models.Processed.Validation
         /// <summary>
         ///     List of defects
         /// </summary>
-        public ICollection<string> Defects { get; set; }
+        public ICollection<ObservationDefect> Defects { get; set; }
 
         public string OccurrenceID { get; set; }
 

@@ -26,7 +26,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Observations.Api.ApplicationInsights;
+using SOS.Lib.ApplicationInsights;
 
 namespace SOS.Administration.Gui
 {

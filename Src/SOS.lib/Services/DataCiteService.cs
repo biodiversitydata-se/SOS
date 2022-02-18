@@ -100,7 +100,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Failed to get user roles", e);
+                _logger.LogError("Failed to get metadata", e);
             }
 
             return null;

@@ -27,16 +27,21 @@ namespace SOS.Lib.Models.Search
             {
                 return;
             }
-            
+
+            BirdNestActivityLimit = searchFilter.BirdNestActivityLimit;
+            Date = searchFilter.Date;
             DataProviderIds = searchFilter.DataProviderIds;
-            DateFilterType = searchFilter.DateFilterType;
-            EndDate = searchFilter.EndDate;
+            DeterminationFilter = searchFilter.DeterminationFilter;
+            DiffusionStatuses = searchFilter.DiffusionStatuses;
+            ExtendedAuthorization = searchFilter.ExtendedAuthorization;
             FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
             Location = searchFilter.Location;
+            NotRecoveredFilter = searchFilter.NotRecoveredFilter;
+            OutputFields = searchFilter.OutputFields;
+            PositiveSightings = searchFilter.PositiveSightings;
+            ProjectIds = searchFilter.ProjectIds;
             Taxa = searchFilter.Taxa;
             VerificationStatus = searchFilter.VerificationStatus;
-            PositiveSightings = searchFilter.PositiveSightings;
-            StartDate = searchFilter.StartDate;
         }
 
         /// <summary>

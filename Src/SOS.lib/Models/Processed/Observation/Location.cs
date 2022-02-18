@@ -1,5 +1,6 @@
 ﻿using Nest;
 using SOS.Lib.Swagger;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -233,6 +234,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string HigherGeographyId { get; set; }
+
+        /// <summary>
+        ///     Internal flag used in validation. must be true to be stored in processed data
+        /// </summary>
+        [JsonIgnore]
+        [SwaggerExclude]
+        public bool IsInEconomicZoneOfSweden { get; set; }
 
         /// <summary>
         ///     The name of the island on or near which the Location occurs.

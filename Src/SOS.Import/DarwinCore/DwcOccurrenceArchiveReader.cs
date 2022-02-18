@@ -20,7 +20,7 @@ namespace SOS.Import.DarwinCore
     {
         private readonly ILogger<DwcArchiveReader> _logger;
         private int _idCounter;
-        protected int NextId => Interlocked.Increment(ref _idCounter);
+        private int NextId => Interlocked.Increment(ref _idCounter);
 
         public DwcOccurrenceArchiveReader(ILogger<DwcArchiveReader> logger)
         {
@@ -77,6 +77,13 @@ namespace SOS.Import.DarwinCore
             }
 
             return observations;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadEvents(ArchiveReader archiveReader,
+            IIdIdentifierTuple idIdentifierTuple)
+        {
+            throw new NotImplementedException("Not implemented for this reader");
         }
 
         /// <summary>

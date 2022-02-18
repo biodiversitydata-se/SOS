@@ -12,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
@@ -66,7 +67,7 @@ namespace SOS.Import.Factories.Validation
             Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues);
         protected abstract void ValidateVerbatimTaxon(
             TVerbatimObservation verbatimObservation,
-            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingTaxonIds,
             HashSet<string> nonMatchingScientificNames);
 
         public async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
@@ -81,7 +82,7 @@ namespace SOS.Import.Factories.Validation
             int nrValidObservations = 0;
             int nrInvalidObservations = 0;
             var validationRemarksBuilder = new DwcaValidationRemarksBuilder();
-            var observationDefects = new Dictionary<string, int>();
+            var observationDefects = new Dictionary<ObservationDefect.ObservationDefectType, int>();
             var processedFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, int>>();
             var verbatimFieldValues = new Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>>();
             foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
@@ -129,22 +130,22 @@ namespace SOS.Import.Factories.Validation
                             invalidObservations.Add(new InvalidObservationTuple<object>
                             {
                                 VerbatimObservation = verbatimObservation,
-                                ProcessedObservationDefects = observationValidation.Defects
+                                ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
                             });
                         }
 
                         foreach (var validationDefect in observationValidation.Defects)
                         {
-                            if (validationDefect == "Taxon not found")
+                            if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
                             {
                                 ValidateVerbatimTaxon(verbatimObservation, nonMatchingTaxonIds, nonMatchingScientificNames);
                             }
-                            if (!observationDefects.ContainsKey(validationDefect))
+                            if (!observationDefects.ContainsKey(validationDefect.DefectType))
                             {
-                                observationDefects.Add(validationDefect, 0);
+                                observationDefects.Add(validationDefect.DefectType, 0);
                             }
 
-                            observationDefects[validationDefect]++;
+                            observationDefects[validationDefect.DefectType]++;
                         }
                     }
 
@@ -194,7 +195,7 @@ namespace SOS.Import.Factories.Validation
                     NrValidObservations = nrValidObservations,
                     NrInvalidObservations = nrInvalidObservations,
                     Remarks = remarks,
-                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key, Count = m.Value }).ToList(),
+                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key.ToString(), Count = m.Value }).ToList(),
                     NonMatchingTaxonIds = nonMatchingTaxonIds.Count == 0 ? null : nonMatchingTaxonIds.ToList(),
                     NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList()
                 },

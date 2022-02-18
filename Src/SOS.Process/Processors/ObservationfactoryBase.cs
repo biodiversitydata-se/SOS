@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -15,6 +17,29 @@ namespace SOS.Process.Processors
     /// </summary>
     public class ObservationFactoryBase
     {
+        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="taxa"></param>
+        protected ObservationFactoryBase(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        {
+            Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+        }
+        
+        /// <summary>
+        /// Get taxon
+        /// </summary>
+        /// <param name="taxonId"></param>
+        /// <returns></returns>
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId)
+        {
+            Taxa.TryGetValue(taxonId, out var taxon);
+
+            return taxon ?? new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = taxonId.ToString() };
+        }
+
         /// <summary>
         /// Init location class
         /// </summary>

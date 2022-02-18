@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -160,7 +161,7 @@ namespace SOS.Process.Processors
                
                 foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
-                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
                  
                     if (observation == null)
                     {
@@ -169,27 +170,33 @@ namespace SOS.Process.Processors
 
                     // Populate data quality property
                     PopulateDataQuality(observation);
-                    
+
                     // If  observation is protected
-                    if (observation.Occurrence.ProtectionLevel > 2)
+                    if (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage)
                     {
                         observation.Protected = true;
                         observation.Sensitive = true;
                         protectedObservations.Add(observation);
 
                         //If it is a protected sighting, public users should not be possible to find it in the current month 
-                        if (!EnableDiffusion || ((observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
+                        if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
                             ((observation.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
                         {
                             continue;
                         }
 
-                        // Recreate observation to make a new object
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                        // Recreate observation, diffused if provider supports diffusing 
+                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
+
                         // Populate data quality property
                         PopulateDataQuality(observation);
-                        // Diffuse protected observation before adding it to public index. Clone it to not affect protected obs
-                        _diffusionManager.DiffuseObservation(observation);
+
+                        // If provider don't support diffusion, we provide it for them
+                        if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
+                        {
+                            // Diffuse protected observation before adding it to public index. 
+                            _diffusionManager.DiffuseObservation(observation);
+                        }
                     }
 
                     // Add public observation

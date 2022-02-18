@@ -29,11 +29,17 @@ namespace SOS.Lib.Managers.Interfaces
         Task PrepareFilter(
             int? roleId,
             string authorizationApplicationIdentifier, 
-            FilterBase filter,
+            SearchFilterBase filter,
             string authorityIdentity = "Sighting",
             int? areaBuffer = 0, 
             bool? authorizationUsePointAccuracy = false, 
             bool? authorizationUseDisturbanceRadius = false, 
             bool? setDefaultProviders = true);
+
+        /// <summary>
+        /// Prepare taxon filter
+        /// </summary>
+        /// <param name="filter"></param>
+        void PrepareTaxonFilter(TaxonFilter filter);
     }
 }

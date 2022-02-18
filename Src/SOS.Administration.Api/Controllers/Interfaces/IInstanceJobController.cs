@@ -7,14 +7,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     ///     System job controller
     /// </summary>
     public interface IInstanceJobController
-    {
-        /// <summary>
-        ///     Copy data from active to inactive instance
-        /// </summary>
-        /// <param name="dataProviderIdOrIdentifier"></param>
-        /// <returns></returns>
-        Task<IActionResult> RunCopyDataProviderData(string dataProviderIdOrIdentifier);
-
+    {        
         /// <summary>
         ///     Activate instance
         /// </summary>

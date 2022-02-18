@@ -154,7 +154,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <returns></returns>
         Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds);
 
-        Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
+        Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
 
         /// <summary>
         /// Get number of matching observations
@@ -165,7 +165,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <returns></returns>
         Task<long> GetMatchCountAsync(
             int? roleId,
-            string authorizationApplicationIdentifier, FilterBase filter);
+            string authorizationApplicationIdentifier, SearchFilterBase filter);
 
         /// <summary>
         /// Aggregate observations by taxon.

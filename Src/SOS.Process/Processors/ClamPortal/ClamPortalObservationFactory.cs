@@ -17,8 +17,7 @@ namespace SOS.Process.Processors.ClamPortal
     public class ClamPortalObservationFactory : ObservationFactoryBase, IObservationFactory<ClamObservationVerbatim>
     {
         private const string ValidatedObservationStringValue = "Godkänd";
-        private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
+        private readonly DataProvider _dataProvider;        
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -27,10 +26,9 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));            
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
@@ -39,9 +37,9 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ClamObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(ClamObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
+            var taxon = GetTaxon(verbatim.DyntaxaTaxonId ?? -1);
             var accessRights = GetAccessRightsIdFromString(verbatim.AccessRights);
 
             var obs = new Observation
@@ -51,6 +49,7 @@ namespace SOS.Process.Processors.ClamPortal
                 BasisOfRecord = GetBasisOfRecordIdFromString(verbatim.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",
                 DatasetName = "Träd och musselportalen",
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = verbatim.ObservationDate.ToUniversalTime(),
@@ -119,7 +118,7 @@ namespace SOS.Process.Processors.ClamPortal
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             return obs;
         }

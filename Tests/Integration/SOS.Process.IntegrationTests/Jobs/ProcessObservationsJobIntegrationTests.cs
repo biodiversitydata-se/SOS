@@ -46,7 +46,7 @@ namespace SOS.Process.IntegrationTests.Jobs
 {
     public class ProcessObservationsJobIntegrationTests : TestBase
     {
-        private ProcessJob CreateProcessJob(bool storeProcessed)
+        private ProcessObservationsJob CreateProcessJob(bool storeProcessed)
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -86,7 +86,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             {
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>());
             }
             else
@@ -221,19 +221,18 @@ namespace SOS.Process.IntegrationTests.Jobs
                 diffusionManager,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
+
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(),  
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                new ProcessedObservationRepository(elasticClientManager, 
+                    processClient, 
+                    new ElasticSearchConfiguration(), 
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>()),
-                processInfoRepository,
                 new NullLogger<InstanceManager>());
 
-            // todo
-            var taxonProcessor = new TaxonProcessor(new Mock<ITaxonService>().Object, new Mock<ITaxonAttributeService>().Object, new TaxonRepository(processClient, new NullLogger<TaxonRepository>()), processConfiguration, new NullLogger<TaxonProcessor>());
+            var processTaxaJob = new ProcessTaxaJob(null, // todo
+                harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());                       
 
-            var processTaxaJob = new ProcessTaxaJob(taxonProcessor, 
-                harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
                 verbatimClient,
                 processedObservationRepository,
@@ -263,7 +262,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
             
 
-            var processJob = new ProcessJob(
+            var processJob = new ProcessObservationsJob(
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
@@ -279,14 +278,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 virtualHrbariumProcessor,
                 dwcaProcessor,
                 taxonCache,
-                dataProviderCache,
-                instanceManager,
+                dataProviderCache,                
                 validationManager,
                 processTaxaJob,
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
                 processConfiguration, 
-                new NullLogger<ProcessJob>());
+                new NullLogger<ProcessObservationsJob>());
 
             return processJob;
         }

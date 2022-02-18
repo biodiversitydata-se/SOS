@@ -136,7 +136,7 @@ namespace SOS.Hangfire.JobServer
                                     },
                                     CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     Prefix = "hangfire",
-                                    CheckConnection = true,
+                                    CheckConnection = true
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
@@ -190,7 +190,7 @@ namespace SOS.Hangfire.JobServer
                             builder
                                 .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }
                 )

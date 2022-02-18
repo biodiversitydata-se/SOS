@@ -6,13 +6,14 @@ namespace SOS.Process.Processors.Interfaces
     /// <summary>
     /// Interface for observation factory
     /// </summary>
-    public interface IObservationFactory<TEntity> where TEntity: IEntity<int>
+    public interface IObservationFactory<TEntity> where TEntity : IEntity<int>
     {
         /// <summary>
         /// Cast verbatim to observation
         /// </summary>
         /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        Observation CreateProcessedObservation(TEntity verbatim);
+        Observation CreateProcessedObservation(TEntity verbatim, bool diffuseIfSupported);
     }
 }

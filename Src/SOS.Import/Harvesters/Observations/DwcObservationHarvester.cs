@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DwC_A;
@@ -11,12 +12,10 @@ using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
@@ -27,37 +26,16 @@ namespace SOS.Import.Harvesters.Observations
     public class DwcObservationHarvester : IDwcObservationHarvester
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IDarwinCoreArchiveEventRepository _dwcArchiveEventRepository;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IFileDownloadService _fileDownloadService;
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
-        private async Task HarvestEventData(IIdIdentifierTuple idIdentifierTuple,
-            ArchiveReader archiveReader,
-            IJobCancellationToken cancellationToken)
-        {
-            _logger.LogDebug("Start storing DwC-A events");
-            await _dwcArchiveEventRepository.ClearTempHarvestCollection(idIdentifierTuple);
-            var eventBatches =
-                _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, idIdentifierTuple,
-                    _dwcaConfiguration.BatchSize);
-            await foreach (var eventBatch in eventBatches)
-            {
-                cancellationToken?.ThrowIfCancellationRequested();
-                await _dwcArchiveEventRepository.AddManyToTempHarvestAsync(eventBatch, idIdentifierTuple);
-            }
-
-            await _dwcArchiveEventRepository.RenameTempHarvestCollection(idIdentifierTuple);
-            _logger.LogDebug("Finish storing DwC-A events");
-        }
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="verbatimClient"></param>
-        /// <param name="dwcArchiveEventRepository"></param>
         /// <param name="dwcArchiveReader"></param>
         /// <param name="fileDownloadService"></param>
         /// <param name="dataProviderRepository"></param>
@@ -65,7 +43,6 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="logger"></param>
         public DwcObservationHarvester(
             IVerbatimClient verbatimClient,
-            IDarwinCoreArchiveEventRepository dwcArchiveEventRepository,
             IDwcArchiveReader dwcArchiveReader,
             IFileDownloadService fileDownloadService,
             IDataProviderRepository dataProviderRepository,
@@ -73,8 +50,6 @@ namespace SOS.Import.Harvesters.Observations
             ILogger<DwcObservationHarvester> logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _dwcArchiveEventRepository = dwcArchiveEventRepository ??
-                                         throw new ArgumentNullException(nameof(dwcArchiveEventRepository));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _fileDownloadService = fileDownloadService ?? throw new ArgumentNullException(nameof(fileDownloadService));
             _dataProviderRepository =
@@ -110,7 +85,7 @@ namespace SOS.Import.Harvesters.Observations
                     dataProvider,
                     _verbatimClient,
                     _logger)
-                { TempMode = true };
+            { TempMode = true };
 
             try
             {
@@ -122,6 +97,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
                 var observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
+
                 var observationBatches =
                     _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider,
                         _dwcaConfiguration.BatchSize);
@@ -135,11 +111,11 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    observationCount += verbatimObservationsBatch.Count;
+                    observationCount += verbatimObservationsBatch.Count();
                     await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }
 
-                if(dataProvider.UseVerbatimFileInExport)
+                if (dataProvider.UseVerbatimFileInExport)
                 {
                     _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
                     await using var fileStream = File.OpenRead(archivePath);
@@ -185,7 +161,7 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider,  IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now)
             {
@@ -194,12 +170,15 @@ namespace SOS.Import.Harvesters.Observations
             XDocument emlDocument = null;
             _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo.Status}");
 
-            if (!string.IsNullOrEmpty(provider.DownloadUrlEml))
+            var downloadUrlEml = provider.DownloadUrls
+                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ObservationEml))?.Url;
+
+            if (!string.IsNullOrEmpty(downloadUrlEml))
             {
                 try
                 {
                     // Try to get eml document from ipt
-                    emlDocument = await _fileDownloadService.GetXmlFileAsync(provider.DownloadUrlEml);
+                    emlDocument = await _fileDownloadService.GetXmlFileAsync(downloadUrlEml);
 
                     if (emlDocument != null)
                     {
@@ -210,11 +189,11 @@ namespace SOS.Import.Harvesters.Observations
                             // If data set not has changed since last harvest, don't harvest again
                             if (provider.SourceDate == pubDate.ToUniversalTime())
                             {
-                                _logger.LogInformation( $"Harvest of {provider.Identifier} canceled, No new data");
+                                _logger.LogInformation($"Harvest of {provider.Identifier} canceled, No new data");
                                 harvestInfo.Status = RunStatus.CanceledSuccess;
                                 return harvestInfo;
                             }
-                            
+
                             provider.SourceDate = pubDate;
                         };
                     }
@@ -227,8 +206,10 @@ namespace SOS.Import.Harvesters.Observations
 
             var path = Path.Combine(_dwcaConfiguration.ImportPath, $"dwca-{provider.Identifier}.zip");
 
-            // Try to get DwcA file from IPT and store it locall
-            if (!await _fileDownloadService.GetFileAndStoreAsync(provider.DownloadUrl, path))
+            // Try to get DwcA file from IPT and store it locally
+            var downloadUrl = provider.DownloadUrls
+                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.Observations))?.Url;
+            if (!await _fileDownloadService.GetFileAndStoreAsync(downloadUrl, path))
             {
                 return harvestInfo;
             }
@@ -240,7 +221,7 @@ namespace SOS.Import.Harvesters.Observations
             {
                 if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlDocument))
                 {
-                    _logger.LogWarning( $"Error updating EML for {provider.Identifier}");
+                    _logger.LogWarning($"Error updating EML for {provider.Identifier}");
                 }
             }
 
