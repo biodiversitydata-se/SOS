@@ -21,7 +21,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateEventCsvFileAsync(
-            FilterBase filter,
+            SearchFilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,

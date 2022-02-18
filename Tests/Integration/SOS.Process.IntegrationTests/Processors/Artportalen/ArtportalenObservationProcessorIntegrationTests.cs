@@ -99,8 +99,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             if (storeProcessedObservations)
             {
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
-                    new ElasticSearchConfiguration(), 
-                    new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new ElasticSearchConfiguration(),
+                    new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>());
             }
             else

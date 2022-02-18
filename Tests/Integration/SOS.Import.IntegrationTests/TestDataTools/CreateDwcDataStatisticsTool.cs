@@ -64,8 +64,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 processConfiguration.WriteBatchSize
                 );
             var dwcObservationHarvester = new DwcObservationHarvester(
-                importClient,
-                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
+                importClient,                
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 new FileDownloadService(new HttpClientService(new NullLogger<HttpClientService>()), new NullLogger<FileDownloadService>()),
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), 

@@ -229,13 +229,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue InstitutionCode { get; set; }
 
         /// <summary>
-        ///     Internal flag used in validation. must be true to be stored in processed data
-        /// </summary>
-        [JsonIgnore]
-        [SwaggerExclude]
-        public bool IsInEconomicZoneOfSweden { get; set; }
-
-        /// <summary>
         ///     A language of the resource.
         ///     Recommended best practice is to use a controlled
         ///     vocabulary such as RFC 4646 [RFC4646].

@@ -33,6 +33,26 @@ namespace SOS.Process.Processors.Artportalen
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
 
+      
+
+        /// Cast verbatim area to processed area
+        /// </summary>
+        /// <param name="area"></param>
+        /// <returns></returns>
+        private static Area CastToArea(GeographicalArea area)
+        {
+            if (area == null)
+            {
+                return null;
+            }
+
+            return new Area
+            {
+                FeatureId = area.FeatureId,
+                Name = area.Name
+            };
+        }
+
         /// <summary>
         ///     Calculate protection level
         /// </summary>
@@ -67,10 +87,9 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             bool incrementalMode,
-            string artPortalenUrl) 
+            string artPortalenUrl) : base(taxa) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
@@ -93,10 +112,12 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation, bool diffuseIfSupported)
         {
             try
             {
+                var diffuseFactor = verbatimObservation?.Site?.DiffusionFactor ?? 0;
+                var diffuse = diffuseIfSupported && diffuseFactor > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
                 var point = (Point)verbatimObservation.Site?.Point?.ToGeometry();
@@ -112,9 +133,12 @@ namespace SOS.Process.Processors.Artportalen
                     : verbatimObservation.EndDate;
 
                 var taxonId = verbatimObservation.TaxonId ?? -1;
-                _taxa.TryGetValue(taxonId, out var taxon);
-               
-                var obs = new Observation();
+                var taxon = GetTaxon(taxonId);
+
+                var obs = new Observation
+                {
+                    DiffusionStatus = diffuse ? DiffusionStatus.DiffusedByProvider : DiffusionStatus.NotDiffused
+                };
 
                 // Record level
 
@@ -131,12 +155,12 @@ namespace SOS.Process.Processors.Artportalen
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
                 obs.InformationWithheld = null;
-                obs.IsInEconomicZoneOfSweden = hasPosition;
+                obs.Location.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
-                obs.PrivateCollection = verbatimObservation.PrivateCollection;
-                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
+                obs.PrivateCollection = verbatimObservation.PrivateCollection;                
+                obs.Projects = verbatimObservation.Projects?.Select(ArtportalenFactoryHelper.CreateProcessedProject);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
                 obs.Type = null;
@@ -189,6 +213,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
                 obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
+                obs.Location.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
                 obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
@@ -198,13 +223,26 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
-                AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
-                    verbatimObservation.Site?.YCoord,
-                    CoordinateSys.WebMercator,
-                    point,
-                    verbatimObservation.Site?.PointWithBuffer,
-                    verbatimObservation.Site?.Accuracy,
-                    taxon?.Attributes?.DisturbanceRadius);
+                if (diffuse)
+                {
+                    AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
+                        verbatimObservation.Site?.YCoord,
+                        CoordinateSys.WebMercator,
+                        (Point)verbatimObservation.Site?.DiffusedPoint?.ToGeometry(),
+                        verbatimObservation.Site?.DiffusedPointWithBuffer,
+                        verbatimObservation.Site?.Accuracy,
+                        taxon?.Attributes?.DisturbanceRadius);
+                }
+                else
+                {
+                    AddPositionData(obs.Location, verbatimObservation.Site?.TrueXCoord,
+                        verbatimObservation.Site?.TrueYCoord,
+                        CoordinateSys.WebMercator,
+                        (Point)verbatimObservation.Site?.Point?.ToGeometry(),
+                        verbatimObservation.Site?.PointWithBuffer,
+                        verbatimObservation.Site?.Accuracy,
+                        taxon?.Attributes?.DisturbanceRadius);
+                }
 
                 // Occurrence
                 obs.Occurrence = new Occurrence();
@@ -306,7 +344,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
                 obs.ArtportalenInternal.OccurrenceVerifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
-                obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.URL;
+                obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.SightingBarcodeURL;
                 obs.ArtportalenInternal.SecondHandInformation =
                     (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
                     (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false);
@@ -345,20 +383,6 @@ namespace SOS.Process.Processors.Artportalen
             {
                 throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}, SightingId={verbatimObservation.SightingId}", e);
             }
-        }
-
-        private static Area CastToArea(GeographicalArea area)
-        {
-            if (area == null)
-            {
-                return null;
-            }
-
-            return new Area
-            {
-                FeatureId = area.FeatureId,
-                Name = area.Name
-            };
         }
 
         private List<ExtendedMeasurementOrFact> CreateMeasurementOrFacts(string occurrenceId, ArtportalenObservationVerbatim verbatimObservation)

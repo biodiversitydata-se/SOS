@@ -47,6 +47,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
+        ///     Sex id's to match. Queryable values are available in sex vocabulary.
+        /// </summary>
+        public IEnumerable<int> SexIds { get; set; }
+
+        /// <summary>
         /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
         /// </summary>
         public TaxonListOp TaxonListOperator { get; set; } = TaxonListOp.Merge;

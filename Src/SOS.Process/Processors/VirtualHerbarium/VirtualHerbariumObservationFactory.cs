@@ -17,7 +17,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
     public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObservationFactory<VirtualHerbariumObservationVerbatim>
     {
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -26,26 +25,26 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public VirtualHerbariumObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper)
+        public VirtualHerbariumObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
-        ///     Cast verbatim observations to processed data model
+        /// Cast verbatim observations to processed data model
         /// </summary>
         /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
         /// <returns></returns>
-        public Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             if (verbatim == null)
             {
                 return null;
             }
 
-            _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);
+            var taxon = GetTaxon(verbatim.DyntaxaId);
             var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
 
             var defects = new Dictionary<string, string>();
@@ -63,6 +62,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
                 DatasetName = "Virtual Herbarium",
                 Defects = defects.Count == 0 ? null : defects,
+                DiffusionStatus = DiffusionStatus.NotDiffused,
                 Event = new Event
                 {
                     EndDate = dateCollected?.ToUniversalTime(),
@@ -106,7 +106,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
             return obs;
         }

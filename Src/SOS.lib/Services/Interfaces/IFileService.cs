@@ -6,6 +6,13 @@
     public interface IFileService
     {
         /// <summary>
+        /// Compress directory
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="targetPath"></param>
+        void CompressDirectory(string folderPath, string targetPath);
+
+        /// <summary>
         ///     Compress folder content
         /// </summary>
         /// <param name="path"></param>

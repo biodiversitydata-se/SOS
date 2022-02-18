@@ -15,7 +15,7 @@ namespace SOS.Import.DarwinCore.Interfaces
         /// <param name="idIdentifierTuple"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
-        IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+        IAsyncEnumerable<IEnumerable<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
             int batchSize = 100000);
@@ -27,7 +27,7 @@ namespace SOS.Import.DarwinCore.Interfaces
         /// <param name="idIdentifierTuple"></param>
         /// <param name="maxNrObservationsToReturn">Max number of observations to return.</param>
         /// <returns></returns>
-        public Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+        Task<IEnumerable<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
             int maxNrObservationsToReturn = int.MaxValue);
@@ -37,20 +37,8 @@ namespace SOS.Import.DarwinCore.Interfaces
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
-        /// <param name="batchSize"></param>
         /// <returns></returns>
-        IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
-            ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple,
-            int batchSize);
-
-        /// <summary>
-        ///     Reads a Sampling Event DwC-A and returns the events.
-        /// </summary>
-        /// <param name="archiveReader"></param>
-        /// <param name="idIdentifierTuple"></param>
-        /// <returns></returns>
-        public Task<List<DwcEvent>> ReadSamplingEventArchiveAsDwcEventAsync(
+        Task<IEnumerable<DwcEventOccurrenceVerbatim>> ReadSamplingEventArchiveAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple);
     }

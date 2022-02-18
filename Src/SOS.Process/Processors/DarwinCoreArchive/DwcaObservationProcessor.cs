@@ -16,7 +16,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Interfaces;
+using SOS.Process.Processors.DarwinCoreArchive.Interfaces;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
 {

@@ -12,8 +12,6 @@ namespace SOS.Process.Managers
     /// </summary>
     public class InstanceManager : ManagerBase<InstanceManager>, IInstanceManager
     {
-        private readonly IProcessInfoRepository _processInfoRepository;
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -21,53 +19,11 @@ namespace SOS.Process.Managers
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public InstanceManager(
-            IProcessedObservationRepository processedObservationRepository,
-            IProcessInfoRepository processInfoRepository,
+            IProcessedObservationRepository processedObservationRepository,            
             ILogger<InstanceManager> logger) : base(processedObservationRepository, logger)
         {
-            _processInfoRepository =
-                processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
-        {
-            try
-            {
-                Logger.LogDebug("Start deleting data from inactive instance");
-                if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, false))
-                {
-                    Logger.LogError("Failed to delete delete public data from inactive instance");
-                    return false;
-                }
-                if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, true))
-                {
-                    Logger.LogError("Failed to delete protected data from inactive instance");
-                    return false;
-                }
-                Logger.LogDebug("Finish deleting data from inactive instance");
-
-                Logger.LogDebug("Start copying data from active to inactive instance");
-                if (await ProcessedObservationRepository.CopyProviderDataAsync(dataProvider, false) && 
-                    await ProcessedObservationRepository.CopyProviderDataAsync(dataProvider, true))
-                {
-                    Logger.LogDebug("Finish copying data from active to inactive instance");
-
-                    Logger.LogDebug("Start copying metadata from active to inactive instance");
-                    var res = await _processInfoRepository.CopyProviderDataAsync(dataProvider);
-                    Logger.LogDebug("Finish copying metadata from active to inactive instance");
-
-                    return res;
-                }
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to copy from active to inactive instance");
-                return false;
-            }
-        }
+            
+        }     
 
         public async Task<bool> SetActiveInstanceAsync(byte instance)
         {

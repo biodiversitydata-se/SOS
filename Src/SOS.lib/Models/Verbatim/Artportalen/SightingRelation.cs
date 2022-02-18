@@ -5,6 +5,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     public class SightingRelation
     {
         public int Id { get; set; }
+        public bool Discover { get; set; }
         public int SightingId { get; set; }
         public int UserId { get; set; }
         public int SightingRelationTypeId { get; set; }
@@ -17,7 +18,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public override string ToString()
         {
             return
-                $"{nameof(SightingId)}: {SightingId}, {nameof(UserId)}: {UserId}, {nameof(SightingRelationTypeId)}: {SightingRelationTypeId}, {nameof(Sort)}: {Sort}, {nameof(IsPublic)}: {IsPublic}, {nameof(DeterminationYear)}: {DeterminationYear}";
+                $"{nameof(SightingId)}: {SightingId}, {nameof(UserId)}: {UserId}, {nameof(SightingRelationTypeId)}: {SightingRelationTypeId}, {nameof(Sort)}: {Sort}, {nameof(Discover)}: {Discover}, {nameof(IsPublic)}: {IsPublic}, {nameof(DeterminationYear)}: {DeterminationYear}";
         }
     }
 }

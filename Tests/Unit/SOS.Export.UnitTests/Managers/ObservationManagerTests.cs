@@ -90,7 +90,7 @@ namespace SOS.Export.UnitTests.Managers
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
-                    It.IsAny<FilterBase>(),
+                    It.IsAny<SearchFilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,
                     It.IsAny<ProcessInfo>(),
@@ -156,7 +156,7 @@ namespace SOS.Export.UnitTests.Managers
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
-                    It.IsAny<FilterBase>(),
+                    It.IsAny<SearchFilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,
                     It.IsAny<ProcessInfo>(),

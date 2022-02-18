@@ -253,7 +253,7 @@ namespace SOS.Import.Entities.Artportalen
         /// <summary>
         ///     SightingBarcode url
         /// </summary>
-        public string URL { get; set; }
+        public string SightingBarcodeURL { get; set; }
 
         /// <summary>
         ///     Validation status id

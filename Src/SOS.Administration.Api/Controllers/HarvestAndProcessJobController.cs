@@ -174,5 +174,42 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc />
+        [HttpPost("CheckLists/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyCheckListHarvestAndProcessJob([FromQuery] int hour, [FromQuery] int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<ICheckListsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
+                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Check lists harvest and process job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding check lists harvest and process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("CheckLists/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunCheckListHarvestAndProcessJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ICheckListsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Check lists harvest and process job was enqueued to Hangfire.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing check lists harvest and process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

@@ -46,7 +46,8 @@ namespace SOS.Export.IoC.Modules
         public (ExportConfiguration ExportConfiguration, 
             MongoDbConfiguration ProcessDbConfiguration, 
             BlobStorageConfiguration BlobStorageConfiguration,
-            DataCiteServiceConfiguration DataCiteServiceConfiguration) Configurations { get; set; }
+            DataCiteServiceConfiguration DataCiteServiceConfiguration,
+            UserServiceConfiguration UserServiceConfiguration) Configurations { get; set; }
 
         /// <summary>
         ///     Load event
@@ -64,8 +65,8 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configurations.ExportConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configurations.ExportConfiguration.UserServiceConfiguration).As<UserServiceConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configurations.ExportConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();            
+            builder.RegisterInstance(Configurations.UserServiceConfiguration).As<UserServiceConfiguration>().SingleInstance();
 
             // Processed Mongo Db
             var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
@@ -76,8 +77,8 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<CurrentUserAuthorization>().As<IAuthorizationProvider>().InstancePerLifetimeScope();
 
             // Add cache
-            builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();
-            builder.RegisterType<ClassCache<ProcessedConfiguration>>().As<IClassCache<ProcessedConfiguration>>().SingleInstance();
+            builder.RegisterType<AreaCache>().As<IAreaCache>().SingleInstance();            
+            builder.RegisterType<ProcessedConfigurationCache>().As<ICache<string, ProcessedConfiguration>>().SingleInstance();
 
             // Add managers
             builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
@@ -90,6 +91,7 @@ namespace SOS.Export.IoC.Modules
 
             // Repositories mongo
             builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedConfigurationRepository>().As<IProcessedConfigurationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>()
                 .InstancePerLifetimeScope();

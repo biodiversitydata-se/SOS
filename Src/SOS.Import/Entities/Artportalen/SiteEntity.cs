@@ -10,6 +10,10 @@
         /// </summary>
         public int Accuracy { get; set; }
 
+        /// <summary>
+        ///     Id of diffusion, 0 if no diffusion
+        /// </summary>
+        public int DiffusionFactor { get; set; }
 
         /// <summary>
         /// External id
@@ -31,6 +35,16 @@
         ///     Name of site
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        ///     Ensured not diffused X coordinate of site
+        /// </summary>
+        public int TrueXCoord { get; set; }
+
+        /// <summary>
+        ///     Ensured not diffused Y coordinate of site
+        /// </summary>
+        public int TrueYCoord { get; set; }
 
         /// <summary>
         ///     X coordinate of site

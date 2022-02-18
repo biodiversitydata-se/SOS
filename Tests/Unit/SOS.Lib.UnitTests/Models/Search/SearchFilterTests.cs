@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using MongoDB.Bson;
 using Nest;
 using SOS.Lib.Models.Search;
 using Xunit;
@@ -42,8 +41,8 @@ namespace SOS.Lib.UnitTests.Models.Search
                             }
                         }
                     }
-                }, 
-                EndDate = currentDate
+                },
+                Date = new DateFilter { EndDate = currentDate }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -90,7 +89,7 @@ namespace SOS.Lib.UnitTests.Models.Search
                         }
                     }
                 },
-                EndDate = currentDate
+                Date = new DateFilter { EndDate = currentDate }
             };
 
             //-----------------------------------------------------------------------------------------------------------

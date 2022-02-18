@@ -15,6 +15,7 @@ using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Lib.Helpers
 {
@@ -47,38 +48,37 @@ namespace SOS.Lib.Helpers
             ClearCache();
         }
 
-
         /// <inheritdoc />
-        public void AddAreaDataToProcessedObservations(IEnumerable<Observation> processedObservations)
+        public void AddAreaDataToProcessedLocation(Location processedLocation)
         {
-            foreach (var processedObservation in processedObservations)
-            {
-                AddAreaDataToProcessedObservation(processedObservation);
-            }
-        }
-
-        /// <inheritdoc />
-        public void AddAreaDataToProcessedObservation(Observation processedObservation)
-        {
-            if ((processedObservation?.Location?.DecimalLongitude ?? 0) == 0 
-                || (processedObservation?.Location?.DecimalLatitude ?? 0) == 0)
+            if ((processedLocation?.DecimalLongitude ?? 0) == 0
+                || (processedLocation?.DecimalLatitude ?? 0) == 0)
             {
                 return;
             }
 
-            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
-                processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = positionLocation?.County;
-            processedObservation.Location.Municipality = positionLocation?.Municipality;
-            processedObservation.Location.Parish = positionLocation?.Parish;
-            processedObservation.Location.Province = positionLocation?.Province;
-            processedObservation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
+            var positionLocation = GetPositionLocation(processedLocation.DecimalLongitude.Value,
+                processedLocation.DecimalLatitude.Value);
+            processedLocation.County = positionLocation?.County;
+            processedLocation.Municipality = positionLocation?.Municipality;
+            processedLocation.Parish = positionLocation?.Parish;
+            processedLocation.Province = positionLocation?.Province;
+            processedLocation.IsInEconomicZoneOfSweden = positionLocation?.EconomicZoneOfSweden ?? false;
 
-            processedObservation.Location.Attributes.ProvincePartIdByCoordinate =
-                GetProvincePartIdByCoordinate(processedObservation.Location.Province?.FeatureId);
+            processedLocation.Attributes.ProvincePartIdByCoordinate =
+                GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
 
-            processedObservation.Location.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
-                processedObservation.Location.County?.FeatureId, processedObservation.Location.Province?.FeatureId);
+            processedLocation.Attributes.CountyPartIdByCoordinate = GetCountyPartIdByCoordinate(
+                processedLocation.County?.FeatureId, processedLocation.Province?.FeatureId);
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToProcessedLocations(IEnumerable<Location> processedLocations)
+        {
+            foreach (var processedLocation in processedLocations)
+            {
+                AddAreaDataToProcessedLocation(processedLocation);
+            }
         }
 
         /// <inheritdoc />

@@ -206,6 +206,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string occurrenceId,
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
-            bool sensitiveObservations = false);
+            bool sensitiveObservations = false);        
     }
 }

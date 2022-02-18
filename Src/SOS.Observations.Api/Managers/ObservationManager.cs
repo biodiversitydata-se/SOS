@@ -87,7 +87,7 @@ namespace SOS.Observations.Api.Managers
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e, "Error in postprocessing observations");
                 throw;
             }
         }
@@ -121,6 +121,9 @@ namespace SOS.Observations.Api.Managers
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // Make sure we are working with live data
+            _processedObservationRepository.LiveMode = true;
         }
 
 
@@ -313,19 +316,19 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
+        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
             await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
-        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
+        private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
             await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
-        public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
+        public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
         {
             var taxonObservationCountCacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch);
             var countByTaxonId = new Dictionary<int, TaxonCount>();
@@ -461,6 +464,12 @@ namespace SOS.Observations.Api.Managers
             PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
            
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex)
+        {
+            return await _processedObservationRepository.HasIndexOccurrenceIdDuplicatesAsync(protectedIndex);
         }
 
         /// <inheritdoc />

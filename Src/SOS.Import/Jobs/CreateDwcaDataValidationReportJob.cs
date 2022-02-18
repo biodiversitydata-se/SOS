@@ -112,7 +112,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
@@ -136,7 +136,7 @@ namespace SOS.Import.Jobs
             var jsonResolver = new IgnorableSerializerContractResolver()
                 .Ignore<Observation>(obs => obs.Location.Point)
                 .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)

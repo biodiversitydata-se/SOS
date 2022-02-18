@@ -27,6 +27,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                sr.SightingId,
 	                sr.UserId,
 	                sr.SightingRelationTypeId,
+                    sr.Discover,
 	                sr.Sort,
 	                sr.IsPublic,	                
 	                sr.DeterminationYear

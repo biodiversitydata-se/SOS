@@ -59,11 +59,14 @@ namespace SOS.Export.IntegrationTests.Managers
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
                 new NullLogger<DwcArchiveFileWriter>());
 
+            var processedConfigurationRepository = new ProcessedConfigurationRepository(processClient,
+                new NullLogger<ProcessedConfigurationRepository>());
+
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
                 processClient,
                 elasticConfiguration,
-                new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryDistributedCacheOptions())),
+                new ProcessedConfigurationCache(processedConfigurationRepository),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
@@ -138,7 +141,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     "datasetName",
                     "event.startDate",
                     "event.endDate",
-                    "identification.validated",
+                    "identification.verified",
                     "location.decimalLongitude",
                     "location.decimalLatitude",
                     "occurrence.occurrenceId",
@@ -182,7 +185,7 @@ namespace SOS.Export.IntegrationTests.Managers
                         "datasetName",
                         "event.startDate",
                         "event.endDate",
-                        "identification.validated",
+                        "identification.verified",
                         "location.decimalLongitude",
                         "location.decimalLatitude",
                         "occurrence.occurrenceId",

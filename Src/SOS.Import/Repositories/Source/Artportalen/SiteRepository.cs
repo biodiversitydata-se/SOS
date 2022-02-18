@@ -23,12 +23,16 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                ISNULL(s.PresentationName, s.Name) AS Name,
 	                s.XCoord,
 	                s.YCoord,
+                    s.TrueXCoord,
+                    s.TrueYCoord,
                     s.Accuracy,
 				    s.ExternalId,
 				    s.ParentId AS ParentSiteId,
-				    s.PresentationNameParishRegion
+				    s.PresentationNameParishRegion,
+                    d.Factor AS DiffusionFactor
                 FROM 
 	                Site s 
+                    LEFT JOIN Diffusion d ON s.DiffusionId = d.Id
                     { join }";
 
 
@@ -55,7 +59,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 {
                     return await GetByIdsAsync(ids, live, ++attempt);
                 }
-                
+
                 return null;
             }
         }
@@ -120,7 +124,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
         /// <inheritdoc />
         public async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live = false)
-		{
+        {
             if (!ids?.Any() ?? true)
             {
                 return null;

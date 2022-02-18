@@ -32,7 +32,7 @@ namespace SOS.Observations.Api.HealthChecks
                     Ids = new[] { 103032 },
                     IncludeUnderlyingTaxa = true
                 },
-                VerificationStatus = FilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
                 PositiveSightings = true,
                 OutputFields = new List<string>
                 {

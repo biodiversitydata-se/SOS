@@ -31,6 +31,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
+using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
@@ -65,7 +66,6 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.ActionFilters;
-using SOS.Observations.Api.ApplicationInsights;
 using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -179,7 +179,7 @@ namespace SOS.Observations.Api
             services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 4);
+                o.DefaultApiVersion = new ApiVersion(1, 5);
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
             });
@@ -226,7 +226,7 @@ namespace SOS.Observations.Api
                             apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
                             string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
                             string methodName = methodInfo.Name;
-                            return $"{controller}_{methodName}";
+                            return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
                         });
                     }
 
@@ -378,13 +378,15 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
-            services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
+            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();            
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
+            services.AddSingleton<ICheckListManager, CheckListManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
             services.AddScoped<IUserManager, UserManager>();
