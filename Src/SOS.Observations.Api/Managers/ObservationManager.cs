@@ -35,6 +35,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
+        private readonly IArtportalenApiManager _artportalenApiManager;
         private readonly ILogger<ObservationManager> _logger;
         
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
@@ -101,6 +102,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="filterManager"></param>
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
+        /// <param name="artportalenApiManager"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -109,6 +111,7 @@ namespace SOS.Observations.Api.Managers
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
+            IArtportalenApiManager artportalenApiManager,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -119,6 +122,7 @@ namespace SOS.Observations.Api.Managers
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
+            _artportalenApiManager = artportalenApiManager ?? throw new ArgumentNullException(nameof(artportalenApiManager));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -447,19 +451,37 @@ namespace SOS.Observations.Api.Managers
                 protectedIndex, maxReturnedItems);
         }
 
-        public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+        public async Task<dynamic> GetObservationAsync(int? roleId, 
+            string authorizationApplicationIdentifier, 
+            string occurrenceId,
+            OutputFieldSet outputFieldSet,
+            string translationCultureCode,
+            bool protectedObservations,
+            bool includeInternalFields)
         {
+            dynamic processedObservation;
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
-
             filter.PopulateOutputFields(outputFieldSet);
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
-
             await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, null, null, null, null, false);
-            
-            var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
-
+            processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
             PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
-           
+            return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
+        }
+
+        public async Task<dynamic> GetObservationFromArtportalenApiAsync(int? roleId,
+            string authorizationApplicationIdentifier,
+            string occurrenceId,
+            OutputFieldSet outputFieldSet,
+            string translationCultureCode,
+            bool protectedObservations,
+            bool includeInternalFields)
+        {
+            dynamic processedObservation;            
+            var sighting = await _artportalenApiManager.GetObservationAsync(occurrenceId);
+            processedObservation = sighting.ToDynamic();
+            processedObservation = new List<dynamic>() { processedObservation };           
+            PostProcessObservations(protectedObservations, processedObservation, translationCultureCode);
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }
 

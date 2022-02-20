@@ -247,13 +247,20 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             MemoryCacheOptions memoryCacheOptions = new MemoryCacheOptions { SizeLimit = null};
-            
+            var artportalenApiService = new ArtportalenApiService(new Mock<IAuthorizationProvider>().Object,
+                new HttpClientService(new NullLogger<HttpClientService>()),
+                new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
+                new NullLogger<ArtportalenApiService>());
+            var artportalenApiManager = new ArtportalenApiManager(artportalenApiService, new NullLogger<ArtportalenApiManager>());
+
+
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
                 filterManager,
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
+                artportalenApiManager,
                 new NullLogger<ObservationManager>());
 
             return observationsManager;

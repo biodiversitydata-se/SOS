@@ -1758,6 +1758,7 @@ namespace SOS.Observations.Api.Controllers
         /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
+        /// <param name="artportalenFetchMode">Experimental feature. Specify from which system, the observation is to be fetched.</param>
         /// <returns></returns>
         [HttpGet("Internal/{id?}")]
         [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -1771,15 +1772,36 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] ArtportalenFetchModeDto artportalenFetchMode = ArtportalenFetchModeDto.Sos)
         {
             try
             {
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
-                var observation = await ObservationManager.GetObservationAsync(
+                dynamic observation;
+                if (artportalenFetchMode == ArtportalenFetchModeDto.Artportalen)
+                {
+                    observation = await ObservationManager.GetObservationFromArtportalenApiAsync(
                     roleId,
-                    authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
+                    authorizationApplicationIdentifier,
+                    occurrenceId,
+                    outputFieldSet,
+                    translationCultureCode,
+                    sensitiveObservations,
                     includeInternalFields: true);
+                }
+                else
+                {
+                    observation = await ObservationManager.GetObservationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    occurrenceId,
+                    outputFieldSet,
+                    translationCultureCode,
+                    sensitiveObservations,
+                    includeInternalFields: true);
+                }
+                
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
@@ -1797,7 +1819,7 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, $"Error getting observation {occurrenceId}");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }       
 
         /// <inheritdoc />
         [HttpPost("Internal/SignalSearch")]

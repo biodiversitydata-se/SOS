@@ -204,11 +204,36 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="outputFieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
-        /// <param name="includeInternalFields"></param>
+        /// <param name="includeInternalFields"></param>        
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(
             int? roleId,
-            string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields);
+            string authorizationApplicationIdentifier, 
+            string occurrenceId, 
+            OutputFieldSet outputFieldSet, 
+            string translationCultureCode, 
+            bool protectedObservations, 
+            bool includeInternalFields);
+
+        /// <summary>
+        /// Get single observation from Artportalen API.
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="occurrenceId"></param>
+        /// <param name="outputFieldSet"></param>
+        /// <param name="translationCultureCode"></param>
+        /// <param name="protectedObservations"></param>
+        /// <param name="includeInternalFields"></param>        
+        /// <returns></returns>
+        Task<dynamic> GetObservationFromArtportalenApiAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string occurrenceId,
+            OutputFieldSet outputFieldSet,
+            string translationCultureCode,
+            bool protectedObservations,
+            bool includeInternalFields);
 
         /// <summary>
         /// Signal search
