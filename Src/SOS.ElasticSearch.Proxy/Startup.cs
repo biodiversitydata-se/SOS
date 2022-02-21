@@ -11,6 +11,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.ElasticSearch.Proxy
 {
@@ -81,9 +83,10 @@ namespace SOS.ElasticSearch.Proxy
             services.AddSingleton(elasticConfiguration);
 
             // Add Caches
-            services.AddSingleton<IClassCache<ProcessedConfiguration>, ClassCache<ProcessedConfiguration>>();
+            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
 
             // Add repositories
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
         }
 

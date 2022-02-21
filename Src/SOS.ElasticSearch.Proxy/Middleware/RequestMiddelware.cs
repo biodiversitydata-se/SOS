@@ -1,6 +1,4 @@
-﻿using System.Text;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
+﻿using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -39,7 +37,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
 
-          /*  requestMessage.Headers.Remove("Authorization");
+            /*  requestMessage.Headers.Remove("Authorization");
             var authenticationString = $"{_elasticSearchConfiguration.UserName}:{_elasticSearchConfiguration.Password}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(ASCIIEncoding.UTF8.GetBytes(authenticationString));
             requestMessage.Headers.Add("Authorization", "Basic " + base64EncodedAuthenticationString);*/
@@ -76,17 +74,10 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         private Uri? BuildTargetUri(HttpRequest request)
         {
-            if (!request.Path.HasValue)
-            {
-                return null;
-            }
-
             var hostUrl = _processedObservationRepository.HostUrl;
             var index = _processedObservationRepository.PublicIndexName;
-
-            var url = new Uri(hostUrl, $"{index}/_search{request.QueryString}");
-
-            return url;
+            var path = string.Join('/', request.Path.HasValue ? request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(1) : Array.Empty<string>());
+            return new Uri(hostUrl, $"{index}/{path}/{request.QueryString}");
         }
 
        /// <summary>
@@ -102,13 +93,17 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
         }
 
+       /// <summary>
+       /// Handle request
+       /// </summary>
+       /// <param name="context"></param>
+       /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
             var targetUri = BuildTargetUri(context.Request);
 
             if (targetUri != null)
             {
-
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
                 var httpClientHandler = new HttpClientHandler();
                 httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
