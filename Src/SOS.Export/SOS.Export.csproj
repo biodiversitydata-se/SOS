@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	  <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-        <PackageReference Include="Autofac" Version="6.2.0" />
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.28" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
-        <PackageReference Include="MongoDB.Driver.GridFS" Version="2.14.1" />
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
+	  <PackageReference Include="Autofac" Version="6.3.0" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
+	  <PackageReference Include="Hangfire.Core" Version="1.7.28" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
+	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.14.1" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 
   <ItemGroup>

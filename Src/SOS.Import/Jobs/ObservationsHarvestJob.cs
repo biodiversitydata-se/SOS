@@ -31,6 +31,26 @@ namespace SOS.Import.Jobs
         private readonly ITaxonListHarvester _taxonListHarvester;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
+        private void StopHarvestIfProcessingIsRunning(JobRunModes mode, IJobCancellationToken cancellationToken)
+        {
+            var monitoringApi = JobStorage.Current.GetMonitoringApi();
+
+            if (monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())
+                .Any(j => j.Value.InProcessingState &&
+                          j.Value.Job.Type.Name.Equals("IProcessObservationsJob",
+                              StringComparison.CurrentCultureIgnoreCase) &&
+                          j.Value.Job.Method.Name.Equals("RunAsync", StringComparison.CurrentCultureIgnoreCase) &&
+                          j.Value.Job.Args.Any(a =>
+                              a.GetType() == typeof(JobRunModes) &&
+                              (JobRunModes)a == mode)))
+            {
+                _logger.LogInformation($"Stop harvest job ({mode}) since processing is running.");
+                cancellationToken = new JobCancellationToken(true);
+
+                cancellationToken.ThrowIfCancellationRequested();
+            };
+        }
+
         private  async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             var activeProviders = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
@@ -320,16 +340,19 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunFullAsync(IJobCancellationToken cancellationToken)
         {
+            StopHarvestIfProcessingIsRunning(JobRunModes.Full, cancellationToken);
             return await RunAsync(JobRunModes.Full, cancellationToken);
         }
 
         public async Task<bool> RunIncrementalActiveAsync(IJobCancellationToken cancellationToken)
         {
+            StopHarvestIfProcessingIsRunning(JobRunModes.IncrementalActiveInstance, cancellationToken);
             return await RunAsync(JobRunModes.IncrementalActiveInstance, cancellationToken);
         }
 
         public async Task<bool> RunIncrementalInactiveAsync(IJobCancellationToken cancellationToken)
         {
+            StopHarvestIfProcessingIsRunning(JobRunModes.IncrementalInactiveInstance, cancellationToken);
             return await RunAsync(JobRunModes.IncrementalInactiveInstance, cancellationToken);
         }
 
@@ -339,6 +362,8 @@ namespace SOS.Import.Jobs
             List<string> processDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)
         {
+            StopHarvestIfProcessingIsRunning(JobRunModes.Full, cancellationToken);
+
             if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
             {
                 _logger.LogInformation(
@@ -381,6 +406,8 @@ namespace SOS.Import.Jobs
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)
         {
+            StopHarvestIfProcessingIsRunning(JobRunModes.Full, cancellationToken);
+
             if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
             {
                 _logger.LogInformation(

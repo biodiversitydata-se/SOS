@@ -29,7 +29,6 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
-        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
 
@@ -155,7 +154,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
                 obs.InformationWithheld = null;
-                obs.Location.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
@@ -277,7 +275,7 @@ namespace SOS.Process.Processors.Artportalen
                 Lib.Models.Processed.Observation.Taxon substrateTaxon = null;
                 if (verbatimObservation.SubstrateSpeciesId.HasValue)
                 {
-                    _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon);
+                    Taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out substrateTaxon);
                 }
 
                 obs.Occurrence.Substrate = new Substrate
