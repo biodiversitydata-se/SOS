@@ -55,8 +55,10 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public VirtualHerbariumObservationProcessor(
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
             IAreaHelper areaHelper,
@@ -66,9 +68,10 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<VirtualHerbariumObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(

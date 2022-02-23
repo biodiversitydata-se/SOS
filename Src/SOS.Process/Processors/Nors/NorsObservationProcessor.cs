@@ -55,8 +55,10 @@ namespace SOS.Process.Processors.Nors
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
@@ -65,9 +67,10 @@ namespace SOS.Process.Processors.Nors
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<NorsObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

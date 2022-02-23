@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +25,8 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive.Interfaces;
@@ -49,6 +50,7 @@ namespace SOS.Process.Jobs
         private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
         private readonly IDataProviderCache _dataProviderCache;
+        private readonly IProcessTimeManager _processTimeManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
@@ -58,6 +60,7 @@ namespace SOS.Process.Jobs
         private readonly string _exportContainer;
         private readonly bool _runIncrementalAfterFull;
         private readonly long _minObservationCount;
+        private readonly bool _enableTimeManager;
 
         private async Task<IDictionary<int, Taxon>> GetTaxaAsync(JobRunModes mode)
         {
@@ -317,6 +320,8 @@ namespace SOS.Process.Jobs
         {
             try
             {
+                var processOverallTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessOverall);
+
                 //-----------------
                 // 1. Arrange
                 //-----------------
@@ -386,11 +391,14 @@ namespace SOS.Process.Jobs
                         mode == JobRunModes.IncrementalInactiveInstance)
                     {
                         _logger.LogInformation($"Start validate indexes");
+                        var validateIndexTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateIndex);
                         if (!await ValidateIndexesAsync())
                         {
                             throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
                         }
                         _logger.LogInformation($"Finish validate indexes");
+
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
                         // Toggle active instance if we are done
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
@@ -412,7 +420,9 @@ namespace SOS.Process.Jobs
                         //----------------------------------------------------------------------------
                         // 7. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
+                        var dwCCreationTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.DwCCreation);
                         var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.DwCCreation, dwCCreationTimerSessionId);
 
                         if (dwcFiles?.Any() ?? false)
                         {
@@ -429,6 +439,25 @@ namespace SOS.Process.Jobs
                 }
 
                 _logger.LogInformation($"Processing done: {success} {mode}");
+
+                _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
+
+                if (_enableTimeManager)
+                {
+                    var timers = _processTimeManager.GetTimers();
+
+                    foreach (var timer in timers)
+                    {
+                        var timerMessage = $"Total duration for {timer.Key}:{mode} was {timer.Value.TotalDuration:g}";
+
+                        if (timer.Value.SessionCount > 1)
+                        {
+                            timerMessage += $", there where {timer.Value.SessionCount} sessions and the average duration was {timer.Value.AverageDuration:g}";
+                        }
+
+                        _logger.LogInformation(timerMessage);
+                    }
+                }
 
                 //-------------------------------
                 // 8. Return processing result
@@ -458,11 +487,11 @@ namespace SOS.Process.Jobs
         }
 
         /// <summary>
-        /// Process verbatim observations
+        ///  Process verbatim observations
         /// </summary>
         /// <param name="dataProvidersToProcess"></param>
         /// <param name="mode"></param>
-        /// <param name="taxonById"></param>        
+        /// <param name="taxonById"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<IDictionary<DataProvider, ProcessingStatus>> ProcessVerbatim(
@@ -671,6 +700,7 @@ namespace SOS.Process.Jobs
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
         /// <param name="dataProviderCache"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
@@ -694,6 +724,7 @@ namespace SOS.Process.Jobs
             IDwcaObservationProcessor dwcaObservationProcessor,
             ICache<int, Taxon> taxonCache,
             IDataProviderCache dataProviderCache,
+            IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
@@ -707,6 +738,7 @@ namespace SOS.Process.Jobs
             _taxonCache = taxonCache ??
                           throw new ArgumentNullException(nameof(taxonCache));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
+            _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -747,6 +779,7 @@ namespace SOS.Process.Jobs
                                throw new ArgumentNullException(nameof(processConfiguration));
             _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
             _minObservationCount = processConfiguration.MinObservationCount;
+            _enableTimeManager = processConfiguration.EnableTimeManager;
         }
 
         /// <inheritdoc />

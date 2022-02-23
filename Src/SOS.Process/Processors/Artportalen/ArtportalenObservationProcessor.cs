@@ -39,8 +39,10 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyRepository processedVocabularyRepository,
@@ -49,9 +51,10 @@ namespace SOS.Process.Processors.Artportalen
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));

@@ -52,21 +52,24 @@ namespace SOS.Process.Processors.Sers
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public SersObservationProcessor(ISersObservationVerbatimRepository sersObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IProcessManager processManager,
+            IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
             ProcessConfiguration processConfiguration,
             ILogger<SersObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

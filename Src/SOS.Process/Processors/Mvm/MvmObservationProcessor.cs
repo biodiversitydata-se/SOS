@@ -47,14 +47,16 @@ namespace SOS.Process.Processors.Mvm
         /// </summary>
         /// <param name="mvmObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public MvmObservationProcessor(IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
@@ -63,9 +65,10 @@ namespace SOS.Process.Processors.Mvm
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<MvmObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(

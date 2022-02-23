@@ -33,7 +33,6 @@ using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Processors.FishData;
 using SOS.Process.Processors.FishData.Interfaces;
-using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm;
@@ -177,6 +176,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessManager>().As<IProcessManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessTimeManager>().As<IProcessTimeManager>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationManager>().As<IValidationManager>().InstancePerLifetimeScope();
 
             // Add jobs

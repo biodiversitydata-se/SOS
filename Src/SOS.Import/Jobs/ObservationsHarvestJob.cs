@@ -35,14 +35,14 @@ namespace SOS.Import.Jobs
         {
             var monitoringApi = JobStorage.Current.GetMonitoringApi();
 
-            if (monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())
+            if (monitoringApi.ProcessingJobs(0, (int)monitoringApi.ProcessingCount())?
                 .Any(j => j.Value.InProcessingState &&
                           j.Value.Job.Type.Name.Equals("IProcessObservationsJob",
                               StringComparison.CurrentCultureIgnoreCase) &&
                           j.Value.Job.Method.Name.Equals("RunAsync", StringComparison.CurrentCultureIgnoreCase) &&
                           j.Value.Job.Args.Any(a =>
-                              a.GetType() == typeof(JobRunModes) &&
-                              (JobRunModes)a == mode)))
+                              a?.GetType() == typeof(JobRunModes) &&
+                              (JobRunModes)a == mode)) ?? false)
             {
                 _logger.LogInformation($"Stop harvest job ({mode}) since processing is running.");
                 cancellationToken = new JobCancellationToken(true);

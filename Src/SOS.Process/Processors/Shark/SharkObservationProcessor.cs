@@ -54,8 +54,10 @@ namespace SOS.Process.Processors.Shark
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public SharkObservationProcessor(ISharkObservationVerbatimRepository sharkObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
@@ -64,9 +66,10 @@ namespace SOS.Process.Processors.Shark
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<SharkObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
                                                   throw new ArgumentNullException(

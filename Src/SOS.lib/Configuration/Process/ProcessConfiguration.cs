@@ -16,6 +16,11 @@
         public bool Diffusion { get; set; }
 
         /// <summary>
+        /// True if time manager should be enabled
+        /// </summary>
+        public bool EnableTimeManager { get; set; }
+
+        /// <summary>
         ///     No of threads to run in parallel
         /// </summary>
         public int NoOfThreads { get; set; }

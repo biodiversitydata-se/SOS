@@ -55,6 +55,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _instanceManager = new Mock<IInstanceManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManager = new Mock<IValidationManager>();
             _taxonCache =new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
@@ -91,6 +92,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<ICache<int, Taxon>> _taxonCache;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<IValidationManager> _validationManager;
         private readonly Mock<IInstanceManager> _instanceManager;
         private readonly Mock<IDataProviderCache> _dataProviderCache;
@@ -116,7 +118,8 @@ namespace SOS.Process.UnitTests.Jobs
             _virtualHerbariumProcessor.Object,
             _dwcaObservationProcessor.Object,
             _taxonCache.Object,
-            _dataProviderCache.Object,            
+            _dataProviderCache.Object,
+            _processTimeManagerMock.Object,
             _validationManager.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,
@@ -205,7 +208,7 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo(DateTime.Now));
             _clamPortalProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full,  JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
                     DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1, 1));
 
@@ -213,7 +216,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(
                     DateTime.Now));
             _kulProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full,  JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
                     DateTime.Now, DateTime.Now, 1, 1));
 

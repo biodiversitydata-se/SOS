@@ -80,6 +80,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
@@ -278,7 +279,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 virtualHrbariumProcessor,
                 dwcaProcessor,
                 taxonCache,
-                dataProviderCache,                
+                dataProviderCache,
+                processTimeManager,
                 validationManager,
                 processTaxaJob,
                 areaHelper,

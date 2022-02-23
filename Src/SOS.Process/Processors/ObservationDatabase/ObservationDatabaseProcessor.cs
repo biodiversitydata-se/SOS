@@ -52,21 +52,24 @@ namespace SOS.Process.Processors.ObservationDatabase
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="diffusionManager"></param>
         /// <param name="processManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ObservationDatabaseProcessor(IObservationDatabaseVerbatimRepository observationDatabaseVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             IDiffusionManager diffusionManager,
             IProcessManager processManager,
+            IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<ObservationDatabaseProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _observationDatabaseVerbatimRepository = observationDatabaseVerbatimRepository ??
                                                      throw new ArgumentNullException(nameof(observationDatabaseVerbatimRepository));

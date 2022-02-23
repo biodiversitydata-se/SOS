@@ -66,7 +66,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
+        /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
+        /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationProcessor(
             IVerbatimClient verbatimClient,
             IProcessedObservationRepository processedObservationRepository,
@@ -77,9 +81,10 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaObservationProcessor> logger) :
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??

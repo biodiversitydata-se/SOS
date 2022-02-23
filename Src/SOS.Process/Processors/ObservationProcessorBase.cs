@@ -20,6 +20,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 
@@ -29,8 +30,9 @@ namespace SOS.Process.Processors
         where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
-        private readonly IProcessManager _processManager;
         private readonly IDiffusionManager _diffusionManager;
+        private readonly IProcessManager _processManager;
+        private readonly IProcessTimeManager _processTimeManager;
 
         /// <summary>
         /// Commit batch
@@ -48,8 +50,12 @@ namespace SOS.Process.Processors
             string batchId,
             byte attempt = 1)
         {
+            var elasticSearchWriteTimerSessionId = Guid.Empty;
             try
             {
+                elasticSearchWriteTimerSessionId =
+                    _processTimeManager.Start(ProcessTimeManager.TimerTypes.ElasticSearchWrite);
+
                 if (vocabularyValueResolver.Configuration.ResolveValues)
                 {
                     // used for testing purpose for easier debugging of vocabulary mapped data.
@@ -61,7 +67,7 @@ namespace SOS.Process.Processors
                 Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
                 var processedCount =
                     await ProcessedObservationRepository.AddManyAsync(processedObservations, protectedData);
-                   
+
                 Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
@@ -79,7 +85,10 @@ namespace SOS.Process.Processors
                 Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}");
                 throw;
             }
-
+            finally
+            {
+                _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticSearchWrite, elasticSearchWriteTimerSessionId);
+            }
         }
 
         /// <summary>
@@ -146,7 +155,9 @@ namespace SOS.Process.Processors
 
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
+                var mongoDbReadTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
                 var verbatimObservationsBatch = await observationVerbatimRepository.GetBatchAsync(startId, endId);
+                _processTimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
                 Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({batchId})");
 
                 if (!verbatimObservationsBatch?.Any() ?? true)
@@ -161,8 +172,10 @@ namespace SOS.Process.Processors
                
                 foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
+                    var processTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                 
+                    _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
+
                     if (observation == null)
                     {
                         continue;
@@ -186,16 +199,22 @@ namespace SOS.Process.Processors
                         }
 
                         // Recreate observation, diffused if provider supports diffusing 
+                        processTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-
+                        
                         // Populate data quality property
                         PopulateDataQuality(observation);
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                         // If provider don't support diffusion, we provide it for them
                         if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
                         {
+                            var diffuseTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
+
                             // Diffuse protected observation before adding it to public index. 
                             _diffusionManager.DiffuseObservation(observation);
+
+                            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
                         }
                     }
 
@@ -212,6 +231,8 @@ namespace SOS.Process.Processors
                     var occurrenceIds = publicObservations.Select(o => o.Occurrence.OccurrenceId).ToHashSet();
                     occurrenceIds.UnionWith(protectedObservations.Select(o => o.Occurrence.OccurrenceId));
 
+                    var elasticSearchDeleteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
+
                     // Make sure no old data exists in elastic
                     var deleteTasks = new[]
                     {
@@ -219,6 +240,8 @@ namespace SOS.Process.Processors
                         DeleteBatchAsync(true, occurrenceIds)
                     };
                     var deleteResult = await Task.WhenAll(deleteTasks);
+
+                    _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
 
                     Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
                 }
@@ -267,9 +290,13 @@ namespace SOS.Process.Processors
         {
 
             Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
+            var csvWriteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
+
             LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
             vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
             var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
+
+            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
 
             Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
 
@@ -290,10 +317,13 @@ namespace SOS.Process.Processors
         /// <param name="processedObservationRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="processManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
+        /// <param name="processTimeManager"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
             IVocabularyValueResolver vocabularyValueResolver,
@@ -301,6 +331,7 @@ namespace SOS.Process.Processors
             IProcessManager processManager,
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
+            IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<TClass> logger)
         {
@@ -315,7 +346,7 @@ namespace SOS.Process.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
-
+            _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -364,7 +395,6 @@ namespace SOS.Process.Processors
             {
                 return 0;
             }
-
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
 
@@ -373,7 +403,7 @@ namespace SOS.Process.Processors
                 return 0;
             }
             var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
-
+            
             if (mode == JobRunModes.Full && !protectedObservations)
             {
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
@@ -389,8 +419,13 @@ namespace SOS.Process.Processors
             string batchId)
         {
             Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
+            var validateObservationsTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateObservations);
             var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
+            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateObservations, validateObservationsTimerSessionId);
+
+            var mongoDbWriteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbWrite);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbWrite, mongoDbWriteTimerSessionId);
             Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
 
             return observations;
