@@ -133,7 +133,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
             IProcessedObservationRepository processedObservationRepository;
      
             if (storeProcessedObservations)
@@ -161,6 +161,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }

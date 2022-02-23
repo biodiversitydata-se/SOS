@@ -118,6 +118,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
+            var processTimeManager = new ProcessTimeManager(processConfiguration);
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
@@ -128,6 +129,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
         }

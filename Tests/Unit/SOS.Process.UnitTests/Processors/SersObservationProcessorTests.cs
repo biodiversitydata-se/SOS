@@ -39,6 +39,7 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _processManagerMock = new Mock<IProcessManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _loggerMock = new Mock<ILogger<SersObservationProcessor>>();
@@ -52,6 +53,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<ILogger<SersObservationProcessor>> _loggerMock;
 
         private SersObservationProcessor TestObject => new SersObservationProcessor(
@@ -61,6 +63,7 @@ namespace SOS.Process.UnitTests.Processors
             _vocabularyResolverMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
             _processManagerMock.Object,
+            _processTimeManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
             new ProcessConfiguration(),

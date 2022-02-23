@@ -125,6 +125,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
@@ -137,6 +138,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
@@ -149,6 +151,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
@@ -161,6 +164,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
@@ -173,6 +177,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
@@ -183,6 +188,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 vocabularyValueResolver,
                 dwcArchiveFileWriterCoordinator,
                 processManager,
+                processTimeManager,
                 validationManager,
                 diffusionManager,
                 processConfiguration,
@@ -197,6 +203,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
@@ -209,6 +216,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
@@ -220,6 +228,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
 
@@ -230,6 +239,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new NullLogger<ProcessedObservationRepository>()),
                 new NullLogger<InstanceManager>());
+
+            
 
             var processTaxaJob = new ProcessTaxaJob(null, // todo
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());                       
@@ -244,6 +255,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processManager,
                 validationManager,
                 diffusionManager,
+                processTimeManager,
                 processConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
 
@@ -255,6 +267,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcArchiveFileWriterCoordinator,
                 diffusionManager,
                 processManager,
+                processTimeManager,
                 validationManager,
                 areaHelper,
                 processConfiguration,

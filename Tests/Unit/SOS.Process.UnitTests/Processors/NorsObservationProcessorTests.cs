@@ -41,6 +41,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock = new Mock<IProcessManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _loggerMock = new Mock<ILogger<NorsObservationProcessor>>();
         }
 
@@ -52,6 +53,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessManager> _processManagerMock;
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<ILogger<NorsObservationProcessor>> _loggerMock;
 
         private NorsObservationProcessor TestObject => new NorsObservationProcessor(
@@ -63,6 +65,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
+            _processTimeManagerMock.Object,
             new ProcessConfiguration(),
             _loggerMock.Object);
 

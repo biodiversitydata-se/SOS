@@ -40,6 +40,7 @@ namespace SOS.Process.UnitTests.Processors
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _diffusionManagerMock = new Mock<IDiffusionManager>();
             _processManagerMock = new Mock<IProcessManager>();
+            _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
@@ -54,7 +55,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
-
+        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
@@ -65,6 +66,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock.Object,
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
+            _processTimeManagerMock.Object,
             _processConfiguration,
             _loggerMock.Object);
 
