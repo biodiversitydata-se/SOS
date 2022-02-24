@@ -67,6 +67,7 @@ namespace SOS.Process.Managers
             MongoDbWrite,
             ProcessObservation,
             ProcessOverall,
+            Sweref99Conversion,
             ValidateObservations,
             ValidateIndex
         }

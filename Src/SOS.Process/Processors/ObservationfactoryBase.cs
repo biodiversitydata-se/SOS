@@ -8,6 +8,8 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Process.Managers;
+using SOS.Process.Managers.Interfaces;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Process.Processors
@@ -18,14 +20,18 @@ namespace SOS.Process.Processors
     public class ObservationFactoryBase
     {
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        protected readonly IProcessTimeManager TimeManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="taxa"></param>
-        protected ObservationFactoryBase(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
+        /// <param name="processTimeManager"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected ObservationFactoryBase(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IProcessTimeManager processTimeManager)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
         }
         
         /// <summary>
@@ -71,9 +77,11 @@ namespace SOS.Process.Processors
             location.PointWithBuffer = pointWithBuffer;
             location.PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
 
+            var sweref99TimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Sweref99Conversion);
             var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
             location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
             location.Sweref99TmY = sweRef99TmPoint.Coordinate.Y;
+            TimeManager.Stop(ProcessTimeManager.TimerTypes.Sweref99Conversion, sweref99TimerSessionId);
 
             location.VerbatimSRS = verbatimCoordinateSystem.EpsgCode();
 

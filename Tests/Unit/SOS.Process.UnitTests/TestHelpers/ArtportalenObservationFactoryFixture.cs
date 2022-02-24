@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using Xunit;
@@ -38,7 +40,8 @@ namespace SOS.Process.UnitTests.TestHelpers
                 new Dictionary<int, Taxon>(), 
                 vocabularyRepository.Object,
                 false,
-                "https://artportalen-st.artdata.slu.se").Result;
+                "https://artportalen-st.artdata.slu.se",
+                new ProcessTimeManager(new ProcessConfiguration())).Result;
             return factory;
         }
     }

@@ -15,6 +15,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -32,7 +33,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName;
-        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;        
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor;
 
         /// <summary>
         /// Constructor
@@ -41,11 +42,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="processTimeManager"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper) : base(taxa)
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
@@ -73,14 +77,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper);
+            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, processTimeManager);
         }
 
         /// <summary>

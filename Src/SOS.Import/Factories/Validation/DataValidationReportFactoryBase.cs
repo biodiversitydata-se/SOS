@@ -15,6 +15,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
 namespace SOS.Import.Factories.Validation
@@ -31,13 +32,15 @@ namespace SOS.Import.Factories.Validation
         protected readonly ITaxonRepository _processedTaxonRepository;
         protected Dictionary<int, Taxon> _taxonById;
         protected IDictionary<VocabularyId, Vocabulary> _vocabularyById;
+        protected readonly IProcessTimeManager _processTimeManager;
 
         protected DataValidationReportFactoryBase(
             IVocabularyRepository processedVocabularyRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
-            ITaxonRepository processedTaxonRepository)
+            ITaxonRepository processedTaxonRepository,
+            IProcessTimeManager processTimeManager)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));

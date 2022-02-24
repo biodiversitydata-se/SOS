@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
@@ -11,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
@@ -57,7 +59,8 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 dataProviderDummy,
                 taxonByTaxonId,
                 vocabularyRepository,
-                areaHelper);
+                areaHelper,
+                new ProcessTimeManager(new ProcessConfiguration()));
 
             return dwcaObservationFactory;
         }

@@ -32,7 +32,7 @@ namespace SOS.Process.Processors.Mvm
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new MvmObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new MvmObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

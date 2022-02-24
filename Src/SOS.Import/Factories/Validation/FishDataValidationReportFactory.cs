@@ -10,6 +10,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.FishData;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -29,8 +30,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
+            IProcessTimeManager processTimeManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository;
         }
@@ -86,7 +88,8 @@ namespace SOS.Import.Factories.Validation
                 _fishdataObservationFactory = new FishDataObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _processTimeManager);
             }
 
             return _fishdataObservationFactory;

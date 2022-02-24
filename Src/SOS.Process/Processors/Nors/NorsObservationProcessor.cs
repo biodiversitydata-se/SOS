@@ -34,7 +34,7 @@ namespace SOS.Process.Processors.Nors
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new NorsObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new NorsObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

@@ -17,6 +17,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Process.Managers;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Managers
@@ -169,6 +170,7 @@ namespace SOS.Import.IntegrationTests.Managers
                 areaHelper,
                 vocabularyValueResolver,
                 processedTaxonRepository,
+                new ProcessTimeManager(new ProcessConfiguration()),
                 new NullLogger<DwcaDataValidationReportManager>()
             );
 

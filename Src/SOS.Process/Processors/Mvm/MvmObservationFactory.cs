@@ -9,6 +9,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.Mvm
@@ -20,12 +21,17 @@ namespace SOS.Process.Processors.Mvm
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
-        public MvmObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IAreaHelper areaHelper) : base(taxa)
+        /// <param name="processTimeManager"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public MvmObservationFactory(DataProvider dataProvider, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

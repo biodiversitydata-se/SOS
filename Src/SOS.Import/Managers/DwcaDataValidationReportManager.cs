@@ -17,6 +17,7 @@ using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -33,6 +34,7 @@ namespace SOS.Import.Managers
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ITaxonRepository _processedTaxonRepository;
+        private readonly IProcessTimeManager _processTimeManager;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
         private Dictionary<int, Taxon> _taxonById;
         private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
@@ -44,6 +46,7 @@ namespace SOS.Import.Managers
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
+            IProcessTimeManager processTimeManager,
             ILogger<DwcaDataValidationReportManager> logger)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
@@ -52,6 +55,7 @@ namespace SOS.Import.Managers
             _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -89,7 +93,8 @@ namespace SOS.Import.Managers
                 dataProvider,
                 _taxonById,
                 _dwcaVocabularyById,
-                _areaHelper);
+                _areaHelper,
+                _processTimeManager);
 
             var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
             var observationsBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(

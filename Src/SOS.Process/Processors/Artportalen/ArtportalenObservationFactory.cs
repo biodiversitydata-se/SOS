@@ -14,6 +14,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using DateTime = System.DateTime;
@@ -80,13 +81,15 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="vocabularyById"></param>
         /// <param name="incrementalMode"></param>
         /// <param name="artPortalenUrl"></param>
+        /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             bool incrementalMode,
-            string artPortalenUrl) : base(taxa) 
+            string artPortalenUrl, 
+            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager) 
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
@@ -99,11 +102,12 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IVocabularyRepository processedVocabularyRepository,
             bool incrementalMode,
-            string artPortalenUrl)
+            string artPortalenUrl,
+            IProcessTimeManager processTimeManager)
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl);
+            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, incrementalMode, artPortalenUrl, processTimeManager);
         }
 
         /// <summary>

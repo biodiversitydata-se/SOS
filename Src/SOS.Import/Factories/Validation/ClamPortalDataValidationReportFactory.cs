@@ -10,6 +10,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.ClamPortal;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -29,8 +30,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            IClamObservationVerbatimRepository clamPortalObservationVerbatimRepository,
+            IProcessTimeManager processTimeManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
         {
             _clamPortalObservationVerbatimRepository = clamPortalObservationVerbatimRepository;
         }
@@ -89,7 +91,8 @@ namespace SOS.Import.Factories.Validation
                 _clamPortalObservationFactory = new ClamPortalObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _processTimeManager);
             }
 
             return _clamPortalObservationFactory;

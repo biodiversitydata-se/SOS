@@ -8,6 +8,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 
 namespace SOS.Process.Processors.FishData
@@ -19,13 +20,16 @@ namespace SOS.Process.Processors.FishData
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="processTimeManager"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IAreaHelper areaHelper) : base(taxa)
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));            
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

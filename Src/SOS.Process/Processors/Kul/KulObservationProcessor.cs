@@ -34,7 +34,7 @@ namespace SOS.Process.Processors.Kul
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new KulObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new KulObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

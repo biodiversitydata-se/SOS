@@ -72,7 +72,12 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
-                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedVocabularyRepository,  mode != JobRunModes.Full, _artPortalenUrl);
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, 
+                    taxa, 
+                    _processedVocabularyRepository,
+                    mode != JobRunModes.Full, 
+                    _artPortalenUrl, 
+                    TimeManager);
             _artportalenVerbatimRepository.Mode = mode;
 
             return await base.ProcessObservationsAsync(

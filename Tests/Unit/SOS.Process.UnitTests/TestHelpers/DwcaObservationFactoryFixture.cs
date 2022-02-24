@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers;
@@ -48,7 +50,8 @@ namespace SOS.Process.UnitTests.TestHelpers
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
                 vocabularyRepository.Object,
-                areaHelper).Result;
+                areaHelper,
+                new ProcessTimeManager(new ProcessConfiguration())).Result;
             return factory;
         }
     }

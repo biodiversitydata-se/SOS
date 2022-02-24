@@ -13,6 +13,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -34,8 +35,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
+            IProcessTimeManager processTimeManager,
             ILoggerFactory loggerFactory)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
@@ -125,7 +127,8 @@ namespace SOS.Import.Factories.Validation
                     dataProvider,
                     _taxonById,
                     dwcaVocabularyById,
-                    _areaHelper);
+                    _areaHelper,
+                    _processTimeManager);
             }
 
             return _dwcaObservationFactory;

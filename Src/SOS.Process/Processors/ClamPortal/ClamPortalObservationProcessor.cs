@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.ClamPortal
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new ClamPortalObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new ClamPortalObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

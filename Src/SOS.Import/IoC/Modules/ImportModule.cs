@@ -40,6 +40,8 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
+using SOS.Process.Managers;
+using SOS.Process.Managers.Interfaces;
 using ITaxonRepository = SOS.Lib.Repositories.Resource.Interfaces.ITaxonRepository;
 using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 
@@ -147,6 +149,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataValidationReportManager>().As<IDataValidationReportManager>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessTimeManager>().As<IProcessTimeManager>().InstancePerLifetimeScope();
             builder.RegisterType<ReportManager>().As<IReportManager>().InstancePerLifetimeScope();
 
             // Repositories elastic

@@ -45,7 +45,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 dataProvider,
                 taxa,
                 _processedVocabularyRepository,
-                _areaHelper);
+                _areaHelper,
+                TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

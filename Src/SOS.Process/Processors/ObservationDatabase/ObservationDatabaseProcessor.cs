@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.ObservationDatabase
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new ObservationDatabaseObservationFactory(dataProvider, taxa, _areaHelper);
+            var observationFactory = new ObservationDatabaseObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

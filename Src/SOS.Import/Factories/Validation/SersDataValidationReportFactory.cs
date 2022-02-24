@@ -10,6 +10,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Sers;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 
@@ -29,8 +30,9 @@ namespace SOS.Import.Factories.Validation
             IAreaHelper areaHelper,
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
-            ISersObservationVerbatimRepository sersObservationVerbatimRepository) 
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository)
+            ISersObservationVerbatimRepository sersObservationVerbatimRepository,
+            IProcessTimeManager processTimeManager) 
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager)
         {
             _sersObservationVerbatimRepository = sersObservationVerbatimRepository;
         }
@@ -86,7 +88,8 @@ namespace SOS.Import.Factories.Validation
                 _sersObservationFactory = new SersObservationFactory(
                     dataProvider,
                     _taxonById,
-                    _areaHelper);
+                    _areaHelper,
+                    _processTimeManager);
             }
 
             return _sersObservationFactory;

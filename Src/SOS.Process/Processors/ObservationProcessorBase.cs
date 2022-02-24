@@ -32,7 +32,7 @@ namespace SOS.Process.Processors
     {
         private readonly IDiffusionManager _diffusionManager;
         private readonly IProcessManager _processManager;
-        private readonly IProcessTimeManager _processTimeManager;
+        protected readonly IProcessTimeManager TimeManager;
 
         /// <summary>
         /// Commit batch
@@ -54,7 +54,7 @@ namespace SOS.Process.Processors
             try
             {
                 elasticSearchWriteTimerSessionId =
-                    _processTimeManager.Start(ProcessTimeManager.TimerTypes.ElasticSearchWrite);
+                    TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticSearchWrite);
 
                 if (vocabularyValueResolver.Configuration.ResolveValues)
                 {
@@ -87,7 +87,7 @@ namespace SOS.Process.Processors
             }
             finally
             {
-                _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticSearchWrite, elasticSearchWriteTimerSessionId);
+                TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticSearchWrite, elasticSearchWriteTimerSessionId);
             }
         }
 
@@ -155,9 +155,9 @@ namespace SOS.Process.Processors
 
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
-                var mongoDbReadTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
+                var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
                 var verbatimObservationsBatch = await observationVerbatimRepository.GetBatchAsync(startId, endId);
-                _processTimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
+                TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
                 Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({batchId})");
 
                 if (!verbatimObservationsBatch?.Any() ?? true)
@@ -172,9 +172,9 @@ namespace SOS.Process.Processors
                
                 foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
-                    var processTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
+                    var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                    _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
+                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                     if (observation == null)
                     {
@@ -199,22 +199,22 @@ namespace SOS.Process.Processors
                         }
 
                         // Recreate observation, diffused if provider supports diffusing 
-                        processTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
+                        processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
                         
                         // Populate data quality property
                         PopulateDataQuality(observation);
-                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
+                        TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                         // If provider don't support diffusion, we provide it for them
                         if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
                         {
-                            var diffuseTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
+                            var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
 
                             // Diffuse protected observation before adding it to public index. 
                             _diffusionManager.DiffuseObservation(observation);
 
-                            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
+                            TimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
                         }
                     }
 
@@ -231,7 +231,7 @@ namespace SOS.Process.Processors
                     var occurrenceIds = publicObservations.Select(o => o.Occurrence.OccurrenceId).ToHashSet();
                     occurrenceIds.UnionWith(protectedObservations.Select(o => o.Occurrence.OccurrenceId));
 
-                    var elasticSearchDeleteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
+                    var elasticSearchDeleteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
 
                     // Make sure no old data exists in elastic
                     var deleteTasks = new[]
@@ -241,7 +241,7 @@ namespace SOS.Process.Processors
                     };
                     var deleteResult = await Task.WhenAll(deleteTasks);
 
-                    _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
+                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
 
                     Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
                 }
@@ -290,13 +290,13 @@ namespace SOS.Process.Processors
         {
 
             Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
-            var csvWriteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
+            var csvWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
 
             LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
             vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
             var success = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
 
-            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
+            TimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
 
             Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
 
@@ -346,7 +346,7 @@ namespace SOS.Process.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
-            _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
+            TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -419,13 +419,13 @@ namespace SOS.Process.Processors
             string batchId)
         {
             Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
-            var validateObservationsTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateObservations);
+            var validateObservationsTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ValidateObservations);
             var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
-            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateObservations, validateObservationsTimerSessionId);
+            TimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateObservations, validateObservationsTimerSessionId);
 
-            var mongoDbWriteTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbWrite);
+            var mongoDbWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbWrite);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-            _processTimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbWrite, mongoDbWriteTimerSessionId);
+            TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbWrite, mongoDbWriteTimerSessionId);
             Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
 
             return observations;
