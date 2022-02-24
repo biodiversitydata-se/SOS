@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Repositories.Processed.Interfaces;
+﻿using System.Net.Http.Headers;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -10,37 +11,30 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
         {
             var requestMessage = new HttpRequestMessage();
-            CopyFromOriginalRequestContentAndHeaders(context, requestMessage);
-
-            requestMessage.RequestUri = targetUri;
-            requestMessage.Headers.Host = targetUri.Host;
-            requestMessage.Method = GetMethod(context.Request.Method);
-
-            return requestMessage;
-        }
-
-        private void CopyFromOriginalRequestContentAndHeaders(HttpContext context, HttpRequestMessage requestMessage)
-        {
-            var requestMethod = context.Request.Method;
-
-            if (!HttpMethods.IsGet(requestMethod) &&
-              !HttpMethods.IsHead(requestMethod) &&
-              !HttpMethods.IsDelete(requestMethod) &&
-              !HttpMethods.IsTrace(requestMethod))
-            {
-                var streamContent = new StreamContent(context.Request.Body);
-                requestMessage.Content = streamContent;
-            }
-           
             foreach (var header in context.Request.Headers)
             {
                 requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
+            requestMessage.Headers.Host = targetUri.Host;
+            requestMessage.RequestUri = targetUri;
+            requestMessage.Method = GetMethod(context.Request.Method);
 
-            /*  requestMessage.Headers.Remove("Authorization");
-            var authenticationString = $"{_elasticSearchConfiguration.UserName}:{_elasticSearchConfiguration.Password}";
-            var base64EncodedAuthenticationString = Convert.ToBase64String(ASCIIEncoding.UTF8.GetBytes(authenticationString));
-            requestMessage.Headers.Add("Authorization", "Basic " + base64EncodedAuthenticationString);*/
+            if (!HttpMethods.IsGet(requestMessage.Method.Method) &&
+                !HttpMethods.IsHead(requestMessage.Method.Method) &&
+                !HttpMethods.IsDelete(requestMessage.Method.Method) &&
+                !HttpMethods.IsTrace(requestMessage.Method.Method))
+            {
+                var streamContent = new StreamContent(context.Request.Body);
+
+                foreach (var header in context.Request.Headers)
+                {
+                    streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                }
+
+                requestMessage.Content = streamContent;
+            }
+
+            return requestMessage;
         }
 
         private void CopyFromTargetResponseHeaders(HttpContext context, HttpResponseMessage responseMessage)
