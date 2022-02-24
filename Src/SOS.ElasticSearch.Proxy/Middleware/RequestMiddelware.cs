@@ -68,10 +68,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         private Uri? BuildTargetUri(HttpRequest request)
         {
-            var hostUrl = _processedObservationRepository.HostUrl;
-            var index = _processedObservationRepository.PublicIndexName;
-            var path = string.Join('/', request.Path.HasValue ? request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(1) : Array.Empty<string>());
-            return new Uri(hostUrl, $"{index}/{path}/{request.QueryString}");
+            var uriParts = new []
+            {
+                _processedObservationRepository.PublicIndexName,
+                string.Join('/', request.Path.HasValue ? request.Path.Value.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(1) : Array.Empty<string>()),
+                request.QueryString.ToString()
+            };
+
+            return new Uri(_processedObservationRepository.HostUrl, string.Join('/', uriParts.Where(p => !string.IsNullOrEmpty(p))));
         }
 
         /// <summary>
