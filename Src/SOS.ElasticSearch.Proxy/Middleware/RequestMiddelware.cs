@@ -100,6 +100,8 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _processedObservationRepository.LiveMode = true;
         }
 
        /// <summary>
