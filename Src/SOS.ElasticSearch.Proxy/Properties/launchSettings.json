@@ -9,13 +9,13 @@
   },
   "profiles": {
     "SOS.ElasticSearch.Proxy": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local"
-      },
-      "applicationUrl": "https://130.238.117.117:7013;http://localhost:5013",
-      "dotnetRunMessages": true
+        "commandName": "Project",
+        "launchBrowser": true,
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "local"
+        },
+        "applicationUrl": "https://localhost:7013;http://localhost:5013",
+        "dotnetRunMessages": true
     },
     "IIS Express": {
       "commandName": "IISExpress",
