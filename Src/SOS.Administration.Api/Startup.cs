@@ -20,7 +20,6 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
-using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;

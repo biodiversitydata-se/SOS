@@ -15,7 +15,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;

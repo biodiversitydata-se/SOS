@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using NLog.Web;
 using SOS.ElasticSearch.Proxy.Middleware;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -94,12 +93,10 @@ namespace SOS.ElasticSearch.Proxy
         ///  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="env"></param>
         public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env)
+            IApplicationBuilder app)
         {
-            NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
+
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();

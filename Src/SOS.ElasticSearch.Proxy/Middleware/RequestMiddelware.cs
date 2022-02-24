@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using SOS.Lib.Repositories.Processed.Interfaces;
+﻿using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -7,6 +6,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly ILogger<RequestMiddelware> _logger;
 
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
         {
@@ -74,17 +74,19 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             return new Uri(hostUrl, $"{index}/{path}/{request.QueryString}");
         }
 
-       /// <summary>
-       /// Constructor
-       /// </summary>
-       /// <param name="nextMiddleware"></param>
-       /// <param name="processedObservationRepository"></param>
-       /// <exception cref="ArgumentNullException"></exception>
-        public RequestMiddelware(RequestDelegate nextMiddleware, IProcessedObservationRepository processedObservationRepository)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="nextMiddleware"></param>
+        /// <param name="processedObservationRepository"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public RequestMiddelware(RequestDelegate nextMiddleware, IProcessedObservationRepository processedObservationRepository, ILogger<RequestMiddelware> logger)
         {
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
        /// <summary>
@@ -98,6 +100,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
 
             if (targetUri != null)
             {
+                _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
                 var httpClientHandler = new HttpClientHandler();
                 httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;

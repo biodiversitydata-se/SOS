@@ -8,7 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NLog" Version="4.7.13" />
+		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
+		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
+		<PackageReference Include="NLog" Version="4.7.14" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
 	</ItemGroup>
