@@ -141,7 +141,9 @@ namespace SOS.Export.Jobs
             catch (Exception e)
             {
                 _logger.LogInformation("Failed to create DOI.", e);
+                throw;
             }
+
             return false;
         }
     }

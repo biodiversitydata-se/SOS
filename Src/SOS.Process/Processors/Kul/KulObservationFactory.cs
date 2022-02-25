@@ -15,7 +15,6 @@ namespace SOS.Process.Processors.Kul
 {
     public class KulObservationFactory : ObservationFactoryBase, IObservationFactory<KulObservationVerbatim>
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;        
         private readonly IAreaHelper _areaHelper;
 
@@ -68,8 +67,8 @@ namespace SOS.Process.Processors.Kul
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = true,
-                    Verified = true,
+                    Validated = false,
+                    Verified = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
