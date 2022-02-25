@@ -82,8 +82,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = true,
-                    Verified = true,
+                    Validated = false,
+                    Verified = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },

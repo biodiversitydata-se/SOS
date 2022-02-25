@@ -13,21 +13,19 @@ namespace SOS.Observations.Api.HealthChecks
     /// </summary>
     public partial class AzureSearchHealthCheck : IHealthCheck
     {
-        private readonly HealthCheckConfiguration _healthCheckConfiguration;         
         private readonly SosAzureClient _sosAzureClient;
-        private bool _intialized; // true if Azure API URL and subscription key is set.
+        private readonly bool _initialized; // true if Azure API URL and subscription key is set.
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="healthCheckConfiguration"></param>
         public AzureSearchHealthCheck(HealthCheckConfiguration healthCheckConfiguration)
-        {            
-            _healthCheckConfiguration = healthCheckConfiguration ?? throw new ArgumentNullException(nameof(healthCheckConfiguration));
+        {
             if (healthCheckConfiguration != null && !string.IsNullOrEmpty(healthCheckConfiguration.AzureApiUrl) && !string.IsNullOrEmpty(healthCheckConfiguration.AzureSubscriptionKey))
             {
                 _sosAzureClient = new SosAzureClient(healthCheckConfiguration.AzureApiUrl, healthCheckConfiguration.AzureSubscriptionKey);
-                _intialized = true;
+                _initialized = true;
             }            
         }
        
@@ -49,12 +47,12 @@ namespace SOS.Observations.Api.HealthChecks
             };
 
             // Warm up
-            await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 2);            
+            await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 1);            
 
             Thread.Sleep(1100);
             var sw = new Stopwatch();
             sw.Start();
-            var result = await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 2);
+            var result = await _sosAzureClient.SearchObservations(searchFilter, "sv-SE", 0, 1);
             sw.Stop();
 
             return (Duration: sw.Elapsed, TotalCount: result.TotalCount);
@@ -72,7 +70,7 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                if (!_intialized)
+                if (!_initialized)
                 {
                     return new HealthCheckResult(HealthStatus.Healthy, $"Azure API URL and/or Subscription key not set.");
                 }
@@ -101,7 +99,7 @@ namespace SOS.Observations.Api.HealthChecks
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Degraded, "Health check failed", e);
+                return new HealthCheckResult(HealthStatus.Degraded, "Azure API Health check failed", e);
             }
         }
     }

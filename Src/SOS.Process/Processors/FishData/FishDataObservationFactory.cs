@@ -15,7 +15,6 @@ namespace SOS.Process.Processors.FishData
 {
     public class FishDataObservationFactory : ObservationFactoryBase, IObservationFactory<FishDataObservationVerbatim>
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;        
         private readonly IAreaHelper _areaHelper;
 
@@ -66,8 +65,8 @@ namespace SOS.Process.Processors.FishData
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = true,
-                    Verified = true,
+                    Validated = false,
+                    Verified = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },

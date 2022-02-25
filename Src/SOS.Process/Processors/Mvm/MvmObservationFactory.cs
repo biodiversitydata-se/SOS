@@ -16,7 +16,6 @@ namespace SOS.Process.Processors.Mvm
 {
     public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory<MvmObservationVerbatim>
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
 
@@ -71,8 +70,8 @@ namespace SOS.Process.Processors.Mvm
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = true,
-                    Verified = true,
+                    Validated = false,
+                    Verified = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
