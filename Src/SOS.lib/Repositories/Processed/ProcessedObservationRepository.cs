@@ -77,6 +77,9 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Observation>(m => m
                     .AutoMap()
                     .Properties(ps => ps
+                        .Keyword(kw => kw
+                            .Name(nm => nm.DatasetName)
+                        )
                         .Object<Location>(l => l
                             .Name(nm => nm.Location)
                             .Properties(ps => ps
@@ -121,6 +124,38 @@ namespace SOS.Lib.Repositories.Processed
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Name)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        .Object<Occurrence>(t => t
+                            .Name(nm => nm.Occurrence)
+                            .Properties(ps => ps
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.OccurrenceStatus)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        .Object<Taxon>(t => t
+                            .Name(nm => nm.Taxon)
+                            .Properties(ps => ps
+                                .Object<TaxonAttributes>(c => c
+                                    .Name(nm => nm.Attributes)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.OrganismGroup)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.RedlistCategory)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.SwedishHistory)
                                         )
                                     )
                                 )
