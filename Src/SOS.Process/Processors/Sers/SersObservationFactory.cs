@@ -62,8 +62,8 @@ namespace SOS.Process.Processors.Sers
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Validated = true,
-                    Verified = true,
+                    Validated = false,
+                    Verified = false,
                     ValidationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert },
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
