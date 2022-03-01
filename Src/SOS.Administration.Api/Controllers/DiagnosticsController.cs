@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
-using SOS.Import.Harvesters.Interfaces;
+using SOS.Harvest.Harvesters.Interfaces;
+using SOS.Harvest.Helpers.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {

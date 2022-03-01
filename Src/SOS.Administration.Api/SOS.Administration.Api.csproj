@@ -42,7 +42,7 @@
 
     <ItemGroup>
 	    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
-	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.28.1" />
+	    <PackageReference Include="CSharpFunctionalExtensions" Version="2.28.2" />
 	    <PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
 	    <PackageReference Include="HangFire" Version="1.7.28" />
@@ -57,9 +57,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
-        <ProjectReference Include="..\SOS.Import\SOS.Import.csproj" />
+        <ProjectReference Include="..\SOS.Harvest\SOS.Harvest.csproj" />
         <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
-        <ProjectReference Include="..\SOS.Process\SOS.Process.csproj" />
     </ItemGroup>
 
 </Project>

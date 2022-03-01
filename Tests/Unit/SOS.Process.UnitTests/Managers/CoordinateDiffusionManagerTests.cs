@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
+﻿using FluentAssertions;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Process.Managers;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Managers

@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
-using SOS.Import.Extensions;
-using SOS.Import.Factories;
-using SOS.Import.UnitTests.TestData;
+﻿using FluentAssertions;
+using SOS.Harvest.Factories;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories

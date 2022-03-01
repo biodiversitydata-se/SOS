@@ -1,0 +1,372 @@
+{
+  "Id": 22,
+  "Name": "ReproductiveCondition",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 13,
+      "Value": "brood patch",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvfläckar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "brood patch"
+        }
+      ]
+    },
+    {
+      "Id": 54,
+      "Value": "egg laying",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äggläggande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg laying"
+        }
+      ]
+    },
+    {
+      "Id": 61,
+      "Value": "trace of oestrous female",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spår från löpande hona"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "trace of oestrous female"
+        }
+      ]
+    },
+    {
+      "Id": 79,
+      "Value": "lactating",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ammande hondjur"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "lactating"
+        }
+      ]
+    },
+    {
+      "Id": 80,
+      "Value": "pregnant female",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dräktig hona"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pregnant female"
+        }
+      ]
+    },
+    {
+      "Id": 82,
+      "Value": "spawning",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "leking"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "spawning"
+        }
+      ]
+    },
+    {
+      "Id": 85,
+      "Value": "female with offspring",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "obs av hona med unge/ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "female with offspring"
+        }
+      ]
+    },
+    {
+      "Id": 88,
+      "Value": "in breeding colours",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i lekdräkt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in breeding colours"
+        }
+      ]
+    },
+    {
+      "Id": 101,
+      "Value": "breeding ground or offspring",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "yngelplats med ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "breeding ground or offspring"
+        }
+      ]
+    },
+    {
+      "Id": 104,
+      "Value": "testes developed",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "testes developed"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "testes developed"
+        }
+      ]
+    },
+    {
+      "Id": 105,
+      "Value": "mating [not bird]",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "mating [not bird]"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mating [not bird]"
+        }
+      ]
+    },
+    {
+      "Id": 106,
+      "Value": "not breeding/non-reproductive",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "not breeding/non-reproductive"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "not breeding/non-reproductive"
+        }
+      ]
+    },
+    {
+      "Id": 107,
+      "Value": "carrying food for young",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "carrying food for young"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying food for young"
+        }
+      ]
+    },
+    {
+      "Id": 108,
+      "Value": "sterile",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sterile"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "sterile"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 54,
+              "SosId": 54
+            },
+            {
+              "Value": 61,
+              "SosId": 61
+            },
+            {
+              "Value": 79,
+              "SosId": 79
+            },
+            {
+              "Value": 80,
+              "SosId": 80
+            },
+            {
+              "Value": 82,
+              "SosId": 82
+            },
+            {
+              "Value": 85,
+              "SosId": 85
+            },
+            {
+              "Value": 88,
+              "SosId": 88
+            },
+            {
+              "Value": 101,
+              "SosId": 101
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Name": "DarwinCore",
+      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+      "Mappings": [
+        {
+          "Key": "reproductiveCondition",
+          "Description": "The reproductiveCondition term (http://rs.tdwg.org/dwc/terms/reproductiveCondition)",
+          "Values": [
+            {
+              "Value": "ruvfläckar",
+              "SosId": 13
+            },
+            {
+              "Value": "brood patch",
+              "SosId": 13
+            },
+            {
+              "Value": "äggläggande",
+              "SosId": 54
+            },
+            {
+              "Value": "egg laying",
+              "SosId": 54
+            },
+            {
+              "Value": "spår från löpande hona",
+              "SosId": 61
+            },
+            {
+              "Value": "trace of oestrous female",
+              "SosId": 61
+            },
+            {
+              "Value": "ammande hondjur",
+              "SosId": 79
+            },
+            {
+              "Value": "lactating",
+              "SosId": 79
+            },
+            {
+              "Value": "dräktig hona",
+              "SosId": 80
+            },
+            {
+              "Value": "pregnant female",
+              "SosId": 80
+            },
+            {
+              "Value": "leking",
+              "SosId": 82
+            },
+            {
+              "Value": "spawning",
+              "SosId": 82
+            },
+            {
+              "Value": "obs av hona med unge/ungar",
+              "SosId": 85
+            },
+            {
+              "Value": "female with offspring",
+              "SosId": 85
+            },
+            {
+              "Value": "i lekdräkt",
+              "SosId": 88
+            },
+            {
+              "Value": "in breeding colours",
+              "SosId": 88
+            },
+            {
+              "Value": "yngelplats med ungar",
+              "SosId": 101
+            },
+            {
+              "Value": "breeding ground or offspring",
+              "SosId": 101
+            },
+            {
+              "Value": "testes developed",
+              "SosId": 104
+            },
+            {
+              "Value": "mating [not bird]",
+              "SosId": 105
+            },
+            {
+              "Value": "not breeding/non-reproductive",
+              "SosId": 106
+            },
+            {
+              "Value": "carrying food for young",
+              "SosId": 107
+            },
+            {
+              "Value": "sterile",
+              "SosId": 108
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Managers;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Managers

@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NetTopologySuite.Geometries;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Harvesters;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Harvesters;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -28,7 +27,7 @@ namespace SOS.Import.UnitTests.Harvesters
         /// </summary>
         public AreaHarvesterTests()
         {
-            _areaRepositoryMock = new Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository>();
+            _areaRepositoryMock = new Mock<Harvest.Repositories.Source.Artportalen.Interfaces.IAreaRepository>();
             _areaProcessedRepository = new Mock<IAreaRepository>();
             _areaHelperMock = new Mock<IAreaHelper>();
             _geoRegionApiServiceMock = new Mock<IGeoRegionApiService>();
@@ -36,7 +35,7 @@ namespace SOS.Import.UnitTests.Harvesters
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
-        private readonly Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository> _areaRepositoryMock;
+        private readonly Mock<Harvest.Repositories.Source.Artportalen.Interfaces.IAreaRepository> _areaRepositoryMock;
         private readonly Mock<IAreaRepository> _areaProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelperMock;
         private readonly Mock<IGeoRegionApiService> _geoRegionApiServiceMock;

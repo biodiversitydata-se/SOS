@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Process.Jobs;
-using SOS.Process.Processors.Taxon;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Processors.Taxon;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Jobs

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Process.Jobs;
-using SOS.Process.Managers.Interfaces;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Managers.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs

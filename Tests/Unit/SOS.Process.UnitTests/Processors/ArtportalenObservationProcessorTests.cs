@@ -16,8 +16,8 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Artportalen;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Artportalen;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors

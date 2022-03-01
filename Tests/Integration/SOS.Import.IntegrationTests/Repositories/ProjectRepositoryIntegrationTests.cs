@@ -3,8 +3,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Repositories

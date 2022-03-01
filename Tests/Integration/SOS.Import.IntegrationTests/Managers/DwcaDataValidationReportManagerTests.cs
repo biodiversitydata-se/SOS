@@ -5,8 +5,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Import.DarwinCore;
-using SOS.Import.Managers;
+using SOS.Harvest.DarwinCore;
+using SOS.Harvest.Managers;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -17,7 +17,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Process.Managers;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Managers

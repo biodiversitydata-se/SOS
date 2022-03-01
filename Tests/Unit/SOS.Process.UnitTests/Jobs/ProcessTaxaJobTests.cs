@@ -8,8 +8,8 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Jobs;
-using SOS.Process.Processors.Taxon.Interfaces;
+using SOS.Harvest.Jobs;
+using SOS.Harvest.Processors.Taxon.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs

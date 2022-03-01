@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SOS.Import.Entities.Artportalen;
+using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Import.UnitTests.TestData
 {

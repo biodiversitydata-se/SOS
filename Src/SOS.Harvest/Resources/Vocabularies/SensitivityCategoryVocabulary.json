@@ -1,0 +1,68 @@
+{
+  "Id": 24,
+  "Name": "SensitivityCategory",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 1,
+      "Value": "1. Full access and free use for all",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "1. Fullständig åtkomst och fri användning för alla"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "1. Full access and free use for all"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "3. Generalized to a 5*5 km grid cell for public usage",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "3. Maximal upplösning 5*5 km för allmänheten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "3. Generalized to a 5*5 km grid cell for public usage"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "4. Generalized to a 25*25 km grid cell for public usage",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "4. Maximal upplösning 25*25 km för allmänheten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "4. Generalized to a 25*25 km grid cell for public usage"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "5. Generalized to a 50*50 km grid cell for public usage",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "5. Maximal upplösning 50*50 km för allmänheten"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "5. Generalized to a 50*50 km grid cell for public usage"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": []
+}

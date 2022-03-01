@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Entities.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Constants;
 using Xunit;
 

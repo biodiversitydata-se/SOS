@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Managers;
-using SOS.Process.Processors.Artportalen;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using Xunit;
 

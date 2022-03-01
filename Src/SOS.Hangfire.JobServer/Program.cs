@@ -19,7 +19,7 @@ using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
-using SOS.Import.IoC.Modules;
+using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -32,7 +32,6 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Process.IoC.Modules;
 using SOS.Lib.Configuration.ObservationApi;
 
 namespace SOS.Hangfire.JobServer
@@ -187,8 +186,7 @@ namespace SOS.Hangfire.JobServer
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
-                                .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
+                                .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                                 .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
                         );
                     }

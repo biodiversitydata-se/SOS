@@ -30,7 +30,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-		<PackageReference Include="Moq" Version="4.16.1" />
+		<PackageReference Include="Moq" Version="4.17.1" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
 			<PrivateAssets>all</PrivateAssets>
@@ -44,7 +44,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Src\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
-		<ProjectReference Include="..\..\..\Src\SOS.Import\SOS.Import.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
 		<ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
 	</ItemGroup>
 

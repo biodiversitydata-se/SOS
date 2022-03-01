@@ -17,8 +17,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Shark;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Shark;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors

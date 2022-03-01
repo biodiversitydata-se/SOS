@@ -15,8 +15,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.ClamPortal;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.ClamPortal;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors

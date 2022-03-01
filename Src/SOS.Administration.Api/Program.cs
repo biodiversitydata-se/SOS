@@ -9,12 +9,11 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
 using SOS.Administration.Api.IoC;
-using SOS.Import.IoC.Modules;
+using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
-using SOS.Process.IoC.Modules;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Administration.Api
@@ -105,8 +104,7 @@ namespace SOS.Administration.Api
 
                     return new AutofacServiceProviderFactory(builder =>
                         builder
-                            .RegisterModule(new ImportModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
-                            .RegisterModule(new ProcessModule { Configurations = (new ProcessConfiguration(), _verbatimDbConfiguration, _processDbConfiguration) })
+                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, new ProcessConfiguration(), _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                             .RegisterModule<AdministrationModule>()
                     );
                 }

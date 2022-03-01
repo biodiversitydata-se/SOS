@@ -3,10 +3,10 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Process.Processors.Artportalen;
+using SOS.Harvest.Processors.Artportalen;
 using System.Collections.Generic;
 using SOS.Lib.Configuration.Process;
-using SOS.Process.Managers;
+using SOS.Harvest.Managers;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.Artportalen

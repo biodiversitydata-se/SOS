@@ -72,9 +72,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
-		<ProjectReference Include="..\SOS.Import\SOS.Import.csproj" />
+		<ProjectReference Include="..\SOS.Harvest\SOS.Harvest.csproj" />
 		<ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
-		<ProjectReference Include="..\SOS.Process\SOS.Process.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

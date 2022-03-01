@@ -1,0 +1,701 @@
+{
+  "Id": 25,
+  "Name": "BirdNestActivity",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 1,
+      "Value": "nest with egg",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bo, ägg/ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest with egg"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "nest with chick heard",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bo, hörda ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest with chick heard"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "breeding failed",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "misslyckad häckning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "breeding failed"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "incubating",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "incubating"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "egg shells",
+      "Localized": true,
+      "Category": {
+        "Id": 6,
+        "Name": "Trace",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Spår"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Trace"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "äggskal"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg shells"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "carrying food for young",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "föda åt ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying food for young"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "carrying faecal sac",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bär exkrementsäck"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "carrying faecal sac"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "visiting occupied nest",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "besöker bebott bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visiting occupied nest"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Value": "recently fledged young",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "pulli/nyligen flygga ungar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "recently fledged young"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Value": "recently used nest",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "nyligen använt bo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "recently used nest"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "distraction display",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "avledningsbeteende"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "distraction display"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "nest building",
+      "Localized": true,
+      "Category": {
+        "Id": 1,
+        "Name": "Reproduction confirmed",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Säkerställd reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Reproduction confirmed"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobygge"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nest building"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "Value": "brood patch",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ruvfläckar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "brood patch"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Value": "agitated behaviour",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "upprörd, varnande"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "agitated behaviour"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Value": "visit possible nest?",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bobesök?"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "visit possible nest?"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Value": "mating/mating ceremonies",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "parning/parningsceremonier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "mating/mating ceremonies"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Value": "permanent territory",
+      "Localized": true,
+      "Category": {
+        "Id": 2,
+        "Name": "Probable reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Trolig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Probable reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "permanent revir"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "permanent territory"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Value": "pair in suitable habitat",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "par i lämplig häckbiotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pair in suitable habitat"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Value": "display/song",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spel/sång"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "display/song"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Value": "in nesting habitat",
+      "Localized": true,
+      "Category": {
+        "Id": 3,
+        "Name": "Possible reproduction",
+        "Localized": true,
+        "Translations": [
+          {
+            "CultureCode": "sv-SE",
+            "Value": "Möjlig reproduktion"
+          },
+          {
+            "CultureCode": "en-GB",
+            "Value": "Possible reproduction"
+          }
+        ]
+      },
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "obs i häcktid, lämplig biotop"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in nesting habitat"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

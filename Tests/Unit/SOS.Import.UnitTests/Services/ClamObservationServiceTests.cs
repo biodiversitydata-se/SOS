@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Services.Interfaces;

@@ -1,9 +1,7 @@
-﻿using System;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using MvmService;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 

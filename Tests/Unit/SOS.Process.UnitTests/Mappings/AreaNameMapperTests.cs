@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SOS.Process.Mappings;
+using SOS.Harvest.Mappings;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Mappings

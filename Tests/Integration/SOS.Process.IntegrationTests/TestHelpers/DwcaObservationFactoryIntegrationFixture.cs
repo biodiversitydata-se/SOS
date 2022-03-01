@@ -12,8 +12,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Process.Managers;
-using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
 {

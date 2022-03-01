@@ -4,8 +4,8 @@ using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Services;
-using SOS.Import.Services.Interfaces;
+using SOS.Harvest.Services;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 

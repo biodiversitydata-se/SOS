@@ -1,0 +1,40 @@
+{
+    "Id": 15,
+    "Name": "OccurrenceStatus",
+    "Localized": false,
+    "Values": [
+        {
+            "Id": 0,
+            "Value": "present",
+            "Localized": false
+        },
+        {
+            "Id": 1,
+            "Value": "absent",
+            "Localized": false
+        }
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "occurrenceStatus",
+                    "Description": "The occurrenceStatus term (http://rs.tdwg.org/dwc/terms/occurrenceStatus)",
+                    "Values": [
+                        {
+                            "Value": "present",
+                            "SosId": 0
+                        },
+                        {
+                            "Value": "absent",
+                            "SosId": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

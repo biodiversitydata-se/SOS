@@ -17,8 +17,8 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
-using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Kul;
+using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.Kul;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors

@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Import.Services;
+using SOS.Harvest.Services;
 using SOS.Lib.Services;
 using Xunit;
 

@@ -3,16 +3,13 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Import.DarwinCore;
-using SOS.Import.Harvesters.Observations;
-using SOS.Import.Services;
+using SOS.Harvest.DarwinCore;
+using SOS.Harvest.Harvesters.DwC;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
-using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
 using Xunit;
 
