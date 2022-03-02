@@ -74,7 +74,7 @@ namespace SOS.Harvest.Processors
                 if (attempt < 3)
                 {
                     Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
-                    System.Threading.Thread.Sleep(attempt * 200);
+                    Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, protectedData, processedObservations, batchId, attempt);
                 }

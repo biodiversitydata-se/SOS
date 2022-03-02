@@ -108,9 +108,9 @@ namespace SOS.Harvest.Jobs
         {
             _logger.LogInformation($"Start harvest job ({mode})");
             await HarvestResources(mode, cancellationToken);
-            var success = await Harvest(harvestProviders, mode, cancellationToken);
+            var harvestCount = await Harvest(harvestProviders, mode, cancellationToken);
 
-            if (!success)
+            if (harvestCount == -1)
             {
                 _logger.LogInformation($"Harvest job ({mode}) failed");
 
@@ -119,7 +119,7 @@ namespace SOS.Harvest.Jobs
 
             _logger.LogInformation($"Finish harvest job ({mode})");
 
-            if (!processOnSuccess)
+            if (!processOnSuccess || harvestCount == 0)
             {
                 return true;
             }
@@ -166,7 +166,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> Harvest(
+        private async Task<long> Harvest(
         IEnumerable<DataProvider> dataProviders,
         JobRunModes mode,
         IJobCancellationToken cancellationToken)
@@ -182,7 +182,7 @@ namespace SOS.Harvest.Jobs
                 {
                     _logger.LogError(
                         $"No data providers for {mode} harvest");
-                    return false;
+                    return 0;
                 }
 
                 //------------------------------------------------------------------------
@@ -250,12 +250,12 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation($"Finish {mode} observations harvesting. Success: { success }");
 
-                return success;
+                return success ? harvestTaskByDataProvider.Sum(ht => ht.Value.Result.Count) : -1;
             }
             catch (JobAbortedException)
             {
                 _logger.LogInformation($"{mode} observation harvest job was cancelled.");
-                return false;
+                return 0;
             }
             catch (Exception e)
             {
@@ -436,10 +436,10 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            return await Harvest(
+            return (await Harvest(
                 harvestDataProviders.Select(d => d.Value).ToList(),
                 JobRunModes.Full,
-                cancellationToken);
+                cancellationToken)) != -1;
         }
 
         /// <inheritdoc />
