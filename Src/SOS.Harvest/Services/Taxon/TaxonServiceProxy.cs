@@ -3,7 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using SOS.Harvest.Services.Taxon.Interfaces;
 
-namespace SOS.Process.Services
+namespace SOS.Harvest.Services.Taxon
 {
     public class TaxonServiceProxy : ITaxonServiceProxy
     {

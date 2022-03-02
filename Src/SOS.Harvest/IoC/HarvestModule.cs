@@ -100,7 +100,7 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Process.Services;
+
 using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
 using IAreaRepository = SOS.Lib.Repositories.Resource.Interfaces.IAreaRepository;
 using ITaxonRepository = SOS.Lib.Repositories.Resource.Interfaces.ITaxonRepository;
