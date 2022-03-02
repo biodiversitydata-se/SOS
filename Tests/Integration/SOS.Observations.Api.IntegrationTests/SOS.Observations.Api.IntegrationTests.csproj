@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CycleDetection" Version="2.0.0" />
     <PackageReference Include="FluentAssertions" Version="6.1.0" />
     <PackageReference Include="Hangfire.Core" Version="1.7.28" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.10" />

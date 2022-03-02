@@ -31,6 +31,7 @@
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.21.1" />
     <PackageReference Include="NGeoHash" Version="1.2.0" />
+    <PackageReference Include="QuikGraph" Version="2.3.0" />
     <PackageReference Include="RecordParser" Version="1.2.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
