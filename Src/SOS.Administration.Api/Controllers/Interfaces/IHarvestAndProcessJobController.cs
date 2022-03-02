@@ -40,6 +40,12 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunIncrementalObservationHarvestAndProcessJob();
 
         /// <summary>
+        /// Run incremaental harvest and processing of specified Artportalen observations
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob(IEnumerable<int> ids);
+
+        /// <summary>
         ///  Incremental harvest and processing
         /// </summary>
         /// <param name="runIntervalInMinutes"></param>

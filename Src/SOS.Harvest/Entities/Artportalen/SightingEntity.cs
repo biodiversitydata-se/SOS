@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SOS.Harvest.Entities.Artportalen
+﻿namespace SOS.Harvest.Entities.Artportalen
 {
     /// <summary>
     ///     Sighting object
@@ -23,19 +21,9 @@ namespace SOS.Harvest.Entities.Artportalen
         public string BiotopeDescription { get; set; }
 
         /// <summary>
-        ///     Id of collection
-        /// </summary>
-        public string CollectionID { get; set; }
-
-        /// <summary>
         ///     SightingCommentPublic comment
         /// </summary>
         public string Comment { get; set; }
-
-        /// <summary>
-        ///     Id of controlling organisation
-        /// </summary>
-        public int? ControlingOrganisationId { get; set; }
 
         /// <summary>
         /// Data source id
@@ -95,11 +83,6 @@ namespace SOS.Harvest.Entities.Artportalen
         ///     Id of sighting
         /// </summary>
         public int Id { get; set; }
-
-        /// <summary>
-        ///     SightingSpeciesCollectionItem label
-        /// </summary>
-        public string Label { get; set; }
 
         /// <summary>
         ///     Taxon length
@@ -191,11 +174,6 @@ namespace SOS.Harvest.Entities.Artportalen
         public int? SiteId { get; set; }
 
         /// <summary>
-        ///     Id of SightingSpeciesCollectionItem
-        /// </summary>
-        public int? SightingSpeciesCollectionItemId { get; set; }
-
-        /// <summary>
         ///     Taxon stage id
         /// </summary>
         public int? StageId { get; set; }
@@ -269,16 +247,6 @@ namespace SOS.Harvest.Entities.Artportalen
         /// </summary>
         public int SightingTypeId { get; set; }
         public int SightingTypeSearchGroupId { get; set; }
-
-        /// <summary>
-        ///     Id of Organization to get name of Public Collection
-        /// </summary>
-        public int? OrganizationCollectorId { get; set; }
-
-        /// <summary>
-        ///     Id of User to get name of Private Collector
-        /// </summary>
-        public int? UserCollectorId { get; set; }
 
         public int? DeterminerUserId { get; set; }
 

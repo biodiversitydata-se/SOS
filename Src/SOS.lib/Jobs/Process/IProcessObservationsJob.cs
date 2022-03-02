@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Lib.Jobs.Process
 {
@@ -29,5 +30,14 @@ namespace SOS.Lib.Jobs.Process
         [JobDisplayName("Process verbatim observations for all active providers")]
         [Queue("high")]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Process passed Artportalen verbatims
+        /// </summary>
+        /// <param name="verbatims"></param>
+        /// <returns></returns>
+        [JobDisplayName("Process passed Artportalen verbatim observations")]
+        [Queue("high")]
+        Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims);
     }
 }

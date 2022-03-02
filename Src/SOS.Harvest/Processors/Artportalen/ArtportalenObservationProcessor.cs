@@ -86,5 +86,27 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
+
+        /// <inheritdoc />
+        public async Task<bool> ProcessObservationsAsync(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
+            IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+        {
+            var observationFactory =
+                await ArtportalenObservationFactory.CreateAsync(dataProvider,
+                    taxa,
+                    _processedVocabularyRepository,
+                    true,
+                    _artPortalenUrl,
+                    TimeManager);
+
+            var result = await base.ProcessBatchAsync(
+                dataProvider,
+                verbatimObservations,
+                $"1-{verbatimObservations.Count()}",
+                JobRunModes.IncrementalActiveInstance,
+                observationFactory);
+
+            return result.publicCount + result.protectedCount > 0;
+        }
     }
 }

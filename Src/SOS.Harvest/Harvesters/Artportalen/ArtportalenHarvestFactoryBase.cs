@@ -21,7 +21,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        protected async Task AddMissingSitesAsync(IEnumerable<int> siteIds)
+        protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -51,9 +51,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="sitesAreas"></param>
         /// <param name="sitesGeometry"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<Site>> CastSiteEntitiesToVerbatimAsync(ICollection<SiteEntity> siteEntities, IDictionary<int, ICollection<AreaEntityBase>> sitesAreas, IDictionary<int, string> sitesGeometry)
+        private async Task<IEnumerable<Site>> CastSiteEntitiesToVerbatimAsync(IEnumerable<SiteEntity>? siteEntities, IDictionary<int, ICollection<AreaEntityBase>>? sitesAreas, IDictionary<int, string>? sitesGeometry)
         {
-            var sites = new List<Site>();
+            var sites = new HashSet<Site>();
 
             if (!siteEntities?.Any() ?? true)
             {
@@ -69,7 +69,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
                 sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
 
-                var site = await CastSiteEntityToVerbatimAsync(siteEntity, siteAreas, geometryWkt);
+                var site = CastSiteEntityToVerbatim(siteEntity, siteAreas, geometryWkt);
 
                 if (site != null)
                 {
@@ -87,14 +87,14 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="areas"></param>
         /// <param name="geometryWkt"></param>
         /// <returns></returns>
-        private async Task<Site> CastSiteEntityToVerbatimAsync(SiteEntity entity, ICollection<AreaEntityBase> areas, string geometryWkt)
+        private Site? CastSiteEntityToVerbatim(SiteEntity? entity, ICollection<AreaEntityBase>? areas, string? geometryWkt)
         {
             if (entity == null)
             {
                 return null;
             }
 
-            Point wgs84Point = null;
+            Point? wgs84Point = null;
             const int defaultAccuracy = 100;
 
             if (entity.XCoord > 0 && entity.YCoord > 0)
@@ -105,7 +105,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
-            Geometry siteGeometry = null;
+            Geometry? siteGeometry = null;
             if (!string.IsNullOrEmpty(geometryWkt))
             {
                 siteGeometry = geometryWkt.ToGeometry()
@@ -166,7 +166,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="siteRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="logger"></param>
         public ArtportalenHarvestFactoryBase(
             ISiteRepository siteRepository,
             IAreaHelper areaHelper) : base()

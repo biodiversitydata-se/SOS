@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
@@ -13,8 +11,9 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// Get areas connected to sites
         /// </summary>
         /// <param name="siteIds"></param>
+        /// <param name="live"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds, bool live = false);
+        Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds, bool live = false);
 
         /// <summary>
         /// Get sites by id
@@ -22,13 +21,14 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// <param name="ids"></param>
         /// <param name="live"></param>
         /// <returns></returns>
-        Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live = false);
+        Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids, bool live = false);
 
         /// <summary>
         /// Get site geometry
         /// </summary>
         /// <param name="siteIds"></param>
+        /// <param name="live"></param>
         /// <returns></returns>
-        Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false);
+        Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false);
     }
 }

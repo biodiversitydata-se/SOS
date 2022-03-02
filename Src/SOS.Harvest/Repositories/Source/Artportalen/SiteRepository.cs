@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -75,7 +71,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<AreaEntityBase>>> GetSitesAreas(IEnumerable<int> siteIds, bool live = false)
+        public async Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds, bool live = false)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -92,8 +88,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     a.Name
 	            FROM 
 		            SiteAreas sa
-		            INNER JOIN Area a ON sa.AreasId = a.Id 
                     INNER JOIN @sid s ON sa.SiteId = s.Id
+		            INNER JOIN Area a ON sa.AreasId = a.Id 
                 WHERE
                     a.AreaDatasetId IN (1, 16, 18, 19, 21)";
 
@@ -123,7 +119,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live = false)
+        public async Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids, bool live = false)
         {
             if (!ids?.Any() ?? true)
             {
@@ -134,7 +130,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, string>> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false)
+        public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -145,13 +141,19 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 const string query = @"
                 SELECT
-			        sg.SiteId,
-                    MAX(sg.Geometry.STAsText()) AS GeometryWKT -- Ugly workaround to only get one geometry/site. Bad data, duplicates exists
-		        FROM 
-		            SiteGeometry sg 
-                    INNER JOIN @sid s ON sg.SiteId = s.Id
-				GROUP BY 
-					sg.SiteId";
+	                lg.SiteId,
+	                lg.Geometry.STAsText() AS GeometryWKT
+                FROM (
+	                    SELECT
+		                    sg.SiteId,
+		                    sg.Geometry,
+		                    ROW_NUMBER() OVER (PARTITION BY SiteId ORDER BY EditDate DESC) rn -- Workaround to only get one geometry/site. Bad data, duplicates exists
+	                    FROM 
+		                    SiteGeometry sg 
+	                        INNER JOIN @sid s ON sg.SiteId = s.Id
+                    ) AS lg
+                WHERE 
+	                lg.rn = 1";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
                     new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();

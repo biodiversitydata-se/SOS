@@ -32,6 +32,7 @@ using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -824,6 +825,15 @@ namespace SOS.Harvest.Jobs
                 dataProvidersToProcess,
                 JobRunModes.Full,
                 cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims)
+        {
+            var processor = _processorByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationProcessor;
+            var provider = await _dataProviderCache.GetAsync(1);
+            var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
+            return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
         }
     }
 }

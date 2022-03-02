@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -80,8 +76,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     s.DiscoveryMethodId,
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
-                    ssci.Label AS CollectionID,
-                    ssci.Id as SightingSpeciesCollectionItemId,
 	                scp.Comment,
                     s.EditDate,
 	                s.EndDate,
@@ -89,7 +83,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                s.GenderId,
                     s.HasImages,
 	                s.HiddenByProvider,
-	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
 					s.MaxHeight,
@@ -127,8 +120,6 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                si.DeterminationMethodId,
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId,
-                    ssci.OrganizationId AS OrganizationCollectorId,
-	                ssci.CollectorId AS UserCollectorId,
 	                srDeterminer.UserId AS DeterminerUserId,
 	                srDeterminer.DeterminationYear AS DeterminationYear,
 	                srConfirmator.UserId AS ConfirmatorUserId,
@@ -141,8 +132,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                {SightingsFromBasics}
                     {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
-	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId                    
-                    LEFT JOIN (SELECT Id, Label, SightingId, OrganizationId, CollectorId FROM SightingSpeciesCollectionItem WITH(NOLOCK) WHERE Id IN (SELECT MAX(Id) FROM SightingSpeciesCollectionItem WITH(NOLOCK) GROUP BY SightingId)) ssci ON s.SightingId = ssci.SightingId	                
+	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId                                   
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id

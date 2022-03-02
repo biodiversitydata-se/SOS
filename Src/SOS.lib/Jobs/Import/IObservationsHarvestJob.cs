@@ -67,5 +67,13 @@ namespace SOS.Lib.Jobs.Import
         Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken);
+
+        [DisableConcurrentExecution(45)]
+        [JobDisplayName("Harvest specific observations from Artportalen")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [Queue("high")]
+        Task<bool> RunHarvestArtportalenObservationsAsync(
+            IEnumerable<int> sightingIds,
+            IJobCancellationToken cancellationToken);
     }
 }

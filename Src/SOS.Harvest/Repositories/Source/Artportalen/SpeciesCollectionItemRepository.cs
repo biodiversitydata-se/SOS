@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -20,7 +16,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
         }
 
-        public async Task<IEnumerable<SpeciesCollectionItemEntity>> GetBySightingAsync(IEnumerable<int> sightingIds, bool live = false)
+        ///<inheritdoc />
+        public async Task<IEnumerable<SpeciesCollectionItemEntity>?> GetBySightingAsync(IEnumerable<int> sightingIds, bool live = false)
         {
             if (!sightingIds?.Any() ?? true)
             {
@@ -31,14 +28,16 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 const string query = @"
                 SELECT
-                    ssci.OrganizationId,
                     ssci.CollectorId,
-                    ssci.SightingId,      
+                    ssci.ConfirmatorText,
+                    ssci.ConfirmatorYear,
                     ssci.Description,      
                     ssci.DeterminerText,
-                    ssci.ConfirmatorText,
                     ssci.DeterminerYear,
-                    ssci.ConfirmatorYear
+                    ssci.Id,
+                    ssci.[Label],
+                    ssci.OrganizationId,
+                    ssci.SightingId
                 FROM [SightingSpeciesCollectionItem] ssci
                 INNER JOIN @tvp t ON ssci.SightingId = t.Id";
 

@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using System.Collections.Concurrent;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
@@ -91,7 +92,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                var checkLists = new HashSet<CheckList>();
+                var checkLists = new ConcurrentDictionary<string, CheckList>();
 
                 Parallel.ForEach(verbatimCheckListBatch, verbatimCheckList =>
                 {
@@ -103,12 +104,12 @@ namespace SOS.Harvest.Processors
                     }
 
                     // Add checklist
-                    checkLists.Add(checkList);
+                    checkLists.TryAdd(checkList.Id, checkList);
                 });
 
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                return await ValidateAndStoreObservations(dataProvider, checkLists, $"{startId}-{endId}");
+                return await ValidateAndStoreObservations(dataProvider, checkLists.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException e)
             {

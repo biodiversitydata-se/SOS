@@ -441,5 +441,21 @@ namespace SOS.Harvest.Jobs
                 JobRunModes.Full,
                 cancellationToken);
         }
+
+        /// <inheritdoc />
+        public async Task<bool> RunHarvestArtportalenObservationsAsync(
+            IEnumerable<int> sightingIds,
+            IJobCancellationToken cancellationToken)
+        {
+            var harvester = _harvestersByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationHarvester;
+            var verbatims = await harvester.HarvestObservationsAsync(sightingIds, cancellationToken);
+
+            if (!verbatims?.Any() ?? true)
+            {
+                return false;
+            }
+
+            return await _processObservationsJob.ProcessArtportalenObservationsAsync(verbatims);
+        }
     }
 }

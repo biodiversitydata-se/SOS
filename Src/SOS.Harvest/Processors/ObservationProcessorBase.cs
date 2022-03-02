@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using System.Collections.Concurrent;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
@@ -136,7 +137,7 @@ namespace SOS.Harvest.Processors
         /// <param name="observationVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<(int publicCount, int protectedCount)> ProcessBatchAsync(
+        private async Task<(int publicCount, int protectedCount)> FetchAndProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -145,10 +146,9 @@ namespace SOS.Harvest.Processors
             TVerbatimRepository observationVerbatimRepository,
             IJobCancellationToken cancellationToken)
         {
+            var batchId = $"{startId}-{endId}";
             try
             {
-                var batchId = $"{startId}-{endId}";
-
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
                 var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
@@ -156,105 +156,8 @@ namespace SOS.Harvest.Processors
                 TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
                 Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({batchId})");
 
-                if (!verbatimObservationsBatch?.Any() ?? true)
-                {
-                    return (0, 0);
-                }
-       
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
-                
-                var publicObservations = new HashSet<Observation>();
-                var protectedObservations = new HashSet<Observation>();
-
-                Parallel.ForEach(verbatimObservationsBatch, verbatimObservation =>
-                {
-                    var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
-                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
-
-                    if (observation == null)
-                    {
-                        return;
-                    }
-
-                    // Populate data quality property
-                    PopulateDataQuality(observation);
-
-                    // If  observation is protected
-                    if (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage)
-                    {
-                        observation.Protected = true;
-                        observation.Sensitive = true;
-                        protectedObservations.Add(observation);
-
-                        //If it is a protected sighting, public users should not be possible to find it in the current month 
-                        if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
-                            ((observation.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
-                        {
-                            return;
-                        }
-
-                        // Recreate observation, diffused if provider supports diffusing 
-                        processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-
-                        // Populate data quality property
-                        PopulateDataQuality(observation);
-                        TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
-
-                        // If provider don't support diffusion, we provide it for them
-                        if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
-                        {
-                            var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
-
-                            // Diffuse protected observation before adding it to public index. 
-                            _diffusionManager.DiffuseObservation(observation);
-
-                            TimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
-                        }
-                    }
-
-                    // Add public observation
-                    publicObservations.Add(observation);
-                });
-
-                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
-
-                // If incremental harvest
-                if (mode != JobRunModes.Full)
-                {
-                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data {batchId}");
-                    var occurrenceIds = publicObservations.Select(o => o.Occurrence.OccurrenceId).ToHashSet();
-                    occurrenceIds.UnionWith(protectedObservations.Select(o => o.Occurrence.OccurrenceId));
-
-                    var elasticSearchDeleteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
-
-                    // Make sure no old data exists in elastic
-                    var deleteTasks = new[]
-                    {
-                        DeleteBatchAsync(false, occurrenceIds),
-                        DeleteBatchAsync(true, occurrenceIds)
-                    };
-                    var deleteResult = await Task.WhenAll(deleteTasks);
-
-                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
-
-                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
-                }
-
-                // Store observations
-                var validateAndStoreTasks = new[]
-                {
-                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations, $"{batchId}"),
-                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations, $"{batchId}")
-                };
-                
-                await Task.WhenAll(validateAndStoreTasks);
-
-                var publicCount = validateAndStoreTasks[0].Result;
-                var protectedCount = validateAndStoreTasks[1].Result;
-                
-                return (publicCount, protectedCount);
+                return await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
+                    observationFactory);
             }
             catch (JobAbortedException e)
             {
@@ -263,7 +166,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Process {dataProvider.Identifier} sightings from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, $"Fetch and Process {dataProvider.Identifier} observations, batch {batchId} failed");
                 throw;
             }
             finally
@@ -369,7 +272,7 @@ namespace SOS.Harvest.Processors
                 await _processManager.WaitAsync();
 
                 var batchEndId = startId + WriteBatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(
+                processBatchTasks.Add(FetchAndProcessBatchAsync(
                     dataProvider,
                     startId, 
                     batchEndId, 
@@ -383,6 +286,127 @@ namespace SOS.Harvest.Processors
             await Task.WhenAll(processBatchTasks);
 
             return (processBatchTasks.Sum(t => t.Result.publicCount), processBatchTasks.Sum(t => t.Result.protectedCount));
+        }
+
+        protected async Task<(int publicCount, int protectedCount)> ProcessBatchAsync(
+            DataProvider dataProvider,
+            IEnumerable<TVerbatim> verbatimObservationsBatch,
+            string batchId,
+            JobRunModes mode,
+            IObservationFactory<TVerbatim> observationFactory)
+        {
+            try
+            {
+                if (!verbatimObservationsBatch?.Any() ?? true)
+                {
+                    return (0, 0);
+                }
+
+                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
+
+                var publicObservations = new ConcurrentDictionary<string, Observation>();
+                var protectedObservations = new ConcurrentDictionary<string, Observation>();
+
+                Parallel.ForEach(verbatimObservationsBatch, verbatimObservation =>
+                {
+                    var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
+                    var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
+
+                    if (observation == null)
+                    {
+                        return;
+                    }
+
+                    // Populate data quality property
+                    PopulateDataQuality(observation);
+
+                    // If  observation is protected
+                    if (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage)
+                    {
+                        observation.Protected = true;
+                        observation.Sensitive = true;
+                        protectedObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
+
+                        //If it is a protected sighting, public users should not be possible to find it in the current month 
+                        if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
+                            ((observation.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
+                        {
+                            return;
+                        }
+
+                        // Recreate observation, diffused if provider supports diffusing 
+                        processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
+                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
+
+                        // Populate data quality property
+                        PopulateDataQuality(observation);
+                        TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
+
+                        // If provider don't support diffusion, we provide it for them
+                        if (observation.DiffusionStatus != DiffusionStatus.DiffusedByProvider)
+                        {
+                            var diffuseTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Diffuse);
+
+                            // Diffuse protected observation before adding it to public index. 
+                            _diffusionManager.DiffuseObservation(observation);
+
+                            TimeManager.Stop(ProcessTimeManager.TimerTypes.Diffuse, diffuseTimerSessionId);
+                        }
+                    }
+
+                    // Add public observation
+                    publicObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
+                });
+
+                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
+
+                // If incremental harvest
+                if (mode != JobRunModes.Full)
+                {
+                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data {batchId}");
+                    var occurrenceIds = publicObservations.Select(o => o.Key).ToHashSet();
+                    occurrenceIds.UnionWith(protectedObservations.Select(o => o.Key));
+
+                    var elasticSearchDeleteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticsearchDelete);
+
+                    // Make sure no old data exists in elastic
+                    var deleteTasks = new[]
+                    {
+                        DeleteBatchAsync(false, occurrenceIds),
+                        DeleteBatchAsync(true, occurrenceIds)
+                    };
+                    var deleteResult = await Task.WhenAll(deleteTasks);
+
+                    TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
+
+                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
+                }
+
+                // Store observations
+                var validateAndStoreTasks = new[]
+                {
+                    ValidateAndStoreObservations(dataProvider, mode, false, publicObservations.Values, $"{batchId}"),
+                    ValidateAndStoreObservations(dataProvider, mode, true, protectedObservations.Values, $"{batchId}")
+                };
+
+                await Task.WhenAll(validateAndStoreTasks);
+
+                var publicCount = validateAndStoreTasks[0].Result;
+                var protectedCount = validateAndStoreTasks[1].Result;
+
+                return (publicCount, protectedCount);
+            }
+            catch (JobAbortedException e)
+            {
+                // Throw cancelation again to let function above handle it
+                throw;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Process {dataProvider.Identifier} observations, batch {batchId} failed");
+                throw;
+            }
         }
 
         protected async Task<int> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool protectedObservations, ICollection<Observation> observations, string batchId)

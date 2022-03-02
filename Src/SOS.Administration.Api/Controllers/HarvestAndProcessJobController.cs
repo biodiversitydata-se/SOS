@@ -146,6 +146,28 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
+        [HttpPost("Observations/Run/Incremental/Artportalen")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult RunIncrementalArtportalenObservationHarvestAndProcessJob([FromBody] IEnumerable<int> ids)
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunHarvestArtportalenObservationsAsync(ids,
+                    JobCancellationToken.Null));
+
+
+
+                return new OkObjectResult("Incremental observation Harvest and process job for specified Artportalen id's enqued");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Incremental observation Harvest and process job for specified Artportalen id's failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <inheritdoc />
         [HttpPost("Observations/Schedule/Incremental")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
