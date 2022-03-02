@@ -94,19 +94,19 @@ namespace SOS.Harvest.Processors
 
                 var checkLists = new ConcurrentDictionary<string, CheckList>();
 
-                Parallel.ForEach(verbatimCheckListBatch, verbatimCheckList =>
+                foreach (var verbatimCheckList in verbatimCheckListBatch)
                 {
                     var checkList = checkListFactory.CreateProcessedCheckList(verbatimCheckList);
 
                     if (checkList == null)
                     {
-                        return;
+                        continue;
                     }
 
                     // Add checklist
                     checkLists.TryAdd(checkList.Id, checkList);
-                });
-
+                }
+               
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
                 return await ValidateAndStoreObservations(dataProvider, checkLists.Values, $"{startId}-{endId}");

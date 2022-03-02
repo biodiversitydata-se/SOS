@@ -307,7 +307,7 @@ namespace SOS.Harvest.Processors
                 var publicObservations = new ConcurrentDictionary<string, Observation>();
                 var protectedObservations = new ConcurrentDictionary<string, Observation>();
 
-                Parallel.ForEach(verbatimObservationsBatch, verbatimObservation =>
+                foreach (var verbatimObservation in verbatimObservationsBatch)
                 {
                     var processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                     var observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
@@ -315,7 +315,7 @@ namespace SOS.Harvest.Processors
 
                     if (observation == null)
                     {
-                        return;
+                        continue;
                     }
 
                     // Populate data quality property
@@ -332,7 +332,7 @@ namespace SOS.Harvest.Processors
                         if (!EnableDiffusion || (observation.Occurrence.SensitivityCategory > 2 && (observation.Event?.StartDate?.Year ?? 0) == DateTime.Now.Year || (observation?.Event?.EndDate?.Year ?? 0) == DateTime.Now.Year) &&
                             ((observation.Event?.StartDate?.Month ?? 0) == DateTime.Now.Month || (observation?.Event?.EndDate?.Month ?? 0) == DateTime.Now.Month))
                         {
-                            return;
+                            continue;
                         }
 
                         // Recreate observation, diffused if provider supports diffusing 
@@ -357,7 +357,7 @@ namespace SOS.Harvest.Processors
 
                     // Add public observation
                     publicObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
-                });
+                }
 
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
 
