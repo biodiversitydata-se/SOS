@@ -46,8 +46,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);
-            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-
+            
             var defects = new Dictionary<string, string>();
             DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected);
             if (dateCollected == null)
@@ -56,8 +55,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             }
 
             var obs = new Observation
-            {
-                AccessRights = accessRights,
+            {                
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
@@ -95,14 +93,27 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, null),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, null),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon
             };
+            
+            if (obs.Occurrence.SensitivityCategory > 1)
+            {
+                obs.Sensitive = true;
+                obs.Protected = true;
+                obs.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
+            }
+            else
+            {
+                obs.Sensitive = false;
+                obs.Protected = false;
+                obs.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
+            }            
 
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
