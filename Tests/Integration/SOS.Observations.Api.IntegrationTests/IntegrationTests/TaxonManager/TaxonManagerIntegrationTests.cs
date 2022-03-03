@@ -80,8 +80,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var taxonTree = _fixture.TaxonManager.TaxonTree;
-            //var taxonIds = new List<int>() { 261815, 261806 };
-            var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
+            var taxonIds = new List<int>() { 261815, 261806 };
+            //var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
             
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -96,6 +96,32 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             strGraphviz.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public void Create_taxon_Mermaid_diagram()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            //var taxonIds = new List<int>() { 261815, 261806 };
+            var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var strMermaid = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
+                taxonTree,
+                taxonIds,
+                TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+                true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            strMermaid.Should().NotBeNullOrEmpty();
         }
     }
 }

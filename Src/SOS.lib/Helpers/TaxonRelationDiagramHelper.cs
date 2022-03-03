@@ -58,6 +58,31 @@ namespace SOS.Lib.Helpers
             return str;
         }
 
+        /// <summary>
+        /// Create a taxon relation GraphViz diagram.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="taxonTree"></param>
+        /// <param name="taxonIds"></param>
+        /// <param name="treeIterationMode"></param>
+        /// <param name="includeSecondaryRelations"></param>
+        /// <returns></returns>
+        public static string CreateMermaidFormatRepresentation<T>(
+            TaxonTree<T> taxonTree,
+            IEnumerable<int> taxonIds,
+            TaxonRelationsTreeIterationMode treeIterationMode,
+            bool includeSecondaryRelations = true)
+        {
+            var taxonTreeNodes = taxonTree.GetTreeNodes(taxonIds);
+            var edges = GetAllEdges(
+                taxonTreeNodes,
+                treeIterationMode,
+                includeSecondaryRelations);
+
+            string str = CreateMermaidFormatRepresentation(edges);
+            return str;
+        }
+
         private static string CreateGraphvizFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges)
         {
             HashSet<TaxonTreeNode<T>> nodes = new HashSet<TaxonTreeNode<T>>();
@@ -102,6 +127,39 @@ namespace SOS.Lib.Helpers
 
             sb.AppendLine("}");
             return sb.ToString();            
+        }
+
+        private static string CreateMermaidFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges)
+        {
+            HashSet<TaxonTreeNode<T>> nodes = new HashSet<TaxonTreeNode<T>>();
+            foreach (var edge in edges)
+            {
+                nodes.Add(edge.Parent);
+                nodes.Add(edge.Child);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("graph TD");
+
+            //-------------------
+            // Create main tree
+            //-------------------
+            foreach (var node in nodes)
+            {
+                string label = $"{node.ScientificName.Replace("/", "")}<br/>{node.TaxonId}";
+                sb.AppendLine($"    node_{node.TaxonId}(\"{label}\")");
+            }
+
+            foreach (var edge in edges)
+            {
+                sb.AppendLine(string.Format(
+                    "    node_{0} {2} node_{1}",
+                    edge.Parent.TaxonId,
+                    edge.Child.TaxonId,
+                    edge.IsMainRelation ? "-->" : "-.->"));
+            }
+            
+            return sb.ToString();
         }
 
         private static HashSet<TaxonTreeEdge<T>> GetAllEdges<T>(
