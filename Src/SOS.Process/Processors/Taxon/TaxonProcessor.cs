@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Enums;
@@ -170,9 +172,9 @@ namespace SOS.Process.Processors.Taxon
         ///     each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(ICollection<Lib.Models.Processed.Observation.Taxon> taxa)
-        {
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+        private void CalculateHigherClassificationField(ICollection<Lib.Models.Processed.Observation.Taxon> taxa,
+            TaxonTree<IBasicTaxon> taxonTree)
+        {            
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);
             foreach (var treeNode in taxonTree.TreeNodeById.Values)
             {
@@ -228,9 +230,11 @@ namespace SOS.Process.Processors.Taxon
                 _logger.LogDebug("Finish adding taxon attributes");
 
                 var taxa = dwcTaxa.ToProcessedTaxa().ToList();
-
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+                bool isTaxonDataOk = IsTaxonDataOk(taxa, taxonTree);
+                // todo - don't replace taxonomy if data isn't ok.
                 _logger.LogDebug("Start calculating higher classification for taxa");
-                CalculateHigherClassificationField(taxa);
+                CalculateHigherClassificationField(taxa, taxonTree);
                 _logger.LogDebug("Finish calculating higher classification for taxa");
 
                 _logger.LogDebug("Start deleting processed taxa");
@@ -254,6 +258,19 @@ namespace SOS.Process.Processors.Taxon
             }
 
             return -1;
+        }
+
+        private bool IsTaxonDataOk(ICollection<Lib.Models.Processed.Observation.Taxon> taxa,
+            TaxonTree<IBasicTaxon> taxonTree)
+        {
+            var cycles = TaxonTreeCyclesDetectionHelper.CheckForCycles(taxonTree);
+            if (cycles.Count > 0)
+            {
+                _logger.LogError(TaxonTreeCyclesDetectionHelper.GetCyclesDescription(cycles));
+                return false;
+            }
+
+            return true;
         }
     }
 }

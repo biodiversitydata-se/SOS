@@ -6,15 +6,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.IntegrationTests.Utils
+namespace SOS.Lib.Helpers
 {
-    internal static class TaxonTreeCyclesDetectionUtil
+    /// <summary>
+    /// Helper class for detecting cycles in Dyntaxa taxon graph.
+    /// </summary>
+    public static class TaxonTreeCyclesDetectionHelper
     {
         public static List<StronglyConnectedComponent<int>> CheckForCycles<T>(TaxonTree<T> tree)
         {
             var graph = CreateGraph(tree);
             var cycles = GetCyclesInGraph(graph);
             return cycles;
+        }
+
+        public static string GetCyclesDescription(List<StronglyConnectedComponent<int>> cycles)
+        {
+            if (cycles == null || cycles.Count == 0) return "No cycles detected";
+
+            var cyclesDescriptions = new List<string>();
+            foreach (var cycle in cycles)
+            {
+                var taxonIds = new List<int>();
+                foreach (var vertex in cycle)
+                {
+                    taxonIds.Add(vertex.Value);
+                }
+
+                cyclesDescriptions.Add($"({string.Join(",", taxonIds)})");
+            }
+
+            string str = $"Taxon relation cycles detected. Check the following taxa: [{string.Join(",", cyclesDescriptions)}]";
+            return str;
         }
 
         private static List<StronglyConnectedComponent<int>> GetCyclesInGraph(List<Vertex<int>> graph)

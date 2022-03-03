@@ -64,12 +64,13 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var cycles = TaxonTreeCyclesDetectionUtil.CheckForCycles(taxonTree);
+            var cycles = TaxonTreeCyclesDetectionHelper.CheckForCycles(taxonTree);
+            string cyclesDescription = TaxonTreeCyclesDetectionHelper.GetCyclesDescription(cycles);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            cycles.Count.Should().Be(0);
+            cyclesDescription.Should().Be("No cycles detected");
         }
 
         [Fact]
@@ -80,8 +81,8 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var taxonTree = _fixture.TaxonManager.TaxonTree;
-            var taxonIds = new List<int>() { 261815, 261806 };
-            //var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
+            //var taxonIds = new List<int>() { 261815, 261806 };
+            var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
             
             //-----------------------------------------------------------------------------------------------------------
             // Act
