@@ -2,6 +2,8 @@
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 using SOS.Observations.Api.IntegrationTests.Utils;
+using SOS.Lib.Helpers;
+using System.Collections.Generic;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
 {
@@ -68,6 +70,32 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             cycles.Count.Should().Be(0);
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public void Create_taxon_Graphviz_diagram()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            //var taxonIds = new List<int>() { 261815, 261806 };
+            var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
+            
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var strGraphviz = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
+                taxonTree,
+                taxonIds,
+                TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+                true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            strGraphviz.Should().NotBeNullOrEmpty();
         }
     }
 }
