@@ -68,7 +68,6 @@ namespace SOS.Lib.Jobs.Import
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken);
 
-        [DisableConcurrentExecution(45)]
         [JobDisplayName("Harvest specific observations from Artportalen")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]

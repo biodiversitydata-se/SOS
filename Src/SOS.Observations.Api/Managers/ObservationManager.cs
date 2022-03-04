@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -11,6 +14,7 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Gis;
@@ -119,7 +123,6 @@ namespace SOS.Observations.Api.Managers
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
-
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -450,8 +453,32 @@ namespace SOS.Observations.Api.Managers
                 protectedIndex, maxReturnedItems);
         }
 
-        public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields)
+        /// <inheritdoc />
+        public async Task<dynamic> GetObservationAsync(int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, 
+            string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated = false)
         {
+            if (ensureArtportalenUpdated && (occurrenceId?.Contains("artportalen", StringComparison.CurrentCultureIgnoreCase) ?? false))
+            {
+                var regex = new Regex(@"\d+$");
+                var match = regex.Match(occurrenceId);
+                if (int.TryParse(match.Value, out var sightingId))
+                {
+                    var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(
+                        job => job.RunHarvestArtportalenObservationsAsync(new[] { sightingId },
+                        JobCancellationToken.Null));
+                    
+                    using var connection = JobStorage.Current.GetConnection();
+                    var stateData = connection.GetStateData(jobId);
+
+                    while (stateData.Name.Equals("Enqueued", StringComparison.CurrentCultureIgnoreCase) || 
+                           stateData.Name.Equals("Processing", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        Thread.Sleep(100);
+                        stateData = connection.GetStateData(jobId);
+                    }
+                }
+            }
+
             var filter = includeInternalFields ? new SearchFilterInternal() : new SearchFilter();
 
             filter.PopulateOutputFields(outputFieldSet);

@@ -969,7 +969,7 @@ namespace SOS.Observations.Api.Controllers
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
 
                 var observation = await ObservationManager.GetObservationAsync(roleId, authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: false);
+                    includeInternalFields: false, false);
 
                 if (observation == null)
                 {
@@ -1755,6 +1755,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">
+        /// <param name="ensureArtportalenUpdated">
         /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.
         /// </param>
@@ -1771,7 +1772,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string occurrenceId,
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool ensureArtportalenUpdated = false)
         {
             try
             {
@@ -1779,7 +1781,7 @@ namespace SOS.Observations.Api.Controllers
                 var observation = await ObservationManager.GetObservationAsync(
                     roleId,
                     authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
-                    includeInternalFields: true);
+                    includeInternalFields: true, ensureArtportalenUpdated);
                 if (observation == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);

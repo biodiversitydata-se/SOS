@@ -205,10 +205,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="translationCultureCode"></param>
         /// <param name="protectedObservations"></param>
         /// <param name="includeInternalFields"></param>
+        /// <param name="ensureArtportalenUpdated"></param>
         /// <returns></returns>
         Task<dynamic> GetObservationAsync(
             int? roleId,
-            string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields);
+            string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated);
 
         /// <summary>
         /// Signal search

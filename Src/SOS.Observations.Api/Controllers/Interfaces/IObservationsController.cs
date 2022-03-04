@@ -198,6 +198,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="fieldSet"></param>
         /// <param name="translationCultureCode"></param>
         /// <param name="sensitiveObservations"></param>
+        /// <param name="ensureArtportalenUpdated"></param>
         /// <returns></returns>
         Task<IActionResult> GetObservationByIdInternal(
             int? roleId,
@@ -206,6 +207,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string occurrenceId,
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
-            bool sensitiveObservations = false);        
+            bool sensitiveObservations = false,
+            bool ensureArtportalenUpdated = false);        
     }
 }

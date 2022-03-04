@@ -833,6 +833,7 @@ namespace SOS.Harvest.Jobs
             var processor = _processorByType[DataProviderType.ArtportalenObservations] as IArtportalenObservationProcessor;
             var provider = await _dataProviderCache.GetAsync(1);
             var taxa = await GetTaxaAsync(JobRunModes.IncrementalActiveInstance);
+            _processedObservationRepository.LiveMode = true;
             return await processor.ProcessObservationsAsync(provider, taxa, verbatims);
         }
     }

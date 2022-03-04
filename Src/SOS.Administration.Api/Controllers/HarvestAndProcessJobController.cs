@@ -157,8 +157,6 @@ namespace SOS.Administration.Api.Controllers
                 BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunHarvestArtportalenObservationsAsync(ids,
                     JobCancellationToken.Null));
 
-
-
                 return new OkObjectResult("Incremental observation Harvest and process job for specified Artportalen id's enqued");
             }
             catch (Exception e)

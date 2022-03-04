@@ -400,6 +400,7 @@ namespace SOS.Observations.Api
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
