@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.HangfireAttributes;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -11,6 +13,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobExpirationTimeout(Minutes = 60 * 24 * 3)]
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Full Observations Harvest")]
@@ -22,6 +25,7 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [JobExpirationTimeout(Minutes = 0)]
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, active instance")]
@@ -68,6 +72,7 @@ namespace SOS.Lib.Jobs.Import
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken);
 
+        [JobExpirationTimeout(Minutes = 0)]
         [JobDisplayName("Harvest specific observations from Artportalen")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]

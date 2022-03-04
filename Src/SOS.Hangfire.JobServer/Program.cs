@@ -135,7 +135,8 @@ namespace SOS.Hangfire.JobServer
                                     CheckQueuedJobsStrategy = _hangfireDbConfiguration.Hosts.Length == 1 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     QueuePollInterval = new TimeSpan(0, 0, 0, 1),
                                     Prefix = "hangfire",
-                                    CheckConnection = true
+                                    CheckConnection = true,
+                                    JobExpirationCheckInterval = TimeSpan.FromMinutes(10)
                                 })
                     );
                     GlobalJobFilters.Filters.Add(
