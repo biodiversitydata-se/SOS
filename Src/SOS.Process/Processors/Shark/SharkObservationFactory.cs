@@ -41,13 +41,11 @@ namespace SOS.Process.Processors.Shark
         /// <returns></returns>
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
-            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
+            _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);            
             var sharkSampleId = $"{verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId}-{verbatim.DyntaxaId}-{verbatim.Parameter}-{verbatim.Value}".RemoveWhiteSpace();
             
             var obs = new Observation
-            {
-                AccessRights = accessRights,
+            {                
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
@@ -85,8 +83,8 @@ namespace SOS.Process.Processors.Shark
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Taxonomist,
                     ReportedBy = verbatim.ReportedStationName,
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)
@@ -94,6 +92,8 @@ namespace SOS.Process.Processors.Shark
                 OwnerInstitutionCode = verbatim.ReportingInstituteNameSv,
                 Taxon = taxon
             };
+
+            obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd, 
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);

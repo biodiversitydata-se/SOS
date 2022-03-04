@@ -93,28 +93,16 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, null),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, null),
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon
             };
-            
-            if (obs.Occurrence.SensitivityCategory > 1)
-            {
-                obs.Sensitive = true;
-                obs.Protected = true;
-                obs.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
-            }
-            else
-            {
-                obs.Sensitive = false;
-                obs.Protected = false;
-                obs.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-            }            
 
+            obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedObservation(obs);

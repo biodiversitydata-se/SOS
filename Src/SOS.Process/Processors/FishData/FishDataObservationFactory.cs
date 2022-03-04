@@ -40,11 +40,9 @@ namespace SOS.Process.Processors.FishData
         /// <returns></returns>
         public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim)
         {
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
-            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
+            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);            
             var obs = new Observation
-            {
-                AccessRights = accessRights,
+            {                
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
@@ -82,8 +80,8 @@ namespace SOS.Process.Processors.FishData
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    ProtectionLevel = CalculateProtectionLevel(taxon, null),
+                    SensitivityCategory = CalculateProtectionLevel(taxon, null),
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
@@ -92,6 +90,8 @@ namespace SOS.Process.Processors.FishData
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
+
+            obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedObservation(obs);
