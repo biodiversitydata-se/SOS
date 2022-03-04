@@ -116,6 +116,22 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                             )
                         )
+                        .Object<Occurrence>(t => t
+                            .Name(nm => nm.Occurrence)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OccurrenceId)
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.OccurrenceStatus)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                    )
+                                )
+                            )
+                        )
                     )
                 )
             );
