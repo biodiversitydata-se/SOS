@@ -30,6 +30,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.Lib.Repositories.Processed
@@ -45,6 +47,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Http context accessor.
@@ -534,6 +537,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="telemetry"></param>
         /// <param name="httpContextAccessor"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
@@ -542,6 +546,7 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
         {
             LiveMode = true;
@@ -549,6 +554,7 @@ namespace SOS.Lib.Repositories.Processed
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));            
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
@@ -560,18 +566,21 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
         {
             LiveMode = false;
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
@@ -1687,20 +1696,54 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        private class TaxonAggregationTreeNodeSum
+        {   
+            public int TopologicalIndex { get; set; }
+            public TaxonTreeNode<IBasicTaxon> TreeNode { get; set; }
+            public int ObservationCount { get; set; }
+            public int SumObservationCount { get; set; }            
+            public HashSet<int> DependentTaxonIds { get; set; }
+            // public TaxonAggregationTreeNodeSum MainParent { get; set; } // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryParents { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> MainChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+
+            public override bool Equals(object obj)
+            {
+                return obj is TaxonAggregationTreeNodeSum sum &&
+                       EqualityComparer<TaxonTreeNode<IBasicTaxon>>.Default.Equals(TreeNode, sum.TreeNode);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(TreeNode);
+            }
+
+            public override string ToString()
+            {
+                if (TreeNode != null) return $"TaxonId: {TreeNode.TaxonId}, Count: {ObservationCount:N0}, SumCount: {SumObservationCount:N0}";
+                return base.ToString();
+            }
+        }        
+
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             int? skip,
-            int? take)
+            int? take,
+            bool sumUnderlyingTaxa = false,
+            bool includeUnderlyingGraphInResult = false)
         {
-            var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-
-            Dictionary<int,int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
-                indexName,
-                query, 
-                excludeQuery);
-
+            Dictionary<int, int> observationCountByTaxonId = null;
+            if (sumUnderlyingTaxa)
+            {
+                observationCountByTaxonId = await GetTaxonAggregationSumAsync(filter, includeUnderlyingGraphInResult);
+            }
+            else
+            {
+                observationCountByTaxonId = await GetTaxonAggregationAsync(filter);                
+            }
+            
             // Update skip and take
             if (skip == null)
             {
@@ -1724,6 +1767,7 @@ namespace SOS.Lib.Repositories.Processed
                     b.Key,
                     b.Value))
                 .OrderByDescending(m => m.ObservationCount)
+                .ThenBy(m => m.TaxonId)
                 .Skip(skip.Value)
                 .Take(take.Value)
                 .ToList();
@@ -1737,6 +1781,133 @@ namespace SOS.Lib.Repositories.Processed
             };
 
             return Result.Success(pagedResult);
+        }
+
+        private async Task<Dictionary<int, int>> GetTaxonAggregationAsync(SearchFilter filter)
+        {
+            var indexName = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+                indexName,
+                query,
+                excludeQuery);
+            return observationCountByTaxonId;
+        }
+
+        private async Task<Dictionary<int, int>> GetTaxonAggregationSumAsync(SearchFilter filter, bool includeUnderlyingGraphInResult = false)
+        {
+            var indexName = GetCurrentIndex(filter);
+            Dictionary<int, int> observationCountByTaxonId = null;
+            Dictionary<int, int> outputCountByTaxonId = null;
+            if (filter.HasTaxonFilter())
+            {
+                var filterWithoutTaxaFilter = filter.Clone();
+                filterWithoutTaxaFilter.Taxa = null;
+                var (queryWithoutTaxaFilter, excludeQueryWithoutTaxaFilter) = GetCoreQueries(filterWithoutTaxaFilter);
+                observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+                indexName,
+                queryWithoutTaxaFilter,
+                excludeQueryWithoutTaxaFilter);
+
+                var (query, excludeQuery) = GetCoreQueries(filter);
+                outputCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+                    indexName,
+                    query,
+                    excludeQuery);
+                
+                if (filter.Taxa?.Ids != null && filter.Taxa.Ids.Any())
+                {
+                    IEnumerable<int> taxonIds = includeUnderlyingGraphInResult ?
+                        _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa.Ids, true) : filter.Taxa.Ids;
+
+                    foreach (var taxonId in taxonIds)
+                    {
+                        outputCountByTaxonId.TryAdd(taxonId, 0);
+                    }                    
+                }
+            }
+            else
+            {
+                var (query, excludeQuery) = GetCoreQueries(filter);
+                outputCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+                    indexName,
+                    query,
+                    excludeQuery);
+                observationCountByTaxonId = outputCountByTaxonId;
+            }
+            
+            var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
+            var tree = _taxonManager.TaxonTree;            
+            foreach (var item in tree.TreeNodeById.Values)
+            {
+                int observationCount = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);                
+                var sumNode = new TaxonAggregationTreeNodeSum
+                {
+                    TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
+                    TreeNode = item,
+                    ObservationCount = observationCount,
+                    SumObservationCount = observationCount,
+                    DependentTaxonIds = new HashSet<int>() { item.TaxonId }
+                };                
+                treeNodeSumByTaxonId.Add(item.TaxonId, sumNode);
+            }
+            
+            var orderedTreeNodeSum = treeNodeSumByTaxonId.Values.OrderBy(m => m.TopologicalIndex).ToList();
+            foreach (var sumNode in orderedTreeNodeSum)
+            {                
+                // Main parent
+                if (sumNode.TreeNode.Parent != null)
+                {
+                    if (treeNodeSumByTaxonId.TryGetValue(sumNode.TreeNode.Parent.TaxonId, out var parentSumNode))
+                    {
+                        // sumNode.MainParent = parentSumNode; // Uncomment to use for debug purpose
+                        // parentSumNode.MainChildren.Add(sumNode); // Uncomment to use for debug purpose
+                        var newDependedntTaxonIds = sumNode.DependentTaxonIds.Except(parentSumNode.DependentTaxonIds).ToList();
+                        parentSumNode.DependentTaxonIds.UnionWith(newDependedntTaxonIds);
+                        foreach (var taxonId in newDependedntTaxonIds)
+                        {
+                            parentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
+                        }
+                    }                    
+                }
+
+                // Secondary parent
+                if (sumNode.TreeNode.SecondaryParents != null && sumNode.TreeNode.SecondaryParents.Count > 0)
+                {
+                    foreach (var secondaryParent in sumNode.TreeNode.SecondaryParents)
+                    {
+                        if (treeNodeSumByTaxonId.TryGetValue(secondaryParent.TaxonId, out var secondaryParentSumNode))
+                        {
+                            // sumNode.SecondaryParents.Add(secondaryParentSumNode); // Uncomment to use for debug purpose
+                            // secondaryParentSumNode.SecondaryChildren.Add(sumNode); // Uncomment to use for debug purpose
+                            var newDependentTaxonIds = sumNode.DependentTaxonIds.Except(secondaryParentSumNode.DependentTaxonIds).ToList();
+                            secondaryParentSumNode.DependentTaxonIds.UnionWith(newDependentTaxonIds);
+                            foreach (var taxonId in newDependentTaxonIds)
+                            {
+                                secondaryParentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
+                            }
+                        }                        
+                    }
+                }
+            }
+
+            // Replace observation count with accumulated sum. Remove nodes with 0 observations.
+            foreach (var taxonId in outputCountByTaxonId.Keys)
+            {
+                if (treeNodeSumByTaxonId.TryGetValue(taxonId, out var sumNode))
+                {
+                    if (sumNode.SumObservationCount > 0)
+                    {
+                        outputCountByTaxonId[taxonId] = sumNode.SumObservationCount;
+                    }
+                    else
+                    {
+                        outputCountByTaxonId.Remove(taxonId);
+                    }
+                }
+            }
+            
+            return outputCountByTaxonId;
         }
 
         /// <inheritdoc />

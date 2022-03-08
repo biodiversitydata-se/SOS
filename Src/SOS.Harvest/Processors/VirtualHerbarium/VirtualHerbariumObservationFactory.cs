@@ -49,8 +49,6 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             }
 
             var taxon = GetTaxon(verbatim.DyntaxaId);
-            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-
             var defects = new Dictionary<string, string>();
             DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected);
             if (dateCollected == null)
@@ -59,8 +57,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             }
 
             var obs = new Observation
-            {
-                AccessRights = accessRights,
+            {                
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
@@ -99,8 +96,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
                     OccurrenceRemarks = verbatim.Notes
                 },
@@ -108,6 +105,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 Taxon = taxon
             };
 
+            obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

@@ -30,6 +30,45 @@ namespace SOS.Lib.Models.TaxonTree
         public Dictionary<int, TaxonTreeNode<T>> TreeNodeById { get; set; }
 
         /// <summary>
+        /// Topological sort in reverse order, bottom-up. Key is TaxonId.
+        /// </summary>
+        public Dictionary<int, int> ReverseTopologicalSortById { get; set; }
+
+        /// <summary>
+        /// Get tree nodes for the given taxon ids.
+        /// </summary>
+        /// <param name="taxonIds">Taxon ids.</param>
+        /// <returns></returns>
+        public List<TaxonTreeNode<T>> GetTreeNodes(IEnumerable<int> taxonIds)
+        {
+            var taxonTreeNodes = new List<TaxonTreeNode<T>>();
+            foreach (var taxonId in taxonIds)
+            {
+                if (TreeNodeById.TryGetValue(taxonId, out var treeNode))
+                {
+                    taxonTreeNodes.Add(treeNode);
+                }
+            }
+
+            return taxonTreeNodes;
+        }
+
+        /// <summary>
+        /// Get tree node.
+        /// </summary>
+        /// <param name="taxonId">Taxon id.</param>
+        /// <returns></returns>
+        public TaxonTreeNode<T> GetTreeNode(int taxonId)
+        {            
+            if (TreeNodeById.TryGetValue(taxonId, out var treeNode))
+            {
+                return treeNode;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         ///     Get underlying taxa.
         /// </summary>
         /// <param name="taxonIds">The taxon ids that we will get underlying taxa for.</param>
@@ -61,7 +100,7 @@ namespace SOS.Lib.Models.TaxonTree
         /// <returns></returns>
         public IEnumerable<int> GetUnderlyingTaxonIds(int taxonId, bool returnSelfs)
         {
-            return GetUnderlyingTaxonIds(new[] {taxonId}, returnSelfs);
+            return GetUnderlyingTaxonIds(new[] { taxonId }, returnSelfs);
         }
-    }
+    }  
 }

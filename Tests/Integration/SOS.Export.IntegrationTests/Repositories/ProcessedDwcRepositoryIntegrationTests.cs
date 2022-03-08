@@ -5,10 +5,12 @@ using Elasticsearch.Net;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
@@ -75,6 +77,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                     exportClient,
                     elasticConfiguration,
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,                    
                     new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;

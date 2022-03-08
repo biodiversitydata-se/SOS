@@ -23,6 +23,7 @@ using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services;
 using Xunit;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
 {
@@ -71,6 +72,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
+                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
             return processedObservationRepository;
 

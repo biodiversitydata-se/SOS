@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -156,6 +157,19 @@ namespace SOS.Lib.Models.Search
         public override string ToString()
         {
             return JsonSerializer.Serialize(this);
+        }
+
+        /// <summary>
+        /// Check if the filter has any taxon filter set.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasTaxonFilter()
+        {
+            if (Taxa == null) return false;
+            if (Taxa.Ids != null && Taxa.Ids.Any()) return true;
+            if (Taxa.ListIds != null && Taxa.ListIds.Any()) return true;
+            if (Taxa.RedListCategories != null && Taxa.RedListCategories.Any()) return true;
+            return false;
         }
     }
 }
