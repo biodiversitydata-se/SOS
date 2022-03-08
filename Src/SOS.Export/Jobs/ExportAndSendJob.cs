@@ -46,7 +46,6 @@ namespace SOS.Export.Jobs
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             PerformContext context,
@@ -58,7 +57,7 @@ namespace SOS.Export.Jobs
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 
-                var success = await _observationManager.ExportAndSendAsync(filter, email, description, exportFormat, culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken);
+                var success = await _observationManager.ExportAndSendAsync(filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken);
                 
                 _logger.LogInformation($"End export and send job. Success: {success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id);

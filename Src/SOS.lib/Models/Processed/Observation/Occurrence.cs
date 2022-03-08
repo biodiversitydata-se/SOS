@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -15,7 +14,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue
             Activity { get; set; }
 
@@ -60,7 +58,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Behavior { get; set; }
 
         /// <summary>
@@ -69,7 +66,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Biotope { get; set; }
 
         /// <summary>
@@ -107,7 +103,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue EstablishmentMeans { get; set; }
 
         /// <summary>
@@ -165,13 +160,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue LifeStage { get; set; }
 
         /// <summary>
         ///     Media associated with the observation
         /// </summary>
-        [Nested]
         public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
@@ -180,7 +173,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// identifiers in the record that will most closely make the occurrenceID globally unique.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        [Keyword]
         public string OccurrenceId { get; set; }
 
         /// <summary>
@@ -196,7 +188,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue OccurrenceStatus { get; set; }
 
         /// <summary>
@@ -279,13 +270,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Name of the person that reported the species observation.
         /// </summary>
-        [Keyword]
         public string ReportedBy { get; set; }
 
         /// <summary>
         ///     Date and time when the species observation was reported (UTC).
         /// </summary>
-        [Date]
         public DateTime? ReportedDate { get; set; }
 
         /// <summary>
@@ -294,7 +283,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue ReproductiveCondition { get; set; }
 
         /// <summary>
@@ -305,13 +293,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Sex { get; set; }
 
         /// <summary>
         /// Substrate.
         /// </summary>
-        [Object]
         public Substrate Substrate { get; set; }
 
         /// <summary>

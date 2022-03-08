@@ -46,6 +46,12 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<CheckList>(p => p
                     .AutoMap()
                     .Properties(ps => ps
+                        .Date(d => d
+                            .Name(nm => nm.Modified)
+                        )
+                        .Date(d => d
+                            .Name(nm => nm.RegisterDate)
+                        )
                         .GeoShape(gs => gs
                             .Name(nn => nn.Location.Point))
                         .GeoPoint(gp => gp

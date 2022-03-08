@@ -22,7 +22,6 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// <summary>
         /// Check list edit date 
         /// </summary>
-        [Date]
         public DateTime Modified { get; set; }
 
         /// <summary>
@@ -71,7 +70,6 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// <summary>
         /// Check list register date 
         /// </summary>
-        [Date]
         public DateTime RegisterDate { get; set; }
 
         /// <summary>

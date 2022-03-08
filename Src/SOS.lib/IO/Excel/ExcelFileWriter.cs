@@ -56,8 +56,7 @@ namespace SOS.Lib.IO.Excel
         public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath,
             string fileName, 
-            string culture, 
-            OutputFieldSet outputFieldSet, 
+            string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
             IJobCancellationToken cancellationToken)
@@ -68,7 +67,11 @@ namespace SOS.Lib.IO.Excel
             {
                 string excelFilePath = null;
                 int nrObservations = 0;
-                var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
+                var propertyFields = filter.OutputFields?.Any() ?? false ?
+                    ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath
+                        .Where(f => filter.OutputFields.Contains(f.Key))
+                        .Select(f => f.Value) :
+                    ObservationPropertyFieldDescriptionHelper.AllFields;
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {
@@ -185,7 +188,7 @@ namespace SOS.Lib.IO.Excel
             }
         }
 
-        private void WriteHeader(ExcelWorksheet sheet, List<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
+        private void WriteHeader(ExcelWorksheet sheet, IEnumerable<PropertyFieldDescription> propertyFields, PropertyLabelType propertyLabelType)
         {
             if (!propertyFields?.Any() ?? true)
             {

@@ -199,21 +199,6 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///  Add wildcard criteria
-        /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        /// <param name="wildcard"></param>
-        public static void AddWildcardCriteria<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, string wildcard) where TQueryContainer : class
-        {
-            query.Add(q => q
-                .Wildcard(w => w
-                    .Field(field)
-                    .Value(wildcard)));
-        }
-
-        /// <summary>
         /// Cast property to field
         /// </summary>
         /// <param name="property"></param>
@@ -578,6 +563,28 @@ namespace SOS.Lib.Extensions
             query.Add(q => q
                 .Bool(b => b
                     .Should(timeRangeContainers)
+                )
+            );
+        }
+
+        /// <summary>
+        /// Add wildcard criteria
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="field"></param>
+        /// <param name="wildcard"></param>
+        public static void TryAddWildcardCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, string wildcard)
+        {
+            if (string.IsNullOrEmpty(wildcard))
+            {
+                return;
+            }
+
+            query.Add(q => q
+                .Wildcard(w => w
+                    .Field(field)
+                    .CaseInsensitive(true)
+                    .Value(wildcard)
                 )
             );
         }

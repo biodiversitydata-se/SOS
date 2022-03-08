@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Nest;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Swagger;
 
@@ -205,7 +204,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     IdentificationQualifier term.
         ///     Currently scientific name without author is provided.
         /// </summary>
-        [Keyword]
         public string ScientificName { get; set; }
 
         /// <summary>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Nest;
+﻿using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -12,7 +10,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Project parameters.
         /// </summary>
-        [Nested]
         public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
         public override string ToString()
         {

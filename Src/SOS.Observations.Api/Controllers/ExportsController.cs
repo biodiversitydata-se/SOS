@@ -23,7 +23,6 @@ using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -75,7 +74,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="email"></param>
         /// <param name="userExport"></param>
         /// <returns></returns>
-        private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(ExportFilterDto filter, string email, UserExport userExport)
+        private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(SearchFilterDto filter, string email, UserExport userExport)
         {
             var validationResults = Result.Combine(
                 ValidateSearchFilter(filter),
@@ -108,7 +107,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private async Task<IActionResult> DownloadValidateAsync(ExportFilterDto filter)
+        private async Task<IActionResult> DownloadValidateAsync(SearchFilterDto filter)
         {
             var validationResults = ValidateSearchFilter(filter);
 
@@ -225,8 +224,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadCsv(
-             [FromBody] ExportFilterDto filter,
-             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+             [FromBody] SearchFilterDto filter,
              [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
              [FromQuery] string cultureCode = "sv-SE",
              [FromQuery] bool gzip = true)
@@ -243,13 +241,11 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateExportOutputFields(outputFieldSet);
-
+               
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Csv,
                         _exportPath, cultureCode,
                         false,
-                        outputFieldSet,
                         propertyLabelType,
                         false,
                         gzip,
@@ -276,7 +272,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/DwC")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadDwC([FromBody] ExportFilterDto filter)
+        public async Task<IActionResult> DownloadDwC([FromBody] SearchFilterDto filter)
         {
             FileExportResult fileExportResult = null;
             try
@@ -293,8 +289,7 @@ namespace SOS.Observations.Api.Controllers
                         ExportFormat.DwC,
                         _exportPath, 
                         Cultures.en_GB, 
-                        false, 
-                        OutputFieldSet.All,
+                        false,
                         PropertyLabelType.PropertyPath,
                         false,
                         true,
@@ -319,8 +314,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadExcel(
-            [FromBody] ExportFilterDto filter, 
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
+            [FromBody] SearchFilterDto filter,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true)
@@ -337,12 +331,10 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateExportOutputFields(outputFieldSet);
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(exportFilter, ExportFormat.Excel, 
                         _exportPath, cultureCode,
                         false,
-                        outputFieldSet,
                         propertyLabelType,
                         false,
                         gzip,
@@ -369,8 +361,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost("Download/GeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> DownloadGeoJson([FromBody] ExportFilterDto filter, 
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+        public async Task<IActionResult> DownloadGeoJson([FromBody] SearchFilterDto filter,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
@@ -389,7 +380,6 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateExportOutputFields(outputFieldSet);
 
                 fileExportResult =
                     await _exportManager.CreateExportFileAsync(
@@ -397,8 +387,7 @@ namespace SOS.Observations.Api.Controllers
                         ExportFormat.GeoJson, 
                         _exportPath, 
                         cultureCode, 
-                        flat, 
-                        outputFieldSet,
+                        flat,
                         propertyLabelType,
                         excludeNullValues,
                         gzip,
@@ -428,9 +417,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderCsv([FromBody] ExportFilterDto filter,
+        public async Task<IActionResult> OrderCsv([FromBody] SearchFilterDto filter,
             [FromQuery] string description,
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE")
         {
@@ -446,10 +434,9 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Csv, cultureCode, false,
-                        outputFieldSet, propertyLabelType, false, null, JobCancellationToken.Null));
+                        propertyLabelType, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
@@ -460,7 +447,7 @@ namespace SOS.Observations.Api.Controllers
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = ExportFormat.Csv,
                     Description = description,
-                    OutputFieldSet = outputFieldSet
+                    OutputFieldSet = filter?.Output?.FieldSet
                 };
 
                 if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
@@ -483,7 +470,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderDwC([FromBody] ExportFilterDto filter, [FromQuery] string description)
+        public async Task<IActionResult> OrderDwC([FromBody] SearchFilterDto filter, [FromQuery] string description)
         {
             try
             {
@@ -498,7 +485,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.DwC, "en-GB", false,
-                        OutputFieldSet.All, PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null));
+                        PropertyLabelType.PropertyName, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
@@ -531,9 +518,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderExcel([FromBody] ExportFilterDto filter, 
-            [FromQuery] string description, 
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
+        public async Task<IActionResult> OrderExcel([FromBody] SearchFilterDto filter, 
+            [FromQuery] string description,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE")
         {
@@ -549,10 +535,10 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
+
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.Excel, cultureCode, false,
-                        outputFieldSet, propertyLabelType, false, null, JobCancellationToken.Null));
+                        propertyLabelType, false, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
@@ -563,7 +549,7 @@ namespace SOS.Observations.Api.Controllers
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = ExportFormat.Excel,
                     Description = description,
-                    OutputFieldSet = outputFieldSet                    
+                    OutputFieldSet = filter?.Output?.FieldSet                    
                 };
 
                 if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();
@@ -586,9 +572,8 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> OrderGeoJson([FromBody] ExportFilterDto filter, 
+        public async Task<IActionResult> OrderGeoJson([FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
@@ -606,10 +591,9 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                exportFilter.PopulateOutputFields(outputFieldSet);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, UserId, UserEmail, description, ExportFormat.GeoJson, cultureCode,
-                        flat, outputFieldSet, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
+                        flat, propertyLabelType, excludeNullValues, null, JobCancellationToken.Null));
 
                 userExports.OnGoingJobIds.Add(jobId);
                 var exportJobInfo = new ExportJobInfo
@@ -620,7 +604,7 @@ namespace SOS.Observations.Api.Controllers
                     NumberOfObservations = Convert.ToInt32(validateResult.Count),
                     Format = ExportFormat.GeoJson,
                     Description = description,
-                    OutputFieldSet = outputFieldSet                    
+                    OutputFieldSet = filter?.Output?.FieldSet
                 };
 
                 if (userExports.Jobs == null) userExports.Jobs = new List<ExportJobInfo>();

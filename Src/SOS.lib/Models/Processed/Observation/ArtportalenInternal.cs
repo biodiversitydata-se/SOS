@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nest;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 
@@ -112,13 +111,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Internal field used for searches by Artportalen, contains extra user information.
         /// </summary>
-        [Nested]
         public IEnumerable<UserInternal> OccurrenceRecordedByInternal { get; set; }
 
         /// <summary>
         /// Info about users verifying the observation
         /// </summary>
-        [Nested]
         public IEnumerable<UserInternal> OccurrenceVerifiedByInternal { get; set; }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 

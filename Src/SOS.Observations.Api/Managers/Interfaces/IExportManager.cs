@@ -19,7 +19,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="exportPath"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut">Only applicable when GeoJson is selected as export format</param>
-        /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
         /// <param name="gzip"></param>
@@ -30,7 +29,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string exportPath,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             bool gzip,

@@ -1,6 +1,4 @@
-﻿using Nest;
-
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Substrate info.
@@ -23,7 +21,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Name { get; set; }
 
         /// <summary>

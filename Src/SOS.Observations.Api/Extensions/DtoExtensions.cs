@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        private static LocationFilter PopulateLocationFilter(GeographicsFilterDto filter, string locationNameFilter = null)
+        private static LocationFilter PopulateLocationFilter(GeographicsFilterDto filter)
         {
             if (filter == null)
             {
@@ -207,8 +207,7 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
                     UsePointAccuracy = filter.ConsiderObservationAccuracy,
                 },
-                MaxAccuracy = filter.MaxAccuracy,
-                NameFilter = locationNameFilter
+                MaxAccuracy = filter.MaxAccuracy
             };
         }
 
