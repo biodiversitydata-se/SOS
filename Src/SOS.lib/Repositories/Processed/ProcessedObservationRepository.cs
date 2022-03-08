@@ -1672,10 +1672,10 @@ namespace SOS.Lib.Repositories.Processed
             public int ObservationCount { get; set; }
             public int SumObservationCount { get; set; }            
             public HashSet<int> DependentTaxonIds { get; set; }
-            public TaxonAggregationTreeNodeSum MainParent { get; set; }
-            public HashSet<TaxonAggregationTreeNodeSum> SecondaryParents { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>();
-            public HashSet<TaxonAggregationTreeNodeSum> MainChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>();
-            public HashSet<TaxonAggregationTreeNodeSum> SecondaryChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>();            
+            // public TaxonAggregationTreeNodeSum MainParent { get; set; } // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryParents { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> MainChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
 
             public override bool Equals(object obj)
             {
@@ -1828,9 +1828,9 @@ namespace SOS.Lib.Repositories.Processed
                 if (sumNode.TreeNode.Parent != null)
                 {
                     if (treeNodeSumByTaxonId.TryGetValue(sumNode.TreeNode.Parent.TaxonId, out var parentSumNode))
-                    {                        
-                        sumNode.MainParent = parentSumNode;
-                        parentSumNode.MainChildren.Add(sumNode);
+                    {
+                        // sumNode.MainParent = parentSumNode; // Uncomment to use for debug purpose
+                        // parentSumNode.MainChildren.Add(sumNode); // Uncomment to use for debug purpose
                         var newDependedntTaxonIds = sumNode.DependentTaxonIds.Except(parentSumNode.DependentTaxonIds).ToList();
                         parentSumNode.DependentTaxonIds.UnionWith(newDependedntTaxonIds);
                         foreach (var taxonId in newDependedntTaxonIds)
@@ -1847,8 +1847,8 @@ namespace SOS.Lib.Repositories.Processed
                     {
                         if (treeNodeSumByTaxonId.TryGetValue(secondaryParent.TaxonId, out var secondaryParentSumNode))
                         {
-                            sumNode.SecondaryParents.Add(secondaryParentSumNode);
-                            secondaryParentSumNode.SecondaryChildren.Add(sumNode);                                                        
+                            // sumNode.SecondaryParents.Add(secondaryParentSumNode); // Uncomment to use for debug purpose
+                            // secondaryParentSumNode.SecondaryChildren.Add(sumNode); // Uncomment to use for debug purpose
                             var newDependentTaxonIds = sumNode.DependentTaxonIds.Except(secondaryParentSumNode.DependentTaxonIds).ToList();
                             secondaryParentSumNode.DependentTaxonIds.UnionWith(newDependentTaxonIds);
                             foreach (var taxonId in newDependentTaxonIds)
