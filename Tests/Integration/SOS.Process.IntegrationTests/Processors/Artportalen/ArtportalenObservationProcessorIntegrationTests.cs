@@ -27,6 +27,7 @@ using SOS.Lib.Services;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using Xunit;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {
@@ -100,6 +101,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>());
             }
             else

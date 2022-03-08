@@ -232,15 +232,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <summary>
         /// Aggregate observations by taxon. Sort by observation count descending.
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="bbox"></param>
+        /// <param name="filter"></param>        
         /// <param name="skip"></param>
         /// <param name="take"></param>
+        /// <param name="sumUnderlyingTaxa"></param>
+        /// <param name="includeUnderlyingGraphInResult"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             int? skip,
-            int? take);
+            int? take,
+            bool sumUnderlyingTaxa = false,
+            bool includeUnderlyingGraphInResult = false);
 
         /// <summary>
         /// Get indication if taxa exists in specified area

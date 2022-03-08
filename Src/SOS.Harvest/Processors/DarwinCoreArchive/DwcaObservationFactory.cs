@@ -446,11 +446,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
             processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
             processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
-
-            // todo - handle the following fields:
-            // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
-            // processedOccurrence.URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
-
             return processedOccurrence;
         }
 

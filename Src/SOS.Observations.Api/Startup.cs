@@ -343,7 +343,10 @@ namespace SOS.Observations.Api
 
             var healthCheckConfiguration = Configuration.GetSection("HealthCheckConfiguration").Get<HealthCheckConfiguration>();
 
+            var artportalenApiServiceConfiguration = Configuration.GetSection("ArtportalenApiServiceConfiguration").Get<ArtportalenApiServiceConfiguration>();
+
             // Add configuration
+            services.AddSingleton(artportalenApiServiceConfiguration);
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
@@ -396,6 +399,7 @@ namespace SOS.Observations.Api
             services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
+            services.AddScoped<IArtportalenApiManager, ArtportalenApiManager>();
 
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
@@ -415,6 +419,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
 
             // Add writers
             services.AddScoped<IDwcArchiveFileWriter, DwcArchiveFileWriter>();

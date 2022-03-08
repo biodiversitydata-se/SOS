@@ -163,7 +163,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(processClient);
             var taxonManager = CreateTaxonManager(processClient, memoryCache);
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
 
@@ -199,7 +199,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
+            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
             {
@@ -254,13 +254,20 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         {
             var protectedLogRepository = new ProtectedLogRepository(processClient, new NullLogger<ProtectedLogRepository>());
             MemoryCacheOptions memoryCacheOptions = new MemoryCacheOptions { SizeLimit = null};
-            
+            var artportalenApiService = new ArtportalenApiService(new Mock<IAuthorizationProvider>().Object,
+                new HttpClientService(new NullLogger<HttpClientService>()),
+                new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
+                new NullLogger<ArtportalenApiService>());
+            var artportalenApiManager = new ArtportalenApiManager(artportalenApiService, new NullLogger<ArtportalenApiManager>());
+
+
             var observationsManager = new ObservationManager(processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
                 filterManager,
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
+                artportalenApiManager,
                 new NullLogger<ObservationManager>());
 
             return observationsManager;
@@ -299,7 +306,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             IProcessClient processClient,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ITaxonManager taxonManager)
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
@@ -309,6 +317,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
+                taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }

@@ -36,6 +36,7 @@ using SOS.Harvest.Processors.Sers;
 using SOS.Harvest.Processors.Shark;
 using SOS.Harvest.Processors.VirtualHerbarium;
 using Xunit;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
@@ -83,6 +84,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>());
             }
             else
@@ -232,6 +234,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     processClient, 
                     new ElasticSearchConfiguration(), 
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>()),
                 new NullLogger<InstanceManager>());
 

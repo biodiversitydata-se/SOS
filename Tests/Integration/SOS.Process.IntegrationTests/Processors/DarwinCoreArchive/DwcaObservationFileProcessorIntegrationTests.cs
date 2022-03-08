@@ -31,6 +31,7 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using Xunit;
 using Xunit.Abstractions;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -93,6 +94,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>());
             }
             else

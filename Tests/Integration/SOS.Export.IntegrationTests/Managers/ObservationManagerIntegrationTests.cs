@@ -69,6 +69,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ProcessedConfigurationCache(processedConfigurationRepository),
                 new TelemetryClient(),
                 new HttpContextAccessor(),
+                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             var excelWriter = new ExcelFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver,

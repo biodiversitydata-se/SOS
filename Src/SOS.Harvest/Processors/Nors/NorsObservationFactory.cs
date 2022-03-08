@@ -42,11 +42,8 @@ namespace SOS.Harvest.Processors.Nors
         public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
-            var accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-
             var obs = new Observation
-            {
-                AccessRights = accessRights,
+            {                
                 DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
@@ -85,8 +82,8 @@ namespace SOS.Harvest.Processors.Nors
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    ProtectionLevel = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, (AccessRightsId)accessRights.Id),
+                    ProtectionLevel = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = CalculateProtectionLevel(taxon),
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),
                     OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
@@ -94,6 +91,8 @@ namespace SOS.Harvest.Processors.Nors
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
+
+            obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

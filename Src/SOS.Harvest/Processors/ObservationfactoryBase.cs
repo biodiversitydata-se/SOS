@@ -161,11 +161,33 @@ namespace SOS.Harvest.Processors
         /// <param name="taxon"></param>
         /// <param name="accessRightsId"></param>
         /// <returns></returns>
+        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon)
+        {
+            return CalculateProtectionLevel(taxon, null);
+        }
+
+        /// <summary>
+        /// Calculate protection level
+        /// </summary>
+        /// <param name="taxon"></param>
+        /// <param name="accessRightsId"></param>
+        /// <returns></returns>
         protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, AccessRightsId? accessRightsId)
         {
             if (accessRightsId is AccessRightsId.FreeUsage) return 1;
             var protectionLevel = taxon?.Attributes?.ProtectionLevel?.Id ?? 1;
             return protectionLevel > 0 ? protectionLevel : 1;
+        }
+
+        protected VocabularyValue GetAccessRightsFromSensitivityCategory(int sensitivityCategory)
+        {
+            return VocabularyValue.Create((int)GetAccessRightsIdFromSensitivityCategory(sensitivityCategory));
+        }
+
+        private AccessRightsId GetAccessRightsIdFromSensitivityCategory(int sensitivityCategory)
+        {
+            if (sensitivityCategory > 1) return AccessRightsId.NotForPublicUsage;
+            return AccessRightsId.FreeUsage;            
         }
     }
 }

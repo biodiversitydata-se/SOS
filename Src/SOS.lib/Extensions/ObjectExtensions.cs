@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -123,6 +124,46 @@ namespace SOS.Lib.Extensions
         {
 
             return DotNetCore.Mapping.Extensions.Clone(original);
+        }
+
+        public static dynamic ToDynamic(this object value)
+        {            
+            var expando = ToExpando(value);
+            return expando;
+        }
+
+        private static ExpandoObject ToExpando(object @object)
+        {
+            var properties = @object.GetType().GetProperties();
+            IDictionary<string, object> expando = new ExpandoObject();
+            foreach (var property in properties)
+            {
+                var value = GetValueOrExpandoObject(@object, property);
+                expando.Add(property.Name, value);
+            }
+            return (ExpandoObject)expando;
+        }
+
+        private static object GetValueOrExpandoObject(object @object, PropertyInfo property)
+        {
+            var value = property.GetValue(@object);
+            if (value == null) return null;
+
+            var valueType = value.GetType();
+            if (valueType.IsValueType || value is string) return value;
+
+            if (value is IEnumerable enumerable) return ToExpandoCollection(enumerable);
+
+            return ToExpando(value);
+        }
+
+        private static IEnumerable<ExpandoObject> ToExpandoCollection(IEnumerable enumerable)
+        {
+            var enumerator = enumerable.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                yield return ToExpando(enumerator.Current);
+            }
         }
 
         #region ConcurrentDictionary
