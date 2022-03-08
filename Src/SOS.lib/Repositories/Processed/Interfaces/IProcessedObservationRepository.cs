@@ -230,14 +230,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
-        /// <param name="includeUnderlyingGraphInResult"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false);
+            bool sumUnderlyingTaxa = false);
 
         /// <summary>
         /// Get indication if taxa exists in specified area

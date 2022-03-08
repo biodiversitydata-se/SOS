@@ -379,8 +379,7 @@ namespace SOS.Observations.Api.Managers
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false)
+            bool sumUnderlyingTaxa = false)
         {
             try
             {
@@ -388,8 +387,7 @@ namespace SOS.Observations.Api.Managers
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, 
                     skip, 
                     take, 
-                    sumUnderlyingTaxa, 
-                    includeUnderlyingGraphInResult);
+                    sumUnderlyingTaxa);
             }
             catch (Exception e)
             {
