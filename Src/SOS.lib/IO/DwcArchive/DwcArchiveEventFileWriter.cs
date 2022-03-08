@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.IO.DwcArchive.Interfaces;
-using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
@@ -27,7 +25,6 @@ namespace SOS.Lib.IO.DwcArchive
         private readonly IDwcArchiveEventCsvWriter _dwcArchiveEventCsvWriter;
         private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
         private readonly ISimpleMultimediaCsvWriter _simpleMultimediaCsvWriter;
-        private readonly IFileService _fileService;
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DwcArchiveFileWriter> _logger;
         private readonly object _eventsLock = new object();
@@ -39,14 +36,12 @@ namespace SOS.Lib.IO.DwcArchive
         /// <param name="dwcArchiveEventCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
         /// <param name="simpleMultimediaCsvWriter"></param>
-        /// <param name="fileService"></param>
         /// <param name="dataProviderRepository"></param>
         /// <param name="logger"></param>
         public DwcArchiveEventFileWriter(IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
             IDwcArchiveEventCsvWriter dwcArchiveEventCsvWriter,
             IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             ISimpleMultimediaCsvWriter simpleMultimediaCsvWriter,
-            IFileService fileService,
             IDataProviderRepository dataProviderRepository,
             ILogger<DwcArchiveFileWriter> logger)
         {
@@ -58,7 +53,6 @@ namespace SOS.Lib.IO.DwcArchive
                                                   throw new ArgumentNullException(
                                                       nameof(extendedMeasurementOrFactCsvWriter));
             _simpleMultimediaCsvWriter = simpleMultimediaCsvWriter ?? throw new ArgumentNullException(nameof(simpleMultimediaCsvWriter));
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dataProviderRepository =
                 dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -119,7 +113,7 @@ namespace SOS.Lib.IO.DwcArchive
             var eventFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions();
 
             // Create Event CSV file
-            string eventCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Event];
+            var eventCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Event];
             var dwcObservations = nonProcessedObservationEvents.ToDarwinCore();
             await using var eventFileStream = File.AppendText(eventCsvFilePath);
             await _dwcArchiveEventCsvWriter.WriteHeaderlessEventCsvFileAsync(
@@ -128,7 +122,7 @@ namespace SOS.Lib.IO.DwcArchive
                 eventFieldDescriptions);
 
             // Create EMOF Event CSV file
-            string emofCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Emof];
+            var emofCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows(true);
             emofRows = GetNonWrittenMeasurements(emofRows, writtenEventsData.WrittenMeasurements);
             if (emofRows != null && emofRows.Any())
@@ -141,7 +135,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
 
             // Create Occurrence event CSV file - exclude event data
-            string occurrenceCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Occurrence];
+            var occurrenceCsvFilePath = eventFilePathByFilePart[DwcaEventFilePart.Occurrence];
             var dwcEventObservations = processedObservations.ToDarwinCore();
             var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreOccurrenceFieldDescriptions();
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);

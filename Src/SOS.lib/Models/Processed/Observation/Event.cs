@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Nest;
-using SOS.Lib.JsonConverters;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -19,13 +16,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Start date/time of the event in W. Europe Standard Time.
         /// </summary>
-        [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
         ///     End date/time of the event in W. Europe Standard Time.
         /// </summary>
-        [Date]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
@@ -51,7 +46,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///    DiscoveryMethod from Artportalen.
         /// </summary>
-        [Object]
         public VocabularyValue DiscoveryMethod { get; set; }
 
         /// <summary>
@@ -124,13 +118,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Multimedia associated with the event.
         /// </summary>
-        [Nested]
         public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
         ///     Measurement or facts associated with the event.
         /// </summary>
-        [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
     }
 }

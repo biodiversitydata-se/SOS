@@ -91,7 +91,7 @@ namespace SOS.Lib.Repositories
                     return await AddBatchAsync(items, mongoCollection, attempt);
                 }
 
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to add batch",e);
                 throw;
             }
         }
@@ -195,15 +195,15 @@ namespace SOS.Lib.Repositories
 
                 return true;
             }
-            catch (MongoWriteException)
+            catch (MongoWriteException e)
             {
-                // Item allready exists
+                Logger.LogError("Failed to add item", e);
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to add item", e);
+                throw;
             }
         }
 
@@ -225,8 +225,8 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to add collection", e);
+                throw;
             }
         }
 
@@ -329,9 +329,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to delete item", e);
 
-                return false;
+                throw; 
             }
         }
 
@@ -353,8 +353,8 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to delete collection", e);
+                throw;
             }
         }
 
@@ -396,9 +396,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to delete batch", e);
 
-                return false;
+                throw;
             }
         }
 
@@ -419,8 +419,8 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return default;
+                Logger.LogError("Failed to get item by id", e);
+                throw;
             }
         }
 
@@ -433,9 +433,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get many by id's", e);
 
-                return null;
+                throw;
             }
         }
 
@@ -461,9 +461,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get batch", e);
 
-                return default;
+                throw;
             }
         }
 
@@ -521,9 +521,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get batch", e);
 
-                return default;
+                throw;
             }
         }
 
@@ -549,9 +549,9 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError("Failed to get max id", e);
 
-                return default;
+                throw;
             }
         }
 
@@ -570,7 +570,7 @@ namespace SOS.Lib.Repositories
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                return default;
+                throw;
             }
         }
 
@@ -593,8 +593,8 @@ namespace SOS.Lib.Repositories
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                return false;
+                Logger.LogError("Failed to update entity", e);
+                throw;
             }
         }
     }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Nest;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Swagger;
 
@@ -44,7 +42,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     List of defects found in harvest.
         /// </summary>
-        [Object]
         [SwaggerExclude]
         public IDictionary<string, string> Defects { get; set; }
 
@@ -57,27 +54,23 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     The category of information pertaining to an event (an
         ///     action that occurs at a place and during a period of time).
         /// </summary>
-        [Object]
         public Event Event { get; set; }
 
         /// <summary>
         ///     Geological information, such as stratigraphy, that qualifies a region or place.
         /// </summary>
-        [Object]
         public GeologicalContext GeologicalContext { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to taxonomic
         ///     determinations (the assignment of a scientific name).
         /// </summary>
-        [Object]
         public Identification Identification { get; set; }
 
         /// <summary>
         ///     A spatial region or named place. For Darwin Core,
         ///     a set of terms describing a place, whether named or not.
         /// </summary>
-        [Object]
         public Location Location { get; set; }
 
         /// <summary>
@@ -88,7 +81,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     A whole organism preserved in a collection. A part of an organism isolated for some purpose.
         ///     A soil sample. A marine microbial sample.
         /// </example>
-        [Object]
         public MaterialSample MaterialSample { get; set; }
 
         /// <summary>
@@ -96,20 +88,17 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     an occurrence in nature, in a collection, or in a
         ///     dataset (specimen, observation, etc.).
         /// </summary>
-        [Object]
         public Occurrence Occurrence { get; set; }
 
         /// <summary>
         ///     A particular organism or defined group of organisms considered to be taxonomically homogeneous.
         /// </summary>
-        [Object]
         public Organism Organism { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to taxonomic names,
         ///     taxon name usages, or taxon concepts.
         /// </summary>
-        [Object]
         public Taxon Taxon { get; set; }
 
         #region Record level
@@ -123,8 +112,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         /// <remarks>
         ///     This field uses a controlled vocabulary.
-        /// </remarks>
-        [Object]
         public VocabularyValue AccessRights { get; set; }
 
         /// <summary>
@@ -137,7 +124,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue BasisOfRecord { get; set; }
 
         /// <summary>
@@ -225,7 +211,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue InstitutionCode { get; set; }
 
         /// <summary>
@@ -307,7 +292,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Type { get; set; }
 
         /// <summary>
@@ -320,13 +304,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Measurement or facts associated with the observation.
         /// </summary>
-        [Nested]
         public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
         ///     Projects from Artportalen associated with the observation.
         /// </summary>
-        [Nested]
         public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>

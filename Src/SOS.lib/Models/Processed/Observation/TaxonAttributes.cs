@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -104,13 +103,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Scientific synonym names.
         /// </summary>
-        [Nested]
         public IEnumerable<TaxonSynonymName> Synonyms { get; set; }
 
         /// <summary>
         ///     Vernacular names.
         /// </summary>
-        [Nested]
         public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
     }
 }

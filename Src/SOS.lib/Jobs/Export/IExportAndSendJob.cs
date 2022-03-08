@@ -21,7 +21,6 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="exportFormat"></param>
         /// <param name="culture"></param>
         /// <param name="flatOut"></param>
-        /// <param name="outputFieldSet"></param>
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
         /// <param name="context"></param>
@@ -37,7 +36,6 @@ namespace SOS.Lib.Jobs.Export
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             PerformContext context,

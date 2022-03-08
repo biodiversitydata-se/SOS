@@ -1,5 +1,4 @@
 ﻿using System;
-using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -73,7 +72,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         [Obsolete("Replaced by VerificationStatus")]
         public VocabularyValue ValidationStatus { get; set; }
         
@@ -84,7 +82,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue VerificationStatus { get; set; }
 
         /// <summary>
@@ -109,7 +106,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///    Method used in species determination.
         /// </summary>
-        [Object]
         public VocabularyValue DeterminationMethod { get; set; }
 
         /// <summary>

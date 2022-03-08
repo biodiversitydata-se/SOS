@@ -32,7 +32,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Continent { get; set; }
 
         /// <summary>
@@ -60,7 +59,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This field uses a controlled vocabulary.
         /// </remarks>
-        [Object]
         public VocabularyValue Country { get; set; }
 
         /// <summary>
@@ -77,7 +75,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     department, etc.) in which the Location occurs
         ///     ('län' in swedish).
         /// </summary>
-        [Object]
         public Area County { get; set; }
 
         /// <summary>
@@ -85,13 +82,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     administrative region than county (city, municipality, etc.)
         ///     in which the Location occurs.
         /// </summary>
-        [Object]
         public Area Municipality { get; set; }
 
         /// <summary>
         ///     Parish ('socken' in swedish).
         /// </summary>
-        [Object]
         public Area Parish { get; set; }
 
         /// <summary>       
@@ -100,7 +95,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     in which the Location occurs.
         ///     ('landskap' in swedish). Darwin Core term name: stateProvince.
         /// </summary>
-        [Object]
         public Area Province { get; set; }
 
         /// <summary>
@@ -265,7 +259,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     from the original to correct perceived errors or
         ///     standardize the description.
         /// </summary>
-        [Keyword]
         public string Locality { get; set; }
 
         /// <summary>
@@ -281,7 +274,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     May be a global unique identifier or an identifier
         ///     specific to the data set.
         /// </summary>
-        [Keyword]
         public string LocationId { get; set; }
 
         /// <summary>
@@ -338,25 +330,25 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Point (WGS84).
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
         ///     Point used in distance from point search.
         /// </summary>
-        [GeoPoint, SwaggerExclude]
+        [SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84).
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        [GeoShape, SwaggerExclude]
+        [SwaggerExclude]
         public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
         
         /// <summary>

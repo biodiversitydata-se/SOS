@@ -100,7 +100,6 @@ namespace SOS.Export.Managers
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             IJobCancellationToken cancellationToken)
@@ -112,10 +111,10 @@ namespace SOS.Export.Managers
 
                 fileExportResult = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, cancellationToken)
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, Guid.NewGuid().ToString(), culture, propertyLabelType, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken)
                 };
                 
                 // zend file to user
@@ -205,7 +204,6 @@ namespace SOS.Export.Managers
         private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter,
             string fileName,
             string culture,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
@@ -217,7 +215,6 @@ namespace SOS.Export.Managers
                     _exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
                     gzip,
                     cancellationToken);
@@ -278,7 +275,6 @@ namespace SOS.Export.Managers
         private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
             string fileName, 
             string culture,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             IJobCancellationToken cancellationToken)
         {
@@ -290,7 +286,6 @@ namespace SOS.Export.Managers
                     _exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
                     gzip,
                     cancellationToken);
@@ -313,7 +308,6 @@ namespace SOS.Export.Managers
             string fileName, 
             string culture, 
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             IJobCancellationToken cancellationToken)
@@ -327,7 +321,6 @@ namespace SOS.Export.Managers
                    fileName,
                    culture,
                    flatOut,
-                   outputFieldSet, 
                    propertyLabelType, 
                    excludeNullValues,
                    gzip,

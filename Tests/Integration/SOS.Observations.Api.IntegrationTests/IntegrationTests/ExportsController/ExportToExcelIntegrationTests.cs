@@ -33,7 +33,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto
             {
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Geographics = new GeographicsFilterDto
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Extended, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter,  PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 ProjectIds = new List<int> {2976},
                 Date = new DateFilterDto()
@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.AllWithValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto
             {
                 DataProvider = new DataProviderFilterDto()
                 {
@@ -130,8 +130,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadExcel(
-                searchFilter, 
-                OutputFieldSet.AllWithValues, 
+                searchFilter,
                 PropertyLabelType.Swedish, 
                 "sv-SE", 
                 false);                
@@ -159,7 +158,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var geometry = feature.Geometry;
             var geoShape = geometry.ToGeoShape();
 
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto
             {
                 Geographics = new GeographicsFilterDto
                 {
@@ -178,7 +177,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter,  PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------

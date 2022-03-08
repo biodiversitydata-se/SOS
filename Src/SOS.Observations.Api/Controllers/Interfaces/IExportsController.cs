@@ -26,8 +26,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadCsv(
-            [FromBody] ExportFilterDto filter,
-            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true);
@@ -37,7 +36,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<IActionResult> DownloadDwC(ExportFilterDto filter);
+        Task<IActionResult> DownloadDwC(SearchFilterDto filter);
 
         /// <summary>
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
@@ -48,8 +47,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadExcel(ExportFilterDto filter,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
+        Task<IActionResult> DownloadExcel(SearchFilterDto filter,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE",
             bool gzip = true);
@@ -65,8 +63,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
-        Task<IActionResult> DownloadGeoJson(ExportFilterDto filter,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
+        Task<IActionResult> DownloadGeoJson(SearchFilterDto filter,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
@@ -85,9 +82,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderCsv(ExportFilterDto filter,
+        Task<IActionResult> OrderCsv(SearchFilterDto filter,
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE");
 
@@ -100,7 +96,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderDwC(ExportFilterDto filter, string description);
+        Task<IActionResult> OrderDwC(SearchFilterDto filter, string description);
 
         /// <summary>
         /// Starts the process of creating a Excel file with observations based on provided filter.
@@ -114,9 +110,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderExcel(ExportFilterDto filter, 
+        Task<IActionResult> OrderExcel(SearchFilterDto filter, 
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum, 
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
@@ -134,9 +129,8 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
         /// <param name="excludeNullValues">Exclude properties with null values.</param>
         /// <returns></returns>
-        Task<IActionResult> OrderGeoJson(ExportFilterDto filter,
+        Task<IActionResult> OrderGeoJson(SearchFilterDto filter,
             string description,
-            OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,

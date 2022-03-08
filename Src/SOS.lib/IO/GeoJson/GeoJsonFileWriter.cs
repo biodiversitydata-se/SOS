@@ -56,7 +56,6 @@ namespace SOS.Lib.IO.GeoJson
             string fileName,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             bool gzip,
@@ -66,8 +65,12 @@ namespace SOS.Lib.IO.GeoJson
 
             try
             {
-                int nrObservations = 0;
-                var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[outputFieldSet];
+                var nrObservations = 0;
+                var propertyFields = filter.OutputFields?.Any() ?? false ?
+                    ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath
+                        .Where(f => filter.OutputFields.Contains(f.Key))
+                        .Select(f => f.Value) :
+                    ObservationPropertyFieldDescriptionHelper.AllFields;
                 JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
@@ -169,7 +172,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             IDictionary<string, object> record,
             bool excludeNullValues,
             Utf8JsonWriter jsonWriter,
@@ -183,7 +186,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             Observation observation,
             bool excludeNullValues,
             Utf8JsonWriter jsonWriter,
@@ -197,7 +200,7 @@ namespace SOS.Lib.IO.GeoJson
         }
 
         private async Task WriteFeature(
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             FlatObservation flatObservation,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
@@ -267,7 +270,7 @@ namespace SOS.Lib.IO.GeoJson
 
         private AttributesTable GetFeatureAttributesTable(
             Observation observation,
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             bool excludeNullValues)
         {
             var attributesTable = new AttributesTable();
@@ -277,7 +280,7 @@ namespace SOS.Lib.IO.GeoJson
 
         private AttributesTable GetFeatureAttributesTable(
             FlatObservation flatObservation,
-            List<PropertyFieldDescription> propertyFields,
+            IEnumerable<PropertyFieldDescription> propertyFields,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues)
         {

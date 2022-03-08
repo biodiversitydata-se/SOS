@@ -42,7 +42,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var geometry = feature.Geometry;
             var geoShape = geometry.ToGeoShape();
 
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
@@ -58,7 +58,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.AllWithValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             var geometry = feature.Geometry;
             var geoShape = geometry.ToGeoShape();
 
-            ExportFilterDto searchFilter = new ExportFilterDto
+            var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
@@ -100,7 +100,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -127,12 +127,12 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
                 PropertyNameCaseInsensitive = true,
                 Converters = { new GeoShapeConverter(), new GeoLocationConverter(), new JsonStringEnumConverter() }
             };
-            var searchFilter = JsonSerializer.Deserialize<ExportFilterDto>(str, jsonSerializerOptions);
+            var searchFilter = JsonSerializer.Deserialize<SearchFilterDto>(str, jsonSerializerOptions);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, OutputFieldSet.AllWithValues, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------

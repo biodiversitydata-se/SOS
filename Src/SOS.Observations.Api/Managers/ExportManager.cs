@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -46,8 +47,7 @@ namespace SOS.Observations.Api.Managers
         private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter, 
             string exportPath,
             string fileName, 
-            string culture, 
-            OutputFieldSet outputFieldSet, 
+            string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
             IJobCancellationToken cancellationToken)
@@ -59,7 +59,6 @@ namespace SOS.Observations.Api.Managers
                     exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
                     gzip,
                     cancellationToken);
@@ -92,7 +91,14 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
-                var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
+                var propertyFields = filter.OutputFields?.Any() ?? false ?
+                    ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath
+                        .Where(f => filter.OutputFields.Contains(f.Key))
+                        .Select(f => f.Value) :
+                    ObservationPropertyFieldDescriptionHelper.AllFields;
+                var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
+                    Where(fd => propertyFields.Select(pf => pf.DwcIdentifier.ToLower()).Contains(fd.DwcIdentifier.ToLower()));
+               
                 var fileExportResult = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
@@ -128,13 +134,11 @@ namespace SOS.Observations.Api.Managers
         /// <param name="propertyLabelType"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
         private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter, 
             string exportPath, 
             string fileName, 
-            string culture, 
-            OutputFieldSet outputFieldSet, 
+            string culture,
             PropertyLabelType propertyLabelType,
             bool gzip,
             IJobCancellationToken cancellationToken)
@@ -146,7 +150,6 @@ namespace SOS.Observations.Api.Managers
                     exportPath,
                     fileName,
                     culture,
-                    outputFieldSet,
                     propertyLabelType,
                     gzip,
                     cancellationToken);
@@ -177,14 +180,12 @@ namespace SOS.Observations.Api.Managers
         /// <param name="excludeNullValues"></param>
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
         private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter, 
             string exportPath, 
             string fileName, 
             string culture, 
-            bool flatOut, 
-            OutputFieldSet outputFieldSet,
+            bool flatOut,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             bool gzip,
@@ -198,7 +199,6 @@ namespace SOS.Observations.Api.Managers
                    fileName,
                    culture,
                    flatOut,
-                   outputFieldSet, 
                    propertyLabelType, 
                    excludeNullValues,
                    gzip,
@@ -262,7 +262,6 @@ namespace SOS.Observations.Api.Managers
             string exportPath,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             bool gzip,
@@ -274,10 +273,10 @@ namespace SOS.Observations.Api.Managers
 
                 var fileExportResult = exportFormat switch
                 {
-                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, gzip, cancellationToken),
+                    ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
                     ExportFormat.DwC => await CreateDWCExportAsync(filter, exportPath, Guid.NewGuid().ToString(), cancellationToken),
-                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, outputFieldSet, propertyLabelType, gzip, cancellationToken),
-                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, outputFieldSet, propertyLabelType, excludeNullValues, gzip, cancellationToken)
+                    ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, propertyLabelType, gzip, cancellationToken),
+                    ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, Guid.NewGuid().ToString(), culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken)
                 };
                 
                 return fileExportResult;

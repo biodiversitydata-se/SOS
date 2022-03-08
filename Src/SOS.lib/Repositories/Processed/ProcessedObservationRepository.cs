@@ -39,7 +39,7 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessedObservationRepository : ProcessRepositoryBase<Observation, string>,
         IProcessedObservationRepository
-    {                
+    {
         private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
@@ -78,9 +78,418 @@ namespace SOS.Lib.Repositories.Processed
                     .AutoMap()
                     .Properties(ps => ps
                         .Keyword(kw => kw
+                            .Name(nm => nm.BibliographicCitation)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.CollectionId)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.CollectionCode)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.DataGeneralizations)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.DatasetId)
+                        )
+                        .Keyword(kw => kw
                             .Name(nm => nm.DatasetName)
                         )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.InstitutionId)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.Language)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.License)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.OwnerInstitutionCode)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.PrivateCollection)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.PublicCollection)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.References)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.RightsHolder)
+                        )
+                        .Keyword(kw => kw
+                            .Name(nm => nm.SpeciesCollectionLabel)
+                        )
+                        .Nested<ExtendedMeasurementOrFact>(n => n
+                            .Name(nm => nm.MeasurementOrFacts)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementAccuracy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementDeterminedBy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementDeterminedDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementID)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementMethod)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementRemarks)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementType)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementTypeID)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementUnit)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementUnitID)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementValue)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MeasurementValueID)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OccurrenceID)
+                                )
+                            )
+                        )
+                        .Nested<Project>(n => n
+                            .AutoMap()
+                            .Name(nm => nm.Projects)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Category)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.CategorySwedish)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Name)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Owner)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ProjectURL)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SurveyMethod)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SurveyMethodUrl)
+                                )
+                                .Nested<ProjectParameter>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.ProjectParameters)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.DataType)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Name)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Unit)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        .Object<VocabularyValue>(c => c
+                            .Name(nm => nm.AccessRights)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Value)
+                                )
+                                .Number(nr => nr
+                                    .Name(nm => nm.Id)
+                                    .Type(NumberType.Integer)
+                                )
+                            )
+                        )
+                        .Object<ArtportalenInternal>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.ArtportalenInternal)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LocationExternalId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LocationPresentationNameParishRegion)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ParentLocality)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ReportedByUserAlias)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SightingBarcodeURL)
+                                )
+                                .Nested<UserInternal>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.OccurrenceRecordedByInternal)
+                                )
+                                .Nested<UserInternal>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.OccurrenceVerifiedByInternal)
+                                )
+                            )
+                        )
+                        .Object<VocabularyValue>(c => c
+                            .Name(nm => nm.BasisOfRecord)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Value)
+                                )
+                                .Number(nr => nr
+                                    .Name(nm => nm.Id)
+                                    .Type(NumberType.Integer)
+                                )
+                            )
+                        )
+                        .Object<DataQuality>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.DataQuality)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.UniqueKey)
+                                )
+                            )
+                        )
+                        .Object<IDictionary<string, string>>(c => c
+                            .AutoMap()
+                            .Name(nm => nm.Defects)
+                        )
+                        .Object<Event>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Event)
+                            .Properties(ps => ps
+                                .Date(d => d
+                                    .Name(nm => nm.EndDate)
+                                )
+                                .Date(d => d
+                                    .Name(nm => nm.StartDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EventId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EventRemarks)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.FieldNumber)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ParentEventId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.PlainEndDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.PlainEndTime)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.PlainStartDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.PlainStartTime)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SampleSizeUnit)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SampleSizeValue)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SamplingEffort)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SamplingProtocol)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimEventDate)
+                                )
+                                .Nested<Multimedia>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.Media)
+                                )
+                                .Nested<ExtendedMeasurementOrFact>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.MeasurementOrFacts)
+                                )
+                                .Object<VocabularyValue>(t => t
+                                    .Name(nm => nm.DiscoveryMethod)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        .Object<GeologicalContext>(c => c
+                            .Name(nm => nm.GeologicalContext)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Bed)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestAgeOrLowestStage)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestEonOrLowestEonothem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestEpochOrLowestSeries)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestEraOrLowestErathem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestGeochronologicalEra)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.EarliestPeriodOrLowestSystem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Formation)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeologicalContextId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Group)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.HighestBiostratigraphicZone)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestAgeOrHighestStage)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestEonOrHighestEonothem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestEpochOrHighestSeries)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestEraOrHighestErathem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestGeochronologicalEra)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LatestPeriodOrHighestSystem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LithostratigraphicTerms)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LowestBiostratigraphicZone)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Member)
+                                )
+                            )
+                        )
+                        .Object<Identification>(c => c
+                            .AutoMap()
+                            .Name(nm => nm.Identification)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ConfirmedBy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ConfirmedDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.DateIdentified)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IdentificationId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IdentificationQualifier)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IdentificationReferences)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IdentifiedBy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerifiedBy)
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.DeterminationMethod)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.ValidationStatus)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.VerificationStatus)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        .Object<VocabularyValue>(c => c
+                            .Name(nm => nm.InstitutionCode)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Value)
+                                )
+                                .Number(nr => nr
+                                    .Name(nm => nm.Id)
+                                    .Type(NumberType.Integer)
+                                )
+                            )
+                        )
                         .Object<Location>(l => l
+                            .AutoMap()
                             .Name(nm => nm.Location)
                             .Properties(ps => ps
                                 .GeoShape(gs => gs
@@ -95,7 +504,101 @@ namespace SOS.Lib.Repositories.Processed
                                 .GeoShape(gs => gs
                                     .Name(nn => nn.PointWithDisturbanceBuffer)
                                 )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.CountryCode)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.FootprintSRS)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeodeticDatum)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeoreferencedBy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeoreferencedDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeoreferenceProtocol)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeoreferenceSources)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.GeoreferenceVerificationStatus)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.HigherGeography)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.HigherGeographyId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Island)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IslandGroup)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LocationAccordingTo)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LocationId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimCoordinates)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimCoordinateSystem)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimDepth)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimElevation)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimLatitude)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimLocality)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimLongitude)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimSRS)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.WaterBody)
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Continent)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Country)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
                                 .Object<Area>(c => c
+                                    .AutoMap()
                                     .Name(nm => nm.County)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
@@ -104,6 +607,7 @@ namespace SOS.Lib.Repositories.Processed
                                     )
                                 )
                                 .Object<Area>(c => c
+                                    .AutoMap()
                                     .Name(nm => nm.Municipality)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
@@ -112,6 +616,7 @@ namespace SOS.Lib.Repositories.Processed
                                     )
                                 )
                                 .Object<Area>(c => c
+                                    .AutoMap()
                                     .Name(nm => nm.Parish)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
@@ -120,6 +625,7 @@ namespace SOS.Lib.Repositories.Processed
                                     )
                                 )
                                 .Object<Area>(c => c
+                                    .AutoMap()
                                     .Name(nm => nm.Province)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
@@ -127,13 +633,115 @@ namespace SOS.Lib.Repositories.Processed
                                         )
                                     )
                                 )
+                                .Wildcard(wc => wc
+                                    .Name(nm => nm.Locality)
+                                )
                             )
                         )
+                        .Object<MaterialSample>(c => c
+                            .AutoMap()
+                            .Name(nm => nm.MaterialSample)
+                        )
                         .Object<Occurrence>(t => t
+                            .AutoMap()
                             .Name(nm => nm.Occurrence)
                             .Properties(ps => ps
+                                .Date(d => d
+                                    .Name(nm => nm.ReportedDate)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.CatalogNumber)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Disposition)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.IndividualCount)
+                                )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OccurrenceId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OccurrenceStatus)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OrganismQuantity)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OtherCatalogNumbers)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.RecordNumber)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ReportedBy)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Url)
+                                )
+                                .Nested<Multimedia>(n => n
+                                    .AutoMap()
+                                    .Name(nm => nm.Media)
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Activity)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Behavior)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Biotope)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.EstablishmentMeans)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.LifeStage)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.OccurrenceStatus)
@@ -141,16 +749,169 @@ namespace SOS.Lib.Repositories.Processed
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Value)
                                         )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.ReproductiveCondition)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.Sex)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<Substrate>(c => c
+                                    .AutoMap()
+                                    .Name(nm => nm.Substrate)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.SpeciesScientificName)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.SpeciesVernacularName)
+                                        )
+                                        .Object<VocabularyValue>(c => c
+                                            .Name(nm => nm.Name)
+                                            .Properties(ps => ps
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Value)
+                                                )
+                                                .Number(nr => nr
+                                                    .Name(nm => nm.Id)
+                                                    .Type(NumberType.Integer)
+                                                )
+                                            )
+                                        )
                                     )
                                 )
                             )
                         )
+                        .Object<Organism>(c => c
+                            .AutoMap()
+                            .Name(nm => nm.Organism)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.AssociatedOrganisms)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OrganismId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OrganismName)
+                                )
+                            )
+                        )
                         .Object<Taxon>(t => t
+                            .AutoMap()
                             .Name(nm => nm.Taxon)
                             .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.AcceptedNameUsage)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.AcceptedNameUsageId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Family)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Genus)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.HigherClassification)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.InfraspecificEpithet)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Kingdom)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.NameAccordingTo)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.NameAccordingToId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.NamePublishedIn)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.NamePublishedInId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.NamePublishedInYear)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OriginalNameUsage)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.OriginalNameUsageId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ParentNameUsage)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ParentNameUsageId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Phylum)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ScientificName)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ScientificNameAuthorship)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.ScientificNameId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.SpecificEpithet)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Subgenus)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.TaxonConceptId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.TaxonomicStatus)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.TaxonRank)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VerbatimId)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.VernacularName)
+                                )
                                 .Object<TaxonAttributes>(c => c
+                                    .AutoMap()
                                     .Name(nm => nm.Attributes)
                                     .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.ActionPlan)
+                                        )
                                         .Keyword(kw => kw
                                             .Name(nm => nm.OrganismGroup)
                                         )
@@ -158,9 +919,82 @@ namespace SOS.Lib.Repositories.Processed
                                             .Name(nm => nm.RedlistCategory)
                                         )
                                         .Keyword(kw => kw
+                                            .Name(nm => nm.SwedishOccurrence)
+                                        )
+                                        .Keyword(kw => kw
                                             .Name(nm => nm.SwedishHistory)
                                         )
+                                        .Nested<TaxonSynonymName>(n => n
+                                            .Name(nm => nm.Synonyms)
+                                            .Properties(ps => ps
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Author)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Name)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.NomenclaturalStatus)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.TaxonomicStatus)
+                                                )
+                                            )
+                                        )
+                                        .Nested<TaxonVernacularName>(n => n
+                                            .Name(nm => nm.VernacularNames)
+                                            .Properties(ps => ps
+                                                .Boolean(b => b
+                                                    .Name(nm => nm.IsPreferredName)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.CountryCode)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Name)
+                                                )
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Language)
+                                                )
+                                            )
+                                        )
+                                        .Object<VocabularyValue>(c => c
+                                            .Name(nm => nm.ProtectionLevel)
+                                            .Properties(ps => ps
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Value)
+                                                )
+                                                .Number(nr => nr
+                                                    .Name(nm => nm.Id)
+                                                    .Type(NumberType.Integer)
+                                                )
+                                            )
+                                        )
+                                        .Object<VocabularyValue>(c => c
+                                            .Name(nm => nm.SensitivityCategory)
+                                            .Properties(ps => ps
+                                                .Keyword(kw => kw
+                                                    .Name(nm => nm.Value)
+                                                )
+                                                .Number(nr => nr
+                                                    .Name(nm => nm.Id)
+                                                    .Type(NumberType.Integer)
+                                                )
+                                            )
+                                        )
                                     )
+                                )
+                            )
+                        )
+                        .Object<VocabularyValue>(c => c
+                            .Name(nm => nm.Type)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Value)
+                                )
+                                .Number(nr => nr
+                                    .Name(nm => nm.Id)
+                                    .Type(NumberType.Integer)
                                 )
                             )
                         )
@@ -251,13 +1085,13 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, 
+        private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>,
             ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(SearchFilterBase filter)
         {
             var query = filter.ToQuery();
             var excludeQuery = filter.ToExcludeQuery();
 
-            return new Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, 
+            return new Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>,
                 ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>>(query, excludeQuery);
         }
 
@@ -547,7 +1381,7 @@ namespace SOS.Lib.Repositories.Processed
             LiveMode = true;
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));            
+            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             WriteBatchSize = elasticConfiguration.WriteBatchSize;
@@ -888,7 +1722,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Sort(sort => sortDescriptor)
             );
-            
+
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
@@ -1080,13 +1914,13 @@ namespace SOS.Lib.Repositories.Processed
                 SearchFilter filter,
                 int precision)
         {
-           
+
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-           
+
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Size(0)
@@ -1161,7 +1995,7 @@ namespace SOS.Lib.Repositories.Processed
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-           
+
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Size(0)
@@ -1237,7 +2071,7 @@ namespace SOS.Lib.Repositories.Processed
             using var operation =
                 _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_MetricGridAggregation");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-           
+
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Size(0)
@@ -1267,7 +2101,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Aggregations(a => a
                             .Cardinality("taxa_count", c => c
                                 .Field("taxon.id")
-                            ) 
+                            )
                         )
                     )
                 )
@@ -1290,13 +2124,13 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             _telemetry.StopOperation(operation);
-            
+
             var gridResult = new GeoGridMetricResult()
             {
                 BoundingBox = filter.Location.Geometries.BoundingBox,
                 GridCellSizeInMeters = gridCellSizeInMeters,
                 GridCellCount = nrOfGridCells,
-                GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b => 
+                GridCells = searchResponse.Aggregations.Composite("gridCells").Buckets.Select(b =>
                     new GridCell
                     {
                         Sweref99TmBoundingBox = new XYBoundingBox
@@ -1425,7 +2259,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");            
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Get");
 
             operation.Telemetry.Properties["OccurrenceId"] = occurrenceId;
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -1509,7 +2343,7 @@ namespace SOS.Lib.Repositories.Processed
 
         public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
             SearchFilter filter,
-            int take, 
+            int take,
             string sortBy,
             SearchSortOrder sortOrder,
             string scrollId)
@@ -1639,7 +2473,7 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             var defaultGeoBounds = new GeoBounds
-                { BottomRight = new LatLon() { Lat = 0.0, Lon = 0.0 }, TopLeft = new LatLon() { Lat = 0.0, Lon = 0.0 } };
+            { BottomRight = new LatLon() { Lat = 0.0, Lon = 0.0 }, TopLeft = new LatLon() { Lat = 0.0, Lon = 0.0 } };
             if (!res.IsValid)
             {
                 return (null, null, defaultGeoBounds);
@@ -1696,9 +2530,9 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            Dictionary<int,int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
+            Dictionary<int, int> observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
                 indexName,
-                query, 
+                query,
                 excludeQuery);
 
             // Update skip and take
@@ -1981,7 +2815,7 @@ namespace SOS.Lib.Repositories.Processed
                 searchResponse = await Client
                     .SearchAsync<dynamic>(s => s
                         .Index(indexNames)
-                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))                        
+                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                         .Query(q => q
                             .Bool(b => b
                                 .Filter(query)
@@ -2023,7 +2857,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
-            
+
             var searchResponse = await Client.CountAsync<dynamic>(s => s
                 .Index(ProtectedIndexName)
                 .Query(q => q

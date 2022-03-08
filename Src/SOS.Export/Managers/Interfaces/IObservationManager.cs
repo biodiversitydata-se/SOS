@@ -22,14 +22,12 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="propertyLabelType"></param>
         /// <param name="excludeNullValues"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="outputFieldSet"></param>
         /// <returns></returns>
         Task<bool> ExportAndSendAsync(SearchFilter filter, string emailAddress,
             string description,
             ExportFormat exportFormat,
             string culture,
             bool flatOut,
-            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType,
             bool excludeNullValues,
             IJobCancellationToken cancellationToken);
