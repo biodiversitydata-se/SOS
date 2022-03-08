@@ -18,6 +18,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -87,6 +88,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>());
             }
             else
@@ -225,6 +227,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(),  
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());

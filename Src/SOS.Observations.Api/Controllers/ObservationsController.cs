@@ -1632,6 +1632,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sumUnderlyingTaxa">If true, the observation count will be the sum of all underlying taxa observation count, otherwise it will be the count for the specific taxon.</param>
+        /// <param name="includeUnderlyingGraphInResult">If sumUnderlyingTaxa is true, and this parameter is set to true alla underlying taxa to the specified taxa will be included in the result.</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1647,7 +1649,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int? take = null,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sumUnderlyingTaxa = false,
+            [FromQuery] bool includeUnderlyingGraphInResult = false)
         {
             try
             {
@@ -1668,7 +1672,14 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take);
+                var result = await ObservationManager.GetTaxonAggregationAsync(roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), 
+                    skip, 
+                    take, 
+                    sumUnderlyingTaxa,
+                    includeUnderlyingGraphInResult);
+
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);

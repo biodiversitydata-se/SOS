@@ -157,7 +157,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(processClient);
             var taxonManager = CreateTaxonManager(processClient, memoryCache);
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
 
@@ -192,7 +192,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache);
+            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
             {
@@ -299,7 +299,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             IProcessClient processClient,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            ITaxonManager taxonManager)
         {
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
@@ -309,6 +310,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processedConfigurationCache,
                 new TelemetryClient(),
                 new HttpContextAccessor(),
+                taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }

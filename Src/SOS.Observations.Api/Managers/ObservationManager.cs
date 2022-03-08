@@ -378,12 +378,18 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int? skip,
-            int? take)
+            int? take,
+            bool sumUnderlyingTaxa = false,
+            bool includeUnderlyingGraphInResult = false)
         {
             try
             {
                 await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, skip, take);
+                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, 
+                    skip, 
+                    take, 
+                    sumUnderlyingTaxa, 
+                    includeUnderlyingGraphInResult);
             }
             catch (Exception e)
             {
