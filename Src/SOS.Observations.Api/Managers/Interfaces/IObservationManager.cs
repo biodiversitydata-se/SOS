@@ -176,7 +176,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
-        /// <param name="includeUnderlyingGraphInResult"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             int? roleId,
@@ -184,8 +183,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false);
+            bool sumUnderlyingTaxa = false);
 
         /// <summary>
         /// Get a indication if taxon exist in specified area

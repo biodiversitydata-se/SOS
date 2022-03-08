@@ -242,8 +242,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false);
+            bool sumUnderlyingTaxa = false);
 
         /// <summary>
         /// Get indication if taxa exists in specified area
