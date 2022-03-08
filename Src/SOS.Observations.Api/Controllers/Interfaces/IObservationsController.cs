@@ -144,7 +144,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false,
             bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false);        
+            bool includeUnderlyingTaxaInResult = false);        
 
         Task<IActionResult> TaxonExistsIndicationInternal(
             int? roleId,
