@@ -270,23 +270,23 @@ namespace SOS.Lib.Extensions
             query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
 
             //search by locationId, but include child-locations observations aswell
-
             var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
             if (siteTerms?.Any() ?? false)
             {
                 
                 query.Add(q => q
                     .Bool(p=>p
-                        .Should(
-                            s=>s
-                            .Terms(t=> t
-                                .Field("location.locationId")
+                        .Should(s => s
+                            .Terms(t => t
+                                .Field("location.locationId.keyword")
                                 .Terms(siteTerms)),
-                            s =>s
+                            s => s
                             .Terms(t => t
                                 .Field("artportalenInternal.parentLocationId")
                                 .Terms(internalFilter.SiteIds))
-                             )));
+                             )
+                        )
+                    );
             }
 
             if (internalFilter.SpeciesFactsIds?.Any() ?? false)
