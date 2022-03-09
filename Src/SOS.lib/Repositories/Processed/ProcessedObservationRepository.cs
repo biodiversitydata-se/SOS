@@ -2565,13 +2565,12 @@ namespace SOS.Lib.Repositories.Processed
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false,
-            bool includeUnderlyingGraphInResult = false)
+            bool sumUnderlyingTaxa = false)
         {
             Dictionary<int, int> observationCountByTaxonId = null;
             if (sumUnderlyingTaxa)
             {
-                observationCountByTaxonId = await GetTaxonAggregationSumAsync(filter, includeUnderlyingGraphInResult);
+                observationCountByTaxonId = await GetTaxonAggregationSumAsync(filter);
             }
             else
             {
@@ -2628,7 +2627,7 @@ namespace SOS.Lib.Repositories.Processed
             return observationCountByTaxonId;
         }
 
-        private async Task<Dictionary<int, int>> GetTaxonAggregationSumAsync(SearchFilter filter, bool includeUnderlyingGraphInResult = false)
+        private async Task<Dictionary<int, int>> GetTaxonAggregationSumAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
             Dictionary<int, int> observationCountByTaxonId = null;
@@ -2649,9 +2648,14 @@ namespace SOS.Lib.Repositories.Processed
                     query,
                     excludeQuery);
                 
-                if (filter.Taxa?.Ids != null && filter.Taxa.Ids.Any())
+                if (filter.Taxa.IncludeUnderlyingTaxa && (filter.Taxa.Ids == null || !filter.Taxa.Ids.Any()))
                 {
-                    IEnumerable<int> taxonIds = includeUnderlyingGraphInResult ?
+                    filter.Taxa.Ids = new int[] { 0 }; // Add Biota if IncludeUnderlyingTaxa and there are no Taxon Ids.
+                }
+
+                if (filter.Taxa.Ids != null && filter.Taxa.Ids.Any())
+                {
+                    IEnumerable<int> taxonIds = filter.Taxa.IncludeUnderlyingTaxa ?
                         _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa.Ids, true) : filter.Taxa.Ids;
 
                     foreach (var taxonId in taxonIds)

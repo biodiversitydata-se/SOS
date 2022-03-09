@@ -195,7 +195,10 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
             {
-                Taxon = new TaxonFilterDto() { Ids = new int[] { 0 } } // Biota                
+                Taxon = new TaxonFilterDto() { 
+                    Ids = new int[] { 0 }, // Biota
+                    IncludeUnderlyingTaxa = true
+                } 
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -203,13 +206,12 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
                 null, 
-                searchFilter, 
+                searchFilter,
                 null, 
                 null, 
                 false, 
                 "sv-SE", 
                 false, 
-                true,
                 true);
             var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
 
