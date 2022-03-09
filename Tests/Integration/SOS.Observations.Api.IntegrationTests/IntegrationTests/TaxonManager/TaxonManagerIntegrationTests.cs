@@ -4,6 +4,7 @@ using Xunit;
 using SOS.Observations.Api.IntegrationTests.Utils;
 using SOS.Lib.Helpers;
 using System.Collections.Generic;
+using SOS.Lib.Models.TaxonTree;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
 {
@@ -32,25 +33,25 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             taxonTree.Root.ScientificName.Should().Be("Biota");
         }
 
-        [Fact]
-        [Trait("Category", "ApiIntegrationTest")]
-        public void Test_topological_sort()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+        //[Fact]
+        //[Trait("Category", "ApiIntegrationTest")]
+        //public void Test_topological_sort()
+        //{
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Arrange
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var taxonTree = _fixture.TaxonManager.TaxonTree;            
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            taxonTree.CreateTopologicalSort();
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Act
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var topoSort = taxonTree.CreateTopologicalSort();
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            taxonTree.Root.ScientificName.Should().Be("Biota");
-        }
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Assert
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    taxonTree.Root.ScientificName.Should().Be("Biota");
+        //}
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
@@ -59,7 +60,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = _fixture.TaxonManager.TaxonTree;            
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -123,6 +124,6 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             strMermaid.Should().NotBeNullOrEmpty();
-        }
+        }        
     }
 }

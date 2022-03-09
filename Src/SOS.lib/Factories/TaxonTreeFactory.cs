@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using QuikGraph;
+using QuikGraph.Algorithms;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
@@ -24,6 +27,8 @@ namespace SOS.Lib.Factories
             var treeNodeById = CreateTaxonTreeNodeDictionary(taxonById);
             treeNodeById.TryGetValue(BiotaTaxonId, out var rootNode);
             var tree = new TaxonTree<IBasicTaxon>(rootNode, treeNodeById);
+            RemoveIllegalRelations(tree); // Temporary fix.
+            tree.ReverseTopologicalSortById = CreateReverseTopologicalSort(treeNodeById.Values);
             return tree;
         }
 
@@ -100,6 +105,80 @@ namespace SOS.Lib.Factories
             }
 
             return treeNodeById;
+        }
+
+        /// <summary>
+        /// Create a reverse topological sort for the taxon tree nodes.
+        /// </summary>
+        /// <returns>A dictionary with TaxonId as key and reverse topological index as value.</returns>
+        private static Dictionary<int, int> CreateReverseTopologicalSort(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
+        {
+            try
+            {
+                var graph = CreateAdjencyGraph(treeNodes);
+                var topoSortByTaxonId = graph
+                    .TopologicalSort()
+                    .Reverse()
+                    .Select((Value, Index) => new { Value, Index })
+                    .ToDictionary(m => m.Value, m => m.Index);
+
+                return topoSortByTaxonId;
+            }
+            catch (Exception ex) 
+            {
+                // Temporary catch exceptions as long as the graph isn't a directed acyclic graph (DAG)
+                return new Dictionary<int, int>();
+            }
+        }
+
+        private static AdjacencyGraph<int, Edge<int>> CreateAdjencyGraph(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
+        {
+            var graph = new AdjacencyGraph<int, Edge<int>>(true);
+            foreach (var treeNode in treeNodes)
+            {
+                graph.AddVertex(treeNode.TaxonId);
+            }
+
+            foreach (var treeNode in treeNodes)
+            {
+                if (treeNode.Parent != null)
+                {
+                    graph.AddEdge(new Edge<int>(treeNode.Parent.TaxonId, treeNode.TaxonId));
+                }
+
+                if (treeNode.SecondaryParents != null && treeNode.SecondaryParents.Count > 0)
+                {
+                    foreach (var parent in treeNode.SecondaryParents)
+                    {
+                        graph.AddEdge(new Edge<int>(parent.TaxonId, treeNode.TaxonId));
+                    }
+                }
+            }
+
+            return graph;
+        }
+
+        private static void RemoveIllegalRelations<T>(TaxonTree<T> tree)
+        {
+            // Temporary fix.
+            try
+            {
+                var taxon_2002715 = tree.GetTreeNode(2002715);
+                var taxon_222474 = tree.GetTreeNode(222474);
+                var taxon_221107 = tree.GetTreeNode(221107);
+
+                if (taxon_2002715 != null && taxon_222474 != null && taxon_221107 != null)
+                {
+                    taxon_2002715.SecondaryParents.Remove(taxon_222474);
+                    taxon_2002715.SecondaryParents.Remove(taxon_221107);
+                    taxon_222474.SecondaryChildren.Remove(taxon_2002715);
+                    taxon_221107.SecondaryChildren.Remove(taxon_2002715);
+                }
+            }
+            catch
+            {
+
+            }
         }
     }
 }

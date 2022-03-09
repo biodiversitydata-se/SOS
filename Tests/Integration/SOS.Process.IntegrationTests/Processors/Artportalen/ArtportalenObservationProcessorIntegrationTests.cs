@@ -17,6 +17,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -101,6 +102,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
                     new ElasticSearchConfiguration(), 
                     new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                    new Mock<ITaxonManager>().Object,
                     new NullLogger<ProcessedObservationRepository>());
             }
             else

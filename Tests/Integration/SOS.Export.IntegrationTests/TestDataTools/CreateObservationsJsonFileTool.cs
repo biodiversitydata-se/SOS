@@ -10,6 +10,7 @@ using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
@@ -43,6 +44,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 exportClient,
                 new ElasticSearchConfiguration(),
                 new ClassCache<ProcessedConfiguration>(new MemoryCache(new MemoryCacheOptions())),
+                new Mock<ITaxonManager>().Object,
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

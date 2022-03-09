@@ -1,6 +1,4 @@
-﻿using QuikGraph;
-using QuikGraph.Algorithms;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SOS.Lib.Models.TaxonTree
@@ -32,6 +30,11 @@ namespace SOS.Lib.Models.TaxonTree
         public Dictionary<int, TaxonTreeNode<T>> TreeNodeById { get; set; }
 
         /// <summary>
+        /// Topological sort in reverse order, bottom-up. Key is TaxonId.
+        /// </summary>
+        public Dictionary<int, int> ReverseTopologicalSortById { get; set; }
+
+        /// <summary>
         /// Get tree nodes for the given taxon ids.
         /// </summary>
         /// <param name="taxonIds">Taxon ids.</param>
@@ -48,6 +51,21 @@ namespace SOS.Lib.Models.TaxonTree
             }
 
             return taxonTreeNodes;
+        }
+
+        /// <summary>
+        /// Get tree node.
+        /// </summary>
+        /// <param name="taxonId">Taxon id.</param>
+        /// <returns></returns>
+        public TaxonTreeNode<T> GetTreeNode(int taxonId)
+        {            
+            if (TreeNodeById.TryGetValue(taxonId, out var treeNode))
+            {
+                return treeNode;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -83,44 +101,6 @@ namespace SOS.Lib.Models.TaxonTree
         public IEnumerable<int> GetUnderlyingTaxonIds(int taxonId, bool returnSelfs)
         {
             return GetUnderlyingTaxonIds(new[] { taxonId }, returnSelfs);
-        }
-
-        /// <summary>
-        /// Create a topological sort for the taxon tree nodes.
-        /// </summary>
-        /// <returns>A list with TaxonIds topological sorted.</returns>
-        public List<int> CreateTopologicalSort()
-        {
-            var graph = CreateAdjencyGraph();            
-            var topologicalSort = graph.TopologicalSort().ToList();
-            return topologicalSort;
-        }
-        
-        private AdjacencyGraph<int, Edge<int>> CreateAdjencyGraph()
-        {
-            var graph = new AdjacencyGraph<int, Edge<int>>(true);
-            foreach (var treeNode in TreeNodeById.Values)
-            {
-                graph.AddVertex(treeNode.TaxonId);
-            }
-
-            foreach (var treeNode in TreeNodeById.Values)
-            {
-                if (treeNode.Parent != null)
-                {
-                    graph.AddEdge(new Edge<int>(treeNode.Parent.TaxonId, treeNode.TaxonId));
-                }
-
-                if (treeNode.SecondaryParents != null && treeNode.SecondaryParents.Count > 0)
-                {
-                    foreach (var parent in treeNode.SecondaryParents)
-                    {
-                        graph.AddEdge(new Edge<int>(parent.TaxonId, treeNode.TaxonId));
-                    }
-                }
-            }
-
-            return graph;
         }
     }  
 }

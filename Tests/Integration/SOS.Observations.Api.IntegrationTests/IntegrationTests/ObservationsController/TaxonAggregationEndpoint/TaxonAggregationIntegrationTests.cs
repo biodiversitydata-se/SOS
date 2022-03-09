@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().BeGreaterThan(30000, "There are observations on more than 30 000 taxa");
+            result.TotalCount.Should().BeGreaterThan(25000, "There are observations on more than 25000 000 taxa");
             result.Records.First().ObservationCount.Should().BeGreaterThan(100000,
                 "The taxon with most observations has more than 100 000 observations");
         }
@@ -114,11 +114,158 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().BeGreaterThan(30000, "There are observations on more than 30 000 taxa");
+            result.TotalCount.Should().BeGreaterThan(25000, "There are observations on more than 25 000 taxa");
             result.Records.First().ObservationCount.Should().BeGreaterThan(100000,
                 "The taxon with most observations has more than 100 000 observations");
         }
 
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal_SumUnderlyingTaxa()
+        {            
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {                
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
+                null, 
+                searchFilter, 
+                0, 
+                100, 
+                false, 
+                "sv-SE", 
+                false, 
+                true);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().BeGreaterThan(25000, "There are observations on more than 25 000 taxa");
+            result.Records.First().ObservationCount.Should().BeGreaterThan(100000,
+                "The taxon with most observations has more than 100 000 observations");
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal_SumUnderlyingTaxa_OnlyBiota()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {                
+                Taxon = new TaxonFilterDto() { Ids = new int[] { 0 } } // Biota                
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
+                null, 
+                searchFilter, 
+                0, 
+                100, 
+                false, 
+                "sv-SE", 
+                false, 
+                true);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            int biotaObservationCount = result.Records.First().ObservationCount;
+            biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");            
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal_SumUnderlyingTaxa_BiotaIncludeUnderlyingTaxa()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {
+                Taxon = new TaxonFilterDto() { 
+                    Ids = new int[] { 0 },
+                    IncludeUnderlyingTaxa = true
+                } // Biota                
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
+                null, 
+                searchFilter, 
+                null, 
+                null, 
+                false, 
+                "sv-SE", 
+                false, 
+                true);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            int biotaObservationCount = result.Records.First().ObservationCount;
+            biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");
+            result.TotalCount.Should().BeGreaterThan(40000, "The number of taxa under Biota with observations are more than 40 000");
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal_CompareSum_with_WithoutSum()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {                
+                Taxon = new TaxonFilterDto { Ids = new int[] { 3597 }}                
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var responseWithSum = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
+                null, 
+                searchFilter, 
+                0, 
+                100, 
+                false, 
+                "sv-SE", 
+                false, 
+                true);
+            var resultWithSum = responseWithSum.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+            var responseWithoutSum = await _fixture.ObservationsController.TaxonAggregationInternal(null, 
+                null, 
+                searchFilter, 
+                0, 
+                100, 
+                false, 
+                "sv-SE", 
+                false, 
+                false);
+            var resultWithoutSum = responseWithoutSum.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            int countWithSum = resultWithSum.Records.First().ObservationCount;
+            int countWithoutSum = resultWithoutSum.Records.First().ObservationCount;
+            countWithSum.Should().BeGreaterThan(countWithoutSum);
+        }
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
@@ -168,7 +315,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().BeGreaterThan(7500, "There are observations on more than 7 500 taxa inside the bounding box");
+            result.TotalCount.Should().BeGreaterThan(6000, "There are observations on more than 6 000 taxa inside the bounding box");
             result.Records.First().ObservationCount.Should().BeGreaterThan(2500,
                 "The taxon with most observations inside the bounding box has more than 2 500 observations");
         }
