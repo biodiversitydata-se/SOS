@@ -122,7 +122,7 @@ namespace SOS.Lib
             query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", internalFilter.ObservedByUserId);
             query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "userServiceUserId", internalFilter.ObservedByUserServiceUserId);
 
-            query.TryAddTermCriteria("institutionId.keyword", internalFilter.InstitutionId);
+            query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
 
             if (internalFilter.OnlyWithMedia)
             {
@@ -204,9 +204,9 @@ namespace SOS.Lib
                     break;
             }
 
-            query.TryAddTermCriteria("speciesCollectionLabel.keyword", internalFilter.SpeciesCollectionLabel);
-            query.TryAddTermCriteria("publicCollection.keyword", internalFilter.PublicCollection);
-            query.TryAddTermCriteria("privateCollection.keyword", internalFilter.PrivateCollection);
+            query.TryAddTermCriteria("speciesCollectionLabel", internalFilter.SpeciesCollectionLabel);
+            query.TryAddTermCriteria("publicCollection", internalFilter.PublicCollection);
+            query.TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection);
             query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
             query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
             query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);

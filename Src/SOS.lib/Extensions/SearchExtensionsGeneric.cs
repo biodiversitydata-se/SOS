@@ -588,59 +588,5 @@ namespace SOS.Lib.Extensions
                 )
             );
         }
-
-        /// <summary>
-        /// Create a sort descriptor
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        public static SortDescriptor<dynamic> ToSortDescriptor<T>(this string sortBy, SearchSortOrder sortOrder)
-        {
-            var sortDescriptor = new SortDescriptor<dynamic>();
-
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                // Split sort string 
-                var propertyNames = sortBy.Split('.');
-                // Create a object of current class
-                var parent = Activator.CreateInstance(typeof(T));
-                var targetProperty = (PropertyInfo)null;
-
-                // Loop throw all levels in passed sort string
-                for (var i = 0; i < propertyNames.Length; i++)
-                {
-                    // Get property info for current property
-                    targetProperty = parent?.GetProperty(propertyNames[i]);
-
-                    // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
-                    if (i != propertyNames.Length - 1)
-                    {
-                        parent = Activator.CreateInstance(targetProperty.GetPropertyType());
-                    }
-                }
-
-                // Target property found, get it's type
-                var propertyType = targetProperty?.GetPropertyType();
-
-                // If it's a string, add keyword in order to make the sorting work
-                if (propertyType == typeof(string))
-                {
-                    //check if the string property already has the keyword attribute, if it does, we do not need the .keyword
-                    KeywordAttribute isKeywordAttribute =
-                        (KeywordAttribute)Attribute.GetCustomAttribute(targetProperty, typeof(KeywordAttribute));
-                    if (isKeywordAttribute == null)
-                    {
-                        sortBy = $"{sortBy}.keyword";
-                    }
-                }
-
-                sortDescriptor.Field(sortBy,
-                    sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
-            }
-
-            return sortDescriptor;
-        }
     }
 }
