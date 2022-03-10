@@ -48,9 +48,19 @@ namespace SOS.Lib.Models.ApplicationInsights
         public string RequestBody { get; set; }
 
         /// <summary>
-        /// Number of observations returned
+        /// Number of items returned
         /// </summary>
-        public string ObservationCount { get; set; }
+        public string ResponseCount { get; set; }
+
+        /// <summary>
+        /// Name of system making the request
+        /// </summary>
+        public string RequestingSystem { get; set; }
+
+        /// <summary>
+        /// Name of systems making the request
+        /// </summary>
+        public string RequestingSystems { get; set; }
 
         /// <summary>
         /// Successful call

@@ -73,7 +73,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Sum of observations returned
         /// </summary>
-        public long SumObservationCount { get; set; }
+        public long SumResponseCount { get; set; }
 
         /// <summary>
         /// E-mail to user making the request

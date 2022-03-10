@@ -229,8 +229,9 @@ namespace SOS.Observations.Api
                         });
                     }
 
-                    // add a custom operation filter which sets default values
+                    // add a custom operation filters
                     swagger.OperationFilter<SwaggerDefaultValues>();
+                    swagger.OperationFilter<SwaggerAddOptionalHeaderParameters>();
 
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()

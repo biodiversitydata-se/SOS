@@ -73,21 +73,25 @@ namespace SOS.Lib.Services
                         method = substring(name, 0, indexof(name, ' ' )), 
                         endpoint = substring(name, indexof(name, ' ')+1), 
                         user_AccountId,
-                        user_AuthenticatedId, 
+                        user_AuthenticatedId,
+                        requestingSystem = tostring(customDimensions['Requesting-System']),
+                        requestingSystems = tostring(customDimensions['Requesting-Systems']),
                         duration, 
                         success,
-                        observationCount = toint(customDimensions['Observation-count'])
+                        responseCount = toint(customDimensions['Response-count'])
                     | summarize 
                         requestCount = count(), 
                         failureCount = count(success == false), 
                         averageDuration = toint(avg(duration)),
-                        sumObservationCount = sum(observationCount)
+                        sumResponseCount = sum(responseCount)
                         by 
                             method, 
                             endpoint,
                             user_AccountId,
-                            user_AuthenticatedId";
-            
+                            user_AuthenticatedId,
+                            requestingSystem,
+                            requestingSystems";
+
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
             return result?.Tables.FirstOrDefault()?.Rows?.Select(r =>
@@ -98,10 +102,12 @@ namespace SOS.Lib.Services
                     Endpoint = ((JsonElement)r[1]).GetString(),
                     AccountId = ((JsonElement)r[2]).GetString(),
                     UserId = ((JsonElement)r[3]).GetString(),
-                    RequestCount = ((JsonElement)r[4]).GetInt64(),
-                    FailureCount = ((JsonElement)r[5]).GetInt64(),
-                    AverageDuration = ((JsonElement)r[6]).GetInt64(),
-                    SumObservationCount = ((JsonElement)r[7]).GetInt64()
+                    RequestingSystem = ((JsonElement)r[4]).GetString(),
+                    RequestingSystems = ((JsonElement)r[5]).GetString(),
+                    RequestCount = ((JsonElement)r[6]).GetInt64(),
+                    FailureCount = ((JsonElement)r[7]).GetInt64(),
+                    AverageDuration = ((JsonElement)r[8]).GetInt64(),
+                    SumResponseCount = ((JsonElement)r[9]).GetInt64()
                 });
         }
 
@@ -126,7 +132,9 @@ namespace SOS.Lib.Services
                         resultCode, 
                         requestBody = customDimensions['Request-body'], 
                         protectedObservations = customDimensions['Protected-observations'], 
-                        observationCount = customDimensions['Observation-count']";
+                        responseCount = customDimensions['Response-count'],
+                        requestingSystem = tostring(customDimensions['Requesting-System']),
+                        requestingSystems = tostring(customDimensions['Requesting-Systems'])";
 
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
@@ -143,7 +151,9 @@ namespace SOS.Lib.Services
                     HttpResponseCode = r[7] == null ? null : ((JsonElement)r[7]).GetString(),
                     RequestBody = r[8] == null ? null : ((JsonElement)r[8]).GetString(),
                     ProtectedObservations = r[9] == null ? null : ((JsonElement)r[9]).GetString(),
-                    ObservationCount = r[10] == null ? null : ((JsonElement)r[10]).GetString()
+                    ResponseCount = r[10] == null ? null : ((JsonElement)r[10]).GetString(),
+                    RequestingSystem = r[11] == null ? null : ((JsonElement)r[11]).GetString(),
+                    RequestingSystems = r[12] == null ? null : ((JsonElement)r[12]).GetString()
                 });
         }
     }

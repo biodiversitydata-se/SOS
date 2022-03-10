@@ -152,7 +152,7 @@ namespace SOS.Lib.Managers
             private const int RequestCountColumnIndex = 13;
             private const int FailureCountColumnIndex = 14;
             private const int AverageDurationColumnIndex = 15;
-            private const int SumObservationCountColumnIndex = 16;
+            private const int SumResponseCountColumnIndex = 16;
 
             public ApiUsageStatisticsExcelWriter(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
             {
@@ -197,7 +197,7 @@ namespace SOS.Lib.Managers
                         worksheet.Cells[rowIndex, RequestCountColumnIndex].Value = row.RequestCount;
                         worksheet.Cells[rowIndex, FailureCountColumnIndex].Value = row.FailureCount;
                         worksheet.Cells[rowIndex, AverageDurationColumnIndex].Value = row.AverageDuration;
-                        worksheet.Cells[rowIndex, SumObservationCountColumnIndex].Value = row.SumObservationCount;
+                        worksheet.Cells[rowIndex, SumResponseCountColumnIndex].Value = row.SumResponseCount;
 
                         rowIndex++;
                     }
@@ -232,10 +232,10 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, RequestCountColumnIndex].Value = "RequestCount";
                 worksheet.Cells[1, FailureCountColumnIndex].Value = "FailureCount";
                 worksheet.Cells[1, AverageDurationColumnIndex].Value = "AverageDuration";
-                worksheet.Cells[1, SumObservationCountColumnIndex].Value = "ObservationCount";
+                worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";
 
                 // Format style by columns in first row
-                using (var range = worksheet.Cells[1, 1, 1, SumObservationCountColumnIndex])
+                using (var range = worksheet.Cells[1, 1, 1, SumResponseCountColumnIndex])
                 {
                     range.Style.Font.Bold = false;
                     range.Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));

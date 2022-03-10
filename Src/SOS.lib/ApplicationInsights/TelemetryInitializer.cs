@@ -60,6 +60,22 @@ namespace SOS.Lib.ApplicationInsights
             {
                 telemetry.Context.User.AccountId = accountId;
             }
+
+            if (platformContext.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystem))
+            {
+                if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
+                {
+                    telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
+                }
+            }
+
+            if (platformContext.Request.Headers.TryGetValue("X-Requesting-Systems", out var requestingSystems))
+            {
+                if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-Systems"))
+                {
+                    telemetry.Context.GlobalProperties.Add("Requesting-Systems", requestingSystems.ToString());
+                }
+            }
         }
 
         /// <summary>
