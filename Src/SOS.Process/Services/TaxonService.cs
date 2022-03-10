@@ -68,7 +68,7 @@ namespace SOS.Process.Services
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
-                AddTaxonSortOrders(taxa, zipArchive, csvFieldDelimiter);
+                AddTaxonProperties(taxa, zipArchive, csvFieldDelimiter);
                 return taxa.Values;
             }
             catch (Exception e)
@@ -105,6 +105,13 @@ namespace SOS.Process.Services
             .Map(t => t.TaxonId, indexColumn: 0)
             .Map(t => t.SortOrder, 1);
 
+        private IVariableLengthReaderBuilder<TaxonProperties<string>> TaxonPropertiesMapping => new VariableLengthReaderBuilder<TaxonProperties<string>>()
+            .Map(t => t.TaxonId, indexColumn: 0)
+            .Map(t => t.SortOrder, 1)
+            .Map(t => t.TaxonCategoryId, 2)
+            .Map(t => t.TaxonCategorySwedishName, 3)
+            .Map(t => t.TaxonCategoryEnglishName, 4)
+            .Map(t => t.TaxonCategoryDarwinCoreName, 5);
 
         private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
             new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
@@ -281,42 +288,50 @@ namespace SOS.Process.Services
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>
         /// <param name="csvFieldDelimiter"></param>
-        private void AddTaxonSortOrders(
+        private void AddTaxonProperties(
             Dictionary<string, DarwinCoreTaxon> taxa,
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
             _logger.LogDebug("Start adding sort orders to taxon");
-            // Try to get TaxonSortOrders.csv
-            var taxonSortOrdersFile = zipArchive.Entries.FirstOrDefault(f =>
-                f.Name.Equals("TaxonSortOrders.csv", StringComparison.CurrentCultureIgnoreCase));
+            // Try to get TaxonProperties.csv
+            var taxonPropertiesFile = zipArchive.Entries.FirstOrDefault(f =>
+                f.Name.Equals("TaxonProperties.csv", StringComparison.CurrentCultureIgnoreCase));
             
-            if (taxonSortOrdersFile == null)
+            if (taxonPropertiesFile == null)
             {
                 _logger.LogError("Failed to open TaxonSortOrders.csv, sort order will be set to 0");
-                return; // If no taxon sort orders file found, we can't do anything more
+                return; // If no taxon properties file found, we can't do anything more
             }
             // Read taxon sort order data
             using var csvFileHelper = new CsvFileHelper();
-            csvFileHelper.InitializeRead(taxonSortOrdersFile.Open(), csvFieldDelimiter);
+            csvFileHelper.InitializeRead(taxonPropertiesFile.Open(), csvFieldDelimiter);
 
-            // Get taxon sort orders by guid
-            var allTaxonSortOrders = csvFileHelper
-                .GetRecords(TaxonSortOrderMapping)
-                .Select(m => new TaxonSortOrder<int>
+            // Get taxon properties by guid
+            var allTaxonProperties = csvFileHelper
+                .GetRecords(TaxonPropertiesMapping)
+                .Select(m => new TaxonProperties<int>
                 {
+                    TaxonCategoryId = m.TaxonCategoryId,
+                    TaxonCategorySwedishName = m.TaxonCategorySwedishName,
+                    TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
+                    TaxonCategoryDarwinCoreName = m.TaxonCategoryDarwinCoreName,
                     SortOrder = m.SortOrder,
                     TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),                    
                 });
             csvFileHelper.FinishRead();
-            var taxonSortOrdersById = allTaxonSortOrders                
-                .ToDictionary(g => g.TaxonId, g => g.SortOrder);
+            var taxonPropertiesById = allTaxonProperties
+                .ToDictionary(g => g.TaxonId, g => g);
 
             foreach (var taxon in taxa.Values)
             {
-                if (taxonSortOrdersById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var sortOrder))
+                if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
-                    taxon.SortOrder = sortOrder.HasValue ? sortOrder.Value : 0;                    
+                    taxon.SortOrder = taxonProperties.SortOrder.GetValueOrDefault(0);
+                    taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
+                    taxon.DynamicProperties.TaxonCategorySwedishName = taxonProperties.TaxonCategorySwedishName;
+                    taxon.DynamicProperties.TaxonCategoryEnglishName = taxonProperties.TaxonCategoryEnglishName;
+                    taxon.DynamicProperties.TaxonCategoryDarwinCoreName = taxonProperties.TaxonCategoryDarwinCoreName;
                 }
             }
             _logger.LogDebug("Finish adding sort orders to taxon");
