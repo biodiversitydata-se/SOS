@@ -482,8 +482,10 @@ namespace SOS.Import.Factories.Harvest
             Geometry siteGeometry = null;
             if (!string.IsNullOrEmpty(geometryWkt))
             {
-                siteGeometry = geometryWkt.ToGeometry()
-                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).TryMakeValid();
+                siteGeometry = geometryWkt
+                    .ToGeometry()?
+                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84)?
+                    .TryMakeValid();
             }
 
             var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
@@ -494,7 +496,7 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
+                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point?.ToCircle(accuracy))?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
