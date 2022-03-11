@@ -8,5 +8,4 @@
         public T TaxonId { get; set; }
         public int? SortOrder { get; set; }        
     }
-
 }
