@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -61,6 +62,39 @@ namespace SOS.Observations.Api.Controllers
                 Result.Failure(string.Join(". ", missingAreas))
                 :
                 Result.Success();
+        }
+
+        /// <summary>
+        /// Validate bounding box
+        /// </summary>
+        /// <param name="boundingBox"></param>
+        /// <param name="mandatory"></param>
+        /// <returns></returns>
+        protected Result ValidateBoundingBox(
+            LatLonBoundingBoxDto boundingBox,
+            bool mandatory = false)
+        {
+            if (boundingBox == null)
+            {
+                return mandatory ? Result.Failure("Bounding box is missing.") : Result.Success();
+            }
+
+            if (boundingBox.TopLeft == null || boundingBox.BottomRight == null)
+            {
+                return Result.Failure("Bounding box is incomplete.");
+            }
+
+            if (boundingBox.TopLeft.Longitude >= boundingBox.BottomRight.Longitude)
+            {
+                return Result.Failure("Bounding box left longitude value is >= right longitude value.");
+            }
+
+            if (boundingBox.BottomRight.Latitude >= boundingBox.TopLeft.Latitude)
+            {
+                return Result.Failure("Bounding box bottom latitude value is >= top latitude value.");
+            }
+
+            return Result.Success();
         }
 
         protected Result ValidateEmail(string email)
@@ -149,7 +183,7 @@ namespace SOS.Observations.Api.Controllers
             return Result.Failure($"Missing property ({ property }) used for { name }");
         }
 
-        protected Result ValidateSearchFilter(SearchFilterBaseDto filter)
+        protected Result ValidateSearchFilter(SearchFilterBaseDto filter, bool bboxMandatory = false)
         {
             var errors = new List<string>();
 
@@ -159,6 +193,12 @@ namespace SOS.Observations.Api.Controllers
             if (areaValidationResult.IsFailure)
             {
                 errors.Add(areaValidationResult.Error);
+            }
+
+            var bboxResult = ValidateBoundingBox(filter?.Geographics?.BoundingBox, bboxMandatory);
+            if (bboxResult.IsFailure)
+            {
+                errors.Add(bboxResult.Error);
             }
 
             if (searchFilter?.ModifiedDate?.From > searchFilter?.ModifiedDate?.To)
