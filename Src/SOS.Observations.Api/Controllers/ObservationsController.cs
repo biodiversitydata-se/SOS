@@ -172,39 +172,6 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Validate bounding box
-        /// </summary>
-        /// <param name="boundingBox"></param>
-        /// <param name="failOnNull"></param>
-        /// <returns></returns>
-        private Result ValidateBoundingBox(
-            LatLonBoundingBoxDto boundingBox,
-            bool failOnNull = false)
-        {
-            if (boundingBox == null)
-            {
-                return failOnNull ? Result.Failure("Bounding box is missing.") : Result.Success();
-            }
-
-            if (boundingBox.TopLeft == null || boundingBox.BottomRight == null)
-            {
-                return Result.Failure("Bounding box is incomplete.");
-            }
-
-            if (boundingBox.TopLeft.Longitude >= boundingBox.BottomRight.Longitude)
-            {
-                return Result.Failure("Bounding box left longitude value is >= right longitude value.");
-            }
-
-            if (boundingBox.BottomRight.Latitude >= boundingBox.TopLeft.Latitude)
-            {
-                return Result.Failure("Bounding box bottom latitude value is >= top latitude value.");
-            }
-
-            return Result.Success();
-        }
-
-        /// <summary>
         ///  Validate signal search filter
         /// </summary>
         /// <param name="filter"></param>
@@ -547,8 +514,7 @@ namespace SOS.Observations.Api.Controllers
                     ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
@@ -592,8 +558,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 var searchFilter = filter.ToSearchFilter("sv-SE", sensitiveObservations);
@@ -675,7 +640,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
@@ -740,7 +704,6 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
 
                 if (validationResult.IsFailure)
@@ -900,7 +863,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
@@ -1044,8 +1006,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
                     ValidateSearchPagingArgumentsInternal(skip, take),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
@@ -1157,8 +1118,7 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
                     ValidatePropertyExists(nameof(sortBy), sortBy),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1208,8 +1168,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1265,8 +1224,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     ValidateAggregationPagingArguments(skip, take, true),
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
-                    ValidateTranslationCultureCode(translationCultureCode),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure)
                 {
@@ -1360,7 +1318,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
@@ -1422,7 +1379,6 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateMetricTilesLimit(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters));
 
                 if (validationResult.IsFailure)
@@ -1490,7 +1446,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
@@ -1590,7 +1545,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, zoom));
 
                 if (validationResult.IsFailure)
@@ -1659,7 +1613,6 @@ namespace SOS.Observations.Api.Controllers
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTranslationCultureCode(translationCultureCode),
                     ValidateTaxonAggregationPagingArguments(skip, take),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox),
                     ValidateTilesLimit(boundingBox, 1));
 
                 if (validationResult.IsFailure)
@@ -1725,8 +1678,7 @@ namespace SOS.Observations.Api.Controllers
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success(),
                     ValidateTaxonExists(filter),
-                    ValidateGeographicalAreaExists(filter?.Geographics),
-                    ValidateBoundingBox(filter?.Geographics?.BoundingBox));
+                    ValidateGeographicalAreaExists(filter?.Geographics));
 
                 if (validationResult.IsFailure)
                 {
