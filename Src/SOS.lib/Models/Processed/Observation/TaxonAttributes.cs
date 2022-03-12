@@ -110,22 +110,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Taxon category.
         /// </summary>
-        public VocabularyValue TaxonCategory { get; set; }
-
-        /// <summary>
-        /// Dyntaxa taxon category id..
-        /// </summary>
-        public int TaxonCategoryId { get; set; }
-
-        /// <summary>
-        /// Dyntaxa taxon category in Swedish.
-        /// </summary>
-        public string TaxonCategorySwedish { get; set; }
-
-        /// <summary>
-        /// Dyntaxa taxon category in English.
-        /// </summary>
-        public string TaxonCategoryEnglish { get; set; }
+        public VocabularyValue TaxonCategory { get; set; }        
 
         /// <summary>
         ///     Vernacular names.

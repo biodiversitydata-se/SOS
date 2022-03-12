@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,48 +12,41 @@ namespace SOS.Lib.Helpers
     /// </summary>
     public static class TaxonCategoryHelper
     {
-        public static List<TaxonCategory> GetTaxonCategories(TaxonTree<IBasicTaxon> tree)
+        public static List<TaxonCategory> GetTaxonCategories(Dictionary<int, DarwinCoreTaxon> darwinCoreTaxonById)
         {
             var taxonCategoryById = new Dictionary<int, TaxonCategory>();
-            foreach (var treeNode in tree.TreeNodeById.Values)
+            foreach (var taxon in darwinCoreTaxonById.Values)
             {
-                if (taxonCategoryById.ContainsKey(treeNode.Data.Attributes.TaxonCategoryId)) continue;
-                taxonCategoryById.Add(treeNode.Data.Attributes.TaxonCategoryId, CreateTaxonCategory(treeNode));
+                int taxonCategoryId = taxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault();
+                if (taxonCategoryById.ContainsKey(taxonCategoryId)) continue;
+                taxonCategoryById.Add(taxonCategoryId, CreateTaxonCategory(taxon));
             }
 
-            foreach (var treeNode in tree.TreeNodeById.Values)
+            foreach (var taxon in darwinCoreTaxonById.Values)
             {
-                var taxonCategory = taxonCategoryById[treeNode.Data.Attributes.TaxonCategoryId];
-                if (treeNode.Parent != null)
-                {
-                    taxonCategory.Parents.Add(taxonCategoryById[treeNode.Parent.Data.Attributes.TaxonCategoryId]);
-                    taxonCategory.MainParents.Add(taxonCategoryById[treeNode.Parent.Data.Attributes.TaxonCategoryId]);
+                int taxonCategoryId = taxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault();
+                var taxonCategory = taxonCategoryById[taxonCategoryId];
+                if (darwinCoreTaxonById.TryGetValue(taxon.DynamicProperties.ParentDyntaxaTaxonId.GetValueOrDefault(-1), out var parentTaxon))
+                {                    
+                    var parentTaxonCategory = taxonCategoryById[parentTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault()];
+                    taxonCategory.Parents.Add(parentTaxonCategory);
+                    taxonCategory.MainParents.Add(parentTaxonCategory);
+                    parentTaxonCategory.Children.Add(taxonCategory);
+                    parentTaxonCategory.MainChildren.Add(taxonCategory);
                 }
 
-                if (treeNode.SecondaryParents != null)
+                if (taxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds != null)
                 {
-                    foreach (var node in treeNode.SecondaryParents)
+                    foreach (var secondaryParentId in taxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds)
                     {
-                        taxonCategory.Parents.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
-                        taxonCategory.SecondaryParents.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
-                    }
-                }
-
-                if (treeNode.Children != null)
-                {
-                    foreach (var node in treeNode.Children)
-                    {
-                        taxonCategory.Children.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
-                        taxonCategory.MainChildren.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
-                    }
-                }
-
-                if (treeNode.SecondaryChildren != null)
-                {
-                    foreach (var node in treeNode.SecondaryChildren)
-                    {
-                        taxonCategory.Children.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
-                        taxonCategory.SecondaryChildren.Add(taxonCategoryById[node.Data.Attributes.TaxonCategoryId]);
+                        if (darwinCoreTaxonById.TryGetValue(secondaryParentId, out var secondaryParentTaxon))
+                        {                            
+                            var secondaryParentTaxonCategory = taxonCategoryById[secondaryParentTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault()];                            
+                            taxonCategory.Parents.Add(secondaryParentTaxonCategory);
+                            taxonCategory.SecondaryParents.Add(secondaryParentTaxonCategory);
+                            secondaryParentTaxonCategory.Children.Add(taxonCategory);
+                            secondaryParentTaxonCategory.SecondaryChildren.Add(taxonCategory);
+                        }                        
                     }
                 }
             }
@@ -60,12 +54,13 @@ namespace SOS.Lib.Helpers
             return taxonCategoryById.Values.ToList();
         }
 
-        private static TaxonCategory CreateTaxonCategory(TaxonTreeNode<IBasicTaxon> treeNode)
+        private static TaxonCategory CreateTaxonCategory(DarwinCoreTaxon darwinCoreTaxon)
         {
             var taxonCategory = new TaxonCategory();
-            taxonCategory.Id = treeNode.Data.Attributes.TaxonCategoryId;
-            taxonCategory.SwedishName = treeNode.Data.Attributes.TaxonCategorySwedish;
-            taxonCategory.EnglishName = treeNode.Data.Attributes.TaxonCategoryEnglish;
+            taxonCategory.Id = darwinCoreTaxon.DynamicProperties.TaxonCategoryId.GetValueOrDefault();
+            taxonCategory.SwedishName = darwinCoreTaxon.DynamicProperties.TaxonCategorySwedishName;
+            taxonCategory.EnglishName = darwinCoreTaxon.DynamicProperties.TaxonCategoryEnglishName;
+            taxonCategory.DwcName = darwinCoreTaxon.DynamicProperties.TaxonCategoryDarwinCoreName;
             return taxonCategory;
         }
 

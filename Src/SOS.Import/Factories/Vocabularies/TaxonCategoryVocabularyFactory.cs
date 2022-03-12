@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Process.Services.Interfaces;
 
 namespace SOS.Import.Factories.Vocabularies
 {
@@ -19,8 +17,8 @@ namespace SOS.Import.Factories.Vocabularies
     /// </summary>
     public class TaxonCategoryVocabularyFactory : ArtportalenVocabularyFactoryBase
     {
-        private readonly Repositories.Source.Artportalen.Interfaces.IMetadataRepository _artportalenMetadataRepository;
-        private readonly ITaxonRepository _taxonRepository;
+        private readonly Repositories.Source.Artportalen.Interfaces.IMetadataRepository _artportalenMetadataRepository;        
+        private readonly ITaxonService _taxonService;
         private readonly ILogger<TaxonCategoryVocabularyFactory> _logger;
 
         /// <summary>
@@ -29,14 +27,14 @@ namespace SOS.Import.Factories.Vocabularies
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
         public TaxonCategoryVocabularyFactory(
-            Repositories.Source.Artportalen.Interfaces.IMetadataRepository metadataRepository,
-            ITaxonRepository taxonRepository,
+            Repositories.Source.Artportalen.Interfaces.IMetadataRepository metadataRepository,            
+            ITaxonService taxonService,
             ILogger<TaxonCategoryVocabularyFactory> logger)
         {
             _artportalenMetadataRepository =
-                metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
-            _taxonRepository =
-                taxonRepository ?? throw new ArgumentNullException(nameof(taxonRepository));
+                metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));            
+            _taxonService =
+                taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -44,9 +42,10 @@ namespace SOS.Import.Factories.Vocabularies
         protected override bool Localized => true;
 
         protected override async Task<ICollection<VocabularyValueInfo>> GetVocabularyValues()
-        {
-            var taxonTree = await GetTaxonTreeAsync();
-            var taxonCategories = TaxonCategoryHelper.GetTaxonCategories(taxonTree);
+        {            
+            var dwcTaxa = await _taxonService.GetTaxaAsync();
+            var dwcTaxonById = dwcTaxa.ToDictionary(m => m.Id, m => m);
+            var taxonCategories = TaxonCategoryHelper.GetTaxonCategories(dwcTaxonById);
             var vocabularyValues = GetVocabularyValues(taxonCategories);            
             return vocabularyValues;
         }
@@ -82,13 +81,6 @@ namespace SOS.Import.Factories.Vocabularies
             };
 
             return vocabularyValue;
-        }
-
-        private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
-        {
-            var taxa = await _taxonRepository.GetAllAsync();
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
-            return taxonTree;
-        }
+        }     
     }
 }
