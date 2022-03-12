@@ -74,6 +74,7 @@ namespace SOS.Lib.Extensions
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
                     Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames(),
+                    TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId),
                     TaxonCategoryId = sourceTaxon.DynamicProperties?.TaxonCategoryId ?? 0,
                     TaxonCategorySwedish = sourceTaxon.DynamicProperties?.TaxonCategorySwedishName,
                     TaxonCategoryEnglish = sourceTaxon.DynamicProperties?.TaxonCategoryEnglishName,

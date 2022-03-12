@@ -82,6 +82,7 @@ namespace SOS.Import.Harvesters
             BehaviorVocabularyFactory behaviorVocabularyFactory,
             SensitivityCategoryVocabularyFactory sensitivityCategoryVocabularyFactory,
             BirdNestActivityVocabularyFactory birdNestActivityVocabularyFactory,
+            TaxonCategoryVocabularyFactory taxonCategoryVocabularyFactory,
             ICacheManager cacheManager,
             ILogger<VocabularyHarvester> logger)
         {
@@ -112,7 +113,8 @@ namespace SOS.Import.Harvesters
                 {VocabularyId.ReproductiveCondition, reproductiveConditionVocabularyFactory},
                 {VocabularyId.Behavior, behaviorVocabularyFactory},
                 {VocabularyId.SensitivityCategory, sensitivityCategoryVocabularyFactory},
-                {VocabularyId.BirdNestActivity, birdNestActivityVocabularyFactory}
+                {VocabularyId.BirdNestActivity, birdNestActivityVocabularyFactory},
+                {VocabularyId.TaxonCategory, taxonCategoryVocabularyFactory}
             };
         }
 

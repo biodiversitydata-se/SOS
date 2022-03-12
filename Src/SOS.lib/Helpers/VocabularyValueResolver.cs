@@ -96,6 +96,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,
+                    valueMappingDictionaries[VocabularyId.TaxonCategory]);
             }
         }
 
@@ -235,6 +237,7 @@ namespace SOS.Lib.Helpers
                     var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
                 }
             }
         }

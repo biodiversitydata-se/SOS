@@ -108,6 +108,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<TaxonSynonymName> Synonyms { get; set; }
 
         /// <summary>
+        /// Taxon category.
+        /// </summary>
+        public VocabularyValue TaxonCategory { get; set; }
+
+        /// <summary>
         /// Dyntaxa taxon category id..
         /// </summary>
         public int TaxonCategoryId { get; set; }
