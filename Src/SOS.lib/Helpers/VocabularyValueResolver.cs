@@ -103,7 +103,7 @@ namespace SOS.Lib.Helpers
 
         private async Task InitializeAsync()
         {
-            var vocabularies = await _processedVocabularyRepository.GetAllAsync();
+            var vocabularies = await _processedVocabularyRepository.GetAllAsync();            
             _valueMappingDictionariesByCultureCode =
                 new Dictionary<string, Dictionary<VocabularyId, Dictionary<int, string>>>
                 {
@@ -247,7 +247,7 @@ namespace SOS.Lib.Helpers
             string fieldName,
             Dictionary<int, string> valueById)
         {
-            if (observationNode == null) return;
+            if (observationNode == null || valueById == null) return;
             var camelCaseName = fieldName.ToCamelCase();
             
             if (observationNode.ContainsKey(camelCaseName))
