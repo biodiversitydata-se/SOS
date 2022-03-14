@@ -41,6 +41,9 @@
     <None Update="Resources\DataProvider\DefaultDataProviders.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\DataProvider\Eml\Biologg.eml.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\DataProvider\Eml\SosDataProvidersCombined.eml.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

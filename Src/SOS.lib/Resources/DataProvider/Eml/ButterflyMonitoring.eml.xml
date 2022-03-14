@@ -10,8 +10,8 @@
          xml:lang="en">
 	<dataset>
 		<identifier>33fa6529-cdca-54fe-be80-1095fc2265d3</identifier>
-        <alternateIdentifier>urn:lsid:artdata.slu.se:SOS:ButterflyMonitoring</alternateIdentifier>
-        <title>Swedish Butterfly Monitoring Scheme (SeBMS)</title>
+		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:ButterflyMonitoring</alternateIdentifier>
+		<title>Swedish Butterfly Monitoring Scheme (SeBMS)</title>
 		<creator>
 			<organizationName>Lund University</organizationName>
 			<address>
@@ -19,8 +19,8 @@
 				<country>SE</country>
 			</address>
 			<electronicMailAddress></electronicMailAddress>
-            <onlineUrl>https://www.dagfjarilar.lu.se/english</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<onlineUrl>https://www.dagfjarilar.lu.se/english</onlineUrl>
+			<sos:contactNameType>Organizational</sos:contactNameType>
 		</creator>
 		<metadataProvider>
 			<organizationName>Lund University</organizationName>
@@ -28,16 +28,18 @@
 				<city>Lund</city>
 				<country>SE</country>
 			</address>
-            <electronicMailAddress></electronicMailAddress>
-            <onlineUrl></onlineUrl>
-		</metadataProvider>		
-		<pubDate>      
+			<electronicMailAddress></electronicMailAddress>
+			<onlineUrl></onlineUrl>
+		</metadataProvider>
+		<pubDate>
 		</pubDate>
 		<language>ENGLISH</language>
-        <licenseName></licenseName>
+		<licenseName></licenseName>
 		<abstract>
-			<para>The SeBMS is a standarised monitoring scheme for monitoring in Sweden. This dataset includes records from traditional fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. 
-                The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards.</para>
+			<para>
+				The SeBMS is a standarised monitoring scheme for monitoring in Sweden. This dataset includes records from traditional fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time.
+				The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards.
+			</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
@@ -48,31 +50,33 @@
 			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
 		</keywordSet>
 		<intellectualRights>
-			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+			<para>
+				To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
 					<citetitle>Public Domain (CC0 1.0)</citetitle>
-				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+			</para>
 		</intellectualRights>
 		<coverage>
 			<geographicCoverage>
 				<geographicDescription>This resource covers Sweden.</geographicDescription>
 				<boundingCoordinates>
-					<westBoundingCoordinate>0.0</westBoundingCoordinate>
-					<eastBoundingCoordinate>0.0</eastBoundingCoordinate>
-					<northBoundingCoordinate>0.0</northBoundingCoordinate>
-					<southBoundingCoordinate>0.0</southBoundingCoordinate>
+					<westBoundingCoordinate>10.13</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.3</northBoundingCoordinate>
+					<southBoundingCoordinate>55.11</southBoundingCoordinate>
 				</boundingCoordinates>
 			</geographicCoverage>
-            <temporalCoverage>
-                <sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
-                <sos:LivingTimePeriod></sos:LivingTimePeriod>
-                <sos:StartDate></sos:StartDate>
-                <sos:EndDate></sos:EndDate>
-            </temporalCoverage>
-            <taxonomicCoverage>
-                <sos:TaxonomicDescription>Butterflies</sos:TaxonomicDescription>
-                <taxonId>3000188</taxonId>
-                <sos:TaxonList></sos:TaxonList>
-            </taxonomicCoverage>
+			<temporalCoverage>
+				<sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
+				<sos:LivingTimePeriod></sos:LivingTimePeriod>
+				<sos:StartDate></sos:StartDate>
+				<sos:EndDate></sos:EndDate>
+			</temporalCoverage>
+			<taxonomicCoverage>
+				<sos:TaxonomicDescription>Butterflies</sos:TaxonomicDescription>
+				<taxonId>3000188</taxonId>
+				<sos:TaxonList></sos:TaxonList>
+			</taxonomicCoverage>
 		</coverage>
 		<maintenance>
 			<description>
@@ -81,52 +85,52 @@
 			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
 		</maintenance>
 		<contact>
-            <individualName>
-                <givenName></givenName>
-                <surName></surName>
-            </individualName>
-            <electronicMailAddress></electronicMailAddress>
-            <organizationName>Lund University</organizationName>
+			<individualName>
+				<givenName></givenName>
+				<surName></surName>
+			</individualName>
+			<electronicMailAddress></electronicMailAddress>
+			<organizationName>Lund University</organizationName>
 			<address>
 				<city>Lund</city>
 				<country>SE</country>
 			</address>
-            <onlineUrl>https://www.lu.se/</onlineUrl>
-            <sos:contactNameType>Organizational</sos:contactNameType>
+			<onlineUrl>https://www.lu.se/</onlineUrl>
+			<sos:contactNameType>Organizational</sos:contactNameType>
 		</contact>
-        <sos:resourceType>occurrence data</sos:resourceType>
-        <sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
-        <sos:datsetSubtype>census data</sos:datsetSubtype>
-        <sos:resourceHomepage>https://www.lu.se/</sos:resourceHomepage>
-        <gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
-        <gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
-        <project>
-            <sos:projectTitle></sos:projectTitle>
-            <funding></funding>
-            <funderIdentifier></funderIdentifier>
-            <dc:funderIdentifierType></dc:funderIdentifierType>
-            <designDescription></designDescription>
-        </project>
-        <samplingMethods>
-            <studyExtent></studyExtent>
-            <samplingDescription></samplingDescription>
-            <methodStep></methodStep>
-            <qualityControl></qualityControl>
-        </samplingMethods>
-        <additionalMetadata>
-            <metadata>
-                <gettingStarted></gettingStarted>
-                <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
-                <snd:dataFormat></snd:dataFormat>
-            </metadata>
-        </additionalMetadata>
-        <citations>
-            <sos:ResourceCitation></sos:ResourceCitation>
-        </citations>
+		<sos:resourceType>occurence data</sos:resourceType>
+		<sos:dataAccessibilityLevel></sos:dataAccessibilityLevel>
+		<sos:datsetSubtype>census data</sos:datsetSubtype>
+		<sos:resourceHomepage>https://www.lu.se/</sos:resourceHomepage>
+		<gbif:MetadataLanguage>ENGLISH</gbif:MetadataLanguage>
+		<gbif:UpdateFrequency>unknown</gbif:UpdateFrequency>
+		<project>
+			<sos:projectTitle></sos:projectTitle>
+			<funding></funding>
+			<funderIdentifier></funderIdentifier>
+			<dc:funderIdentifierType></dc:funderIdentifierType>
+			<designDescription></designDescription>
+		</project>
+		<samplingMethods>
+			<studyExtent></studyExtent>
+			<samplingDescription></samplingDescription>
+			<methodStep></methodStep>
+			<qualityControl></qualityControl>
+		</samplingMethods>
+		<additionalMetadata>
+			<metadata>
+				<gettingStarted></gettingStarted>
+				<purpose></purpose>
+				<sos>
+					<sos:PersonalData></sos:PersonalData>
+					<sos:SensitiveData></sos:SensitiveData>
+					<sos:SensitiveDataDescription></sos:SensitiveDataDescription>
+				</sos>
+				<snd:dataFormat></snd:dataFormat>
+			</metadata>
+		</additionalMetadata>
+		<citations>
+			<sos:ResourceCitation></sos:ResourceCitation>
+		</citations>
 	</dataset>
 </eml:eml>
