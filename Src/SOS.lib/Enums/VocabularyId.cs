@@ -26,6 +26,9 @@
         ReproductiveCondition = 22,
         Behavior = 23,
         SensitivityCategory = 24,
-        BirdNestActivity = 25
+        BirdNestActivity = 25,
+        // ValidationStatus = 26, // Obsolete
+        // TaxonProtectionLevel = 27, // Obsolete
+        TaxonCategory = 28
     }
 }

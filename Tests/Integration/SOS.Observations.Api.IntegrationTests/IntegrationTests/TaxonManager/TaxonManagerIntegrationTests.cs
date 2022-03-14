@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
-using SOS.Observations.Api.IntegrationTests.Utils;
 using SOS.Lib.Helpers;
 using System.Collections.Generic;
-using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Factories;
 
 namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
 {
@@ -73,6 +72,44 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.TaxonManager
             //-----------------------------------------------------------------------------------------------------------
             cyclesDescription.Should().Be("No cycles detected");
         }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public void Test_QuickGraph_DepthFirstSearch()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var taxonTree = _fixture.TaxonManager.TaxonTree;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            TaxonTreeFactory.TestQuickGraphDfs(taxonTree.TreeNodeById.Values);
+        }
+
+        //[Fact]
+        //[Trait("Category", "ApiIntegrationTest")]
+        //public void Get_TaxonCategories_From_TaxonTree()
+        //{
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Arrange
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var taxonTree = _fixture.TaxonManager.TaxonTree;
+
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Act
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var categories = TaxonCategoryHelper.GetTaxonCategories(taxonTree);
+        //    var edges = TaxonCategoryHelper.GetTaxonCategoryEdges(categories);
+        //    string strMermaid = TaxonCategoryHelper.CreateMermaidDiagram(edges);
+        //    string strGraphViz = TaxonCategoryHelper.CreateGraphVizDiagram(edges);
+
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Assert
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    categories.Should().NotBeNull();
+        //}
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]

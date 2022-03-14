@@ -102,5 +102,5 @@ namespace SOS.Lib.Models.TaxonTree
         {
             return GetUnderlyingTaxonIds(new[] { taxonId }, returnSelfs);
         }
-    }  
+    }
 }

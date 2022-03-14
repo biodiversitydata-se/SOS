@@ -15,7 +15,7 @@ namespace SOS.Harvest.Containers
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Metadata> CastMetdataEntityToVerbatim(IEnumerable<MetadataEntity> entities)
+        private IEnumerable<Metadata> CastMetdataEntitiesToVerbatims(IEnumerable<MetadataEntity> entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -78,12 +78,17 @@ namespace SOS.Harvest.Containers
 
         #region Organization
         /// <summary>
-        ///     Cast multiple projects to aggregates
+        ///     Cast multiple organizations to verbatims
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private IEnumerable<Organization> CastOrganizationEntityToVerbatim(IEnumerable<OrganizationEntity> entities)
+        private IEnumerable<Organization> CastOrganizationEntitiesToVerbatims(IEnumerable<OrganizationEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
             return from o in entities
                    select new Organization
                    {
@@ -95,8 +100,13 @@ namespace SOS.Harvest.Containers
         #endregion Organization
 
         #region Person
-        private IEnumerable<Person> CastPersonEntityToVerbatim(IEnumerable<PersonEntity> entities)
+        private IEnumerable<Person> CastPersonEntitiesToVerbatims(IEnumerable<PersonEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
             return from e in entities
                    select new Person
                    {
@@ -118,6 +128,11 @@ namespace SOS.Harvest.Containers
         public void AddProject(ProjectEntity entity)
         {
             var project = CastProjectEntityToVerbatim(entity);
+
+            if (project == null)
+            {
+                return;
+            }
             Projects.TryAdd(project.Id, project);
         }
         /// <summary>
@@ -127,6 +142,11 @@ namespace SOS.Harvest.Containers
         /// <returns></returns>
         private IEnumerable<Project> CastProjectEntitiesToVerbatim(IEnumerable<ProjectEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
             return from p in entities
                    select CastProjectEntityToVerbatim(p);
         }
@@ -138,6 +158,11 @@ namespace SOS.Harvest.Containers
         /// <returns></returns>
         private Project CastProjectEntityToVerbatim(ProjectEntity entity)
         {
+            if (entity == null)
+            {
+                return null;
+            }
+
             return new Project
             {
                 Category = entity.Category,
@@ -199,20 +224,20 @@ namespace SOS.Harvest.Containers
             IEnumerable<MetadataEntity> validationStatus
         )
         {
-            Activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToConcurrentDictionary(a => a.Id, a => a);
-            Biotopes = CastMetdataEntityToVerbatim(biotopes)?.ToConcurrentDictionary(b => b.Id, b => b);
-            DeterminationMethods = CastMetdataEntityToVerbatim(determinationMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm);
-            DiscoveryMethods = CastMetdataEntityToVerbatim(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm);
-            Genders = CastMetdataEntityToVerbatim(genders)?.ToConcurrentDictionary(g => g.Id, g => g);
-            OrganizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToConcurrentDictionary(o => o.Id, o => o);
-            Organizations = CastMetdataEntityToVerbatim(organizations)?.ToConcurrentDictionary(o => o.Id, o => o);
-            PersonByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p);
-            Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p);
-            Stages = CastMetdataEntityToVerbatim(stages)?.ToConcurrentDictionary(s => s.Id, s => s);
-            Substrates = CastMetdataEntityToVerbatim(substrates)?.ToConcurrentDictionary(s => s.Id, s => s);
-            TaxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId);
-            Units = CastMetdataEntityToVerbatim(units)?.ToConcurrentDictionary(u => u.Id, u => u);
-            ValidationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs);
+            Activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToConcurrentDictionary(a => a.Id, a => a) ?? new ConcurrentDictionary<int, MetadataWithCategory>();
+            Biotopes = CastMetdataEntitiesToVerbatims(biotopes)?.ToConcurrentDictionary(b => b.Id, b => b) ?? new ConcurrentDictionary<int, Metadata>();
+            DeterminationMethods = CastMetdataEntitiesToVerbatims(determinationMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
+            DiscoveryMethods = CastMetdataEntitiesToVerbatims(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
+            Genders = CastMetdataEntitiesToVerbatims(genders)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<int, Metadata>();
+            OrganizationById = CastOrganizationEntitiesToVerbatims(organizationById)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Organization>();
+            Organizations = CastMetdataEntitiesToVerbatims(organizations)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Metadata>();
+            PersonByUserId = CastPersonEntitiesToVerbatims(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
+            Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();
+            Stages = CastMetdataEntitiesToVerbatims(stages)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
+            Substrates = CastMetdataEntitiesToVerbatims(substrates)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
+            TaxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId) ?? new ConcurrentDictionary<int, int?>();
+            Units = CastMetdataEntitiesToVerbatims(units)?.ToConcurrentDictionary(u => u.Id, u => u) ?? new ConcurrentDictionary<int, Metadata>();
+            ValidationStatus = CastMetdataEntitiesToVerbatims(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata>();
 
             IsInitialized = true;
         }

@@ -143,7 +143,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool validateSearchFilter,
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false,
-            bool sumUnderlyingTaxa = false);
+            bool sumUnderlyingTaxa = false);        
 
         Task<IActionResult> TaxonExistsIndicationInternal(
             int? roleId,

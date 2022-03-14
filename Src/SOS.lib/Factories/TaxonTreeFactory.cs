@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using QuikGraph;
 using QuikGraph.Algorithms;
+using QuikGraph.Algorithms.Observers;
+using QuikGraph.Algorithms.Search;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
@@ -108,6 +110,23 @@ namespace SOS.Lib.Factories
         }
 
         /// <summary>
+        /// Test run depth first search using QuickGraph library.
+        /// </summary>
+        /// <param name="treeNodes"></param>
+        public static void TestQuickGraphDfs(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
+        {
+            var graph = CreateAdjencyGraph(treeNodes);            
+            var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);            
+            var observer = new VertexPredecessorRecorderObserver<int, Edge<int>>();            
+            using (observer.Attach(dfs)) // Attach/detach to DFS events
+            {
+                dfs.Compute(4000107); // DFS for Mammalia
+            }
+
+            IDictionary<int, Edge<int>> edges = observer.VerticesPredecessors;
+        }
+
+        /// <summary>
         /// Create a reverse topological sort for the taxon tree nodes.
         /// </summary>
         /// <returns>A dictionary with TaxonId as key and reverse topological index as value.</returns>
@@ -120,7 +139,7 @@ namespace SOS.Lib.Factories
                     .TopologicalSort()
                     .Reverse()
                     .Select((Value, Index) => new { Value, Index })
-                    .ToDictionary(m => m.Value, m => m.Index);
+                    .ToDictionary(m => m.Value, m => m.Index);                
 
                 return topoSortByTaxonId;
             }

@@ -98,5 +98,25 @@ namespace SOS.Lib.Models.DarwinCore
         ///     Do taxon occur in sweden
         /// </summary>
         public string SwedishHistory { get; set; }
+
+        /// <summary>
+        /// Dyntaxa taxon category id.
+        /// </summary>
+        public int? TaxonCategoryId { get; set; }
+        
+        /// <summary>
+        /// Dyntaxa taxon category swedish name.
+        /// </summary>
+        public string TaxonCategorySwedishName { get; set; }
+
+        /// <summary>
+        /// Dyntaxa taxon category english name.
+        /// </summary>
+        public string TaxonCategoryEnglishName { get; set; }
+        
+        /// <summary>
+        /// Darwin Core taxon category name.
+        /// </summary>
+        public string TaxonCategoryDarwinCoreName { get; set; }
     }
 }

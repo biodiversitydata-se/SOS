@@ -381,6 +381,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<TypeVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<UnitVocabularyFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VerificationStatusVocabularyFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonCategoryVocabularyFactory>().InstancePerLifetimeScope();
 
             // Add Validation Report Factories
             builder.RegisterType<ClamPortalDataValidationReportFactory>().InstancePerLifetimeScope();
