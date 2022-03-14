@@ -116,11 +116,9 @@
             <metadata>
                 <gettingStarted></gettingStarted>
                 <purpose></purpose>
-                <sos>
-                    <sos:PersonalData></sos:PersonalData>
-                    <sos:SensitiveData></sos:SensitiveData>
-                    <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
-                </sos>
+                <sos:PersonalData></sos:PersonalData>
+                <sos:SensitiveData></sos:SensitiveData>
+                <sos:SensitiveDataDescription></sos:SensitiveDataDescription>
                 <snd:dataFormat></snd:dataFormat>
             </metadata>
         </additionalMetadata>
