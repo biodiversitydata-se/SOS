@@ -199,6 +199,7 @@ namespace SOS.Observations.Api.Extensions
             if (filterDto is TaxonFilterDto taxonFilterDto)
             {
                 filter.RedListCategories = taxonFilterDto.RedListCategories;
+                filter.TaxonCategories = taxonFilterDto.TaxonCategories;
                 filter.TaxonListOperator =
                     (TaxonFilter.TaxonListOp) (taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
             }

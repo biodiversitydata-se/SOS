@@ -84,9 +84,14 @@ namespace SOS.Lib.Helpers
             return edges;
         }
 
-        public static string CreateMermaidDiagram(HashSet<TaxonCategoryEdge> edges)
+        public static string CreateMermaidDiagram(HashSet<TaxonCategoryEdge> edges, bool includeSecondaryRelations)
         {
             var nodes = new HashSet<TaxonCategory>();
+            if (!includeSecondaryRelations)
+            {
+                edges = new HashSet<TaxonCategoryEdge>(edges.Where(m => m.IsMainRelation));
+            }
+
             foreach (var edge in edges)
             {
                 nodes.Add(edge.Parent);
@@ -117,9 +122,14 @@ namespace SOS.Lib.Helpers
             return sb.ToString();
         }
 
-        public static string CreateGraphVizDiagram(HashSet<TaxonCategoryEdge> edges)
+        public static string CreateGraphVizDiagram(HashSet<TaxonCategoryEdge> edges, bool includeSecondaryRelations)
         {
             var nodes = new HashSet<TaxonCategory>();
+            if (!includeSecondaryRelations)
+            {
+                edges = new HashSet<TaxonCategoryEdge>(edges.Where(m => m.IsMainRelation));
+            }
+
             foreach (var edge in edges)
             {
                 nodes.Add(edge.Parent);
