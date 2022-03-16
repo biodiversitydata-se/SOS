@@ -96,12 +96,14 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,
+                    valueMappingDictionaries[VocabularyId.TaxonCategory]);
             }
         }
 
         private async Task InitializeAsync()
         {
-            var vocabularies = await _processedVocabularyRepository.GetAllAsync();
+            var vocabularies = await _processedVocabularyRepository.GetAllAsync();            
             _valueMappingDictionariesByCultureCode =
                 new Dictionary<string, Dictionary<VocabularyId, Dictionary<int, string>>>
                 {
@@ -235,6 +237,7 @@ namespace SOS.Lib.Helpers
                     var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                     ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
                 }
             }
         }
@@ -244,7 +247,7 @@ namespace SOS.Lib.Helpers
             string fieldName,
             Dictionary<int, string> valueById)
         {
-            if (observationNode == null) return;
+            if (observationNode == null || valueById == null) return;
             var camelCaseName = fieldName.ToCamelCase();
             
             if (observationNode.ContainsKey(camelCaseName))

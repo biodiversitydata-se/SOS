@@ -68,15 +68,15 @@ namespace SOS.Observations.Api.Controllers
         /// Validate bounding box
         /// </summary>
         /// <param name="boundingBox"></param>
-        /// <param name="failOnNull"></param>
+        /// <param name="mandatory"></param>
         /// <returns></returns>
         protected Result ValidateBoundingBox(
             LatLonBoundingBoxDto boundingBox,
-            bool failOnNull = false)
+            bool mandatory = false)
         {
             if (boundingBox == null)
             {
-                return failOnNull ? Result.Failure("Bounding box is missing.") : Result.Success();
+                return mandatory ? Result.Failure("Bounding box is missing.") : Result.Success();
             }
 
             if (boundingBox.TopLeft == null || boundingBox.BottomRight == null)
@@ -195,11 +195,12 @@ namespace SOS.Observations.Api.Controllers
                 errors.Add(areaValidationResult.Error);
             }
 
-            var bboxResult = ValidateBoundingBox(filter.Geographics.BoundingBox, bboxMandatory);
+            var bboxResult = ValidateBoundingBox(filter?.Geographics?.BoundingBox, bboxMandatory);
             if (bboxResult.IsFailure)
             {
                 errors.Add(bboxResult.Error);
             }
+
             if (searchFilter?.ModifiedDate?.From > searchFilter?.ModifiedDate?.To)
             {
                 errors.Add("Modified from date can't be greater tha to date");

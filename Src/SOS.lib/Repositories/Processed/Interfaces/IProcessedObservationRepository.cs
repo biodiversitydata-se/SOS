@@ -236,7 +236,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sumUnderlyingTaxa"></param>
-        /// <param name="includeUnderlyingGraphInResult"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,

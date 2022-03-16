@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Nest;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
@@ -162,7 +163,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             var searchFilter = new SearchFilterAggregationInternalDto()
             {                
-                Taxon = new TaxonFilterDto() { Ids = new int[] { 0 } } // Biota                
+                Taxon = new TaxonFilterDto() { Ids = new int[] { TestData.TaxonIds.Biota } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -196,9 +197,9 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             var searchFilter = new SearchFilterAggregationInternalDto()
             {
                 Taxon = new TaxonFilterDto() { 
-                    Ids = new int[] { 0 }, // Biota
+                    Ids = new int[] { TestData.TaxonIds.Biota },
                     IncludeUnderlyingTaxa = true
-                } 
+                }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -221,6 +222,45 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             int biotaObservationCount = result.Records.First().ObservationCount;
             biotaObservationCount.Should().BeGreaterThan(10000000, "There are more than 10 million observations");
             result.TotalCount.Should().BeGreaterThan(40000, "The number of taxa under Biota with observations are more than 40 000");
+        }
+        
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationInternal_SumUnderlyingTaxa_BiotaIncludeUnderlyingTaxa_OnlySpecies()
+        {   
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var searchFilter = new SearchFilterAggregationInternalDto()
+            {
+                Taxon = new TaxonFilterDto()
+                {
+                    Ids = new int[] { TestData.TaxonIds.Biota },
+                    IncludeUnderlyingTaxa = true,
+                    TaxonCategories = new List<int> { (int)TaxonCategoryId.Species }
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonAggregationInternal(null,
+                null,
+                searchFilter,
+                null,
+                null,
+                false,
+                "sv-SE",
+                false,
+                true);
+            var result = response.GetResult<PagedResultDto<TaxonAggregationItemDto>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            int biotaObservationCount = result.Records.First().ObservationCount;
+            biotaObservationCount.Should().BeGreaterThan(150000, "The species with most observations has more than 150k observations.");
+            result.TotalCount.Should().BeGreaterThan(25000, "The number of species taxon under Biota with observations are more than 25 000");
         }
 
         [Fact]

@@ -1,0 +1,838 @@
+{
+  "Id": 28,
+  "Name": "TaxonCategory",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Value": "Root",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Rot"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Root"
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Value": "Kingdom",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Rike"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Kingdom"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "Phylum",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Fylum"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Phylum"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "Subphylum",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underfylum"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subphylum"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "Superclass",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Överklass"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Superclass"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "Class",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Klass"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Class"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "Subclass",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underklass"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subclass"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "Superorder",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Överordning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Superorder"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "Order",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Ordning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Order"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Value": "Suborder",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underordning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Suborder"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Value": "Superfamily",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Överfamilj"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Superfamily"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "Family",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Familj"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Family"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "Subfamily",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underfamilj"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subfamily"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "Value": "Tribe",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Tribus"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Tribe"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Value": "Genus",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Släkte"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Genus"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Value": "Subgenus",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Undersläkte"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subgenus"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Value": "Section (botany)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Sektion (botanik)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Section (botany)"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Value": "Species",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Art"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Species"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Value": "Subspecies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underart"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subspecies"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Value": "Variety",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Varietet"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Variety"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Value": "Form",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Form"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Form"
+        }
+      ]
+    },
+    {
+      "Id": 21,
+      "Value": "Hybrid",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Hybrid"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Hybrid"
+        }
+      ]
+    },
+    {
+      "Id": 22,
+      "Value": "Cultivar",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Sort"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Cultivar"
+        }
+      ]
+    },
+    {
+      "Id": 23,
+      "Value": "Population",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Population"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Population"
+        }
+      ]
+    },
+    {
+      "Id": 25,
+      "Value": "Infraclass",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Infraklass"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Infraclass"
+        }
+      ]
+    },
+    {
+      "Id": 26,
+      "Value": "Parvclass",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Parvklass"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Parvclass"
+        }
+      ]
+    },
+    {
+      "Id": 27,
+      "Value": "Collective Taxon",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Kollektivtaxon"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Collective Taxon"
+        }
+      ]
+    },
+    {
+      "Id": 28,
+      "Value": "Species Complex",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Artkomplex"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Species Complex"
+        }
+      ]
+    },
+    {
+      "Id": 29,
+      "Value": "Infraorder",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Infraordning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Infraorder"
+        }
+      ]
+    },
+    {
+      "Id": 30,
+      "Value": "Division",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Avdelning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Division"
+        }
+      ]
+    },
+    {
+      "Id": 31,
+      "Value": "Subdivision",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underavdelning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subdivision"
+        }
+      ]
+    },
+    {
+      "Id": 32,
+      "Value": "Morphotype",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Morfotyp"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Morphotype"
+        }
+      ]
+    },
+    {
+      "Id": 33,
+      "Value": "Pseudotaxon",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Pseudotaxon"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Pseudotaxon"
+        }
+      ]
+    },
+    {
+      "Id": 35,
+      "Value": "Subkingdom",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Underrike"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subkingdom"
+        }
+      ]
+    },
+    {
+      "Id": 37,
+      "Value": "Infrakingdom",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Infrarike"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Infrakingdom"
+        }
+      ]
+    },
+    {
+      "Id": 38,
+      "Value": "Superphylum",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Överfylum"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Superphylum"
+        }
+      ]
+    },
+    {
+      "Id": 39,
+      "Value": "Infraphylum",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Infrafylum"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Infraphylum"
+        }
+      ]
+    },
+    {
+      "Id": 41,
+      "Value": "Infradivision",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Infraavdelning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Infradivision"
+        }
+      ]
+    },
+    {
+      "Id": 44,
+      "Value": "Subtribe",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Undertribus"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Subtribe"
+        }
+      ]
+    },
+    {
+      "Id": 49,
+      "Value": "Species Aggregate",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Aggregat"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Species Aggregate"
+        }
+      ]
+    },
+    {
+      "Id": 52,
+      "Value": "Unranked",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Ranglös"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Unranked"
+        }
+      ]
+    },
+    {
+      "Id": 75,
+      "Value": "Suprageneric Name",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Namn Över Släktesnivå"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Suprageneric Name"
+        }
+      ]
+    },
+    {
+      "Id": 95,
+      "Value": "Forma Specialis",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Forma Specialis"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Forma Specialis"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 3,
+      "Name": "Dyntaxa",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            },
+            {
+              "Value": 21,
+              "SosId": 21
+            },
+            {
+              "Value": 22,
+              "SosId": 22
+            },
+            {
+              "Value": 23,
+              "SosId": 23
+            },
+            {
+              "Value": 25,
+              "SosId": 25
+            },
+            {
+              "Value": 26,
+              "SosId": 26
+            },
+            {
+              "Value": 27,
+              "SosId": 27
+            },
+            {
+              "Value": 28,
+              "SosId": 28
+            },
+            {
+              "Value": 29,
+              "SosId": 29
+            },
+            {
+              "Value": 30,
+              "SosId": 30
+            },
+            {
+              "Value": 31,
+              "SosId": 31
+            },
+            {
+              "Value": 32,
+              "SosId": 32
+            },
+            {
+              "Value": 33,
+              "SosId": 33
+            },
+            {
+              "Value": 35,
+              "SosId": 35
+            },
+            {
+              "Value": 37,
+              "SosId": 37
+            },
+            {
+              "Value": 38,
+              "SosId": 38
+            },
+            {
+              "Value": 39,
+              "SosId": 39
+            },
+            {
+              "Value": 41,
+              "SosId": 41
+            },
+            {
+              "Value": 44,
+              "SosId": 44
+            },
+            {
+              "Value": 49,
+              "SosId": 49
+            },
+            {
+              "Value": 52,
+              "SosId": 52
+            },
+            {
+              "Value": 75,
+              "SosId": 75
+            },
+            {
+              "Value": 95,
+              "SosId": 95
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

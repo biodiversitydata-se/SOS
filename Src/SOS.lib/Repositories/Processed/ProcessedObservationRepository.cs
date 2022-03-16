@@ -2647,7 +2647,7 @@ namespace SOS.Lib.Repositories.Processed
                     indexName,
                     query,
                     excludeQuery);
-                
+
                 if (filter.Taxa.IncludeUnderlyingTaxa && (filter.Taxa.Ids == null || !filter.Taxa.Ids.Any()))
                 {
                     filter.Taxa.Ids = new int[] { 0 }; // Add Biota if IncludeUnderlyingTaxa and there are no Taxon Ids.

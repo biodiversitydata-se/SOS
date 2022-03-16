@@ -24,6 +24,7 @@ namespace SOS.Administration.Api
     {
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static ImportConfiguration _importConfiguration;
+        private static ProcessConfiguration _processConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
@@ -98,13 +99,14 @@ namespace SOS.Administration.Api
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
                     _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
                     _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+                    _processConfiguration = hostContext.Configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
                     _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
                     _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
                     _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
 
                     return new AutofacServiceProviderFactory(builder =>
                         builder
-                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, new ProcessConfiguration(), _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
+                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
                             .RegisterModule<AdministrationModule>()
                     );
                 }

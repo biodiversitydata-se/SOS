@@ -22,7 +22,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Taxon id value in Dyntaxa.
         /// </summary>
-        public int DyntaxaTaxonId { get; set; }
+        public int DyntaxaTaxonId { get; set; }        
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
@@ -104,6 +104,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Scientific synonym names.
         /// </summary>
         public IEnumerable<TaxonSynonymName> Synonyms { get; set; }
+
+        /// <summary>
+        /// Taxon category.
+        /// </summary>
+        public VocabularyValue TaxonCategory { get; set; }        
 
         /// <summary>
         ///     Vernacular names.
