@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, registerLocaleData } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,6 @@ import { ChartsModule, ThemeService } from 'ng2-charts';
 import { GaugeModule } from 'angular-gauge';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { DlDateTimeDateModule, DlDateTimePickerModule } from 'angular-bootstrap-datetimepicker';
-
 import { AppComponent } from './app.component';
 import { ApplicationInsightsComponent } from './application-insights/application-insights.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -28,8 +27,10 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { AuthGuard } from './guard/authguard';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
 import { ProtectedLogComponent } from './protected-log/protected-log.component';
-
 import { FileService } from './services/file-service';
+import localeSv from '@angular/common/locales/sv';
+
+registerLocaleData(localeSv, 'sv');
 
 export function tokenGetter() {
   return localStorage.getItem("jwt");
@@ -85,7 +86,7 @@ export function tokenGetter() {
       }
     })
   ],
-  providers: [ThemeService, AuthGuard, DatePipe, FileService],
+  providers: [ThemeService, AuthGuard, DatePipe, DecimalPipe, FileService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

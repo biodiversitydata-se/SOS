@@ -13,6 +13,9 @@
           "styleext": "scss"
         }
       },
+      "i18n": {
+        "sourceLocale": "sv_SE"
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",

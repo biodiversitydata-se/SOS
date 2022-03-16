@@ -47,21 +47,17 @@
 		<language>ENGLISH</language>
 		<licenseName>CC0 1.0</licenseName>
 		<abstract>
-			<para>
-				Biologg is a mobile application for iOS and Android with the purpose of encouraging citizens to learn about nature by collecting observations of species that they find in nature.
+			<para>Biologg is a mobile application for iOS and Android with the purpose of encouraging citizens to learn about nature by collecting observations of species that they find in nature.
 				The app uses gamification to encourage users by, for example, earning credits, and using rewards and challenges.
 				These gamification techniques are used to encourage the users to collect specific species by giving instructions for what to look for.
 			</para>
-			<para>
-				The app displays species names and taxonomic relationships using the Dyntaxa - Swedish Taxonomic Database maintained at SLU Swedish Species Information Centre.
+			<para>The app displays species names and taxonomic relationships using the Dyntaxa - Swedish Taxonomic Database maintained at SLU Swedish Species Information Centre.
 				The app also displays facts and images of species in Sweden using open data from SLU Swedish Species Information Centre as well as Wikipedia.
 			</para>
-			<para>
-				The app has no automatic function for suggesting identification of species (such as image recognition) but users can help each other by suggesting species identity or confirming species identification.
+			<para>The app has no automatic function for suggesting identification of species (such as image recognition) but users can help each other by suggesting species identity or confirming species identification.
 				Users can also report other users' observation records if they are incorrect or violating the app's terms and conditions.
 			</para>
-			<para>
-				Each observation record includes one or more photographic images, a species identification, time and GPS position.
+			<para>Each observation record includes one or more photographic images, a species identification, time and GPS position.
 				When a new observation is recorded the time and location are fetched automatically, but users can modify the information in cases when no data are fetched or if the fetched data appear incorrect.
 				An observation can be recorded at species level, or at a higher taxonomic level. Users can also choose to record an observation as "identified with uncertainty" when they are not certain that their species identification is correct.
 				Images are mandatory, that is only observations with images are recorded, and can be used to verify the record.

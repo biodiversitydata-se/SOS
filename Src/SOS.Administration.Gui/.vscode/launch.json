@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net5.0/SOS.Administration.Gui.dll",
+            "program": "${workspaceFolder}/bin/Debug/net6.0/SOS.Administration.Gui.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

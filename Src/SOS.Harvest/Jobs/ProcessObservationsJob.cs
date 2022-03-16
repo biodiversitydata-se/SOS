@@ -545,6 +545,10 @@ namespace SOS.Harvest.Jobs
             {
                 var providersInfo = new List<ProviderInfo>();
 
+                var totalProcessFailCount = 0;
+                var totalPublicCount = 0;
+                var totalProtectedCount = 0;
+
                 foreach (var taskProvider in processTaskByDataProvider)
                 {
                     var provider = taskProvider.Key;
@@ -564,6 +568,7 @@ namespace SOS.Harvest.Jobs
                         HarvestNotes = harvestInfo?.Notes,
                         HarvestStart = harvestInfo?.Start,
                         HarvestStatus = harvestInfo?.Status,
+                        ProcessFailCount = processResult.FailedCount,
                         PublicProcessCount = processResult.PublicCount,
                         ProtectedProcessCount = processResult.ProtectedCount,
                         ProcessEnd = processResult.End,
@@ -572,6 +577,10 @@ namespace SOS.Harvest.Jobs
                     };
 
                     providersInfo.Add(providerInfo);
+
+                    totalProcessFailCount += processResult.FailedCount;
+                    totalPublicCount += processResult.PublicCount;
+                    totalProtectedCount += processResult.ProtectedCount;
                 }
 
                 var metaDataProcessInfo = await GetProcessInfoAsync(new[]
@@ -583,8 +592,9 @@ namespace SOS.Harvest.Jobs
 
                 processInfo = new ProcessInfo(_processedObservationRepository.UniquePublicIndexName, processStart)
                 {
-                    PublicCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.PublicCount),
-                    ProtectedCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.ProtectedCount),
+                    ProcessFailCount = totalProcessFailCount,
+                    PublicCount = totalPublicCount,
+                    ProtectedCount = totalProtectedCount,
                     End = DateTime.Now,
                     MetadataInfo = metaDataProcessInfo,
                     ProvidersInfo = providersInfo,

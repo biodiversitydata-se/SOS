@@ -232,7 +232,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} check lists.");
 
-                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount, 0);
+                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount, 0, 0);
             }
             catch (JobAbortedException)
             {

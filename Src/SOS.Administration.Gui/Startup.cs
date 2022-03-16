@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -12,7 +11,6 @@ using System.Text.Json.Serialization;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
-using Nest;
 using SOS.Administration.Gui.Managers;
 using SOS.Administration.Gui.Managers.Interfaces;
 using SOS.Lib.Cache;
@@ -93,11 +91,11 @@ namespace SOS.Administration.Gui
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.SecretKey))
                 };
             });
-            services.Configure<MongoDbConfiguration>(
-                Configuration.GetSection(nameof(MongoDbConfiguration)));
+            var processDbConfigurationSection = Configuration.GetSection("ProcessDbConfiguration");
+            services.Configure<MongoDbConfiguration>(processDbConfigurationSection);
 
             // Processed Mongo Db
-            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var processedDbConfiguration = processDbConfigurationSection.Get<MongoDbConfiguration>();
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));

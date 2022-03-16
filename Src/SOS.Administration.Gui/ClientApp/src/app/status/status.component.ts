@@ -5,11 +5,11 @@ import { compareAsc } from 'date-fns/esm';
 import { ActiveInstanceInfo } from '../models/activeinstanceinfo';
 import { FunctionalTest } from '../models/functionaltest';
 import { HangfireJob } from '../models/hangfirejob';
-import { LoadTestMetrics, LoadTestResult } from '../models/loadtestmetrics';
+import { LoadTestResult } from '../models/loadtestmetrics';
 import { LogEntries } from '../models/logentries';
 import { MongoDbInfo } from '../models/mongodbinfo';
 import { PerformanceData } from '../models/performancedata';
-import { ProcessInfo } from '../models/providerinfo';
+import { ProcessInfo } from '../models/processinfo';
 import { SearchIndexInfo } from '../models/searchindexinfo';
 import { TestResults } from '../models/testresults';
 
@@ -106,7 +106,7 @@ export class StatusComponent implements OnInit {
   failedTests: number = 0;
   totalRuntimeMs: number = 0;
   hostingenvironment: Environment;
-  dataComparison: DataCompare[] = [];
+  dataComparison: ProcessCompare[] = [];
   totalDataDifference: number = 0;
   performanceComparison: DataCompare[] = [];
   failedCalls: FailedCalls[] = [];
@@ -125,6 +125,8 @@ export class StatusComponent implements OnInit {
         this.processInfo = result;
         this.totalDataDifference = 0;
         let active = this.processInfo.find(p => p.id.endsWith(this.activeInstance));
+        
+        console.log(active);
         var activeEndDate = parseISO(active.end);
         var oneDayAgo = subHours(new Date(), 24);
         if (compareAsc(activeEndDate, oneDayAgo) == -1) {
@@ -135,23 +137,31 @@ export class StatusComponent implements OnInit {
         }
         let inactive = this.processInfo.find(p => !p.id.endsWith(this.activeInstance) && p.id.includes("observation"));
         for (let provider of active.providersInfo) {
-          let compare = new DataCompare();
+          let compare = new ProcessCompare();
           compare.source = provider.dataProviderIdentifier;
-          compare.today = provider.publicProcessCount + provider.protectedProcessCount;
+          compare.publicToday = provider.publicProcessCount
+          compare.protectedToday = provider.protectedProcessCount;
+          compare.failedToday = provider.processFailCount;
 
           if (inactive) {
             let inactiveprovider = inactive.providersInfo.find(p => p.dataProviderId == provider.dataProviderId);
 
             if (inactiveprovider) {
-              compare.yesterday = inactiveprovider.publicProcessCount + inactiveprovider.protectedProcessCount;
+              compare.publicYesterday = inactiveprovider.publicProcessCount;
+              compare.protectedYesterday = inactiveprovider.protectedProcessCount;
+              compare.failedYesterday = inactiveprovider.processFailCount ?? 0;
             } else {
-              compare.yesterday = 0;
+              compare.publicYesterday = 0;
+              compare.protectedYesterday = 0;
+              compare.failedYesterday = 0;
             }
           } else {
-            compare.yesterday = 0;
+              compare.publicYesterday = 0;
+              compare.protectedYesterday = 0;
+              compare.failedYesterday = 0;
           }
 
-          this.totalDataDifference += compare.today - compare.yesterday;
+          this.totalDataDifference += (compare.publicToday + compare.protectedToday) - (compare.publicYesterday + compare.protectedYesterday);
           this.dataComparison.push(compare);
         }
       }, error => console.error(error));
@@ -341,6 +351,15 @@ export class StatusComponent implements OnInit {
 
     }, error => console.error(error));
   }
+}
+class ProcessCompare {
+  source: string;
+  publicToday: number;
+  publicYesterday: number;
+  protectedToday: number;
+  protectedYesterday: number;
+  failedToday: number;
+  failedYesterday: number;
 }
 class DataCompare {
   source: string;

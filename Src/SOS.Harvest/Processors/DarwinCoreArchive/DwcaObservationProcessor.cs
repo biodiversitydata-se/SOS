@@ -27,7 +27,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _processedVocabularyRepository;
 
-        protected override async Task<(int publicCount, int protectedCount)> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,

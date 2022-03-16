@@ -23,6 +23,8 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
             Start = start;
         }
 
+        public int ProcessFailCount { get; set; }
+
         /// <summary>
         ///     Item processed
         /// </summary>

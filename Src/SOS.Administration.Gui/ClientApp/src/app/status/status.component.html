@@ -52,30 +52,50 @@
     <div class="row">
       <div class="col">
         <h2>Data status</h2>
-        <table class="table-small">
+        <table class="table table-striped">
           <thead>
+            <tr>
+              <th></th>
+              <th scope="col" colspan="3" style="text-align: center;">Public observations</th>
+              <th scope="col" colspan="3" style="text-align: center;">Protected observations</th>
+              <th scope="col" colspan="3" style="text-align: center;">Invalid observations</th>
+            </tr>
             <tr>
               <th scope="col">Datasource</th>
               <th scope="col">Active</th>
               <th scope="col">Inactive</th>
-              <th scope="col">Difference</th>
-              <th></th>
+              <th scope="col">Diff</th>
+              <th scope="col">Active</th>
+              <th scope="col">Inactive</th>
+              <th scope="col">Diff</th>
+              <th scope="col">Active</th>
+              <th scope="col">Inactive</th>
+              <th scope="col">Diff</th>
             </tr>
           </thead>
-
           <tbody>
             <tr *ngFor="let data of dataComparison">
               <td scope="row">{{data.source}}</td>
-              <td scope="row">{{data.today}}</td>
-              <td scope="row">{{data.yesterday}}</td>
-              <td scope="row" [class.green]="(data.today - data.yesterday) >= 0" [class.red]="(data.today - data.yesterday) < 0">{{data.today - data.yesterday}}</td>
-              <td>
-                <span *ngIf="(data.today - data.yesterday) < 0">
-                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
-                </span>
-                <span *ngIf="(data.today - data.yesterday) >= 0">
-                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
-                </span>
+              <td scope="row">{{data.publicToday | number:'1.0-0':'sv'}}</td>
+              <td scope="row">{{data.publicYesterday | number:'1.0-0':'sv'}}</td>
+              <td scope="row" 
+                [class.bg-success]="(data.publicToday - data.publicYesterday) >= 0" 
+                [class.bg-warning]="(data.publicToday - data.publicYesterday) < 0 && publicYesterday != 0 && data.publicToday / data.publicYesterday >= 0.95"
+                [class.bg-danger]="(data.publicToday - data.publicYesterday) < 0 && (publicYesterday == 0 && data.publicToday / data.publicYesterday < 0.95)">{{data.publicToday - data.publicYesterday | number:'1.0-0':'sv'}}
+              </td>
+              <td scope="row">{{data.protectedToday | number:'1.0-0':'sv'}}</td>
+              <td scope="row">{{data.protectedYesterday | number:'1.0-0':'sv'}}</td>
+              <td scope="row" 
+                [class.bg-success]="(data.protectedToday - data.protectedYesterday) >= 0" 
+                [class.bg-warning]="(data.protectedToday - data.protectedYesterday) < 0 && data.protectedYesterday != 0 && data.protectedToday / data.protectedYesterday >= 0.95"
+                [class.bg-danger]="(data.protectedToday - data.protectedYesterday) < 0 && (data.protectedYesterday == 0 || data.protectedToday / data.protectedYesterday < 0.95)">{{data.protectedToday - data.protectedYesterday | number:'1.0-0':'sv'}}
+              </td>
+              <td scope="row">{{data.failedToday | number:'1.0-0':'sv'}}</td>
+              <td scope="row">{{data.failedYesterday | number:'1.0-0':'sv'}}</td>
+              <td scope="row" 
+                [class.bg-success]="(data.failedYesterday - data.failedToday) >= 0" 
+                [class.bg-warning]="(data.failedYesterday - data.failedToday) < 0 && data.failedToday != 0 && data.failedYesterday / data.failedToday >= 0.95"
+                [class.bg-danger]="(data.failedYesterday - data.failedToday) < 0 && (data.failedToday == 0 || data.failedYesterday / data.failedToday < 0.95)">{{data.failedToday - data.failedYesterday | number:'1.0-0':'sv'}}
               </td>
             </tr>
           </tbody>
@@ -83,79 +103,30 @@
       </div>
       <div class="col">
         <h2>Performance status</h2>
-        <table class="table-small">
+        <table class="table table-striped">
           <thead>
             <tr>
               <th scope="col">URL</th>
               <th scope="col">{{getYesterdayDate()}}</th>
               <th scope="col">{{getYesterYesterdayDate()}}</th>
               <th scope="col">Difference</th>
-              <th></th>
             </tr>
           </thead>
 
           <tbody>
             <tr *ngFor="let data of performanceComparison">
               <td scope="row">{{data.source}}</td>
-              <td scope="row">{{data.today}}ms</td>
-              <td scope="row">{{data.yesterday}}ms</td>
-              <td scope="row" [class.red]="isPerformanceRed(data.today,data.yesterday)" [class.yellow]="isPerformanceYellow(data.today,data.yesterday)" [class.green]="isPerformanceGreen(data.today,data.yesterday)">{{data.today - data.yesterday | number}}ms</td>
-              <td>
-                <span *ngIf="isPerformanceRed(data.today,data.yesterday)">
-                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="red" /></svg>
-                </span>
-                <span *ngIf="isPerformanceYellow(data.today,data.yesterday)">
-                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="gold" /></svg>
-                </span>
-                <span *ngIf="isPerformanceGreen(data.today,data.yesterday)">
-                  <svg height="20" width="25"><circle cx="10" cy="10" r="8" fill="green" /></svg>
-                </span>
+              <td scope="row">{{data.today | number:'1.0-0':'sv'}}ms</td>
+              <td scope="row">{{data.yesterday | number:'1.0-0':'sv'}}ms</td>
+              <td scope="row" 
+                [class.bg-danger]="isPerformanceRed(data.today,data.yesterday)" 
+                [class.bg-warning]="isPerformanceYellow(data.today,data.yesterday)" 
+                [class.bg-success]="isPerformanceGreen(data.today,data.yesterday)">{{data.today - data.yesterday | number:'1.0-0':'sv'}}ms
               </td>
             </tr>
           </tbody>
         </table>
         <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SOS-Observation-API/performance">Details in Application insights</a>
-      </div>
-      <div>
-        <div>
-          <h2>Failed searches</h2>
-          <table class="table-small">
-            <thead>
-              <tr>
-                <th scope="col">URL</th>
-                <th scope="col">Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let data of failedCalls">
-                <td scope="row">{{data.name}}</td>
-                <td scope="row">{{data.count}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SOS-Observation-API/failures">Details in Application insights</a>
-        </div>
-        <div>
-          <h2>Latest load tests</h2>
-          <table class="table-small" *ngIf="loadTestSummary">
-            <thead>
-              <tr>
-                <th width="100px" scope="col">Date</th>
-                <th width="140px" scope="col">Iteration Count</th>
-                <th width="80px" scope="col">Rate</th>
-                <th scope="col">Avg time(ms)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let data of loadTestSummary.slice(0,5)">
-                <td scope="row">{{data.timestamp | date}}</td>
-                <td scope="row">{{data.metrics.iterations.count}}</td>
-                <td scope="row">{{data.metrics.iterations.rate | number}}</td>
-                <td scope="row">{{data.metrics.iteration_duration.avg | number}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
     <hr />
@@ -222,6 +193,24 @@
                          [columnDefs]="processingJobsColumnDefs">
         </ag-grid-angular>
         <a target="_blank" [href]="hostingenvironment.hangfireUrl">Hangfire</a>
+      </div>
+      <div class="col-sm">
+        <h2>Failed searches</h2>
+        <table class="table-small table-striped">
+          <thead>
+            <tr>
+              <th scope="col">URL</th>
+              <th scope="col">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of failedCalls">
+              <td scope="row">{{data.name}}</td>
+              <td scope="row">{{data.count}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <a target="_blank" href="https://portal.azure.com/#@svelantbruksuniversitet.onmicrosoft.com/resource/subscriptions/86477f0b-e000-4738-ba92-59b14bc73fa3/resourceGroups/911AppInsights-prod/providers/microsoft.insights/components/SOS-Observation-API/failures">Details in Application insights</a>
       </div>
     </div>
     <hr />

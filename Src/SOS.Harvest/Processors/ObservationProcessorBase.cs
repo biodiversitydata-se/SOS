@@ -137,7 +137,7 @@ namespace SOS.Harvest.Processors
         /// <param name="observationVerbatimRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<(int publicCount, int protectedCount)> FetchAndProcessBatchAsync(
+        private async Task<(int publicCount, int protectedCount, int failedCount)> FetchAndProcessBatchAsync(
             DataProvider dataProvider,
             int startId,
             int endId,
@@ -249,14 +249,14 @@ namespace SOS.Harvest.Processors
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected abstract Task<(int publicCount, int protectedCount)> ProcessObservations(
+        protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
 
         /// <inheritdoc />
-        protected async Task<(int publicCount, int protectedCount)> ProcessObservationsAsync(
+        protected async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             JobRunModes mode,
             IObservationFactory<TVerbatim> observationFactory,
@@ -265,7 +265,7 @@ namespace SOS.Harvest.Processors
         {
             var startId = 1;
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
-            var processBatchTasks = new List<Task<(int publicCount, int protectedCount)>>();
+            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
 
             while (startId <= maxId)
             {
@@ -285,10 +285,10 @@ namespace SOS.Harvest.Processors
 
             await Task.WhenAll(processBatchTasks);
 
-            return (processBatchTasks.Sum(t => t.Result.publicCount), processBatchTasks.Sum(t => t.Result.protectedCount));
+            return (processBatchTasks.Sum(t => t.Result.publicCount), processBatchTasks.Sum(t => t.Result.protectedCount), processBatchTasks.Sum(t => t.Result.failedCount));
         }
 
-        protected async Task<(int publicCount, int protectedCount)> ProcessBatchAsync(
+        protected async Task<(int publicCount, int protectedCount, int FailedCount)> ProcessBatchAsync(
             DataProvider dataProvider,
             IEnumerable<TVerbatim> verbatimObservationsBatch,
             string batchId,
@@ -299,7 +299,7 @@ namespace SOS.Harvest.Processors
             {
                 if (!verbatimObservationsBatch?.Any() ?? true)
                 {
-                    return (0, 0);
+                    return (0, 0, 0);
                 }
 
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
@@ -392,10 +392,11 @@ namespace SOS.Harvest.Processors
 
                 await Task.WhenAll(validateAndStoreTasks);
 
-                var publicCount = validateAndStoreTasks[0].Result;
-                var protectedCount = validateAndStoreTasks[1].Result;
-
-                return (publicCount, protectedCount);
+                var publicCount = validateAndStoreTasks[0].Result.SuccessCount;
+                var protectedCount = validateAndStoreTasks[1].Result.SuccessCount;
+                var failedCount = validateAndStoreTasks[0].Result.FailedCount + validateAndStoreTasks[1].Result.FailedCount;
+                
+                return (publicCount, protectedCount, failedCount);
             }
             catch (JobAbortedException e)
             {
@@ -409,19 +410,21 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        protected async Task<int> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool protectedObservations, ICollection<Observation> observations, string batchId)
+        protected async Task<(int SuccessCount, int FailedCount)> ValidateAndStoreObservations(DataProvider dataProvider, JobRunModes mode, bool protectedObservations, ICollection<Observation> observations, string batchId)
         {
             if (!observations?.Any() ?? true)
             {
-                return 0;
+                return (0, 0);
             }
+            var preValidationCount = observations.Count;
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);
-
+            
             if (!observations?.Any() ?? true)
             {
-                return 0;
+                return (0, preValidationCount);
             }
+         
             var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
             
             if (mode == JobRunModes.Full && !protectedObservations)
@@ -430,7 +433,7 @@ namespace SOS.Harvest.Processors
             }
             observations.Clear();
 
-            return processedCount;
+            return (processedCount, preValidationCount - processedCount);
         }
 
         protected async Task<ICollection<Observation>> ValidateAndRemoveInvalidObservations(
@@ -495,7 +498,7 @@ namespace SOS.Harvest.Processors
 
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
 
-                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount);
+                return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
             catch (JobAbortedException)
             {
