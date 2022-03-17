@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Repositories.Processed.Interfaces;
+﻿using System.Text.RegularExpressions;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.ElasticSearch.Proxy.Configuration;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -6,6 +8,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly int _averageObservationSize;
         private readonly ILogger<RequestMiddelware> _logger;
 
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
@@ -94,11 +97,15 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RequestMiddelware(RequestDelegate nextMiddleware, IProcessedObservationRepository processedObservationRepository, ILogger<RequestMiddelware> logger)
+        public RequestMiddelware(RequestDelegate nextMiddleware, 
+            IProcessedObservationRepository processedObservationRepository,
+            ProxyConfiguration proxyConfiguration,
+            ILogger<RequestMiddelware> logger)
         {
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
+            _averageObservationSize = proxyConfiguration?.AvrageObservationSize ?? throw new ArgumentNullException(nameof(proxyConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _processedObservationRepository.LiveMode = true;
@@ -127,7 +134,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     context.Response.StatusCode = (int)responseMessage.StatusCode;
                     CopyFromTargetResponseHeaders(context, responseMessage);
                     await responseMessage.Content.CopyToAsync(context.Response.Body);
-                
+
+                var match = Regex.Match(context.Request.Path.Value, @"([^\/]+)$");
+                if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
+                  {
+                    // Estimate number of observations returned 
+                    var observationCount = Math.Ceiling((double)((context.Response.ContentLength ?? 0) / _averageObservationSize));
+                    context.Items.Add("Observation-count", observationCount);
+                  }
                 return;
             }
             await _nextMiddleware(context);

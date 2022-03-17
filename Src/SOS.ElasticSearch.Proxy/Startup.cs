@@ -7,11 +7,15 @@ using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.TaxonListService;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.ElasticSearch.Proxy.Configuration;
 
 namespace SOS.ElasticSearch.Proxy
 {
@@ -68,6 +72,9 @@ namespace SOS.ElasticSearch.Proxy
 
             services.AddMvc();
 
+            // Add application insights.
+            services.AddApplicationInsightsTelemetry(Configuration);
+
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
@@ -80,6 +87,8 @@ namespace SOS.ElasticSearch.Proxy
 
             // Add configuration
             services.AddSingleton(elasticConfiguration);
+            services.AddSingleton(Configuration.GetSection("ProxyConfiguration").Get<ProxyConfiguration>());
+
 
             // Add Caches
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
@@ -87,6 +96,15 @@ namespace SOS.ElasticSearch.Proxy
             // Add repositories
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+
+            // Add managers
+            services.AddScoped<ITaxonManager, TaxonManager>();
+
+            // Add caches
+            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         }
 
         /// <summary>

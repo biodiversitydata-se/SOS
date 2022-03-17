@@ -171,7 +171,7 @@ namespace SOS.Observations.Api
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.ObservationApi.ApplicationInsights>());
+            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
@@ -454,7 +454,7 @@ namespace SOS.Observations.Api
             IWebHostEnvironment env, 
             IApiVersionDescriptionProvider apiVersionDescriptionProvider, 
             TelemetryConfiguration configuration, 
-            Lib.Configuration.ObservationApi.ApplicationInsights applicationInsightsConfiguration, 
+            ApplicationInsights applicationInsightsConfiguration, 
             ObservationApiConfiguration observationApiConfiguration,
             IProtectedLogRepository protectedLogRepository)
         {
