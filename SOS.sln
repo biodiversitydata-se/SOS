@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-8
 		Docs\FAQ.md = Docs\FAQ.md
 		Docs\FieldSets.md = Docs\FieldSets.md
 		Docs\FlatObservation.md = Docs\FlatObservation.md
+		Docs\GeoServerInfrastructure.md = Docs\GeoServerInfrastructure.md
 		Docs\Harvest.md = Docs\Harvest.md
 		Docs\index.md = Docs\index.md
 		Docs\Install.md = Docs\Install.md
