@@ -12,6 +12,11 @@ namespace SOS.Lib.Cache
         private readonly string _cacheKey;
 
         /// <summary>
+        /// Cache duration.
+        /// </summary>
+        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="memoryCache"></param>
@@ -36,7 +41,7 @@ namespace SOS.Lib.Cache
             lock (InitLock)
             {
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+                    .SetAbsoluteExpiration(CacheDuration);
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
             }
         }

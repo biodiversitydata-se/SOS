@@ -14,6 +14,7 @@ namespace SOS.Observations.Api.IntegrationTests
             public static readonly int Mammalia = 4000107;
             public static readonly int Wolf = 267320;
             public static readonly int Aves = 4000104;
+            public static readonly int CommonBlackbird = 102998; // Koltrast
         }
 
         public static class Areas

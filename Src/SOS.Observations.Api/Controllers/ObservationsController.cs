@@ -464,6 +464,114 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
+        /// Count the number of present observations for the specified taxon. This endpoint uses caching to improve performance.
+        /// </summary>
+        /// <param name="taxonId">Count present observations for this taxon.</param>        
+        /// <returns></returns>
+        [HttpGet("Internal/CachedCount")]
+        [ProducesResponseType(typeof(TaxonSumAggregationItem), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> CachedCountInternal(
+            [FromQuery] int taxonId)
+        {
+            try
+            {                
+                var result = await ObservationManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
+                if (!result.Any())
+                    return NoContent();
+
+                return new OkObjectResult(result.First());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Cached count error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Count the number of present observations for the specified taxa. This endpoint uses caching to improve performance.
+        /// </summary>
+        /// <param name="taxonIds">Count present observations for these taxa.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/CachedCount")]
+        [ProducesResponseType(typeof(IEnumerable<TaxonSumAggregationItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> MultipleCachedCountInternal(
+            [FromBody] IEnumerable<int> taxonIds)
+        {
+            try
+            {
+                var result = await ObservationManager.GetCachedTaxonSumAggregationItemsAsync(taxonIds);
+                if (!result.Any())
+                    return NoContent();
+
+                return new OkObjectResult(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Multiple cached count error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Aggregates present observations by taxon (absent observations are excluded).
+        /// The resulting items also contains sum of underlying taxa observation count.
+        /// To get the first 100 taxa with the most observations, set skip to 0 and take to 100.
+        /// To retrieve all records, set skip and take parameters to null.
+        /// </summary>
+        /// <param name="taxonFilter">The taxon filter.</param>        
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="sortBy">Sort by one of the following field: SumObservationCount, ObservationCount, SumProvinceCount, ProvinceCount.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/TaxonSumAggregation")]
+        [ProducesResponseType(typeof(PagedResultDto<TaxonSumAggregationItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> TaxonSumAggregationInternal(
+            [FromBody] TaxonFilterDto taxonFilter,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
+            [FromQuery] string sortBy = "SumObservationCount")
+        {
+            try
+            {                
+                var result = await ObservationManager.GetTaxonSumAggregationAsync(
+                    taxonFilter.ToTaxonFilterFilter(),
+                    skip,
+                    take,
+                    sortBy);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                var dto = result.Value.ToPagedResultDto(result.Value.Records);
+                return new OkObjectResult(dto);                
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TaxonSumAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         ///     Get observations matching the provided search filter. Permitted filter values depends on the specific filter field:
         ///     Some values are retrieved from the vocabularies endpoint. Some are defined as enum values. Some values are defined in other systems, e.g. Dyntaxa taxon id's.
         ///     Some are defined by the range of the underlying data type.

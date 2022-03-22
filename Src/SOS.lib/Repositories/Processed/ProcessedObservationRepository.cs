@@ -32,6 +32,7 @@ using Result = CSharpFunctionalExtensions.Result;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
+using System.Diagnostics;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -217,6 +218,66 @@ namespace SOS.Lib.Repositories.Processed
             return observationCountByTaxonId;
         }
 
+        private class TaxonProvinceItem
+        {
+            public int TaxonId { get; set; }
+            public string ProvinceId { get; set; }
+            public int ObservationCount { get; set; }
+        }
+
+        private class TaxonProvinceAgg
+        {
+            public int TaxonId { get; set; }
+            public List<string> ProvinceIds { get; set; } = new List<string>();
+            public Dictionary<string, int> ObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
+            public int ObservationCount { get; set; }
+        }
+
+        private async Task<Dictionary<int, TaxonProvinceAgg>> GetElasticTaxonSumAggregationByTaxonIdAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+        {
+            List<TaxonProvinceItem> items = new List<TaxonProvinceItem>();            
+            CompositeKey nextPageKey = null;
+            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await PageElasticTaxonSumAggregationAsync(indexName, query, excludeQuery, nextPageKey, pageTaxaAsyncTake);
+                var compositeAgg = searchResponse.Aggregations.Composite("taxonComposite");
+                foreach (var bucket in compositeAgg.Buckets)
+                {
+                    var taxonId = Convert.ToInt32((long)bucket.Key["taxonId"]);
+                    var provinceId = bucket.Key["provinceId"].ToString();
+                    var observationCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0));
+                    items.Add(new TaxonProvinceItem
+                    {
+                        TaxonId = taxonId,
+                        ProvinceId = provinceId,
+                        ObservationCount = observationCount
+                    });                    
+                }
+
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+            } while (nextPageKey != null);
+
+            var dic = new Dictionary<int, TaxonProvinceAgg>();
+            foreach (var item in items)
+            {
+                if (!dic.TryGetValue(item.TaxonId, out var taxonProvinceAgg))
+                {
+                    taxonProvinceAgg = new TaxonProvinceAgg() { TaxonId = item.TaxonId };
+                    dic.Add(item.TaxonId, taxonProvinceAgg);                    
+                }
+
+                taxonProvinceAgg.ObservationCount += item.ObservationCount;
+                taxonProvinceAgg.ProvinceIds.Add(item.ProvinceId);
+                taxonProvinceAgg.ObservationCountByProvinceId.Add(item.ProvinceId, item.ObservationCount);
+            }
+
+            return dic;
+        }
+
         /// <summary>
         /// Get core queries
         /// </summary>
@@ -339,6 +400,65 @@ namespace SOS.Lib.Repositories.Processed
                             .Terms("taxonId", tt => tt
                                 .Field("taxon.id")
                             ))))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+
+            if (!searchResponse.IsValid)
+            {
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            return searchResponse;
+        }
+
+        private async Task<ISearchResponse<dynamic>> PageElasticTaxonSumAggregationAsync(
+            string indexName,
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            CompositeKey nextPage,
+            int take)
+        {
+            ISearchResponse<dynamic> searchResponse;
+
+            if (nextPage == null) // First request
+            {
+                searchResponse = await Client.SearchAsync<dynamic>(s => s
+                    .Index(indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("taxonComposite", g => g
+                        .Size(take)
+                        .Sources(src => src
+                            .Terms("taxonId", tt => tt
+                                .Field("taxon.id"))
+                            .Terms("provinceId", p => p
+                                .Field("location.province.featureId.keyword"))
+                            )))
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    ));
+            }
+            else
+            {
+                searchResponse = await Client.SearchAsync<dynamic>(s => s
+                    .Index(indexName)
+                    .Size(0)
+                    .Aggregations(a => a.Composite("taxonComposite", g => g
+                        .Size(take)
+                        .After(nextPage)
+                        .Sources(src => src
+                            .Terms("taxonId", tt => tt
+                                .Field("taxon.id"))
+                            .Terms("provinceId", p => p
+                                .Field("location.province.featureId.keyword"))
+                            )))                            
                     .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -1670,12 +1790,17 @@ namespace SOS.Lib.Repositories.Processed
             public int TopologicalIndex { get; set; }
             public TaxonTreeNode<IBasicTaxon> TreeNode { get; set; }
             public int ObservationCount { get; set; }
-            public int SumObservationCount { get; set; }            
+            public int SumObservationCount { get; set; }
+            public Dictionary<string, int> ObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
+            public Dictionary<string, int> SumObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
+            public int ProvinceCount { get; set; }
+            public int SumProvinceCount => DependentProvinceIds == null ? 0 : DependentProvinceIds.Count;
+            public HashSet<string> DependentProvinceIds { get; set; }
             public HashSet<int> DependentTaxonIds { get; set; }
-            // public TaxonAggregationTreeNodeSum MainParent { get; set; } // Uncomment to use for debug purpose
-            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryParents { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
-            // public HashSet<TaxonAggregationTreeNodeSum> MainChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
-            // public HashSet<TaxonAggregationTreeNodeSum> SecondaryChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            public TaxonAggregationTreeNodeSum MainParent { get; set; } // Uncomment to use for debug purpose
+            public HashSet<TaxonAggregationTreeNodeSum> SecondaryParents { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            public HashSet<TaxonAggregationTreeNodeSum> MainChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
+            public HashSet<TaxonAggregationTreeNodeSum> SecondaryChildren { get; set; } = new HashSet<TaxonAggregationTreeNodeSum>(); // Uncomment to use for debug purpose
 
             public override bool Equals(object obj)
             {
@@ -1693,8 +1818,8 @@ namespace SOS.Lib.Repositories.Processed
                 if (TreeNode != null) return $"TaxonId: {TreeNode.TaxonId}, Count: {ObservationCount:N0}, SumCount: {SumObservationCount:N0}";
                 return base.ToString();
             }
-        }        
-
+        }
+       
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
@@ -1882,6 +2007,131 @@ namespace SOS.Lib.Repositories.Processed
             
             return outputCountByTaxonId;
         }
+
+        /// <summary>
+        /// Get taxon sum aggregation. Including underlying taxa and province count.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter)
+        {
+            var indexName = GetCurrentIndex(filter);            
+            Dictionary<int, TaxonProvinceAgg> pObservationCountByTaxonId = null;            
+            
+            var filterWithoutTaxaFilter = filter.Clone();
+            filterWithoutTaxaFilter.Taxa = null;
+            var (queryWithoutTaxaFilter, excludeQueryWithoutTaxaFilter) = GetCoreQueries(filterWithoutTaxaFilter);
+            var sp1 = Stopwatch.StartNew();
+            pObservationCountByTaxonId = await GetElasticTaxonSumAggregationByTaxonIdAsync(
+                indexName,
+                queryWithoutTaxaFilter,
+                excludeQueryWithoutTaxaFilter);
+            sp1.Stop();
+            var sp2 = Stopwatch.StartNew();
+            var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
+            var tree = _taxonManager.TaxonTree;
+            foreach (var item in tree.TreeNodeById.Values)
+            {
+                var taxonProvinceAgg = pObservationCountByTaxonId.GetValueOrDefault(item.TaxonId);
+                var pSumNode = new TaxonAggregationTreeNodeSum
+                {
+                    TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
+                    TreeNode = item,
+                    ObservationCount = taxonProvinceAgg == null ? 0 : taxonProvinceAgg.ObservationCount,
+                    SumObservationCount = taxonProvinceAgg == null ? 0 : taxonProvinceAgg.ObservationCount,
+                    ProvinceCount = taxonProvinceAgg == null ? 0 : taxonProvinceAgg.ProvinceIds.Count,
+                    DependentProvinceIds = new HashSet<string>() { },
+                    DependentTaxonIds = new HashSet<int>() { item.TaxonId }
+                };
+                if (taxonProvinceAgg != null)
+                {
+                    pSumNode.DependentProvinceIds.UnionWith(taxonProvinceAgg.ProvinceIds);
+                    foreach (var pair in taxonProvinceAgg.ObservationCountByProvinceId)
+                    {
+                        pSumNode.ObservationCountByProvinceId.Add(pair.Key, pair.Value);
+                        pSumNode.SumObservationCountByProvinceId.Add(pair.Key, pair.Value);
+                    }
+                }
+
+                treeNodeSumByTaxonId.Add(item.TaxonId, pSumNode);
+            }
+
+            var orderedTreeNodeSum = treeNodeSumByTaxonId.Values.OrderBy(m => m.TopologicalIndex).ToList();
+            foreach (var sumNode in orderedTreeNodeSum)
+            {
+                // Main parent
+                if (sumNode.TreeNode.Parent != null)
+                {
+                    if (treeNodeSumByTaxonId.TryGetValue(sumNode.TreeNode.Parent.TaxonId, out var parentSumNode))
+                    {
+                        sumNode.MainParent = parentSumNode; // Uncomment to use for debug purpose
+                        parentSumNode.MainChildren.Add(sumNode); // Uncomment to use for debug purpose
+                        var newDependedntTaxonIds = sumNode.DependentTaxonIds.Except(parentSumNode.DependentTaxonIds).ToList();
+                        parentSumNode.DependentTaxonIds.UnionWith(newDependedntTaxonIds);
+                        parentSumNode.DependentProvinceIds.UnionWith(sumNode.DependentProvinceIds);
+                        foreach (var taxonId in newDependedntTaxonIds)
+                        {
+                            parentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
+
+                            foreach (var pair in treeNodeSumByTaxonId[taxonId].ObservationCountByProvinceId)
+                            {
+                                if (!parentSumNode.SumObservationCountByProvinceId.TryAdd(pair.Key, pair.Value))
+                                {
+                                    parentSumNode.SumObservationCountByProvinceId[pair.Key] += pair.Value;
+                                }                                                           
+                            }
+                        }
+                    }
+                }
+
+                // Secondary parent
+                if (sumNode.TreeNode.SecondaryParents != null && sumNode.TreeNode.SecondaryParents.Count > 0)
+                {
+                    foreach (var secondaryParent in sumNode.TreeNode.SecondaryParents)
+                    {
+                        if (treeNodeSumByTaxonId.TryGetValue(secondaryParent.TaxonId, out var secondaryParentSumNode))
+                        {
+                            sumNode.SecondaryParents.Add(secondaryParentSumNode); // Uncomment to use for debug purpose
+                            secondaryParentSumNode.SecondaryChildren.Add(sumNode); // Uncomment to use for debug purpose
+                            var newDependentTaxonIds = sumNode.DependentTaxonIds.Except(secondaryParentSumNode.DependentTaxonIds).ToList();
+                            secondaryParentSumNode.DependentTaxonIds.UnionWith(newDependentTaxonIds);
+                            secondaryParentSumNode.DependentProvinceIds.UnionWith(sumNode.DependentProvinceIds);
+                            foreach (var taxonId in newDependentTaxonIds)
+                            {
+                                secondaryParentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
+                                foreach (var pair in treeNodeSumByTaxonId[taxonId].ObservationCountByProvinceId)
+                                {
+                                    if (!secondaryParentSumNode.SumObservationCountByProvinceId.TryAdd(pair.Key, pair.Value))
+                                    {
+                                        secondaryParentSumNode.SumObservationCountByProvinceId[pair.Key] += pair.Value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            var result = new Dictionary<int, TaxonSumAggregationItem>();
+            foreach (var node in orderedTreeNodeSum)
+            {
+                var agg = new TaxonSumAggregationItem()
+                {
+                    TaxonId = node.TreeNode.TaxonId,
+                    ObservationCount = node.ObservationCount,
+                    SumObservationCount = node.SumObservationCount,
+                    ProvinceCount = node.ProvinceCount,
+                    SumProvinceCount = node.SumProvinceCount,
+                    SumObservationCountByProvinceId = node.SumObservationCountByProvinceId                    
+                };
+
+                result.Add(node.TreeNode.TaxonId, agg);
+            }
+
+            sp2.Stop();
+            return result;
+        }
+
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(

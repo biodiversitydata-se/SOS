@@ -539,6 +539,11 @@ namespace SOS.Observations.Api.Extensions
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
+        public static TaxonFilter ToTaxonFilterFilter(this TaxonFilterDto taxonFilterDto)
+        {
+            return PopulateTaxa(taxonFilterDto);            
+        }
+
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
             return (SearchFilterInternal)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);

@@ -144,9 +144,10 @@ namespace SOS.Lib.Managers
             bool includeUnderlyingTaxa, 
             IEnumerable<int> listIds, 
             TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
-            List<int> taxonCategories = null)
+            List<int> taxonCategories = null,
+            bool returnBiotaResultAsNull = true)
         {            
-            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
+            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
             if (listIds != null && listIds.Count() > 0)
             {
                 taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator);
@@ -204,17 +205,39 @@ namespace SOS.Lib.Managers
             return taxaSet.ToList();
         }
 
+        /// <summary>
+        /// Get taxon ids.
+        /// </summary>
+        /// <param name="taxonIds"></param>
+        /// <param name="includeUnderlyingTaxa"></param>
+        /// <param name="returnBiotaResultAsNull">If true, and the result will be every taxa, returnu null; otherwise return all taxon ids.</param>
+        /// <returns></returns>
         private IEnumerable<int> GetTaxonFilterIds(
             IEnumerable<int> taxonIds,
-            bool includeUnderlyingTaxa
+            bool includeUnderlyingTaxa,
+            bool returnBiotaResultAsNull = true
         )
         {                        
             if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
             {
-                return taxonIds;
+                if (!returnBiotaResultAsNull && includeUnderlyingTaxa)
+                {
+                    return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(new int[] {0}, true);
+                }
+                else
+                {
+                    return taxonIds;
+                }
             }
 
-            return taxonIds.Contains(BiotaTaxonId) ? null : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
+            if (returnBiotaResultAsNull && taxonIds.Contains(BiotaTaxonId))
+            {
+                return null;
+            }
+            else
+            {
+                return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
+            }
         }
 
         /// <summary>
@@ -393,6 +416,25 @@ namespace SOS.Lib.Managers
             }
             
             PopulateTaxonFilter(filter.Taxa);
+        }
+
+        public HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter)
+        {
+            if (filter == null)
+            {
+                filter = new TaxonFilter() { IncludeUnderlyingTaxa = true };
+            }          
+
+            // todo - add support for red list categories.
+            var taxonIds = GetTaxonIds(filter.Ids,
+                filter.IncludeUnderlyingTaxa,
+                filter.ListIds,
+                filter.TaxonListOperator,
+                filter.TaxonCategories,
+                false);
+
+            if (taxonIds == null) return new HashSet<int>();
+            return taxonIds.ToHashSet();
         }
     }
 }
