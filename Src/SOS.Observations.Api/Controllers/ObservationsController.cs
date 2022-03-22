@@ -1580,6 +1580,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="sortBy">Sort by one of the following field: SumObservationCount, ObservationCount, SumProvinceCount, ProvinceCount.</param>
+        /// <param name="sortOrder">Sort order (Asc, Desc).</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonSumAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonSumAggregationItem>), (int)HttpStatusCode.OK)]
@@ -1591,7 +1592,8 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] TaxonFilterDto taxonFilter,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
-            [FromQuery] string sortBy = "SumObservationCount")
+            [FromQuery] string sortBy = "SumObservationCount",
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
             try
             {
@@ -1599,7 +1601,8 @@ namespace SOS.Observations.Api.Controllers
                     taxonFilter.ToTaxonFilterFilter(),
                     skip,
                     take,
-                    sortBy);
+                    sortBy,
+                    sortOrder);
 
                 if (result.IsFailure)
                 {

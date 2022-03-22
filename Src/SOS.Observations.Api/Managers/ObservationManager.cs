@@ -418,7 +418,7 @@ namespace SOS.Observations.Api.Managers
                         taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
                         sp.Stop();
                         _taxonSumAggregationCache.Set(taxonAggregation);
-                        _logger.LogDebug("Finish create taxonSumAggregationCache");
+                        _logger.LogDebug($"Finish create taxonSumAggregationCache. Elapsed time: {sp.Elapsed.Seconds} seconds");
                     }
                 }
                 finally
@@ -449,10 +449,11 @@ namespace SOS.Observations.Api.Managers
             TaxonFilter taxonFilter,
             int? skip,
             int? take,
-            string sortBy)
+            string sortBy,
+            SearchSortOrder sortOrder)
         {
             try
-            {                
+            {
                 var taxonIds = _filterManager.GetTaxonIdsFromFilter(taxonFilter);
                 var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
                 var aggregationByTaxonId = cachedTaxonSumAggregation
@@ -478,38 +479,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 // Sort result.
-                IEnumerable<TaxonSumAggregationItem> orderedResult = null;
-                string sort = sortBy == null ? "" : sortBy.ToLower();
-                if (sort == nameof(TaxonSumAggregationItem.SumObservationCount).ToLower())
-                {
-                    orderedResult = aggregationByTaxonId.Values
-                            .OrderByDescending(m => m.SumObservationCount)
-                            .ThenBy(m => m.TaxonId);
-                }
-                else if (sort == nameof(TaxonSumAggregationItem.ObservationCount).ToLower())
-                {
-                    orderedResult = aggregationByTaxonId.Values
-                            .OrderByDescending(m => m.ObservationCount)
-                            .ThenBy(m => m.TaxonId);
-                }
-                else if (sort == nameof(TaxonSumAggregationItem.SumProvinceCount).ToLower())
-                {
-                    orderedResult = aggregationByTaxonId.Values
-                            .OrderByDescending(m => m.SumProvinceCount)
-                            .ThenBy(m => m.TaxonId);
-                }
-                else if (sort == nameof(TaxonSumAggregationItem.ProvinceCount).ToLower())
-                {
-                    orderedResult = aggregationByTaxonId.Values
-                            .OrderByDescending( m => m.ProvinceCount)
-                            .ThenBy(m => m.TaxonId);
-                }
-                else
-                {
-                    orderedResult = aggregationByTaxonId.Values
-                            .OrderByDescending(m => m.SumObservationCount)
-                            .ThenBy(m => m.TaxonId);
-                }
+                IEnumerable<TaxonSumAggregationItem> orderedResult = OrderSumTaxonAggregation(aggregationByTaxonId.Values, sortBy, sortOrder);
 
                 var result = orderedResult
                     .Skip(skip.Value)
@@ -531,6 +501,68 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Failed to get taxon aggregation");
                 throw;
             }
+        }
+
+        private static IEnumerable<TaxonSumAggregationItem> OrderSumTaxonAggregation(IEnumerable<TaxonSumAggregationItem> items, string sortBy, SearchSortOrder sortOrder)
+        {
+            IEnumerable<TaxonSumAggregationItem> orderedResult = null;
+            string sort = sortBy == null ? "" : sortBy.ToLower();
+            if (sort == nameof(TaxonSumAggregationItem.SumObservationCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumObservationCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ObservationCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.ObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ObservationCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.ObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumProvinceCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumProvinceCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.SumProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ProvinceCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.ProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ProvinceCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.ProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+
+            return orderedResult;
         }
 
         /// <inheritdoc />

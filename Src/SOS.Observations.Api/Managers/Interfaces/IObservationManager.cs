@@ -200,12 +200,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <param name="sortBy"></param>
+        /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<Result<PagedResult<TaxonSumAggregationItem>>> GetTaxonSumAggregationAsync(
             TaxonFilter taxonFilter,
             int? skip,
             int? take,
-            string sortBy);
+            string sortBy,
+            SearchSortOrder sortOrder);
 
         /// <summary>
         /// Get a indication if taxon exist in specified area
