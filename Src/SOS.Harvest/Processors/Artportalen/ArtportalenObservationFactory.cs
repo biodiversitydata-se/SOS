@@ -180,11 +180,11 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Identification
                 obs.Identification = new Identification();
-                obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy;
+                obs.Identification.ConfirmedBy = verbatimObservation.ConfirmedBy?.Clean();
                 obs.Identification.ConfirmedDate = verbatimObservation.ConfirmationYear?.ToString();
                 obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString();
                 obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
-                obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy;
+                obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy?.Clean();
                 obs.Identification.Validated = new[]
                 {
                     (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
@@ -280,7 +280,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 obs.Occurrence.Substrate = new Substrate
                 {
-                    Description = GetSubstrateDescription(verbatimObservation, substrateTaxon),
+                    Description = GetSubstrateDescription(verbatimObservation, substrateTaxon)?.Clean(),
                     Id = verbatimObservation?.Substrate?.Id,
                     Name = GetSosIdFromMetadata(verbatimObservation?.Substrate, VocabularyId.Substrate),
                     Quantity = verbatimObservation.QuantityOfSubstrate,
@@ -288,7 +288,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     SpeciesId = verbatimObservation.SubstrateSpeciesId,
                     SpeciesScientificName = substrateTaxon?.ScientificName,
                     SpeciesVernacularName = substrateTaxon?.VernacularName,
-                    SubstrateDescription = verbatimObservation.SubstrateDescription
+                    SubstrateDescription = verbatimObservation.SubstrateDescription?.Clean()
                 };
                 
                 obs.Occurrence.Url = $"{_artPortalenUrl}/sighting/{verbatimObservation.SightingId}";
@@ -302,7 +302,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         Created = m.UploadDateTime?.ToShortDateString(),
                         Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.')): string.Empty,
                         Identifier = GetMediaUrl(m.FileUri),
-                        License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText,
+                        License = string.IsNullOrEmpty(m.CopyrightText) ? "© all rights reserved" : m.CopyrightText?.Clean(),
                         References = $"{_artPortalenUrl}/Image/{m.Id}",
                         RightsHolder = m.RightsHolder,
                         Type = m.FileType
