@@ -33,7 +33,7 @@ namespace SOS.Lib.Extensions
                 HigherClassification = sourceTaxon.HigherClassification,
                 Id = sourceTaxon.Id,
                 InfraspecificEpithet = sourceTaxon.InfraspecificEpithet,
-                Kingdom = sourceTaxon.Kingdom,
+                Kingdom = sourceTaxon.Kingdom?.Clean(),
                 NameAccordingTo = sourceTaxon.NameAccordingTo,
                 NameAccordingToId = sourceTaxon.NameAccordingToID,
                 NamePublishedIn = sourceTaxon.NamePublishedIn,
@@ -79,7 +79,7 @@ namespace SOS.Lib.Extensions
                 },
                 TaxonId = sourceTaxon.TaxonID,
                 TaxonRank = sourceTaxon.TaxonRank,
-                TaxonRemarks = sourceTaxon.TaxonRemarks,
+                TaxonRemarks = sourceTaxon.TaxonRemarks?.Clean(),
                 TaxonomicStatus = sourceTaxon.TaxonomicStatus,
                 VernacularName = sourceTaxon.VernacularName,
                 VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
@@ -134,7 +134,7 @@ namespace SOS.Lib.Extensions
         {
             return new TaxonSynonymName()
             {
-                Name = synonym.ScientificName,
+                Name = synonym.ScientificName?.Clean(),
                 Author = synonym.ScientificNameAuthorship?.Clean(),
                 NomenclaturalStatus = synonym.NomenclaturalStatus,
                 TaxonomicStatus = synonym.TaxonomicStatus,

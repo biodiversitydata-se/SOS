@@ -417,7 +417,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 verbatim.ObservationMultimedia,
                 verbatim.ObservationAudubonMedia);
             processedOccurrence.OccurrenceId = verbatim.OccurrenceID;
-            processedOccurrence.OccurrenceRemarks = verbatim.OccurrenceRemarks;
+            processedOccurrence.OccurrenceRemarks = verbatim.OccurrenceRemarks?.Clean();
             processedOccurrence.OccurrenceStatus = GetSosId(
                 verbatim.OccurrenceStatus,
                 _vocabularyById[VocabularyId.OccurrenceStatus],

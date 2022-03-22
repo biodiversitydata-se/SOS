@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -342,7 +338,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.ReportedByUserServiceUserId = verbatimObservation.ReportedByUserServiceUserId;
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
-                obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
+                obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion?.Clean();
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
                 obs.ArtportalenInternal.OccurrenceVerifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
