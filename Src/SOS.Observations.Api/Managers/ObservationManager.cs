@@ -386,10 +386,14 @@ namespace SOS.Observations.Api.Managers
                 try
                 {
                     await _taxonSumAggregationSemaphore.WaitAsync();
-                    _taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()))
+                    if (_taxonSumAggregationCache == null)
                     {
-                        CacheDuration = TimeSpan.FromHours(1)
-                    };
+                        _logger.LogDebug("Create _taxonSumAggregationCache ClassCache");
+                        _taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()))
+                        {
+                            CacheDuration = TimeSpan.FromHours(1)
+                        };
+                    }
                 }
                 finally
                 {
@@ -403,13 +407,19 @@ namespace SOS.Observations.Api.Managers
                 try
                 {
                     await _taxonSumAggregationSemaphore.WaitAsync();
-                    var searchFilter = new SearchFilter();
-                    searchFilter.PositiveSightings = true;
-                    _filterManager.PrepareFilter(null, null, searchFilter).Wait();
-                    Stopwatch sp = Stopwatch.StartNew();
-                    taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
-                    sp.Stop();
-                    _taxonSumAggregationCache.Set(taxonAggregation);
+                    taxonAggregation = _taxonSumAggregationCache.Get();
+                    if (taxonAggregation == null)
+                    {
+                        _logger.LogDebug("Start create taxonSumAggregationCache");
+                        var searchFilter = new SearchFilter();
+                        searchFilter.PositiveSightings = true;
+                        _filterManager.PrepareFilter(null, null, searchFilter).Wait();
+                        Stopwatch sp = Stopwatch.StartNew();
+                        taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
+                        sp.Stop();
+                        _taxonSumAggregationCache.Set(taxonAggregation);
+                        _logger.LogDebug("Finish create taxonSumAggregationCache");
+                    }
                 }
                 finally
                 {
@@ -423,12 +433,14 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonSumAggregationItem>> GetCachedTaxonSumAggregationItemsAsync(IEnumerable<int> taxonIds)
         {
+            _logger.LogDebug("Start GetCachedTaxonSumAggregationItemsAsync()");
             var taxonIdsSet = taxonIds.ToHashSet();
             var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
             var taxonAggregations = cachedTaxonSumAggregation
                 .Values
                 .Where(m => taxonIdsSet.Contains(m.TaxonId));
-            
+
+            _logger.LogDebug("Finish GetCachedTaxonSumAggregationItemsAsync()");
             return taxonAggregations;
         }
 

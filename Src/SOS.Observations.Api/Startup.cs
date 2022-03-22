@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
@@ -433,7 +435,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IGeoJsonFileWriter, GeoJsonFileWriter>();
 
             // Helpers, static data => single instance 
-            services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
+            services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();                       
         }
 
         /// <summary>
@@ -552,8 +554,14 @@ namespace SOS.Observations.Api
             {
                 protectedLogRepository.CreateIndexAsync();
             }
-        }
 
+            var serviceProvider = app.ApplicationServices;
+            var observationManager = serviceProvider.GetService<IObservationManager>();
+            Task.Run(() => {                
+                    observationManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
+            });
+        }
+        
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
         {
             var actionApiVersionModel = apiDescription.ActionDescriptor
