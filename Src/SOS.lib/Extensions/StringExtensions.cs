@@ -9,16 +9,50 @@ namespace SOS.Lib.Extensions
 {
     public static class StringExtensions
     {
-        public static string UntilNonAlfanumeric(this string value)
+        private static readonly Regex RxFromNonAlfanumeric = new Regex(@"\w+$", RegexOptions.Compiled);
+        private static readonly Regex RxUntilNonAlfanumeric = new Regex(@"\w+", RegexOptions.Compiled);
+        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
+
+        /// <summary>
+        /// Remove unprintable characters 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string Clean(this string value)
         {
-            var regex = new Regex(@"\w+");
-            return regex.Match(value).Value;
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxIllegalCharacters.Replace(value, match => // Slower, but handles new line and tab correctly.
+            {
+                if (RxNewLineTab.IsMatch(match.Value))
+                    return " ";
+                else
+                    return "";
+            }).Trim();
         }
 
         public static string FromNonAlfanumeric(this string value)
         {
-            var regex = new Regex(@"\w+$");
-            return regex.Match(value).Value;
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxFromNonAlfanumeric.Match(value).Value;
+        }
+
+        public static string UntilNonAlfanumeric(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxUntilNonAlfanumeric.Match(value).Value;
         }
 
         /// <summary>

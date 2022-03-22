@@ -167,7 +167,7 @@ namespace SOS.Harvest.Containers
             {
                 Category = entity.Category,
                 CategorySwedish = entity.CategorySwedish,
-                Description = entity.Description,
+                Description = entity.Description?.Clean(),
                 EndDate = entity.EndDate,
                 Id = entity.Id,
                 IsPublic = entity.IsPublic,

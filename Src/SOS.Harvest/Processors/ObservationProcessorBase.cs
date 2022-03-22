@@ -29,7 +29,107 @@ namespace SOS.Harvest.Processors
     {
         private readonly IDiffusionManager _diffusionManager;
         private readonly IProcessManager _processManager;
+        private readonly bool _logGarbageCharFields;
         protected readonly IProcessTimeManager TimeManager;
+
+        private void CleanGarbageChars(Observation observation)
+        {
+            if (observation == null)
+            {
+                return;
+            }
+
+            observation.DynamicProperties = observation.DynamicProperties?.Clean();
+
+            if (observation.Event != null)
+            {
+                observation.Event.EventRemarks = observation.Event.EventRemarks?.Clean();
+                observation.Event.FieldNotes = observation.Event.FieldNotes?.Clean();
+
+                if (observation.Event.MeasurementOrFacts?.Any() ?? false)
+                {
+                    Parallel.ForEach(observation.Event.MeasurementOrFacts, measurementOrFact =>
+                    {
+                        measurementOrFact.MeasurementRemarks = measurementOrFact.MeasurementRemarks?.Clean();
+                    });
+                }
+
+                if (observation.Event.Media?.Any() ?? false)
+                {
+                    Parallel.ForEach(observation.Event.Media, media =>
+                    {
+                        media.Description = media.Description?.Clean();
+                    });
+                }
+            }
+
+            if (observation.Identification != null)
+            {
+                observation.Identification.IdentificationRemarks = observation.Identification.IdentificationRemarks?.Clean();
+            }
+
+            if (observation.Location != null)
+            {
+                observation.Location.GeoreferenceRemarks = observation.Location.GeoreferenceRemarks?.Clean();
+                observation.Location.LocationRemarks = observation.Location.LocationRemarks?.Clean();
+                observation.Location.Locality = observation.Location.Locality?.Clean();
+            }
+
+            if (observation.MeasurementOrFacts?.Any() ?? false)
+            {
+                Parallel.ForEach(observation.MeasurementOrFacts, measurementOrFact =>
+                {
+                    measurementOrFact.MeasurementRemarks = measurementOrFact.MeasurementRemarks?.Clean();
+                });
+            }
+
+            if (observation.Occurrence != null)
+            {
+                observation.Occurrence.BiotopeDescription = observation.Occurrence.BiotopeDescription?.Clean();
+
+                if (observation.Occurrence.Media?.Any() ?? false)
+                {
+                    Parallel.ForEach(observation.Occurrence.Media, media =>
+                    {
+                        media.Description = media.Description?.Clean();
+                    });
+                }
+
+                observation.Occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks?.Clean();
+
+                if (observation.Occurrence.Substrate != null)
+                {
+                    observation.Occurrence.Substrate.Description = observation.Occurrence.Substrate.Description?.Clean();
+                    observation.Occurrence.Substrate.SpeciesDescription = observation.Occurrence.Substrate.SpeciesDescription?.Clean();
+                    observation.Occurrence.Substrate.SubstrateDescription = observation.Occurrence.Substrate.SubstrateDescription?.Clean();
+                }
+            }
+
+            if (observation.Organism != null)
+            {
+                observation.Organism.OrganismRemarks = observation.Organism.OrganismRemarks?.Clean();
+                observation.Organism.OrganismScope = observation.Organism.OrganismScope?.Clean();
+            }
+
+            if (observation.Projects?.Any() ?? false)
+            {
+                Parallel.ForEach(observation.Projects, project =>
+                {
+                    project.Description = project.Description?.Clean();
+
+                    if (project.ProjectParameters?.Any() ?? false)
+                    {
+                        Parallel.ForEach(project.ProjectParameters, projectParameter =>
+                        {
+                            projectParameter.Description = projectParameter.Description?.Clean();
+                            projectParameter.Value = projectParameter.Value?.Clean();
+                        });
+                    }
+                });
+            }
+            
+            observation.References = observation.References?.Clean();
+        }
 
         /// <summary>
         /// Commit batch
@@ -244,6 +344,7 @@ namespace SOS.Harvest.Processors
             ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
+            _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
             _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
             TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -321,6 +422,17 @@ namespace SOS.Harvest.Processors
                     // Populate data quality property
                     PopulateDataQuality(observation);
 
+                    if (_logGarbageCharFields)
+                    {
+                        var objectHelper = new ObjectHelper();
+                        var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
+
+                        if (propsWithGarabageChars.Any())
+                        {
+                            Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
+                        }
+                    }
+                    
                     // If  observation is protected
                     if (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage)
                     {
@@ -341,6 +453,7 @@ namespace SOS.Harvest.Processors
 
                         // Populate data quality property
                         PopulateDataQuality(observation);
+
                         TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
                         // If provider don't support diffusion, we provide it for them
@@ -477,22 +590,6 @@ namespace SOS.Harvest.Processors
 
             try
             {
-                if (mode == JobRunModes.Full)
-                {
-                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data");
-                    if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, false))
-                    {
-                        Logger.LogError($"Failed to delete {dataProvider.Identifier} public data");
-                    }
-
-                    if (!await ProcessedObservationRepository.DeleteProviderDataAsync(dataProvider, true))
-                    {
-                        Logger.LogError($"Failed to delete {dataProvider.Identifier} protected data");
-                    }
-
-                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data");
-                }
-
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
                 var processCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
 

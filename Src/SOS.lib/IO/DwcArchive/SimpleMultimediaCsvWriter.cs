@@ -120,21 +120,21 @@ namespace SOS.Lib.IO.DwcArchive
             CsvFileHelper csvFileHelper,
             SimpleMultimediaRow multimediaRow)
         {
-            csvFileHelper.WriteField(multimediaRow.OccurrenceId.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Type.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Format.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Identifier.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.References.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Title.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Description.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Source.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Audience.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Created.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Creator.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Contributor.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.Publisher.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.License.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(multimediaRow.RightsHolder.RemoveIllegalCharacters());
+            csvFileHelper.WriteField(multimediaRow.OccurrenceId);
+            csvFileHelper.WriteField(multimediaRow.Type);
+            csvFileHelper.WriteField(multimediaRow.Format);
+            csvFileHelper.WriteField(multimediaRow.Identifier);
+            csvFileHelper.WriteField(multimediaRow.References);
+            csvFileHelper.WriteField(multimediaRow.Title);
+            csvFileHelper.WriteField(multimediaRow.Description);
+            csvFileHelper.WriteField(multimediaRow.Source);
+            csvFileHelper.WriteField(multimediaRow.Audience);
+            csvFileHelper.WriteField(multimediaRow.Created);
+            csvFileHelper.WriteField(multimediaRow.Creator);
+            csvFileHelper.WriteField(multimediaRow.Contributor);
+            csvFileHelper.WriteField(multimediaRow.Publisher);
+            csvFileHelper.WriteField(multimediaRow.License);
+            csvFileHelper.WriteField(multimediaRow.RightsHolder);
 
             csvFileHelper.NextRecord();
         }

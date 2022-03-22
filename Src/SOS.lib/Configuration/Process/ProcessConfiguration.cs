@@ -31,6 +31,12 @@
         public bool RunIncrementalAfterFull { get; set; }
 
         /// <summary>
+        /// Look for garbage chars i any string field and log every occurrence
+        /// Will slow down processing 
+        /// </summary>
+        public bool LogGarbageCharFields { get; set; }
+
+        /// <summary>
         ///     Vocabulary configuration
         /// </summary>
         public VocabularyConfiguration VocabularyConfiguration { get; set; }

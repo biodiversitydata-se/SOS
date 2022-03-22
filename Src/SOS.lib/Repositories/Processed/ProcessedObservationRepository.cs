@@ -329,10 +329,89 @@ namespace SOS.Lib.Repositories.Processed
                                 .Nested<Multimedia>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.Media)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Audience)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Contributor)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Created)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Creator)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.DatasetID)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Format)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Identifier)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.License)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Publisher)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.References)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.RightsHolder)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Source)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Title)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Type)
+                                        )
+                                    )
                                 )
                                 .Nested<ExtendedMeasurementOrFact>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.MeasurementOrFacts)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementAccuracy)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementDeterminedBy)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementDeterminedDate)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementID)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementMethod)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementType)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementTypeID)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementUnit)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementUnitID)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementValue)
+                                        )
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.MeasurementValueID)
+                                        )
+                                    )
                                 )
                                 .Object<VocabularyValue>(t => t
                                     .Name(nm => nm.DiscoveryMethod)
@@ -437,6 +516,9 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.IdentifiedBy)
+                                )
+                                 .Keyword(kw => kw
+                                    .Name(nm => nm.TypeStatus)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerifiedBy)
@@ -605,6 +687,9 @@ namespace SOS.Lib.Repositories.Processed
                                     .Name(nm => nm.County)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
+                                            .Name(nm => nm.FeatureId)
+                                        )
+                                        .Keyword(kw => kw
                                             .Name(nm => nm.Name)
                                         )
                                     )
@@ -613,6 +698,9 @@ namespace SOS.Lib.Repositories.Processed
                                     .AutoMap()
                                     .Name(nm => nm.Municipality)
                                     .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.FeatureId)
+                                        )
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Name)
                                         )
@@ -623,6 +711,9 @@ namespace SOS.Lib.Repositories.Processed
                                     .Name(nm => nm.Parish)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
+                                            .Name(nm => nm.FeatureId)
+                                        )
+                                        .Keyword(kw => kw
                                             .Name(nm => nm.Name)
                                         )
                                     )
@@ -631,6 +722,9 @@ namespace SOS.Lib.Repositories.Processed
                                     .AutoMap()
                                     .Name(nm => nm.Province)
                                     .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.FeatureId)
+                                        )
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Name)
                                         )
@@ -642,8 +736,12 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                         .Object<MaterialSample>(c => c
-                            .AutoMap()
                             .Name(nm => nm.MaterialSample)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.MaterialSampleId)
+                                )
+                            )
                         )
                         .Object<Occurrence>(t => t
                             .AutoMap()
@@ -748,6 +846,18 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.OccurrenceStatus)
+                                    .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.Value)
+                                        )
+                                        .Number(nr => nr
+                                            .Name(nm => nm.Id)
+                                            .Type(NumberType.Integer)
+                                        )
+                                    )
+                                )
+                                .Object<VocabularyValue>(c => c
+                                    .Name(nm => nm.OrganismQuantityUnit)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Value)

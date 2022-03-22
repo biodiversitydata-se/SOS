@@ -135,7 +135,7 @@ namespace SOS.Lib.Extensions
             return new TaxonSynonymName()
             {
                 Name = synonym.ScientificName,
-                Author = synonym.ScientificNameAuthorship,
+                Author = synonym.ScientificNameAuthorship?.Clean(),
                 NomenclaturalStatus = synonym.NomenclaturalStatus,
                 TaxonomicStatus = synonym.TaxonomicStatus,
                 //NameId = synonyme.NameId, // probably not needed

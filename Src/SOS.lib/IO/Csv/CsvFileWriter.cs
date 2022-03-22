@@ -111,7 +111,6 @@ namespace SOS.Lib.IO.Excel
                                 PropertyFieldDataType.Int32 => ((int)value).ToString(),
                                 PropertyFieldDataType.Int64 => ((long)value).ToString(),
                                 PropertyFieldDataType.TimeSpan => ((TimeSpan?)value)?.ToString("hh\\:mm"),
-                                PropertyFieldDataType.String => ((string)value).RemoveIllegalCharacters(),
                                 _ => (string)value
                             };
 

@@ -5,15 +5,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 
 namespace SOS.Lib.Helpers
 {
     /// <inheritdoc />
-    public class ObjectFlattenerHelper : IObjectFlattenerHelper
+    public class ObjectHelper : IObjectHelper
     {
         private static readonly ConcurrentDictionary<Type, Dictionary<PropertyInfo, Func<object, object>>> CachedProperties;
+        private static readonly Regex RxIllegalCharacters; // Match all control characters and other non-printable characters
+
+        private static bool ContainsIllegalCharacters(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            return RxIllegalCharacters.Match(value).Success;
+        }
 
         private static Dictionary<string, object> ExecuteInternal(
             object @object,
@@ -23,7 +35,7 @@ namespace SOS.Lib.Helpers
         {
             dictionary ??= new Dictionary<string, object>();
             var type = @object.GetType();
-            var properties = GetProperties(type);
+            var properties = GetTypeProperties(type);
 
             foreach (var (property, getter) in properties)
             {
@@ -69,7 +81,12 @@ namespace SOS.Lib.Helpers
             return dictionary;
         }
 
-        private static Dictionary<PropertyInfo, Func<object, object>> GetProperties(Type type)
+        /// <summary>
+        /// Get properties for passed object type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Dictionary<PropertyInfo, Func<object, object>> GetTypeProperties(Type type)
         {
             if (CachedProperties.TryGetValue(type, out var properties))
             {
@@ -79,7 +96,6 @@ namespace SOS.Lib.Helpers
             CacheProperties(type);
             return CachedProperties[type];
         }
-
         private static void CacheProperties(Type type)
         {
             if (CachedProperties.ContainsKey(type))
@@ -130,15 +146,98 @@ namespace SOS.Lib.Helpers
         /// <summary>
         /// Constructor
         /// </summary>
-        static ObjectFlattenerHelper()
+        static ObjectHelper()
         {
             CachedProperties = new ConcurrentDictionary<Type, Dictionary<PropertyInfo, Func<object, object>>>();
+            RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled);
         }
 
         /// <inheritdoc />
-        public IDictionary<string, object> Execute(object @object, string prefix = "", bool valuesAsString = false)
+        public IDictionary<string, object> Flatten(object @object, string prefix = "", bool valuesAsString = false)
         {
             return ExecuteInternal(@object, prefix: prefix, valuesAsString: valuesAsString);
+        }
+
+        public IEnumerable<string> GetPropertiesWithGarbageChars<T>( T @object)
+        {
+            var garbageProperties = new HashSet<string>();
+
+            if (@object == null)
+            {
+                return garbageProperties;
+            }
+
+            var objectType = @object.GetType();
+            var properties = GetTypeProperties(objectType);
+
+            foreach (var (property, getter) in properties)
+            {
+                var key = property.Name;
+                var value = getter(@object);
+
+                if (value == null)
+                {
+                    // dictionary.Add(key, null);
+                    continue;
+                }
+                var properyType = property.PropertyType;
+                if (properyType.IsValueTypeOrString())
+                {
+                    if (properyType == typeof(string))
+                    {
+                        if (ContainsIllegalCharacters(value.ToString()))
+                        {
+                            garbageProperties.Add(property.Name);
+                        }
+                    }
+                    continue;
+                }
+
+                if (value is IEnumerable enumerable)
+                {
+                    foreach (var item in enumerable)
+                    {
+                        var itemType = item.GetType();
+                        if (itemType.IsValueTypeOrString())
+                        {
+                            if (itemType == typeof(string))
+                            {
+                                if (ContainsIllegalCharacters(item?.ToString()))
+                                {
+                                    garbageProperties.Add(property.Name);
+                                }
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            var subObjProperties = GetPropertiesWithGarbageChars(item);
+
+                            if (subObjProperties != null)
+                            {
+                                foreach (var subPropertie in subObjProperties)
+                                {
+                                    garbageProperties.Add($"{property.Name}.{subPropertie}");
+                                }
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                var subProperties = GetPropertiesWithGarbageChars(property.GetValue(@object, null));
+
+                if (subProperties != null)
+                {
+                    foreach (var subPropertie in subProperties)
+                    {
+                        garbageProperties.Add($"{property.Name}.{subPropertie}");
+                    }
+                }
+            }
+
+            return garbageProperties;
         }
     }
 }

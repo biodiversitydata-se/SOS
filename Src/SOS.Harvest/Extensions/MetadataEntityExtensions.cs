@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Extensions
@@ -25,7 +25,7 @@ namespace SOS.Harvest.Extensions
             {
                 Category = entity.Category,
                 CategorySwedish = entity.CategorySwedish,
-                Description = entity.Description,
+                Description = entity.Description?.Clean(),
                 EndDate = entity.EndDate,
                 Id = entity.Id,
                 IsPublic = entity.IsPublic,

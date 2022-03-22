@@ -253,7 +253,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     : "";
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, VocabularyId.Biotope);
-                obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription;
+                obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription?.Clean();
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.SightingId.ToString();
                 obs.Occurrence.CatalogId = verbatimObservation.SightingId;
@@ -271,7 +271,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
                 obs.Occurrence.RecordNumber = verbatimObservation.Label;
-                obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment;
+                obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment?.Clean();
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new VocabularyValue {Id = (int) OccurrenceStatusId.Absent}
                     : new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
@@ -355,9 +355,9 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Set dependent properties
                 var biotope = obs.Occurrence.Biotope?.Value;
-                obs.Event.Habitat = (biotope != null
+                obs.Event.Habitat = ((biotope != null
                     ? $"{biotope}{(string.IsNullOrEmpty(obs.Occurrence.BiotopeDescription) ? "" : " # ")}{obs.Occurrence.BiotopeDescription}"
-                    : obs.Occurrence.BiotopeDescription).WithMaxLength(255);
+                    : obs.Occurrence.BiotopeDescription).WithMaxLength(255))?.Clean();
 
                 // Get vocabulary mapped values
                 obs.Occurrence.Sex = GetSosIdFromMetadata(verbatimObservation?.Gender, VocabularyId.Sex);

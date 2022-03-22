@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Processed.Observation;
@@ -104,7 +102,7 @@ namespace SOS.Harvest.Harvesters
                 EndDate = projectEntity.EndDate,
                 Category = projectEntity.Category,
                 CategorySwedish = projectEntity.CategorySwedish,
-                Description = projectEntity.Description,
+                Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
                 Owner = projectEntity.Owner,
                 ProjectURL =projectEntity.ProjectURL,

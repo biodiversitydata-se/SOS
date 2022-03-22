@@ -144,20 +144,20 @@ namespace SOS.Lib.IO.DwcArchive
                 return;
             }
 
-            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.OccurrenceID.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementID.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementType.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementTypeID.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementValue.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementValueID.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementAccuracy.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementUnit.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementUnitID.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementRemarks.RemoveIllegalCharacters());
-            csvFileHelper.WriteField(emofRow.MeasurementMethod.RemoveIllegalCharacters());
+            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
+            csvFileHelper.WriteField(emofRow.OccurrenceID);
+            csvFileHelper.WriteField(emofRow.MeasurementID);
+            csvFileHelper.WriteField(emofRow.MeasurementType);
+            csvFileHelper.WriteField(emofRow.MeasurementTypeID);
+            csvFileHelper.WriteField(emofRow.MeasurementValue);
+            csvFileHelper.WriteField(emofRow.MeasurementValueID);
+            csvFileHelper.WriteField(emofRow.MeasurementAccuracy);
+            csvFileHelper.WriteField(emofRow.MeasurementUnit);
+            csvFileHelper.WriteField(emofRow.MeasurementUnitID);
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
+            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy);
+            csvFileHelper.WriteField(emofRow.MeasurementRemarks);
+            csvFileHelper.WriteField(emofRow.MeasurementMethod);
 
             csvFileHelper.NextRecord();
         }

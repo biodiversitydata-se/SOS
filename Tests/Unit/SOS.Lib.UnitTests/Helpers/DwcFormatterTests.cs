@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentAssertions;
-using SOS.Lib.Helpers;
+﻿using FluentAssertions;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Helpers
@@ -30,7 +27,7 @@ namespace SOS.Lib.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = DwcFormatter.RemoveIllegalCharacters(str);                
+            var result = str;                
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

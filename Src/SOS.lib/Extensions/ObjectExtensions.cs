@@ -7,10 +7,45 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+
 namespace SOS.Lib.Extensions
 {
     public static class ObjectExtensions
     {
+        private static object GetValueOrExpandoObject(object @object, PropertyInfo property)
+        {
+            var value = property.GetValue(@object);
+            if (value == null) return null;
+
+            var valueType = value.GetType();
+            if (valueType.IsValueType || value is string) return value;
+
+            if (value is IEnumerable enumerable) return ToExpandoCollection(enumerable);
+
+            return ToExpando(value);
+        }
+
+        private static ExpandoObject ToExpando(object @object)
+        {
+            var properties = @object.GetType().GetProperties();
+            IDictionary<string, object> expando = new ExpandoObject();
+            foreach (var property in properties)
+            {
+                var value = GetValueOrExpandoObject(@object, property);
+                expando.Add(property.Name, value);
+            }
+            return (ExpandoObject)expando;
+        }
+
+        private static IEnumerable<ExpandoObject> ToExpandoCollection(IEnumerable enumerable)
+        {
+            var enumerator = enumerable.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                yield return ToExpando(enumerator.Current);
+            }
+        }
+
         public static bool IsValueTypeOrString(this Type type)
         {
             return type.IsValueType || type == typeof(string);
@@ -31,6 +66,8 @@ namespace SOS.Lib.Extensions
             return type.IsAssignableTo(typeof(IEnumerable));
         }
 
+        
+
         /// <summary>
         /// Get object property
         /// </summary>
@@ -44,6 +81,7 @@ namespace SOS.Lib.Extensions
                 BindingFlags.SetProperty | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         }
 
+       
         /// <summary>
         /// Get property type
         /// </summary>
@@ -56,10 +94,12 @@ namespace SOS.Lib.Extensions
             return underlyingType ?? propertyType;
         }
 
+        
+
         /// <summary>
         /// Check if property exist in object
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="objectType"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
         public static bool HasProperty(this Type objectType, string propertyName)
@@ -122,7 +162,6 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static T Clone<T>(this T original) where T : class
         {
-
             return DotNetCore.Mapping.Extensions.Clone(original);
         }
 
@@ -130,40 +169,6 @@ namespace SOS.Lib.Extensions
         {            
             var expando = ToExpando(value);
             return expando;
-        }
-
-        private static ExpandoObject ToExpando(object @object)
-        {
-            var properties = @object.GetType().GetProperties();
-            IDictionary<string, object> expando = new ExpandoObject();
-            foreach (var property in properties)
-            {
-                var value = GetValueOrExpandoObject(@object, property);
-                expando.Add(property.Name, value);
-            }
-            return (ExpandoObject)expando;
-        }
-
-        private static object GetValueOrExpandoObject(object @object, PropertyInfo property)
-        {
-            var value = property.GetValue(@object);
-            if (value == null) return null;
-
-            var valueType = value.GetType();
-            if (valueType.IsValueType || value is string) return value;
-
-            if (value is IEnumerable enumerable) return ToExpandoCollection(enumerable);
-
-            return ToExpando(value);
-        }
-
-        private static IEnumerable<ExpandoObject> ToExpandoCollection(IEnumerable enumerable)
-        {
-            var enumerator = enumerable.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                yield return ToExpando(enumerator.Current);
-            }
         }
 
         #region ConcurrentDictionary
