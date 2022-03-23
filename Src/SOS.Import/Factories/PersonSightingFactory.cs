@@ -206,7 +206,7 @@ namespace SOS.Import.Factories
             foreach (var grouping in query)
             {
                 var persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId))
-                    .OrderBy(ob => ob.Sort)
+                    .OrderByDescending(ob => ob.Sort)
                     .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0 ));
                 var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
