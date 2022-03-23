@@ -40,8 +40,9 @@ namespace SOS.Observations.Api.Managers
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly IArtportalenApiManager _artportalenApiManager;
-        private readonly ILogger<ObservationManager> _logger;
-        
+        private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly ILogger<ObservationManager> _logger;        
+
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
@@ -107,6 +108,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
         /// <param name="artportalenApiManager"></param>
+        /// <param name="taxonSumAggregationCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -116,6 +118,7 @@ namespace SOS.Observations.Api.Managers
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
             IArtportalenApiManager artportalenApiManager,
+            IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -127,6 +130,7 @@ namespace SOS.Observations.Api.Managers
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _artportalenApiManager = artportalenApiManager ?? throw new ArgumentNullException(nameof(artportalenApiManager));
+            _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -376,31 +380,10 @@ namespace SOS.Observations.Api.Managers
             return taxonCountDtos;
         }
 
-        private readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);
-        IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);        
 
         private async Task<Dictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation()
-        {
-            if (_taxonSumAggregationCache == null)
-            {
-                try
-                {
-                    await _taxonSumAggregationSemaphore.WaitAsync();
-                    if (_taxonSumAggregationCache == null)
-                    {
-                        _logger.LogDebug("Create _taxonSumAggregationCache ClassCache");
-                        _taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()))
-                        {
-                            CacheDuration = TimeSpan.FromHours(1)
-                        };
-                    }
-                }
-                finally
-                {
-                    _taxonSumAggregationSemaphore.Release();
-                }
-            }
-
+        {            
             var taxonAggregation = _taxonSumAggregationCache.Get();
             if (taxonAggregation == null)
             {
