@@ -227,7 +227,13 @@ namespace SOS.Harvest.Processors.Taxon
                 var taxa = dwcTaxa.ToProcessedTaxa().ToList();
                 var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
                 bool isTaxonDataOk = IsTaxonDataOk(taxa, taxonTree);
-                // todo - don't replace taxonomy if data isn't ok.
+                if (!isTaxonDataOk)
+                {
+                    // If there are cycles in the data, use the current information in Taxon collection.
+                    var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();
+                    return Convert.ToInt32(taxonCount);
+                }
+                
                 _logger.LogDebug("Start calculating higher classification for taxa");
                 CalculateHigherClassificationField(taxa, taxonTree);
                 _logger.LogDebug("Finish calculating higher classification for taxa");

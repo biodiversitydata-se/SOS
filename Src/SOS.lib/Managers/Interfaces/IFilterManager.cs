@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Services.Interfaces;
 
@@ -41,5 +42,12 @@ namespace SOS.Lib.Managers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         void PrepareTaxonFilter(TaxonFilter filter);
+
+        /// <summary>
+        /// Get taxon ids from filter.
+        /// </summary>
+        /// <param name="filter">The taxon filter.</param>
+        /// <returns></returns>
+        HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter);
     }
 }

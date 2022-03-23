@@ -241,7 +241,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter,
             int? skip,
             int? take,
-            bool sumUnderlyingTaxa = false);
+            bool sumUnderlyingTaxa = false);        
+
+        /// <summary>
+        /// Get taxon sum aggregation. Including underlying taxa and province count.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
 
         /// <summary>
         /// Get indication if taxa exists in specified area
