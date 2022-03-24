@@ -14,8 +14,9 @@ namespace SOS.Lib.Helpers
     /// <inheritdoc />
     public class ObjectHelper : IObjectHelper
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<PropertyInfo, Func<object, object>>> CachedProperties;
+        private static readonly ConcurrentDictionary<Type, IDictionary<PropertyInfo, Func<object, object>>> CachedProperties;
         private static readonly Regex RxIllegalCharacters; // Match all control characters and other non-printable characters
+        private static object _lock;
 
         private static bool ContainsIllegalCharacters(string value)
         {
@@ -86,29 +87,34 @@ namespace SOS.Lib.Helpers
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static Dictionary<PropertyInfo, Func<object, object>> GetTypeProperties(Type type)
+        public static IDictionary<PropertyInfo, Func<object, object>> GetTypeProperties(Type type)
         {
             if (CachedProperties.TryGetValue(type, out var properties))
             {
                 return properties;
             }
 
-            CacheProperties(type);
+            lock (_lock)
+            {
+                CacheProperties(type);
+            }
+            
             return CachedProperties[type];
         }
+
         private static void CacheProperties(Type type)
         {
             if (CachedProperties.ContainsKey(type))
             {
                 return;
             }
+            CachedProperties.TryAdd(type, new ConcurrentDictionary<PropertyInfo, Func<object, object>>());
 
-            CachedProperties[type] = new Dictionary<PropertyInfo, Func<object, object>>();
             var properties = type.GetProperties().Where(x => x.CanRead);
             foreach (var propertyInfo in properties)
             {
                 var getter = CompilePropertyGetter(propertyInfo);
-                CachedProperties[type].Add(propertyInfo, getter);
+                CachedProperties[type].TryAdd(propertyInfo, getter);
                 if (!propertyInfo.PropertyType.IsValueTypeOrString())
                 {
                     if (propertyInfo.PropertyType.IsIEnumerable())
@@ -148,8 +154,9 @@ namespace SOS.Lib.Helpers
         /// </summary>
         static ObjectHelper()
         {
-            CachedProperties = new ConcurrentDictionary<Type, Dictionary<PropertyInfo, Func<object, object>>>();
+            CachedProperties = new ConcurrentDictionary<Type, IDictionary<PropertyInfo, Func<object, object>>>();
             RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled);
+            _lock = new object();
         }
 
         /// <inheritdoc />
