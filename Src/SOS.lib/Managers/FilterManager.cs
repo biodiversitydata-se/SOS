@@ -431,10 +431,14 @@ namespace SOS.Lib.Managers
                 filter.ListIds,
                 filter.TaxonListOperator,
                 filter.TaxonCategories,
-                false);
+                true);
+            
+            if (taxonIds == null && !filter.IncludeUnderlyingTaxa)
+            {
+                taxonIds = new List<int> { 0 }; // Return only Biota if includeUnderlyingTaxa=false
+            }
 
-            if (taxonIds == null) return new HashSet<int>();
-            return taxonIds.ToHashSet();
+            return taxonIds?.ToHashSet();
         }
     }
 }

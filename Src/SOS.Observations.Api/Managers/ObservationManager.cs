@@ -439,10 +439,18 @@ namespace SOS.Observations.Api.Managers
             {
                 var taxonIds = _filterManager.GetTaxonIdsFromFilter(taxonFilter);
                 var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
-                var aggregationByTaxonId = cachedTaxonSumAggregation
-                    .Where(m => taxonIds.Contains(m.Key))
-                    .ToDictionary(m => m.Key, m => m.Value);
-
+                Dictionary<int, TaxonSumAggregationItem> aggregationByTaxonId = null;
+                if (taxonIds == null)
+                {
+                    aggregationByTaxonId = cachedTaxonSumAggregation;
+                }
+                else
+                {
+                    aggregationByTaxonId = cachedTaxonSumAggregation
+                        .Where(m => taxonIds.Contains(m.Key))
+                        .ToDictionary(m => m.Key, m => m.Value);
+                }
+                
                 // Update skip and take
                 if (skip == null)
                 {
