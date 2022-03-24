@@ -157,6 +157,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(FilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
 
         /// <summary>
+        /// Get cached TaxonSumAggregationItems
+        /// </summary>
+        /// <param name="taxonIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TaxonSumAggregationItem>> GetCachedTaxonSumAggregationItemsAsync(IEnumerable<int> taxonIds);
+        
+        /// <summary>
         /// Get number of matching observations
         /// </summary>
         /// <param name="roleId"></param>
@@ -184,6 +191,23 @@ namespace SOS.Observations.Api.Managers.Interfaces
             int? skip,
             int? take,
             bool sumUnderlyingTaxa = false);
+
+        /// <summary>
+        /// Aggregates present observations by taxon (absent observations are excluded).
+        /// The resulting items also contains sum of underlying taxa observation count.
+        /// </summary>
+        /// <param name="taxonFilter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Task<Result<PagedResult<TaxonSumAggregationItem>>> GetTaxonSumAggregationAsync(
+            TaxonFilter taxonFilter,
+            int? skip,
+            int? take,
+            string sortBy,
+            SearchSortOrder sortOrder);
 
         /// <summary>
         /// Get a indication if taxon exist in specified area

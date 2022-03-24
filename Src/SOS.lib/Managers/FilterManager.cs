@@ -133,18 +133,47 @@ namespace SOS.Lib.Managers
                 return;
             }
 
-            filter.Ids = GetTaxonIds(filter.Ids, filter.IncludeUnderlyingTaxa, filter.ListIds,
-                filter.TaxonListOperator);
+            filter.Ids = GetTaxonIds(filter.Ids, 
+                filter.IncludeUnderlyingTaxa, 
+                filter.ListIds,
+                filter.TaxonListOperator, 
+                filter.TaxonCategories);
         }
 
-        private List<int> GetTaxonIds(IEnumerable<int> taxonIds, bool includeUnderlyingTaxa, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge)
-        {
-            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa);
-            if (!listIds?.Any() ?? true)
+        private List<int> GetTaxonIds(IEnumerable<int> taxonIds, 
+            bool includeUnderlyingTaxa, 
+            IEnumerable<int> listIds, 
+            TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
+            List<int> taxonCategories = null,
+            bool returnBiotaResultAsNull = true)
+        {            
+            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
+            if (listIds != null && listIds.Count() > 0)
             {
-                return taxaIds?.ToList();
+                taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator);
             }
 
+            if (taxonCategories != null && taxonCategories.Count > 0)
+            {
+                if (taxaIds == null || taxaIds.Count() == 0 && includeUnderlyingTaxa)
+                {
+                    // If there are no taxaIds we need to add all taxa before taxon category filters are applied.
+                    taxaIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(BiotaTaxonId, true);
+                }
+
+                taxaIds = FilterTaxonIdsByTaxonCategories(taxaIds, taxonCategories);
+                if (taxaIds == null || taxaIds.Count() == 0)
+                {
+                    // If the filter results in no taxa, there should be no matching occurrences.
+                    taxaIds = new List<int> { -1 };
+                }
+            }
+
+            return taxaIds?.ToList();
+        }
+
+        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator)
+        {
             var taxonListIdsSet = new HashSet<int>();
             foreach (var taxonListId in listIds)
             {
@@ -176,20 +205,80 @@ namespace SOS.Lib.Managers
             return taxaSet.ToList();
         }
 
+        /// <summary>
+        /// Get taxon ids.
+        /// </summary>
+        /// <param name="taxonIds"></param>
+        /// <param name="includeUnderlyingTaxa"></param>
+        /// <param name="returnBiotaResultAsNull">If true, and the result will be every taxa, returnu null; otherwise return all taxon ids.</param>
+        /// <returns></returns>
         private IEnumerable<int> GetTaxonFilterIds(
             IEnumerable<int> taxonIds,
-            bool includeUnderlyingTaxa
+            bool includeUnderlyingTaxa,
+            bool returnBiotaResultAsNull = true
         )
-        {
+        {                        
             if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
+            {
+                if (!returnBiotaResultAsNull && includeUnderlyingTaxa)
+                {
+                    return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(new int[] {0}, true);
+                }
+                else
+                {
+                    return taxonIds;
+                }
+            }
+
+            if (returnBiotaResultAsNull && taxonIds.Contains(BiotaTaxonId))
+            {
+                return null;
+            }
+            else
+            {
+                return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
+            }
+        }
+
+        /// <summary>
+        /// Filter taxon ids by taxon categories.
+        /// </summary>
+        /// <param name="taxonIds"></param>
+        /// <param name="taxonCategories"></param>
+        /// <returns></returns>
+        private IEnumerable<int> FilterTaxonIdsByTaxonCategories(IEnumerable<int> taxonIds, 
+            List<int> taxonCategories)
+        {
+            if (taxonCategories == null || !taxonCategories.Any() || taxonIds == null)
             {
                 return taxonIds;
             }
 
-            return taxonIds.Contains(BiotaTaxonId) ? null : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
+            var taxonCategorySet = new HashSet<int>(taxonCategories);
+            var filteredIdsByTaxonCategories = new List<int>();
+            foreach (var taxonId in taxonIds)
+            {
+                var node = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                if (node != null)
+                {
+                    int? taxonCategoryId = node?.Data?.Attributes?.TaxonCategory?.Id;
+                    if (!taxonCategoryId.HasValue)
+                    {
+                        filteredIdsByTaxonCategories.Add(taxonId);
+                    }
+                    else
+                    {
+                        if (taxonCategorySet.Contains(taxonCategoryId.Value))
+                        {
+                            filteredIdsByTaxonCategories.Add(taxonId);
+                        }
+                    }
+                }
+            }
+
+            taxonIds = filteredIdsByTaxonCategories;
+            return taxonIds;
         }
-
-
 
         /// <summary>
         /// Populate geographical filter
@@ -327,6 +416,25 @@ namespace SOS.Lib.Managers
             }
             
             PopulateTaxonFilter(filter.Taxa);
+        }
+
+        public HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter)
+        {
+            if (filter == null)
+            {
+                filter = new TaxonFilter() { IncludeUnderlyingTaxa = true };
+            }          
+
+            // todo - add support for red list categories.
+            var taxonIds = GetTaxonIds(filter.Ids,
+                filter.IncludeUnderlyingTaxa,
+                filter.ListIds,
+                filter.TaxonListOperator,
+                filter.TaxonCategories,
+                false);
+
+            if (taxonIds == null) return new HashSet<int>();
+            return taxonIds.ToHashSet();
         }
     }
 }

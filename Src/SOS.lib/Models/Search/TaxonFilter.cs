@@ -47,6 +47,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
+        ///     Taxon categories.
+        /// </summary>
+        public List<int> TaxonCategories { get; set; }
+
+        /// <summary>
         /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
         /// </summary>
         public TaxonListOp TaxonListOperator { get; set; } = TaxonListOp.Merge;

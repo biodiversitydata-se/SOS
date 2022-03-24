@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -20,6 +21,7 @@ using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.UserService;
@@ -261,6 +263,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
                 artportalenApiManager,
+                new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(4) },
                 new NullLogger<ObservationManager>());
 
             return observationsManager;

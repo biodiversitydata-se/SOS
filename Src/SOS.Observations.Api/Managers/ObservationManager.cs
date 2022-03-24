@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -36,8 +40,9 @@ namespace SOS.Observations.Api.Managers
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly IArtportalenApiManager _artportalenApiManager;
-        private readonly ILogger<ObservationManager> _logger;
-        
+        private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly ILogger<ObservationManager> _logger;        
+
         private void PostProcessObservations(bool protectedObservations, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
@@ -103,6 +108,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="httpContextAccessor"></param>
         /// <param name="taxonObservationCountCache"></param>
         /// <param name="artportalenApiManager"></param>
+        /// <param name="taxonSumAggregationCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -112,6 +118,7 @@ namespace SOS.Observations.Api.Managers
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
             IArtportalenApiManager artportalenApiManager,
+            IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -123,6 +130,7 @@ namespace SOS.Observations.Api.Managers
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _artportalenApiManager = artportalenApiManager ?? throw new ArgumentNullException(nameof(artportalenApiManager));
+            _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -314,7 +322,7 @@ namespace SOS.Observations.Api.Managers
             var locations =  await _processedObservationRepository.GetLocationsAsync(locationIds);
 
             return locations?.Select(l => l.ToDto());
-        }
+        }        
 
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, FilterBase filter)
@@ -352,7 +360,7 @@ namespace SOS.Observations.Api.Managers
                 foreach (var notCachedTaxonId in notCachedTaxonIds)
                 {
                     filter.Taxa.Ids = new[] { notCachedTaxonId };
-                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));
+                    int observationCount = Convert.ToInt32(await GetMatchCountAsync(null, null, filter));                    
                     int provinceCount = Convert.ToInt32(await GetProvinceCountAsync(null, null, filter));
                     var taxonCount = new TaxonCount { ObservationCount = observationCount, ProvinceCount = provinceCount };
                     var cacheKey = TaxonObservationCountCacheKey.Create(taxonObservationCountSearch, notCachedTaxonId);
@@ -372,6 +380,174 @@ namespace SOS.Observations.Api.Managers
             return taxonCountDtos;
         }
 
+        private readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);        
+
+        private async Task<Dictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation()
+        {            
+            var taxonAggregation = _taxonSumAggregationCache.Get();
+            if (taxonAggregation == null)
+            {
+                try
+                {
+                    await _taxonSumAggregationSemaphore.WaitAsync();
+                    taxonAggregation = _taxonSumAggregationCache.Get();
+                    if (taxonAggregation == null)
+                    {
+                        _logger.LogDebug("Start create taxonSumAggregationCache");
+                        var searchFilter = new SearchFilter();
+                        searchFilter.PositiveSightings = true;
+                        _filterManager.PrepareFilter(null, null, searchFilter).Wait();
+                        Stopwatch sp = Stopwatch.StartNew();
+                        taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
+                        sp.Stop();
+                        _taxonSumAggregationCache.Set(taxonAggregation);
+                        _logger.LogDebug($"Finish create taxonSumAggregationCache. Elapsed time: {sp.Elapsed.Seconds} seconds");
+                    }
+                }
+                finally
+                {
+                    _taxonSumAggregationSemaphore.Release();
+                }
+            }
+
+            return taxonAggregation;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TaxonSumAggregationItem>> GetCachedTaxonSumAggregationItemsAsync(IEnumerable<int> taxonIds)
+        {
+            _logger.LogDebug("Start GetCachedTaxonSumAggregationItemsAsync()");
+            var taxonIdsSet = taxonIds.ToHashSet();
+            var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
+            var taxonAggregations = cachedTaxonSumAggregation
+                .Values
+                .Where(m => taxonIdsSet.Contains(m.TaxonId));
+
+            _logger.LogDebug("Finish GetCachedTaxonSumAggregationItemsAsync()");
+            return taxonAggregations;
+        }
+
+        /// <inheritdoc />
+        public async Task<Result<PagedResult<TaxonSumAggregationItem>>> GetTaxonSumAggregationAsync(
+            TaxonFilter taxonFilter,
+            int? skip,
+            int? take,
+            string sortBy,
+            SearchSortOrder sortOrder)
+        {
+            try
+            {
+                var taxonIds = _filterManager.GetTaxonIdsFromFilter(taxonFilter);
+                var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
+                var aggregationByTaxonId = cachedTaxonSumAggregation
+                    .Where(m => taxonIds.Contains(m.Key))
+                    .ToDictionary(m => m.Key, m => m.Value);
+
+                // Update skip and take
+                if (skip == null)
+                {
+                    skip = 0;
+                }
+                if (skip > aggregationByTaxonId.Count)
+                {
+                    skip = aggregationByTaxonId.Count;
+                }
+                if (take == null)
+                {
+                    take = aggregationByTaxonId.Count - skip;
+                }
+                else
+                {
+                    take = Math.Min(aggregationByTaxonId.Count - skip.Value, take.Value);
+                }
+
+                // Sort result.
+                IEnumerable<TaxonSumAggregationItem> orderedResult = OrderSumTaxonAggregation(aggregationByTaxonId.Values, sortBy, sortOrder);
+
+                var result = orderedResult
+                    .Skip(skip.Value)
+                    .Take(take.Value)
+                    .ToList();
+
+                var pagedResult = new PagedResult<TaxonSumAggregationItem>
+                {
+                    Records = result,
+                    Skip = skip.Value,
+                    Take = take.Value,
+                    TotalCount = aggregationByTaxonId.Count
+                };
+
+                return Result.Success(pagedResult);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get taxon aggregation");
+                throw;
+            }
+        }
+
+        private static IEnumerable<TaxonSumAggregationItem> OrderSumTaxonAggregation(IEnumerable<TaxonSumAggregationItem> items, string sortBy, SearchSortOrder sortOrder)
+        {
+            IEnumerable<TaxonSumAggregationItem> orderedResult = null;
+            string sort = sortBy == null ? "" : sortBy.ToLower();
+            if (sort == nameof(TaxonSumAggregationItem.SumObservationCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumObservationCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ObservationCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.ObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ObservationCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.ObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumProvinceCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.SumProvinceCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.SumProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ProvinceCount).ToLower() && sortOrder == SearchSortOrder.Desc)
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.ProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else if (sort == nameof(TaxonSumAggregationItem.ProvinceCount).ToLower() && sortOrder == SearchSortOrder.Asc)
+            {
+                orderedResult = items
+                        .OrderBy(m => m.ProvinceCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+            else
+            {
+                orderedResult = items
+                        .OrderByDescending(m => m.SumObservationCount)
+                        .ThenBy(m => m.TaxonId);
+            }
+
+            return orderedResult;
+        }
+
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             int? roleId,
@@ -383,7 +559,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);                
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, 
                     skip, 
                     take, 

@@ -56,7 +56,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.Count().Should().Be(2, "because the take parameter is 2");
-            result.TotalCount.Should().BeGreaterThan(3500, "because there should be more than 3500 observations of otter");
+            result.TotalCount.Should().BeGreaterThan(1800, "because there should be more than 1800 observations of otter");
             result.Records.First().Taxon.Id.Should().Be(100077, "because otter has TaxonId=100077");
         }
 
@@ -95,7 +95,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.Count().Should().Be(2, "because the take parameter is 2");
-            result.TotalCount.Should().BeGreaterThan(3500, "because there should be more than 3500 observations of otter");
+            result.TotalCount.Should().BeGreaterThan(1800, "because there should be more than 1800 observations of otter");
             result.Records.First().Taxon.Id.Should().Be(100077, "because otter has TaxonId=100077");
         }
 

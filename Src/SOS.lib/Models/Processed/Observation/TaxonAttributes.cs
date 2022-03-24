@@ -108,19 +108,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<TaxonSynonymName> Synonyms { get; set; }
 
         /// <summary>
-        /// Dyntaxa taxon category id..
+        /// Taxon category.
         /// </summary>
-        public int TaxonCategoryId { get; set; }
-
-        /// <summary>
-        /// Dyntaxa taxon category in Swedish.
-        /// </summary>
-        public string TaxonCategorySwedish { get; set; }
-
-        /// <summary>
-        /// Dyntaxa taxon category in English.
-        /// </summary>
-        public string TaxonCategoryEnglish { get; set; }
+        public VocabularyValue TaxonCategory { get; set; }        
 
         /// <summary>
         ///     Vernacular names.

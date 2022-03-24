@@ -283,7 +283,7 @@ namespace SOS.Process.Services
         }
 
         /// <summary>
-        /// Reads taxon sort orders from zip file
+        /// Reads taxon properties from zip file
         /// </summary>
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>
@@ -293,17 +293,17 @@ namespace SOS.Process.Services
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
-            _logger.LogDebug("Start adding sort orders to taxon");
+            _logger.LogDebug("Start adding taxon properties to taxon");
             // Try to get TaxonProperties.csv
             var taxonPropertiesFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonProperties.csv", StringComparison.CurrentCultureIgnoreCase));
             
             if (taxonPropertiesFile == null)
             {
-                _logger.LogError("Failed to open TaxonSortOrders.csv, sort order will be set to 0");
+                _logger.LogError("Failed to open TaxonProperties.csv, sort order will be set to 0");
                 return; // If no taxon properties file found, we can't do anything more
             }
-            // Read taxon sort order data
+            // Read taxon properties data
             using var csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeRead(taxonPropertiesFile.Open(), csvFieldDelimiter);
 
@@ -334,7 +334,7 @@ namespace SOS.Process.Services
                     taxon.DynamicProperties.TaxonCategoryDarwinCoreName = taxonProperties.TaxonCategoryDarwinCoreName;
                 }
             }
-            _logger.LogDebug("Finish adding sort orders to taxon");
+            _logger.LogDebug("Finish adding taxon properties to taxon");
         }
 
 

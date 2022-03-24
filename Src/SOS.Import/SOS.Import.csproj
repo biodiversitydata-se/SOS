@@ -159,6 +159,9 @@
     <None Update="Resources\Vocabularies\SensitivityCategoryVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Vocabularies\TaxonCategoryVocabulary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Vocabularies\TypeVocabulary.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

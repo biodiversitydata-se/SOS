@@ -199,6 +199,7 @@ namespace SOS.Observations.Api.Extensions
             if (filterDto is TaxonFilterDto taxonFilterDto)
             {
                 filter.RedListCategories = taxonFilterDto.RedListCategories;
+                filter.TaxonCategories = taxonFilterDto.TaxonCategories;
                 filter.TaxonListOperator =
                     (TaxonFilter.TaxonListOp) (taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
             }
@@ -536,6 +537,11 @@ namespace SOS.Observations.Api.Extensions
         public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
         {
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
+        }
+
+        public static TaxonFilter ToTaxonFilterFilter(this TaxonFilterDto taxonFilterDto)
+        {
+            return PopulateTaxa(taxonFilterDto);            
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, string translationCultureCode, bool sensitiveObservations)
