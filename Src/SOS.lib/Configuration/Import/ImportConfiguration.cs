@@ -1,6 +1,4 @@
-﻿using SOS.Lib.Configuration.Shared;
-
-namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Import
 {
     /// <summary>
     ///     Root config
@@ -26,11 +24,6 @@ namespace SOS.Lib.Configuration.Import
         ///     Configuration for clam tree service
         /// </summary>
         public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
-
-        /// <summary>
-        ///     Configuration for area import.
-        /// </summary>
-        public AreaHarvestConfiguration AreaHarvestConfiguration { get; set; }
 
         /// <summary>
         ///     Configuration for GeoRegion API.

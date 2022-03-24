@@ -47,7 +47,6 @@ namespace SOS.Import.UnitTests.Harvesters
             _areaProcessedRepository.Object,
             _areaHelperMock.Object,
             _geoRegionApiServiceMock.Object,
-            new AreaHarvestConfiguration(), 
             _cacheManagerMock.Object,
             _loggerMock.Object);
 

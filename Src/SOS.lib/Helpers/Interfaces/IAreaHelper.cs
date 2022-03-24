@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Lib.Helpers.Interfaces
 {
@@ -41,5 +44,27 @@ namespace SOS.Lib.Helpers.Interfaces
         /// Return true if object is initialized
         /// </summary>
         bool IsInitialized { get; }
+
+        /// <summary>
+        /// Get areas of specified type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Models.Shared.Area>> GetAreasAsync(AreaType type);
+
+        /// <summary>
+        /// Get area geometry
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<NetTopologySuite.Geometries.Geometry> GetGeometryAsync(AreaType type, string featureId);
+
+        /// <summary>
+        /// Get all features where position is inside feature
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        IEnumerable<IFeature> GetPointFeatures(Point point);
     }
 }

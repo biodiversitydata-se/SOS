@@ -169,7 +169,6 @@ namespace SOS.Administration.Api
             var sosApiConfiguration = Configuration.GetSection("SosApiConfiguration").Get<SosApiConfiguration>();
             services.AddSingleton<SosApiConfiguration>(sosApiConfiguration);
             var importConfiguration = Configuration.GetSection("ImportConfiguration").Get<ImportConfiguration>();
-            services.AddSingleton<AreaHarvestConfiguration>(importConfiguration.AreaHarvestConfiguration);
             services.AddSingleton<GeoRegionApiConfiguration>(importConfiguration.GeoRegionApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();

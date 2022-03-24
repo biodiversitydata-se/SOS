@@ -25,7 +25,6 @@ namespace SOS.Harvest.Harvesters
         private readonly IGeoRegionApiService _geoRegionApiService;
         private readonly IAreaRepository _areaProcessedRepository;
         private readonly IAreaHelper _areaHelper;
-        private readonly AreaHarvestConfiguration _areaHarvestConfiguration;
         private readonly ICacheManager _cacheManager;
         private readonly ILogger<AreaHarvester> _logger;
 
@@ -36,7 +35,6 @@ namespace SOS.Harvest.Harvesters
         /// <param name="areaProcessedRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="geoRegionApiService"></param>
-        /// <param name="areaHarvestConfiguration"></param>
         /// <param name="cacheManager"></param>
         /// <param name="logger"></param>
         public AreaHarvester(
@@ -44,7 +42,6 @@ namespace SOS.Harvest.Harvesters
             IAreaRepository areaProcessedRepository,
             IAreaHelper areaHelper,
             IGeoRegionApiService geoRegionApiService,
-            AreaHarvestConfiguration areaHarvestConfiguration,
             ICacheManager cacheManager,
             ILogger<AreaHarvester> logger)
         {
@@ -53,7 +50,6 @@ namespace SOS.Harvest.Harvesters
                 areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _geoRegionApiService = geoRegionApiService ?? throw new ArgumentNullException(nameof(geoRegionApiService));
-            _areaHarvestConfiguration = areaHarvestConfiguration ?? throw new ArgumentNullException(nameof(areaHarvestConfiguration));
             _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -61,23 +57,13 @@ namespace SOS.Harvest.Harvesters
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
         {
-            if (_areaHarvestConfiguration.UseGeoRegionApiHarvest)
-            {
-                return await HarvestAreasWithGeoRegionApiAsync();
-            }
-
-            return await HarvestAreasFromArtportalenAsync();
-        }
-
-        private async Task<HarvestInfo> HarvestAreasWithGeoRegionApiAsync()
-        {
             var harvestInfo = new HarvestInfo(DateTime.Now) { Id = nameof(Area) };
             try
             {
                 _logger.LogDebug("Start getting areas");
-                var featureCollection = await _geoRegionApiService.GetFeatureCollectionFromZipAsync(Enum.GetValues(typeof(AreaType)).Cast<int>(),4326);
+                var featureCollection = await _geoRegionApiService.GetFeatureCollectionFromZipAsync(Enum.GetValues(typeof(AreaType)).Cast<int>(), 4326);
                 _logger.LogDebug("Finish getting areas");
-                
+
                 var areas = new List<Area>();
                 var areaGeometries = new Dictionary<string, Geometry>();
                 foreach (IFeature feature in featureCollection)
@@ -112,78 +98,6 @@ namespace SOS.Harvest.Harvesters
 
                                 // Clear observation api cache
                                 await _cacheManager.ClearAsync(Cache.Area);
-
-                                // Update harvest info
-                                harvestInfo.End = DateTime.Now;
-                                harvestInfo.Status = RunStatus.Success;
-                                harvestInfo.Count = areas?.Count() ?? 0;
-
-                                return harvestInfo;
-                            }
-                        }
-                    }
-                }
-
-                _logger.LogDebug("Failed harvest of areas");
-                harvestInfo.Status = RunStatus.Failed;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed harvest of areas");
-                harvestInfo.Status = RunStatus.Failed;
-            }
-
-            return harvestInfo;
-        }
-
-        private async Task<HarvestInfo> HarvestAreasFromArtportalenAsync()
-        {
-            var harvestInfo = new HarvestInfo(DateTime.Now){Id = nameof(Area) };
-            try
-            {
-                _logger.LogDebug("Start getting areas");
-
-                var areaEntities = await _areaRepository.GetAsync();
-                _logger.LogDebug("Finish getting areas");
-
-                // Make sure we have an empty collection
-                if ((areaEntities?.Any() ?? false) && await _areaProcessedRepository.DeleteCollectionAsync())
-                {
-                    _logger.LogDebug("Start preparing area collection");
-                    await _areaProcessedRepository.DropGeometriesAsync();
-
-                    if (await _areaProcessedRepository.AddCollectionAsync())
-                    {
-                        _logger.LogDebug("Finish preparing area collection");
-
-                        _logger.LogDebug("Start casting geometries");
-                        var geometries = areaEntities.ToDictionary(a => ((AreaType)a.AreaDatasetId).ToAreaId(a.FeatureId), a => a
-                            .PolygonWKT?
-                            .ToGeometry()?
-                            .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
-                        _logger.LogDebug("Finish casting geometries");
-
-                        var harvestFactory = new AreaHarvestFactory(geometries);
-                        var areas = await harvestFactory.CastEntitiesToVerbatimsAsync(areaEntities);
-
-                        _logger.LogDebug("Start adding areas");
-
-                        if (await _areaProcessedRepository.AddManyAsync(areas))
-                        {
-                            _logger.LogDebug("Finish adding areas");
-
-                            _logger.LogDebug("Start storing geometries");
-                            if (await _areaProcessedRepository.StoreGeometriesAsync(geometries))
-                            {
-                                _logger.LogDebug("Finish storing geometries");
-
-                                await _areaProcessedRepository.CreateIndexAsync();
-
-                                _logger.LogDebug("Start clearing cache");
-                                _areaHelper.ClearCache();
-                                _logger.LogDebug("Finish clearing cache");
-
-                                _logger.LogDebug("Adding areas succeeded");
 
                                 // Update harvest info
                                 harvestInfo.End = DateTime.Now;

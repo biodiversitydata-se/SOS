@@ -151,7 +151,7 @@ namespace SOS.Lib.Helpers
                         var feature = geometry.ToFeature(attributes);
                         _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                     }
-
+                    
                     _strTree.Build();
                     IsInitialized = true;
                 }
@@ -164,6 +164,34 @@ namespace SOS.Lib.Helpers
 
         /// <inheritdoc />
         public bool IsInitialized { get; private set; }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<Models.Shared.Area>> GetAreasAsync(AreaType type)
+        {
+            return await _processedAreaRepository.GetAsync(new[] {type});
+        }
+
+        /// <inheritdoc />
+        public async Task<Geometry> GetGeometryAsync(AreaType type, string featureId)
+        {
+            return await _processedAreaRepository.GetGeometryAsync(type, featureId);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IFeature> GetPointFeatures(Point point)
+        {
+            var featuresContainingPoint = new List<IFeature>();
+            var possibleFeatures = _strTree.Query(point.EnvelopeInternal);
+            foreach (var feature in possibleFeatures)
+            {
+                if (feature.Geometry.Contains(point))
+                {
+                    featuresContainingPoint.Add(feature);
+                }
+            }
+
+            return featuresContainingPoint;
+        }
 
         /// <summary>
         ///     Get all features where position is inside area

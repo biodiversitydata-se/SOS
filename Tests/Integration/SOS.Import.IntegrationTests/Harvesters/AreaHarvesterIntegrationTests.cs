@@ -44,7 +44,6 @@ namespace SOS.Import.IntegrationTests.Harvesters
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
                 new GeoRegionApiService(new GeoRegionApiConfiguration {ApiUrl = "https://georegionapi-dev.artdata.slu.se/"}), 
-                new AreaHarvestConfiguration {UseGeoRegionApiHarvest = true},
                 cacheManager.Object, 
                 new Mock<ILogger<AreaHarvester>>().Object);
 
@@ -85,7 +84,6 @@ namespace SOS.Import.IntegrationTests.Harvesters
                 areaVerbatimRepository,
                 new AreaHelper(new Mock<IAreaRepository>().Object),
                 new GeoRegionApiService(new GeoRegionApiConfiguration { ApiUrl = "https://georegionapi-dev.artdata.slu.se/" }),
-                new AreaHarvestConfiguration { UseGeoRegionApiHarvest = true },
                 cacheManagerMock.Object,
                 new Mock<ILogger<AreaHarvester>>().Object);
 

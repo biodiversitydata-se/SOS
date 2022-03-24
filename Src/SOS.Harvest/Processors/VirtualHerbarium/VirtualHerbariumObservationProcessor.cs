@@ -32,6 +32,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             IJobCancellationToken cancellationToken)
         {
             var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, _areaHelper, TimeManager);
+            await observationFactory.InitializeAsync();
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

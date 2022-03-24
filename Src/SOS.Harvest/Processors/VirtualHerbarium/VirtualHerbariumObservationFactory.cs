@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Constants;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -10,6 +12,7 @@ using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
+using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Harvest.Processors.VirtualHerbarium
 {
@@ -17,6 +20,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     {
         private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
+        private readonly IDictionary<string, (double longitude, double latitude, int precision)> _communities;
 
         /// <summary>
         /// Constructor
@@ -33,6 +37,87 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _communities = new Dictionary<string, (double longitude, double latitude, int precision)>();
+        }
+
+        public async Task InitializeAsync()
+        {
+            var communities = await _areaHelper.GetAreasAsync(AreaType.Community);
+            if (!communities?.Any() ?? true)
+            {
+                return;
+            }
+            var duplictes = new HashSet<string>();
+            foreach (var community in communities)
+            {
+                var geometry = await _areaHelper.GetGeometryAsync(community.AreaType, community.FeatureId);
+                if (geometry == null)
+                {
+                    continue;
+                }
+
+                var centroid = geometry.Centroid;
+                var maxDistance = 0d;
+                var maxPoint = centroid;
+                // Find point most far away from centroid
+                foreach (var coordinate in geometry.Coordinates)
+                {
+                    var distance = centroid.Coordinate.Distance(coordinate);
+
+                    if (distance > maxDistance)
+                    {
+                        maxDistance = distance;
+                        maxPoint = new Point(coordinate);
+                    }
+                }
+                var maxDistanceInM = 0;
+                
+                //If we have found a point, get distance in meters
+                if (maxDistance > 0)
+                {
+                    maxDistanceInM = (int)centroid.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Distance(maxPoint.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM));
+                }
+
+                // Get point county, parish etc
+                var features = _areaHelper.GetPointFeatures(geometry.Centroid);
+                
+                if (!features?.Any() ?? true)
+                {
+                    continue;
+                }
+                var proviceName = string.Empty;
+                foreach(var feature in features)
+                {
+                    var attributes = feature.Attributes as AttributesTable;
+
+                    if (((AreaType)attributes["areaType"]) == AreaType.Province)
+                    {
+                        proviceName = attributes["name"]?.ToString();
+                        break;
+                    }
+                }
+                
+                if (!string.IsNullOrEmpty(proviceName))
+                {
+                    var key = $"{proviceName.Trim()}-{community.Name.Trim()}".ToLower();
+
+                    // If combination of province and community exists more than once, we can't use it to determine position
+                    if (duplictes.Contains(key))
+                    {
+                        continue;
+                    }
+
+                    // If combination of province and community exists more than once, we can't use it to determine position
+                    if (_communities.ContainsKey(key))
+                    {
+                        _communities.Remove(key);
+                        duplictes.Add(key);
+                        continue;
+                    }
+
+                    _communities.Add(key, (centroid.X, centroid.Y, maxDistanceInM));
+                }
+            }
         }
 
         /// <summary>
@@ -104,6 +189,16 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon
             };
+
+            if ((verbatim.DecimalLongitude == 0 || verbatim.DecimalLatitude == 0) && !string.IsNullOrEmpty(verbatim.District))
+            {
+                if (_communities.TryGetValue($"{verbatim.Province}-{verbatim.District}".ToLower(), out var parish))
+                {
+                    verbatim.DecimalLongitude = parish.longitude;
+                    verbatim.DecimalLatitude = parish.latitude;
+                    verbatim.CoordinatePrecision = parish.precision;
+                }
+            }
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);

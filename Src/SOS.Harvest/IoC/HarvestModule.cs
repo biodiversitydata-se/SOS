@@ -137,9 +137,6 @@ namespace SOS.Harvest.IoC.Modules
             if (Configurations.ImportConfiguration.ClamServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
                     .SingleInstance();
-            if (Configurations.ImportConfiguration.AreaHarvestConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.AreaHarvestConfiguration).As<AreaHarvestConfiguration>()
-                    .SingleInstance();
             if (Configurations.ImportConfiguration.GeoRegionApiConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.GeoRegionApiConfiguration).As<GeoRegionApiConfiguration>()
                     .SingleInstance();
