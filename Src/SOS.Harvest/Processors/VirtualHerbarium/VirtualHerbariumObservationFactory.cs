@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Features;
+﻿using System.Text.RegularExpressions;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -135,10 +136,18 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
             var taxon = GetTaxon(verbatim.DyntaxaId);
             var defects = new Dictionary<string, string>();
-            DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected);
+            DateTime? dateCollected = DwcParser.ParseDate(verbatim.DateCollected?.Replace("&", "6"));
             if (dateCollected == null)
             {
                 defects.Add("DateCollected", verbatim.DateCollected);
+            }
+
+            var notes = verbatim.Notes;
+            if (!string.IsNullOrEmpty(notes))
+            {
+                // Remove invalid charaters.
+                notes = Regex.Replace(verbatim.Notes, @"[\x00-\x1F]", string.Empty);
+                notes = Regex.Replace(notes, @"\s\&\s", " och "); // replace ' & ' with ' och '
             }
 
             var obs = new Observation
@@ -184,7 +193,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
-                    OccurrenceRemarks = verbatim.Notes
+                    OccurrenceRemarks = notes
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon

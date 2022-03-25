@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Extensions;
@@ -8,7 +9,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 {
     public class VirtualHerbariumHarvestFactory : HarvestBaseFactory, IHarvestFactory<XDocument, VirtualHerbariumObservationVerbatim>
     {
-        private IDictionary<string, double[]> _localities;
+        private readonly IDictionary<string, double[]> _localities;
         
         /// <summary>
         ///     Create virtual herbarium verbatim from one row of data
@@ -28,16 +29,14 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             foreach (var cell in rowData.Elements())
             {
                 var value = cell.Value;
-                if (string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value))
                 {
-                    index++;
-                    continue;
+                    observation.SetProperty(propertyMapping[index], value);
                 }
-
-                observation.SetProperty(propertyMapping[index], value);
+                
                 index++;
             }
-
+            
             // If position is missing, try to get it from locality file
             if ((observation.DecimalLatitude.Equals(0) || observation.DecimalLongitude.Equals(0)) &&
                 !string.IsNullOrEmpty(observation.Province) &&
@@ -74,11 +73,13 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         /// </summary>
         /// <param name="xDocument"></param>
         /// <returns></returns>
-        private void InitializeLocalities(XDocument xDocument)
+        private IDictionary<string, double[]> InitializeLocalities(XDocument xDocument)
         {
-            if (xDocument == null)
+            var localities = new Dictionary<string, double[]>();
+
+            if (xDocument?.Document == null)
             {
-                return;
+                return localities;
             }
 
             XNamespace xmlns = "urn:schemas-microsoft-com:office:spreadsheet";
@@ -106,7 +107,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     index++;
                 }
 
-                _localities = new Dictionary<string, double[]>();
+               
                 // Data in all rows where country is sweden
                 var rows = table.Elements(xmlns + "Row").Where(r =>
                     r.Elements().ToArray()[propertyMapping["country"]].Value
@@ -126,15 +127,18 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     }
                 }
             }
+
+            return localities;
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="xDocument"></param>
         public VirtualHerbariumHarvestFactory(
             XDocument xDocument): base()
         {
-            InitializeLocalities(xDocument);
+            _localities = InitializeLocalities(xDocument);
         }
 
         /// <inheritdoc />
@@ -142,9 +146,9 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         {
             return await Task.Run(() =>
             {
-                if (xDocument == null)
+                if (xDocument?.Document == null)
                 {
-                    return null;
+                    return Array.Empty<VirtualHerbariumObservationVerbatim>();
                 }
 
                 XNamespace xmlns = "urn:schemas-microsoft-com:office:spreadsheet";
@@ -174,7 +178,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                            select CastEntitiesToVerbatims(r, propertyMapping);
                 }
 
-                return null;
+                return Array.Empty<VirtualHerbariumObservationVerbatim>();
             });
         }
     }
