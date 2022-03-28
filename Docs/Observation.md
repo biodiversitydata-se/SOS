@@ -226,6 +226,7 @@ These fields are deprecated and should not be used.
 | taxon.attributes.swedishHistory 	| string 	| "Spontan" 	| This property contains information about the species immigration history.    	|  	|
 | taxon.attributes.swedishOccurrence 	| string 	| "Bofast och reproducerande" 	| Information about the species   occurrence in Sweden. For example information about if the species reproduce   in sweden.    	|  	|
 | taxon.attributes.synonyms 	| Collection\<TaxonSynonymName\> 	| [\{<br/>&nbsp;"name":"Orchis morio",<br/>&nbsp;"author":"L.",<br/>&nbsp;"taxonomicStatus":"synonym",<br/>&nbsp;"nomenclaturalStatus":"valid"<br/>\}] 	| Scientific synonym names. 	|  	|
+| taxon.attributes.taxonCategory 	| VocabularyValue[\<taxonCategory\>](Vocabularies.md#taxonCategory)	| \{ "id":17, "value":"Art" \}	| Taxon category. 	|  	|
 | taxon.attributes.vernacularNames 	| Collection\<TaxonVernacularName\> 	| [\{<br/>&nbsp;"name":"göknycklar",<br/>&nbsp;"language":"sv",<br/>&nbsp;"countryCode":"SE",<br/>&nbsp;"isPreferredName":"true"<br/>\}] | Vernacular names. 	|  	|
 | taxon.acceptedNameUsage 	| string 	|  	| The full name, with authorship and date information if known, of the   currently valid or accepted taxon.    	| https://dwc.tdwg.org/terms/#dwc:acceptedNameUsage 	|
 | taxon.infraspecificEpithet 	| string 	|  	| The name of the lowest or terminal infraspecific epithet of the   scientificName, excluding any rank designation.    	| https://dwc.tdwg.org/terms/#dwc:infraspecificEpithet 	|
