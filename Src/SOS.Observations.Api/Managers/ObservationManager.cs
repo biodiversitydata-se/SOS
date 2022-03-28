@@ -393,7 +393,7 @@ namespace SOS.Observations.Api.Managers
                     taxonAggregation = _taxonSumAggregationCache.Get();
                     if (taxonAggregation == null)
                     {
-                        _logger.LogDebug("Start create taxonSumAggregationCache");
+                        _logger.LogInformation("Start create taxonSumAggregationCache");
                         var searchFilter = new SearchFilter();
                         searchFilter.PositiveSightings = true;
                         _filterManager.PrepareFilter(null, null, searchFilter).Wait();
@@ -401,7 +401,7 @@ namespace SOS.Observations.Api.Managers
                         taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
                         sp.Stop();
                         _taxonSumAggregationCache.Set(taxonAggregation);
-                        _logger.LogDebug($"Finish create taxonSumAggregationCache. Elapsed time: {sp.Elapsed.Seconds} seconds");
+                        _logger.LogInformation($"Finish create taxonSumAggregationCache. Elapsed time: {sp.Elapsed.Seconds} seconds");
                     }
                 }
                 finally
