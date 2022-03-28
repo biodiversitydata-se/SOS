@@ -23,6 +23,7 @@ This page provides information about how to use the search filter parameters.
   * [Taxon lists](#taxon-lists)
   * [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
   * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
+  * [Search for observations with taxon categories](#search-for-observations-with-taxon-categories)
 - [Projects filter](#projects-filter)
 - [Occurrence status filter](#occurrence-status-filter)
 - [Verification status filter](#verification-status-filter)
@@ -436,6 +437,19 @@ This filter will return observations for mammal (TaxonId=4000107) species that a
         "includeUnderlyingTaxa": true,
         "taxonListIds": [ 8 ],
         "taxonListOperator": "Filter"
+    }
+}
+```
+
+### Search for observations with taxon categories
+
+This filter will return observations for bird species. The taxon categories can be found [here](Vocabularies.md#taxonCategory).
+```json
+{        
+    "taxon" : {
+        "ids": [4000104],
+        "includeUnderlyingTaxa": true,
+        "taxonCategories": [17]
     }
 }
 ```
