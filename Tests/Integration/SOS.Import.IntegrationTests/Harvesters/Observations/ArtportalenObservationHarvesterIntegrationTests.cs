@@ -54,8 +54,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new SightingRepository(artportalenDataService, new Mock<ILogger<SightingRepository>>().Object);
             var personRepository =
                 new PersonRepository(artportalenDataService, new Mock<ILogger<PersonRepository>>().Object);
-            var organizationRepository = new OrganizationRepository(artportalenDataService,
-                new Mock<ILogger<OrganizationRepository>>().Object);
             var sightingRelationRepository = new SightingRelationRepository(artportalenDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
@@ -81,7 +79,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 siteRepositoryMock.Object,
                 sightingVerbatimRepository,
                 personRepository,
-                organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,
@@ -123,8 +120,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new SightingRepository(artportalenDataService, new Mock<ILogger<SightingRepository>>().Object);
             var personRepository =
                 new PersonRepository(artportalenDataService, new Mock<ILogger<PersonRepository>>().Object);
-            var organizationRepository = new OrganizationRepository(artportalenDataService,
-                new Mock<ILogger<OrganizationRepository>>().Object);
             var sightingRelationRepository = new SightingRelationRepository(artportalenDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
@@ -148,7 +143,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 siteRepositoryMock.Object,
                 sightingVerbatimRepositoryMock.Object,
                 personRepository,
-                organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 processedObservationRepository,

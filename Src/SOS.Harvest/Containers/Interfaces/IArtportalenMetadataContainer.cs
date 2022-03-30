@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -23,7 +22,6 @@ namespace SOS.Harvest.Containers.Interfaces
         ConcurrentDictionary<int, Metadata> DeterminationMethods { get; }
         ConcurrentDictionary<int, Metadata> DiscoveryMethods { get; }
         ConcurrentDictionary<int, Metadata> Genders { get; }
-        ConcurrentDictionary<int, Organization> OrganizationById { get; }
         ConcurrentDictionary<int, Metadata> Organizations { get; }
         ConcurrentDictionary<int, Person> PersonByUserId { get; }
         ConcurrentDictionary<int, Project> Projects { get; }
@@ -41,7 +39,6 @@ namespace SOS.Harvest.Containers.Interfaces
         /// <param name="determinationMethods"></param>
         /// <param name="discoveryMethods"></param>
         /// <param name="genders"></param>
-        /// <param name="organizationById"></param>
         /// <param name="organizations"></param>
         /// <param name="personByUserId"></param>
         /// <param name="projectEntities"></param>
@@ -56,7 +53,6 @@ namespace SOS.Harvest.Containers.Interfaces
             IEnumerable<MetadataEntity> determinationMethods,
             IEnumerable<MetadataEntity> discoveryMethods,
             IEnumerable<MetadataEntity> genders,
-            IEnumerable<OrganizationEntity> organizationById,
             IEnumerable<MetadataEntity> organizations,
             IEnumerable<PersonEntity> personByUserId,
             IEnumerable<ProjectEntity> projectEntities,

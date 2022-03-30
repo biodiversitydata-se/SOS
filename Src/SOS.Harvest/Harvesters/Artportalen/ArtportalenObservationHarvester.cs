@@ -24,7 +24,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private readonly ArtportalenConfiguration _artportalenConfiguration;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMetadataRepository _metadataRepository;
-        private readonly IOrganizationRepository _organizationRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IProjectRepository _projectRepository;        
         private readonly ISightingRelationRepository _sightingRelationRepository;
@@ -80,8 +79,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug("Finish getting metadata");
 
                 _logger.LogDebug("Start getting sighting metadata");
-                var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
-
+                var personByUserId = await _personRepository.GetAsync();
                 var projectEntities = await _projectRepository.GetProjectsAsync();
                 _logger.LogDebug("Finish getting sighting metadata");
 
@@ -92,7 +90,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     determinationMethods,
                     discoveryMethods,
                     genders,
-                    organizationById,
                     organizations,
                     personByUserId,
                     projectEntities,
@@ -395,20 +392,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
 
         /// <summary>
-        /// persons and organizations
-        /// </summary>
-        /// <returns></returns>
-        private async Task<(IEnumerable<PersonEntity>, IEnumerable<OrganizationEntity>)> GetPersonsAndOrganizationsAsync()
-        {
-            _logger.LogDebug("Start getting persons & organizations data");
-            var personByUserId = await _personRepository.GetAsync();
-            var organizationById = await _organizationRepository.GetAsync();
-            _logger.LogDebug("Finish getting persons & organizations data");
-
-            return (personByUserId, organizationById);
-        }
-
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenConfiguration"></param>
@@ -419,7 +402,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="siteRepository"></param>
         /// <param name="artportalenVerbatimRepository"></param>
         /// <param name="personRepository"></param>
-        /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="processedObservationRepository"></param>
@@ -436,7 +418,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             ISiteRepository siteRepository,
             IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IPersonRepository personRepository,
-            IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
             IProcessedObservationRepository processedObservationRepository,
@@ -455,8 +436,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
-            _organizationRepository =
-                organizationRepository ?? throw new ArgumentNullException(nameof(organizationRepository));
             _sightingRelationRepository = sightingRelationRepository ??
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??

@@ -247,7 +247,6 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsRepository>().As<IApiUsageStatisticsRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<OrganizationRepository>().As<IOrganizationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>()
                 .InstancePerLifetimeScope();

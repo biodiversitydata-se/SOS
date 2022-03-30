@@ -12,7 +12,7 @@ namespace SOS.Harvest.Factories
         public static Dictionary<int, PersonSighting>? CreatePersonSightingDictionary(
             ISet<int> sightingIds,
             IDictionary<int, Person> personByUserId,
-            IDictionary<int, Organization> organizationById,
+            IDictionary<int, Metadata> organizations,
             IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
             IEnumerable<SightingRelation>? sightingRelations)
         {
@@ -29,7 +29,7 @@ namespace SOS.Harvest.Factories
                 // Add SpeciesCollection values
                 //------------------------------------------------------------------------------
                 var speciesCollectionBySightingId = CreateSpeciesCollectionDictionary(personByUserId,
-                    organizationById,
+                    organizations,
                     speciesCollectionItemsBySightingId);
 
                 if (speciesCollectionBySightingId?.Any() ?? false)
@@ -141,7 +141,7 @@ namespace SOS.Harvest.Factories
 
         private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
             IDictionary<int, Person> personById,
-            IDictionary<int, Organization> organizationById,
+            IDictionary<int, Metadata> organizations,
             IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId)
         {
             var speciesCollectionBySightingId = new Dictionary<int, string>();
@@ -165,16 +165,17 @@ namespace SOS.Harvest.Factories
                     }
 
                     // Collection is Organization
-                    if ((organizationById?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
-                        organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
+                    if ((organizations?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
+                        organizations.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
                     {
+                        var name = organization?.Translations?.FirstOrDefault()?.Value ?? "";
                         if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
                         {
-                            speciesCollectionBySightingId[speciesCollectionItem.SightingId] = organization.Name;
+                            speciesCollectionBySightingId[speciesCollectionItem.SightingId] = name;
                         }
                         else
                         {
-                            speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, organization.Name);
+                            speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, name);
                         }
                     }
                 }

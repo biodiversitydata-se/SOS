@@ -196,7 +196,6 @@ namespace SOS.Harvest.Containers
         public ConcurrentDictionary<int, Metadata> DeterminationMethods { get; private set; }
         public ConcurrentDictionary<int, Metadata> DiscoveryMethods { get; private set; }
         public ConcurrentDictionary<int, Metadata> Genders { get; private set; }
-        public ConcurrentDictionary<int, Organization> OrganizationById { get; private set; }
         public ConcurrentDictionary<int, Metadata> Organizations { get; private set; }
         public ConcurrentDictionary<int, Person> PersonByUserId { get; private set; }
         public ConcurrentDictionary<int, Project> Projects { get; private set; }        
@@ -213,7 +212,6 @@ namespace SOS.Harvest.Containers
             IEnumerable<MetadataEntity> determinationMethods,
             IEnumerable<MetadataEntity> discoveryMethods,
             IEnumerable<MetadataEntity> genders,
-            IEnumerable<OrganizationEntity> organizationById,
             IEnumerable<MetadataEntity> organizations,
             IEnumerable<PersonEntity> personByUserId,
             IEnumerable<ProjectEntity> projectEntities,
@@ -229,7 +227,6 @@ namespace SOS.Harvest.Containers
             DeterminationMethods = CastMetdataEntitiesToVerbatims(determinationMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
             DiscoveryMethods = CastMetdataEntitiesToVerbatims(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
             Genders = CastMetdataEntitiesToVerbatims(genders)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<int, Metadata>();
-            OrganizationById = CastOrganizationEntitiesToVerbatims(organizationById)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Organization>();
             Organizations = CastMetdataEntitiesToVerbatims(organizations)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Metadata>();
             PersonByUserId = CastPersonEntitiesToVerbatims(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
             Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();

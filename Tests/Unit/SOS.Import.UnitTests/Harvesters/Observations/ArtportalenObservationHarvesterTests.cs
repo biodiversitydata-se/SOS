@@ -38,7 +38,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _siteRepositoryMockMock = new Mock<ISiteRepository>();
             _artportalenVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
             _personRepository = new Mock<IPersonRepository>();
-            _organizationRepository = new Mock<IOrganizationRepository>();
             _sightingRelationRepository = new Mock<ISightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<ISpeciesCollectionItemRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
@@ -56,7 +55,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<ISiteRepository> _siteRepositoryMockMock;
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepositoryMock;
         private readonly Mock<IPersonRepository> _personRepository;
-        private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<ISpeciesCollectionItemRepository> _speciesCollectionItemRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
@@ -74,7 +72,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _siteRepositoryMockMock.Object,
             _artportalenVerbatimRepositoryMock.Object,
             _personRepository.Object,
-            _organizationRepository.Object,
             _sightingRelationRepository.Object,
             _speciesCollectionItemRepository.Object,
             _processedObservationRepositoryMock.Object,

@@ -159,7 +159,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                         ? _artportalenMetadataContainer.PersonByUserId[speciesCollectionItemEntity.CollectorId.Value].FullName
                         : null;
                 }
-
+                
                 if (personSighting != null)
                 {
                     observation.VerifiedBy = personSighting.VerifiedBy;
@@ -521,7 +521,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var personSightings = PersonSightingFactory.CreatePersonSightingDictionary(
                 sightingIds,
                 _artportalenMetadataContainer.PersonByUserId,
-                _artportalenMetadataContainer.OrganizationById,
+                _artportalenMetadataContainer.Organizations,
                 speciesCollectionsBySightingId,
                 sightingRelations);
 
@@ -532,8 +532,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 var entity = entities[i];
 
-                ICollection<SpeciesCollectionItemEntity>? speciesCollections = null;
-                speciesCollectionsBySightingId.TryGetValue(entity.Id, out speciesCollections);
+                speciesCollectionsBySightingId.TryGetValue(entity.Id, out var speciesCollections);
                 PersonSighting? personSighting = null;
                 personSightings?.TryGetValue(entity.Id, out personSighting);
                 Project[]? projects = null;
