@@ -153,7 +153,7 @@ namespace SOS.Lib.Managers
                     "Location point with buffer is missing")
                 );
             }
-
+         
             if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))
             {
                 observationValidation.Defects.Add(new ObservationDefect(

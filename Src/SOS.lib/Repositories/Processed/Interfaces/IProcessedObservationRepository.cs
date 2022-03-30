@@ -368,10 +368,5 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
-
-        /// <summary>
-        /// Batch size used for write
-        /// </summary>
-        int WriteBatchSize { get; set; }
     }
 }

@@ -36,7 +36,6 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await Client.Indices.CreateAsync(IndexName, s => s
-                .IncludeTypeName(false)
                 .Settings(s => s
                     .NumberOfShards(_elasticConfiguration.NumberOfShards)
                     .NumberOfReplicas(_elasticConfiguration.NumberOfReplicas)
@@ -59,7 +58,7 @@ namespace SOS.Lib.Repositories.Processed
                         .GeoShape(gs => gs
                             .Name(nn => nn.Location.PointWithBuffer)))));
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid;
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create checklist index. Error: {createIndexResponse.DebugInformation}");
         }
 
         /// <summary>
@@ -114,7 +113,7 @@ namespace SOS.Lib.Repositories.Processed
                     // how many concurrent bulk requests to make
                     .MaxDegreeOfParallelism(Environment.ProcessorCount)
                     // number of items per bulk request
-                    .Size(1000)
+                    .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
                     {
                         Logger.LogError($"Check list id: {o?.Id}, Error: {r.Error.Reason}");
@@ -137,7 +136,7 @@ namespace SOS.Lib.Repositories.Processed
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedCheckListRepository> logger) : base(client, true, processedConfigurationCache, logger)
+            ILogger<ProcessedCheckListRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
         {
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));

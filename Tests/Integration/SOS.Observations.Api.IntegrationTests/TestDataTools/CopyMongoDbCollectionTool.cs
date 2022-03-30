@@ -13,7 +13,28 @@ using Xunit;
 namespace SOS.Observations.Api.IntegrationTests.TestDataTools
 {
     public class CopyMongoDbCollectionTool : FixtureBase
-    {        
+    {
+        /* [Fact]
+         [Trait("Category", "ApiIntegrationTest")]
+         public async Task CopyClamsCollection()
+         {
+             //-----------------------------------------------------------------------------------------------------------
+             // Arrange
+             //-----------------------------------------------------------------------------------------------------------
+             var fromClient = GetProcessClient(InstallationEnvironment.SystemTest, "sos-harvest-st");
+             var toClient = GetProcessClient(InstallationEnvironment.Production, "sos-harvest");
+             var mongoDbUtil = new MongoDbUtil(fromClient, toClient);
+
+             //-----------------------------------------------------------------------------------------------------------
+             // Act
+             //-----------------------------------------------------------------------------------------------------------
+             await mongoDbUtil.CopyCollectionAsync<ClamObservationVerbatim>("ClamObservationVerbatim_copy", "ClamObservationVerbatim");
+
+             //-----------------------------------------------------------------------------------------------------------
+             // Assert
+             //-----------------------------------------------------------------------------------------------------------                        
+         }
+        */
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
         public async Task CopyTaxonCollection()

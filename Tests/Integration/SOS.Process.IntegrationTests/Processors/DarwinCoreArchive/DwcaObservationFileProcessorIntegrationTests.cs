@@ -139,7 +139,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         {
             var mock = new Mock<IProcessedObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(100000);
+            mock.Setup(m => m.ReadBatchSize).Returns(10000);
+            mock.Setup(m => m.WriteBatchSize).Returns(1000);
             return mock;
         }
 

@@ -72,9 +72,10 @@ namespace SOS.Harvest.Processors
             location.DecimalLatitude = point.Y;
             location.Point = point.ToGeoShape() as PointGeoShape;
             location.PointLocation = point.ToGeoLocation();
+
             location.PointWithBuffer = pointWithBuffer;
             location.PointWithDisturbanceBuffer = pointWithDisturbanceBuffer;
-
+          
             var sweref99TimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.Sweref99Conversion);
             var sweRef99TmPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
             location.Sweref99TmX = sweRef99TmPoint.Coordinate.X;
@@ -128,10 +129,10 @@ namespace SOS.Harvest.Processors
                     point = point.Transform(verbatimCoordinateSystem, CoordinateSys.WGS84) as Point;
                 }
             }
-
+            
             var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
-
+            
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
         }
 

@@ -14,6 +14,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -21,19 +22,17 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using System.Diagnostics;
-using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -71,15 +70,15 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync(bool protectedIndex)
         {
             var createIndexResponse = await Client.Indices.CreateAsync(protectedIndex ? ProtectedIndexName : PublicIndexName, s => s
-                .IncludeTypeName(false)
                 .Settings(s => s
                     .NumberOfShards(_elasticConfiguration.NumberOfShards)
                     .NumberOfReplicas(_elasticConfiguration.NumberOfReplicas)
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
+                
                 .Map<Observation>(m => m
-                    .AutoMap()
+                    .AutoMap<Observation>()
                     .Properties(ps => ps
                         .Keyword(kw => kw
                             .Name(nm => nm.BibliographicCitation)
@@ -1116,7 +1115,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid;
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
         /// <summary>
@@ -1571,7 +1570,7 @@ namespace SOS.Lib.Repositories.Processed
                 }
                 Logger.LogDebug(diskUsageDescription);
             }
-
+         
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
@@ -1582,14 +1581,19 @@ namespace SOS.Lib.Repositories.Processed
                     // how many concurrent bulk requests to make
                     .MaxDegreeOfParallelism(Environment.ProcessorCount)
                     // number of items per bulk request
-                    .Size(1000)
+                    .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
                     {
-                        Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, Error: {r.Error.Reason}");
+                        if (r.Error != null)
+                        {
+                            Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, { r.Error.Reason }");
+                        }
                     })
                 )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
+                .Wait(TimeSpan.FromHours(1),
+                    next => { 
+                        Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); 
+                    });
         }
 
         /// <summary>
@@ -1611,7 +1615,7 @@ namespace SOS.Lib.Repositories.Processed
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
 
@@ -1620,7 +1624,6 @@ namespace SOS.Lib.Repositories.Processed
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
         /// <summary>
@@ -1638,14 +1641,13 @@ namespace SOS.Lib.Repositories.Processed
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = false;
 
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            WriteBatchSize = elasticConfiguration.WriteBatchSize;
         }
 
         /// <inheritdoc />
@@ -2390,17 +2392,25 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus)
         {
-            var response = await Client.Cluster.HealthAsync(new ClusterHealthRequest() { WaitForStatus = waitForStatus });
-
-            var healthColor = response.Status.ToString().ToLower();
-
-            return healthColor switch
+            try
             {
-                "green" => WaitForStatus.Green,
-                "yellow" => WaitForStatus.Yellow,
-                "red" => WaitForStatus.Red,
-                _ => WaitForStatus.Red
-            };
+                var response = await Client.Cluster.HealthAsync(new ClusterHealthRequest() { WaitForStatus = waitForStatus });
+
+                var healthColor = response.Status.ToString().ToLower();
+
+                return healthColor switch
+                {
+                    "green" => WaitForStatus.Green,
+                    "yellow" => WaitForStatus.Yellow,
+                    "red" => WaitForStatus.Red,
+                    _ => WaitForStatus.Red
+                };
+            }
+            catch(Exception e)
+            {
+                Logger.LogError("Failed to get ElasticSearch health", e);
+                return WaitForStatus.Red;
+            }
         }
 
         /// <inheritdoc />
@@ -3497,8 +3507,5 @@ namespace SOS.Lib.Repositories.Processed
 
             return !response.Exists;
         }
-
-        /// <inheritdoc />
-        public int WriteBatchSize { get; set; }
     }
 }

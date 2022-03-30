@@ -36,7 +36,6 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             Created = DateTime.Now;
             DiffusionStatus = DiffusionStatus.NotDiffused;
-            Occurrence = new Occurrence();
         }
 
         /// <summary>

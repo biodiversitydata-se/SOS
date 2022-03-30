@@ -10,11 +10,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IProcessRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
-        /// Batch size
-        /// </summary>
-        int BatchSize { get; }
-
-        /// <summary>
         ///     Get 0 or 1 depending of witch instance to update
         /// </summary>
         byte ActiveInstance { get; }
@@ -35,11 +30,25 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         bool LiveMode { get; set; }
 
         /// <summary>
+        /// Batch size used for read
+        /// </summary>
+        int ReadBatchSize { get; }
+
+        /// <summary>
+        /// Batch size used for read
+        /// </summary>
+        int ScrollBatchSize { get; }
+
+        /// <summary>
         /// Set active instance
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
         Task<bool> SetActiveInstanceAsync(byte instance);
 
-}
+        /// <summary>
+        /// Batch size used for write
+        /// </summary>
+        int WriteBatchSize { get; }
+    }
 }

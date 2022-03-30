@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
@@ -16,7 +16,6 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        private readonly IProcessClient _client;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly bool _toggleable;
         private readonly string _id = typeof(TEntity).Name;
@@ -25,11 +24,6 @@ namespace SOS.Lib.Repositories.Processed
         ///     Disposed
         /// </summary>
         private bool _disposed;
-
-        /// <summary>
-        ///     Mongo db
-        /// </summary>
-        private IMongoDatabase _database;
 
         /// <summary>
         ///     Get configuration object
@@ -88,30 +82,28 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
-        /// <param name="logger"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="elasticConfiguration"></param>
+        /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ProcessRepositoryBase(
             IProcessClient client,
             bool toggleable,
-            ICache<string, ProcessedConfiguration> processedConfigurationCache = null,
-            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger = null
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
+            ElasticSearchConfiguration elasticConfiguration,
+            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
             _toggleable = toggleable;
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
-
+            ReadBatchSize = elasticConfiguration?.ReadBatchSize ?? throw new ArgumentNullException(nameof(elasticConfiguration));
+            ScrollBatchSize = elasticConfiguration.ScrollBatchSize;
+            WriteBatchSize = elasticConfiguration.WriteBatchSize;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _database = _client.GetDatabase();
-            BatchSize = _client.WriteBatchSize;
 
             // Default use non live instance
             LiveMode = false;
         }
-
-        /// <inheritdoc />
-        public int BatchSize { get; }
 
         /// <summary>
         ///     Dispose
@@ -135,6 +127,12 @@ namespace SOS.Lib.Repositories.Processed
         public bool LiveMode { get; set; }
 
         /// <inheritdoc />
+        public int ReadBatchSize { get; }
+
+        /// <inheritdoc />
+        public int ScrollBatchSize { get; }
+
+        /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)
         {
             try
@@ -152,5 +150,8 @@ namespace SOS.Lib.Repositories.Processed
                 return default;
             }
         }
+
+        /// <inheritdoc />
+        public int WriteBatchSize { get; }
     }
 }

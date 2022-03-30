@@ -178,7 +178,8 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
         {
             var mock = new Mock<IProcessedObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>())).ReturnsAsync(true);
-            mock.Setup(m => m.BatchSize).Returns(batchSize);
+            mock.Setup(m => m.WriteBatchSize).Returns(batchSize);
+            mock.Setup(m => m.ReadBatchSize).Returns(batchSize);
             return mock;
         }
 

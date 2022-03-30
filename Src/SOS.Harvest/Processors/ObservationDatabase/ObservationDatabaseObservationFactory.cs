@@ -60,8 +60,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Event = new Event
                 {
                     EndDate = verbatim.EndDate.ToUniversalTime(),
-                    FieldNotes = verbatim.Origin, // Is there any better field for this?
-                    Habitat = verbatim.Habitat,
+                    FieldNotes = verbatim.Origin?.Clean(), // Is there any better field for this?
+                    Habitat = verbatim.Habitat?.Clean(),
                     StartDate = verbatim.StartDate.ToUniversalTime(),
                     PlainStartDate = verbatim.StartDate.ToLocalTime().ToString("yyyy-MM-dd"),
                     PlainEndDate = verbatim.EndDate.ToLocalTime().ToString("yyyy-MM-dd"),
@@ -86,7 +86,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                         VerbatimMunicipality = verbatim.Municipality,
                         VerbatimProvince = verbatim.Province
                     },
-                    Locality = verbatim.Locality,
+                    Locality = verbatim.Locality?.Clean(),
                     VerbatimCoordinateSystem = "EPSG:3857"
                 },
                 Modified = verbatim.EditDate,
@@ -95,13 +95,13 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     BirdNestActivityId = taxon?.IsBird() ?? false ? 1000000 : 0,
                     CatalogId = verbatim.Id,
                     CatalogNumber = verbatim.Id.ToString(),
-                    IndividualCount = verbatim.IndividualCount,
+                    IndividualCount = verbatim.IndividualCount?.Clean(),
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.TaxonId != 0,
                     OccurrenceId = $"urn:lsid:observationsdatabasen.se:observation:{verbatim.Id}",
-                    OccurrenceRemarks = verbatim.OccurrenceRemarks,
+                    OccurrenceRemarks = verbatim.OccurrenceRemarks?.Clean(),
                     OccurrenceStatus = new VocabularyValue { Id = (int)(verbatim.TaxonId == 0 ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
                     ProtectionLevel = verbatim.ProtectionLevel,
                     SensitivityCategory = verbatim.ProtectionLevel,
@@ -109,7 +109,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     ReportedDate = verbatim.StartDate.ToUniversalTime()
                 },
                 OwnerInstitutionCode = verbatim.SCI_code,
-                RightsHolder = verbatim.SCI_name,
+                RightsHolder = verbatim.SCI_name?.Clean(),
                 Taxon = taxon
             };
 

@@ -20,8 +20,8 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class GISExtensions
     {
-        private static IDictionary<string, Point> _transformPointCache = new ConcurrentDictionary<string, Point>();
-
+        private readonly static IDictionary<string, Point> _transformPointCache = new ConcurrentDictionary<string, Point>();
+        private readonly static WKTReader _wktReader;
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -50,7 +50,9 @@ namespace SOS.Lib.Extensions
                         new MathTransformFilter(coordinateTransformation.MathTransform));
                 }
             }
-        }
+
+            _wktReader = new WKTReader(); 
+    }
 
         #region Private
 
@@ -362,6 +364,7 @@ namespace SOS.Lib.Extensions
             }
 
             var shapeFactory = new GeometricShapeFactory();
+            
             shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
             shapeFactory.Centre = point.Coordinate;
             var diameterInMeters = (double)accuracy * 2;
@@ -385,7 +388,7 @@ namespace SOS.Lib.Extensions
 
                     break;
             }
-
+            
             var circle = shapeFactory.CreateCircle();
             circle.SRID = point.SRID;
             return circle;
@@ -724,10 +727,8 @@ namespace SOS.Lib.Extensions
         public static Geometry ToGeometry(
             this string wkt)
         {
-            var factory = new GeometryFactory();
-            var wktReader = new WKTReader(factory);
-            var geometry = wktReader.Read(wkt);
-
+            var geometry = _wktReader.Read(wkt);
+  
             return geometry;
         }
 

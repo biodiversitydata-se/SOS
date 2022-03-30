@@ -16,6 +16,7 @@
     </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SOS.ElasticSearch.Proxy\SOS.ElasticSearch.Proxy.csproj" />
     <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
   </ItemGroup>
 

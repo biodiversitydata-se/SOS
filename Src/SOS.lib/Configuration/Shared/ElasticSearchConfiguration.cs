@@ -106,19 +106,20 @@ namespace SOS.Lib.Configuration.Shared
 
                 var connectionPool = new StaticConnectionPool(uris);
                 var settings = new ConnectionSettings(connectionPool);
-
+                settings.EnableHttpCompression(true);
+                settings.RequestTimeout(TimeSpan.FromSeconds(300));
+                settings.SniffOnStartup(true);
+                settings.SniffOnConnectionFault(true);
+                settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+             
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
-                    settings.RequestTimeout(TimeSpan.FromSeconds(300));
                     settings.BasicAuthentication(UserName, Password);
-                    settings.SniffOnStartup(false);
-                    settings.SniffOnConnectionFault(false);
-                    settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
                 }
 
                 if (DebugMode || debugMode)
                 {
-                    settings.DisableDirectStreaming().EnableDebugMode();
+                    settings.EnableDebugMode();
                 }
                 clients.Add(new ElasticClient(settings));
             }

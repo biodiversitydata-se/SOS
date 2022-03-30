@@ -24,10 +24,10 @@
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.28.3" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.29.0" />
 		<PackageReference Include="HangFire" Version="1.7.28" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-		<PackageReference Include="HangFire.Mongo" Version="0.7.28" />
+		<PackageReference Include="HangFire.Mongo" Version="1.7.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />

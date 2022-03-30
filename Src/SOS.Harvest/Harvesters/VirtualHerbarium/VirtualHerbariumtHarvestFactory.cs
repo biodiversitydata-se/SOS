@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Extensions;
@@ -107,7 +106,6 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     index++;
                 }
 
-               
                 // Data in all rows where country is sweden
                 var rows = table.Elements(xmlns + "Row").Where(r =>
                     r.Elements().ToArray()[propertyMapping["country"]].Value
@@ -121,9 +119,9 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     var lon = double.Parse(cells[propertyMapping["long"]].Value, CultureInfo.InvariantCulture);
                     var lat = double.Parse(cells[propertyMapping["lat"]].Value, CultureInfo.InvariantCulture);
 
-                    if (!_localities.ContainsKey(key))
+                    if (!localities.ContainsKey(key))
                     {
-                        _localities.Add(key, new[] { lon, lat });
+                        localities.Add(key, new[] { lon, lat });
                     }
                 }
             }
