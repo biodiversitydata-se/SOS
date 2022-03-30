@@ -86,6 +86,10 @@ namespace SOS.Lib.Configuration.Shared
                 {
                     return $"sos-local-{Environment.MachineName}";
                 }
+                else if (_indexPrefix == "sos-integrationtests")
+                {
+                    return $"sos-integrationtests-{Environment.MachineName}";
+                }
 
                 return _indexPrefix;
             }

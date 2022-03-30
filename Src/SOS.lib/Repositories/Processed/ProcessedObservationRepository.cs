@@ -1667,6 +1667,25 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<bool> DeleteAllDocumentsAsync(bool protectedIndex)
+        {
+            try
+            {                
+                var res = await Client.DeleteByQueryAsync<Observation>(q => q
+                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Query(q => q.MatchAll())
+                );
+
+                return res.IsValid;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider, bool protectedIndex)
         {
             var scrollResult = await ScrollObservationsWithCompleteObjectAsync(dataProvider.Id, protectedIndex, null);

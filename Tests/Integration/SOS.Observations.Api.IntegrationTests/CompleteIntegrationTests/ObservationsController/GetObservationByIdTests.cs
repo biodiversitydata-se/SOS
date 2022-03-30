@@ -18,24 +18,24 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
     [Collection(Collections.CompleteApiIntegrationTestsCollection)]
     public class GetObservationByIdTests
     {
-        private readonly ApiIntegrationTestFixture _fixture;
+        private readonly CompleteApiIntegrationTestFixture _fixture;
 
-        public GetObservationByIdTests(ApiIntegrationTestFixture fixture)
+        public GetObservationByIdTests(CompleteApiIntegrationTestFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
         [Trait("Category", "CompleteApiIntegrationTest")]
-        public async Task TestProcessObservation()
+        public async Task TestGetObservationById()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Add observation to Elasticsearch
             //-----------------------------------------------------------------------------------------------------------                
+            await _fixture.CustomProcessedObservationRepository.DeleteAllDocumentsAsync(false);
             var verbatimObservation = ArtportalenObservationVerbatimFactory.Create();
             var observation = _fixture.ArtportalenObservationFactory.CreateProcessedObservation(verbatimObservation, false);
-            await CreateIntegrationTestIndexAsync();            
-            await AddObservationToElasticAsync(observation);            
+            await AddObservationToElasticAsync(observation);
             string occurrenceId = $"urn:lsid:artportalen.se:sighting:{verbatimObservation.SightingId}";
 
             //-----------------------------------------------------------------------------------------------------------
@@ -46,8 +46,7 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
                 null, 
                 null, 
                 occurrenceId, 
-                Lib.Enums.OutputFieldSet.AllWithValues);
-            
+                Lib.Enums.OutputFieldSet.AllWithValues);            
             var resultObservation = response.GetResult<Observation>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -57,11 +56,39 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
             resultObservation.Occurrence.OccurrenceId.Should().Be(occurrenceId);
         }
 
-        private async Task CreateIntegrationTestIndexAsync()
+        /// <summary>
+        /// Just a copy of TestGetObservationById() to test initialization of test code.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "CompleteApiIntegrationTest")]
+        public async Task TestGetObservationByIdCopy()
         {
-            const bool protectedIndex = false;
-            var customRepository = _fixture.CustomProcessedObservationRepository;
-            await customRepository.ClearCollectionAsync(protectedIndex);
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Add observation to Elasticsearch
+            //-----------------------------------------------------------------------------------------------------------                
+            await _fixture.CustomProcessedObservationRepository.DeleteAllDocumentsAsync(false);
+            var verbatimObservation = ArtportalenObservationVerbatimFactory.Create();
+            var observation = _fixture.ArtportalenObservationFactory.CreateProcessedObservation(verbatimObservation, false);
+            await AddObservationToElasticAsync(observation);
+            string occurrenceId = $"urn:lsid:artportalen.se:sighting:{verbatimObservation.SightingId}";
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.CustomObservationsController.GetObservationById(
+                null,
+                null,
+                null,
+                occurrenceId,
+                Lib.Enums.OutputFieldSet.AllWithValues);
+            var resultObservation = response.GetResult<Observation>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            resultObservation.Should().NotBeNull();
+            resultObservation.Occurrence.OccurrenceId.Should().Be(occurrenceId);
         }
 
         private async Task AddObservationToElasticAsync(Observation observation)

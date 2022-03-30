@@ -3,7 +3,7 @@
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
     [CollectionDefinition(Collections.CompleteApiIntegrationTestsCollection)]
-    public class CompleteApiIntegrationTestCollection : ICollectionFixture<ApiIntegrationTestFixture>
+    public class CompleteApiIntegrationTestCollection : ICollectionFixture<CompleteApiIntegrationTestFixture>
     {
 
     }
