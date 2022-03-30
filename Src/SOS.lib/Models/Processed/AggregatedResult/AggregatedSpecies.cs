@@ -63,7 +63,19 @@
         /// <summary>
         /// Scientific Name
         /// </summary>
-        public string ScientificName { get; set; }
+        public string ScientificName { get; set; }        
+
+        /// <summary>
+        /// Taxon attributes.
+        /// </summary>
+        public SpeciesAggregatedInfoTaxonAttributes Attributes { get; set; }
+    }
+
+    /// <summary>
+    /// Taxon attributes in aggregated result.
+    /// </summary>
+    public class SpeciesAggregatedInfoTaxonAttributes
+    {
         /// <summary>
         /// Redlist Category
         /// </summary>
