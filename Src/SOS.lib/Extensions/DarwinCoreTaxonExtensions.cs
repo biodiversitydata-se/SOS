@@ -68,7 +68,7 @@ namespace SOS.Lib.Extensions
                     ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
                     ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
                     SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
-                    ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw,
+                    ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false,
                     RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,

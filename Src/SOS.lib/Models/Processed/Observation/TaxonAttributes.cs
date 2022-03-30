@@ -55,7 +55,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Indicates whether the species 
         /// is protected by the law in Sweden.
         /// </summary>
-        public bool? ProtectedByLaw { get; set; }
+        public bool ProtectedByLaw { get; set; }
 
         /// <summary>
         /// Information about how protected information about a species is in Sweden.
