@@ -729,7 +729,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="externalSystemId"></param>
         /// <param name="allVocabularies"></param>
         /// <returns></returns>
-        private static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
+        public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
             ExternalSystemId externalSystemId,
             ICollection<Vocabulary> allVocabularies)
         {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -8,12 +10,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using Moq;
+using SOS.Harvest.Managers;
+using SOS.Harvest.Processors.Artportalen;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
@@ -44,6 +49,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
     public class ApiIntegrationTestFixture : FixtureBase, IDisposable
     {
+        public ArtportalenObservationProcessor ArtportalenObservationProcessor { get; set; }
+        public ArtportalenObservationFactory ArtportalenObservationFactory { get; set; }
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
@@ -78,7 +85,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 t => true);
 
             InstallationEnvironment = GetEnvironmentFromAppSettings();
-            Initialize();
+            Initialize().Wait();
         }
 
         public void Dispose() { }
@@ -152,8 +159,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return observationApiConfiguration;
         }
 
-        private void Initialize()
-        {
+        private async Task Initialize()
+        {            
             UserAuthenticationToken = GetUserAuthenticationToken();
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
@@ -165,7 +172,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(processClient);
-            var taxonManager = CreateTaxonManager(processClient, memoryCache);
+            var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
+            var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
@@ -189,11 +197,11 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, processClient, filterManager);
-            
+
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());            
+            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
@@ -218,6 +226,17 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
             _userManager = new UserManager(userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
+            var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
+            var taxa = await taxonRepository.GetAllAsync();
+            var taxaById = taxa.ToDictionary(m => m.Id, m => m);
+            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
+            ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
+                artportalenDataProvider,
+                taxaById,
+                vocabularyRepository,
+                false,
+                "https:\\www.artportalen.se",
+                processTimeManager);            
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
@@ -241,9 +260,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return areaManager;
         }
 
-        private TaxonManager CreateTaxonManager(ProcessClient processClient, IMemoryCache memoryCache)
-        {
-            var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
+        private TaxonManager CreateTaxonManager(ProcessClient processClient, TaxonRepository taxonRepository, IMemoryCache memoryCache)
+        {            
             var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
             var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
                 new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
