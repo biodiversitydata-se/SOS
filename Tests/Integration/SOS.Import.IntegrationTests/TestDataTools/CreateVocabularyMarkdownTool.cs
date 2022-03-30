@@ -181,6 +181,11 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 {
                     SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\verificationStatusVocabulary.json"),
                     Title = "validationStatus"
+                },
+                new VocabularyFile
+                {
+                    SourceFilePath = Path.Combine(assemblyPath, @"Resources\Vocabularies\taxonCategoryVocabulary.json"),
+                    Title = "taxonCategory"
                 }
             };
 

@@ -1989,3 +1989,50 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |
 | 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |
 | 70 | Ej möjlig att validera | Not able to validate |
+
+## taxonCategory
+| Id | Value (Swedish) | Value (English) |
+|:---	|:---	|:---	|
+| 0 | Rot | Root |
+| 1 | Rike | Kingdom |
+| 2 | Fylum | Phylum |
+| 3 | Underfylum | Subphylum |
+| 4 | Överklass | Superclass |
+| 5 | Klass | Class |
+| 6 | Underklass | Subclass |
+| 7 | Överordning | Superorder |
+| 8 | Ordning | Order |
+| 9 | Underordning | Suborder |
+| 10 | Överfamilj | Superfamily |
+| 11 | Familj | Family |
+| 12 | Underfamilj | Subfamily |
+| 13 | Tribus | Tribe |
+| 14 | Släkte | Genus |
+| 15 | Undersläkte | Subgenus |
+| 16 | Sektion (botanik) | Section (botany) |
+| 17 | Art | Species |
+| 18 | Underart | Subspecies |
+| 19 | Varietet | Variety |
+| 20 | Form | Form |
+| 21 | Hybrid | Hybrid |
+| 22 | Sort | Cultivar |
+| 23 | Population | Population |
+| 25 | Infraklass | Infraclass |
+| 26 | Parvklass | Parvclass |
+| 27 | Kollektivtaxon | Collective Taxon |
+| 28 | Artkomplex | Species Complex |
+| 29 | Infraordning | Infraorder |
+| 30 | Avdelning | Division |
+| 31 | Underavdelning | Subdivision |
+| 32 | Morfotyp | Morphotype |
+| 33 | Pseudotaxon | Pseudotaxon |
+| 35 | Underrike | Subkingdom |
+| 37 | Infrarike | Infrakingdom |
+| 38 | Överfylum | Superphylum |
+| 39 | Infrafylum | Infraphylum |
+| 41 | Infraavdelning | Infradivision |
+| 44 | Undertribus | Subtribe |
+| 49 | Aggregat | Species Aggregate |
+| 52 | Ranglös | Unranked |
+| 75 | Namn Över Släktesnivå | Suprageneric Name |
+| 95 | Forma Specialis | Forma Specialis |
