@@ -467,6 +467,38 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Add nested term criteria with and
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="nestedPath"></param>
+        /// <param name="fieldValues"></param>
+        public static void TryAddNestedTermAndCriteria(this
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath,
+            IDictionary<string, object> fieldValues)
+        {
+            if (!fieldValues?.Any() ?? true)
+            {
+                return;
+            }
+
+            var nestedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            foreach (var fieldValue in fieldValues)
+            {
+                nestedQuery.TryAddTermCriteria($"{nestedPath}.{fieldValue.Key}", fieldValue.Value);
+            }
+
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(nestedPath)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(nestedQuery)
+                        )
+                    )));
+        }
+
+        /// <summary>
         /// Try to add query criteria
         /// </summary>
         /// <typeparam name="TQueryContainer"></typeparam>

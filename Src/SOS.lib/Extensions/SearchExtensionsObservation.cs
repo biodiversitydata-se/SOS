@@ -7,7 +7,6 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using static SOS.Lib.Extensions.SearchExtensionsGeneric;
 
@@ -16,7 +15,7 @@ namespace SOS.Lib
     /// <summary>
     /// Observation specific search related extensions
     /// </summary>
-    public static class SearchExtensions
+    public static class SearchExtensionsObservation
     {
         /// <summary>
         /// Add filter to limit response to only show observations user is allowed to see
@@ -33,11 +32,10 @@ namespace SOS.Lib
 
             if (filter.ObservedByMe)
             {
-                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                    "userServiceUserId",
-                    filter.UserId);
-                query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                    "viewAccess", true);
+                query.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> { 
+                    { "userServiceUserId", filter.UserId },
+                    { "viewAccess", true }
+                });
             }
 
             if (!filter.ProtectedObservations)
@@ -67,6 +65,7 @@ namespace SOS.Lib
 
             if (filter.UserId != 0)
             {
+                // Add autorization to a users 'own' observations 
                 var observedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
                 observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
                     filter.UserId);
@@ -78,12 +77,10 @@ namespace SOS.Lib
                 );
 
                 var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-
-                reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                    "userServiceUserId",
-                    filter.UserId);
-                reportedByMeQuery.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal",
-                    "viewAccess", true);
+                reportedByMeQuery.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> {
+                    { "userServiceUserId", filter.UserId },
+                    { "viewAccess", true }
+                });
 
                 authorizeQuerys.Add(q => q
                     .Bool(b => b
@@ -328,115 +325,6 @@ namespace SOS.Lib
             excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
-        /// <summary>
-        /// Add field must exists criteria
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        private static void AddMustExistsCriteria(
-        this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
-        {
-            query.Add(q => q
-                .Regexp(re => re.Field(field).Value(".+"))
-            );
-        }
-
-        private static void AddNestedMustExistsCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string path)
-        {
-            query.Add(q => q
-                .Nested(n => n
-                    .Path(path)
-                    .Query(nq => nq
-                        .Bool(b => b
-                            .Filter(f => f
-                                .Exists(e => e
-                                    .Field(path)
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-        }
-
-        /// <summary>
-        /// Add field not exists criteria
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        private static void AddNotExistsCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field)
-        {
-            query.Add(q => q
-                .Bool(b => b
-                    .MustNot(mn => mn
-                        .Exists(e => e
-                            .Field(field)
-                        )
-                    )
-                )
-            );
-        }
-
-        // Get observations from other than Artportalen too
-
-        /// <summary>
-        /// Add numeric filter with relation operator
-        /// </summary>
-        /// <param name="queryInternal"></param>
-        /// <param name="fieldName"></param>
-        /// <param name="value"></param>
-        /// <param name="relationalOperator"></param>
-        private static void AddNumericFilterWithRelationalOperator(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryInternal, string fieldName,
-            int value, string relationalOperator)
-        {
-            switch (relationalOperator.ToLower())
-            {
-                case "eq":
-                    queryInternal.Add(q => q
-                        .Term(r => r
-                            .Field(fieldName)
-                            .Value(value)
-                        )
-                    );
-                    break;
-                case "gte":
-                    queryInternal.Add(q => q
-                        .Range(r => r
-                            .Field(fieldName)
-                            .GreaterThanOrEquals(value)
-                        )
-                    );
-                    break;
-                case "lte":
-                    queryInternal.Add(q => q
-                        .Range(r => r
-                            .Field(fieldName)
-                            .LessThanOrEquals(value)
-                        )
-                    );
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Add script source
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="source"></param>
-        private static void AddScript(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string source)
-        {
-            query.Add(q => q
-                .Script(s => s
-                    .Script(sc => sc
-                        .Source(source)
-                    )
-                )
-            );
-        }
-
         private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
@@ -484,44 +372,6 @@ namespace SOS.Lib
             query.Add(q => q
                 .Bool(b => b
                     .Should(sightingTypeQuery)
-                )
-            );
-        }
-
-        /// <summary>
-        /// Cast property to field
-        /// </summary>
-        /// <param name="property"></param>
-        /// <returns></returns>
-        private static Field ToField(this string property)
-        {
-            return new Field(string.Join('.', property.Split('.').Select(p => p
-                .ToCamelCase()
-            )));
-        }
-
-        /// <summary>
-        /// Try to add bounding box criteria
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="field"></param>
-        /// <param name="boundingBox"></param>
-        private static void TryAddBoundingBoxCriteria(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, LatLonBoundingBox boundingBox)
-        {
-            if (boundingBox?.BottomRight == null || boundingBox?.TopLeft == null)
-            {
-                return;
-            }
-
-            query.Add(q => q
-                .GeoBoundingBox(g => g
-                    .Field(new Field(field))
-                    .BoundingBox(
-                        boundingBox.TopLeft.Latitude,
-                        boundingBox.TopLeft.Longitude,
-                        boundingBox.BottomRight.Latitude,
-                        boundingBox.BottomRight.Longitude)
                 )
             );
         }
@@ -638,53 +488,6 @@ namespace SOS.Lib
 
             query.TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals);
-        }
-
-        /// <summary>
-        /// Try to add nested term criteria
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="nestedPath"></param>
-        /// <param name="field"></param>
-        /// <param name="value"></param>
-        private static void TryAddNestedTermCriteria<T>(this
-        ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath, string field, T value)
-        {
-            query.Add(q => q
-                .Nested(n => n
-                    .Path(nestedPath)
-                    .Query(q => q
-                        .Term(t => t
-                            .Field($"{nestedPath}.{field}")
-                            .Value(value)
-                        )
-                    )));
-        }
-
-        /// <summary>
-        /// Try to add nested terms criteria
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="nestedPath"></param>
-        /// <param name="field"></param>
-        /// <param name="values"></param>
-        private static void TryAddNestedTermsCriteria<T>(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath, string field, IEnumerable<T> values)
-        {
-            if (values?.Any() ?? false)
-            {
-                query.Add(q => q
-                    .Nested(n => n
-                        .Path(nestedPath)
-                        .Query(q => q
-                            .Terms(t => t
-                                .Field($"{nestedPath}.{field}")
-                                .Terms(values)
-                            )
-                        )));
-            }
         }
 
         /// <summary>
