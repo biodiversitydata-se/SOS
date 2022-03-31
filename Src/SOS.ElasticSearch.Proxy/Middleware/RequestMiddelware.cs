@@ -135,7 +135,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     CopyFromTargetResponseHeaders(context, responseMessage);
                     await responseMessage.Content.CopyToAsync(context.Response.Body);
 
-                var match = Regex.Match(context.Request.Path.Value, @"([^\/]+)$");
+                var match = Regex.Match(context.Request?.Path.Value ?? string.Empty, @"([^\/]+)$");
                 if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
                   {
                     // Estimate number of observations returned 
