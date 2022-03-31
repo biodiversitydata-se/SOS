@@ -206,15 +206,13 @@ namespace SOS.Harvest.Containers
         public ConcurrentDictionary<int, Metadata> ValidationStatus { get; private set; }
 
         /// <inheritdoc />
-        public void Initialize(
+        public void InitializeStatic(
             IEnumerable<MetadataWithCategoryEntity> activities,
             IEnumerable<MetadataEntity> biotopes,
             IEnumerable<MetadataEntity> determinationMethods,
             IEnumerable<MetadataEntity> discoveryMethods,
             IEnumerable<MetadataEntity> genders,
             IEnumerable<MetadataEntity> organizations,
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities,
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
             IEnumerable<TaxonEntity> taxa,
@@ -228,8 +226,6 @@ namespace SOS.Harvest.Containers
             DiscoveryMethods = CastMetdataEntitiesToVerbatims(discoveryMethods)?.ToConcurrentDictionary(dm => dm.Id, dm => dm) ?? new ConcurrentDictionary<int, Metadata>();
             Genders = CastMetdataEntitiesToVerbatims(genders)?.ToConcurrentDictionary(g => g.Id, g => g) ?? new ConcurrentDictionary<int, Metadata>();
             Organizations = CastMetdataEntitiesToVerbatims(organizations)?.ToConcurrentDictionary(o => o.Id, o => o) ?? new ConcurrentDictionary<int, Metadata>();
-            PersonByUserId = CastPersonEntitiesToVerbatims(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
-            Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();
             Stages = CastMetdataEntitiesToVerbatims(stages)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
             Substrates = CastMetdataEntitiesToVerbatims(substrates)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Metadata>();
             TaxonSpeciesGroups = taxa.ToConcurrentDictionary(t => t.Id, t => t.SpeciesGroupId) ?? new ConcurrentDictionary<int, int?>();
@@ -237,6 +233,16 @@ namespace SOS.Harvest.Containers
             ValidationStatus = CastMetdataEntitiesToVerbatims(validationStatus)?.ToConcurrentDictionary(vs => vs.Id, vs => vs) ?? new ConcurrentDictionary<int, Metadata>();
 
             IsInitialized = true;
+        }
+
+        /// <inheritdoc />
+        public void InitializeDynamic(
+            IEnumerable<PersonEntity> personByUserId,
+            IEnumerable<ProjectEntity> projectEntities
+        )
+        {
+            PersonByUserId = CastPersonEntitiesToVerbatims(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p) ?? new ConcurrentDictionary<int, Person>();
+            Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p) ?? new ConcurrentDictionary<int, Project>();
         }
     }
 }

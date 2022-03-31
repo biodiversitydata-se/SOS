@@ -78,29 +78,32 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 cancellationToken?.ThrowIfCancellationRequested();
                 _logger.LogDebug("Finish getting metadata");
 
-                _logger.LogDebug("Start getting sighting metadata");
-                var personByUserId = await _personRepository.GetAsync();
-                var projectEntities = await _projectRepository.GetProjectsAsync();
-                _logger.LogDebug("Finish getting sighting metadata");
-
-                _logger.LogDebug("Start Initialize metadata");
-                _artportalenMetadataContainer.Initialize(
+                _logger.LogDebug("Start Initialize static metadata");
+                _artportalenMetadataContainer.InitializeStatic(
                     activities,
                     biotopes,
                     determinationMethods,
                     discoveryMethods,
                     genders,
                     organizations,
-                    personByUserId,
-                    projectEntities,
                     stages,
                     substrates,
                     taxa,
                     units,
                     validationStatus);
-
-                _logger.LogDebug("Finish Initialize metadata");
+                _logger.LogDebug("Finish Initialize static metadata");
             }
+
+            _logger.LogDebug("Start getting sighting metadata");
+            var persons = await _personRepository.GetAsync();
+            var projects = await _projectRepository.GetProjectsAsync();
+            _logger.LogDebug("Finish getting sighting metadata");
+
+            _logger.LogDebug("Start Initialize dynamic metadata");
+            _artportalenMetadataContainer.InitializeDynamic(
+                persons,
+                projects);
+            _logger.LogDebug("Finish Initialize dynamic metadata");
 
             _logger.LogDebug("Start creating factory");
             var harvestFactory = new ArtportalenHarvestFactory(

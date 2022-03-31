@@ -32,7 +32,7 @@ namespace SOS.Harvest.Containers.Interfaces
         ConcurrentDictionary<int, Metadata> ValidationStatus { get; }
 
         /// <summary>
-        /// Initialize meta data
+        ///  Initialize static meta data 
         /// </summary>
         /// <param name="activities"></param>
         /// <param name="biotopes"></param>
@@ -40,26 +40,31 @@ namespace SOS.Harvest.Containers.Interfaces
         /// <param name="discoveryMethods"></param>
         /// <param name="genders"></param>
         /// <param name="organizations"></param>
-        /// <param name="personByUserId"></param>
-        /// <param name="projectEntities"></param>
         /// <param name="stages"></param>
         /// <param name="substrates"></param>
         /// <param name="taxa"></param>
         /// <param name="units"></param>
         /// <param name="validationStatus"></param>
-        void Initialize(
+        void InitializeStatic(
             IEnumerable<MetadataWithCategoryEntity> activities,
             IEnumerable<MetadataEntity> biotopes,
             IEnumerable<MetadataEntity> determinationMethods,
             IEnumerable<MetadataEntity> discoveryMethods,
             IEnumerable<MetadataEntity> genders,
             IEnumerable<MetadataEntity> organizations,
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities,
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
             IEnumerable<TaxonEntity> taxa,
             IEnumerable<MetadataEntity> units,
             IEnumerable<MetadataEntity> validationStatus);
+
+        /// <summary>
+        ///  Initialize dynamic meta data
+        /// </summary>
+        /// <param name="personByUserId"></param>
+        /// <param name="projectEntities"></param>
+        void InitializeDynamic(
+            IEnumerable<PersonEntity> personByUserId,
+            IEnumerable<ProjectEntity> projectEntities);
     }
 }
