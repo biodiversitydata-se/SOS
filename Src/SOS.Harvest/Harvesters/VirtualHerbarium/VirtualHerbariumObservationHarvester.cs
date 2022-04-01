@@ -65,9 +65,9 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
 
                 _logger.LogDebug($"Start getting Localities for Virtual Herbarium");
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
-                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
                 _logger.LogDebug($"Finish getting Localities for Virtual Herbarium");
 
+                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
                 var pageIndex = 1;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);

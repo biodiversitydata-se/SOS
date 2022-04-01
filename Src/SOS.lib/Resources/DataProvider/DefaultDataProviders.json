@@ -62,7 +62,7 @@
     },
     {
         "Type": "ClamPortalObservations",
-        "IsActive": true,
+        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -110,15 +110,15 @@
             "Email": "eddie.vonwachenfeldt@slu.se"
         },
         "DownloadUrl": null,
-        "IncludeInScheduledHarvest": true,
+        "IncludeInScheduledHarvest": false,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
+        "IncludeInSearchByDefault": false,
         "Id": 2,
         "Identifier": "ClamGateway",
         "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
+        "IncludeInHealthCheck": false,
         "UseVerbatimFileInExport": false
     },
     {
