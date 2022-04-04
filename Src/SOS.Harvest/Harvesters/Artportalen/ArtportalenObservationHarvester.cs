@@ -308,7 +308,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
                 //Clean up
-                Array.Clear(sightings);
+                sightings = null;
                 _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 if (!storeVerbatim)

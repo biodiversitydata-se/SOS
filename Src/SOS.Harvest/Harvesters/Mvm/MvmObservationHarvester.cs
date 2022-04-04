@@ -72,7 +72,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
-                    Array.Clear(result.Observations);
+                    result.Observations = null;
 
                     nrSightingsHarvested += verbatims.Length;
 

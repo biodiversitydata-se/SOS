@@ -135,7 +135,7 @@ namespace SOS.Harvest.Harvesters.Shark
                         distinctVerbatims.Add(verbatim);
                         harvestedSharkSampleIds.Add(sharkSampleId);
                     }
-                    Array.Clear(verbatims);
+                    verbatims = null;
                     nrSightingsHarvested += distinctVerbatims?.Count() ?? 0;
 
                     // Add sightings to MongoDb
