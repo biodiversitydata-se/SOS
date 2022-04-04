@@ -9,6 +9,6 @@ namespace SOS.Harvest.Services.Interfaces
         /// </summary>
         /// <param name="getFromId"></param>
         /// <returns></returns>
-        Task<(long MaxChangeId, IEnumerable<WebSpeciesObservation> Observations)> GetAsync(long getFromId);
+        Task<(long MaxChangeId, WebSpeciesObservation[] Observations)> GetAsync(long getFromId);
     }
 }

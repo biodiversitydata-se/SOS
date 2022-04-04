@@ -62,7 +62,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Populate data on full harvest or if it's not initialized
             if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
             {
-                _logger.LogDebug("Start getting metadata");
+                _logger.LogDebug("Start getting static metadata");
                 var activities = await GetActivitiesAsync();
                 var (biotopes,
                     genders,
@@ -76,7 +76,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var taxa = await _taxonRepository.GetAsync();
 
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Finish getting metadata");
+                _logger.LogDebug("Finish getting static metadata");
 
                 _logger.LogDebug("Start Initialize static metadata");
                 _artportalenMetadataContainer.InitializeStatic(
@@ -94,10 +94,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug("Finish Initialize static metadata");
             }
 
-            _logger.LogDebug("Start getting sighting metadata");
+            _logger.LogDebug("Start getting dynamic metadata");
             var persons = await _personRepository.GetAsync();
             var projects = await _projectRepository.GetProjectsAsync();
-            _logger.LogDebug("Finish getting sighting metadata");
+            _logger.LogDebug("Finish getting dynamic metadata");
 
             _logger.LogDebug("Start Initialize dynamic metadata");
             _artportalenMetadataContainer.InitializeDynamic(
@@ -307,7 +307,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
-
+                //Clean up
+                Array.Clear(sightings);
                 _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 if (!storeVerbatim)

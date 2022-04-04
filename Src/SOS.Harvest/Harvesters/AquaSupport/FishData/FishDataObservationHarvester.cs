@@ -91,6 +91,8 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                             $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
                         var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
+                        // Clean up
+                        xmlDocument = null;
 
                         // Add sightings to MongoDb
                         await _fishDataObservationVerbatimRepository.AddManyAsync(verbatims);

@@ -263,14 +263,14 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
         #endregion Media
 
-            #region Project
+        #region Project
 
-            /// <summary>
-            ///     Cast project parameter itemEntity to aggregate
-            /// </summary>
-            /// <param name="entity"></param>
-            /// <returns></returns>
-            private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
+        /// <summary>
+        ///     Cast project parameter itemEntity to aggregate
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        private ProjectParameter CastProjectParameterEntityToVerbatim(ProjectParameterEntity entity)
         {
             if (entity == null)
             {
@@ -319,17 +319,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 {
                     if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out var project))
                     {
-                        var projectEntity = await _projectRepository.GetProjectAsync(projectId, live);
-
-                        if (projectEntity == null)
-                        {
-                            continue;
-                        }
-                        _artportalenMetadataContainer.AddProject(projectEntity);
-                        if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out project))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     // Make a copy of project so we can add params to it later
@@ -357,17 +347,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     {
                         if (!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project))
                         {
-                            var projectEntity = await _projectRepository.GetProjectAsync(projectParameterEntity.ProjectId, live);
-
-                            if (projectEntity == null)
-                            {
-                                continue;
-                            }
-                            _artportalenMetadataContainer.AddProject(projectEntity);
-                            if(!_artportalenMetadataContainer.Projects.TryGetValue(projectParameterEntity.ProjectId, out project)) 
-                            { 
-                                continue;
-                            }
+                            continue;
                         }
 
                         project = project.Clone();

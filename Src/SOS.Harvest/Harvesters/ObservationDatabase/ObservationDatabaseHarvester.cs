@@ -55,7 +55,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = observations.Select(e => CastEntityToVerbatim(e)); ;
-
+                Array.Clear(observations);
                 _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
                 _logger.LogDebug($"Start storing batch ({batchIndex})");

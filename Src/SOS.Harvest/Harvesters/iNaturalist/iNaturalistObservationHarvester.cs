@@ -102,7 +102,6 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                     startDate = endDate.AddDays(1);
                     endDate = startDate.AddMonths(1).AddDays(-1);
-
                     gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
 
                 } while (gBIFResult != null && endDate <= DateTime.Now);

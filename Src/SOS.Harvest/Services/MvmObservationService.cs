@@ -12,7 +12,7 @@ namespace SOS.Harvest.Services
         private readonly MvmServiceConfiguration _mvmServiceConfiguration;
         private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
 
-        private async Task<(long maxChangeId, IEnumerable<WebSpeciesObservation> observations)> GetAsync(long getFromId, byte attempt)
+        private async Task<(long maxChangeId, WebSpeciesObservation[] observations)> GetAsync(long getFromId, byte attempt)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace SOS.Harvest.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<(long MaxChangeId, IEnumerable<WebSpeciesObservation> Observations)> GetAsync(long getFromId)
+        public async Task<(long MaxChangeId, WebSpeciesObservation[] Observations)> GetAsync(long getFromId)
         {
             return await GetAsync(getFromId, 1);
         }

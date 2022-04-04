@@ -72,6 +72,8 @@ namespace SOS.Harvest.Harvesters.Mvm
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
+                    Array.Clear(result.Observations);
+
                     nrSightingsHarvested += verbatims.Length;
 
                     // Add sightings to MongoDb

@@ -81,6 +81,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                     cancellationToken?.ThrowIfCancellationRequested();
                     _logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
+                    observations = null;
                     _logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
 
                     if ((verbatims?.Length ?? 0) == 0)
