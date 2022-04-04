@@ -253,40 +253,6 @@ namespace SOS.Lib.Helpers
             return positionLocation;
         }
 
-        private static void SetProvincePartIdByCoordinate(Observation processedObservation)
-        {
-            // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedObservation.Location.Attributes.ProvincePartIdByCoordinate = processedObservation.Location.Province?.FeatureId;
-            if (new[]
-            {
-                ProvinceIds.LuleLappmark,
-                ProvinceIds.LyckseleLappmark,
-                ProvinceIds.PiteLappmark,
-                ProvinceIds.TorneLappmark,
-                ProvinceIds.ÅseleLappmark
-            }.Contains(processedObservation.Location.Province?.FeatureId))
-            {
-                processedObservation.Location.Attributes.ProvincePartIdByCoordinate = SpecialProvincePartId.Lappland;
-            }
-        }
-
-        private static void SetCountyPartIdByCoordinate(Observation processedObservation)
-        {
-            // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedObservation.Location.Attributes.CountyPartIdByCoordinate = processedObservation.Location.County?.FeatureId;
-            if (processedObservation.Location.County?.FeatureId == CountyId.Kalmar)
-            {
-                if (processedObservation.Location.Province?.FeatureId == ProvinceIds.Öland)
-                {
-                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.Öland;
-                }
-                else
-                {
-                    processedObservation.Location.Attributes.CountyPartIdByCoordinate = SpecialCountyPartId.KalmarFastland;
-                }
-            }
-        }
-
         private static string GetProvincePartIdByCoordinate(string provinceFeatureId)
         {
             if (new[]

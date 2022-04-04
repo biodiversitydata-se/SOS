@@ -307,7 +307,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
-                //Clean up
+                // Clean up
                 sightings = null;
                 _logger.LogDebug($"Finish casting entities to verbatim ({batchIndex})");
 
@@ -319,6 +319,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
                 await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
+                // Clean up
+                verbatimObservations = null;
                 _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 // If sleep is required to free resources to other systems

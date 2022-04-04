@@ -98,8 +98,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public bool IncrementalMode { get; set; }
-
         /// <inheritdoc />
         public async Task<IEnumerable<ArtportalenCheckListVerbatim>> CastEntitiesToVerbatimsAsync(CheckListEntity[] entities)
         {
