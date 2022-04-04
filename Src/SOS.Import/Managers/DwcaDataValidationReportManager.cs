@@ -329,7 +329,7 @@ namespace SOS.Import.Managers
             var taxon = _taxonById[processedObservation.Taxon.Id];
             taxaStatistics.TaxaSet.Add(taxon.Id);
 
-            if (taxon.Attributes.ProtectedByLaw.GetValueOrDefault(false))
+            if (taxon.Attributes.ProtectedByLaw)
             {
                 if (!taxaStatistics.ProtectedByLawTaxa.ContainsKey(taxon.Id))
                 {
