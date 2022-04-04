@@ -25,6 +25,45 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
             (6, 0.05f)
         };
 
+        public static List<ArtportalenObservationVerbatim> VerbatimFromJsonNewtonsoft
+        {
+            get
+            {
+                if (_verbatimFromJsonNewtonsoft == null)
+                {
+                    string str = System.IO.File.ReadAllText(@"C:\TEMP\2022-04-04\ArtportalenVerbatimObservations1.json", Encoding.UTF8);
+                    var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
+                    {
+                        Converters = new List<Newtonsoft.Json.JsonConverter> { new TestHelpers.JsonConverters.ObjectIdConverter() }
+                    };
+
+                    _verbatimFromJsonNewtonsoft = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
+                }
+
+                return _verbatimFromJsonNewtonsoft;
+            }        
+        }
+        private static List<ArtportalenObservationVerbatim> _verbatimFromJsonNewtonsoft;
+
+        public static List<ArtportalenObservationVerbatim> VerbatimFromJson
+        {
+            get
+            {
+                if (_verbatimFromJsonNewtonsoft == null)
+                {
+                    string str = System.IO.File.ReadAllText(@"C:\TEMP\2022-04-04\ArtportalenVerbatimObservations2.json", Encoding.UTF8);
+                    var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                    jsonSerializerOptions.Converters.Add(new Lib.JsonConverters.GeoShapeConverter());
+                    jsonSerializerOptions.Converters.Add(new Lib.JsonConverters.GeoLocationConverter());
+
+                    _verbatimFromJson = System.Text.Json.JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(str, jsonSerializerOptions);
+                }
+
+                return _verbatimFromJson;
+            }
+        }
+        private static List<ArtportalenObservationVerbatim> _verbatimFromJson;
+        
         private static UserInternal GetRandomUserInternal()
         {            
             return new UserInternal

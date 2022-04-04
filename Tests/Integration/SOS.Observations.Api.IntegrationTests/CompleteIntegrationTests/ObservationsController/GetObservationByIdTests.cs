@@ -1,21 +1,16 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.ObservationsController
-{ 
+{
     [Collection(Collections.CompleteApiIntegrationTestsCollection)]
     public class GetObservationByIdTests
     {
@@ -26,19 +21,6 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
             _fixture = fixture;
         }
 
-        private List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
-        {
-            var processedObservations = new List<Observation>();
-            bool diffuseIfSupported = false;
-            foreach (var verbatimObservation in verbatimObservations)
-            {
-                var processedObservation = _fixture.ArtportalenObservationFactory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
-                processedObservations.Add(processedObservation);
-            }
-
-            return processedObservations;
-        }
-        
         [Fact]
         [Trait("Category", "CompleteApiIntegrationTest")]
         public async Task TestGetObservationById()
@@ -49,7 +31,7 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
             const int sightingId = 123456;
             const string occurrenceId = $"urn:lsid:artportalen.se:sighting:123456";
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All()
+                .All()                    
                     .HaveRandomValidValues()
                 .TheFirst(1)
                     .With(p => p.SightingId = sightingId)                
@@ -82,7 +64,20 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
             //-----------------------------------------------------------------------------------------------------------            
             resultObservation.Should().NotBeNull();
             resultObservation.Occurrence.OccurrenceId.Should().Be(occurrenceId);
-        }        
+        }
+
+        private List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+        {
+            var processedObservations = new List<Observation>();
+            bool diffuseIfSupported = false;
+            foreach (var verbatimObservation in verbatimObservations)
+            {
+                var processedObservation = _fixture.ArtportalenObservationFactory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
+                processedObservations.Add(processedObservation);
+            }
+
+            return processedObservations;
+        }
 
         private async Task AddObservationToElasticAsync(Observation observation)
         {

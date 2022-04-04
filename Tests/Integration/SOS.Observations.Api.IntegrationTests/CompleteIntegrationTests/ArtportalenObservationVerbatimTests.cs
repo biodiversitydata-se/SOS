@@ -28,5 +28,30 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
             //-----------------------------------------------------------------------------------------------------------
             verbatims.Count.Should().Be(100);
         }
+
+        [Fact]
+        public async Task CreateArtportalenTestDataFromPredefinedObservations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var predefinedObservations = ArtportalenObservationVerbatimBuilderExtensions.VerbatimFromJsonNewtonsoft;
+            var verbatims = Builder<ArtportalenObservationVerbatimWrapper>.CreateListOfSize(100)
+                .All()
+                    .With(m => m.Observation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(predefinedObservations))
+                .TheFirst(1)
+                    .With(m => m.Observation.SightingId = 123456)                
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            verbatims.Count.Should().Be(100);
+        }
+
+        public class ArtportalenObservationVerbatimWrapper
+        {
+            public ArtportalenObservationVerbatim Observation { get; set; }
+        }
     }
 }

@@ -34,6 +34,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
@@ -61,6 +62,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public ObservationsController CustomObservationsController { get; private set; }
+        public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
         public DwcArchiveFileWriter DwcArchiveFileWriter { get; set; }
         private IFilterManager _filterManager;
         private IUserManager _userManager;
@@ -125,6 +127,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var config = GetAppSettings();
             var configPrefix = GetConfigPrefix(InstallationEnvironment);
             var mongoDbConfiguration = config.GetSection($"{configPrefix}:ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            return mongoDbConfiguration;
+        }
+
+        protected MongoDbConfiguration GetVerbatimMongoDbConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var mongoDbConfiguration = config.GetSection($"{configPrefix}:VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return mongoDbConfiguration;
         }
 
@@ -237,7 +247,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 vocabularyRepository,
                 false,
                 "https:\\www.artportalen.se",
-                processTimeManager);            
+                processTimeManager);
+            var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+            ArtportalenVerbatimRepository = new ArtportalenVerbatimRepository(importClient, new NullLogger<ArtportalenVerbatimRepository>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
