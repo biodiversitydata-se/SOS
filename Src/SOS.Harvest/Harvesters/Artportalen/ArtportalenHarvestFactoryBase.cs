@@ -23,7 +23,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
         {
-            return;
             if (!siteIds?.Any() ?? true)
             {
                 return;
@@ -42,6 +41,22 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     Sites.TryAdd(site.Id, site);
                 }
             }
+        }
+
+        protected async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
+            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
+            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
+
+            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+
+            return sites;
         }
 
         /// <summary>
