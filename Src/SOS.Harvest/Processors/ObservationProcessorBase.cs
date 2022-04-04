@@ -372,6 +372,7 @@ namespace SOS.Harvest.Processors
                     // Add public observation
                     publicObservations.TryAdd(observation.Occurrence.OccurrenceId, observation);
                 }
+                verbatimObservationsBatch = null;
 
                 Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
 

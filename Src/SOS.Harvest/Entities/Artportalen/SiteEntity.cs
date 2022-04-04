@@ -25,6 +25,15 @@
         /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Id of parent site
+        /// </summary>
+        public int? ParentSiteId { get; set; }
+
+        /// <summary>
+        ///     Parent side name
+        /// </summary>
+        public string ParentSiteName { get; set; }
 
         /// <summary>
         ///     Presentation name with Parish
@@ -55,10 +64,5 @@
         ///     Y coordinate of site
         /// </summary>
         public int YCoord { get; set; }
-
-        /// <summary>
-        ///     Parent side id, exposed only to the internal api
-        /// </summary>
-        public int? ParentSiteId { get; set; }
     }
 }

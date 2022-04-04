@@ -89,28 +89,6 @@ namespace SOS.Lib.Helpers
                 return;
             }
 
-         /*   var coordinates = site.Point.Coordinates.ToArray().Select(p => (double)p).ToArray();
-            var positionLocation = GetPositionLocation(coordinates[0], coordinates[1]);
-            site.County = positionLocation?.County == null ? null :new GeographicalArea
-            {
-                FeatureId = positionLocation.County.FeatureId,
-                Name = positionLocation.County.Name
-            };
-            site.Municipality = positionLocation?.Municipality == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Municipality.FeatureId,
-                Name = positionLocation.Municipality.Name
-            };
-            site.Parish = positionLocation?.Parish == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Parish.FeatureId,
-                Name = positionLocation.Parish.Name
-            };
-            site.Province = positionLocation?.Province == null ? null : new GeographicalArea
-            {
-                FeatureId = positionLocation.Province.FeatureId,
-                Name = positionLocation.Province.Name
-            };*/
             site.ProvincePartIdByCoordinate =
                 GetProvincePartIdByCoordinate(site.Province?.FeatureId);
 

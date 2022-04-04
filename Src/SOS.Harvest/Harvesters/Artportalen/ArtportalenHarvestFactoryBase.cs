@@ -27,7 +27,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 return;
             }
-
+           
             var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
             var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
             var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
@@ -41,6 +41,26 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     Sites.TryAdd(site.Id, site);
                 }
             }
+        }
+
+        /// <summary>
+        /// Try to get sites
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <returns></returns>
+        protected async Task<IDictionary<int, Site>> GetSitesAsync(IEnumerable<int>? siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
+            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
+            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
+
+            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            return sites?.ToDictionary(s => s.Id, s => s) ?? new Dictionary<int, Site>();
         }
 
         /// <summary>
@@ -122,10 +142,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
                 Name = entity.Name,
+                ParentSiteId = entity.ParentSiteId,
+                ParentSiteName = entity.ParentSiteName,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
                 VerbatimCoordinateSystem = CoordinateSys.WebMercator,
-                ParentSiteId = entity.ParentSiteId
+                
             };
 
             if (!areas?.Any() ?? true)
