@@ -15,7 +15,7 @@ using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
 using System.ComponentModel;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint
+namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.Artportalen
 {
     [Collection(Constants.IntegrationTestsCollectionName)]
     public class ArtportalenProcessorTests

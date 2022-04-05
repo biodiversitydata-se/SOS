@@ -10,8 +10,8 @@ using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
 
-namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController
-{    
+namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.GetObservationByIdEndpoint
+{
     [Collection(Constants.IntegrationTestsCollectionName)]
     public class GetObservationByIdTests
     {
@@ -37,7 +37,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .TheFirst(1)
                     .With(p => p.SightingId = SightingId)
                 .Build();
-            
+
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             //-----------------------------------------------------------------------------------------------------------
