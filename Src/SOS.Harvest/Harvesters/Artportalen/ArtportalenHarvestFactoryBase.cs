@@ -48,9 +48,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var siteAreas = await getSitesAreasTask;
             var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
 
-            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
-
-            return sites;
+            return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
         }
 
         /// <summary>

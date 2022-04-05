@@ -319,8 +319,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
                 await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
-                // Clean up
-                verbatimObservations = null;
                 _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 // If sleep is required to free resources to other systems
