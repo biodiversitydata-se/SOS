@@ -31,18 +31,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     return null;
                 }
 
-                if (Sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
-                {
-                    // Try to set parent site name if empty
-                    if (site?.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
-                    {
-                        if (Sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
-                        {
-                            site.ParentSiteName = parentSite.Name;
-                        }
-                    }
-                }
-
+                Sites.TryGetValue(entity.SiteId ?? 0, out var site);
                 _projects.TryGetValue(entity.ProjectId ?? 0, out var project);
 
                 var checkListVerbatim = new ArtportalenCheckListVerbatim

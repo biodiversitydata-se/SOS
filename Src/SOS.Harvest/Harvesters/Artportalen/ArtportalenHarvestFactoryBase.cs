@@ -23,16 +23,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
         {
-            if (!siteIds?.Any() ?? true)
-            {
-                return;
-            }
-           
-            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
-            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
-
-            var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            var sites = await GetSitesAsync(siteIds);
 
             if (sites?.Any() ?? false)
             {
@@ -49,10 +40,13 @@ namespace SOS.Harvest.Harvesters.Artportalen
             {
                 return null;
             }
-
-            var siteEntities = await _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var siteAreas = await _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
-            var sitesGeometry = await _siteRepository.GetSitesGeometry(siteIds, IncrementalMode); // It's faster to get geometries in separate query than join it in site query
+            var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
+            var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
+            var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, IncrementalMode);
+           
+            var siteEntities = await getSitesTask;
+            var siteAreas = await getSitesAreasTask;
+            var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
 
             var sites = await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
 
