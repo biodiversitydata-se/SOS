@@ -324,5 +324,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
 
         public IEnumerable<int> SpeciesFactsIds { get; set; }
         public int FirstImageId { get; set; }
+
+        public ArtportalenObservationVerbatim Clone()
+        {            
+            var obs = (ArtportalenObservationVerbatim)MemberwiseClone();
+            return obs;
+        }
     }
 }

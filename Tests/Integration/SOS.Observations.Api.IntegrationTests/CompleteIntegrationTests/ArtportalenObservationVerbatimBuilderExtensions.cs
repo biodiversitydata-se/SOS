@@ -180,103 +180,310 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
 
         public static IOperable<ArtportalenObservationVerbatim> HaveRandomValidValues(this IOperable<ArtportalenObservationVerbatim> operable)
         {
-            //bool equalStartAndEndDate = _faker.Random.WeightedRandom(new bool[] { true, false }, new float[] { 0.9f, 0.1f }); 
-            TimeSpan? obsTimeSpan = _faker.Random.Bool(0.9f) ? null : _faker.Date.Timespan(TimeSpan.FromHours(5)); // 90% probability of equal start and end date.
-            DateTime startDate = _faker.Date.Past(10); // random date within 10 years
-            DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
-            DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
-            DateTime editDate = reportedDate;
-            List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
-            string verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
-            List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
-            string observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
-            UserInternal reportedByInternal = GetRandomUserInternal();
-
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
-            builder.With(x => x.Id = _faker.IndexVariable++);
-            builder.With(x => x.DatasourceId = ArtportalenDataSourceId);
-            builder.With(x => x.DiscoveryMethod = new Metadata(0)); // todo
-            builder.With(x => x.DeterminationMethod = new Metadata(0)); // todo
-            builder.With(x => x.EditDate = editDate);
-            builder.With(x => x.ReportedDate = reportedDate);
-            builder.With(x => x.StartDate = startDate);
-            builder.With(x => x.EndDate = endDate);
-            builder.With(x => x.Gender = new Metadata(0));
-            builder.With(x => x.HasImages = false); // todo
-            builder.With(x => x.FirstImageId = 0); // todo
-            builder.With(x => x.HasTriggeredValidationRules = _faker.Random.Bool()); // todo
-            builder.With(x => x.HasAnyTriggeredValidationRuleWithWarning = _faker.Random.Bool()); // todo
-            builder.With(x => x.NoteOfInterest = _faker.Random.Bool()); // todo
-            builder.With(x => x.HasUserComments = _faker.Random.Bool()); // todo
-            builder.With(x => x.NotPresent = false); // _faker.Random.Bool()); // todo
-            builder.With(x => x.NotRecovered = false); // _faker.Random.Bool()); // todo
-            builder.With(x => x.ProtectedBySystem = false); // _faker.Random.Bool()); // todo
-            builder.With(x => x.RightsHolder = _faker.Name.FullName());
-            builder.With(x => x.VerifiedByInternal = verifiedByInternal);
-            builder.With(x => x.VerifiedBy = verifiedBy);
-            builder.With(x => x.ObserversInternal = observersInternal);
-            builder.With(x => x.Observers = observers);
-            builder.With(x => x.Site = GetTestSite()); // todo
-            builder.With(x => x.SpeciesGroupId = 1); // todo
-            builder.With(x => x.Stage = new Metadata(0)); // todo
-            builder.With(x => x.TaxonId = 231326); // todo
-            builder.With(x => x.Unit = new Metadata(0)); // todo
-            builder.With(x => x.Unspontaneous = false); // todo?
-            builder.With(x => x.UnsureDetermination = false); // todo?
-            builder.With(x => x.ValidationStatus = new Metadata(10)); // todo
-            builder.With(x => x.ReportedBy = reportedByInternal.UserAlias); // todo
-            builder.With(x => x.ReportedByUserId = reportedByInternal.Id);
-            builder.With(x => x.ReportedByUserServiceUserId = reportedByInternal.UserServiceUserId);
-            builder.With(x => x.ReportedByUserAlias = reportedByInternal.UserAlias);
-            builder.With(x => x.DeterminedBy = _faker.Name.FullName());
-            builder.With(x => x.SightingTypeSearchGroupId = 1); // todo
-            builder.With(x => x.SpeciesFactsIds = new List<int> { 4, 1938 }); // todo
+            builder.With((ArtportalenObservationVerbatim obs, int index) =>
+            {
+                //bool equalStartAndEndDate = _faker.Random.WeightedRandom(new bool[] { true, false }, new float[] { 0.9f, 0.1f }); 
+                TimeSpan? obsTimeSpan = _faker.Random.Bool(0.9f) ? null : _faker.Date.Timespan(TimeSpan.FromHours(5)); // 90% probability of equal start and end date.
+                DateTime startDate = _faker.Date.Past(10); // random date within 10 years
+                DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
+                DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
+                DateTime editDate = reportedDate;
+                List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
+                string verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
+                List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
+                string observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
+                UserInternal reportedByInternal = GetRandomUserInternal();
 
-            // todo - add values for more properties
-            //Activity
-            //Biotope
-            //BiotopeDescription
-            //CollectionID
-            //Comment
-            //ConfirmationYear
-            //ConfirmedBy
-            //DatasourceId
-            //DeterminationYear
-            //StartTime
-            //EndTime
-            //FrequencyId
-            //HasUserComments
-            //HiddenByProvider
-            //Label
-            //Length
-            //MaxDepth
-            //MaxHeight
-            //Media
-            //MigrateSightingObsId
-            //MigrateSightingPortalId
-            //MinDepth
-            //MinHeight
-            //OwnerOrganization
-            //PrivateCollection
-            //Projects
-            //PublicCollection
-            //Quantity
-            //QuantityOfSubstrates
-            //RegionalSightingStateId
-            //ReproductionId
-            //SightingPublishTypeIds
-            //SightingSpeciesCollectionItemId
-            //SightingTypeId
-            //SightingTypeSearchGroupId
-            //SpeciesCollection
-            //SpeciesGroupId
-            //StartTime
-            //Substrate
-            //SubstrateDescription
-            //SubstrateSpeciesId
-            //VerifiedBy
-            //VerifiedByInternal
-            //Weight
+                obs.Id = _faker.IndexVariable++;
+                obs.DatasourceId = ArtportalenDataSourceId;
+                obs.DiscoveryMethod = new Metadata(0); // todo
+                obs.DeterminationMethod = new Metadata(0); // todo
+                obs.EditDate = editDate;
+                obs.ReportedDate = reportedDate;
+                obs.StartDate = startDate;
+                obs.EndDate = endDate;
+                obs.StartTime = startDate.TimeOfDay;
+                obs.EndTime = endDate.TimeOfDay;
+                obs.Gender = new Metadata(0);
+                obs.HasImages = false; // todo
+                obs.FirstImageId = 0; // todo
+                obs.HasTriggeredValidationRules = _faker.Random.Bool(); // todo
+                obs.HasAnyTriggeredValidationRuleWithWarning = _faker.Random.Bool(); // todo
+                obs.NoteOfInterest = _faker.Random.Bool(); // todo
+                obs.HasUserComments = _faker.Random.Bool(); // todo
+                obs.NotPresent = false; // _faker.Random.Bool(); // todo
+                obs.NotRecovered = false; // _faker.Random.Bool(); // todo
+                obs.ProtectedBySystem = false; // _faker.Random.Bool(); // todo
+                obs.RightsHolder = _faker.Name.FullName();
+                obs.VerifiedByInternal = verifiedByInternal;
+                obs.VerifiedBy = verifiedBy;
+                obs.ObserversInternal = observersInternal;
+                obs.Observers = observers;
+                obs.Site = GetTestSite(); // todo
+                obs.SpeciesGroupId = 1; // todo
+                obs.Stage = new Metadata(0); // todo
+                obs.TaxonId = 231326; // todo
+                obs.Unit = new Metadata(0); // todo
+                obs.Unspontaneous = false; // todo?
+                obs.UnsureDetermination = false; // todo?
+                obs.ValidationStatus = new Metadata(10); // todo
+                obs.ReportedBy = reportedByInternal.UserAlias; // todo
+                obs.ReportedByUserId = reportedByInternal.Id;
+                obs.ReportedByUserServiceUserId = reportedByInternal.UserServiceUserId;
+                obs.ReportedByUserAlias = reportedByInternal.UserAlias;
+                obs.DeterminedBy = _faker.Name.FullName();
+                obs.SightingTypeSearchGroupId = 1; // todo
+                obs.SpeciesFactsIds = new List<int> { 4, 1938 }; // todo
+
+                // todo - add values for more properties
+                //Activity
+                //Biotope
+                //BiotopeDescription
+                //CollectionID
+                //Comment
+                //ConfirmationYear
+                //ConfirmedBy
+                //DatasourceId
+                //DeterminationYear                
+                //FrequencyId
+                //HasUserComments
+                //HiddenByProvider
+                //Label
+                //Length
+                //MaxDepth
+                //MaxHeight
+                //Media
+                //MigrateSightingObsId
+                //MigrateSightingPortalId
+                //MinDepth
+                //MinHeight
+                //OwnerOrganization
+                //PrivateCollection
+                //Projects
+                //PublicCollection
+                //Quantity
+                //QuantityOfSubstrates
+                //RegionalSightingStateId
+                //ReproductionId
+                //SightingPublishTypeIds
+                //SightingSpeciesCollectionItemId
+                //SightingTypeId
+                //SightingTypeSearchGroupId
+                //SpeciesCollection
+                //SpeciesGroupId
+                //StartTime
+                //Substrate
+                //SubstrateDescription
+                //SubstrateSpeciesId            
+                //Weight
+                //SightingBarcodeURL
+                //SubstrateSpeciesDescription
+            });
+
+            return operable;
+        }
+
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveRandomValidValuesWithPredfinedObservationAsSource(this IOperable<ArtportalenObservationVerbatim> operable)
+        {                        
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((ArtportalenObservationVerbatim obs, int index) =>
+            {
+                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimFromJsonNewtonsoft);
+                TimeSpan? obsTimeSpan = _faker.Random.Bool(0.9f) ? null : _faker.Date.Timespan(TimeSpan.FromHours(5)); // 90% probability of equal start and end date.
+                DateTime startDate = _faker.Date.Past(10); // random date within 10 years
+                DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
+                DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
+                DateTime editDate = reportedDate;
+                List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
+                string verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
+                List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
+                string observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
+                UserInternal reportedByInternal = GetRandomUserInternal();
+
+                // Set some properties from random generated data.
+                obs.Id = _faker.IndexVariable++;
+                obs.SightingId = _faker.IndexVariable++;
+                obs.DatasourceId = ArtportalenDataSourceId;
+                obs.RightsHolder = _faker.Name.FullName();
+                obs.VerifiedByInternal = verifiedByInternal;
+                obs.VerifiedBy = verifiedBy;
+                obs.ObserversInternal = observersInternal;
+                obs.Observers = observers;
+                obs.ReportedBy = reportedByInternal.UserAlias; // todo
+                obs.ReportedByUserId = reportedByInternal.Id;
+                obs.ReportedByUserServiceUserId = reportedByInternal.UserServiceUserId;
+                obs.ReportedByUserAlias = reportedByInternal.UserAlias;
+                obs.DeterminedBy = _faker.Name.FullName();
+
+                // Copy properties from predefined observation.
+                obs.DiscoveryMethod = sourceObservation.DiscoveryMethod;
+                obs.DeterminationMethod = sourceObservation.DeterminationMethod;
+                obs.EditDate = sourceObservation.EditDate;
+                obs.ReportedDate = sourceObservation.ReportedDate;
+                obs.StartDate = sourceObservation.StartDate;
+                obs.EndDate = sourceObservation.EndDate;
+                obs.Gender = sourceObservation.Gender;
+                obs.HasImages = sourceObservation.HasImages;
+                obs.FirstImageId = sourceObservation.FirstImageId;
+                obs.HasTriggeredValidationRules = sourceObservation.HasTriggeredValidationRules;
+                obs.HasAnyTriggeredValidationRuleWithWarning = sourceObservation.HasAnyTriggeredValidationRuleWithWarning;
+                obs.NoteOfInterest = sourceObservation.NoteOfInterest;
+                obs.HasUserComments = sourceObservation.HasUserComments;
+                obs.NotPresent = sourceObservation.NotPresent;
+                obs.NotRecovered = sourceObservation.NotRecovered;
+                obs.ProtectedBySystem = sourceObservation.ProtectedBySystem;                
+                obs.Site = sourceObservation.Site;
+                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
+                obs.Stage = sourceObservation.Stage;
+                obs.TaxonId = sourceObservation.TaxonId;
+                obs.Unit = sourceObservation.Unit;
+                obs.Unspontaneous = sourceObservation.Unspontaneous;
+                obs.UnsureDetermination = sourceObservation.UnsureDetermination;
+                obs.ValidationStatus = sourceObservation.ValidationStatus;                
+                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
+                obs.SpeciesFactsIds = sourceObservation.SpeciesFactsIds;
+                obs.Activity = sourceObservation.Activity;
+                obs.Biotope = sourceObservation.Biotope;
+                obs.BiotopeDescription = sourceObservation.BiotopeDescription;
+                obs.CollectionID = sourceObservation.CollectionID;
+                obs.Comment = sourceObservation.Comment;
+                obs.ConfirmationYear = sourceObservation.ConfirmationYear;
+                obs.ConfirmedBy = sourceObservation.ConfirmedBy;
+                obs.DatasourceId = sourceObservation.DatasourceId;
+                obs.DeterminationYear = sourceObservation.DeterminationYear;
+                obs.StartTime = sourceObservation.StartTime;
+                obs.EndTime = sourceObservation.EndTime;
+                obs.FrequencyId = sourceObservation.FrequencyId;
+                obs.HasUserComments = sourceObservation.HasUserComments;
+                obs.HiddenByProvider = sourceObservation.HiddenByProvider;
+                obs.Label = sourceObservation.Label;
+                obs.Length = sourceObservation.Length;
+                obs.MaxDepth = sourceObservation.MaxDepth;
+                obs.MaxHeight = sourceObservation.MaxHeight;
+                obs.Media = sourceObservation.Media;
+                obs.MigrateSightingObsId = sourceObservation.MigrateSightingObsId;
+                obs.MigrateSightingPortalId = sourceObservation.MigrateSightingPortalId;
+                obs.MinDepth = sourceObservation.MinDepth;
+                obs.MinHeight = sourceObservation.MinHeight;
+                obs.OwnerOrganization = sourceObservation.OwnerOrganization;
+                obs.PrivateCollection = sourceObservation.PrivateCollection;
+                obs.Projects = sourceObservation.Projects;
+                obs.PublicCollection = sourceObservation.PublicCollection;
+                obs.Quantity = sourceObservation.Quantity;
+                obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
+                obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
+                obs.ReproductionId = sourceObservation.ReproductionId;
+                obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
+                obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
+                obs.SightingTypeId = sourceObservation.SightingTypeId;
+                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
+                obs.SpeciesCollection = sourceObservation.SpeciesCollection;
+                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
+                obs.StartTime = sourceObservation.StartTime;
+                obs.Substrate = sourceObservation.Substrate;
+                obs.SubstrateDescription = sourceObservation.SubstrateDescription;
+                obs.SubstrateSpeciesId = sourceObservation.SubstrateSpeciesId;
+                obs.Weight = sourceObservation.Weight;
+                obs.SightingBarcodeURL = sourceObservation.SightingBarcodeURL;
+                obs.SubstrateSpeciesDescription = sourceObservation.SubstrateSpeciesDescription;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromRandomPredefinedObservation(this IOperable<ArtportalenObservationVerbatim> operable)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((ArtportalenObservationVerbatim obs, int index) =>
+            {
+                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimFromJsonNewtonsoft);                
+
+                obs.Id = _faker.IndexVariable++;
+                obs.DatasourceId = ArtportalenDataSourceId;
+                obs.SightingId = _faker.IndexVariable++;
+                obs.DiscoveryMethod = sourceObservation.DiscoveryMethod;
+                obs.DeterminationMethod = sourceObservation.DeterminationMethod;
+                obs.EditDate = sourceObservation.EditDate;
+                obs.ReportedDate = sourceObservation.ReportedDate;
+                obs.StartDate = sourceObservation.StartDate;
+                obs.EndDate = sourceObservation.EndDate;
+                obs.Gender = sourceObservation.Gender;
+                obs.HasImages = sourceObservation.HasImages;
+                obs.FirstImageId = sourceObservation.FirstImageId;
+                obs.HasTriggeredValidationRules = sourceObservation.HasTriggeredValidationRules;
+                obs.HasAnyTriggeredValidationRuleWithWarning = sourceObservation.HasAnyTriggeredValidationRuleWithWarning;
+                obs.NoteOfInterest = sourceObservation.NoteOfInterest;
+                obs.HasUserComments = sourceObservation.HasUserComments;
+                obs.NotPresent = sourceObservation.NotPresent;
+                obs.NotRecovered = sourceObservation.NotRecovered;
+                obs.ProtectedBySystem = sourceObservation.ProtectedBySystem;
+                obs.RightsHolder = sourceObservation.RightsHolder;
+                obs.VerifiedByInternal = sourceObservation.VerifiedByInternal;
+                obs.VerifiedBy = sourceObservation.VerifiedBy;
+                obs.ObserversInternal = sourceObservation.ObserversInternal;
+                obs.Observers = sourceObservation.Observers;
+                obs.Site = sourceObservation.Site;
+                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
+                obs.Stage = sourceObservation.Stage;
+                obs.TaxonId = sourceObservation.TaxonId;
+                obs.Unit = sourceObservation.Unit;
+                obs.Unspontaneous = sourceObservation.Unspontaneous;
+                obs.UnsureDetermination = sourceObservation.UnsureDetermination;
+                obs.ValidationStatus = sourceObservation.ValidationStatus;
+                obs.ReportedBy = sourceObservation.ReportedBy;
+                obs.ReportedByUserId = sourceObservation.ReportedByUserId;
+                obs.ReportedByUserServiceUserId = sourceObservation.ReportedByUserServiceUserId;
+                obs.ReportedByUserAlias = sourceObservation.ReportedByUserAlias;
+                obs.DeterminedBy = sourceObservation.DeterminedBy;
+                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
+                obs.SpeciesFactsIds = sourceObservation.SpeciesFactsIds;
+                obs.Activity = sourceObservation.Activity;
+                obs.Biotope = sourceObservation.Biotope;
+                obs.BiotopeDescription = sourceObservation.BiotopeDescription;
+                obs.CollectionID = sourceObservation.CollectionID;
+                obs.Comment = sourceObservation.Comment;
+                obs.ConfirmationYear = sourceObservation.ConfirmationYear;
+                obs.ConfirmedBy = sourceObservation.ConfirmedBy;
+                obs.DatasourceId = sourceObservation.DatasourceId;
+                obs.DeterminationYear = sourceObservation.DeterminationYear;
+                obs.StartTime = sourceObservation.StartTime;
+                obs.EndTime = sourceObservation.EndTime;
+                obs.FrequencyId = sourceObservation.FrequencyId;
+                obs.HasUserComments = sourceObservation.HasUserComments;
+                obs.HiddenByProvider = sourceObservation.HiddenByProvider;
+                obs.Label = sourceObservation.Label;
+                obs.Length = sourceObservation.Length;
+                obs.MaxDepth = sourceObservation.MaxDepth;
+                obs.MaxHeight = sourceObservation.MaxHeight;
+                obs.Media = sourceObservation.Media;
+                obs.MigrateSightingObsId = sourceObservation.MigrateSightingObsId;
+                obs.MigrateSightingPortalId = sourceObservation.MigrateSightingPortalId;
+                obs.MinDepth = sourceObservation.MinDepth;
+                obs.MinHeight = sourceObservation.MinHeight;
+                obs.OwnerOrganization = sourceObservation.OwnerOrganization;
+                obs.PrivateCollection = sourceObservation.PrivateCollection;
+                obs.Projects = sourceObservation.Projects;
+                obs.PublicCollection = sourceObservation.PublicCollection;
+                obs.Quantity = sourceObservation.Quantity;
+                obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
+                obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
+                obs.ReproductionId = sourceObservation.ReproductionId;
+                obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
+                obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
+                obs.SightingTypeId = sourceObservation.SightingTypeId;
+                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
+                obs.SpeciesCollection = sourceObservation.SpeciesCollection;
+                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
+                obs.StartTime = sourceObservation.StartTime;
+                obs.Substrate = sourceObservation.Substrate;
+                obs.SubstrateDescription = sourceObservation.SubstrateDescription;
+                obs.SubstrateSpeciesId = sourceObservation.SubstrateSpeciesId;
+                obs.Weight = sourceObservation.Weight;
+                obs.SightingBarcodeURL = sourceObservation.SightingBarcodeURL;
+                obs.SubstrateSpeciesDescription = sourceObservation.SubstrateSpeciesDescription;
+            });
 
             return operable;
         }

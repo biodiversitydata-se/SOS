@@ -1,4 +1,5 @@
-﻿using SOS.Lib.JsonConverters;
+﻿using LinqStatistics;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using SOS.TestHelpers.JsonConverters;
@@ -21,8 +22,14 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
             _fixture = fixture;
         }
 
-        [Fact]
-        [Trait("Category", "CompleteApiIntegrationTest")]
+        private bool IsObservationOk(ArtportalenObservationVerbatim obs)
+        {
+            if (obs.ProtectedBySystem) return false;
+
+            return true;
+        }
+
+        [Fact]        
         public async Task CreateArtportalenVerbatimObservationTestData()
         {
             // Read observations from MongoDB
@@ -33,11 +40,14 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
             while (await cursor.MoveNextAsync())
             {
                 if (nrRowsRead >= NrRowsToRead) break;
-                foreach (var row in cursor.Current)
+                foreach (var observation in cursor.Current)
                 {
                     if (nrRowsRead >= NrRowsToRead) break;
-                    verbatimObservations.Add(row);
-                    nrRowsRead++;
+                    if (IsObservationOk(observation))
+                    {
+                        verbatimObservations.Add(observation);
+                        nrRowsRead++;
+                    }
                 }
             }
 
@@ -59,6 +69,6 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
             var strJson2 = System.Text.Json.JsonSerializer.Serialize(verbatimObservations.First(), jsonSerializerOptions);
             System.IO.File.WriteAllText(@"C:\Temp\2022-04-04\ArtportalenVerbatimObservations2.json", strJson, Encoding.UTF8);
             //var observations2 = System.Text.Json.JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(strJson2, jsonSerializerOptions);            
-        }
+        }      
     }
 }

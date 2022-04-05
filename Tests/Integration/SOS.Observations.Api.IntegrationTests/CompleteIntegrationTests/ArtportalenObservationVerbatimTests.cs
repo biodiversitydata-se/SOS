@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
+using LinqStatistics;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System;
 using System.Collections.Generic;
@@ -13,45 +14,69 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests
     public class ArtportalenObservationVerbatimTests
     {
         [Fact]
-        public async Task CreateArtportalenTestData()
+        public void CreateArtportalenTestDataWithAllRandomValues()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var verbatims = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            const int NrObservations = 100;
+            var verbatims = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(NrObservations)
                 .All()
                     .HaveRandomValidValues()
+                .TheFirst(1)
+                    .With(m => m.SightingId = 123456)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            verbatims.Count.Should().Be(100);
+            verbatims.Count.Should().Be(NrObservations);
+            verbatims.First().SightingId.Should().Be(123456);
+            verbatims.Select(m => m.SightingId).Should().OnlyHaveUniqueItems("because all SightingIds should be unique");
         }
 
         [Fact]
-        public async Task CreateArtportalenTestDataFromPredefinedObservations()
+        public void CreateArtportalenTestDataWithRandomValuesAndPredefinedObservationAsSource()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var predefinedObservations = ArtportalenObservationVerbatimBuilderExtensions.VerbatimFromJsonNewtonsoft;
-            var verbatims = Builder<ArtportalenObservationVerbatimWrapper>.CreateListOfSize(100)
+            const int NrObservations = 10;
+            var verbatims = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(NrObservations)
                 .All()
-                    .With(m => m.Observation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(predefinedObservations))
+                    .HaveRandomValidValuesWithPredfinedObservationAsSource()
                 .TheFirst(1)
-                    .With(m => m.Observation.SightingId = 123456)                
+                    .With(m => m.SightingId = 123456)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            verbatims.Count.Should().Be(100);
+            verbatims.Count.Should().Be(NrObservations);
+            verbatims.First().SightingId.Should().Be(123456);
+            verbatims.Select(m => m.SightingId).Should().OnlyHaveUniqueItems("because all SightingIds should be unique");
         }
 
-        public class ArtportalenObservationVerbatimWrapper
+        [Fact]
+        public void CreateArtportalenTestDataWithValuesFromPredefinedObservationAsSource()
         {
-            public ArtportalenObservationVerbatim Observation { get; set; }
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const int NrObservations = 10;
+            var verbatims = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(NrObservations)
+                .All()
+                    .HaveValuesFromRandomPredefinedObservation()
+                .TheFirst(1)
+                    .With(m => m.SightingId = 123456)
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            verbatims.Count.Should().Be(NrObservations);
+            verbatims.First().SightingId.Should().Be(123456);
+            verbatims.Select(m => m.SightingId).Should().OnlyHaveUniqueItems("because all SightingIds should be unique");
         }
     }
 }

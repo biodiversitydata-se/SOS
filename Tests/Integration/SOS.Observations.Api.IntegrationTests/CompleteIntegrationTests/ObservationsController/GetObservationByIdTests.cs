@@ -28,13 +28,13 @@ namespace SOS.Observations.Api.IntegrationTests.CompleteIntegrationTests.Observa
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------
-            const int sightingId = 123456;
+            const int SightingId = 123456;
             const string occurrenceId = $"urn:lsid:artportalen.se:sighting:123456";
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()                    
                     .HaveRandomValidValues()
                 .TheFirst(1)
-                    .With(p => p.SightingId = sightingId)                
+                    .With(p => p.SightingId = SightingId)                
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
