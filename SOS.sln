@@ -96,6 +96,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.ElasticSearch.Proxy", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Harvest", "Src\SOS.Harvest\SOS.Harvest.csproj", "{C7358B1B-F227-4D52-91E7-59CF0B24507E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.AutomaticIntegrationTests", "Tests\Integration\SOS.AutomaticIntegrationTests\SOS.AutomaticIntegrationTests.csproj", "{54507E17-2CDF-4686-940E-BE1EB727C814}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,10 @@ Global
 		{C7358B1B-F227-4D52-91E7-59CF0B24507E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7358B1B-F227-4D52-91E7-59CF0B24507E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7358B1B-F227-4D52-91E7-59CF0B24507E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54507E17-2CDF-4686-940E-BE1EB727C814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54507E17-2CDF-4686-940E-BE1EB727C814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54507E17-2CDF-4686-940E-BE1EB727C814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54507E17-2CDF-4686-940E-BE1EB727C814}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -219,6 +225,7 @@ Global
 		{B9A973D1-C01B-42AE-AC5B-FA9B2FC64824} = {7768AF04-80A0-45EA-A4FD-821937C8DC79}
 		{A999A1AE-EE37-4B9A-B4D3-DCFB2C5FCBFB} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 		{C7358B1B-F227-4D52-91E7-59CF0B24507E} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
+		{54507E17-2CDF-4686-940E-BE1EB727C814} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}
