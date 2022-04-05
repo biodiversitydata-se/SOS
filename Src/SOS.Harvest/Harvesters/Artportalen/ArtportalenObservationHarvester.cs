@@ -482,6 +482,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     await HarvestAllAsync(harvestFactory, cancellationToken)
                     :
                     await HarvestIncrementalAsync(mode, harvestFactory, cancellationToken);
+                // Clean up
+                harvestFactory = null;
 
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
@@ -529,11 +531,14 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 harvestFactory.IncrementalMode = true;
                 _sightingRepository.Live = true;
 
-                return await HarvestBatchAsync(harvestFactory,
+                var observations = await HarvestBatchAsync(harvestFactory,
                     _sightingRepository.GetChunkAsync(ids),
                     1,
                     true,
                     false);
+                // Clean up
+                harvestFactory = null;
+                return observations;
             }
             catch (JobAbortedException)
             {

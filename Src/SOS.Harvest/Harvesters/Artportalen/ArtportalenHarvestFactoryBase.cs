@@ -17,41 +17,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         #region Site
         /// <summary>
-        /// Try to add missing sites from live data
-        /// </summary>
-        /// <param name="siteIds"></param>
-        /// <returns></returns>
-        protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
-        {
-            var sites = await GetSitesAsync(siteIds);
-
-            if (sites?.Any() ?? false)
-            {
-                foreach (var site in sites)
-                {
-                    Sites.TryAdd(site.Id, site);
-                }
-            }
-        }
-
-        protected async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
-        {
-            if (!siteIds?.Any() ?? true)
-            {
-                return null;
-            }
-            var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
-            var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, IncrementalMode);
-           
-            var siteEntities = await getSitesTask;
-            var siteAreas = await getSitesAreasTask;
-            var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
-
-            return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
-        }
-
-        /// <summary>
         /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
         ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
         /// </summary>
@@ -135,7 +100,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
                 VerbatimCoordinateSystem = CoordinateSys.WebMercator,
-                
+
             };
 
             if (!areas?.Any() ?? true)
@@ -168,6 +133,41 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _areaHelper.AddAreaDataToSite(site);
 
             return site;
+        }
+
+        /// <summary>
+        /// Try to add missing sites from live data
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <returns></returns>
+        protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
+        {
+            var sites = await GetSitesAsync(siteIds);
+
+            if (sites?.Any() ?? false)
+            {
+                foreach (var site in sites)
+                {
+                    Sites.TryAdd(site.Id, site);
+                }
+            }
+        }
+
+        protected async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+            var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
+            var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
+            var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, IncrementalMode);
+           
+            var siteEntities = await getSitesTask;
+            var siteAreas = await getSitesAreasTask;
+            var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
+
+            return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
         }
         #endregion Site
 
