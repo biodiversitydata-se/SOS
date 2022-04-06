@@ -23,6 +23,7 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
         }
 
         [Fact(Skip = "Intended to run on demand when needed")]
+        [Trait("Category", "DataUtil")]
         public async Task CalculateArtportalenVerbatimDataStatistics()
         {
             // Read observations from MongoDB

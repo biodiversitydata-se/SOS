@@ -14,6 +14,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder.Tests
     public class ArtportalenObservationBuilderTests
     {
         [Fact]
+        [Trait("Category", "UnitTest")]
         public void CreateArtportalenTestDataWithAllRandomValues()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -36,6 +37,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder.Tests
         }
 
         [Fact]
+        [Trait("Category", "UnitTest")]
         public void CreateArtportalenTestDataWithRandomValuesAndPredefinedObservationAsSource()
         {
             //-----------------------------------------------------------------------------------------------------------
