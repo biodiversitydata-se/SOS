@@ -163,12 +163,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 while (currentId <= maxId)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        currentId - minId >= _artportalenConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        break;
-                    }
-
+                    
                     await _semaphore.WaitAsync();
                     batchIndex++;
 

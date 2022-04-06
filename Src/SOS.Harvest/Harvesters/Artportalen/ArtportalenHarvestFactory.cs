@@ -465,23 +465,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             var sightingIds = new HashSet<int>();
-            var batchSiteIds = new HashSet<int>();
+            var siteIds = new HashSet<int>();
 
             for (var i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];
                 sightingIds.Add(entity.Id);
-                var siteId = entity.SiteId;
-
-                // Check for new sites since we already lopping the array 
-                if (siteId == 0 || batchSiteIds.Contains(siteId))
-                {
-                    continue;
-                }
-
-                batchSiteIds.Add(siteId);
+                siteIds.Add(entity.SiteId);
             }
-            var sites = await GetBatchSitesAsync(batchSiteIds);
+            var sites = await GetBatchSitesAsync(siteIds);
 
             var sightingsProjects = await GetSightingsProjects(sightingIds, Live);
 
@@ -514,11 +506,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 ICollection<Media>? media = null;
                 sightingsMedias?.TryGetValue(entity.Id, out media);
 
-                if (site == null)
-                {
-                    continue;
-                }
-
                 var verbatim = CastEntityToVerbatim(entity, site, speciesCollections, personSighting, projects, media);
 
                 if (verbatim == null)
@@ -530,7 +517,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             // Clean up
             sites.Clear();
-
+           
             return verbatims;
         }
     }
