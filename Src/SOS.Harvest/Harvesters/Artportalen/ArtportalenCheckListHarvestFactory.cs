@@ -133,7 +133,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 chekListsSightingsData.TryGetValue(entity.Id, out var sightingData);
                 verbatims.Add(CastEntityToVerbatim(entity, site, taxonIds, sightingData));
             }
-
+            // Clean up
+            sites.Clear();
             return verbatims;
         }
 

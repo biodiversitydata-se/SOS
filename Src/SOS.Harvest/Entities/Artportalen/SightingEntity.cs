@@ -171,7 +171,7 @@
         /// <summary>
         ///     Id of site
         /// </summary>
-        public int? SiteId { get; set; }
+        public int SiteId { get; set; }
 
         /// <summary>
         ///     Taxon stage id

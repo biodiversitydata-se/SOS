@@ -202,7 +202,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug("Finish getting check list metadata");
 
                 _logger.LogDebug("Start creating factory");
-                var harvestFactory = new ArtportalenCheckListHarvestFactory(
+                using var harvestFactory = new ArtportalenCheckListHarvestFactory(
                     _areaHelper,
                     _checkListRepository,
                     _siteRepository,
@@ -223,7 +223,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _logger.LogDebug("Finish empty artportalen check list verbatim collection");
 
                 var nrCheckListsHarvested = await HarvestAllAsync(harvestFactory, cancellationToken);
-
+               
                 // Update harvest info
                 harvestInfo.Status = nrCheckListsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
 
