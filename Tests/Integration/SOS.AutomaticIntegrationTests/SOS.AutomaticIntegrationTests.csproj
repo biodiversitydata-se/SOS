@@ -52,6 +52,16 @@
 		<ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
 		<ProjectReference Include="..\..\..\Src\SOS.Observations.Api\SOS.Observations.Api.csproj" />
 		<ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Resources\ArtportalenVerbatimObservations_1000.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>	
 	
 </Project>

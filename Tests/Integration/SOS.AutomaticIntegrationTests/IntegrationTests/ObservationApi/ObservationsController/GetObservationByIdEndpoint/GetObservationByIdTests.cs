@@ -33,6 +33,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             const string occurrenceId = $"urn:lsid:artportalen.se:sighting:123456";
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
+                    //.HaveValuesFromRandomPredefinedObservation()
                     .HaveRandomValues()
                 .TheFirst(1)
                     .With(p => p.SightingId = SightingId)

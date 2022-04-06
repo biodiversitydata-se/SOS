@@ -1,10 +1,12 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,44 +27,31 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             (6, 0.05f)
         };
 
-        public static List<ArtportalenObservationVerbatim> VerbatimFromJsonNewtonsoft
+        public static List<ArtportalenObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile
         {
             get
             {
-                if (_verbatimFromJsonNewtonsoft == null)
+                if (_verbatimArtportalenObservationsFromJsonFile == null)
                 {
-                    string str = System.IO.File.ReadAllText(@"C:\TEMP\2022-04-04\ArtportalenVerbatimObservations1.json", Encoding.UTF8);
+                    var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimObservations_1000.json");                    
+                    string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
                     var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
                     {
-                        Converters = new List<Newtonsoft.Json.JsonConverter> { new TestHelpers.JsonConverters.ObjectIdConverter() }
+                        Converters = new List<Newtonsoft.Json.JsonConverter> { 
+                            new TestHelpers.JsonConverters.ObjectIdConverter()                            
+                            //new NewtonsoftGeoShapeConverter() // todo - need to have something like this but for GeoJsonGeometry
+                            //new ArrayListConverter<double[][]>()
+                        }
                     };
 
-                    _verbatimFromJsonNewtonsoft = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
+                    _verbatimArtportalenObservationsFromJsonFile = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
                 }
 
-                return _verbatimFromJsonNewtonsoft;
+                return _verbatimArtportalenObservationsFromJsonFile;
             }
         }
-        private static List<ArtportalenObservationVerbatim> _verbatimFromJsonNewtonsoft;
-
-        public static List<ArtportalenObservationVerbatim> VerbatimFromJson
-        {
-            get
-            {
-                if (_verbatimFromJsonNewtonsoft == null)
-                {
-                    string str = System.IO.File.ReadAllText(@"C:\TEMP\2022-04-04\ArtportalenVerbatimObservations2.json", Encoding.UTF8);
-                    var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                    jsonSerializerOptions.Converters.Add(new Lib.JsonConverters.GeoShapeConverter());
-                    jsonSerializerOptions.Converters.Add(new Lib.JsonConverters.GeoLocationConverter());
-
-                    _verbatimFromJson = System.Text.Json.JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(str, jsonSerializerOptions);
-                }
-
-                return _verbatimFromJson;
-            }
-        }
-        private static List<ArtportalenObservationVerbatim> _verbatimFromJson;
+        private static List<ArtportalenObservationVerbatim> _verbatimArtportalenObservationsFromJsonFile;        
 
         private static UserInternal GetRandomUserInternal()
         {
@@ -284,121 +273,12 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
-
-        public static IOperable<ArtportalenObservationVerbatim> HaveRandomValidValuesWithPredfinedObservationAsSource(this IOperable<ArtportalenObservationVerbatim> operable)
-        {
-            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
-            builder.With((obs, index) =>
-            {
-                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimFromJsonNewtonsoft);
-                TimeSpan? obsTimeSpan = _faker.Random.Bool(0.9f) ? null : _faker.Date.Timespan(TimeSpan.FromHours(5)); // 90% probability of equal start and end date.
-                DateTime startDate = _faker.Date.Past(10); // random date within 10 years
-                DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
-                DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
-                DateTime editDate = reportedDate;
-                List<UserInternal> verifiedByInternal = GetRandomUserInternals(_verifiersProbability);
-                string verifiedBy = verifiedByInternal == null ? null : string.Join(", ", verifiedByInternal.Select(m => m.UserAlias));
-                List<UserInternal> observersInternal = GetRandomUserInternals(_verifiersProbability);
-                string observers = observersInternal == null ? null : string.Join(", ", observersInternal.Select(m => m.UserAlias));
-                UserInternal reportedByInternal = GetRandomUserInternal();
-
-                // Set some properties from random generated data.
-                obs.Id = _faker.IndexVariable++;
-                obs.SightingId = _faker.IndexVariable++;
-                obs.DatasourceId = ArtportalenDataSourceId;
-                obs.RightsHolder = _faker.Name.FullName();
-                obs.VerifiedByInternal = verifiedByInternal;
-                obs.VerifiedBy = verifiedBy;
-                obs.ObserversInternal = observersInternal;
-                obs.Observers = observers;
-                obs.ReportedBy = reportedByInternal.UserAlias; // todo
-                obs.ReportedByUserId = reportedByInternal.Id;
-                obs.ReportedByUserServiceUserId = reportedByInternal.UserServiceUserId;
-                obs.ReportedByUserAlias = reportedByInternal.UserAlias;
-                obs.DeterminedBy = _faker.Name.FullName();
-
-                // Copy properties from predefined observation.
-                obs.DiscoveryMethod = sourceObservation.DiscoveryMethod;
-                obs.DeterminationMethod = sourceObservation.DeterminationMethod;
-                obs.EditDate = sourceObservation.EditDate;
-                obs.ReportedDate = sourceObservation.ReportedDate;
-                obs.StartDate = sourceObservation.StartDate;
-                obs.EndDate = sourceObservation.EndDate;
-                obs.Gender = sourceObservation.Gender;
-                obs.HasImages = sourceObservation.HasImages;
-                obs.FirstImageId = sourceObservation.FirstImageId;
-                obs.HasTriggeredValidationRules = sourceObservation.HasTriggeredValidationRules;
-                obs.HasAnyTriggeredValidationRuleWithWarning = sourceObservation.HasAnyTriggeredValidationRuleWithWarning;
-                obs.NoteOfInterest = sourceObservation.NoteOfInterest;
-                obs.HasUserComments = sourceObservation.HasUserComments;
-                obs.NotPresent = sourceObservation.NotPresent;
-                obs.NotRecovered = sourceObservation.NotRecovered;
-                obs.ProtectedBySystem = sourceObservation.ProtectedBySystem;
-                obs.Site = sourceObservation.Site;
-                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
-                obs.Stage = sourceObservation.Stage;
-                obs.TaxonId = sourceObservation.TaxonId;
-                obs.Unit = sourceObservation.Unit;
-                obs.Unspontaneous = sourceObservation.Unspontaneous;
-                obs.UnsureDetermination = sourceObservation.UnsureDetermination;
-                obs.ValidationStatus = sourceObservation.ValidationStatus;
-                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
-                obs.SpeciesFactsIds = sourceObservation.SpeciesFactsIds;
-                obs.Activity = sourceObservation.Activity;
-                obs.Biotope = sourceObservation.Biotope;
-                obs.BiotopeDescription = sourceObservation.BiotopeDescription;
-                obs.CollectionID = sourceObservation.CollectionID;
-                obs.Comment = sourceObservation.Comment;
-                obs.ConfirmationYear = sourceObservation.ConfirmationYear;
-                obs.ConfirmedBy = sourceObservation.ConfirmedBy;
-                obs.DatasourceId = sourceObservation.DatasourceId;
-                obs.DeterminationYear = sourceObservation.DeterminationYear;
-                obs.StartTime = sourceObservation.StartTime;
-                obs.EndTime = sourceObservation.EndTime;
-                obs.FrequencyId = sourceObservation.FrequencyId;
-                obs.HasUserComments = sourceObservation.HasUserComments;
-                obs.HiddenByProvider = sourceObservation.HiddenByProvider;
-                obs.Label = sourceObservation.Label;
-                obs.Length = sourceObservation.Length;
-                obs.MaxDepth = sourceObservation.MaxDepth;
-                obs.MaxHeight = sourceObservation.MaxHeight;
-                obs.Media = sourceObservation.Media;
-                obs.MigrateSightingObsId = sourceObservation.MigrateSightingObsId;
-                obs.MigrateSightingPortalId = sourceObservation.MigrateSightingPortalId;
-                obs.MinDepth = sourceObservation.MinDepth;
-                obs.MinHeight = sourceObservation.MinHeight;
-                obs.OwnerOrganization = sourceObservation.OwnerOrganization;
-                obs.PrivateCollection = sourceObservation.PrivateCollection;
-                obs.Projects = sourceObservation.Projects;
-                obs.PublicCollection = sourceObservation.PublicCollection;
-                obs.Quantity = sourceObservation.Quantity;
-                obs.QuantityOfSubstrate = sourceObservation.QuantityOfSubstrate;
-                obs.RegionalSightingStateId = sourceObservation.RegionalSightingStateId;
-                obs.ReproductionId = sourceObservation.ReproductionId;
-                obs.SightingPublishTypeIds = sourceObservation.SightingPublishTypeIds;
-                obs.SightingSpeciesCollectionItemId = sourceObservation.SightingSpeciesCollectionItemId;
-                obs.SightingTypeId = sourceObservation.SightingTypeId;
-                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
-                obs.SpeciesCollection = sourceObservation.SpeciesCollection;
-                obs.SpeciesGroupId = sourceObservation.SpeciesGroupId;
-                obs.StartTime = sourceObservation.StartTime;
-                obs.Substrate = sourceObservation.Substrate;
-                obs.SubstrateDescription = sourceObservation.SubstrateDescription;
-                obs.SubstrateSpeciesId = sourceObservation.SubstrateSpeciesId;
-                obs.Weight = sourceObservation.Weight;
-                obs.SightingBarcodeURL = sourceObservation.SightingBarcodeURL;
-                obs.SubstrateSpeciesDescription = sourceObservation.SubstrateSpeciesDescription;
-            });
-
-            return operable;
-        }
-
         public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromRandomPredefinedObservation(this IOperable<ArtportalenObservationVerbatim> operable)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimFromJsonNewtonsoft);
+                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile);                
 
                 obs.Id = _faker.IndexVariable++;
                 obs.DatasourceId = ArtportalenDataSourceId;
@@ -488,4 +368,27 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
     }
+
+    //public class ArrayListConverter<TItem> : Newtonsoft.Json.JsonConverter
+    //{
+    //    public override bool CanWrite { get { return false; } }
+
+    //    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override object ReadJson(Newtonsoft.Json.JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+    //    {
+    //        if (reader.TokenType == Newtonsoft.Json.JsonToken.Null)
+    //            return null;
+    //        var obj = serializer.Deserialize<double[][]>(reader);
+    //        return obj;
+    //    }
+
+    //    public override bool CanConvert(Type objectType)
+    //    {
+    //        return objectType == typeof(System.Collections.ArrayList);
+    //    }
+    //}
 }
