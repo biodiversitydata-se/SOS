@@ -9,12 +9,45 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Harvesters.Artportalen
 {
-    internal class ArtportalenHarvestFactoryBase : HarvestBaseFactory
+    internal class ArtportalenHarvestFactoryBase : HarvestBaseFactory, IDisposable
     {
+        private const int SITE_BATCH_SIZE = 10000;
         private readonly IAreaHelper _areaHelper;
         private readonly ConcurrentDictionary<int, Site> _cachedSites;
         private readonly SemaphoreSlim _semaphore;
         private readonly ISiteRepository _siteRepository;
+
+        #region IDisposable
+
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _cachedSites.Clear();
+            }
+            
+            _disposed = true;
+        }
+
+        ~ArtportalenHarvestFactoryBase()
+        {
+            Dispose(false);
+        }
+
+        #endregion
 
         #region Site
         /// <summary>
@@ -22,16 +55,26 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        private async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
+        private async Task CacheSitesAsync(IEnumerable<int>? siteIds)
         {
-            var sites = await GetSitesAsync(siteIds);
-
-            if (sites?.Any() ?? false)
+            var skip = 0;
+            var siteIdBatch = siteIds.Take(SITE_BATCH_SIZE);
+           
+            while (siteIdBatch.Any())
             {
-                foreach (var site in sites)
+                await _semaphore.WaitAsync();
+                var siteBatch = await GetSiteChunkAsync(siteIdBatch);
+
+                if (siteBatch?.Any() ?? false)
                 {
-                    _cachedSites.TryAdd(site.Id, site);
+                    foreach(var site in siteBatch)
+                {
+                        _cachedSites.TryAdd(site.Id, site);
+                    }
                 }
+
+                skip += SITE_BATCH_SIZE;
+                siteIdBatch = siteIds.Skip(skip).Take(SITE_BATCH_SIZE);
             }
         }
 
@@ -167,8 +210,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             var skip = 0;
-            const int take = 10000;
-            var siteIdBatch = siteIds.Take(take);
+            var siteIdBatch = siteIds.Take(SITE_BATCH_SIZE);
             var sites = new List<Site>();
 
             while (siteIdBatch.Any())
@@ -181,8 +223,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     sites.AddRange(siteBatch);
                 }
                
-                skip += take;
-                siteIdBatch = siteIds.Skip(skip).Take(take);
+                skip += SITE_BATCH_SIZE;
+                siteIdBatch = siteIds.Skip(skip).Take(SITE_BATCH_SIZE);
             }
 
             return sites;
@@ -303,7 +345,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             if (!_cachedSites.Any())
             {
                 var siteIds = await _siteRepository.GetFreqventlyUsedIdsAsync(Live);
-                await AddMissingSitesAsync(siteIds);
+                await CacheSitesAsync(siteIds);
             }
         }
     }

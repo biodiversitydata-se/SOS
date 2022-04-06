@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
-using SOS.Lib.Repositories.Interfaces;
+﻿using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
