@@ -115,12 +115,18 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _speciesCollectionRepository,
                 _artportalenMetadataContainer,
                 _areaHelper,
+                mode != JobRunModes.Full,
+                _artportalenConfiguration.NoOfThreads,
                 _logger
-            )
-            {
-                IncrementalMode = mode != JobRunModes.Full
-            };
+            );
             _logger.LogDebug("Finish creating factory");
+
+            if (mode.Equals(JobRunModes.Full))
+            {
+                _logger.LogDebug("Start caching sites");
+                await harvestFactory.CacheFreqventlyUsedSitesAsync();
+                _logger.LogDebug("Finish caching sites");
+            }
 
             return harvestFactory;
         }
@@ -209,7 +215,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             // Make sure incremental mode is true to get max id from live instance
             _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
-            harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
 
             // We start from last harvested sighting 
@@ -528,7 +533,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var mode = JobRunModes.IncrementalActiveInstance;
                 var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
                 
-                harvestFactory.IncrementalMode = true;
                 _sightingRepository.Live = true;
 
                 var observations = await HarvestBatchAsync(harvestFactory,

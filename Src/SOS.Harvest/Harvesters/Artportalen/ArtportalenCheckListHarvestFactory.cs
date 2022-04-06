@@ -22,7 +22,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="taxonIds"></param>
         /// <param name="sightingData"></param>
         /// <returns></returns>
-        private ArtportalenCheckListVerbatim CastEntityToVerbatim(CheckListEntity entity, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
+        private ArtportalenCheckListVerbatim CastEntityToVerbatim(CheckListEntity entity, Site site, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
         {
             try
             {
@@ -31,7 +31,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     return null;
                 }
 
-                Sites.TryGetValue(entity.SiteId ?? 0, out var site);
                 _projects.TryGetValue(entity.ProjectId ?? 0, out var project);
 
                 var checkListVerbatim = new ArtportalenCheckListVerbatim
@@ -79,7 +78,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
             ISiteRepository siteRepository,
             ISightingRepository sightingRepository,
             IEnumerable<ProjectEntity> projectEntities,
-            ILogger<ArtportalenCheckListHarvester> logger) : base(siteRepository, areaHelper)
+            int noOfThreads,
+            ILogger<ArtportalenCheckListHarvester> logger) : base(siteRepository, areaHelper, false, noOfThreads)
         {
             _checkListRepository = checkListRepository ?? throw new ArgumentNullException(nameof(checkListRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
@@ -95,7 +95,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 return null;
             }
 
-            var newSiteIds = new HashSet<int>();
+            var batchSiteIds = new HashSet<int>();
 
             for (var i = 0; i < entities.Length; i++)
             {
@@ -103,15 +103,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var siteId = entity.SiteId ?? 0;
 
                 // Check for new sites since we already lopping the array 
-                if (siteId == 0 || newSiteIds.Contains(siteId) || Sites.ContainsKey(siteId))
+                if (siteId == 0 || batchSiteIds.Contains(siteId))
                 {
                     continue;
                 }
 
-                newSiteIds.Add(siteId);
+                batchSiteIds.Add(siteId);
             }
 
-            await AddMissingSitesAsync(newSiteIds);
+            var sites = await GetBatchSitesAsync(batchSiteIds);
 
             _logger.LogDebug(
                 "Start getting check lists metadata");
@@ -128,9 +128,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
             for (var i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];
+                sites.TryGetValue(entity.SiteId ?? 0, out var site);
                 checkListsTaxonIds.TryGetValue(entity.Id, out var taxonIds);
                 chekListsSightingsData.TryGetValue(entity.Id, out var sightingData);
-                verbatims.Add(CastEntityToVerbatim(entity, taxonIds, sightingData));
+                verbatims.Add(CastEntityToVerbatim(entity, site, taxonIds, sightingData));
             }
 
             return verbatims;

@@ -132,6 +132,30 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<int>> GetFreqventlyUsedIdsAsync(bool live)
+        {
+            try
+            {
+                return await QueryAsync<int>(
+                        @$"
+                        SELECT
+                            s.SiteId
+                        FROM
+                            {SightingsFromBasics}
+                        WHERE
+                            {SightingWhereBasics}
+                        GROUP BY
+	                        s.SiteId
+                        HAVING COUNT (s.SiteId) > 1", live);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting frequently used sites");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false)
         {
             if (!siteIds?.Any() ?? true)

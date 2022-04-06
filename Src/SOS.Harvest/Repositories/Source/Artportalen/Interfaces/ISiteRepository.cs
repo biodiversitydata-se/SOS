@@ -24,6 +24,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids, bool live = false);
 
         /// <summary>
+        /// Get id from sites connected to more than one sighting
+        /// </summary>
+        /// <param name="live"></param>
+        /// <returns></returns>
+        Task<IEnumerable<int>> GetFreqventlyUsedIdsAsync(bool live);
+
+        /// <summary>
         /// Get site geometry
         /// </summary>
         /// <param name="siteIds"></param>

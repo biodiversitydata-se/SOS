@@ -208,11 +208,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     _siteRepository,
                     _sightingRepository,
                     projectEntities,
+                    _artportalenConfiguration.NoOfThreads,
                     _logger
-                )
-                {
-                    IncrementalMode = false
-                };
+                );
+
                 _logger.LogDebug("Finish creating factory");
 
                 _artportalenCheckListVerbatimRepository.Mode = JobRunModes.Full;

@@ -11,11 +11,30 @@ namespace SOS.Harvest.Harvesters.Artportalen
 {
     internal class ArtportalenHarvestFactoryBase : HarvestBaseFactory
     {
-        private readonly ISiteRepository _siteRepository;
-        protected readonly ConcurrentDictionary<int, Site> Sites;
         private readonly IAreaHelper _areaHelper;
+        private readonly ConcurrentDictionary<int, Site> _cachedSites;
+        private readonly SemaphoreSlim _semaphore;
+        private readonly ISiteRepository _siteRepository;
 
         #region Site
+        /// <summary>
+        /// Try to add missing sites from live data
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <returns></returns>
+        private async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
+        {
+            var sites = await GetSitesAsync(siteIds);
+
+            if (sites?.Any() ?? false)
+            {
+                foreach (var site in sites)
+                {
+                    _cachedSites.TryAdd(site.Id, site);
+                }
+            }
+        }
+
         /// <summary>
         /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
         ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
@@ -136,38 +155,121 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
 
         /// <summary>
-        /// Try to add missing sites from live data
+        /// Get sites and related metadata and create site objects
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        protected async Task AddMissingSitesAsync(IEnumerable<int>? siteIds)
-        {
-            var sites = await GetSitesAsync(siteIds);
-
-            if (sites?.Any() ?? false)
-            {
-                foreach (var site in sites)
-                {
-                    Sites.TryAdd(site.Id, site);
-                }
-            }
-        }
-
-        protected async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
+        private async Task<IEnumerable<Site>> GetSitesAsync(IEnumerable<int>? siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
                 return null;
             }
-            var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, IncrementalMode);
-            var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, IncrementalMode);
-            var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, IncrementalMode);
-           
-            var siteEntities = await getSitesTask;
-            var siteAreas = await getSitesAreasTask;
-            var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
 
-            return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            var skip = 0;
+            const int take = 10000;
+            var siteIdBatch = siteIds.Take(take);
+            var sites = new List<Site>();
+
+            while (siteIdBatch.Any())
+            {
+                await _semaphore.WaitAsync();
+                var siteBatch = await GetSiteChunkAsync(siteIdBatch);
+
+                if (siteBatch?.Any() ?? false)
+                {
+                    sites.AddRange(siteBatch);
+                }
+               
+                skip += take;
+                siteIdBatch = siteIds.Skip(skip).Take(take);
+            }
+
+            return sites;
+        }
+
+        private async Task<IEnumerable<Site>> GetSiteChunkAsync(IEnumerable<int>? siteIds)
+        {
+            if (!siteIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            try
+            {
+                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, Live);
+                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, Live);
+                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, Live);
+
+                var siteEntities = await getSitesTask;
+                var siteAreas = await getSitesAreasTask;
+                var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
+
+                return await CastSiteEntitiesToVerbatimAsync(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Get sites used in current batch
+        /// </summary>
+        /// <param name="siteIds"></param>
+        /// <returns></returns>
+        protected async Task<IDictionary<int, Site>> GetBatchSitesAsync(IEnumerable<int>? siteIds)
+        {
+            var sites = new Dictionary<int, Site>();
+            
+            if (!siteIds?.Any() ?? true)
+            {
+                return sites;
+            }
+
+            var missingSiteIds = new HashSet<int>();
+
+            // Try to get sites from cache
+            foreach (var siteId in siteIds)
+            {
+                if (_cachedSites.TryGetValue(siteId, out var site))
+                {
+                    sites.Add(siteId, site);
+                    continue;
+                }
+                missingSiteIds.Add(siteId);
+            }
+
+            // Get sites that not exists in cache from db
+            if (missingSiteIds.Any())
+            {
+                var missingSites = await GetSitesAsync(missingSiteIds);
+
+                if (missingSites?.Any() ?? false)
+                {
+                    foreach (var site in missingSites)
+                    {
+                        sites.TryAdd(site.Id, site);
+                    }
+                }
+            }
+
+            return sites;
+        }
+
+        /// <summary>
+        /// Check if site exists in cache
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
+
+        protected readonly bool Live;
+
+        protected Site TryGetSite(int siteId) {
+            _cachedSites.TryGetValue(siteId, out var site);
+
+            return site;
         }
         #endregion Site
 
@@ -176,15 +278,33 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// </summary>
         /// <param name="siteRepository"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="live"></param>
+        /// <param name="noOfThreads"></param>
         public ArtportalenHarvestFactoryBase(
             ISiteRepository siteRepository,
-            IAreaHelper areaHelper) : base()
+            IAreaHelper areaHelper,
+            bool live,
+            int noOfThreads) : base()
         {
             _siteRepository = siteRepository;
             _areaHelper = areaHelper;
-            Sites = new ConcurrentDictionary<int, Site>();
+            _cachedSites = new ConcurrentDictionary<int, Site>();
+            Live = live;
+            _semaphore = new SemaphoreSlim(noOfThreads);
         }
 
-        public bool IncrementalMode { get; set; }
+        /// <summary>
+        /// Cache sites used multiple times
+        /// </summary>
+        /// <returns></returns>
+        public async Task CacheFreqventlyUsedSitesAsync()
+        {
+            // Should only be called once
+            if (!_cachedSites.Any())
+            {
+                var siteIds = await _siteRepository.GetFreqventlyUsedIdsAsync(Live);
+                await AddMissingSitesAsync(siteIds);
+            }
+        }
     }
 }
