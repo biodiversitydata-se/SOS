@@ -48,9 +48,7 @@ using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
     public class ApiIntegrationTestFixture : FixtureBase, IDisposable
-    {
-        public ArtportalenObservationProcessor ArtportalenObservationProcessor { get; set; }
-        public ArtportalenObservationFactory ArtportalenObservationFactory { get; set; }
+    {        
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
@@ -229,14 +227,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
             var taxa = await taxonRepository.GetAllAsync();
             var taxaById = taxa.ToDictionary(m => m.Id, m => m);
-            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
-            ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
-                artportalenDataProvider,
-                taxaById,
-                vocabularyRepository,
-                false,
-                "https:\\www.artportalen.se",
-                processTimeManager);            
+            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());                       
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
