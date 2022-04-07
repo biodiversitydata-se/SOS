@@ -302,11 +302,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
             }
-            finally
-            {
-                // Release semaphore in order to let next thread start getting data from source db 
-                _semaphore.Release();
-            }
         }
 
         private async Task<int> HarvestBatchAsync(
