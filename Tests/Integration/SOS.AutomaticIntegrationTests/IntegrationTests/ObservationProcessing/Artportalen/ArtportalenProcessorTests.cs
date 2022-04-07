@@ -36,8 +36,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.A
             //-----------------------------------------------------------------------------------------------------------            
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
-                    //.HaveValuesFromRandomPredefinedObservation()
-                    .HaveRandomValues()
+                    .HaveValuesFromPredefinedObservations()
+                    //.HaveRandomValues()
                 .TheFirst(60)
                     .With(v => v.NotPresent = false)
                     .With(v => v.NotRecovered = false)

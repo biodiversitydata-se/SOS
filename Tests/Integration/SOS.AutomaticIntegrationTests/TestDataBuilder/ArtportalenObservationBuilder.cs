@@ -39,9 +39,8 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
                     {
                         Converters = new List<Newtonsoft.Json.JsonConverter> { 
-                            new TestHelpers.JsonConverters.ObjectIdConverter()                            
-                            //new NewtonsoftGeoShapeConverter() // todo - need to have something like this but for GeoJsonGeometry
-                            //new ArrayListConverter<double[][]>()
+                            new TestHelpers.JsonConverters.ObjectIdConverter(),
+                            new NewtonsoftGeoJsonGeometryConverter()                            
                         }
                     };
 
@@ -273,7 +272,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
-        public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromRandomPredefinedObservation(this IOperable<ArtportalenObservationVerbatim> operable)
+        public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromPredefinedObservations(this IOperable<ArtportalenObservationVerbatim> operable)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
@@ -367,28 +366,5 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
             return operable;
         }
-    }
-
-    //public class ArrayListConverter<TItem> : Newtonsoft.Json.JsonConverter
-    //{
-    //    public override bool CanWrite { get { return false; } }
-
-    //    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public override object ReadJson(Newtonsoft.Json.JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
-    //    {
-    //        if (reader.TokenType == Newtonsoft.Json.JsonToken.Null)
-    //            return null;
-    //        var obj = serializer.Deserialize<double[][]>(reader);
-    //        return obj;
-    //    }
-
-    //    public override bool CanConvert(Type objectType)
-    //    {
-    //        return objectType == typeof(System.Collections.ArrayList);
-    //    }
-    //}
+    } 
 }
