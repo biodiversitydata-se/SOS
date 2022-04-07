@@ -230,7 +230,7 @@ namespace SOS.Lib.Models.TaxonTree
             while (nodesStack.Any())
             {
                 var node = nodesStack.Pop();
-                if (node.MainChildren == null && node.MainChildren.Count > 0)
+                if (node.MainChildren != null && node.MainChildren.Count > 0)
                 {
                     foreach (var child in node.MainChildren)
                     {
