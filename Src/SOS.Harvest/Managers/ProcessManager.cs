@@ -13,7 +13,8 @@ namespace SOS.Harvest.Managers
         /// <param name="processConfiguration"></param>
         public ProcessManager(ProcessConfiguration processConfiguration)
         {
-            _threadHandler = new SemaphoreSlim(processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration)));
+            var noOfThreads = processConfiguration?.NoOfThreads ?? throw new ArgumentNullException(nameof(processConfiguration));
+            _threadHandler = new SemaphoreSlim(noOfThreads, noOfThreads);
         }
 
         /// <inheritdoc />

@@ -332,7 +332,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _areaHelper = areaHelper;
             _cachedSites = new ConcurrentDictionary<int, Site>();
             Live = live;
-            _semaphore = new SemaphoreSlim(noOfThreads);
+            _semaphore = new SemaphoreSlim(noOfThreads, noOfThreads);
         }
 
         /// <summary>

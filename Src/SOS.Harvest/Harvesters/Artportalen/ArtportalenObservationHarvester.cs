@@ -133,6 +133,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
                 _logger.LogDebug("Start adding test sightings");
+                await _semaphore.WaitAsync();
                 await HarvestBatchAsync(harvestFactory,
                        _sightingRepository.GetChunkAsync(_artportalenConfiguration.AddTestSightingIds),
                         0);
@@ -451,7 +452,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
         }
 
         /// inheritdoc />
