@@ -148,7 +148,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                                                 throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);
 
             _observationDatabaseVerbatimRepository.TempMode = true;
         }

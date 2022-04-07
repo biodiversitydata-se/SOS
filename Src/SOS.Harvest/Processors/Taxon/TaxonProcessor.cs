@@ -209,7 +209,7 @@ namespace SOS.Harvest.Processors.Taxon
             {
                 throw new ArgumentException(nameof(processConfiguration));
             }
-            _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads, processConfiguration.NoOfThreads);
         }
 
         /// <inheritdoc />

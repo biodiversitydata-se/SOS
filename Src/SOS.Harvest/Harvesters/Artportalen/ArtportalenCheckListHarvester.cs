@@ -185,7 +185,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                                                           nameof(artportalenCheckListVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
         }
 
 

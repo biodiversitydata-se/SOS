@@ -145,7 +145,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(int startId, int maxRows) returned no sightings. startId={startId}, maxRows={maxRows}, Query: {query}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
                 }
 
                 return result;
@@ -168,7 +168,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(IEnumerable<int> sightingIds) returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}, Query: {query}\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
                 }
 
                 return result;                
@@ -191,7 +191,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync(DateTime modifiedSince, int maxRows) returned no sightings. modifiedSince={modifiedSince}, maxRows={maxRows}, Query: {query}");
+                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings.  Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
                 }
 
                 return result;
@@ -267,7 +267,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     s.EditDate";
 
                 var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);                
-                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count())} sightingIds");
+                Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count()) } sightingIds");
                 return result;
             }
             catch (Exception e)

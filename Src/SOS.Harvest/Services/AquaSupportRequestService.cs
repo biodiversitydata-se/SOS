@@ -25,7 +25,7 @@ namespace SOS.Harvest.Services
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
-            _semaphore = new SemaphoreSlim(1);
+            _semaphore = new SemaphoreSlim(1, 1);
         }
 
         public async Task<XDocument> GetAsync(string baseUrl, DateTime startDate, DateTime endDate, long changeId, int maxReturnedChanges = 10000)

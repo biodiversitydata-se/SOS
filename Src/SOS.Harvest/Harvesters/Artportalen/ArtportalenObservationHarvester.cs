@@ -133,6 +133,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
                 _logger.LogDebug("Start adding test sightings");
+                await _semaphore.WaitAsync();
                 await HarvestBatchAsync(harvestFactory,
                        _sightingRepository.GetChunkAsync(_artportalenConfiguration.AddTestSightingIds),
                         0);
@@ -301,11 +302,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     $"Harvest Artportalen sightings ({batchIndex}) failed");
                 throw new Exception("Harvest Artportalen batch failed");
             }
-            finally
-            {
-                // Release semaphore in order to let next thread start getting data from source db 
-                _semaphore.Release();
-            }
         }
 
         private async Task<int> HarvestBatchAsync(
@@ -451,7 +447,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
         }
 
         /// inheritdoc />
