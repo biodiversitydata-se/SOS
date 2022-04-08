@@ -10,6 +10,8 @@ using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Helpers.Interfaces;
 using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 
 namespace SOS.Administration.Api.Controllers
@@ -108,6 +110,54 @@ namespace SOS.Administration.Api.Controllers
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }        
+        }
+
+        /// <summary>
+        ///     Get Taxon relations as diagram.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("TaxonRelationsDiagram")]
+        //[ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTaxonRelationsDiagram(
+            [FromQuery] int[] taxonIds,
+            [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+            [FromQuery] bool includeSecondaryRelations = false,            
+            [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid)
+        {
+            try
+            {
+                var dwcTaxa = await _taxonService.GetTaxaAsync();
+                var taxa = dwcTaxa.ToProcessedTaxa().ToList();
+                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+
+                string strGraphviz = null;
+                if (diagramFormat == DiagramFormat.GraphViz)
+                {
+                    strGraphviz = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
+                        taxonTree,
+                        taxonIds,
+                        treeIterationMode,
+                        includeSecondaryRelations);
+                }
+                else if (diagramFormat == DiagramFormat.Mermaid)
+                {
+                    strGraphviz = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
+                        taxonTree,
+                        taxonIds,
+                        treeIterationMode,
+                        includeSecondaryRelations);
+                }
+
+                return Ok(strGraphviz);
+                //return File(System.Text.Encoding.UTF8.GetBytes(strGraphviz),"text/plain", "TaxonCategory Diagram.gv");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
