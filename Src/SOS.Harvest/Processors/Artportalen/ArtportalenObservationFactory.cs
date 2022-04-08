@@ -223,7 +223,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
                 if (diffuse)
                 {
-                    AddPositionData(obs.Location, verbatimObservation.Site?.XCoord,
+                    AddPositionData(obs.Location, 
+                        verbatimObservation.Site?.XCoord,
                         verbatimObservation.Site?.YCoord,
                         CoordinateSys.WebMercator,
                         (Point)verbatimObservation.Site?.DiffusedPoint?.ToGeometry(),
@@ -233,8 +234,9 @@ namespace SOS.Harvest.Processors.Artportalen
                 }
                 else
                 {
-                    AddPositionData(obs.Location, verbatimObservation.Site?.TrueXCoord,
-                        verbatimObservation.Site?.TrueYCoord,
+                    AddPositionData(obs.Location, 
+                        verbatimObservation.Site?.XCoord,
+                        verbatimObservation.Site?.YCoord,
                         CoordinateSys.WebMercator,
                         (Point)verbatimObservation.Site?.Point?.ToGeometry(),
                         verbatimObservation.Site?.PointWithBuffer,

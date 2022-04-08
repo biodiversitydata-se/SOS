@@ -155,7 +155,7 @@ namespace SOS.Lib.JsonConverters
                         .Select((x, i) => x.Select((y, j) => y).ToArray()).ToList();
                     return new GeoJsonGeometry()
                     {
-                        Type = "Point",
+                        Type = "Polygon",
                         Coordinates = new System.Collections.ArrayList(polygonCoordinates)
                     };
 
