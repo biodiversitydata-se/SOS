@@ -17,7 +17,7 @@ namespace SOS.Harvest.Services.Taxon.Interfaces
         ///     Get taxon attributes
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TaxonAttributeModel>> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
+        Task<TaxonAttributeResponse> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
             IEnumerable<int> factorIds, IEnumerable<int> periodIds);
     }
 }

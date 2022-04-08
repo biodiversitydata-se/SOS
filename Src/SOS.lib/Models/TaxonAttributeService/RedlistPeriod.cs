@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Models.TaxonAttributeService
 {
-    public class RedlistPeriodModel
+    public class RedlistPeriod
     {
         /// <summary>
         ///    Id

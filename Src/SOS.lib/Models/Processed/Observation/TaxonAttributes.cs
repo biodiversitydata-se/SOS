@@ -22,7 +22,18 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Taxon id value in Dyntaxa.
         /// </summary>
-        public int DyntaxaTaxonId { get; set; }        
+        public int DyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// True if alien in sweden according to EU Regulation 1143/2014
+        /// </summary>
+        public bool IsEURegulation_1143_2014 { get; set; }
+        
+        /// <summary>
+        /// True if redlist category is one of CR, EN, VU, NT
+        /// </summary>
+        [Nest.Ignore]
+        public bool IsRedlisted => new List<string> { "cr", "en", "vu", "nt" }.Contains(RedlistCategory?.ToLower() ?? string.Empty);
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
@@ -88,17 +99,23 @@ namespace SOS.Lib.Models.Processed.Observation
         public int SortOrder { get; set; }
 
         /// <summary>
+        /// Information about the species occurrence in Sweden.
+        /// For example information about if the species reproduce
+        /// in sweden.
+        /// </summary>
+        public string SwedishOccurrence { get; set; }
+
+
+        /// <summary>
         /// This property contains information about the species
         /// immigration history.
         /// </summary>
         public string SwedishHistory { get; set; }
 
         /// <summary>
-        /// Information about the species occurrence in Sweden.
-        /// For example information about if the species reproduce
-        /// in sweden.
+        /// Category if alien in Sweden
         /// </summary>
-        public string SwedishOccurrence { get; set; }
+        public string SwedishHistoryCategory { get; set; }
 
         /// <summary>
         ///     Scientific synonym names.
