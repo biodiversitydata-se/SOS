@@ -221,7 +221,7 @@ namespace SOS.Lib.IO.DwcArchive
             var extension = doc.CreateElement("extension", elementNamespace);
 
             var attr = doc.CreateAttribute("encoding");
-            attr.Value = "UTF8";
+            attr.Value = "UTF-8";
             extension.Attributes.Append(attr);
 
             attr = doc.CreateAttribute("fieldsTerminatedBy");
