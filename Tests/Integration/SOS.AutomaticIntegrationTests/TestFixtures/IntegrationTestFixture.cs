@@ -14,6 +14,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Moq;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
@@ -36,6 +37,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -68,16 +70,54 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
         public ObservationsController CustomObservationsController { get; private set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
+        private DwcaObservationFactory _darwinCoreFactory;        
+
+        public DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper)
+        {            
+            if (_darwinCoreFactory == null)
+            {
+                var dataProvider = new DataProvider() { Id = 1, Identifier = "Artportalen" };
+                _areaHelper = new AreaHelper(new AreaRepository(_processClient, new NullLogger<AreaRepository>()));                
+                _darwinCoreFactory = CreateDarwinCoreFactoryAsync(dataProvider).Result;
+            }
+
+            if (initAreaHelper && !_areaHelper.IsInitialized)
+            {
+                _areaHelper.InitializeAsync().Wait();
+            }
+
+            return _darwinCoreFactory;
+            
+        }
+
         public DarwinCoreArchiveVerbatimRepository GetDarwinCoreArchiveVerbatimRepository(DataProvider dataProvider)
         {
             return new DarwinCoreArchiveVerbatimRepository(dataProvider,
                 _importClient,
                 new Mock<ILogger>().Object);
         }
+        public async Task<DwcaObservationFactory> CreateDarwinCoreFactoryAsync(DataProvider dataProvider)
+        {
+            var factory = await DwcaObservationFactory.CreateAsync(
+                dataProvider,
+                _taxaById,
+                _vocabularyRepository,
+                _areaHelper,
+                _processTimeManager);
+
+            return factory;                
+        }
+
         public DwcArchiveFileWriter DwcArchiveFileWriter { get; set; }
         private IFilterManager _filterManager;
         private IUserManager _userManager;
         private VerbatimClient _importClient;
+        private List<Taxon> _taxa;
+        private Dictionary<int, Taxon> _taxaById;
+        private VocabularyRepository _vocabularyRepository;
+        private ProcessClient _processClient;
+        private AreaHelper _areaHelper;
+        private ProcessTimeManager _processTimeManager;
         public string UserAuthenticationToken { get; set; }
         public TaxonManager TaxonManager { get; private set; }
         public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
@@ -191,39 +231,39 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
+            _processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
-            var areaManager = CreateAreaManager(processClient);
-            var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
-            var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
-            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
-            var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
-            var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
+            var areaManager = CreateAreaManager(_processClient);
+            var taxonRepository = new TaxonRepository(_processClient, new NullLogger<TaxonRepository>());
+            var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache);
+            var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
+            _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
+            var vocabularyManger = CreateVocabularyManager(_processClient, _vocabularyRepository);
 
-            var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
+            var processInfoRepository = new ProcessInfoRepository(_processClient, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
-            var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
+            var dataProviderCache = new DataProviderCache(new DataProviderRepository(_processClient, new NullLogger<DataProviderRepository>()));
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, processedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
-            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(_vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
             var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,
                 vocabularyValueResolver, new NullLogger<CsvFileWriter>());
-            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(vocabularyValueResolver, processClient);
+            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(vocabularyValueResolver, _processClient);
             var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
                 vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(processedObservationRepository, fileService,
                 vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
-            var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
+            var areaRepository = new AreaRepository(_processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
-            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, processClient, filterManager);
+            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, _processClient, filterManager);
 
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
-            var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
+            var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
@@ -234,8 +274,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             TaxonManager = taxonManager;
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
-            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, vocabularyValueResolver, processClient, filterManager);
+            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
+            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, vocabularyValueResolver, _processClient, filterManager);
             CustomObservationsController = new ObservationsController(customObservationManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
@@ -250,16 +290,16 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager = new UserManager(userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-            var taxa = await taxonRepository.GetAllAsync();
-            var taxaById = taxa.ToDictionary(m => m.Id, m => m);
-            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
+            _taxa = await taxonRepository.GetAllAsync();
+            _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
+            _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());            
             ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
                 artportalenDataProvider,
-                taxaById,
-                vocabularyRepository,
+                _taxaById,
+                _vocabularyRepository,
                 false,
                 "https:\\www.artportalen.se",
-                processTimeManager);
+                _processTimeManager);
             var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
             _importClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -434,6 +474,20 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             foreach (var verbatimObservation in verbatimObservations)
             {
                 var processedObservation = ArtportalenObservationFactory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
+                processedObservations.Add(processedObservation);
+            }
+
+            return processedObservations;
+        }
+
+        public List<Observation> ProcessObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations, bool initAreaHelper = false)
+        {
+            var processedObservations = new List<Observation>();
+            bool diffuseIfSupported = false;            
+            var factory = GetDarwinCoreFactory(initAreaHelper);
+            foreach (var verbatimObservation in verbatimObservations)
+            {
+                var processedObservation = factory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
                 processedObservations.Add(processedObservation);
             }
 
