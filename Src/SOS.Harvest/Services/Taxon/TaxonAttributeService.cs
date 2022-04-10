@@ -16,13 +16,13 @@ namespace SOS.Harvest.Services.Taxon
         private readonly ILogger<TaxonAttributeService> _logger;
         private readonly TaxonAttributeServiceConfiguration _taxonAttributeServiceConfiguration;
 
-        private async Task<IEnumerable<TaxonAttributeModel>> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
+        private async Task<TaxonAttributeResponse> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
             IEnumerable<int> factorIds, IEnumerable<int> periodIds, int attempt)
         {
             try
             {
-                return await _httpClientService.PostDataAsync<IEnumerable<TaxonAttributeModel>>(
-                    new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/Taxa"),
+                return await _httpClientService.PostDataAsync<TaxonAttributeResponse>(
+                    new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/TaxonAttributes?pageSize={int.MaxValue}&page=1"),
                     new { taxonIds, factorIds, periodIds, qualityIds = new[] { 1, 2, 3 } }, GetHeaderData());
             }
             catch (Exception e)
@@ -62,7 +62,7 @@ namespace SOS.Harvest.Services.Taxon
         {
             try
             {
-                var redlistPeriod = await _httpClientService.GetDataAsync<RedlistPeriodModel>(
+                var redlistPeriod = await _httpClientService.GetDataAsync<RedlistPeriod>(
                     new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/Periods/CurrentRedlistPeriod"),
                     GetHeaderData());
 
@@ -76,7 +76,7 @@ namespace SOS.Harvest.Services.Taxon
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TaxonAttributeModel>> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
+        public async Task<TaxonAttributeResponse> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
             IEnumerable<int> factorIds, IEnumerable<int> periodIds)
         {
             return await GetTaxonAttributesAsync(taxonIds, factorIds, periodIds, 1);

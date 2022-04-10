@@ -1,19 +1,19 @@
 ﻿namespace SOS.Lib.Models.TaxonAttributeService
 {
-    public class AttributeValueModel
+    public class Attribute
     {
         /// <summary>
-        ///     Attribute id
+        ///     Attribute group id
         /// </summary>
-        public int AttributeId { get; set; }
+        public int AttributeGroupId { get; set; }
 
         /// <summary>
-        ///     Attribute name
+        /// Attribute type id
         /// </summary>
-        public string Attribute { get; set; }
+        public int AttributeTypeId { get; set; }
 
         /// <summary>
-        ///     Compfield index
+        /// Comp field idx
         /// </summary>
         public int CompFieldIdx { get; set; }
 
@@ -21,10 +21,5 @@
         ///     Is mainfield
         /// </summary>
         public bool IsMainField { get; set; }
-
-        /// <summary>
-        ///     Current value
-        /// </summary>
-        public string Value { get; set; }
     }
 }

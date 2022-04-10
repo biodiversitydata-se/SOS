@@ -38,6 +38,11 @@ namespace SOS.Lib.Models.DarwinCore
         public int DisturbanceRadius { get; set; }
 
         /// <summary>
+        /// True if alien in sweden according to EU Regulation 1143/2014
+        /// </summary>
+        public bool IsEURegulation_1143_2014 { get; set; }
+
+        /// <summary>
         ///     part of Habitats directive article 2
         /// </summary>
         public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
@@ -92,12 +97,17 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         ///     Do taxon occur in sweden
         /// </summary>
-        public string SwedishOccurrence { get; set; }
+        public string SwedishHistory { get; set; }
 
+        /// <summary>
+        /// Category if alien in Sweden
+        /// </summary>
+        public string SwedishHistoryCategory { get; set; }
+       
         /// <summary>
         ///     Do taxon occur in sweden
         /// </summary>
-        public string SwedishHistory { get; set; }
+        public string SwedishOccurrence { get; set; }
 
         /// <summary>
         /// Dyntaxa taxon category id.

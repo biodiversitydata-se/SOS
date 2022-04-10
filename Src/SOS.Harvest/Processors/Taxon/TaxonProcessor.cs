@@ -42,13 +42,52 @@ namespace SOS.Harvest.Processors.Taxon
 
             var getTaxonAttributesTasks = new List<Task>();
 
+            // Get taxon attribues to populate enumerations
+            var taxonAttributes =
+                       await _taxonAttributeService.GetTaxonAttributesAsync(new [] {0},
+                           (int[])Enum.GetValues(typeof(FactorEnum)),
+                           new[] { currentRedlistPeriodId }); // Todo add non periodized data
+
+            if (!taxonAttributes?.Factors?.Any() ?? true)
+            {
+                throw new Exception("Failed to get taxon attribute types");
+            }
+
+            var attributeTypes = new Dictionary<int, IDictionary<string, string>>();
+
+            foreach (var factor in taxonAttributes.Factors)
+            {
+                if (!factor.AttributeGroup?.AttributeTypes?.Any() ?? true)
+                {
+                    continue;
+                }
+                foreach (var attributeType in factor.AttributeGroup.AttributeTypes)
+                {
+                    if ((!attributeType.Enumerations?.Any() ?? true) || attributeTypes.ContainsKey(attributeType.AttributeTypeId))
+                    {
+                        continue;
+                    }
+                    var enumerations = new Dictionary<string, string>();
+                    attributeTypes.Add(attributeType.AttributeTypeId, enumerations);
+
+                    foreach (var enumeration in attributeType.Enumerations)
+                    {
+                        if (string.IsNullOrEmpty(enumeration.Name))
+                        {
+                            continue;
+                        }
+                        enumerations.Add(enumeration.Value, enumeration.Name);
+                    }
+                }
+            }
+
             while (skip < taxonCount)
             {
                 var taxonIds = taxa.Skip(skip).Take(take).Select(t => t.Id);
 
                 await _semaphore.WaitAsync();
 
-                getTaxonAttributesTasks.Add(GetTaxonAttributes(taxaDictonary, taxonIds, currentRedlistPeriodId));
+                getTaxonAttributesTasks.Add(PopulateDynamicProperties(taxaDictonary, attributeTypes, taxonIds, currentRedlistPeriodId));
 
                 skip += take;
             }
@@ -56,102 +95,96 @@ namespace SOS.Harvest.Processors.Taxon
         }
 
         /// <summary>
-        /// Get batch of taxon attributes
+        /// Populate taxon attributes
         /// </summary>
         /// <param name="taxaDictonary"></param>
+        /// <param name="attributeTypes"></param>
         /// <param name="taxonIds"></param>
         /// <param name="currentRedlistPeriodId"></param>
         /// <returns></returns>
-        private async Task GetTaxonAttributes(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IEnumerable<int> taxonIds, int currentRedlistPeriodId)
+        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IDictionary<int, IDictionary<string, string>> attributeTypes, IEnumerable<int> taxonIds, int currentRedlistPeriodId)
         {
             try
             {
                 _logger.LogDebug("Start get taxon attributes batch");
-                var taxonAttributes =
+                var response =
                         await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
                             (int[])Enum.GetValues(typeof(FactorEnum)),
-                            new[] { 0, currentRedlistPeriodId });
+                            new[] { currentRedlistPeriodId });  // Todo add non periodized data
 
-                if (taxonAttributes?.Any() ?? false)
+                if (!response?.TaxonAttributes?.Any() ?? true)
                 {
-                    foreach (var taxonAttribute in taxonAttributes)
+                    return;
+                }
+
+                foreach(var taxonAttribute in response.TaxonAttributes) {
+                    var mainField = taxonAttribute.Values?.FirstOrDefault(a => a.AttributeInfo?.IsMainField ?? false);
+
+                    if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon) || mainField == null)
                     {
-                        if (!taxaDictonary.TryGetValue(taxonAttribute.TaxonId, out var taxon))
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        if (taxon.DynamicProperties == null)
+                    taxon.DynamicProperties ??= new TaxonDynamicProperties();
+                    var enumValue = string.Empty;
+                    if (attributeTypes.TryGetValue(mainField.AttributeInfo.AttributeTypeId, out var attributeType))
+                    {
+                        if (!string.IsNullOrEmpty(mainField.Value))
                         {
-                            taxon.DynamicProperties = new TaxonDynamicProperties();
+                            attributeType?.TryGetValue(mainField.Value, out enumValue);
                         }
+                    };
 
-                        foreach (var factor in taxonAttribute.Factors)
-                        {
-                            switch ((FactorEnum)factor.Id)
-                            {
-                                case FactorEnum.ActionPlan:
-                                    taxon.DynamicProperties.ActionPlan =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                                case FactorEnum.BirdDirectiveAnnex1:
-                                case FactorEnum.BirdDirectiveAnnex2:
-                                case FactorEnum.PriorityBirds:
-                                    taxon.DynamicProperties.BirdDirective = factor.Attributes
-                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.DisturbanceRadius:
-                                    taxon.DynamicProperties.DisturbanceRadius =
-                                        int.Parse(factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value ?? "0");
-                                    break;
-                                case FactorEnum.Natura2000HabitatsDirectiveArticle2:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = factor.Attributes
-                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.Natura2000HabitatsDirectiveArticle4:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = factor.Attributes
-                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.Natura2000HabitatsDirectiveArticle5:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = factor.Attributes
-                                        ?.FirstOrDefault(a => a.IsMainField)?.Value.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.OrganismGroup:
-                                    taxon.DynamicProperties.OrganismGroup =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                                case FactorEnum.ProtectedByLawSpeciesProtection:
-                                    taxon.DynamicProperties.ProtectedByLawSpeciesProtection = factor.Attributes
-                                        ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.ProtectedByLawBirds:
-                                    taxon.DynamicProperties.ProtectedByLawBirds = factor.Attributes
-                                        ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
-                                            StringComparison.CurrentCultureIgnoreCase);
-                                    break;
-                                case FactorEnum.ProtectionLevel:
-                                    taxon.DynamicProperties.ProtectionLevel =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                                case FactorEnum.RedlistCategory:
-                                    taxon.DynamicProperties.RedlistCategory =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                                case FactorEnum.SwedishHistory:
-                                    taxon.DynamicProperties.SwedishHistory =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                                case FactorEnum.SwedishOccurrence:
-                                    taxon.DynamicProperties.SwedishOccurrence =
-                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
-                                    break;
-                            }
-                        }
+                    switch ((FactorEnum)taxonAttribute.FactorId)
+                    {
+                        case FactorEnum.ActionPlan:
+                            taxon.DynamicProperties.ActionPlan =
+                                mainField.Value;
+                            break;
+                        case FactorEnum.BirdDirectiveAnnex1:
+                        case FactorEnum.BirdDirectiveAnnex2:
+                        case FactorEnum.PriorityBirds:
+                            taxon.DynamicProperties.BirdDirective = mainField.Value == "1";
+                            break;
+                        case FactorEnum.DisturbanceRadius:
+                            taxon.DynamicProperties.DisturbanceRadius = int.Parse(mainField.Value);
+                            break;
+                        case FactorEnum.EURegulation_1143_2014:
+                            taxon.DynamicProperties.IsEURegulation_1143_2014 = mainField.Value == "1";
+                            break;
+                        case FactorEnum.Natura2000HabitatsDirectiveArticle2:
+                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = mainField.Value == "1";
+                            break;
+                        case FactorEnum.Natura2000HabitatsDirectiveArticle4:
+                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = mainField.Value == "1";
+                            break;
+                        case FactorEnum.Natura2000HabitatsDirectiveArticle5:
+                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = mainField.Value == "1";
+                            break;
+                        case FactorEnum.OrganismGroup:
+                            taxon.DynamicProperties.OrganismGroup = enumValue;
+                            break;
+                        case FactorEnum.ProtectedByLawSpeciesProtection:
+                            taxon.DynamicProperties.ProtectedByLawSpeciesProtection = mainField.Value == "1";
+                            break;
+                        case FactorEnum.ProtectedByLawBirds:
+                            taxon.DynamicProperties.ProtectedByLawBirds = mainField.Value == "1";
+                            break;
+                        case FactorEnum.ProtectionLevel:
+                            taxon.DynamicProperties.ProtectionLevel = enumValue;
+                            break;
+                        case FactorEnum.RedlistCategory:
+                            taxon.DynamicProperties.RedlistCategory = mainField.Value;
+                            break;
+                        case FactorEnum.SwedishHistory:
+                            taxon.DynamicProperties.SwedishHistory = enumValue;
+                            break;
+                        case FactorEnum.SwedishHistoryCategory:
+                            taxon.DynamicProperties.SwedishHistoryCategory = enumValue;
+                            break;
+                        case FactorEnum.SwedishOccurrence:
+                            taxon.DynamicProperties.SwedishOccurrence = enumValue;
+                            break;
                     }
                 }
                 _logger.LogDebug("Finish get taxon attributes batch");

@@ -57,7 +57,8 @@ namespace SOS.Lib.Extensions
                 {
                     ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
                     DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius,
-                    DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,                    
+                    DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0, 
+                    IsEURegulation_1143_2014 = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false,
                     Natura2000HabitatsDirectiveArticle2 =
                         sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
                     Natura2000HabitatsDirectiveArticle4 =
@@ -72,6 +73,7 @@ namespace SOS.Lib.Extensions
                     RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
+                    SwedishHistoryCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory,
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
                     Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames(),
                     TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId),
