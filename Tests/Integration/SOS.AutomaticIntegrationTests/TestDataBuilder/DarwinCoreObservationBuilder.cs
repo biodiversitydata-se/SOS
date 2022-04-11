@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
+using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -19,7 +20,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
         private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");
         private const int ArtportalenDataSourceId = 1;        
 
-        public static List<DwcObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile
+        public static List<DwcObservationVerbatim> VerbatimDarwinCoreObservationsFromJsonFile
         {
             get
             {
@@ -271,11 +272,11 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
         }
 
         public static IOperable<DwcObservationVerbatim> HaveValuesFromPredefinedObservations(this IOperable<DwcObservationVerbatim> operable)
-        {
+        {            
             var builder = ((IDeclaration<DwcObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                var sourceObservation = Pick<DwcObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile);
+                var sourceObservation = Pick<DwcObservationVerbatim>.RandomItemFrom(VerbatimDarwinCoreObservationsFromJsonFile);
                 // Record level
                 obs.Id = sourceObservation.Id; //_faker.IndexVariable++;
                 obs.RecordId = sourceObservation.RecordId;
@@ -485,6 +486,18 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.InCollection = sourceObservation.InCollection;
                 obs.InDataset = sourceObservation.InDataset;
                 obs.InDescribedPlace = sourceObservation.InDescribedPlace;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<DwcObservationVerbatim> HaveSensitiveSpeciesTaxonId(this IOperable<DwcObservationVerbatim> operable)
+        {
+            var builder = ((IDeclaration<DwcObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                var sensitiveTaxonId = Pick<int>.RandomItemFrom(ProtectedSpeciesHelper.SensitiveSpeciesTaxonIds);
+                obs.TaxonID = $"urn:lsid:dyntaxa:{sensitiveTaxonId}";
             });
 
             return operable;

@@ -65,5 +65,42 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.D
                         new ItemCount<bool?>(true, 60),
                         new ItemCount<bool?>(false, 40) });
         }
+
+        [Fact]
+        [Description("Sensitive species sightings should be protected")]
+        public void Sensitive_species_sightings_should_be_protected()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Create verbatim observations
+            //-----------------------------------------------------------------------------------------------------------            
+            var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .TheFirst(60)
+                    .HaveSensitiveSpeciesTaxonId()
+                    .With(m => m.AccessRights = null)
+                .TheNext(20)
+                    .HaveSensitiveSpeciesTaxonId()
+                    .With(m => m.AccessRights = "Free usage") // Sensitive species with "Free usage" => Sensitive=false                
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------            
+            var processedObservations = _fixture.ProcessObservations(verbatimObservations);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            processedObservations
+                .Select(m => m.Sensitive)
+                .CountEach()
+                .OrderByDescending(m => m.Count)
+                .ToList()
+                .Should().BeEquivalentTo(
+                    new List<ItemCount<bool>> {
+                        new ItemCount<bool>(true, 60),
+                        new ItemCount<bool>(false, 40) });
+        }
     }
 }
