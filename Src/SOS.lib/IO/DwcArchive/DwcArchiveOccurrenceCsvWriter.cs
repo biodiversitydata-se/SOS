@@ -39,7 +39,8 @@ namespace SOS.Lib.IO.DwcArchive
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken)
+            IJobCancellationToken cancellationToken,
+            bool leaveStreamOpen = false)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace SOS.Lib.IO.DwcArchive
                 elasticRetrievalStopwatch.Stop();
 
                 using var csvFileHelper = new CsvFileHelper();
-                csvFileHelper.InitializeWrite(stream, "\t");
+                csvFileHelper.InitializeWrite(stream, "\t", leaveStreamOpen);
                 
                 // Write header row
                 WriteHeaderRow(csvFileHelper, fieldDescriptions);
@@ -163,6 +164,7 @@ namespace SOS.Lib.IO.DwcArchive
             if (writeField[(int)FieldDescriptionId.Year]) csvFileHelper.WriteField(dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null); 
             if (writeField[(int)FieldDescriptionId.DateIdentified]) csvFileHelper.WriteField(dwcObservation.Identification.DateIdentified); 
             if (writeField[(int)FieldDescriptionId.IdentificationID]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationID);
+            if (writeField[(int)FieldDescriptionId.IdentificationQualifier]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationQualifier);
             if (writeField[(int)FieldDescriptionId.IdentificationReferences]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationReferences);
             if (writeField[(int)FieldDescriptionId.IdentificationRemarks]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationRemarks);
             if (writeField[(int)FieldDescriptionId.IdentificationVerificationStatus]) csvFileHelper.WriteField(dwcObservation.Identification.IdentificationVerificationStatus);

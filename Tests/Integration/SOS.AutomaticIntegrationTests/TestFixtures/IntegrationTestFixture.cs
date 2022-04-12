@@ -118,11 +118,13 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         private ProcessClient _processClient;
         private AreaHelper _areaHelper;
         private ProcessTimeManager _processTimeManager;
+        private VocabularyValueResolver _vocabularyValueResolver;
         public string UserAuthenticationToken { get; set; }
         public TaxonManager TaxonManager { get; private set; }
         public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
         public SearchPerformanceHealthCheck SearchPerformanceHealthCheck { get; set; }
         public AzureSearchHealthCheck AzureSearchHealthCheck { get; set; }
+        public DwcArchiveOccurrenceCsvWriter DwcArchiveOccurrenceCsvWriter { get; set; }
         public IntegrationTestFixture()
         {
             // MongoDB conventions.
@@ -246,20 +248,20 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(_processClient, new NullLogger<DataProviderRepository>()));
             var dataproviderManager = new DataProviderManager(dataProviderCache, processInfoManager, processedObservationRepository, new NullLogger<DataProviderManager>());
             var fileService = new FileService();
-            VocabularyValueResolver vocabularyValueResolver = new VocabularyValueResolver(_vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
+            _vocabularyValueResolver = new VocabularyValueResolver(_vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
             var csvFileWriter = new CsvFileWriter(processedObservationRepository, fileService,
-                vocabularyValueResolver, new NullLogger<CsvFileWriter>());
-            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(vocabularyValueResolver, _processClient);
+                _vocabularyValueResolver, new NullLogger<CsvFileWriter>());
+            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(_vocabularyValueResolver, _processClient);
             var excelFileWriter = new ExcelFileWriter(processedObservationRepository, fileService,
-                vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
+                _vocabularyValueResolver, new NullLogger<ExcelFileWriter>());
             var geojsonFileWriter = new GeoJsonFileWriter(processedObservationRepository, fileService,
-                vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
+                _vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(_processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
-            var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, _processClient, filterManager);
+            var observationManager = CreateObservationManager(processedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
 
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
@@ -275,7 +277,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             ProcessedObservationRepository = processedObservationRepository;
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
-            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, vocabularyValueResolver, _processClient, filterManager);
+            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
             CustomObservationsController = new ObservationsController(customObservationManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
@@ -307,6 +309,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
             ArtportalenVerbatimRepository = new ArtportalenVerbatimRepository(_importClient, new NullLogger<ArtportalenVerbatimRepository>());
+            DwcArchiveOccurrenceCsvWriter = new DwcArchiveOccurrenceCsvWriter(_vocabularyValueResolver, new NullLogger<DwcArchiveOccurrenceCsvWriter>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
@@ -451,9 +454,13 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await CustomProcessedObservationRepository.ClearCollectionAsync(protectedIndex);
         }
 
-        public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations)
+        public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
         {
             const bool protectedIndex = false;
+            if (clearExistingObservations)
+            {
+                await CustomProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
+            }
             await CustomProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
             await CustomProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
             await CustomProcessedObservationRepository.EnableIndexingAsync(protectedIndex);
@@ -462,8 +469,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
 
         public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
-            var processedObservations = ProcessObservations(verbatimObservations);
-            await DeleteAllObservationsInElasticsearchTestIndex();
+            var processedObservations = ProcessObservations(verbatimObservations);            
             await AddObservationsToElasticsearchAsync(processedObservations);
         }
 
@@ -477,6 +483,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 processedObservations.Add(processedObservation);
             }
 
+            _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);
             return processedObservations;
         }
 
@@ -492,12 +499,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             }
 
             return processedObservations;
-        }
-
-        public async Task DeleteAllObservationsInElasticsearchTestIndex()
-        {
-            const bool protectedIndex = false;
-            await CustomProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
     }
 }
