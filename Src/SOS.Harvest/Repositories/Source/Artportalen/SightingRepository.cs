@@ -270,7 +270,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count()) } sightingIds");
                 if ((result?.Count() ?? 0) == 0)
                 {                    
-                    Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, limit={limit}, Query: {query}");
+                    Logger.LogDebug($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
                 }
                 return result;
             }
