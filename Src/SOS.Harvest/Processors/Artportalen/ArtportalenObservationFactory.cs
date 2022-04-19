@@ -212,7 +212,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
                 obs.Location.IsInEconomicZoneOfSweden = hasPosition;
-                obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
+                obs.Location.Locality = verbatimObservation.Site?.Name.Trim().Clean();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
                 obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
