@@ -12,9 +12,9 @@ namespace SOS.Process.IntegrationTests.Dwca
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------            
-            string sourceFilePath = @"C:\DwC-A\_PartialRead\Artportalen-st.dwca.zip";
+            string sourceFilePath = @"C:\DwC-A\_PartialRead\ST\sos.dwca.zip";
             string outputFolder = @"C:\Temp\";
-            string outputFileName = "Artportalen";
+            string outputFileName = "SOS";
             int nrRowsLimit = int.MaxValue;
             int startRow = 0;
 
