@@ -8,7 +8,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly int _averageObservationSize;
+        private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddelware> _logger;
 
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
@@ -105,7 +105,8 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
-            _averageObservationSize = proxyConfiguration?.AvrageObservationSize ?? throw new ArgumentNullException(nameof(proxyConfiguration));
+            _proxyConfiguration = proxyConfiguration ??
+                                  throw new ArgumentNullException(nameof(proxyConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _processedObservationRepository.LiveMode = true;
@@ -124,10 +125,10 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             {
                 _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
-                string body = await targetRequestMessage.Content?.ReadAsStringAsync();
-                if (body != null)
+                if (_proxyConfiguration.LogRequest)
                 {
-                    _logger.LogDebug($"Body: {body}");
+                    string body = await targetRequestMessage.Content?.ReadAsStringAsync();
+                    _logger.LogInformation($"Body: {body}");
                 }
                 var httpClientHandler = new HttpClientHandler();
                 httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
@@ -138,18 +139,18 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 
                 context.Response.StatusCode = (int)responseMessage.StatusCode;
                 CopyFromTargetResponseHeaders(context, responseMessage);
-                await responseMessage.Content.CopyToAsync(context.Response.Body);
-                string response = await responseMessage.Content.ReadAsStringAsync();
-                if (response != null)
+                if (_proxyConfiguration.LogResponse)
                 {
-                    _logger.LogDebug($"Response: {response}");
+                    string response = await responseMessage.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"Response: {response}");
                 }
+                await responseMessage.Content.CopyToAsync(context.Response.Body);
 
                 var match = Regex.Match(context.Request?.Path.Value ?? string.Empty, @"([^\/]+)$");
                 if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
                 {
                     // Estimate number of observations returned 
-                    var observationCount = Math.Ceiling((double)((context.Response.ContentLength ?? 0) / _averageObservationSize));
+                    var observationCount = Math.Ceiling((context.Response.ContentLength ?? 0) / (double)_proxyConfiguration.AverageObservationSize);
                     context.Items.Add("Observation-count", observationCount);
                 }
                 return;
