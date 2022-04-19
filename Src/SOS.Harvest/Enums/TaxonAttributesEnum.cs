@@ -1,6 +1,11 @@
 ﻿namespace SOS.Harvest.Enums
 {
-    public enum FactorEnum
+    public enum PeriodizeFactorEnum
+    {
+        RedlistCategory = 743,
+    }
+
+    public enum NonPeriodizeFactorEnum
     {
         ActionPlan = 2017,
         DisturbanceRadius = 2471,
@@ -15,7 +20,6 @@
         ProtectedByLawSpeciesProtection = 2009,
         ProtectedByLawBirds = 2710,
         ProtectionLevel = 761,
-        RedlistCategory = 743,
         SwedishOccurrence = 1938,
         SwedishHistory = 1939,
         SwedishHistoryCategory = 2711

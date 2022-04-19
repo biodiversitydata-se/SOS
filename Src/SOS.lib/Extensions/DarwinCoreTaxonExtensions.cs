@@ -73,7 +73,7 @@ namespace SOS.Lib.Extensions
                     RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
-                    SwedishHistoryCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory,
+                    SwedishHistoryCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2),
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
                     Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames(),
                     TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId),
@@ -84,8 +84,7 @@ namespace SOS.Lib.Extensions
                 TaxonRemarks = sourceTaxon.TaxonRemarks?.Clean(),
                 TaxonomicStatus = sourceTaxon.TaxonomicStatus,
                 VernacularName = sourceTaxon.VernacularName,
-                VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
-               
+                VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank
             };
         }
 

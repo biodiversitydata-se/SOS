@@ -42,11 +42,12 @@ namespace SOS.Harvest.Processors.Taxon
 
             var getTaxonAttributesTasks = new List<Task>();
 
+            var allFactors = ((int[])Enum.GetValues(typeof(PeriodizeFactorEnum))).Concat((int[])Enum.GetValues(typeof(NonPeriodizeFactorEnum)));
+
             // Get taxon attribues to populate enumerations
             var taxonAttributes =
                        await _taxonAttributeService.GetTaxonAttributesAsync(new [] {0},
-                           (int[])Enum.GetValues(typeof(FactorEnum)),
-                           new[] { currentRedlistPeriodId }); // Todo add non periodized data
+                           allFactors, Array.Empty<int>());
 
             if (!taxonAttributes?.Factors?.Any() ?? true)
             {
@@ -86,9 +87,9 @@ namespace SOS.Harvest.Processors.Taxon
                 var taxonIds = taxa.Skip(skip).Take(take).Select(t => t.Id);
 
                 await _semaphore.WaitAsync();
-
+                getTaxonAttributesTasks.Add(PopulateDynamicProperties(taxaDictonary, attributeTypes, taxonIds));
+                await _semaphore.WaitAsync();
                 getTaxonAttributesTasks.Add(PopulateDynamicProperties(taxaDictonary, attributeTypes, taxonIds, currentRedlistPeriodId));
-
                 skip += take;
             }
             await Task.WhenAll(getTaxonAttributesTasks);
@@ -102,15 +103,27 @@ namespace SOS.Harvest.Processors.Taxon
         /// <param name="taxonIds"></param>
         /// <param name="currentRedlistPeriodId"></param>
         /// <returns></returns>
-        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IDictionary<int, IDictionary<string, string>> attributeTypes, IEnumerable<int> taxonIds, int currentRedlistPeriodId)
+        private async Task PopulateDynamicProperties(IDictionary<int, DarwinCoreTaxon> taxaDictonary, IDictionary<int, IDictionary<string, string>> attributeTypes, IEnumerable<int> taxonIds, int? currentRedlistPeriodId = null)
         {
             try
             {
                 _logger.LogDebug("Start get taxon attributes batch");
+
+                // Non periodized factors
+                var factors = (int[])Enum.GetValues(typeof(NonPeriodizeFactorEnum));
+                var periods = Array.Empty<int>();
+
+                if (currentRedlistPeriodId.HasValue)
+                {
+                    // Periodized factors
+                    factors = (int[])Enum.GetValues(typeof(PeriodizeFactorEnum));
+                    periods = new[] { currentRedlistPeriodId ?? 0 };
+                }
+                
                 var response =
                         await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
-                            (int[])Enum.GetValues(typeof(FactorEnum)),
-                            new[] { currentRedlistPeriodId });  // Todo add non periodized data
+                            factors,
+                            currentRedlistPeriodId.HasValue ? new[] { currentRedlistPeriodId ?? 0 } : Array.Empty<int>()); 
 
                 if (!response?.TaxonAttributes?.Any() ?? true)
                 {
@@ -135,57 +148,68 @@ namespace SOS.Harvest.Processors.Taxon
                         }
                     };
 
-                    switch ((FactorEnum)taxonAttribute.FactorId)
+                    if (currentRedlistPeriodId.HasValue)
                     {
-                        case FactorEnum.ActionPlan:
-                            taxon.DynamicProperties.ActionPlan =
-                                mainField.Value;
-                            break;
-                        case FactorEnum.BirdDirectiveAnnex1:
-                        case FactorEnum.BirdDirectiveAnnex2:
-                        case FactorEnum.PriorityBirds:
-                            taxon.DynamicProperties.BirdDirective = mainField.Value == "1";
-                            break;
-                        case FactorEnum.DisturbanceRadius:
-                            taxon.DynamicProperties.DisturbanceRadius = int.Parse(mainField.Value);
-                            break;
-                        case FactorEnum.EURegulation_1143_2014:
-                            taxon.DynamicProperties.IsEURegulation_1143_2014 = mainField.Value == "1";
-                            break;
-                        case FactorEnum.Natura2000HabitatsDirectiveArticle2:
-                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = mainField.Value == "1";
-                            break;
-                        case FactorEnum.Natura2000HabitatsDirectiveArticle4:
-                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = mainField.Value == "1";
-                            break;
-                        case FactorEnum.Natura2000HabitatsDirectiveArticle5:
-                            taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = mainField.Value == "1";
-                            break;
-                        case FactorEnum.OrganismGroup:
-                            taxon.DynamicProperties.OrganismGroup = enumValue;
-                            break;
-                        case FactorEnum.ProtectedByLawSpeciesProtection:
-                            taxon.DynamicProperties.ProtectedByLawSpeciesProtection = mainField.Value == "1";
-                            break;
-                        case FactorEnum.ProtectedByLawBirds:
-                            taxon.DynamicProperties.ProtectedByLawBirds = mainField.Value == "1";
-                            break;
-                        case FactorEnum.ProtectionLevel:
-                            taxon.DynamicProperties.ProtectionLevel = enumValue;
-                            break;
-                        case FactorEnum.RedlistCategory:
-                            taxon.DynamicProperties.RedlistCategory = mainField.Value;
-                            break;
-                        case FactorEnum.SwedishHistory:
-                            taxon.DynamicProperties.SwedishHistory = enumValue;
-                            break;
-                        case FactorEnum.SwedishHistoryCategory:
-                            taxon.DynamicProperties.SwedishHistoryCategory = enumValue;
-                            break;
-                        case FactorEnum.SwedishOccurrence:
-                            taxon.DynamicProperties.SwedishOccurrence = enumValue;
-                            break;
+                        switch ((PeriodizeFactorEnum)taxonAttribute.FactorId)
+                        {
+                            case PeriodizeFactorEnum.RedlistCategory:
+                                taxon.DynamicProperties.RedlistCategory = mainField.Value;
+                                break;
+                        }
                     }
+                    else
+                    {
+                        switch ((NonPeriodizeFactorEnum)taxonAttribute.FactorId)
+                        {
+                            case NonPeriodizeFactorEnum.ActionPlan:
+                                taxon.DynamicProperties.ActionPlan =
+                                    enumValue;
+                                break;
+                            case NonPeriodizeFactorEnum.BirdDirectiveAnnex1:
+                            case NonPeriodizeFactorEnum.BirdDirectiveAnnex2:
+                            case NonPeriodizeFactorEnum.PriorityBirds:
+                                taxon.DynamicProperties.BirdDirective = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.DisturbanceRadius:
+                                taxon.DynamicProperties.DisturbanceRadius = int.Parse(mainField.Value);
+                                break;
+                            case NonPeriodizeFactorEnum.EURegulation_1143_2014:
+                                taxon.DynamicProperties.IsEURegulation_1143_2014 = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.Natura2000HabitatsDirectiveArticle2:
+                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.Natura2000HabitatsDirectiveArticle4:
+                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.Natura2000HabitatsDirectiveArticle5:
+                                taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.OrganismGroup:
+                                taxon.DynamicProperties.OrganismGroup = enumValue;
+                                break;
+                            case NonPeriodizeFactorEnum.ProtectedByLawSpeciesProtection:
+                                taxon.DynamicProperties.ProtectedByLawSpeciesProtection = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.ProtectedByLawBirds:
+                                taxon.DynamicProperties.ProtectedByLawBirds = mainField.Value == "1";
+                                break;
+                            case NonPeriodizeFactorEnum.ProtectionLevel:
+                                taxon.DynamicProperties.ProtectionLevel = enumValue;
+                                break;
+                            case NonPeriodizeFactorEnum.SwedishHistory:
+                                taxon.DynamicProperties.SwedishHistory = enumValue;
+                                break;
+                            case NonPeriodizeFactorEnum.SwedishHistoryCategory:
+                                taxon.DynamicProperties.SwedishHistoryCategory = enumValue;
+                                break;
+                            case NonPeriodizeFactorEnum.SwedishOccurrence:
+                                taxon.DynamicProperties.SwedishOccurrence = enumValue;
+                                break;
+                        }
+                    }
+
+                    
                 }
                 _logger.LogDebug("Finish get taxon attributes batch");
             }
