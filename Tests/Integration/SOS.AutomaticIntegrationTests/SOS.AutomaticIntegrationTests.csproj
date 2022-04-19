@@ -62,6 +62,9 @@
 	  <None Update="Resources\ArtportalenVerbatimObservations_1000.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Resources\DarwinCoreObservations_1000.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>	
 	
 </Project>

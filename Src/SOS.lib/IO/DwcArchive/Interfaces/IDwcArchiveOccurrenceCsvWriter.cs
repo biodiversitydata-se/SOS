@@ -20,13 +20,15 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="fieldDescriptions"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="leaveStreamOpen"></param>
         /// <returns></returns>
         Task<int> CreateOccurrenceCsvFileAsync(
             SearchFilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken);
+            IJobCancellationToken cancellationToken,
+            bool leaveStreamOpen = false);
 
         /// <summary>
         /// Write Occurrence CSV file without headers using the stream writer.

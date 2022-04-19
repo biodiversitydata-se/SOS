@@ -97,12 +97,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 return null;
             }
 
-            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);
-            if (accessRights?.Id.Equals((int)VocabularyConstants.NoMappingFoundCustomValueIsUsedId) ?? true)
-            {
-                accessRights = new VocabularyValue { Id = (int)AccessRightsId.FreeUsage };
-            }
-
+            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);            
             var obs = new Observation
             {
                 AccessRights = accessRights,
@@ -173,11 +168,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             // Organism
             obs.Organism = CreateProcessedOrganism(verbatim);
 
-
-
             // Temporarily remove
             //obs.IsInEconomicZoneOfSweden = true;
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
+
+            if (IsSensitiveObservation(obs))
+            {
+                obs.Sensitive = true;
+                obs.Protected = true;
+            }
+            
             return obs;
         }
 
@@ -445,7 +445,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
 
             processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
-            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
             return processedOccurrence;
         }
 

@@ -36,7 +36,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
 
                 requestMessage.Content = streamContent;
             }
-
+            
             return requestMessage;
         }
 
@@ -124,6 +124,11 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             {
                 _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
                 var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                string body = await targetRequestMessage.Content?.ReadAsStringAsync();
+                if (body != null)
+                {
+                    _logger.LogDebug($"Body: {body}");
+                }
                 var httpClientHandler = new HttpClientHandler();
                 httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
 
@@ -131,17 +136,22 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 using var responseMessage = await httpClient.SendAsync(targetRequestMessage,
                     HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
                 
-                    context.Response.StatusCode = (int)responseMessage.StatusCode;
-                    CopyFromTargetResponseHeaders(context, responseMessage);
-                    await responseMessage.Content.CopyToAsync(context.Response.Body);
+                context.Response.StatusCode = (int)responseMessage.StatusCode;
+                CopyFromTargetResponseHeaders(context, responseMessage);
+                await responseMessage.Content.CopyToAsync(context.Response.Body);
+                string response = await responseMessage.Content.ReadAsStringAsync();
+                if (response != null)
+                {
+                    _logger.LogDebug($"Response: {response}");
+                }
 
                 var match = Regex.Match(context.Request?.Path.Value ?? string.Empty, @"([^\/]+)$");
                 if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
-                  {
+                {
                     // Estimate number of observations returned 
                     var observationCount = Math.Ceiling((double)((context.Response.ContentLength ?? 0) / _averageObservationSize));
                     context.Items.Add("Observation-count", observationCount);
-                  }
+                }
                 return;
             }
             await _nextMiddleware(context);

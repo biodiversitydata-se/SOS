@@ -121,9 +121,10 @@ namespace SOS.Lib.Helpers
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="delimiter"></param>
-        public void InitializeWrite(Stream stream, string delimiter)
+        /// <param name="leaveStreamOpen"></param>
+        public void InitializeWrite(Stream stream, string delimiter, bool leaveStreamOpen = false)
         {
-            InitializeWrite(new StreamWriter(stream, Encoding.UTF8), delimiter);
+            InitializeWrite(new StreamWriter(stream, Encoding.UTF8, -1, leaveStreamOpen), delimiter);
         }
 
         /// <summary>

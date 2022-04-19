@@ -190,5 +190,10 @@ namespace SOS.Harvest.Processors
             if (sensitivityCategory > 1) return AccessRightsId.NotForPublicUsage;
             return AccessRightsId.FreeUsage;            
         }
+
+        protected bool IsSensitiveObservation(Observation observation)
+        {
+            return observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage;            
+        }
     }
 }

@@ -22,9 +22,8 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder.Tests
             //-----------------------------------------------------------------------------------------------------------           
             const int NrObservations = 100;
             var verbatims = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(NrObservations)
-                .All()
-                    .HaveValuesFromPredefinedObservations()
-                    //.HaveRandomValues()
+                .All()                    
+                    .HaveRandomValues()
                 .TheFirst(1)
                     .With(m => m.SightingId = 123456)
                 .Build();
@@ -39,7 +38,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder.Tests
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void CreateArtportalenTestDataWithRandomValuesAndPredefinedObservationAsSource()
+        public void CreateArtportalenTestDataWithValuesFromPredefinedObservations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

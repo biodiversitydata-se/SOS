@@ -193,7 +193,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                     ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     RecordedBy = verbatim.Collector,
-                    OccurrenceRemarks = notes
+                    OccurrenceRemarks = notes.Clean()
                 },
                 OwnerInstitutionCode = verbatim.InstitutionCode,
                 Taxon = taxon
