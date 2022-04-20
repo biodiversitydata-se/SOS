@@ -21,5 +21,10 @@
         /// Max number of characters in log response.
         /// </summary>
         public int LogResponseMaxCharacters { get; set; } = 4096;
+
+        /// <summary>
+        /// If True, exclude fields should be added to the JSON query sent to Elasticsearch.
+        /// </summary>
+        public bool ExcludeFieldsInElasticsearchQuery { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.Lib.Extensions;
@@ -11,8 +12,9 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddelware> _logger;
+        private const string ExcludeQuery = "\"_source\": { \"excludes\": [ \"location.pointWithBuffer\", \"location.pointWithDisturbanceBuffer\", \"artportalenInternal\", \"taxon.attributes.vernacularNames\", \"taxon.attributes.synonyms\", \"taxon.higherClassification\", \"measurementOrFacts\", \"occurrence.media\", \"dataQuality\" ]},";
 
-        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
+        private async Task<HttpRequestMessage> CreateTargetMessageAsync(HttpContext context, Uri targetUri)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -29,7 +31,15 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
                 var streamContent = new StreamContent(context.Request.Body);
-
+                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
+                {
+                    var originalQuery = await streamContent.ReadAsStringAsync();
+                    _logger.LogInformation($"OriginalQuery: {originalQuery}");
+                    var newQuery = $"{{ {ExcludeQuery} {originalQuery.Substring(1, originalQuery.Length-1)}";
+                    _logger.LogInformation($"NewQuery: {newQuery}");
+                    streamContent = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(newQuery)));
+                }
+                
                 foreach (var header in context.Request.Headers)
                 {
                     streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
@@ -125,7 +135,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             if (targetUri != null)
             {
                 _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
-                var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                var targetRequestMessage = await CreateTargetMessageAsync(context, targetUri);
                 if (_proxyConfiguration.LogRequest)
                 {
                     string body = await targetRequestMessage.Content?.ReadAsStringAsync();
