@@ -32,7 +32,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// True if redlist category is one of CR, EN, VU, NT
         /// </summary>
-        [Nest.Ignore]
         public bool IsRedlisted => new List<string> { "cr", "en", "vu", "nt" }.Contains(RedlistCategory?.ToLower() ?? string.Empty);
 
         /// <summary>
