@@ -100,6 +100,11 @@ namespace SOS.Lib.Models.DarwinCore
         public string SwedishHistory { get; set; }
 
         /// <summary>
+        /// Id of swedish history enum
+        /// </summary>
+        public string SwedishHistoryId { get; set; }
+
+        /// <summary>
         /// Category if alien in Sweden
         /// </summary>
         public string SwedishHistoryCategory { get; set; }

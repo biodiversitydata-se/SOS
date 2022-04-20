@@ -198,6 +198,7 @@ namespace SOS.Harvest.Processors.Taxon
                                 taxon.DynamicProperties.ProtectionLevel = enumValue;
                                 break;
                             case NonPeriodizeFactorEnum.SwedishHistory:
+                                taxon.DynamicProperties.SwedishHistoryId = mainField.Value;
                                 taxon.DynamicProperties.SwedishHistory = enumValue;
                                 break;
                             case NonPeriodizeFactorEnum.SwedishHistoryCategory:

@@ -25,10 +25,10 @@ namespace SOS.Lib.Models.Processed.Observation
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
-        /// True if alien in sweden according to EU Regulation 1143/2014
+        /// Taxon risk assessment
         /// </summary>
-        public bool IsEURegulation_1143_2014 { get; set; }
-        
+        public TaxonInvasiveInfo InvasiveInfo { get; set; }
+
         /// <summary>
         /// True if redlist category is one of CR, EN, VU, NT
         /// </summary>
@@ -77,13 +77,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public VocabularyValue ProtectionLevel { get; set; }
 
         /// <summary>
-        /// Information about how protected information about a species is in Sweden.
-        /// This is a value between 1 to 5.
-        /// 1 indicates public access and 5 is the highest used security level.
-        /// </summary>
-        public VocabularyValue SensitivityCategory { get; set; }
-
-        /// <summary>
         /// Redlist category for redlisted species. Possible redlist values
         /// are DD (Data Deficient), EX (Extinct),
         /// RE (Regionally Extinct), CR (Critically Endangered),
@@ -91,6 +84,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Not redlisted species has no value in this property.
         /// </summary>
         public string RedlistCategory { get; set; }
+
+        /// <summary>
+        /// Information about how protected information about a species is in Sweden.
+        /// This is a value between 1 to 5.
+        /// 1 indicates public access and 5 is the highest used security level.
+        /// </summary>
+        public VocabularyValue SensitivityCategory { get; set; }
 
         /// <summary>
         /// Systematic sort order.
@@ -104,17 +104,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string SwedishOccurrence { get; set; }
 
-
         /// <summary>
         /// This property contains information about the species
         /// immigration history.
         /// </summary>
         public string SwedishHistory { get; set; }
-
-        /// <summary>
-        /// Category if alien in Sweden
-        /// </summary>
-        public string SwedishHistoryCategory { get; set; }
 
         /// <summary>
         ///     Scientific synonym names.

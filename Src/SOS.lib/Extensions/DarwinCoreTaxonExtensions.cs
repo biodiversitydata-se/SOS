@@ -57,8 +57,7 @@ namespace SOS.Lib.Extensions
                 {
                     ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
                     DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius,
-                    DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0, 
-                    IsEURegulation_1143_2014 = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false,
+                    DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,
                     Natura2000HabitatsDirectiveArticle2 =
                         sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
                     Natura2000HabitatsDirectiveArticle4 =
@@ -70,10 +69,15 @@ namespace SOS.Lib.Extensions
                     ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
                     SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel(),
                     ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false,
+                    InvasiveInfo = new TaxonInvasiveInfo
+                    {
+                        IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false,
+                        IsInvasiveInSweden = new List<string> { "5", "7", "8", "9" }.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty),
+                        RiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2)
+                    },
                     RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
-                    SwedishHistoryCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2),
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
                     Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames(),
                     TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId),
