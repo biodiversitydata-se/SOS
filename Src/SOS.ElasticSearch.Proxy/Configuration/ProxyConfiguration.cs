@@ -23,6 +23,11 @@
         public int LogResponseMaxCharacters { get; set; } = 4096;
 
         /// <summary>
+        /// Log performance.
+        /// </summary>
+        public bool LogPerformance { get; set; }
+
+        /// <summary>
         /// If True, exclude fields should be added to the JSON query sent to Elasticsearch.
         /// </summary>
         public bool ExcludeFieldsInElasticsearchQuery { get; set; }

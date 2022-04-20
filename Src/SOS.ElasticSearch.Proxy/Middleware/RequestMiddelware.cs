@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
@@ -14,7 +15,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly ILogger<RequestMiddelware> _logger;
         private const string ExcludeQuery = "\"_source\": { \"excludes\": [ \"location.pointWithBuffer\", \"location.pointWithDisturbanceBuffer\", \"artportalenInternal\", \"taxon.attributes.vernacularNames\", \"taxon.attributes.synonyms\", \"taxon.higherClassification\", \"measurementOrFacts\", \"occurrence.media\", \"dataQuality\" ]},";
 
-        private async Task<HttpRequestMessage> CreateTargetMessageAsync(HttpContext context, Uri targetUri)
+        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -31,15 +32,6 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
                 var streamContent = new StreamContent(context.Request.Body);
-                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
-                {
-                    var originalQuery = await streamContent.ReadAsStringAsync();
-                    _logger.LogInformation($"OriginalQuery: {originalQuery}");
-                    var newQuery = $"{{ {ExcludeQuery} {originalQuery.Substring(1, originalQuery.Length-1)}";
-                    _logger.LogInformation($"NewQuery: {newQuery}");
-                    streamContent = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(newQuery)));
-                }
-                
                 foreach (var header in context.Request.Headers)
                 {
                     streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
@@ -123,22 +115,46 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             _processedObservationRepository.LiveMode = true;
         }
 
-       /// <summary>
-       /// Handle request
-       /// </summary>
-       /// <param name="context"></param>
-       /// <returns></returns>
+        private string StreamToString(Stream stream)
+        {
+            var streamContent = new StreamContent(stream);
+            var str = streamContent.ReadAsStringAsync().Result;
+            return str;
+        }
+
+        /// <summary>
+        /// Handle request
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
+            var requestStopwatch = Stopwatch.StartNew();
+            var targetUriStopwatch = Stopwatch.StartNew();
             var targetUri = BuildTargetUri(context.Request);
+            targetUriStopwatch.Stop();
+            if (_proxyConfiguration.LogPerformance)
+            {
+                _logger.LogInformation($"Build target URI time: {targetUriStopwatch.ElapsedMilliseconds}ms");
+            }
 
             if (targetUri != null)
             {
-                _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
-                var targetRequestMessage = await CreateTargetMessageAsync(context, targetUri);
-                if (_proxyConfiguration.LogRequest)
+                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery || true)
                 {
-                    string body = await targetRequestMessage.Content?.ReadAsStringAsync();
+                    string originalQuery = StreamToString(context.Request.Body);
+                    _logger.LogInformation($"OriginalQuery: {originalQuery}");
+                    var newQuery = $"{{ {ExcludeQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
+                    _logger.LogInformation($"NewQuery: {newQuery}");
+                    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newQuery));
+                    context.Request.ContentLength = newQuery.Length;
+                }
+
+                _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
+                var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
+                {
+                    string body = await targetRequestMessage.Content.ReadAsStringAsync();
                     _logger.LogInformation($"Request:\r\n{body}");
                 }
                 var httpClientHandler = new HttpClientHandler();
@@ -163,6 +179,12 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     // Estimate number of observations returned 
                     var observationCount = Math.Ceiling((context.Response.ContentLength ?? 0) / (double)_proxyConfiguration.AverageObservationSize);
                     context.Items.Add("Observation-count", observationCount);
+                }
+
+                requestStopwatch.Stop();
+                if (_proxyConfiguration.LogPerformance)
+                {
+                    _logger.LogInformation($"Request time: {requestStopwatch.ElapsedMilliseconds}ms");
                 }
                 return;
             }
