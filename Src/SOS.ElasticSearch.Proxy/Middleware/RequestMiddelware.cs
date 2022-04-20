@@ -129,7 +129,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 if (_proxyConfiguration.LogRequest)
                 {
                     string body = await targetRequestMessage.Content?.ReadAsStringAsync();
-                    _logger.LogInformation($"Body: {body}");
+                    _logger.LogInformation($"Request:\r\n{body}");
                 }
                 var httpClientHandler = new HttpClientHandler();
                 httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;

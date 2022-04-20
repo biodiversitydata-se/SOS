@@ -375,7 +375,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedLocation.HigherGeographyId = verbatim.HigherGeographyID;
             processedLocation.Island = verbatim.Island;
             processedLocation.IslandGroup = verbatim.IslandGroup;
-            processedLocation.Locality = verbatim.Locality;
+            processedLocation.Locality = verbatim.Locality.Clean();
             processedLocation.LocationAccordingTo = verbatim.LocationAccordingTo;
             processedLocation.LocationId = verbatim.LocationID;
             processedLocation.LocationRemarks = verbatim.LocationRemarks;
