@@ -16,5 +16,10 @@
         /// Log the response.
         /// </summary>
         public bool LogResponse { get; set; }
+
+        /// <summary>
+        /// Max number of characters in log response.
+        /// </summary>
+        public int LogResponseMaxCharacters { get; set; } = 4096;
     }
 }

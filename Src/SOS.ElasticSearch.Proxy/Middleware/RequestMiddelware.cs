@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.ElasticSearch.Proxy.Configuration;
+using SOS.Lib.Extensions;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
@@ -142,7 +143,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 if (_proxyConfiguration.LogResponse)
                 {
                     string response = await responseMessage.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"Response: {response}");
+                    _logger.LogInformation($"Response:\r\n{response.WithMaxLength(_proxyConfiguration.LogResponseMaxCharacters)}");
                 }
                 await responseMessage.Content.CopyToAsync(context.Response.Body);
 
