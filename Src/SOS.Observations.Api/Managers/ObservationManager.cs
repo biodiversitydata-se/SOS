@@ -410,6 +410,10 @@ namespace SOS.Observations.Api.Managers
                         _logger.LogDebug($"Finish create taxonSumAggregationCache. Elapsed time: {sp.Elapsed.Seconds} seconds");
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "GetCachedTaxonSumAggregation() error");
+                }
                 finally
                 {
                     _taxonSumAggregationSemaphore.Release();

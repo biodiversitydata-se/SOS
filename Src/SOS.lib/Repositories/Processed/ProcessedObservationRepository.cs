@@ -1411,7 +1411,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Terms("taxonId", tt => tt
                                 .Field("taxon.id"))
                             .Terms("provinceId", p => p
-                                .Field("location.province.featureId.keyword"))
+                                .Field("location.province.featureId"))
                             )))
                     .Query(q => q
                         .Bool(b => b
@@ -1432,7 +1432,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Terms("taxonId", tt => tt
                                 .Field("taxon.id"))
                             .Terms("provinceId", p => p
-                                .Field("location.province.featureId.keyword"))
+                                .Field("location.province.featureId"))
                             )))                            
                     .Query(q => q
                         .Bool(b => b
@@ -2457,13 +2457,13 @@ namespace SOS.Lib.Repositories.Processed
                     .Bool(b => b
                         .Filter(f => f
                             .Terms(t => t
-                                .Field("location.locationId.keyword")
+                                .Field("location.locationId")
                                 .Terms(locationIds)
                             )
                         )
                     )
                 )
-                .Collapse(c => c.Field("location.locationId.keyword"))
+                .Collapse(c => c.Field("location.locationId"))
                .Source(s => s
                     .Includes(i => i
                         .Field("location")
@@ -2509,7 +2509,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Index(indexNames)
                 .Size(0)
                 .Aggregations(a => a.Cardinality("provinceCount", c => c
-                    .Field("location.province.featureId.keyword")))
+                    .Field("location.province.featureId")))
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
