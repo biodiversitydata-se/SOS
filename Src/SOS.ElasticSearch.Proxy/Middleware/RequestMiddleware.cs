@@ -7,13 +7,12 @@ using SOS.Lib.Extensions;
 
 namespace SOS.ElasticSearch.Proxy.Middleware
 {
-    public class RequestMiddelware
+    public class RequestMiddleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ProxyConfiguration _proxyConfiguration;
-        private readonly ILogger<RequestMiddelware> _logger;
-        private const string ExcludeQuery = "\"_source\": { \"excludes\": [ \"location.pointWithBuffer\", \"location.pointWithDisturbanceBuffer\", \"artportalenInternal\", \"taxon.attributes.vernacularNames\", \"taxon.attributes.synonyms\", \"taxon.higherClassification\", \"measurementOrFacts\", \"occurrence.media\", \"dataQuality\" ]},";
+        private readonly ILogger<RequestMiddleware> _logger;
 
         private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
         {
@@ -98,12 +97,13 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// </summary>
         /// <param name="nextMiddleware"></param>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="proxyConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RequestMiddelware(RequestDelegate nextMiddleware, 
+        public RequestMiddleware(RequestDelegate nextMiddleware, 
             IProcessedObservationRepository processedObservationRepository,
             ProxyConfiguration proxyConfiguration,
-            ILogger<RequestMiddelware> logger)
+            ILogger<RequestMiddleware> logger)
         {
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
@@ -130,22 +130,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         public async Task Invoke(HttpContext context)
         {
             var requestStopwatch = Stopwatch.StartNew();
-            var targetUriStopwatch = Stopwatch.StartNew();
             var targetUri = BuildTargetUri(context.Request);
-            targetUriStopwatch.Stop();
-            if (_proxyConfiguration.LogPerformance)
-            {
-                _logger.LogInformation($"Build target URI time: {targetUriStopwatch.ElapsedMilliseconds}ms");
-            }
-
             if (targetUri != null)
             {
-                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery || true)
+                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
                 {
                     string originalQuery = StreamToString(context.Request.Body);
-                    _logger.LogInformation($"OriginalQuery: {originalQuery}");
-                    var newQuery = $"{{ {ExcludeQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
-                    _logger.LogInformation($"NewQuery: {newQuery}");
+                    _logger.LogDebug($"OriginalQuery: {originalQuery}");
+                    var newQuery = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
                     context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newQuery));
                     context.Request.ContentLength = newQuery.Length;
                 }

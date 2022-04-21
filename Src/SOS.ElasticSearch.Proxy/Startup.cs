@@ -124,7 +124,7 @@ namespace SOS.ElasticSearch.Proxy
                 app.UseHsts();
             }
 
-            app.UseMiddleware<RequestMiddelware>();
+            app.UseMiddleware<RequestMiddleware>();
         }
     }
 }
