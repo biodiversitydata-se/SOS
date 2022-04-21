@@ -75,61 +75,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 },
                 new DataProvider
                 {
-                    Identifier = DataProviderIdentifiers.ClamGateway,
-                    Names = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "Clam Gateway"
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "Musselportalen"
-                        }
-                    },
-                    Descriptions = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "The Clam Gateway is an independent site for collecting data about large freshwater clams in Sweden. Threatened and rare species are of special interest but information on more common clams is also important."
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "Musselportalen är ett öppet rapporteringssystem för stormusslor som förekommer i svenska sjöar och vatten­drag. Syftet är att öka kunskapen om stormusslor och innehållet i portalen kan användas för att följa tillståndet för de hotade och sällsynta musselarter­na i landet."
-                        }
-                    },
-                    Organizations = new []
-                    {
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "en-GB",
-                            Value = "SLU Swedish Species Information Centre (SLU Artdatabanken)"
-                        },
-                        new VocabularyValueTranslation
-                        {
-                            CultureCode = "sv-SE",
-                            Value = "SLU Artdatabanken"
-                        }
-                    },
-                    ContactPerson = new ContactPerson
-                    {
-                        Email = "eddie.vonwachenfeldt@slu.se",
-                        FirstName = "Eddie",
-                        LastName = "Von Wachenfeldt"
-                    },
-                    Url = "http://musselportalen.se/",
-                    Type = DataProviderType.ClamPortalObservations,
-                    IsActive = true,
-                    IncludeInScheduledHarvest = true,
-                    IncludeInSearchByDefault = true,
-                    HarvestSchedule = "* * * * *"
-                },
-                new DataProvider
-                {
                     Identifier = DataProviderIdentifiers.KUL,
                     Names = new []
                     {
@@ -1041,7 +986,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var dataProviders = new List<DataProvider>
             {
                 dataProviderByIdentifier[DataProviderIdentifiers.Artportalen],
-                dataProviderByIdentifier[DataProviderIdentifiers.ClamGateway],
                 dataProviderByIdentifier[DataProviderIdentifiers.KUL],
                 dataProviderByIdentifier[DataProviderIdentifiers.MVM],
                 dataProviderByIdentifier[DataProviderIdentifiers.NORS],

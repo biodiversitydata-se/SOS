@@ -61,67 +61,6 @@
         "UseVerbatimFileInExport": false
     },
     {
-        "Type": "ClamPortalObservations",
-        "IsActive": false,
-        "Names": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "Clam Gateway"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Musselportalen"
-            }
-        ],
-        "Descriptions": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "The Clam Gateway is an independent site for collecting data about large freshwater clams in Sweden. Threatened and rare species are of special interest but information on more common clams is also important."
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "Musselportalen är ett öppet rapporteringssystem för stormusslor som förekommer i svenska sjöar och vatten­drag. Syftet är att öka kunskapen om stormusslor och innehållet i portalen kan användas för att följa tillståndet för de hotade och sällsynta musselarter­na i landet."
-            }
-        ],
-        "Organizations": [
-            {
-                "CultureCode": "en-GB",
-                "Value": "SLU Swedish Species Information Centre (SLU Artdatabanken)"
-            },
-            {
-                "CultureCode": "sv-SE",
-                "Value": "SLU Artdatabanken"
-            }
-        ],
-        "Paths": [
-            {
-                "CultureCode": "en-GB",
-                "path": [ "SLU Swedish Species Information Centre", "Clam Gateway" ]
-            },
-            {
-                "CultureCode": "sv-SE",
-                "path": [ "SLU Artdatabanken", "Musselportalen" ]
-            }
-        ],
-        "Url": "http://musselportalen.se/",
-        "ContactPerson": {
-            "FirstName": "Eddie",
-            "LastName": "Von Wachenfeldt",
-            "Email": "eddie.vonwachenfeldt@slu.se"
-        },
-        "DownloadUrl": null,
-        "IncludeInScheduledHarvest": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": false,
-        "Id": 2,
-        "Identifier": "ClamGateway",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": false,
-        "UseVerbatimFileInExport": false
-    },
-    {
         "Type": "KULObservations",
         "IsActive": true,
         "Names": [

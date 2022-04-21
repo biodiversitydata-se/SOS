@@ -18,7 +18,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -26,7 +25,6 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Jobs;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Harvest.Processors.ClamPortal.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData.Interfaces;
 using SOS.Harvest.Processors.Kul.Interfaces;
@@ -58,7 +56,6 @@ namespace SOS.Process.UnitTests.Jobs
             _validationManager = new Mock<IValidationManager>();
             _taxonCache =new Mock<ICache<int, Taxon>>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
-            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _mvmProcessor = new Mock<IMvmObservationProcessor>();
@@ -80,7 +77,6 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
-        private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
         private readonly Mock<IFishDataObservationProcessor> _fishDataProcessor;
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<IMvmObservationProcessor> _mvmProcessor;
@@ -106,7 +102,6 @@ namespace SOS.Process.UnitTests.Jobs
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
             _artportalenProcessor.Object,
-            _clamPortalProcessor.Object,
             _fishDataProcessor.Object,
             _kulProcessor.Object,
             _mvmProcessor.Object,
@@ -204,13 +199,6 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
                     DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1, 1, 0));
 
-            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now));
-            _clamPortalProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full,  JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
-                    DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1, 1, 0));
-
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo(
                     DateTime.Now));
@@ -235,7 +223,7 @@ namespace SOS.Process.UnitTests.Jobs
             var result = await TestObject.RunAsync(
                 new List<string>
                 {
-                    DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway,
+                    DataProviderIdentifiers.Artportalen, 
                     DataProviderIdentifiers.KUL
                 },
                 JobRunModes.Full,

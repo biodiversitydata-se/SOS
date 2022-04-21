@@ -53,9 +53,6 @@
     <None Update="Resources\DataProvider\Eml\ButterflyMonitoring.eml.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\DataProvider\Eml\ClamGateway.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\DataProvider\Eml\Fishdata2.eml.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

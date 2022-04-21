@@ -13,7 +13,6 @@ namespace SOS.Harvest.Managers
         private readonly Dictionary<DataProviderType, IDataValidationReportFactory> _reportCreatorByType;
 
         public DataValidationReportManager(
-            ClamPortalDataValidationReportFactory clamPortalDataValidationReportFactory,
             FishDataValidationReportFactory fishDataValidationReportFactory,
             DwcaDataValidationReportFactory dwcaDataValidationReportFactory,
             MvmDataValidationReportFactory mvmDataValidationReportFactory,
@@ -22,7 +21,6 @@ namespace SOS.Harvest.Managers
             NorsDataValidationReportFactory norsDataValidationReportFactory, 
             VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
         {
-            if (clamPortalDataValidationReportFactory == null) throw new ArgumentNullException(nameof(clamPortalDataValidationReportFactory));
             if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
             if (dwcaDataValidationReportFactory == null) throw new ArgumentNullException(nameof(dwcaDataValidationReportFactory));
             if (mvmDataValidationReportFactory == null) throw new ArgumentNullException(nameof(mvmDataValidationReportFactory));
@@ -33,7 +31,6 @@ namespace SOS.Harvest.Managers
 
             _reportCreatorByType = new Dictionary<DataProviderType, IDataValidationReportFactory>
             {
-                {DataProviderType.ClamPortalObservations, clamPortalDataValidationReportFactory},
                 {DataProviderType.FishDataObservations, fishDataValidationReportFactory},
                 {DataProviderType.MvmObservations, mvmDataValidationReportFactory},
                 {DataProviderType.KULObservations, kulDataValidationReportFactory},

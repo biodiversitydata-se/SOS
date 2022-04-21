@@ -7,7 +7,6 @@ using SOS.Harvest.Harvesters.AquaSupport.Kul.Interfaces;
 using SOS.Harvest.Harvesters.AquaSupport.Nors.Interfaces;
 using SOS.Harvest.Harvesters.Artportalen.Interfaces;
 using SOS.Harvest.Harvesters.Biologg.Interfaces;
-using SOS.Harvest.Harvesters.ClamPortal.Interfaces;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Harvest.Harvesters.iNaturalist.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
@@ -269,7 +268,6 @@ namespace SOS.Harvest.Jobs
         /// </summary>
         /// <param name="artportalenObservationHarvester"></param>
         /// <param name="biologgObservationHarvester"></param>
-        /// <param name="clamPortalObservationHarvester"></param>
         /// <param name="dwcObservationHarvester"></param>
         /// <param name="fishDataObservationHarvester"></param>
         /// <param name="kulObservationHarvester"></param>
@@ -288,7 +286,6 @@ namespace SOS.Harvest.Jobs
         public ObservationsHarvestJob(
             IArtportalenObservationHarvester artportalenObservationHarvester,
             IBiologgObservationHarvester biologgObservationHarvester,
-            IClamPortalObservationHarvester clamPortalObservationHarvester,
             IDwcObservationHarvester dwcObservationHarvester,
             IFishDataObservationHarvester fishDataObservationHarvester,
             IKulObservationHarvester kulObservationHarvester,
@@ -314,7 +311,6 @@ namespace SOS.Harvest.Jobs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenObservationHarvester == null) throw new ArgumentNullException(nameof(artportalenObservationHarvester));
             if (biologgObservationHarvester == null) throw new ArgumentNullException(nameof(biologgObservationHarvester));
-            if (clamPortalObservationHarvester == null) throw new ArgumentNullException(nameof(clamPortalObservationHarvester));
             if (dwcObservationHarvester == null) throw new ArgumentNullException(nameof(dwcObservationHarvester));
             if (fishDataObservationHarvester == null) throw new ArgumentNullException(nameof(fishDataObservationHarvester));
             if (kulObservationHarvester == null) throw new ArgumentNullException(nameof(kulObservationHarvester));
@@ -331,7 +327,6 @@ namespace SOS.Harvest.Jobs
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationHarvester},
                 {DataProviderType.BiologgObservations, biologgObservationHarvester},
-                {DataProviderType.ClamPortalObservations, clamPortalObservationHarvester},
                 {DataProviderType.DwcA, dwcObservationHarvester},
                 {DataProviderType.FishDataObservations, fishDataObservationHarvester},
                 {DataProviderType.KULObservations, kulObservationHarvester},

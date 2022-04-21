@@ -25,7 +25,6 @@ using SOS.Lib.Services;
 using SOS.Harvest.Jobs;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
-using SOS.Harvest.Processors.ClamPortal;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.FishData;
 using SOS.Harvest.Processors.Kul;
@@ -111,20 +110,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), dataProviderRepository, verbatimClient, new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
 
-          
-            var clamPortalProcessor = new ClamPortalObservationProcessor(
-                new ClamObservationVerbatimRepository(verbatimClient,
-                    new NullLogger<ClamObservationVerbatimRepository>()),
-                areaHelper,
-                processedObservationRepository,
-                vocabularyValueResolver, 
-                dwcArchiveFileWriterCoordinator, 
-                processManager,
-                validationManager,
-                diffusionManager,
-                processTimeManager,
-                processConfiguration,
-                new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
                     new NullLogger<FishDataObservationVerbatimRepository>()),
@@ -279,7 +264,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processInfoRepository,
                 harvestInfoRepository,
                 artportalenProcessor,
-                clamPortalProcessor,
                 fishDataProcessor,
                 kulProcessor,
                 mvmProcessor,

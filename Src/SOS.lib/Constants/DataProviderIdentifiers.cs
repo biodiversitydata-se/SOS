@@ -3,7 +3,6 @@
     public static class DataProviderIdentifiers
     {
         public const string Artportalen = "Artportalen";
-        public const string ClamGateway = "ClamGateway";
         public const string FishData = "Fishdata2";
         public const string KUL = "KUL";
         public const string NORS = "NORS";

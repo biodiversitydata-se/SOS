@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
-using SOS.Harvest.Processors.ClamPortal.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
@@ -694,7 +693,6 @@ namespace SOS.Harvest.Jobs
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="artportalenObservationProcessor"></param>
-        /// <param name="clamPortalObservationProcessor"></param>
         /// <param name="fishDataObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
         /// <param name="mvmObservationProcessor"></param>
@@ -718,7 +716,6 @@ namespace SOS.Harvest.Jobs
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IArtportalenObservationProcessor artportalenObservationProcessor,
-            IClamPortalObservationProcessor clamPortalObservationProcessor,
             IFishDataObservationProcessor fishDataObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
             IMvmObservationProcessor mvmObservationProcessor,
@@ -750,8 +747,6 @@ namespace SOS.Harvest.Jobs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
 
-            if (clamPortalObservationProcessor == null)
-                throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
             if (fishDataObservationProcessor == null) throw new ArgumentNullException(nameof(fishDataObservationProcessor));
             if (kulObservationProcessor == null) throw new ArgumentNullException(nameof(kulObservationProcessor));
             if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
@@ -767,7 +762,6 @@ namespace SOS.Harvest.Jobs
             _processorByType = new Dictionary<DataProviderType, IObservationProcessor>
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationProcessor},
-                {DataProviderType.ClamPortalObservations, clamPortalObservationProcessor},
                 {DataProviderType.DwcA, dwcaObservationProcessor},
                 {DataProviderType.BiologgObservations, dwcaObservationProcessor},
                 {DataProviderType.FishDataObservations, fishDataObservationProcessor},
