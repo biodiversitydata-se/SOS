@@ -79,8 +79,9 @@ namespace SOS.Lib.Helpers
         /// <param name="mapping"></param>
         /// <returns></returns>
         public IEnumerable<T> GetRecords<T>(IVariableLengthReaderBuilder<T> mapping)
-        { 
-            var parser = mapping.Build(";");
+        {
+            const string delimiter = "\t";
+            var parser = mapping.Build(delimiter);
 
             var records = new List<T>();
             _csvReader.Read();
@@ -92,7 +93,7 @@ namespace SOS.Lib.Helpers
                 {
                     if (i > 0)
                     {
-                        row += ";";
+                        row += delimiter;
                     }
 
                     row += GetField(i);
