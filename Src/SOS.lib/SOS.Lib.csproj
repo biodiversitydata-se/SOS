@@ -12,8 +12,8 @@
 	  <PackageReference Include="Autofac" Version="6.3.0" />
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.11.0" />
 	  <PackageReference Include="Cronos" Version="0.7.1" />
-	  <PackageReference Include="DotNetCore.Mapping" Version="16.27.0" />
-	  <PackageReference Include="EPPlus" Version="5.8.8" />
+	  <PackageReference Include="DotNetCore.Mapping" Version="16.30.0" />
+	  <PackageReference Include="EPPlus" Version="6.0.3" />
 	  <PackageReference Include="Hangfire.Core" Version="1.7.28" />
 	  <PackageReference Include="MailKit" Version="3.2.0" />
 	  <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
@@ -22,7 +22,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
 	  <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
 	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.15.0" />
-	  <PackageReference Include="NEST" Version="7.17.0" />
+	  <PackageReference Include="NEST" Version="7.17.1" />
 	  <PackageReference Include="NetTopologySuite" Version="2.4.0" />
 	  <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
 	  <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />

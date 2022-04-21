@@ -21,8 +21,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="5.8.8" />
-		<PackageReference Include="FluentAssertions" Version="6.5.1" />
+		<PackageReference Include="EPPlus" Version="6.0.3" />
+		<PackageReference Include="FluentAssertions" Version="6.6.0" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.28" />
 		<PackageReference Include="MessagePack" Version="2.3.85" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
