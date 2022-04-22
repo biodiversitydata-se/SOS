@@ -11,6 +11,7 @@ namespace SOS.Lib.Jobs.Process
         /// <returns></returns>
         [JobDisplayName("Process taxa")]
         [Queue("high")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync();
     }
 }

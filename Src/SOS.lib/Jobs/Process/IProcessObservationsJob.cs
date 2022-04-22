@@ -16,6 +16,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [JobDisplayName("Process Observations [Mode={1}]")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
@@ -28,6 +29,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [JobDisplayName("Process verbatim observations for all active providers")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
 
@@ -37,6 +39,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="verbatims"></param>
         /// <returns></returns>
         [JobDisplayName("Process passed Artportalen verbatim observations")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> ProcessArtportalenObservationsAsync(IEnumerable<ArtportalenObservationVerbatim> verbatims);
     }

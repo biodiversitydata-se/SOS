@@ -11,6 +11,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="dataProviderId"></param>
         /// <returns></returns>
         [JobDisplayName("Copy provider data from active to inactive instance")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunAsync(int dataProviderId);
     }
