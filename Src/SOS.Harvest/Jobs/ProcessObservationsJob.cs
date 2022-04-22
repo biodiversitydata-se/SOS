@@ -354,10 +354,10 @@ namespace SOS.Harvest.Jobs
                     // 4. Start DWC file writing
                     //------------------------------------------------------------------------
                     _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-                }
 
-                // Disable indexing for public and protected index
-                await DisableIndexingAsync();
+                    // Disable indexing for public and protected index
+                    await DisableIndexingAsync();
+                }
 
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
@@ -370,43 +370,18 @@ namespace SOS.Harvest.Jobs
                 //---------------------------------
                 if (success)
                 {
-                    // Enable indexing for public and protected index
-                    await EnableIndexingAsync();
-
                     // Update dynamic provider data
                     await UpdateProvidersMetadataAsync(dataProvidersToProcess);
                     
                     if (mode == JobRunModes.Full)
                     {
+                        // Enable indexing for public and protected index
+                        await EnableIndexingAsync();
                         Thread.Sleep(TimeSpan.FromMinutes(1)); // Wait for Elasticsearch indexing to finish.
-                    }
 
-                    // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
-                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
-                        mode == JobRunModes.IncrementalInactiveInstance)
-                    {
-                        _logger.LogInformation($"Start validate indexes");
-                        var validateIndexTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateIndex);
-                        if (!await ValidateIndexesAsync())
-                        {
-                            throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
-                        }
-                        _logger.LogInformation($"Finish validate indexes");
-
-                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
-
-                        // Toggle active instance if we are done
-                        _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
-                            .InActiveInstance);
-                    }
-
-                    if (mode == JobRunModes.Full)
-                    {                        
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
-
                             var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunIncrementalInactiveAsync(cancellationToken));
 
                             _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
@@ -430,6 +405,26 @@ namespace SOS.Harvest.Jobs
                                 _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
                             }
                         }
+                    }
+
+                    // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
+                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
+                        mode == JobRunModes.IncrementalInactiveInstance)
+                    {
+                        _logger.LogInformation($"Start validate indexes");
+                        var validateIndexTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateIndex);
+                        if (!await ValidateIndexesAsync())
+                        {
+                            throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
+                        }
+                        _logger.LogInformation($"Finish validate indexes");
+
+                        _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
+
+                        // Toggle active instance if we are done
+                        _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
+                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                            .InActiveInstance);
                     }
                 }
 
