@@ -7,7 +7,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Repositories.Processed
@@ -30,7 +29,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(IndexName);
-        private string IndexName => IndexHelper.GetIndexName<TEntity>();
+        private string IndexName => IndexHelper.GetInstanceName<TEntity>();
 
         /// <summary>
         ///     Constructor

@@ -429,7 +429,7 @@ namespace SOS.Observations.Api.Managers
             _logger.LogDebug("Start GetCachedTaxonSumAggregationItemsAsync()");
             var taxonIdsSet = taxonIds.ToHashSet();
             var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation();
-            var taxonAggregations = cachedTaxonSumAggregation
+            var taxonAggregations = cachedTaxonSumAggregation?
                 .Values
                 .Where(m => taxonIdsSet.Contains(m.TaxonId));
 

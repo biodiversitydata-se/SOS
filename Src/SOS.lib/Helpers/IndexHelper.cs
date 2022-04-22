@@ -16,7 +16,7 @@ namespace SOS.Lib.Helpers
         public static string GetIndexName<TEntity>(string indexPrefix, bool toggleable, byte instance,
             bool protectedObservations) =>
             $"{(string.IsNullOrEmpty(indexPrefix) ? "" : $"{indexPrefix}-")}{GetInstanceName<TEntity>(toggleable, instance, protectedObservations)}"
-                .ToLower();
+            .ToLower();
 
         /// <summary>
         /// Get name of index
@@ -59,7 +59,7 @@ namespace SOS.Lib.Helpers
         /// <returns></returns>
         public static string GetInstanceName<TEntity>(bool toggleable, byte instance, bool protectedObservations)
         {
-            var instanceName = $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+            var instanceName = GetInstanceName<TEntity>();
             if (protectedObservations)
             {
                 instanceName += "-protected";
@@ -67,6 +67,16 @@ namespace SOS.Lib.Helpers
 
             instanceName += $"{(toggleable ? $"-{instance}" : string.Empty)}";
             return instanceName;
+        }
+
+        /// <summary>
+        /// Get name of instance
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <returns></returns>
+        public static string GetInstanceName<TEntity>()
+        {
+            return $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
         }
     }
 }
