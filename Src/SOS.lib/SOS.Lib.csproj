@@ -1,95 +1,104 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
 
-  <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+	</PropertyGroup>
 
-  <PropertyGroup>
-      <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildThisFileName).xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(MSBuildThisFileName).xml</DocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-	  <PackageReference Include="Autofac" Version="6.3.0" />
-	  <PackageReference Include="Azure.Storage.Blobs" Version="12.11.0" />
-	  <PackageReference Include="Cronos" Version="0.7.1" />
-	  <PackageReference Include="DotNetCore.Mapping" Version="16.30.0" />
-	  <PackageReference Include="EPPlus" Version="6.0.3" />
-	  <PackageReference Include="Hangfire.Core" Version="1.7.28" />
-	  <PackageReference Include="MailKit" Version="3.2.0" />
-	  <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
-	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.15.0" />
-	  <PackageReference Include="NEST" Version="7.17.1" />
-	  <PackageReference Include="NetTopologySuite" Version="2.4.0" />
-	  <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
-	  <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
-	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	  <PackageReference Include="NReco.Csv" Version="1.0.0" />
-	  <PackageReference Include="ProjNet" Version="2.0.0" />
-	  <PackageReference Include="CSharpFunctionalExtensions" Version="2.29.0" />
-	  <PackageReference Include="NGeoHash" Version="1.2.0" />
-	  <PackageReference Include="RecordParser" Version="1.3.0" />
-	  <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-      <PackageReference Include="QuikGraph" Version="2.3.0" />
-	  <PackageReference Include="CycleDetection" Version="2.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="6.3.0" />
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.11.0" />
+		<PackageReference Include="Cronos" Version="0.7.1" />
+		<PackageReference Include="DotNetCore.Mapping" Version="16.30.0" />
+		<PackageReference Include="EPPlus" Version="6.0.3" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.28" />
+		<PackageReference Include="MailKit" Version="3.2.0" />
+		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.15.0" />
+		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.15.0" />
+		<PackageReference Include="NEST" Version="7.17.1" />
+		<PackageReference Include="NetTopologySuite" Version="2.4.0" />
+		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.4" />
+		<PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="2.1.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="NReco.Csv" Version="1.0.0" />
+		<PackageReference Include="ProjNet" Version="2.0.0" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.29.0" />
+		<PackageReference Include="NGeoHash" Version="1.2.0" />
+		<PackageReference Include="RecordParser" Version="1.3.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+		<PackageReference Include="QuikGraph" Version="2.3.0" />
+		<PackageReference Include="CycleDetection" Version="2.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\DataProvider\DefaultDataProviders.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\Biologg.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\SosDataProvidersCombined.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\Artportalen.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\ButterflyMonitoring.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\Fishdata2.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\KUL.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\MVM.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\NORS.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\ObservationDatabase.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\SERS.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\SHARK.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\DataProvider\Eml\VirtualHerbarium.eml.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\ObservationFieldDescriptions.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\TaxonLists.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\FieldDescriptions.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Resources\DataProvider\DefaultDataProviders.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\Biologg.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\SosDataProvidersCombined.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\Artportalen.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\ButterflyMonitoring.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\Fishdata2.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\KUL.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\MVM.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\NORS.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\ObservationDatabase.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\SERS.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\SHARK.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\DataProvider\Eml\VirtualHerbarium.eml.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\ObservationFieldDescriptions.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\TaxonLists.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\FieldDescriptions.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>    
-    <Folder Include="Models\TestService\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Models\TestService\" />
+	</ItemGroup>
 
 </Project>
