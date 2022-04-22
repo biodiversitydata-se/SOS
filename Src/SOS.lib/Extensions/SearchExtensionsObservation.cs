@@ -236,7 +236,7 @@ namespace SOS.Lib
                     .Bool(p=>p
                         .Should(s => s
                             .Terms(t => t
-                                .Field("location.locationId.keyword")
+                                .Field("location.locationId")
                                 .Terms(siteTerms)),
                             s => s
                             .Terms(t => t

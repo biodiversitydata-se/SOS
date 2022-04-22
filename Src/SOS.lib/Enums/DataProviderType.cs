@@ -11,6 +11,7 @@
         Taxa,
         ArtportalenObservations,
         BiologgObservations,
+        ClamPortalObservations,
         KULObservations,
         DwcA,
         NorsObservations,
