@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.HealthChecks
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="apiUsageStatisticsManager"></param>
+        /// <param name="apiUsageStatisticsRepository"></param>
         public ApplicationInsightstHealthCheck(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
         {
             _apiUsageStatisticsRepository = apiUsageStatisticsRepository ?? throw new ArgumentNullException(nameof(apiUsageStatisticsRepository));
@@ -39,12 +39,12 @@ namespace SOS.Observations.Api.HealthChecks
                 if (latestHarvestDate.HasValue)
                 {
                     var lastHarvestMessage = $"Last ApplicationInsights harvest: {latestHarvestDate.Value.ToShortDateString()}";
-                    if ((DateTime.Now - latestHarvestDate.Value).Days > 90)
+                    if ((DateTime.Now - latestHarvestDate.Value).Days > 30)
                     {
                         return new HealthCheckResult(HealthStatus.Unhealthy, lastHarvestMessage);
                     }
 
-                    if ((DateTime.Now - latestHarvestDate.Value).Days > 75)
+                    if ((DateTime.Now - latestHarvestDate.Value).Days > 25)
                     {
                         return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
                     }
