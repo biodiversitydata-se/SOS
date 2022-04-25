@@ -22,6 +22,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Factories;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Export;
 
 namespace SOS.Lib.IO.DwcArchive
@@ -205,7 +206,8 @@ namespace SOS.Lib.IO.DwcArchive
 
         public async Task WriteHeaderlessDwcaFiles(
             ICollection<Observation> processedObservations,
-            Dictionary<DwcaFilePart, string> filePathByFilePart)
+            Dictionary<DwcaFilePart, string> filePathByFilePart,
+            bool checkForIllegalCharacters = false)
         {
             if (!processedObservations?.Any() ?? true)
             {
@@ -217,6 +219,7 @@ namespace SOS.Lib.IO.DwcArchive
             // Create Occurrence txt file
             string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
             var dwcObservations = processedObservations.ToDarwinCore();
+            if (checkForIllegalCharacters) ValidateObservations(dwcObservations);
             await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
             await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
                 dwcObservations,
@@ -226,6 +229,7 @@ namespace SOS.Lib.IO.DwcArchive
             // Create EMOF txt file
             string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
+            if (checkForIllegalCharacters) ValidateEmofRows(emofRows);
             if (emofRows != null && emofRows.Any())
             {
                 await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
@@ -237,6 +241,7 @@ namespace SOS.Lib.IO.DwcArchive
             // Create Multimedia txt file
             string multimediaCsvFilePath = filePathByFilePart[DwcaFilePart.Multimedia];
             var multimediaRows = processedObservations.ToSimpleMultimediaRows();
+            if (checkForIllegalCharacters) ValidateMultimediaRows(multimediaRows);
             if (multimediaRows != null && multimediaRows.Any())
             {
                 await using var multimediaFileStream = File.AppendText(multimediaCsvFilePath);
@@ -244,6 +249,42 @@ namespace SOS.Lib.IO.DwcArchive
                 _simpleMultimediaCsvWriter.WriteHeaderlessCsvFile(
                     multimediaRows,
                     multimediaFileStream);
+            }
+        }
+
+        private void ValidateObservations(IEnumerable<DarwinCore> dwcObservations)
+        {
+            foreach (var dwcObservation in dwcObservations)
+            {
+                string validation = DwcaFileValidator.Validate(dwcObservation);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateEmofRows(IEnumerable<ExtendedMeasurementOrFactRow> emofRows)
+        {
+            foreach (var emofRow in emofRows)
+            {
+                string validation = DwcaFileValidator.Validate(emofRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
+            }
+        }
+
+        private void ValidateMultimediaRows(IEnumerable<SimpleMultimediaRow> multimediaRows)
+        {
+            foreach (var multimediaRow in multimediaRows)
+            {
+                string validation = DwcaFileValidator.Validate(multimediaRow);
+                if (validation != null)
+                {
+                    _logger.LogInformation(validation);
+                }
             }
         }
 

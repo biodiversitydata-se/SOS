@@ -35,6 +35,18 @@ namespace SOS.Lib.Extensions
             }).Trim();
         }
 
+        /// <summary>
+        /// Checks if the string contains unprintable characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool ContainsIllegalCharacters(this string value)
+        {
+            if (string.IsNullOrEmpty(value)) return false;
+
+            return RxIllegalCharacters.IsMatch(value);
+        }
+
         public static string FromNonAlfanumeric(this string value)
         {
             if (string.IsNullOrEmpty(value))

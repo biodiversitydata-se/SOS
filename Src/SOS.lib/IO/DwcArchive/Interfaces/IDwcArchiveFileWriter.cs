@@ -65,10 +65,12 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="dwcObservations"></param>
         /// <param name="filePathByFilePart"></param>
+        /// <param name="checkForIllegalCharacters"></param>
         /// <returns></returns>
         Task WriteHeaderlessDwcaFiles(
             ICollection<Observation> dwcObservations,
-            Dictionary<DwcaFilePart, string> filePathByFilePart);
+            Dictionary<DwcaFilePart, string> filePathByFilePart,
+            bool checkForIllegalCharacters = false);
 
         /// <summary>
         /// Create a DwC-A file for a data provider.
