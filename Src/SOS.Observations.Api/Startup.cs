@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Mongo;
@@ -373,7 +372,8 @@ namespace SOS.Observations.Api
                 .AddCheck<AzureSearchHealthCheck>("Azure search API health check", tags: new[] { "azure", "database", "elasticsearch", "query" })
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
-                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" });
+                .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
+                .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -409,6 +409,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IArtportalenApiManager, ArtportalenApiManager>();
 
             // Add repositories
+            services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
