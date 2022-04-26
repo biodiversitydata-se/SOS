@@ -1,12 +1,14 @@
 ﻿using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Compression;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Lib.IO.DwcArchive
 {
@@ -396,6 +398,241 @@ namespace SOS.Lib.IO.DwcArchive
                 List<string> rows = new List<string> { Header };
                 rows.AddRange(ErrorRows);
                 return rows;
+            }
+        }
+
+        public static string Validate(DarwinCore dwcObservation)
+        {
+            List<string> errors = new List<string>();
+            Validate(dwcObservation.Occurrence.OccurrenceID, "OccurrenceID", errors);
+            Validate(dwcObservation.Event.EventID, "EventID", errors);
+            Validate(dwcObservation.Occurrence.OccurrenceID, "OccurrenceID", errors);
+            Validate(dwcObservation.BasisOfRecord, "BasisOfRecord", errors);
+            Validate(dwcObservation.BibliographicCitation, "BibliographicCitation", errors);
+            Validate(dwcObservation.CollectionCode, "CollectionCode", errors);
+            Validate(dwcObservation.CollectionID, "CollectionID", errors);
+            Validate(dwcObservation.DataGeneralizations, "DataGeneralizations", errors);
+            Validate(dwcObservation.DatasetID, "DatasetID", errors);
+            Validate(dwcObservation.DatasetName, "DatasetName", errors);
+            Validate(dwcObservation.DynamicProperties, "DynamicProperties", errors);
+            Validate(dwcObservation.InformationWithheld, "InformationWithheld", errors);
+            Validate(dwcObservation.InstitutionCode, "InstitutionCode", errors);
+            Validate(dwcObservation.InstitutionID, "InstitutionID", errors);
+            Validate(dwcObservation.Language, "Language", errors);
+            Validate(dwcObservation.License, "License", errors);
+            Validate(dwcObservation.Modified?.ToString("s", CultureInfo.InvariantCulture), "Modified", errors);
+            Validate(dwcObservation.OwnerInstitutionCode, "OwnerInstitutionCode", errors);
+            Validate(dwcObservation.References, "References", errors);
+            Validate(dwcObservation.RightsHolder, "RightsHolder", errors);
+            Validate(dwcObservation.Type, "Type", errors);
+            Validate(dwcObservation.Event.Day.HasValue ? dwcObservation.Event.Day.ToString() : null, "Day", errors);
+            Validate(dwcObservation.Event.EndDayOfYear.HasValue ? dwcObservation.Event.EndDayOfYear.ToString() : null, "EndDayOfYear", errors);
+            Validate(dwcObservation.Event.EventDate, "EventDate", errors);
+            Validate(dwcObservation.Event.EventID, "EventID", errors);
+            Validate(dwcObservation.Event.EventRemarks, "EventRemarks", errors);
+            Validate(dwcObservation.Event.EventTime, "EventTime", errors);
+            Validate(dwcObservation.Event.FieldNotes, "FieldNotes", errors);
+            Validate(dwcObservation.Event.FieldNumber, "FieldNumber", errors);
+            Validate(dwcObservation.Event.Habitat, "Habitat", errors);
+            Validate(dwcObservation.Event.Month.HasValue ? dwcObservation.Event.Month.ToString() : null, "Month", errors);
+            Validate(dwcObservation.Event.ParentEventID, "ParentEventID", errors);
+            Validate(dwcObservation.Event.SampleSizeValue, "SampleSizeValue", errors);
+            Validate(dwcObservation.Event.SampleSizeUnit, "SampleSizeUnit", errors);
+            Validate(dwcObservation.Event.SamplingEffort, "SamplingEffort", errors);
+            Validate(dwcObservation.Event.SamplingProtocol, "SamplingProtocol", errors);
+            Validate(dwcObservation.Event.StartDayOfYear.HasValue ? dwcObservation.Event.StartDayOfYear.ToString() : null, "StartDayOfYear", errors);
+            Validate(dwcObservation.Event.VerbatimEventDate, "VerbatimEventDate", errors);
+            Validate(dwcObservation.Event.Year.HasValue ? dwcObservation.Event.Year.ToString() : null, "Year", errors);
+            Validate(dwcObservation.Identification.DateIdentified, "DateIdentified", errors);
+            Validate(dwcObservation.Identification.IdentificationID, "IdentificationID", errors);
+            Validate(dwcObservation.Identification.IdentificationQualifier, "IdentificationQualifier", errors);
+            Validate(dwcObservation.Identification.IdentificationReferences, "IdentificationReferences", errors);
+            Validate(dwcObservation.Identification.IdentificationRemarks, "IdentificationRemarks", errors);
+            Validate(dwcObservation.Identification.IdentificationVerificationStatus, "IdentificationVerificationStatus", errors);
+            Validate(dwcObservation.Identification.IdentifiedBy, "IdentifiedBy", errors);
+            Validate(dwcObservation.Identification.TypeStatus, "TypeStatus", errors);
+            Validate(dwcObservation.Location.Continent, "Continent", errors);
+            Validate(dwcObservation.Location.CoordinatePrecision, "CoordinatePrecision", errors);
+            Validate(dwcObservation.Location.CoordinateUncertaintyInMeters.GetValueOrDefault().ToString(), "CoordinateUncertaintyInMeters", errors);
+            Validate(dwcObservation.Location.Country, "Country", errors);
+            Validate(dwcObservation.Location.CountryCode, "CountryCode", errors);
+            Validate(dwcObservation.Location.County, "County", errors);
+            Validate(dwcObservation.Location.DecimalLatitude?.ToString("F5", CultureInfo.InvariantCulture), "DecimalLatitude", errors);
+            Validate(dwcObservation.Location.DecimalLongitude?.ToString("F5", CultureInfo.InvariantCulture), "DecimalLongitude", errors);
+            Validate(dwcObservation.Location.FootprintSpatialFit, "FootprintSpatialFit", errors);
+            Validate(dwcObservation.Location.FootprintSRS, "FootprintSRS", errors);
+            Validate(dwcObservation.Location.FootprintWKT, "FootprintWKT", errors);
+            Validate(dwcObservation.Location.GeodeticDatum, "GeodeticDatum", errors);
+            Validate(dwcObservation.Location.GeoreferencedBy, "GeoreferencedBy", errors);
+            Validate(dwcObservation.Location.GeoreferencedDate, "GeoreferencedDate", errors);
+            Validate(dwcObservation.Location.GeoreferenceProtocol, "GeoreferenceProtocol", errors);
+            Validate(dwcObservation.Location.GeoreferenceRemarks, "GeoreferenceRemarks", errors);
+            Validate(dwcObservation.Location.GeoreferenceSources, "GeoreferenceSources", errors);
+            Validate(dwcObservation.Location.GeoreferenceVerificationStatus, "GeoreferenceVerificationStatus", errors);
+            Validate(dwcObservation.Location.HigherGeography, "HigherGeography", errors);
+            Validate(dwcObservation.Location.HigherGeographyID, "HigherGeographyID", errors);
+            Validate(dwcObservation.Location.Island, "Island", errors);
+            Validate(dwcObservation.Location.IslandGroup, "IslandGroup", errors);
+            Validate(dwcObservation.Location.Locality, "Locality", errors);
+            Validate(dwcObservation.Location.LocationAccordingTo, "LocationAccordingTo", errors);
+            Validate(dwcObservation.Location.LocationID, "LocationID", errors);
+            Validate(dwcObservation.Location.LocationRemarks, "LocationRemarks", errors);
+            Validate(dwcObservation.Location.MaximumDepthInMeters, "MaximumDepthInMeters", errors);
+            Validate(dwcObservation.Location.MaximumDistanceAboveSurfaceInMeters, "MaximumDistanceAboveSurfaceInMeters", errors);
+            Validate(dwcObservation.Location.MaximumElevationInMeters, "MaximumElevationInMeters", errors);
+            Validate(dwcObservation.Location.MinimumDepthInMeters, "MinimumDepthInMeters", errors);
+            Validate(dwcObservation.Location.MinimumDistanceAboveSurfaceInMeters, "MinimumDistanceAboveSurfaceInMeters", errors);
+            Validate(dwcObservation.Location.MinimumElevationInMeters, "MinimumElevationInMeters", errors);
+            Validate(dwcObservation.Location.Municipality, "Municipality", errors);
+            Validate(dwcObservation.Location.PointRadiusSpatialFit, "PointRadiusSpatialFit", errors);
+            Validate(dwcObservation.Location.StateProvince, "StateProvince", errors);
+            Validate(dwcObservation.Location.WaterBody, "WaterBody", errors);
+            Validate(dwcObservation.Location.VerbatimCoordinates, "VerbatimCoordinates", errors);
+            Validate(dwcObservation.Location.VerbatimCoordinateSystem, "VerbatimCoordinateSystem", errors);
+            Validate(dwcObservation.Location.VerbatimDepth, "VerbatimDepth", errors);
+            Validate(dwcObservation.Location.VerbatimElevation, "VerbatimElevation", errors);
+            Validate(dwcObservation.Location.VerbatimLatitude, "VerbatimLatitude", errors);
+            Validate(dwcObservation.Location.VerbatimLocality, "VerbatimLocality", errors);
+            Validate(dwcObservation.Location.VerbatimLongitude, "VerbatimLongitude", errors);
+            Validate(dwcObservation.Location.VerbatimSRS, "VerbatimSRS", errors);
+            Validate(dwcObservation.Occurrence.AssociatedMedia, "AssociatedMedia", errors);
+            Validate(dwcObservation.Occurrence.AssociatedReferences, "AssociatedReferences", errors);
+            Validate(dwcObservation.Occurrence.AssociatedSequences, "AssociatedSequences", errors);
+            Validate(dwcObservation.Occurrence.AssociatedTaxa, "AssociatedTaxa", errors);
+            Validate(dwcObservation.Occurrence.Behavior, "Behavior", errors);
+            Validate(dwcObservation.Occurrence.CatalogNumber, "CatalogNumber", errors);
+            Validate(dwcObservation.Occurrence.Disposition, "Disposition", errors);
+            Validate(dwcObservation.Occurrence.EstablishmentMeans, "EstablishmentMeans", errors);
+            Validate(dwcObservation.Occurrence.IndividualCount, "IndividualCount", errors);
+            Validate(dwcObservation.Occurrence.LifeStage, "LifeStage", errors);
+            Validate(dwcObservation.AccessRights, "AccessRights", errors);
+            Validate(dwcObservation.Occurrence.OccurrenceRemarks, "OccurrenceRemarks", errors);
+            Validate(dwcObservation.Occurrence.OccurrenceStatus, "OccurrenceStatus", errors);
+            Validate(dwcObservation.Occurrence.OrganismQuantity, "OrganismQuantity", errors);
+            Validate(dwcObservation.Occurrence.OrganismQuantityType, "OrganismQuantityType", errors);
+            Validate(dwcObservation.Occurrence.OtherCatalogNumbers, "OtherCatalogNumbers", errors);
+            Validate(dwcObservation.Occurrence.Preparations, "Preparations", errors);
+            Validate(dwcObservation.Occurrence.RecordedBy, "RecordedBy", errors);
+            Validate(dwcObservation.Occurrence.RecordNumber, "RecordNumber", errors);
+            Validate(dwcObservation.Occurrence.ReproductiveCondition, "ReproductiveCondition", errors);
+            Validate(dwcObservation.Occurrence.Sex, "Sex", errors);
+            Validate(dwcObservation.Taxon.AcceptedNameUsage, "AcceptedNameUsage", errors);
+            Validate(dwcObservation.Taxon.AcceptedNameUsageID, "AcceptedNameUsageID", errors);
+            Validate(dwcObservation.Taxon.Class, "Class", errors);
+            Validate(dwcObservation.Taxon.Family, "Family", errors);
+            Validate(dwcObservation.Taxon.Genus, "Genus", errors);
+            Validate(dwcObservation.Taxon.HigherClassification, "HigherClassification", errors);
+            Validate(dwcObservation.Taxon.InfraspecificEpithet, "InfraspecificEpithet", errors);
+            Validate(dwcObservation.Taxon.Kingdom, "Kingdom", errors);
+            Validate(dwcObservation.Taxon.NameAccordingTo, "NameAccordingTo", errors);
+            Validate(dwcObservation.Taxon.NameAccordingToID, "NameAccordingToID", errors);
+            Validate(dwcObservation.Taxon.NamePublishedIn, "NamePublishedIn", errors);
+            Validate(dwcObservation.Taxon.NamePublishedInID, "NamePublishedInID", errors);
+            Validate(dwcObservation.Taxon.NamePublishedInYear, "NamePublishedInYear", errors);
+            Validate(dwcObservation.Taxon.NomenclaturalCode, "NomenclaturalCode", errors);
+            Validate(dwcObservation.Taxon.NomenclaturalStatus, "NomenclaturalStatus", errors);
+            Validate(dwcObservation.Taxon.Order, "Order", errors);
+            Validate(dwcObservation.Taxon.OriginalNameUsage, "OriginalNameUsage", errors);
+            Validate(dwcObservation.Taxon.OriginalNameUsageID, "OriginalNameUsageID", errors);
+            Validate(dwcObservation.Taxon.ParentNameUsage, "ParentNameUsage", errors);
+            Validate(dwcObservation.Taxon.ParentNameUsageID, "ParentNameUsageID", errors);
+            Validate(dwcObservation.Taxon.Phylum, "Phylum", errors);
+            Validate(dwcObservation.Taxon.ScientificName, "ScientificName", errors);
+            Validate(dwcObservation.Taxon.ScientificNameAuthorship, "ScientificNameAuthorship", errors);
+            Validate(dwcObservation.Taxon.ScientificNameID, "ScientificNameID", errors);
+            Validate(dwcObservation.Taxon.SpecificEpithet, "SpecificEpithet", errors);
+            Validate(dwcObservation.Taxon.Subgenus, "Subgenus", errors);
+            Validate(dwcObservation.Taxon.TaxonConceptID, "TaxonConceptID", errors);
+            Validate(dwcObservation.Taxon.TaxonID, "TaxonID", errors);
+            Validate(dwcObservation.Taxon.TaxonomicStatus, "TaxonomicStatus", errors);
+            Validate(dwcObservation.Taxon.TaxonRank, "TaxonRank", errors);
+            Validate(dwcObservation.Taxon.TaxonRemarks, "TaxonRemarks", errors);
+            Validate(dwcObservation.Taxon.VerbatimTaxonRank, "VerbatimTaxonRank", errors);
+            Validate(dwcObservation.Taxon.VernacularName, "VernacularName", errors);
+            Validate(dwcObservation.GeologicalContext?.Bed, "Bed", errors);
+            Validate(dwcObservation.GeologicalContext?.EarliestAgeOrLowestStage, "EarliestAgeOrLowestStage", errors);
+            Validate(dwcObservation.GeologicalContext?.EarliestEonOrLowestEonothem, "EarliestEonOrLowestEonothem", errors);
+            Validate(dwcObservation.GeologicalContext?.EarliestEpochOrLowestSeries, "EarliestEpochOrLowestSeries", errors);
+            Validate(dwcObservation.GeologicalContext?.EarliestEraOrLowestErathem, "EarliestEraOrLowestErathem", errors);
+            Validate(dwcObservation.GeologicalContext?.EarliestPeriodOrLowestSystem, "EarliestPeriodOrLowestSystem", errors);
+            Validate(dwcObservation.GeologicalContext?.Formation, "Formation", errors);
+            Validate(dwcObservation.GeologicalContext?.GeologicalContextID, "GeologicalContextID", errors);
+            Validate(dwcObservation.GeologicalContext?.Group, "Group", errors);
+            Validate(dwcObservation.GeologicalContext?.HighestBiostratigraphicZone, "HighestBiostratigraphicZone", errors);
+            Validate(dwcObservation.GeologicalContext?.LatestAgeOrHighestStage, "LatestAgeOrHighestStage", errors);
+            Validate(dwcObservation.GeologicalContext?.LatestEonOrHighestEonothem, "LatestEonOrHighestEonothem", errors);
+            Validate(dwcObservation.GeologicalContext?.LatestEpochOrHighestSeries, "LatestEpochOrHighestSeries", errors);
+            Validate(dwcObservation.GeologicalContext?.LatestEraOrHighestErathem, "LatestEraOrHighestErathem", errors);
+            Validate(dwcObservation.GeologicalContext?.LatestPeriodOrHighestSystem, "LatestPeriodOrHighestSystem", errors);
+            Validate(dwcObservation.GeologicalContext?.LithostratigraphicTerms, "LithostratigraphicTerms", errors);
+            Validate(dwcObservation.GeologicalContext?.LowestBiostratigraphicZone, "LowestBiostratigraphicZone", errors);
+            Validate(dwcObservation.GeologicalContext?.Member, "Member", errors);
+            Validate(dwcObservation.MaterialSample?.MaterialSampleID, "MaterialSampleID", errors);
+
+            if (errors.Count > 0)
+            {
+                return $"DwC-A illegal characters in occurrence fields: {string.Join(", ", errors)} [DatasetName={dwcObservation.DatasetName}, OccurrenceID={dwcObservation.Occurrence.OccurrenceID}]";
+            }
+            return null;
+        }
+
+
+        public static string Validate(ExtendedMeasurementOrFactRow emofRow)
+        {
+            List<string> errors = new List<string>();
+            Validate(emofRow.EventId, "EventId", errors);
+            Validate(emofRow.OccurrenceID, "OccurrenceID", errors);
+            Validate(emofRow.MeasurementID, "MeasurementID", errors);
+            Validate(emofRow.MeasurementType, "MeasurementType", errors);
+            Validate(emofRow.MeasurementTypeID, "MeasurementTypeID", errors);
+            Validate(emofRow.MeasurementValue, "MeasurementValue", errors);
+            Validate(emofRow.MeasurementValueID, "MeasurementValueID", errors);
+            Validate(emofRow.MeasurementAccuracy, "MeasurementAccuracy", errors);
+            Validate(emofRow.MeasurementUnit, "MeasurementUnit", errors);
+            Validate(emofRow.MeasurementUnitID, "MeasurementUnitID", errors);
+            Validate(emofRow.MeasurementDeterminedDate, "MeasurementDeterminedDate", errors);
+            Validate(emofRow.MeasurementDeterminedBy, "MeasurementDeterminedBy", errors);
+            Validate(emofRow.MeasurementRemarks, "MeasurementRemarks", errors);
+            Validate(emofRow.MeasurementMethod, "MeasurementMethod", errors);
+
+            if (errors.Count > 0)
+            {
+                return $"DwC-A illegal characters in emof extension fields: {string.Join(", ", errors)} [OccurrenceID={emofRow.OccurrenceID}]";
+            }
+            return null;
+        }
+
+        public static string Validate(SimpleMultimediaRow multimediaRow)
+        {
+            List<string> errors = new List<string>();
+            Validate(multimediaRow.OccurrenceId, "OccurrenceId", errors);
+            Validate(multimediaRow.Type, "Type", errors);
+            Validate(multimediaRow.Format, "Format", errors);
+            Validate(multimediaRow.Identifier, "Identifier", errors);
+            Validate(multimediaRow.References, "References", errors);
+            Validate(multimediaRow.Title, "Title", errors);
+            Validate(multimediaRow.Description, "Description", errors);
+            Validate(multimediaRow.Source, "Source", errors);
+            Validate(multimediaRow.Audience, "Audience", errors);
+            Validate(multimediaRow.Created, "Created", errors);
+            Validate(multimediaRow.Creator, "Creator", errors);
+            Validate(multimediaRow.Contributor, "Contributor", errors);
+            Validate(multimediaRow.Publisher, "Publisher", errors);
+            Validate(multimediaRow.License, "License", errors);
+            Validate(multimediaRow.RightsHolder, "RightsHolder", errors);
+
+            if (errors.Count > 0)
+            {
+                return $"DwC-A illegal characters in multimedia extension fields: {string.Join(", ", errors)} [OccurrenceID={multimediaRow.OccurrenceId}]";
+            }
+            return null;
+        }
+
+        public static void Validate(string value, string field, List<string> errors)
+        {
+            if (value.ContainsIllegalCharacters())
+            {
+                errors.Add(field);
             }
         }
     }
