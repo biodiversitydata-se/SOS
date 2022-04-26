@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.5]
+
+**Prod**: 
+
+**Test**:
+
+### `Added`
+- Check lists
+- Added data validation reports for KUL, NORS and SERS
+- Taxon isRedlisted flag
+- Taxon attributes invasive information object
+- Application insights harvest health check
+
+
+### `Changed`
+
+
+### `Fixed`
+- DwC-A file text encoding label typo
+- Duplicates when observation has changed during harvest
+
+
+
 ## [1.4.1]
 
 **Prod**: 
