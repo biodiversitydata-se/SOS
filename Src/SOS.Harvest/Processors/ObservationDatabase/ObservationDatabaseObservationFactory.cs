@@ -87,7 +87,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                         VerbatimProvince = verbatim.Province
                     },
                     Locality = verbatim.Locality?.Clean(),
-                    VerbatimCoordinateSystem = "EPSG:3857"
+                    VerbatimCoordinateSystem = "EPSG:3857",
+                    VerbatimLocality = verbatim.Locality?.Clean()
                 },
                 Modified = verbatim.EditDate,
                 Occurrence = new Occurrence

@@ -178,7 +178,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    VerbatimLocality = verbatim.Locality
                 },
                 Occurrence = new Occurrence
                 {

@@ -69,7 +69,8 @@ namespace SOS.Harvest.Processors.Sers
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    VerbatimLocality = verbatim.Locality
                 },
                 Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?) null,
                 Occurrence = new Occurrence
