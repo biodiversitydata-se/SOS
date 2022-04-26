@@ -275,7 +275,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Description = entity.Description,
                 Name = entity.Name,
                 Unit = entity.Unit,
-                Value = entity.Value
+                Value = entity.Value.Clean()
             };
         }
 
