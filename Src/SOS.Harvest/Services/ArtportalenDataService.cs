@@ -52,7 +52,6 @@ namespace SOS.Harvest.Services
             conn.Open();
             var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
-           
             try
             {
                 var result = (await conn.QueryAsync<T>(

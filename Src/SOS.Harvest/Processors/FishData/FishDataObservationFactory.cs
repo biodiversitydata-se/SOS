@@ -68,7 +68,8 @@ namespace SOS.Harvest.Processors.FishData
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    VerbatimLocality = verbatim.Locality
                 },
                 Modified = verbatim.Start,
                 Occurrence = new Occurrence

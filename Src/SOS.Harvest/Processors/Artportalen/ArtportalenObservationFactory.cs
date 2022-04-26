@@ -221,6 +221,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Location.Municipality = CastToArea(verbatimObservation.Site?.Municipality);
                 obs.Location.Parish = CastToArea(verbatimObservation.Site?.Parish);
                 obs.Location.Province = CastToArea(verbatimObservation.Site?.Province);
+                obs.Location.VerbatimLocality = obs.Location.Locality;
                 if (diffuse)
                 {
                     AddPositionData(obs.Location, 

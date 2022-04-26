@@ -73,7 +73,8 @@ namespace SOS.Harvest.Processors.Mvm
                 Location = new Location
                 {
                     Locality = verbatim.Locality,
-                    LocationRemarks = verbatim.LocationRemarks
+                    LocationRemarks = verbatim.LocationRemarks,
+                    VerbatimLocality = verbatim.Locality
                 },
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence

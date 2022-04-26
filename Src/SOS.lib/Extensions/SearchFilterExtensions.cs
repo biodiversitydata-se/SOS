@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -49,7 +48,9 @@ namespace SOS.Lib.Extensions
                 "Taxon.Id",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName",
+                "Taxon.Attributes.IsRedlisted",
                 "Taxon.Attributes.OrganismGroup",
+                "Taxon.Attributes.TaxonCategory"
             };
 
             if (fieldSet == OutputFieldSet.Extended)
@@ -125,7 +126,8 @@ namespace SOS.Lib.Extensions
                     "Taxon.Attributes.ProtectionLevel",
                     "Taxon.Attributes.SensitivityCategory",
                     "Taxon.Attributes.RedlistCategory",
-                    "Taxon.Attributes.ProtectedByLaw"
+                    "Taxon.Attributes.ProtectedByLaw",
+                    "Taxon.Attributes.InvasiveInfo"
                 });
             }
 

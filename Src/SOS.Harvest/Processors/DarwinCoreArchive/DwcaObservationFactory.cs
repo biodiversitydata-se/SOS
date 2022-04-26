@@ -393,6 +393,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedLocation.VerbatimCoordinateSystem = verbatim.VerbatimCoordinateSystem;
             processedLocation.VerbatimDepth = verbatim.VerbatimDepth;
             processedLocation.VerbatimElevation = verbatim.VerbatimElevation;
+            processedLocation.VerbatimLocality = processedLocation.Locality;
             processedLocation.WaterBody = verbatim.WaterBody;
             
             return processedLocation;

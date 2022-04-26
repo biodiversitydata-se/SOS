@@ -69,7 +69,8 @@ namespace SOS.Harvest.Processors.Nors
                 },
                 Location = new Location
                 {
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    VerbatimLocality = verbatim.Locality
                 },
                 Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new Occurrence
