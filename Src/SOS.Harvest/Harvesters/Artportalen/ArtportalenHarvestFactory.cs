@@ -273,7 +273,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Id = entity.ProjectParameterId,
                 DataType = entity.DataType,
                 Description = entity.Description,
-                Name = entity.Name,
+                Name = entity.Name.Clean(),
                 Unit = entity.Unit,
                 Value = entity.Value.Clean()
             };
