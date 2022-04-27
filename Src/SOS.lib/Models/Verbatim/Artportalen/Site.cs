@@ -104,21 +104,16 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// 
         /// </summary>
         public string ProvincePartIdByCoordinate { get; set; }
+        
+        /// <summary>
+        /// Id of project
+        /// </summary>
+        public int? ProjectId { get; set; }
 
         /// <summary>
         ///     Special Protection Area, Natura 2000, Birds Directive
         /// </summary>
         public GeographicalArea SpecialProtectionArea { get; set; }
-
-        /// <summary>
-        ///     Ensured not diffused X coordinate of site
-        /// </summary>
-        public int TrueXCoord { get; set; }
-
-        /// <summary>
-        ///     Ensured not diffused Y coordinate of site
-        /// </summary>
-        public int TrueYCoord { get; set; }
 
         /// <summary>
         ///     X coordinate of site

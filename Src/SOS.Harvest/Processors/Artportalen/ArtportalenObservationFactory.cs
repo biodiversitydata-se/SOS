@@ -209,6 +209,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 // Location
                 obs.Location = new Location();
                 obs.Location.Attributes.CountyPartIdByCoordinate = verbatimObservation.Site?.CountyPartIdByCoordinate;
+                obs.Location.Attributes.ExternalId = verbatimObservation.Site?.ExternalId;
+                obs.Location.Attributes.ProjectId = verbatimObservation.Site?.ProjectId;
                 obs.Location.Attributes.ProvincePartIdByCoordinate = verbatimObservation.Site?.ProvincePartIdByCoordinate;
                 obs.Location.County = CastToArea(verbatimObservation.Site?.County);
                 obs.Location.IsInEconomicZoneOfSweden = hasPosition;

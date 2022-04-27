@@ -11,6 +11,16 @@
         public string CountyPartIdByCoordinate { get; set; }
 
         /// <summary>
+        ///     External Id of site
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
+        /// Id of project
+        /// </summary>
+        public int? ProjectId { get; set; }
+
+        /// <summary>
         ///     Spacial handling of Lappland.
         /// </summary>
         public string ProvincePartIdByCoordinate { get; set; }

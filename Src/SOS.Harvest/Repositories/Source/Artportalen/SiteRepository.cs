@@ -26,6 +26,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 				    s.ParentId AS ParentSiteId,
 				    s.PresentationNameParishRegion,
                     ISNULL(ps.PresentationName, ps.Name) AS ParentSiteName,
+                    s.ProjectId,
                     d.Factor AS DiffusionFactor
                 FROM 
 	                Site s 

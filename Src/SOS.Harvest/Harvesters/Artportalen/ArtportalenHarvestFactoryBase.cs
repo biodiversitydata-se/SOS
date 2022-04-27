@@ -159,6 +159,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Name = entity.Name,
                 ParentSiteId = entity.ParentSiteId,
                 ParentSiteName = entity.ParentSiteName,
+                ProjectId = entity.ProjectId,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
                 VerbatimCoordinateSystem = CoordinateSys.WebMercator,
