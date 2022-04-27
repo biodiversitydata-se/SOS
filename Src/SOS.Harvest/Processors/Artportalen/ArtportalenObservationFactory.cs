@@ -150,7 +150,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     : new VocabularyValue {Id = (int) BasisOfRecordId.PreservedSpecimen};
                 obs.CollectionCode = "Artportalen";
                 obs.CollectionId = null;
-                obs.SpeciesCollectionLabel = verbatimObservation.CollectionID; // todo - is verbatimObservation.CollectionID always the same as verbatimObservation.SpeciesCollection?;
+                obs.SpeciesCollectionLabel = verbatimObservation.CollectionID.Clean(); // todo - is verbatimObservation.CollectionID always the same as verbatimObservation.SpeciesCollection?;
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
                 obs.InformationWithheld = null;
@@ -269,7 +269,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy;
                 obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
-                obs.Occurrence.RecordNumber = verbatimObservation.Label;
+                obs.Occurrence.RecordNumber = verbatimObservation.Label.Clean();
                 obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment?.Clean();
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new VocabularyValue {Id = (int) OccurrenceStatusId.Absent}
@@ -287,7 +287,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     Id = verbatimObservation?.Substrate?.Id,
                     Name = GetSosIdFromMetadata(verbatimObservation?.Substrate, VocabularyId.Substrate),
                     Quantity = verbatimObservation.QuantityOfSubstrate,
-                    SpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
+                    SpeciesDescription = verbatimObservation.SubstrateSpeciesDescription.Clean(),
                     SpeciesId = verbatimObservation.SubstrateSpeciesId,
                     SpeciesScientificName = substrateTaxon?.ScientificName,
                     SpeciesVernacularName = substrateTaxon?.VernacularName,
