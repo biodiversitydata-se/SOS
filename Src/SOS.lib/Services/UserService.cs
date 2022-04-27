@@ -60,7 +60,7 @@ namespace SOS.Lib.Services
 
                 return response?.Success ?? false
                     ? response.Result
-                    : throw new Exception(string.Concat(response.Messages?.Select(m => m.Text)));
+                    : throw new Exception(string.Concat(response?.Messages?.Select(m => m.Text)));
             }
             catch (Exception e)
             {

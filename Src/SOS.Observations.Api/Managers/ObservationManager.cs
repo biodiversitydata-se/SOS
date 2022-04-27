@@ -672,7 +672,7 @@ namespace SOS.Observations.Api.Managers
             filter.PopulateOutputFields(outputFieldSet);
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
 
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, null, null, null, null, false);
+            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
