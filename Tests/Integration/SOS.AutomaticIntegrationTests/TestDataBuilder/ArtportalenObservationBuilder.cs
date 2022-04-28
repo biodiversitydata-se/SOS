@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 {
@@ -362,6 +363,17 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.Weight = sourceObservation.Weight;
                 obs.SightingBarcodeURL = sourceObservation.SightingBarcodeURL;
                 obs.SubstrateSpeciesDescription = sourceObservation.SubstrateSpeciesDescription;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveRedlistedTaxonId(this IOperable<ArtportalenObservationVerbatim> operable, string? category)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.TaxonId = Pick<int>.RandomItemFrom(ProtectedSpeciesHelper.RedlistedTaxonIdsByCategory[category ?? ""]);
             });
 
             return operable;
