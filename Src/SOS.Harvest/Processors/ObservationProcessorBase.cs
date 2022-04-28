@@ -431,6 +431,10 @@ namespace SOS.Harvest.Processors
             {
                 return (0, 0);
             }
+
+            // Translate vocabularies to swedish, default values in db
+            vocabularyValueResolver.ResolveVocabularyMappedValues(observations, Cultures.sv_SE, true);
+
             var preValidationCount = observations.Count;
             observations =
                 await ValidateAndRemoveInvalidObservations(dataProvider, observations, batchId);

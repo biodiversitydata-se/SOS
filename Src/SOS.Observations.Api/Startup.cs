@@ -403,6 +403,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
+            services.AddScoped<IProjectManager, ProjectManager>();
             services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddScoped<ITaxonManager, TaxonManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();

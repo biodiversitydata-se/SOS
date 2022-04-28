@@ -4,15 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -59,7 +57,10 @@ namespace SOS.Observations.Api.Managers
                 var occurenceIds = new HashSet<string>();
                 var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
                 LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
-                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode, true);
+                
+                // Resolve vocabulary values.
+                _vocabularyValueResolver.ResolveVocabularyMappedValues(observations, cultureCode);
+               
                 foreach (var obs in observations)
                 {
                     if (protectedObservations && obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),

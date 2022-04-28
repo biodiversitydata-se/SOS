@@ -94,7 +94,9 @@ namespace SOS.Lib.IO.GeoJson
                     if (flatOut)
                     {
                         var processedObservations = CastDynamicsToObservations(scrollResult.Records);
+                        
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
+                        
                         foreach (var observation in processedObservations)
                         {
                             var flatObservation = new FlatObservation(observation);
@@ -104,7 +106,9 @@ namespace SOS.Lib.IO.GeoJson
                     else
                     {
                         var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
+                        
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+                       
                         LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                         foreach (var record in processedRecords)
                         {

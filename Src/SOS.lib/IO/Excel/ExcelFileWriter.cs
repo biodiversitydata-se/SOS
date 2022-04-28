@@ -91,10 +91,10 @@ namespace SOS.Lib.IO.Excel
 
                     // Fetch observations from ElasticSearch.
                     var processedObservations = scrollResult.Records.ToArray();
-
+                    
                     // Resolve vocabulary values.
-                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
-
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
+                    
                     // Write occurrence rows to CSV file.
                     foreach (var observation in processedObservations)
                     {

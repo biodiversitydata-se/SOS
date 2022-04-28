@@ -41,6 +41,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
@@ -242,7 +243,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
             _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(_processClient, _vocabularyRepository);
-
+            var projectManger = CreateProjectManager(_processClient);
             var processInfoRepository = new ProcessInfoRepository(_processClient, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(_processClient, new NullLogger<DataProviderRepository>()));
@@ -267,7 +268,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
-            VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
+            VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
@@ -396,9 +397,18 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var vocabularyCache = new VocabularyCache(vocabularyRepository);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
             var projectInfoCache = new ProjectCache(projectInfoRepository);
-            var vocabularyManager = new VocabularyManager(vocabularyCache, projectInfoCache, new NullLogger<VocabularyManager>());
+            var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
             return vocabularyManager;
         }
+
+        private ProjectManager CreateProjectManager(ProcessClient processClient)
+        {
+            var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
+            var projectInfoCache = new ProjectCache(projectInfoRepository);
+            var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
+            return projectManager;
+        }
+        
 
         private ProcessedObservationRepository CreateProcessedObservationRepository(
             ElasticSearchConfiguration elasticConfiguration,

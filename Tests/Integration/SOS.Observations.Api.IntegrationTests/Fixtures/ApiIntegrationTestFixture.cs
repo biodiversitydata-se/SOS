@@ -175,7 +175,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
-
+            var projectManger = CreateProjectManager(processClient);
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var processInfoManager = new ProcessInfoManager(processInfoRepository, new NullLogger<ProcessInfoManager>());
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
@@ -200,7 +200,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
-            VocabulariesController = new VocabulariesController(vocabularyManger, new NullLogger<VocabulariesController>());
+            VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
@@ -312,10 +312,16 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         private VocabularyManager CreateVocabularyManager(ProcessClient processClient, VocabularyRepository vocabularyRepository)
         {
             var vocabularyCache = new VocabularyCache(vocabularyRepository);
+            var vocabularyManager = new VocabularyManager(vocabularyCache, new NullLogger<VocabularyManager>());
+            return vocabularyManager;
+        }
+
+        private ProjectManager CreateProjectManager(ProcessClient processClient)
+        {
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
             var projectInfoCache = new ProjectCache(projectInfoRepository);
-            var vocabularyManager = new VocabularyManager(vocabularyCache, projectInfoCache, new NullLogger<VocabularyManager>());
-            return vocabularyManager;
+            var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
+            return projectManager;
         }
 
         private ProcessedObservationRepository CreateProcessedObservationRepository(

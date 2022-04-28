@@ -60,6 +60,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     ExternalId of Site in Artportalen.
         /// </summary>
+        [Obsolete("Use Location.Attributes.ExternalId")]
         public string LocationExternalId { get; set; }
 
         /// <summary>

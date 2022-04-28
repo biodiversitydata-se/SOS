@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -22,7 +21,6 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly ILogger<VocabularyManager> _logger;
         private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
-        private readonly ICache<int, ProjectInfo> _projectCache;
         private Dictionary<VocabularyId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         
         /// <summary>
@@ -35,16 +33,13 @@ namespace SOS.Observations.Api.Managers
         ///     Constructor
         /// </summary>
         /// <param name="vocabularyCache"></param>
-        /// <param name="projectCache"></param>
         /// <param name="logger"></param>
         public VocabularyManager(
             ICache<VocabularyId, Vocabulary> vocabularyCache,
-            ICache<int, ProjectInfo> projectCache,
             ILogger<VocabularyManager> logger)
         {
             _vocabularyCache = vocabularyCache ??
                                throw new ArgumentNullException(nameof(vocabularyCache));
-            _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Task.Run(InitializeAsync).Wait();
@@ -54,11 +49,6 @@ namespace SOS.Observations.Api.Managers
         {
             _translationDictionary = await CreateLocalizedTranslationDictionaryAsync();
             _nonLocalizedTranslationDictionary = await CreateNonLocalizedTranslationDictionaryAsync();
-        }
-
-        public async Task<IEnumerable<ProjectInfo>> GetProjectsAsync()
-        {
-            return await _projectCache.GetAllAsync();
         }
 
         /// <inheritdoc />
