@@ -21,7 +21,6 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
@@ -41,7 +40,6 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
@@ -113,7 +111,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         private IFilterManager _filterManager;
         private IUserManager _userManager;
         private VerbatimClient _importClient;
-        private List<Taxon> _taxa;
+        public List<Taxon> Taxa;
         private Dictionary<int, Taxon> _taxaById;
         private VocabularyRepository _vocabularyRepository;
         private ProcessClient _processClient;
@@ -293,8 +291,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager = new UserManager(userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-            _taxa = await taxonRepository.GetAllAsync();
-            _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
+            Taxa = await taxonRepository.GetAllAsync();
+            _taxaById = Taxa.ToDictionary(m => m.Id, m => m);
             _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());            
             ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
                 artportalenDataProvider,

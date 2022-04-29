@@ -21,8 +21,7 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
             _fixture = fixture;
         }
 
-        //[Fact(Skip = "Intended to run on demand when needed")]
-        [Fact]
+        [Fact(Skip = "Intended to run on demand when needed")]
         [Trait("Category", "DataUtil")]
         public async Task CreateDarwinCoreVerbatimObservationTestData()
         {
