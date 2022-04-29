@@ -1,7 +1,17 @@
 ﻿[
     {
-        "Type": "ArtportalenObservations",
+        "Id": 1,
+        "Identifier": "Artportalen",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": true,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": true,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "ArtportalenObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -48,21 +58,21 @@
             "LastName": "Liljeblad",
             "Email": "Johan.Liljeblad@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": true,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 1,
-        "Identifier": "Artportalen",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": true,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters":  5000 
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "KULObservations",
+        "Id": 3,
+        "Identifier": "KUL",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "KULObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -109,21 +119,21 @@
             "LastName": "Ljungberg",
             "Email": "peter.ljungberg@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 3,
-        "Identifier": "KUL",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "MvmObservations",
+        "Id": 4,
+        "Identifier": "MVM",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "MvmObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -170,21 +180,21 @@
             "LastName": "Sonesten",
             "Email": "Lars.Sonesten@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 4,
-        "Identifier": "MVM",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "NorsObservations",
+        "Id": 5,
+        "Identifier": "NORS",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "NorsObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -231,21 +241,21 @@
             "LastName": "Kinnerbäck",
             "Email": "anders.kinnerback@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 5,
-        "Identifier": "NORS",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "SersObservations",
+        "Id": 6,
+        "Identifier": "SERS",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "SersObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -292,21 +302,21 @@
             "LastName": "Sers",
             "Email": "berit.sers@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 6,
-        "Identifier": "SERS",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "VirtualHerbariumObservations",
+        "Id": 7,
+        "Identifier": "VirtualHerbarium",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "VirtualHerbariumObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -353,21 +363,21 @@
             "LastName": "Ericson",
             "Email": "mossnisse@hotmail.com"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 7,
-        "Identifier": "VirtualHerbarium",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "SharkObservations",
+        "Id": 8,
+        "Identifier": "SHARK",
         "IsActive": true,
+        "IncludeInScheduledHarvest": false,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "SharkObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -414,21 +424,21 @@
             "LastName": "Strömberg",
             "Email": "patrik.stromberg@smhi.se"
         },
-        "IncludeInScheduledHarvest": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 8,
-        "Identifier": "SHARK",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "DwcA",
+        "Id": 9,
+        "Identifier": "BirdRingingCentre",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -485,21 +495,21 @@
                 "url": "http://www.gbif.se/ipt/eml.do?r=nrm-ringedbirds"
             }
         ],
+        "HarvestSchedule": "* * * * *"
+    },
+    {
+        "Id": 10,
+        "Identifier": "EntomologicalCollection",
+        "IsActive": true,
         "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 9,
-        "Identifier": "BirdRingingCentre",
-        "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
         "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
-    {
+        "CoordinateUncertaintyInMeters": 5000,
         "Type": "DwcA",
-        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -556,21 +566,21 @@
                 "url": "http://www.gbif.se/ipt/eml.do?r=nhrs-nrm"
             }
         ],
+        "HarvestSchedule": "* * * * *"
+    },
+    {
+        "Id": 11,
+        "Identifier": "MalaiseTrap",
+        "IsActive": true,
         "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 10,
-        "Identifier": "EntomologicalCollection",
-        "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
         "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
-    {
+        "CoordinateUncertaintyInMeters": 5000,
         "Type": "DwcA",
-        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -627,21 +637,21 @@
                 "url": "http://www.gbif.se/ipt/eml.do?r=smtp-nrm"
             }
         ],
+        "HarvestSchedule": "* * * * *"
+    },
+    {
+        "Id": 12,
+        "Identifier": "Porpoises",
+        "IsActive": true,
         "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 11,
-        "Identifier": "MalaiseTrap",
-        "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
         "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
-    {
+        "CoordinateUncertaintyInMeters": 5000,
         "Type": "DwcA",
-        "IsActive": true,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -698,21 +708,21 @@
                 "url": "http://www.gbif.se/ipt/eml.do?r=nrm-porpoises"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 12,
-        "Identifier": "Porpoises",
         "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
+    },
     {
-        "Type": "DwcA",
+        "Id": 13,
+        "Identifier": "ButterflyMonitoring",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -765,21 +775,21 @@
                 "url": "http://www.gbif.se/ipt/eml.do?r=lu_sebms"
             }
         ],
-        "IncludeInScheduledHarvest": true,
+        "HarvestSchedule": "* * * * *"
+    },
+    {
+        "Id": 14,
+        "Identifier": "SharkZooplankton",
+        "IsActive": false,
+        "IncludeInScheduledHarvest": false,
+        "IncludeInHealthCheck": false,
+        "IncludeInSearchByDefault": false,
         "SupportIncrementalHarvest": false,
         "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 13,
-        "Identifier": "ButterflyMonitoring",
-        "HarvestSchedule": "* * * * *",
         "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
         "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
-    {
+        "CoordinateUncertaintyInMeters": 5000,
         "Type": "DwcA",
-        "IsActive": false,
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -826,21 +836,21 @@
             "LastName": "Sundqvist",
             "Email": "shark@smhi.se"
         },
-        "IncludeInScheduledHarvest": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 14,
-        "Identifier": "SharkZooplankton",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "FishDataObservations",
+        "Id": 15,
+        "Identifier": "Fishdata2",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "FishDataObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -887,21 +897,21 @@
             "LastName": "Werner",
             "Email": "Malin.Werner@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 15,
-        "Identifier": "Fishdata2",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "DwcA",
+        "Id": 16,
+        "Identifier": "ForestInventory",
         "IsActive": true,
+        "IncludeInScheduledHarvest": false,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": true,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -948,21 +958,21 @@
             "LastName": "Dahlgren",
             "Email": "riksskogstaxeringen@slu.se"
         },
-        "IncludeInScheduledHarvest": false,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 16,
-        "Identifier": "ForestInventory",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": true,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "ObservationDatabase",
+        "Id": 17,
+        "Identifier": "ObservationDatabase",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": false,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "ObservationDatabase",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1009,21 +1019,21 @@
             "LastName": "Edelsjö",
             "Email": "Jan.Edelsjo@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 17,
-        "Identifier": "ObservationDatabase",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": false,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "BiologgObservations",
+        "Id": 18,
+        "Identifier": "Biologg",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": false,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": false,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "BiologgObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1070,22 +1080,21 @@
             "LastName": "Eriksson",
             "Email": "info@biologg.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": false,
-        "Id": 18,
-        "Identifier": "Biologg",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "LatestUploadedFileHash": null,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "iNaturalistObservations",
+        "Id": 19,
+        "Identifier": "iNaturalist",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "iNaturalistObservations",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1132,22 +1141,21 @@
             "LastName": "Placeholder",
             "Email": "Placeholder@slu.se"
         },
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 19,
-        "Identifier": "iNaturalist",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "LatestUploadedFileHash": null,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
+        "HarvestSchedule": "* * * * *"
     },
     {
-        "Type": "DwcA",
+        "Id": 20,
+        "Identifier": "SBS-BirdMonitoringProgramme",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1200,21 +1208,21 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_kfr&v=1.2"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 20,
-        "Identifier": "SBS-BirdMonitoringProgramme",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
+        "HarvestSchedule": "* * * * *"
+    },
     {
-        "Type": "DwcA",
+        "Id": 21,
+        "Identifier": "SBS-SummerPointCountRoutes",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1267,21 +1275,21 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_spkt&v=1.2"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 21,
-        "Identifier": "SBS-SummerPointCountRoutes",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
+        "HarvestSchedule": "* * * * *"
+    },
     {
-        "Type": "DwcA",
+        "Id": 22,
+        "Identifier": "SBS-FixedRoutes",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1334,21 +1342,21 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_sft_std&v=1.8"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 22,
-        "Identifier": "SBS-FixedRoutes",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
+        "HarvestSchedule": "* * * * *"
+    },
     {
-        "Type": "DwcA",
+        "Id": 23,
+        "Identifier": "BirdsInTheGulf",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 5000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1401,21 +1409,21 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=lu_kbv&v=1.3"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 23,
-        "Identifier": "BirdsInTheGulf",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 5000
-},
+        "HarvestSchedule": "* * * * *"
+    },
     {
-        "Type": "DwcA",
+        "Id": 24,
+        "Identifier": "TUVA",
         "IsActive": true,
+        "IncludeInScheduledHarvest": true,
+        "IncludeInHealthCheck": true,
+        "IncludeInSearchByDefault": true,
+        "SupportIncrementalHarvest": false,
+        "SupportDynamicEml": true,
+        "HarvestFailPreventProcessing": false,
+        "UseVerbatimFileInExport": false,
+        "CoordinateUncertaintyInMeters": 1000,
+        "Type": "DwcA",
         "Names": [
             {
                 "CultureCode": "en-GB",
@@ -1472,16 +1480,6 @@
                 "url": "https://www.gbif.se/ipt/eml.do?r=sjv-tuva&v=2.3"
             }
         ],
-        "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
-        "SupportDynamicEml": false,
-        "IncludeInSearchByDefault": true,
-        "Id": 24,
-        "Identifier": "TUVA",
-        "HarvestSchedule": "* * * * *",
-        "HarvestFailPreventProcessing": false,
-        "IncludeInHealthCheck": true,
-        "UseVerbatimFileInExport": false,
-        "CoordinateUncertaintyInMeters": 1000
+        "HarvestSchedule": "* * * * *"
     }
 ]
