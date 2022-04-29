@@ -26,6 +26,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string BiotopeDescription { get; set; }
 
         /// <summary>
+        /// Id of checklist
+        /// </summary>
+        public int? ChecklistId { get; set; }
+
+        /// <summary>
         ///     Id of collection
         /// </summary>
         public string CollectionID { get; set; }

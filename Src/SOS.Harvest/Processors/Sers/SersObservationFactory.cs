@@ -13,7 +13,6 @@ namespace SOS.Harvest.Processors.Sers
 {
     public class SersObservationFactory : ObservationFactoryBase, IObservationFactory<SersObservationVerbatim>
     {
-        private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -27,10 +26,9 @@ namespace SOS.Harvest.Processors.Sers
         public SersObservationFactory(DataProvider dataProvider, 
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
+            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace SOS.Harvest.Processors.Sers
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var obs = new Observation
             {                
-                DataProviderId = _dataProvider.Id,
+                DataProviderId = DataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SERS}",
                 DatasetName = "SERS",

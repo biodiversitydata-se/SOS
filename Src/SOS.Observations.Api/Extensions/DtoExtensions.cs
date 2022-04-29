@@ -106,6 +106,7 @@ namespace SOS.Observations.Api.Extensions
         {
             if (searchFilterInternalDto.ExtendedFilter != null)
             {
+                internalFilter.CheckListId = searchFilterInternalDto.ExtendedFilter.CheckListId;
                 internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
                 internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
                 internalFilter.ReportedByUserServiceUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserServiceUserId;

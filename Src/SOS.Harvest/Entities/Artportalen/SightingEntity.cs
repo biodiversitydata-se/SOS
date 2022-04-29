@@ -21,6 +21,11 @@
         public string BiotopeDescription { get; set; }
 
         /// <summary>
+        /// Id of checklist
+        /// </summary>
+        public int? ChecklistId { get; set; }
+
+        /// <summary>
         ///     SightingCommentPublic comment
         /// </summary>
         public string Comment { get; set; }

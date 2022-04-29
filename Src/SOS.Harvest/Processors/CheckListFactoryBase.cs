@@ -15,6 +15,8 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class CheckListFactoryBase
     {
+        protected DataProvider DataProvider;
+
         /// <summary>
         /// Init location class
         /// </summary>
@@ -64,12 +66,22 @@ namespace SOS.Harvest.Processors
         /// <returns></returns>
         private Geometry GetPointWithDisturbanceBuffer(Point point, int? taxonDisturbanceRadius)
         {
-            if (!(taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0))
+            if ((taxonDisturbanceRadius ?? 0) <= 0)
             {
-                return null;
+                return null!;
             }
 
-            return point.ToCircle(taxonDisturbanceRadius);
+            return point.ToCircle(taxonDisturbanceRadius!.Value);
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        protected CheckListFactoryBase(DataProvider dataProvider)
+        {
+            DataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
         }
 
         /// <summary>
@@ -94,7 +106,12 @@ namespace SOS.Harvest.Processors
                 }
             }
 
-            var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters);
+            if ((coordinateUncertaintyInMeters ?? 0) == 0)
+            {
+                coordinateUncertaintyInMeters = DataProvider.CoordinateUncertaintyInMeters;
+            }
+
+            var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters!.Value);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);

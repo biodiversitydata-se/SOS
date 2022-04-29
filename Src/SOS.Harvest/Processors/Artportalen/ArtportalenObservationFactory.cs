@@ -23,8 +23,7 @@ using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
 namespace SOS.Harvest.Processors.Artportalen
 {
     public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
-    {
-        private readonly DataProvider _dataProvider;
+    { 
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
@@ -85,9 +84,8 @@ namespace SOS.Harvest.Processors.Artportalen
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             bool incrementalMode,
             string artPortalenUrl, 
-            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager) 
+            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager) 
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
@@ -119,8 +117,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 var diffuse = diffuseIfSupported && diffuseFactor > 0;
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
-                var point = (Point)verbatimObservation.Site?.Point?.ToGeometry();
-
+                
                 // Add time to start date if it exists
                 var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue
                     ? verbatimObservation.StartDate.Value.ToLocalTime() + verbatimObservation.StartTime
@@ -141,7 +138,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 // Record level
 
-                obs.DataProviderId = _dataProvider.Id;
+                obs.DataProviderId = DataProvider.Id;
                 obs.AccessRights = verbatimObservation.ProtectedBySystem || verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now
                     ? new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage } 
                     : new VocabularyValue {Id = (int) AccessRightsId.FreeUsage};
@@ -320,6 +317,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 // ArtportalenInternal
                 obs.ArtportalenInternal = new ArtportalenInternal();
                 obs.ArtportalenInternal.BirdValidationAreaIds = verbatimObservation.Site?.BirdValidationAreaIds;
+                obs.ArtportalenInternal.ChecklistId = verbatimObservation.ChecklistId;
                 obs.ArtportalenInternal.ConfirmationYear = verbatimObservation.ConfirmationYear;
                 obs.ArtportalenInternal.DatasourceId = verbatimObservation.DatasourceId;
                 obs.ArtportalenInternal.DeterminationYear = verbatimObservation.DeterminationYear;

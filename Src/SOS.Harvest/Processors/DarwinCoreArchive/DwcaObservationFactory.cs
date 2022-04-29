@@ -24,7 +24,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
         private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor;
@@ -45,9 +44,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
+            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
@@ -101,7 +99,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var obs = new Observation
             {
                 AccessRights = accessRights,
-                DataProviderId = _dataProvider.Id,
+                DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
             };
                         
@@ -458,7 +456,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 var parsedTaxonId = -1;
 
                 // Biologg fix. They should use urn:lsid:dyntaxa prefix.
-                if (_dataProvider.Identifier == "Biologg")
+                if (DataProvider.Identifier == "Biologg")
                 {
                     if (!int.TryParse(verbatim.TaxonID, out parsedTaxonId))
                     {

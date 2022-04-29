@@ -21,7 +21,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private readonly DataProvider _dataProvider;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
 
         private enum MappingNotFoundLogic
@@ -230,9 +229,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public DwcaCheckListFactory(
             DataProvider dataProvider,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper) : base(dataProvider)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
@@ -265,19 +263,19 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                     return null;
                 }
 
-                var id = $"urn:lsid:{_dataProvider.CheckListIdentifier}:Checklist:{verbatimCheckList.Id}";
+                var id = $"urn:lsid:{DataProvider.CheckListIdentifier}:Checklist:{verbatimCheckList.Id}";
 
                 DateTime.TryParse(verbatimCheckList.EventDate, out var eventDate);
                 DateTime.TryParse(verbatimCheckList.Modified, out var modified);
 
                 var checkList = new CheckList
                 {
-                    DataProviderId = _dataProvider.Id,
+                    DataProviderId = DataProvider.Id,
                     Id = id,
                     Event = CreateEvent(verbatimCheckList),
                     Location = CreateLocation(verbatimCheckList),
                     Modified = modified,
-                    Name = $"{_dataProvider.CheckListIdentifier}-{verbatimCheckList.EventID}",
+                    Name = $"{DataProvider.CheckListIdentifier}-{verbatimCheckList.EventID}",
                     OccurrenceIds =
                         verbatimCheckList.Observations?.Select(o => o.OccurrenceID),
                     RecordedBy = verbatimCheckList.RecordedBy,

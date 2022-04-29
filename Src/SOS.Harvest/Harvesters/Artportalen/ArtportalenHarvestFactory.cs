@@ -59,6 +59,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     ? _artportalenMetadataContainer.Biotopes[entity.BiotopeId.Value]
                     : null;
                 observation.BiotopeDescription = entity.BiotopeDescription;
+                observation.ChecklistId = entity.ChecklistId;
                 observation.Comment = entity.Comment;
                 observation.DatasourceId = entity.DatasourceId;
                 observation.DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _artportalenMetadataContainer.DiscoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)

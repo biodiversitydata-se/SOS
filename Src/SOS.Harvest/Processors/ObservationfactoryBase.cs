@@ -17,17 +17,20 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class ObservationFactoryBase
     {
+        protected readonly DataProvider DataProvider;
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
         protected readonly IProcessTimeManager TimeManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected ObservationFactoryBase(IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IProcessTimeManager processTimeManager)
+        protected ObservationFactoryBase(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IProcessTimeManager processTimeManager)
         {
+            DataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
             TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
         }
@@ -100,12 +103,12 @@ namespace SOS.Harvest.Processors
         /// <returns></returns>
         private Geometry GetPointWithDisturbanceBuffer(Point point, int? taxonDisturbanceRadius)
         {
-            if (!(taxonDisturbanceRadius.HasValue && taxonDisturbanceRadius.Value > 0))
+            if ((taxonDisturbanceRadius ?? 0) <= 0)
             {
-                return null;
+                return null!;
             }
 
-            return point.ToCircle(taxonDisturbanceRadius);
+            return point.ToCircle(taxonDisturbanceRadius!.Value);
         }
 
         /// <summary>
@@ -129,8 +132,13 @@ namespace SOS.Harvest.Processors
                     point = point.Transform(verbatimCoordinateSystem, CoordinateSys.WGS84) as Point;
                 }
             }
-            
-            var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters);
+
+            if ((coordinateUncertaintyInMeters ?? 0) == 0)
+            {
+                coordinateUncertaintyInMeters = DataProvider.CoordinateUncertaintyInMeters;
+            }
+
+            var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters!.Value);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
             
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
@@ -151,6 +159,11 @@ namespace SOS.Harvest.Processors
             double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point,
             GeoJsonGeometry pointWithBuffer, int? coordinateUncertaintyInMeters, int? taxonDisturbanceRadius)
         {
+            if ((coordinateUncertaintyInMeters ?? 0) == 0)
+            {
+                coordinateUncertaintyInMeters = DataProvider.CoordinateUncertaintyInMeters;
+            }
+
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
             InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);

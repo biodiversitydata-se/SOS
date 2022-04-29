@@ -309,6 +309,8 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
 
             query.TryAddWildcardCriteria("location.locality", internalFilter?.Location?.NameFilter);
+
+            query.TryAddTermCriteria("artportalenInternal.checkListId", internalFilter.CheckListId);
         }
 
         /// <summary>
@@ -561,7 +563,7 @@ namespace SOS.Lib
                 return;
             }
 
-            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToLower()));
+            query.TryAddTermsCriteria("taxon.attributes.redlistCategory", filter.RedListCategories?.Select(m => m.ToUpper()));
             query.TryAddTermsCriteria("taxon.id", filter.Ids);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
         }

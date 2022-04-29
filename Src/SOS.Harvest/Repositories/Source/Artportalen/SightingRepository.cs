@@ -45,6 +45,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 SELECT {topCount} 
                     si.Id, 
                     s.ActivityId,
+                    s.ChecklistId,
                     s.DiscoveryMethodId,
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,

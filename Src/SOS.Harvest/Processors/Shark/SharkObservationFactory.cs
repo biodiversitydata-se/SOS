@@ -15,7 +15,6 @@ namespace SOS.Harvest.Processors.Shark
 {
     public class SharkObservationFactory : ObservationFactoryBase, IObservationFactory<SharkObservationVerbatim>
     {
-        private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -29,9 +28,8 @@ namespace SOS.Harvest.Processors.Shark
         public SharkObservationFactory(DataProvider dataProvider, 
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, 
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
+            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
@@ -48,7 +46,7 @@ namespace SOS.Harvest.Processors.Shark
             
             var obs = new Observation
             {                
-                DataProviderId = _dataProvider.Id,
+                DataProviderId = DataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,

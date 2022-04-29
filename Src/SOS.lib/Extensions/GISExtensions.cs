@@ -345,22 +345,12 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="point"></param>
         /// <param name="accuracy"></param>
-        /// <param name="defaultWhenAccuracyIsUnknown"></param>
         /// <returns></returns>
-        public static Geometry ToCircle(this Point point, int? accuracy, int defaultWhenAccuracyIsUnknown = 5000)
+        public static Geometry ToCircle(this Point point, int accuracy)
         {
             if (point?.Coordinate == null || point.Coordinate.X <= 0 || point.Coordinate.Y <= 0)
             {
                 return null;
-            }
-
-            if (accuracy == null || accuracy < 0)
-            {
-                accuracy = defaultWhenAccuracyIsUnknown;
-            }
-            else if (accuracy == 0)
-            {
-                accuracy = 1;
             }
 
             var shapeFactory = new GeometricShapeFactory();

@@ -22,6 +22,11 @@ namespace SOS.Lib.Models.Shared
         public ContactPerson ContactPerson { get; set; }
 
         /// <summary>
+        /// Default coordinate uncertainty in meters
+        /// </summary>
+        public int CoordinateUncertaintyInMeters { get; set; }
+
+        /// <summary>
         ///     Decides whether the data provider should be included in search when no data provider filter is set.
         /// </summary>
         public bool IncludeInSearchByDefault { get; set; }

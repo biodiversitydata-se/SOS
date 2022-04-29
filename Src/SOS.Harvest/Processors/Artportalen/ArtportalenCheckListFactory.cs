@@ -13,8 +13,6 @@ namespace SOS.Harvest.Processors.Artportalen
 {
     public class ArtportalenCheckListFactory : CheckListFactoryBase, ICheckListFactory<ArtportalenCheckListVerbatim>
     {
-        private readonly DataProvider _dataProvider;
-
         /// <summary>
         /// Cast verbatim area to processed area
         /// </summary>
@@ -79,9 +77,8 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="dataProvider"></param>
         public ArtportalenCheckListFactory(
-            DataProvider dataProvider)
+            DataProvider dataProvider) : base(dataProvider)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
         }
 
         /// <summary>
@@ -107,7 +104,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         ParentTaxonId = verbatimCheckList.ParentTaxonId,
                         UserId = verbatimCheckList.ControlingUserId
                     },
-                    DataProviderId = _dataProvider.Id,
+                    DataProviderId = DataProvider.Id,
                     Id = id,
                     Event = new Event
                     {

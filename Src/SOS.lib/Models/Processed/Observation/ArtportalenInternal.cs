@@ -16,6 +16,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<string> BirdValidationAreaIds { get; set; }
 
         /// <summary>
+        /// Id of checklist
+        /// </summary>
+        public int? ChecklistId { get; set; }
+
+        /// <summary>
         /// Year of confirmation.
         /// </summary>
         public int? ConfirmationYear { get; set; }

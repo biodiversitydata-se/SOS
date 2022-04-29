@@ -13,7 +13,6 @@ namespace SOS.Harvest.Processors.FishData
 {
     public class FishDataObservationFactory : ObservationFactoryBase, IObservationFactory<FishDataObservationVerbatim>
     {
-        private readonly DataProvider _dataProvider;        
         private readonly IAreaHelper _areaHelper;
 
         /// <summary>
@@ -26,9 +25,8 @@ namespace SOS.Harvest.Processors.FishData
         /// <exception cref="ArgumentNullException"></exception>
         public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IAreaHelper areaHelper,
-            IProcessTimeManager processTimeManager) : base(taxa, processTimeManager)
+            IProcessTimeManager processTimeManager) : base(dataProvider, taxa, processTimeManager)
         {
-            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));            
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
@@ -43,7 +41,7 @@ namespace SOS.Harvest.Processors.FishData
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
             var obs = new Observation
             {                
-                DataProviderId = _dataProvider.Id,
+                DataProviderId = DataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
                 DatasetName = "Fish data",

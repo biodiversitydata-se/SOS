@@ -17,7 +17,6 @@ namespace SOS.Harvest.Managers
         /// Diffuse the point based on the sightings protection level
         /// </summary>
         /// <param name="observation"></param>
-        /// <param name="protectionLevel"></param>
         private void DiffuseGeographicalData(Observation observation)
         {
             if (observation.Location == null)
