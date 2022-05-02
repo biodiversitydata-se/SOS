@@ -705,7 +705,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in path if any</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
-        /// <param name="sensitiveObservations">
+        /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
         /// <param name="ensureArtportalenUpdated">
         /// If true, and the requested observation is sensitive (protected), then the original data will be returned (this requires authentication and authorization).
         /// If false, and the requested observation is sensitive (protected), then diffused data will be returned.

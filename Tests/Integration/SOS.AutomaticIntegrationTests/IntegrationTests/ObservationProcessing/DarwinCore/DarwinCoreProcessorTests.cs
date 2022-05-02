@@ -28,6 +28,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.D
         }
 
         [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
         [Description("Observation is positive (present) when OccurrenceStatus doesn't have the value 'absent'")]
         public void Observation_is_positive_when_OccurrenceStatus_is_not_null()
         {
@@ -67,6 +68,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.D
         }
 
         [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
         [Description("Sensitive species sightings should be protected")]
         public void Sensitive_species_sightings_should_be_protected()
         {

@@ -28,6 +28,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.A
         }
 
         [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
         [Description("Observation is positive (present) when both NotPresent and NotRecovered is false")]
         public void Observation_is_positive_when_both_NotPresent_and_NotRecovered_is_false()
         {

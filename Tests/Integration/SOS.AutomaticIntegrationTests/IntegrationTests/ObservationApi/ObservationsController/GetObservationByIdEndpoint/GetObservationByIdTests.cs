@@ -23,7 +23,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
         }
 
         [Fact]
-        [Trait("Category", "CompleteApiIntegrationTest")]
+        [Trait("Category", "AutomaticIntegrationTest")]
         public async Task TestGetObservationById()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.CustomObservationsController.GetObservationById(
+            var response = await _fixture.ObservationsController.GetObservationById(
                 null,
                 null,
                 null,

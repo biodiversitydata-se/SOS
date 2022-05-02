@@ -66,8 +66,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
-        public IProcessedObservationRepository CustomProcessedObservationRepository { get; set; }
-        public ObservationsController CustomObservationsController { get; private set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
         private DwcaObservationFactory _darwinCoreFactory;        
 
@@ -227,6 +225,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         {
             UserAuthenticationToken = GetUserAuthenticationToken();
             ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
+            if (!elasticConfiguration.IndexPrefix.Contains("integrationtests"))
+                throw new Exception("Elasticsearch configuration must use integrationtest index");
             var blobStorageManagerMock = new Mock<IBlobStorageManager>();
             var observationApiConfiguration = GetObservationApiConfiguration();
             var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
@@ -261,23 +261,18 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
-
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
+            TaxonManager = taxonManager;
+            ProcessedObservationRepository = processedObservationRepository;
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
                 taxonManager, exportManager, fileService, userExportRepository, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
-            TaxonManager = taxonManager;
-            ProcessedObservationRepository = processedObservationRepository;
-            ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
-            CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
-            var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
-            CustomObservationsController = new ObservationsController(customObservationManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
             {
@@ -459,7 +454,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         private async Task CreateIntegrationTestIndexAsync()
         {
             const bool protectedIndex = false;
-            await CustomProcessedObservationRepository.ClearCollectionAsync(protectedIndex);
+            await ProcessedObservationRepository.ClearCollectionAsync(protectedIndex);
         }
 
         public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
@@ -467,11 +462,11 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             const bool protectedIndex = false;
             if (clearExistingObservations)
             {
-                await CustomProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
+                await ProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
             }
-            await CustomProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
-            await CustomProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
-            await CustomProcessedObservationRepository.EnableIndexingAsync(protectedIndex);
+            await ProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
+            await ProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
+            await ProcessedObservationRepository.EnableIndexingAsync(protectedIndex);
             Thread.Sleep(1000);
         }
 
