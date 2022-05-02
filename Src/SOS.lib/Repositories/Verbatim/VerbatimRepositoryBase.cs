@@ -92,7 +92,7 @@ namespace SOS.Lib.Repositories.Verbatim
         /// <inheritdoc />
         public virtual async Task<bool> PermanentizeCollectionAsync()
         {
-            if (!TempMode || !await CheckIfCollectionExistsAsync())
+            if (!TempMode || !await CheckIfCollectionExistsAsync() || await CountAllDocumentsAsync() == 0)
             {
                 return true;
             }

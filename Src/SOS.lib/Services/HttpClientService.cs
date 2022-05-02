@@ -62,6 +62,7 @@ namespace SOS.Lib.Services
                     new HttpClient();
 
             httpClient.Timeout = TimeSpan.FromMinutes(30);
+            httpClient.DefaultRequestHeaders.Add("requesting-system", "SOS");
 
             if (!headerData?.Any() ?? true)
             {

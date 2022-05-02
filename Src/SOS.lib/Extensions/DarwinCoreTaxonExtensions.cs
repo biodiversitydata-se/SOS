@@ -75,7 +75,7 @@ namespace SOS.Lib.Extensions
                         IsInvasiveInSweden = new List<string> { "5", "7", "8", "9" }.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty),
                         RiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2)
                     },
-                    RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory,
+                    RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2),
                     SortOrder = sourceTaxon.SortOrder,
                     SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory,
                     SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence,
