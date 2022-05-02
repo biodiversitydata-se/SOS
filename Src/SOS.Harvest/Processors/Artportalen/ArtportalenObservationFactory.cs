@@ -156,6 +156,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
                 obs.PrivateCollection = verbatimObservation.PrivateCollection;                
                 obs.Projects = verbatimObservation.Projects?.Select(ArtportalenFactoryHelper.CreateProcessedProject);
+                obs.ProjectsSummary = ArtportalenFactoryHelper.CreateProjectsSummary(obs.Projects);
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
                 obs.Type = null;
