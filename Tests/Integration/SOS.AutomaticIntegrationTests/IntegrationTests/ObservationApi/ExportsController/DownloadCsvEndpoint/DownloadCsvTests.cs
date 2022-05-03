@@ -126,6 +126,77 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             fileEntry["Activity"].Should().Be("ruvande");
         }
 
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task DownloadCsvFile_TestDifferentPropertyLabels()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Create verbatim observations
+            //-----------------------------------------------------------------------------------------------------------            
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+
+            var searchFilter = new SearchFilterDto
+            {
+                Output = new OutputFilterDto
+                {
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var propertyNameFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.PropertyName,
+                "sv-SE",
+                false);
+            var propertyNameFile = (FileContentResult)propertyNameFileResult;
+
+            var propertyPathFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.PropertyPath,
+                "sv-SE",
+                false);
+            var propertyPathFile = (FileContentResult)propertyPathFileResult;
+
+            var swedishFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.Swedish,
+                "sv-SE",
+                false);
+            var swedishFile = (FileContentResult)swedishFileResult;
+
+            var englishFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.English,
+                "sv-SE",
+                false);
+            var englishFile = (FileContentResult)englishFileResult;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            var propertyNameEntries = ReadCsvFile(propertyNameFile.FileContents);
+            var propertyPathEntries = ReadCsvFile(propertyPathFile.FileContents);
+            var swedishEntries = ReadCsvFile(swedishFile.FileContents);
+            var englishEntries = ReadCsvFile(englishFile.FileContents);
+
+            propertyNameEntries.First().Keys.Should()
+                .BeEquivalentTo("OccurrenceId", "DatasetName", "RecordedBy", "Activity");
+            propertyPathEntries.First().Keys.Should()
+                .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value");
+            swedishEntries.First().Keys.Should()
+                .BeEquivalentTo("Observation GUID", "Datakälla", "Observatör", "Aktivitet");
+            englishEntries.First().Keys.Should()
+                .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded by", "Activity");
+        }
+
         private List<Dictionary<string, string>> ReadCsvFile(byte[] file)
         {
             var items = new List<Dictionary<string, string>>();
