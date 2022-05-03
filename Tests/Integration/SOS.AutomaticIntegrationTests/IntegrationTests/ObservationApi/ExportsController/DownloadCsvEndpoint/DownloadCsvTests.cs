@@ -11,8 +11,10 @@ using SOS.AutomaticIntegrationTests.Extensions;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -32,7 +34,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
         
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task DownloadCsvFile()
+        public async Task DownloadCsvFile_MinimumFieldSet()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
@@ -70,6 +72,58 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             file.FileContents.Length.Should().BeGreaterThan(0);
             var fileEntries = ReadCsvFile(file.FileContents);
             fileEntries.Count.Should().Be(100);
+        }
+
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task DownloadCsvFile_SpecificFields()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Create verbatim observations
+            //-----------------------------------------------------------------------------------------------------------            
+            const int sightingId = 123456;
+            const string occurrenceId = "urn:lsid:artportalen.se:sighting:123456";
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .TheFirst(1)
+                    .With(m => m.SightingId = sightingId)
+                    .With(m => m.DatasourceId = 1)
+                    .With(m => m.Observers = "Tom Volgers")
+                    .With(m => m.Activity = new MetadataWithCategory((int)ActivityId.Incubating, 1))
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+
+            var searchFilter = new SearchFilterDto
+            {
+                Output = new OutputFilterDto
+                {
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var csvFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.PropertyName,
+                "sv-SE",
+                false);
+
+            var file = (FileContentResult)csvFileResult;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            file.FileContents.Length.Should().BeGreaterThan(0);
+            var fileEntries = ReadCsvFile(file.FileContents);
+            fileEntries.Count.Should().Be(100);
+            var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
+            fileEntry["DatasetName"].Should().Be("Artportalen");
+            fileEntry["RecordedBy"].Should().Be("Tom Volgers");
+            fileEntry["Activity"].Should().Be("ruvande");
         }
 
         private List<Dictionary<string, string>> ReadCsvFile(byte[] file)

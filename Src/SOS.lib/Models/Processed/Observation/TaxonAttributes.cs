@@ -32,7 +32,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// True if redlist category is one of CR, EN, VU, NT
         /// </summary>
-        public bool IsRedlisted => new List<string> { "cr", "en", "vu", "nt" }.Contains(RedlistCategory?.ToLower() ?? string.Empty);
+        public bool IsRedlisted { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
