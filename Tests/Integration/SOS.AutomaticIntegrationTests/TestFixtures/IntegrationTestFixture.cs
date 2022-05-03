@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
@@ -157,6 +161,14 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return userAuthenticationToken;
         }
 
+        protected bool GetUseTaxonZipCollection()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var useTaxonZipCollection = config.GetSection($"{configPrefix}:UseTaxonZipCollection").Get<bool>();
+            return useTaxonZipCollection;
+        }
+
         protected string GetAzureApiUrl()
         {
             var config = GetAppSettings();
@@ -286,7 +298,16 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager = new UserManager(userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-            Taxa = await taxonRepository.GetAllAsync();
+            bool useTaxonZipCollection = GetUseTaxonZipCollection();
+            if (useTaxonZipCollection)
+            {
+                Taxa = GetTaxaFromZipFile();
+            }
+            else
+            {
+                Taxa = await taxonRepository.GetAllAsync();
+            }
+
             _taxaById = Taxa.ToDictionary(m => m.Id, m => m);
             _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());            
             ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
@@ -304,6 +325,25 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 verbatimDbConfiguration.WriteBatchSize);
             ArtportalenVerbatimRepository = new ArtportalenVerbatimRepository(_importClient, new NullLogger<ArtportalenVerbatimRepository>());
             DwcArchiveOccurrenceCsvWriter = new DwcArchiveOccurrenceCsvWriter(_vocabularyValueResolver, new NullLogger<DwcArchiveOccurrenceCsvWriter>());
+        }
+
+        private List<Taxon> GetTaxaFromZipFile()
+        {
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath, @"Resources\TaxonCollection.zip");
+
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                var taxonFile = archive.Entries.FirstOrDefault(f =>
+                    f.Name.Equals("TaxonCollection.json", StringComparison.CurrentCultureIgnoreCase));
+
+                var taxonFileStream = taxonFile.Open();
+                using var sr = new StreamReader(taxonFileStream, Encoding.UTF8);
+                string strJson = sr.ReadToEnd();                
+                var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };                            
+                var taxa = System.Text.Json.JsonSerializer.Deserialize<List<Taxon>>(strJson, jsonSerializerOptions);
+                return taxa;
+            }
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
