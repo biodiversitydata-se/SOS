@@ -279,7 +279,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile);                
-
+                
                 obs.Id = _faker.IndexVariable++;
                 obs.DatasourceId = ArtportalenDataSourceId;
                 obs.SightingId = _faker.IndexVariable++;
@@ -374,6 +374,28 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 obs.TaxonId = Pick<int>.RandomItemFrom(ProtectedSpeciesHelper.RedlistedTaxonIdsByCategory[category ?? ""]);
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveTaxonCategoryTaxonId(this IOperable<ArtportalenObservationVerbatim> operable, int categoryId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.TaxonId = Pick<int>.RandomItemFrom(ProtectedSpeciesHelper.TaxonByCategory[categoryId]);
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveTaxonId(this IOperable<ArtportalenObservationVerbatim> operable, int taxonId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.TaxonId = taxonId;
             });
 
             return operable;

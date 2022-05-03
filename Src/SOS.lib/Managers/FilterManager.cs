@@ -144,7 +144,7 @@ namespace SOS.Lib.Managers
             bool includeUnderlyingTaxa, 
             IEnumerable<int> listIds, 
             TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
-            List<int> taxonCategories = null,
+            IEnumerable<int> taxonCategories = null,
             bool returnBiotaResultAsNull = true)
         {            
             var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
@@ -153,7 +153,7 @@ namespace SOS.Lib.Managers
                 taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator);
             }
 
-            if (taxonCategories != null && taxonCategories.Count > 0)
+            if (taxonCategories?.Any() ?? false)
             {
                 if (taxaIds == null || taxaIds.Count() == 0 && includeUnderlyingTaxa)
                 {
@@ -246,8 +246,8 @@ namespace SOS.Lib.Managers
         /// <param name="taxonIds"></param>
         /// <param name="taxonCategories"></param>
         /// <returns></returns>
-        private IEnumerable<int> FilterTaxonIdsByTaxonCategories(IEnumerable<int> taxonIds, 
-            List<int> taxonCategories)
+        private IEnumerable<int> FilterTaxonIdsByTaxonCategories(IEnumerable<int> taxonIds,
+            IEnumerable<int> taxonCategories)
         {
             if (taxonCategories == null || !taxonCategories.Any() || taxonIds == null)
             {

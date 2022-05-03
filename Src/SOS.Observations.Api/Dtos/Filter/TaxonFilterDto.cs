@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Taxon categories to match.
         /// </summary>
-        public List<int> TaxonCategories { get; set; }
+        public IEnumerable<int> TaxonCategories { get; set; }
 
         /// <summary>
         /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
