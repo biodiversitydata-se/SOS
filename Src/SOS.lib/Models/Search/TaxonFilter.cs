@@ -54,7 +54,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Taxon categories.
         /// </summary>
-        public List<int> TaxonCategories { get; set; }
+        public IEnumerable<int> TaxonCategories { get; set; }
 
         /// <summary>
         /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.

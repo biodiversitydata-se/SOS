@@ -697,7 +697,7 @@ namespace SOS.Observations.Api.Extensions
                 Ids = filterDto.Ids,
                 IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa,
                 ListIds = filterDto.TaxonListIds,
-                TaxonListOperator = TaxonFilter.TaxonListOp.Merge
+                TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
             };
 
             if (filterDto is TaxonFilterDto taxonFilterDto)
@@ -705,6 +705,7 @@ namespace SOS.Observations.Api.Extensions
                 filter.RedListCategories = taxonFilterDto.RedListCategories;
                 filter.TaxonListOperator =
                     (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
+                filter.TaxonCategories = taxonFilterDto.TaxonCategories;
             }
 
             return filter;
