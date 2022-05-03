@@ -37,7 +37,7 @@
 
         public override string ToString()
         {
-            return $"{Name}={Value}";
+            return $"[{Name}={Value}]";
         }
     }
 }

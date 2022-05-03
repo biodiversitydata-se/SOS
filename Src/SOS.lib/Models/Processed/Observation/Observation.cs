@@ -311,6 +311,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
+        ///     Artportalen projects summary.
+        /// </summary>
+        public ProjectsSummary ProjectsSummary { get; set; }
+
+        /// <summary>
         /// The date the observation was created (UTC).
         /// </summary>
         public DateTime Created { get; set; }

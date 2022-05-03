@@ -27,7 +27,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
         }
 
         [Fact]
-        [Trait("Category", "CompleteApiIntegrationTest")]
+        [Trait("Category", "AutomaticIntegrationTest")]
         public async Task TestRedListCategoriesFilter()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.CustomObservationsController.ObservationsBySearch(
+            var response = await _fixture.ObservationsController.ObservationsBySearch(
                 null,
                 null,
                 searchFilter,

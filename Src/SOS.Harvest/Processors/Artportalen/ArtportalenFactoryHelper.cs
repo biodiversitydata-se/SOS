@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Models.Verbatim.Artportalen;
+﻿using SOS.Lib.Models.Processed.Observation;
+using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
+using ProjectParameter = SOS.Lib.Models.Verbatim.Artportalen.ProjectParameter;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -29,6 +31,32 @@ namespace SOS.Harvest.Processors.Artportalen
                 SurveyMethodUrl = project.SurveyMethodUrl,
                 ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)
             };
+        }
+
+        public static ProjectsSummary? CreateProjectsSummary(IEnumerable<Lib.Models.Processed.Observation.Project>? projects)
+        {
+            if (projects == null || !projects.Any()) return null;
+
+            var projectsSummary = new ProjectsSummary();
+            var projectsList = projects.ToArray();
+            var project1 = projectsList[0];
+            projectsSummary.Project1Id = project1.Id;
+            projectsSummary.Project1Category = project1.CategorySwedish;
+            projectsSummary.Project1Name = project1.Name;
+            projectsSummary.Project1Url = project1.ProjectURL;
+            projectsSummary.Project1Values = project1.ProjectParameters != null ? string.Join(", ", project1.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
+
+            if (projectsList.Length > 1)
+            {
+                var project2 = projectsList[1];
+                projectsSummary.Project2Id = project2.Id;
+                projectsSummary.Project2Category = project2.CategorySwedish;
+                projectsSummary.Project2Name = project2.Name;
+                projectsSummary.Project2Url = project2.ProjectURL;
+                projectsSummary.Project2Values = project2.ProjectParameters != null ? string.Join(", ", project2.ProjectParameters.Select(m => $"[{m.Name}={m.Value}]")) : null;
+            }
+
+            return projectsSummary;
         }
 
         /// <summary>
