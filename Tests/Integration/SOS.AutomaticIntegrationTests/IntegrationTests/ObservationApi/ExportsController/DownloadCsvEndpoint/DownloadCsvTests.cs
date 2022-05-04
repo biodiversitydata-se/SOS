@@ -99,7 +99,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             {
                 Output = new OutputFilterDto
                 {
-                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
                 }
             };
 
@@ -144,7 +144,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             {
                 Output = new OutputFilterDto
                 {
-                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
                 }
             };
 
@@ -190,7 +190,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             propertyNameEntries.First().Keys.Should()
                 .BeEquivalentTo("OccurrenceId", "DatasetName", "RecordedBy", "Activity");
             propertyPathEntries.First().Keys.Should()
-                .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value");
+                .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity");
             swedishEntries.First().Keys.Should()
                 .BeEquivalentTo("Observation GUID", "Datakälla", "Observatör", "Aktivitet");
             englishEntries.First().Keys.Should()

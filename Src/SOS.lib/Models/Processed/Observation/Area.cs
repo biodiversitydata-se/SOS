@@ -17,7 +17,7 @@
 
         public override string ToString()
         {
-            return $"{Name} [Id={FeatureId}]";
+            return Name;
         }
     }
 }

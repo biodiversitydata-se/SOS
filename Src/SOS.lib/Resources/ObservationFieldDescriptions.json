@@ -74,14 +74,14 @@
  {
    "PropertyName": "AccessRights",
    "PropertyPath": "AccessRights",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Åtkomsträttigheter",
    "EnglishTitle": "Access rights",
    "DwcName": "accessRights",
    "DwcIdentifier": "http://purl.org/dc/terms/accessRights",
    "DependsOn": "AccessRights",
-   "FieldSet": ""
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "AccessRightsId",
@@ -92,33 +92,21 @@
    "EnglishTitle": "Access rights Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "AccessRights",
+   "DependsOn": "AccessRights.Id",
    "FieldSet": "AllWithValues"
  },
- {
-   "PropertyName": "AccessRights",
-   "PropertyPath": "AccessRights.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Åtkomsträttigheter",
-   "EnglishTitle": "Access rights",
-   "DwcName": "",
-   "DwcIdentifier": "http://purl.org/dc/terms/accessRights",
-   "DependsOn": "AccessRights",
-   "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "BasisOfRecord",
-   "PropertyPath": "BasisOfRecord",
-   "DataType": "",
-   "DataTypeIsNullable": null,
-   "SwedishTitle": "basisOfRecord",
-   "EnglishTitle": "basisOfRecord",
-   "DwcName": "basisOfRecord",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/basisOfRecord",
-   "DependsOn": "BasisOfRecord",
-   "FieldSet": ""
- },
+  {
+    "PropertyName": "BasisOfRecord",
+    "PropertyPath": "BasisOfRecord",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "SwedishTitle": "basisOfRecord",
+    "EnglishTitle": "basisOfRecord",
+    "DwcName": "basisOfRecord",
+    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/basisOfRecord",
+    "DependsOn": "BasisOfRecord",
+    "FieldSet": "Extended"    
+  },
  {
    "PropertyName": "BasisOfRecordId",
    "PropertyPath": "BasisOfRecord.Id",
@@ -128,20 +116,8 @@
    "EnglishTitle": "basisOfRecord Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "BasisOfRecord",
+   "DependsOn": "BasisOfRecord.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "BasisOfRecord",
-   "PropertyPath": "BasisOfRecord.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "basisOfRecord",
-   "EnglishTitle": "basisOfRecord",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "BasisOfRecord",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "CollectionCode",
@@ -170,14 +146,14 @@
  {
    "PropertyName": "InstitutionCode",
    "PropertyPath": "InstitutionCode",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Institution",
    "EnglishTitle": "Institution",
    "DwcName": "institutionCode",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/institutionCode",
    "DependsOn": "InstitutionCode",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "InstitutionCodeId",
@@ -188,20 +164,8 @@
    "EnglishTitle": "Institution Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "InstitutionCode",
+   "DependsOn": "InstitutionCode.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "InstitutionCode",
-   "PropertyPath": "InstitutionCode.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Institution",
-   "EnglishTitle": "Institution",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "InstitutionCode",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "OwnerInstitutionCode",
@@ -362,14 +326,14 @@
  {
    "PropertyName": "DiscoveryMethod",
    "PropertyPath": "Event.DiscoveryMethod",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Metod",
    "EnglishTitle": "Discovery method",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Event.DiscoveryMethod",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "DiscoveryMethodId",
@@ -380,20 +344,8 @@
    "EnglishTitle": "Discovery method Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Event.DiscoveryMethod",
+   "DependsOn": "Event.DiscoveryMethod.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "DiscoveryMethod",
-   "PropertyPath": "Event.DiscoveryMethod.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Metod",
-   "EnglishTitle": "Discovery method",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Event.DiscoveryMethod",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "SamplingEffort",
@@ -879,8 +831,8 @@
  {
    "PropertyName": "ValidationStatus",
    "PropertyPath": "Identification.ValidationStatus",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Valideringsstatus",
    "EnglishTitle": "Verification status",
    "DwcName": "",
@@ -897,21 +849,9 @@
    "EnglishTitle": "Verification status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.ValidationStatus",
+   "DependsOn": "Identification.ValidationStatus.Id",
    "FieldSet": ""
- },
- {
-   "PropertyName": "ValidationStatus",
-   "PropertyPath": "Identification.ValidationStatus.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Valideringsstatus",
-   "EnglishTitle": "Verification status",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Identification.ValidationStatus",
-   "FieldSet": ""
- },
+ }, 
  {
    "PropertyName": "Verified",
    "PropertyPath": "Identification.Verified",
@@ -927,14 +867,14 @@
  {
    "PropertyName": "VerificationStatus",
    "PropertyPath": "Identification.VerificationStatus",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Valideringsstatus",
    "EnglishTitle": "Verification status",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.VerificationStatus",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "VerificationStatusId",
@@ -945,20 +885,8 @@
    "EnglishTitle": "Verification status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.VerificationStatus",
+   "DependsOn": "Identification.VerificationStatus.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "VerificationStatus",
-   "PropertyPath": "Identification.VerificationStatus.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Valideringsstatus",
-   "EnglishTitle": "Verification status",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Identification.VerificationStatus",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ConfirmedBy",
@@ -1023,14 +951,14 @@
  {
    "PropertyName": "DeterminationMethod",
    "PropertyPath": "Identification.DeterminationMethod",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Bestämningsmetod",
    "EnglishTitle": "Determination method",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.DeterminationMethod",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "DeterminationMethodId",
@@ -1041,20 +969,8 @@
    "EnglishTitle": "Determination method Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.DeterminationMethod",
+   "DependsOn": "Identification.DeterminationMethod.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "DeterminationMethod",
-   "PropertyPath": "Identification.DeterminationMethod.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Bestämningsmetod",
-   "EnglishTitle": "Determination method",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Identification.DeterminationMethod",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "VerifiedBy",
@@ -1251,14 +1167,14 @@
  {
    "PropertyName": "Municipality",
    "PropertyPath": "Location.Municipality",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Kommun",
    "EnglishTitle": "Municipality",
    "DwcName": "municipality",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/municipality",
    "DependsOn": "Location.Municipality",
-   "FieldSet": ""
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "MunicipalityId",
@@ -1269,32 +1185,20 @@
    "EnglishTitle": "Municipality Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Municipality",
+   "DependsOn": "Location.Municipality.FeatureId",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Municipality",
-   "PropertyPath": "Location.Municipality.Name",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Kommun",
-   "EnglishTitle": "Municipality",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/municipality",
-   "DependsOn": "Location.Municipality",
-   "FieldSet": "Minimum"
- },
+ }, 
  {
    "PropertyName": "County",
    "PropertyPath": "Location.County",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Län",
    "EnglishTitle": "County",
    "DwcName": "county",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/county",
    "DependsOn": "Location.County",
-   "FieldSet": ""
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "CountyId",
@@ -1305,32 +1209,20 @@
    "EnglishTitle": "County Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.County",
+   "DependsOn": "Location.County.FeatureId",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "County",
-   "PropertyPath": "Location.County.Name",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Län",
-   "EnglishTitle": "County",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/county",
-   "DependsOn": "Location.County",
-   "FieldSet": "Minimum"
- },
+ }, 
  {
    "PropertyName": "Parish",
    "PropertyPath": "Location.Parish",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Församling",
    "EnglishTitle": "Parish",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Location.Parish",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ParishId",
@@ -1341,32 +1233,20 @@
    "EnglishTitle": "Parish Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Parish",
+   "DependsOn": "Location.Parish.FeatureId",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Parish",
-   "PropertyPath": "Location.Parish.Name",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Församling",
-   "EnglishTitle": "Parish",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Location.Parish",
-   "FieldSet": "Extended"
- },
+ }, 
  {
    "PropertyName": "Province",
    "PropertyPath": "Location.Province",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Landskap",
    "EnglishTitle": "Province",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Location.Province",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ProvinceId",
@@ -1377,32 +1257,20 @@
    "EnglishTitle": "Province Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Province",
+   "DependsOn": "Location.Province.FeatureId",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Province",
-   "PropertyPath": "Location.Province.Name",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Landskap",
-   "EnglishTitle": "Province",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Location.Province",
-   "FieldSet": "Extended"
- },
+ }, 
  {
    "PropertyName": "Continent",
    "PropertyPath": "Location.Continent",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Kontinent",
    "EnglishTitle": "Continent",
    "DwcName": "continent",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/continent",
    "DependsOn": "Location.Continent",
-   "FieldSet": ""
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "ContinentId",
@@ -1413,32 +1281,20 @@
    "EnglishTitle": "Continent Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Continent",
-   "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Continent",
-   "PropertyPath": "Location.Continent.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Kontinent",
-   "EnglishTitle": "Continent",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/continent",
-   "DependsOn": "Location.Continent",
+   "DependsOn": "Location.Continent.Id",
    "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "Country",
    "PropertyPath": "Location.Country",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Land",
    "EnglishTitle": "Country",
    "DwcName": "country",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/country",
    "DependsOn": "Location.Country",
-   "FieldSet": ""
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "CountryId",
@@ -1449,19 +1305,7 @@
    "EnglishTitle": "Country Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Country",
-   "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Country",
-   "PropertyPath": "Location.Country.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Land",
-   "EnglishTitle": "Country",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/country",
-   "DependsOn": "Location.Country",
+   "DependsOn": "Location.Country.Id",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1947,14 +1791,14 @@
  {
    "PropertyName": "OccurrenceStatus",
    "PropertyPath": "Occurrence.OccurrenceStatus",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Fyndstatus",
    "EnglishTitle": "Occurrence status",
    "DwcName": "occurrenceStatus",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceStatus",
    "DependsOn": "Occurrence.OccurrenceStatus",
-   "FieldSet": ""
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "OccurrenceStatusId",
@@ -1965,20 +1809,8 @@
    "EnglishTitle": "Occurrence status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.OccurrenceStatus",
+   "DependsOn": "Occurrence.OccurrenceStatus.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "OccurrenceStatus",
-   "PropertyPath": "Occurrence.OccurrenceStatus.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Fyndstatus",
-   "EnglishTitle": "Occurrence status",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceStatus",
-   "DependsOn": "Occurrence.OccurrenceStatus",
-   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "IndividualCount",
@@ -2019,14 +1851,14 @@
  {
    "PropertyName": "OrganismQuantityUnit",
    "PropertyPath": "Occurrence.OrganismQuantityUnit",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Organismkvantitetsenhet",
    "EnglishTitle": "Organism quantity unit",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Occurrence.OrganismQuantityUnit",
-   "FieldSet": ""
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "OrganismQuantityUnitId",
@@ -2037,20 +1869,8 @@
    "EnglishTitle": "Organism quantity unit Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.OrganismQuantityUnit",
+   "DependsOn": "Occurrence.OrganismQuantityUnit.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "OrganismQuantityUnit",
-   "PropertyPath": "Occurrence.OrganismQuantityUnit.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Organismkvantitetsenhet",
-   "EnglishTitle": "Organism quantity unit",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Occurrence.OrganismQuantityUnit",
-   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "IsNaturalOccurrence",
@@ -2139,14 +1959,14 @@
  {
    "PropertyName": "Activity",
    "PropertyPath": "Occurrence.Activity",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Aktivitet",
    "EnglishTitle": "Activity",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Occurrence.Activity",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ActivityId",
@@ -2157,32 +1977,20 @@
    "EnglishTitle": "Activity Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Activity",
+   "DependsOn": "Occurrence.Activity.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Activity",
-   "PropertyPath": "Occurrence.Activity.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Aktivitet",
-   "EnglishTitle": "Activity",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Activity",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "Behavior",
    "PropertyPath": "Occurrence.Behavior",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Beteende",
    "EnglishTitle": "Behaviour",
    "DwcName": "behavior",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/behavior",
    "DependsOn": "Occurrence.Behavior",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "BehaviorId",
@@ -2193,32 +2001,20 @@
    "EnglishTitle": "Behaviour Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Behavior",
+   "DependsOn": "Occurrence.Behavior.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Behavior",
-   "PropertyPath": "Occurrence.Behavior.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Beteende",
-   "EnglishTitle": "Behaviour",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/behavior",
-   "DependsOn": "Occurrence.Behavior",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "Biotope",
    "PropertyPath": "Occurrence.Biotope",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Biotop",
    "EnglishTitle": "Biotope",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Occurrence.Biotope",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "BiotopeId",
@@ -2229,20 +2025,8 @@
    "EnglishTitle": "Biotope Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Biotope",
+   "DependsOn": "Occurrence.Biotope.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Biotope",
-   "PropertyPath": "Occurrence.Biotope.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Biotop",
-   "EnglishTitle": "Biotope",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Biotope",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "BiotopeDescription",
@@ -2271,14 +2055,14 @@
  {
    "PropertyName": "LifeStage",
    "PropertyPath": "Occurrence.LifeStage",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Stadium",
    "EnglishTitle": "Life stage",
    "DwcName": "lifeStage",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lifeStage",
    "DependsOn": "Occurrence.LifeStage",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "LifeStageId",
@@ -2289,32 +2073,20 @@
    "EnglishTitle": "Life stage Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.LifeStage",
+   "DependsOn": "Occurrence.LifeStage.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "LifeStage",
-   "PropertyPath": "Occurrence.LifeStage.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Stadium",
-   "EnglishTitle": "Life stage",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lifeStage",
-   "DependsOn": "Occurrence.LifeStage",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ReproductiveCondition",
    "PropertyPath": "Occurrence.ReproductiveCondition",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Reproduktionsstatus",
    "EnglishTitle": "Reproductive condition",
    "DwcName": "reproductiveCondition",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/reproductiveCondition",
    "DependsOn": "Occurrence.ReproductiveCondition",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ReproductiveConditionId",
@@ -2325,32 +2097,20 @@
    "EnglishTitle": "Reproductive condition Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.ReproductiveCondition",
+   "DependsOn": "Occurrence.ReproductiveCondition.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "ReproductiveCondition",
-   "PropertyPath": "Occurrence.ReproductiveCondition.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Reproduktionsstatus",
-   "EnglishTitle": "Reproductive condition",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/reproductiveCondition",
-   "DependsOn": "Occurrence.ReproductiveCondition",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "Sex",
    "PropertyPath": "Occurrence.Sex",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Kön",
    "EnglishTitle": "Sex",
    "DwcName": "sex",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sex",
    "DependsOn": "Occurrence.Sex",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "SexId",
@@ -2361,20 +2121,8 @@
    "EnglishTitle": "Sex Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Sex",
+   "DependsOn": "Occurrence.Sex.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "Sex",
-   "PropertyPath": "Occurrence.Sex.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Kön",
-   "EnglishTitle": "Sex",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sex",
-   "DependsOn": "Occurrence.Sex",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "Url",
@@ -2451,14 +2199,14 @@
  {
    "PropertyName": "SubstrateName",
    "PropertyPath": "Occurrence.Substrate.Name",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Substratnamn",
    "EnglishTitle": "Substrate name",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Occurrence.Substrate.Name",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "SubstrateNameId",
@@ -2471,19 +2219,7 @@
    "DwcIdentifier": "",
    "DependsOn": "Occurrence.Substrate.Name.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "SubstrateName",
-   "PropertyPath": "Occurrence.Substrate.Name.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Substratnamn",
-   "EnglishTitle": "Substrate name",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Substrate.Name",
-   "FieldSet": "Extended"
- },
+ }, 
  {
    "PropertyName": "SubstrateQuantity",
    "PropertyPath": "Occurrence.Substrate.Quantity",
@@ -2883,14 +2619,14 @@
  {
    "PropertyName": "EstablishmentMeans",
    "PropertyPath": "Occurrence.EstablishmentMeans",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Etableringssätt",
    "EnglishTitle": "Establishment means",
    "DwcName": "establishmentMeans",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/establishmentMeans",
    "DependsOn": "Occurrence.EstablishmentMeans",
-   "FieldSet": ""
+   "FieldSet": "All"
  },
  {
    "PropertyName": "EstablishmentMeansId",
@@ -2901,21 +2637,9 @@
    "EnglishTitle": "Establishment means Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.EstablishmentMeans",
+   "DependsOn": "Occurrence.EstablishmentMeans.Id",
    "FieldSet": "All"
- },
- {
-   "PropertyName": "EstablishmentMeans",
-   "PropertyPath": "Occurrence.EstablishmentMeans.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Etableringssätt",
-   "EnglishTitle": "Establishment means",
-   "DwcName": "",
-   "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/establishmentMeans",
-   "DependsOn": "Occurrence.EstablishmentMeans",
-   "FieldSet": "All"
- },
+ }, 
  {
    "PropertyName": "OtherCatalogNumbers",
    "PropertyPath": "Occurrence.OtherCatalogNumbers",
@@ -3352,13 +3076,13 @@
    "PropertyName": "TaxonCategory",
    "PropertyPath": "Taxon.Attributes.TaxonCategory",
    "DataType": "String",
-   "DataTypeIsNullable": null,
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Taxonkategori",
    "EnglishTitle": "Taxon category",
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Taxon.Attributes.TaxonCategory",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "TaxonCategoryId",
@@ -3369,21 +3093,9 @@
    "EnglishTitle": "Taxon category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.TaxonCategory",
+   "DependsOn": "Taxon.Attributes.TaxonCategory.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "TaxonCategory",
-   "PropertyPath": "Taxon.Attributes.TaxonCategory.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Taxonkategori",
-   "EnglishTitle": "Taxon category",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.TaxonCategory",
-   "FieldSet": "Extended"
- },
+ }, 
  {
    "PropertyName": "TaxonIsRedlisted",
    "PropertyPath": "Taxon.Attributes.IsRedlisted",
@@ -3579,8 +3291,8 @@
  {
    "PropertyName": "TaxonProtectionLevel",
    "PropertyPath": "Taxon.Attributes.ProtectionLevel",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Artens säkerhetsklass",
    "EnglishTitle": "Species sensitivity category",
    "DwcName": "",
@@ -3597,32 +3309,20 @@
    "EnglishTitle": "Species sensitivity category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.ProtectionLevel",
+   "DependsOn": "Taxon.Attributes.ProtectionLevel.Id",
    "FieldSet": ""
- },
+ }, 
  {
-   "PropertyName": "TaxonProtectionLevel",
-   "PropertyPath": "Taxon.Attributes.ProtectionLevel.Value",
+   "PropertyName": "TaxonSensitivityCategory",
+   "PropertyPath": "Taxon.Attributes.SensitivityCategory",
    "DataType": "String",
    "DataTypeIsNullable": false,
    "SwedishTitle": "Artens säkerhetsklass",
    "EnglishTitle": "Species sensitivity category",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.ProtectionLevel",
-   "FieldSet": ""
- },
- {
-   "PropertyName": "TaxonSensitivityCategory",
-   "PropertyPath": "Taxon.Attributes.SensitivityCategory",
-   "DataType": "",
-   "DataTypeIsNullable": null,
-   "SwedishTitle": "Artens säkerhetsklass",
-   "EnglishTitle": "Species sensitivity category",
-   "DwcName": "",
-   "DwcIdentifier": "",
    "DependsOn": "Taxon.Attributes.SensitivityCategory",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "TaxonSensitivityCategoryId",
@@ -3633,20 +3333,8 @@
    "EnglishTitle": "Species sensitivity category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.SensitivityCategory",
+   "DependsOn": "Taxon.Attributes.SensitivityCategory.Id",
    "FieldSet": "AllWithValues"
- },
- {
-   "PropertyName": "TaxonSensitivityCategory",
-   "PropertyPath": "Taxon.Attributes.SensitivityCategory.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Artens säkerhetsklass",
-   "EnglishTitle": "Species sensitivity category",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.SensitivityCategory",
-   "FieldSet": "Extended"
  },
  {
    "PropertyName": "RedlistCategory",
@@ -3987,14 +3675,14 @@
  {
    "PropertyName": "Type",
    "PropertyPath": "Type",
-   "DataType": "",
-   "DataTypeIsNullable": null,
+   "DataType": "String",
+   "DataTypeIsNullable": false,
    "SwedishTitle": "Typ",
    "EnglishTitle": "Type",
    "DwcName": "type",
    "DwcIdentifier": "http://purl.org/dc/terms/type",
    "DependsOn": "Type",
-   "FieldSet": ""
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "TypeId",
@@ -4005,21 +3693,9 @@
    "EnglishTitle": "Type Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Type",
+   "DependsOn": "Type.Id",
    "FieldSet": "All"
- },
- {
-   "PropertyName": "Type",
-   "PropertyPath": "Type.Value",
-   "DataType": "String",
-   "DataTypeIsNullable": false,
-   "SwedishTitle": "Typ",
-   "EnglishTitle": "Type",
-   "DwcName": "",
-   "DwcIdentifier": "http://purl.org/dc/terms/type",
-   "DependsOn": "Type",
-   "FieldSet": "AllWithValues"
- },
+ }, 
   {
     "PropertyName": "MeasurementOrFacts",
     "PropertyPath": "MeasurementOrFacts",
