@@ -861,12 +861,12 @@ namespace SOS.Observations.Api.Extensions
             {
                 PropertyPath = fieldDescription.PropertyPath,
                 DataType = fieldDescription.DataTypeEnum,
-                DataTypeNullable = fieldDescription.DataTypeNullable.GetValueOrDefault(false),
+                DataTypeNullable = fieldDescription.DataTypeIsNullable.GetValueOrDefault(false),
                 DwcIdentifier = fieldDescription.DwcIdentifier,
                 DwcName = fieldDescription.DwcName,
                 EnglishTitle = fieldDescription.GetEnglishTitle(),
                 SwedishTitle = fieldDescription.GetSwedishTitle(),
-                Name = fieldDescription.Name,
+                Name = fieldDescription.PropertyName,
                 FieldSet = fieldDescription.FieldSetEnum,
                 PartOfFieldSets = fieldDescription.FieldSets
             };

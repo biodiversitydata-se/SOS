@@ -40,7 +40,7 @@ namespace SOS.Lib.Helpers
                 case PropertyLabelType.PropertyPath:
                     return field.PropertyPath;
                 case PropertyLabelType.PropertyName:
-                    return field.Name;
+                    return field.PropertyName;
                 case PropertyLabelType.Swedish:
                     return field.GetSwedishTitle();
                 case PropertyLabelType.English:
@@ -85,7 +85,7 @@ namespace SOS.Lib.Helpers
                 // string data type is always nullable.
                 if (field.DataTypeEnum == PropertyFieldDataType.String)
                 {
-                    field.DataTypeNullable = true;
+                    field.DataTypeIsNullable = true;
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace SOS.Lib.Helpers
             {
                 if (propertyPathSet.Contains(field.PropertyPath.ToLowerInvariant()))
                     return false;
-                if (propertyNameSet.Contains(field.Name.ToLowerInvariant()))
+                if (propertyNameSet.Contains(field.PropertyName.ToLowerInvariant()))
                     return false;
                 if (swedishNameSet.Contains(field.GetSwedishTitle().ToLowerInvariant()))
                     return false;
@@ -109,7 +109,7 @@ namespace SOS.Lib.Helpers
                     return false;
 
                 propertyPathSet.Add(field.PropertyPath.ToLowerInvariant());
-                propertyNameSet.Add(field.Name.ToLowerInvariant());
+                propertyNameSet.Add(field.PropertyName.ToLowerInvariant());
                 swedishNameSet.Add(field.GetSwedishTitle().ToLowerInvariant());
                 englishNameSet.Add(field.GetEnglishTitle().ToLowerInvariant());
             }
@@ -128,7 +128,7 @@ namespace SOS.Lib.Helpers
                 {OutputFieldSet.All, new List<PropertyFieldDescription>()}
             };
             
-            foreach (var field in fields.Where(m => m.IsPartOfFlatObservation.GetValueOrDefault()))
+            foreach (var field in fields)
             {
                 if (string.IsNullOrEmpty(field.FieldSet)) continue;
                 if (field.FieldSet == "Minimum")
