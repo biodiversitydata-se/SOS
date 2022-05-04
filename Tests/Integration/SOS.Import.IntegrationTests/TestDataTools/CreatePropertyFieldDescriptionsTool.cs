@@ -40,35 +40,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var fieldDescriptions = System.Text.Json.JsonSerializer.Deserialize<List<SsosFieldDescription>>(strJson);
             return fieldDescriptions;
         }
-
-        private void ReCalculateIds(List<PropertyFieldDescription> propertyFields)
-        {
-            var propertyFieldById = propertyFields.ToDictionary(m => m.Id, m => m);
-            
-            // store parents
-            foreach (var propertyField in propertyFields)
-            {
-                if (propertyField.ParentId.HasValue)
-                {
-                    if (propertyFieldById.TryGetValue(propertyField.ParentId.Value, out var parentPropertyField))
-                    {
-                        propertyField.Parent = parentPropertyField;
-                    }
-                }
-            }
-
-            // Recalculate ids
-            int id = 1;
-            foreach (var propertyField in propertyFields)
-            {
-                propertyField.Id = id++;
-                if (propertyField.Parent != null)
-                {
-                    propertyField.ParentId = propertyField.Parent.Id;
-                }
-            }
-        }
-
+        
         [Fact]
         [Trait("Category", "Tool")]
         public void ValidateUniquePropertyNamesAndTitles()
@@ -82,18 +54,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
         [Fact]
         [Trait("Category", "Tool")]
-        public async Task ReCalculateIdsAndCreateNewJsonFile()
-        {
-            var propertyFields = ObservationPropertyFieldDescriptionHelper.AllFields;
-            ReCalculateIds(propertyFields);
-            string strJson = System.Text.Json.JsonSerializer.Serialize(propertyFields);
-            string filename = FilenameHelper.CreateFilenameWithDate("ObservationFieldDescription", "json");
-            string filePath = Path.Combine(@"C:\temp", filename);
-            await File.WriteAllTextAsync(filePath, strJson);
-        }
-
-        [Fact]
-        [Trait("Category", "Tool")]
         public async Task CreateFlatObservationClassValueSwitchStatements()
         {
             // Arrange
@@ -101,10 +61,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             StringBuilder sb = new StringBuilder();
 
             // Act
-            foreach (var fieldDescription in propertyFields.Where(m => m.IsPartOfFlatObservation.GetValueOrDefault()))
+            foreach (var fieldDescription in propertyFields.Where(m => !string.IsNullOrEmpty(m.FieldSet)))
             {
                 sb.AppendLine($"case \"{fieldDescription.PropertyPath}\":");
-                sb.AppendLine($"    return {fieldDescription.FlatPropertyName};");
+                sb.AppendLine($"    return {fieldDescription.PropertyName};");
             }
             string result = sb.ToString();
             
@@ -124,10 +84,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             var sb = new StringBuilder();
 
             // Act
-            foreach (var fieldDescription in fieldDescriptions.Where(m => m.IsPartOfFlatObservation.GetValueOrDefault()))
+            foreach (var fieldDescription in fieldDescriptions.Where(m => !string.IsNullOrEmpty(m.FieldSet)))
             {
-                string dataType = GetDataTypeString(fieldDescription.DataType, fieldDescription.DataTypeNullable.GetValueOrDefault());
-                string propertyName = fieldDescription.FlatPropertyName;
+                string dataType = GetDataTypeString(fieldDescription.DataType, fieldDescription.DataTypeIsNullable.GetValueOrDefault());
+                string propertyName = fieldDescription.PropertyName;
                 string str = $"public {dataType} {propertyName} => _observation?.{fieldDescription.PropertyPath.Replace(".","?.")};";
                 sb.AppendLine(str);
             }
@@ -172,7 +132,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Act
             AddSsosTitlesToPropertyFields(propertyFields, ssosFieldDescriptions);
             AddSosDwcInfoToPropertyFields(propertyFields, sosFieldDescriptions);
-            var propertyFieldsTree = CreateTreeFromPropertyFields(propertyFields);
             string strJson = System.Text.Json.JsonSerializer.Serialize(propertyFields);
             
             // Assert
@@ -184,7 +143,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var propertyField in propertyFields)
             {
                 var ssosFieldDescription = ssosFieldDescriptions.FirstOrDefault(
-                    m => m.Name.ToLowerInvariant() == propertyField.Name.ToLowerInvariant());
+                    m => m.Name.ToLowerInvariant() == propertyField.PropertyName.ToLowerInvariant());
                 if (ssosFieldDescription != null)
                 {
                     propertyField.SwedishTitle = ssosFieldDescription.SwedishLabel;
@@ -198,27 +157,13 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var propertyField in propertyFields)
             {
                 var sosFieldDescription = sosFieldDescriptions.FirstOrDefault(
-                    m => m.Name.ToLowerInvariant() == propertyField.Name.ToLowerInvariant());
+                    m => m.Name.ToLowerInvariant() == propertyField.PropertyName.ToLowerInvariant());
                 if (sosFieldDescription != null && sosFieldDescription.IsDwC)
                 {
                     propertyField.DwcIdentifier = sosFieldDescription.DwcIdentifier;
                     propertyField.DwcName = sosFieldDescription.Name;
                 }
             }
-        }
-
-        private static List<PropertyFieldDescription> CreateTreeFromPropertyFields(List<PropertyFieldDescription> propertyFields)
-        {
-            List<PropertyFieldDescription> propertyFieldsTree = new List<PropertyFieldDescription>();
-            foreach (var propertyField in propertyFields)
-            {
-                if (propertyField.Parent == null)
-                {
-                    propertyFieldsTree.Add(propertyField);
-                }
-            }
-
-            return propertyFieldsTree;
         }
 
         private static List<PropertyFieldDescription> GetAllProperties(Type type, bool includeClassTypes)
@@ -238,21 +183,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 {
                     var propertyField = new PropertyFieldDescription();
                     propertyField.PropertyPath = $"{prefix}{pi.Name}";
-                    propertyField.Name = pi.Name;
+                    propertyField.PropertyName = pi.Name;
                     if (isValueTypeOrString)
                     {
                         propertyField.DataType = pi.PropertyType.Name;
-                    }
-                    propertyField.IsClass = !isValueTypeOrString;
-                    propertyField.Id = properties.Count;
-                    propertyField.Parent = parent;
-
-                    if (parent != null)
-                    {
-                        propertyField.ParentName = parent.PropertyPath;
-                        propertyField.ParentId = parent.Id;
-                        parent.Children ??= new List<PropertyFieldDescription>();
-                        parent.Children.Add(propertyField);
                     }
 
                     propField = propertyField;
