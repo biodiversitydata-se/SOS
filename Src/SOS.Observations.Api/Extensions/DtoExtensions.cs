@@ -156,6 +156,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.TriggeredObservationRuleReproductionIds =
                     searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleReproductionIds;
                 internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
+                internalFilter.SiteProjectIds = searchFilterInternalDto.ExtendedFilter.SiteProjectIds;
                 internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
                 internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
                 internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
