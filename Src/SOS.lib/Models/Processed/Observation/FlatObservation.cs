@@ -268,6 +268,13 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonAttributesSensitivityCategory => _observation?.Taxon?.Attributes?.ProtectionLevel?.ToString();
         public int? TaxonAttributesSensitivityCategoryId => _observation?.Taxon?.Attributes?.ProtectionLevel?.Id;
         public string TaxonAttributesSensitivityCategoryValue => _observation?.Taxon?.Attributes?.ProtectionLevel?.Value;
+        public string TaxonAttributesTaxonCategory => _observation?.Taxon?.Attributes?.TaxonCategory?.ToString();
+        public int? TaxonAttributesTaxonCategoryId => _observation?.Taxon?.Attributes?.TaxonCategory?.Id;
+        public string TaxonAttributesTaxonCategoryValue => _observation?.Taxon?.Attributes?.TaxonCategory?.Value;
+        public bool? TaxonAttributesIsRedlisted => _observation?.Taxon?.Attributes?.IsRedlisted;
+        public bool? TaxonAttributesIsInvasiveAccordingToEuRegulation => _observation?.Taxon?.Attributes?.InvasiveInfo?.IsInvasiveAccordingToEuRegulation;
+        public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.InvasiveInfo?.IsInvasiveInSweden;
+        public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveInfo?.RiskAssessmentCategory;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
         public string TaxonAttributesSwedishHistory => _observation?.Taxon?.Attributes?.SwedishHistory;
@@ -853,6 +860,20 @@ namespace SOS.Lib.Models.Processed.Observation
                     return TaxonAttributesSynonyms;
                 case "Taxon.Attributes.VernacularNames":
                     return TaxonAttributesVernacularNames;
+                case "Taxon.Attributes.TaxonCategory":
+                    return TaxonAttributesTaxonCategory;
+                case "Taxon.Attributes.TaxonCategory.Id":
+                    return TaxonAttributesTaxonCategoryId;
+                case "Taxon.Attributes.TaxonCategory.Value":
+                    return TaxonAttributesTaxonCategoryValue;
+                case "Taxon.Attributes.IsRedlisted":
+                    return TaxonAttributesIsRedlisted;
+                case "Taxon.Attributes.InvasiveInfo.IsInvasiveAccordingToEuRegulation":
+                    return TaxonAttributesIsInvasiveAccordingToEuRegulation;
+                case "Taxon.Attributes.InvasiveInfo.IsInvasiveInSweden":
+                    return TaxonAttributesIsInvasiveInSweden;
+                case "Taxon.Attributes.InvasiveInfo.RiskAssessmentCategory":
+                    return TaxonAttributesRiskAssessmentCategory;
                 case "DatasetId":
                     return DatasetId;
                 case "DynamicProperties":
