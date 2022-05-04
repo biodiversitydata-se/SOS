@@ -400,5 +400,25 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
             return operable;
         }
+
+        public static IOperable<ArtportalenObservationVerbatim> IsInDateSpan(this IOperable<ArtportalenObservationVerbatim> operable, DateTime spanStartDate, DateTime spanEndDate)
+        {
+            var randomTest = new Random();
+            var startMinutes = (int)(spanEndDate - spanStartDate).TotalMinutes;
+
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+
+            builder.With((obs, index) =>
+            {
+                var startDate = spanStartDate.AddMinutes(randomTest.Next(1, startMinutes));
+                obs.StartDate = startDate;
+                obs.StartTime = null;
+                var endMinutes = (int)(spanEndDate - startDate).TotalMinutes;
+                obs.EndDate = startDate.AddMinutes(randomTest.Next(0, endMinutes));
+                obs.EndTime = null;
+            });
+
+            return operable;
+        }
     } 
 }
