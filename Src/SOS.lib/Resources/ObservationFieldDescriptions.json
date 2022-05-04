@@ -92,7 +92,7 @@
    "EnglishTitle": "Access rights Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "AccessRights.Id",
+   "DependsOn": "AccessRights",
    "FieldSet": "AllWithValues"
  },
  {
@@ -128,7 +128,7 @@
    "EnglishTitle": "basisOfRecord Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "BasisOfRecord.Id",
+   "DependsOn": "BasisOfRecord",
    "FieldSet": "AllWithValues"
  },
  {
@@ -188,7 +188,7 @@
    "EnglishTitle": "Institution Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "InstitutionCode.Id",
+   "DependsOn": "InstitutionCode",
    "FieldSet": "AllWithValues"
  },
  {
@@ -380,7 +380,7 @@
    "EnglishTitle": "Discovery method Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Event.DiscoveryMethod.Id",
+   "DependsOn": "Event.DiscoveryMethod",
    "FieldSet": "AllWithValues"
  },
  {
@@ -453,7 +453,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Event.Media",
-   "FieldSet": "Extended"
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "Type",
@@ -635,18 +635,19 @@
    "DependsOn": "Event.Media.DatasetID",
    "FieldSet": ""
  },
- {
-   "PropertyName": "EventMeasurementOrFacts",
-   "PropertyPath": "Event.MeasurementOrFacts",
-   "DataType": "String",
-   "DataTypeIsNullable": null,
-   "SwedishTitle": "",
-   "EnglishTitle": "",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "Event.MeasurementOrFacts",
-   "FieldSet": "Extended"
- },
+  {
+    "PropertyName": "EventMeasurementOrFacts",
+    "PropertyPath": "Event.MeasurementOrFacts",
+    "DataType": "String",
+    "DataTypeIsNullable": null,
+    "SwedishTitle": "",
+    "EnglishTitle": "",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Event.MeasurementOrFacts",
+    "JsonFormatDependsOn": "Event.MeasurementOrFacts.MeasurementID, Event.MeasurementOrFacts.MeasurementType, Event.MeasurementOrFacts.MeasurementValue, Event.MeasurementOrFacts.MeasurementUnit",
+    "FieldSet": "Extended"
+  },
  {
    "PropertyName": "MeasurementID",
    "PropertyPath": "Event.MeasurementOrFacts.MeasurementID",
@@ -873,7 +874,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.Validated",
-   "FieldSet": "Minimum"
+   "FieldSet": ""
  },
  {
    "PropertyName": "ValidationStatus",
@@ -896,8 +897,8 @@
    "EnglishTitle": "Verification status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.ValidationStatus.Id",
-   "FieldSet": "AllWithValues"
+   "DependsOn": "Identification.ValidationStatus",
+   "FieldSet": ""
  },
  {
    "PropertyName": "ValidationStatus",
@@ -909,7 +910,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.ValidationStatus",
-   "FieldSet": "Minimum"
+   "FieldSet": ""
  },
  {
    "PropertyName": "Verified",
@@ -921,7 +922,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.Verified",
-   "FieldSet": ""
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "VerificationStatus",
@@ -944,8 +945,8 @@
    "EnglishTitle": "Verification status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.VerificationStatus.Id",
-   "FieldSet": ""
+   "DependsOn": "Identification.VerificationStatus",
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "VerificationStatus",
@@ -957,7 +958,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.VerificationStatus",
-   "FieldSet": ""
+   "FieldSet": "Extended"
  },
  {
    "PropertyName": "ConfirmedBy",
@@ -1017,7 +1018,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Identification.UncertainIdentification",
-   "FieldSet": "Extended"
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "DeterminationMethod",
@@ -1040,7 +1041,7 @@
    "EnglishTitle": "Determination method Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Identification.DeterminationMethod.Id",
+   "DependsOn": "Identification.DeterminationMethod",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1173,7 +1174,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Location.Sweref99TmX",
-   "FieldSet": "Extended"
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "Sweref99TmY",
@@ -1185,7 +1186,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Location.Sweref99TmY",
-   "FieldSet": "Extended"
+   "FieldSet": "Minimum"
  },
  {
    "PropertyName": "GeodeticDatum",
@@ -1268,7 +1269,7 @@
    "EnglishTitle": "Municipality Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Municipality.FeatureId",
+   "DependsOn": "Location.Municipality",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1280,7 +1281,7 @@
    "EnglishTitle": "Municipality",
    "DwcName": "",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/municipality",
-   "DependsOn": "Location.Municipality.Name",
+   "DependsOn": "Location.Municipality",
    "FieldSet": "Minimum"
  },
  {
@@ -1304,7 +1305,7 @@
    "EnglishTitle": "County Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.County.FeatureId",
+   "DependsOn": "Location.County",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1316,7 +1317,7 @@
    "EnglishTitle": "County",
    "DwcName": "",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/county",
-   "DependsOn": "Location.County.Name",
+   "DependsOn": "Location.County",
    "FieldSet": "Minimum"
  },
  {
@@ -1340,7 +1341,7 @@
    "EnglishTitle": "Parish Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Parish.FeatureId",
+   "DependsOn": "Location.Parish",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1352,7 +1353,7 @@
    "EnglishTitle": "Parish",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Parish.Name",
+   "DependsOn": "Location.Parish",
    "FieldSet": "Extended"
  },
  {
@@ -1376,7 +1377,7 @@
    "EnglishTitle": "Province Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Province.FeatureId",
+   "DependsOn": "Location.Province",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1388,7 +1389,7 @@
    "EnglishTitle": "Province",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Province.Name",
+   "DependsOn": "Location.Province",
    "FieldSet": "Extended"
  },
  {
@@ -1412,7 +1413,7 @@
    "EnglishTitle": "Continent Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Continent.Id",
+   "DependsOn": "Location.Continent",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1448,7 +1449,7 @@
    "EnglishTitle": "Country Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Location.Country.Id",
+   "DependsOn": "Location.Country",
    "FieldSet": "AllWithValues"
  },
  {
@@ -1964,7 +1965,7 @@
    "EnglishTitle": "Occurrence status Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.OccurrenceStatus.Id",
+   "DependsOn": "Occurrence.OccurrenceStatus",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2036,7 +2037,7 @@
    "EnglishTitle": "Organism quantity unit Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.OrganismQuantityUnit.Id",
+   "DependsOn": "Occurrence.OrganismQuantityUnit",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2156,7 +2157,7 @@
    "EnglishTitle": "Activity Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Activity.Id",
+   "DependsOn": "Occurrence.Activity",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2192,7 +2193,7 @@
    "EnglishTitle": "Behaviour Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Behavior.Id",
+   "DependsOn": "Occurrence.Behavior",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2228,7 +2229,7 @@
    "EnglishTitle": "Biotope Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Biotope.Id",
+   "DependsOn": "Occurrence.Biotope",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2288,7 +2289,7 @@
    "EnglishTitle": "Life stage Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.LifeStage.Id",
+   "DependsOn": "Occurrence.LifeStage",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2324,7 +2325,7 @@
    "EnglishTitle": "Reproductive condition Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.ReproductiveCondition.Id",
+   "DependsOn": "Occurrence.ReproductiveCondition",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2360,7 +2361,7 @@
    "EnglishTitle": "Sex Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.Sex.Id",
+   "DependsOn": "Occurrence.Sex",
    "FieldSet": "AllWithValues"
  },
  {
@@ -2900,7 +2901,7 @@
    "EnglishTitle": "Establishment means Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Occurrence.EstablishmentMeans.Id",
+   "DependsOn": "Occurrence.EstablishmentMeans",
    "FieldSet": "All"
  },
  {
@@ -3345,7 +3346,7 @@
    "DwcName": "taxonRank",
    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonRank",
    "DependsOn": "Taxon.TaxonRank",
-   "FieldSet": "Extended"
+   "FieldSet": "AllWithValues"
  },
  {
    "PropertyName": "TaxonCategory",
@@ -3368,7 +3369,7 @@
    "EnglishTitle": "Taxon category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.TaxonCategory.Id",
+   "DependsOn": "Taxon.Attributes.TaxonCategory",
    "FieldSet": "AllWithValues"
  },
  {
@@ -3596,7 +3597,7 @@
    "EnglishTitle": "Species sensitivity category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.ProtectionLevel.Id",
+   "DependsOn": "Taxon.Attributes.ProtectionLevel",
    "FieldSet": ""
  },
  {
@@ -3632,7 +3633,7 @@
    "EnglishTitle": "Species sensitivity category Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Taxon.Attributes.SensitivityCategory.Id",
+   "DependsOn": "Taxon.Attributes.SensitivityCategory",
    "FieldSet": "AllWithValues"
  },
  {
@@ -4004,7 +4005,7 @@
    "EnglishTitle": "Type Id",
    "DwcName": "",
    "DwcIdentifier": "",
-   "DependsOn": "Type.Id",
+   "DependsOn": "Type",
    "FieldSet": "All"
  },
  {
@@ -4017,20 +4018,21 @@
    "DwcName": "",
    "DwcIdentifier": "http://purl.org/dc/terms/type",
    "DependsOn": "Type",
-   "FieldSet": "All"
+   "FieldSet": "AllWithValues"
  },
- {
-   "PropertyName": "MeasurementOrFacts",
-   "PropertyPath": "MeasurementOrFacts",
-   "DataType": "String",
-   "DataTypeIsNullable": null,
-   "SwedishTitle": "",
-   "EnglishTitle": "",
-   "DwcName": "",
-   "DwcIdentifier": "",
-   "DependsOn": "MeasurementOrFacts",
-   "FieldSet": "Extended"
- },
+  {
+    "PropertyName": "MeasurementOrFacts",
+    "PropertyPath": "MeasurementOrFacts",
+    "DataType": "String",
+    "DataTypeIsNullable": null,
+    "SwedishTitle": "",
+    "EnglishTitle": "",
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "MeasurementOrFacts",
+    "JsonFormatDependsOn": "MeasurementOrFacts.MeasurementID, MeasurementOrFacts.MeasurementType, MeasurementOrFacts.MeasurementValue, MeasurementOrFacts.MeasurementUnit",
+    "FieldSet": "Extended"
+  },
  {
    "PropertyName": "MeasurementID",
    "PropertyPath": "MeasurementOrFacts.MeasurementID",
@@ -4197,6 +4199,7 @@
    "DwcName": "",
    "DwcIdentifier": "",
    "DependsOn": "Projects",
+   "JsonFormatDependsOn": "Projects.Id, Projects.Name, Projects.Owner, Projects.ProjectParameters",
    "FieldSet": "Extended"
  },
  {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -57,8 +58,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string EventSampleSizeUnit => _observation?.Event?.SampleSizeUnit;
         public string EventSampleSizeValue => _observation?.Event?.SampleSizeValue;
         public string EventVerbatimEventDate => _observation?.Event?.VerbatimEventDate;
-        public string EventMedia => _observation?.Event?.Media == null ? null : string.Join(", ", _observation?.Event?.Media);
-        public string EventMeasurementOrFacts => _observation?.Event?.MeasurementOrFacts == null ? null : string.Join(", ", _observation?.Event?.MeasurementOrFacts);
+        public string EventMedia => _observation?.Event?.Media == null ? null : string.Join(", ", _observation?.Event?.Media.Select(m => m.ToString()));
+        public string EventMeasurementOrFacts => _observation?.Event?.MeasurementOrFacts == null ? null : string.Join(", ", _observation?.Event?.MeasurementOrFacts.Select(m => m.ToString()));
         public string GeologicalContextBed => _observation?.GeologicalContext?.Bed;
         public string GeologicalContextEarliestAgeOrLowestStage => _observation?.GeologicalContext?.EarliestAgeOrLowestStage;
         public string GeologicalContextEarliestEonOrLowestEonothem => _observation?.GeologicalContext?.EarliestEonOrLowestEonothem;
@@ -127,6 +128,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string LocationProvinceName => _observation?.Location?.Province?.Name;
         public double? LocationDecimalLatitude => _observation?.Location?.DecimalLatitude;
         public double? LocationDecimalLongitude => _observation?.Location?.DecimalLongitude;
+        public double? LocationSweref99TmX => _observation?.Location?.Sweref99TmX;
+        public double? LocationSweref99TmY => _observation?.Location?.Sweref99TmY;
         public string LocationFootprintSpatialFit => _observation?.Location?.FootprintSpatialFit;
         public string LocationFootprintSRS => _observation?.Location?.FootprintSRS;
         public string LocationFootprintWKT => _observation?.Location?.FootprintWKT;
@@ -193,7 +196,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OccurrenceLifeStage => _observation?.Occurrence?.LifeStage?.ToString();
         public int? OccurrenceLifeStageId => _observation?.Occurrence?.LifeStage?.Id;
         public string OccurrenceLifeStageValue => _observation?.Occurrence?.LifeStage?.Value;
-        public string OccurrenceMedia => _observation?.Occurrence?.Media == null ? null : string.Join(", ", _observation?.Occurrence?.Media);
+        public string OccurrenceMedia => _observation?.Occurrence?.Media == null ? null : string.Join(", ", _observation?.Occurrence?.Media.Select(m => m.ToString()));
         public string OccurrenceOccurrenceId => _observation?.Occurrence?.OccurrenceId;
         public string OccurrenceOccurrenceRemarks => _observation?.Occurrence?.OccurrenceRemarks;
         public string OccurrenceOccurrenceStatus => _observation?.Occurrence?.OccurrenceStatus?.ToString();
@@ -360,8 +363,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Type => _observation?.Type?.ToString();
         public int? TypeId => _observation?.Type?.Id;
         public string TypeValue => _observation?.Type?.Value;
-        public string MeasurementOrFacts => _observation?.MeasurementOrFacts == null ? null : string.Join(", ", _observation?.MeasurementOrFacts);
-        public string Projects => _observation?.Projects == null ? null : string.Join(", ", _observation?.Projects);
+        public string MeasurementOrFacts => _observation?.MeasurementOrFacts == null ? null : string.Join(", ", _observation.MeasurementOrFacts.Select(m => m.ToString()));
+        public string Projects => _observation?.Projects == null ? null : string.Join(", ", _observation.Projects.Select(m => m.ToString()));
 
         public string TaxonSecondaryParentDyntaxaTaxonIds => _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds == null
             ? null
@@ -500,6 +503,10 @@ namespace SOS.Lib.Models.Processed.Observation
                     return LocationDecimalLatitude;
                 case "Location.DecimalLongitude":
                     return LocationDecimalLongitude;
+                case "Location.Sweref99TmX":
+                    return LocationSweref99TmX;
+                case "Location.Sweref99TmY":
+                    return LocationSweref99TmY;
                 case "Location.GeodeticDatum":
                     return LocationGeodeticDatum;
                 case "Location.CoordinateUncertaintyInMeters":

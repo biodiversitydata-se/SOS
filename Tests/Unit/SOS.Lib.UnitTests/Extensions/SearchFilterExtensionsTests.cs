@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -34,13 +33,14 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Event.StartDate", 
                 "Event.EndDate",
                 "DatasetName",
-                "Identification.Validated",
                 "Identification.Verified",
                 "Identification.UncertainIdentification",
                 "Location.County",
                 "Location.Municipality",
                 "Location.DecimalLongitude",
                 "Location.DecimalLatitude",
+                "Location.Sweref99TmX",
+                "Location.Sweref99TmY",
                 "Location.CoordinateUncertaintyInMeters",
                 "Occurrence.OccurrenceStatus",
                 "Occurrence.ReportedBy",
@@ -52,9 +52,7 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Taxon.Id",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName",
-                "Taxon.Attributes.IsRedlisted",
-                "Taxon.Attributes.OrganismGroup",
-                "Taxon.Attributes.TaxonCategory");
+                "Taxon.Attributes.OrganismGroup");
         }
 
         [Fact]
@@ -109,13 +107,14 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Event.StartDate",
                 "Event.EndDate",
                 "DatasetName",
-                "Identification.Validated",
                 "Identification.Verified",
                 "Identification.UncertainIdentification",
                 "Location.County",
                 "Location.Municipality",
                 "Location.DecimalLongitude",
                 "Location.DecimalLatitude",
+                "Location.Sweref99TmX",
+                "Location.Sweref99TmY",
                 "Location.CoordinateUncertaintyInMeters",
                 "Occurrence.OccurrenceStatus",
                 "Occurrence.ReportedBy",
@@ -127,9 +126,7 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Taxon.Id",
                 "Taxon.ScientificName",
                 "Taxon.VernacularName",
-                "Taxon.Attributes.IsRedlisted",
                 "Taxon.Attributes.OrganismGroup",
-                "Taxon.Attributes.TaxonCategory",
                 "Event.PlainStartTime");
         }
 
@@ -160,6 +157,7 @@ namespace SOS.Lib.UnitTests.Extensions
                 "CollectionCode",
                 "DataProviderId",
                 "DatasetName",
+                "Event.DiscoveryMethod",
                 "Event.EventRemarks",
                 "Event.Habitat",
                 "Event.MeasurementOrFacts.MeasurementID",
@@ -178,8 +176,6 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Identification.DeterminationMethod",
                 "Identification.IdentifiedBy",
                 "Identification.UncertainIdentification",
-                "Identification.Validated",
-                "Identification.ValidationStatus",
                 "Identification.VerificationStatus",
                 "Identification.Verified",
                 "Identification.VerifiedBy",
@@ -188,6 +184,8 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Location.County",
                 "Location.DecimalLatitude",
                 "Location.DecimalLongitude",
+                "Location.Sweref99TmX",
+                "Location.Sweref99TmY",
                 "Location.GeodeticDatum",
                 "Location.Locality",
                 "Location.LocationId",
@@ -216,7 +214,6 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Occurrence.OrganismQuantity",
                 "Occurrence.OrganismQuantityInt",
                 "Occurrence.OrganismQuantityUnit",
-                "Occurrence.ProtectionLevel",
                 "Occurrence.RecordedBy",
                 "Occurrence.ReportedBy",
                 "Occurrence.ReproductiveCondition",
@@ -231,11 +228,12 @@ namespace SOS.Lib.UnitTests.Extensions
                 "Projects.Owner",
                 "Projects.ProjectParameters",
                 "RightsHolder",
-                "Taxon.Attributes.InvasiveInfo",
+                "Taxon.Attributes.InvasiveInfo.IsInvasiveAccordingToEuRegulation",
+                "Taxon.Attributes.InvasiveInfo.IsInvasiveInSweden",
+                "Taxon.Attributes.InvasiveInfo.RiskAssessmentCategory",
                 "Taxon.Attributes.IsRedlisted",
                 "Taxon.Attributes.OrganismGroup",
                 "Taxon.Attributes.ProtectedByLaw",
-                "Taxon.Attributes.ProtectionLevel",
                 "Taxon.Attributes.RedlistCategory",
                 "Taxon.Attributes.SensitivityCategory",
                 "Taxon.Attributes.TaxonCategory",

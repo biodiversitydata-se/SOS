@@ -16,6 +16,7 @@ namespace SOS.Lib.Helpers
         public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
         public static readonly Dictionary<OutputFieldSet, List<PropertyFieldDescription>> FieldsByFieldSet;
         public static readonly Dictionary<OutputFieldSet, List<string>> OutputFieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, HashSet<string>> JsonFormatDependencyByFieldSet;
 
         static ObservationPropertyFieldDescriptionHelper()
         {
@@ -24,6 +25,7 @@ namespace SOS.Lib.Helpers
             FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath, x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
             OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
+            JsonFormatDependencyByFieldSet = CreateJsonFormatDependencyDictionary(FieldsByFieldSet);
         }
 
         /// <summary>
@@ -177,6 +179,34 @@ namespace SOS.Lib.Helpers
             }
 
             return fieldsByFieldSet;
+        }
+
+        private static Dictionary<OutputFieldSet, HashSet<string>> CreateJsonFormatDependencyDictionary(
+            Dictionary<OutputFieldSet, List<PropertyFieldDescription>> fieldsByFieldSet)
+        {
+            var jsonFormatDependencyByFieldSet = new Dictionary<OutputFieldSet, HashSet<string>>
+            {
+                {OutputFieldSet.Minimum, new HashSet<string>()},
+                {OutputFieldSet.Extended, new HashSet<string>()}
+            };
+
+            foreach (var pair in fieldsByFieldSet)
+            {
+                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithValues)
+                {
+                    continue; // retrieve all fields from Elasticsearch
+                }
+
+                foreach (var field in pair.Value)
+                {
+                    foreach (var dependentField in field.GetJsonFormatDependsOn())
+                    {
+                        jsonFormatDependencyByFieldSet[pair.Key].Add(dependentField);
+                    }
+                }
+            }
+
+            return jsonFormatDependencyByFieldSet;
         }
 
         private static Dictionary<OutputFieldSet, List<string>> CreateOutputFieldsDictionary(

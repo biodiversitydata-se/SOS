@@ -315,7 +315,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 _taxaById,
                 _vocabularyRepository,
                 false,
-                "https:\\www.artportalen.se",
+                "https://www.artportalen.se",
                 _processTimeManager);
             var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
             _importClient = new VerbatimClient(
