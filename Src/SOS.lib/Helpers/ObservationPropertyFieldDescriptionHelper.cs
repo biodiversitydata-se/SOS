@@ -132,7 +132,6 @@ namespace SOS.Lib.Helpers
             
             foreach (var field in fields)
             {
-                if (string.IsNullOrEmpty(field.FieldSet)) continue;
                 if (field.FieldSet == "Minimum")
                 {
                     fieldsByFieldSet[OutputFieldSet.Minimum].Add(field);
@@ -175,6 +174,10 @@ namespace SOS.Lib.Helpers
                         OutputFieldSet.All
                     };
                     field.FieldSetEnum = OutputFieldSet.All;
+                }
+                else
+                {
+                    field.FieldSetEnum = OutputFieldSet.None;
                 }
             }
 

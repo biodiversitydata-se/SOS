@@ -43,7 +43,12 @@ namespace SOS.Lib.Enums
         /// <summary>
         /// All properties exported
         /// </summary>
-        All
+        All,
+
+        /// <summary>
+        /// The field doesn't belong to any field set.
+        /// </summary>
+        None
     }
 
     /// <summary>
