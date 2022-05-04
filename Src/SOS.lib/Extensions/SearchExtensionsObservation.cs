@@ -114,18 +114,107 @@ namespace SOS.Lib
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
-            query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
+            query.TryAddTermCriteria("artportalenInternal.checkListId", internalFilter.CheckListId);
+            query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
+            query.TryAddTermCriteria("artportalenInternal.hasTriggeredValidationRules", internalFilter.HasTriggeredVerificationRule, true);
+            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
+            query.TryAddTermCriteria("artportalenInternal.hasUserComments", internalFilter.OnlyWithUserComments, true);
+
+            switch (internalFilter.UnspontaneousFilter)
+            {
+                case SightingUnspontaneousFilter.NotUnspontaneous:
+                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", true);
+                    break;
+                case SightingUnspontaneousFilter.Unspontaneous:
+                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
+                    break;
+            }
+
+            query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
             query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", internalFilter.ObservedByUserId);
             query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "userServiceUserId", internalFilter.ObservedByUserServiceUserId);
 
+            //search by locationId, but include child-locations observations aswell
+            var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
+            if (siteTerms?.Any() ?? false)
+            {
+
+                query.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Terms(t => t
+                                .Field("location.locationId")
+                                .Terms(siteTerms)),
+                            s => s
+                            .Terms(t => t
+                                .Field("artportalenInternal.parentLocationId")
+                                .Terms(internalFilter.SiteIds))
+                             )
+                        )
+                    );
+            }
+
+            query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
+            query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
+            query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
+
+            if (internalFilter.OnlySecondHandInformation)
+            {
+                query.TryAddTermCriteria("artportalenInternal.secondHandInformation", true);
+            }
+
+            if (internalFilter.OnlyWithBarcode)
+            {
+                query.AddMustExistsCriteria("artportalenInternal.sightingBarcodeURL");
+            }
+
+            query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
+
+            if (internalFilter.SpeciesFactsIds?.Any() ?? false)
+            {
+                foreach (var factsId in internalFilter.SpeciesFactsIds)
+                {
+                    query.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
+                }
+            }
+
+            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
+            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
+          
+            query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
+
+            query.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.VerificationStatusIds);
             query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
 
+            query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
+            query.TryAddWildcardCriteria("location.locality", internalFilter?.Location?.NameFilter);
+
+            query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
+            
             if (internalFilter.OnlyWithMedia)
             {
                 query.AddMustExistsCriteria("occurrence.associatedMedia");
                 //    query.TryAddWildcardCriteria("occurrence.associatedMedia", "http*");
             }
+
+            query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
+
+            switch (internalFilter.NotPresentFilter)
+            {
+                case SightingNotPresentFilter.DontIncludeNotPresent:
+                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", false);
+                    break;
+                case SightingNotPresentFilter.OnlyNotPresent:
+                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", true);
+                    break;
+            }
+
+            if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
+            {
+                query.AddNumericFilterWithRelationalOperator("occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
+            }
+
+            query.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
 
             if (internalFilter.OnlyWithNotes)
             {
@@ -133,10 +222,26 @@ namespace SOS.Lib
                 //  query.TryAddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
             }
 
-            query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
-            query.TryAddTermCriteria("artportalenInternal.hasUserComments", internalFilter.OnlyWithUserComments, true);
+            if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
+            {
+                query.AddNumericFilterWithRelationalOperator("occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
+            }
+
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, SearchExtensionsGeneric.RangeTypes.GreaterThanOrEquals);
             query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
+
+            query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
+            query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
+            
+            if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
+            {
+                query.AddNumericFilterWithRelationalOperator("occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
+            }
+
+            query.TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection);
+            query.TryAddTermCriteria("publicCollection", internalFilter.PublicCollection);
+
+            query.TryAddTermCriteria("speciesCollectionLabel", internalFilter.SpeciesCollectionLabel);
 
             if (internalFilter.Months?.Any() ?? false)
             {
@@ -158,100 +263,6 @@ namespace SOS.Lib
                 {
                     query.AddScript(monthStartDateScript);
                     query.AddScript(monthEndDateScript);
-                }
-            }
-
-            query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
-            query.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
-            query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
-
-            query.TryAddTermCriteria("artportalenInternal.hasTriggeredValidationRules", internalFilter.HasTriggeredVerificationRule, true);
-            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
-
-
-            if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
-            }
-
-            if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
-            }
-
-            if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
-            }
-
-            query.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.VerificationStatusIds);
-
-            if (internalFilter.OnlyWithBarcode)
-            {
-                query.AddMustExistsCriteria("artportalenInternal.sightingBarcodeURL");
-            }
-
-            switch (internalFilter.UnspontaneousFilter)
-            {
-                case SightingUnspontaneousFilter.NotUnspontaneous:
-                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", true);
-                    break;
-                case SightingUnspontaneousFilter.Unspontaneous:
-                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
-                    break;
-            }
-
-            query.TryAddTermCriteria("speciesCollectionLabel", internalFilter.SpeciesCollectionLabel);
-            query.TryAddTermCriteria("publicCollection", internalFilter.PublicCollection);
-            query.TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection);
-            query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
-            query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
-            query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
-
-            switch (internalFilter.NotPresentFilter)
-            {
-                case SightingNotPresentFilter.DontIncludeNotPresent:
-                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", false);
-                    break;
-                case SightingNotPresentFilter.OnlyNotPresent:
-                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", true);
-                    break;
-            }
-
-            if (internalFilter.OnlySecondHandInformation)
-            {
-                query.TryAddTermCriteria("artportalenInternal.secondHandInformation", true);
-            }
-            query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
-            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
-            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
-            query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
-
-            //search by locationId, but include child-locations observations aswell
-            var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
-            if (siteTerms?.Any() ?? false)
-            {
-
-                query.Add(q => q
-                    .Bool(p=>p
-                        .Should(s => s
-                            .Terms(t => t
-                                .Field("location.locationId")
-                                .Terms(siteTerms)),
-                            s => s
-                            .Terms(t => t
-                                .Field("artportalenInternal.parentLocationId")
-                                .Terms(internalFilter.SiteIds))
-                             )
-                        )
-                    );
-            }
-
-            if (internalFilter.SpeciesFactsIds?.Any() ?? false)
-            {
-                foreach (var factsId in internalFilter.SpeciesFactsIds)
-                {
-                    query.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
                 }
             }
 
@@ -305,12 +316,6 @@ namespace SOS.Lib
                             }}
                         ");
             }
-
-            query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
-
-            query.TryAddWildcardCriteria("location.locality", internalFilter?.Location?.NameFilter);
-
-            query.TryAddTermCriteria("artportalenInternal.checkListId", internalFilter.CheckListId);
         }
 
         /// <summary>

@@ -137,6 +137,8 @@ namespace SOS.Lib.Models.Search
 
         public IEnumerable<int> SiteIds { get; set; }
 
+        public IEnumerable<int> SiteProjectIds { get; set; }
+
         public IEnumerable<int> SpeciesFactsIds { get; set; }
         public string InstitutionId { get; set; }
 
