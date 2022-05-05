@@ -16,10 +16,12 @@ namespace SOS.Lib.UnitTests.Helpers
         public void ValidateUniquePropertyNamesAndTitles()
         {
             // Act
-            bool unique = ObservationPropertyFieldDescriptionHelper.ValidateUniquePropertyNames();
+            bool uniqueProperties = ObservationPropertyFieldDescriptionHelper.ValidateUniquePropertyNames();
+            bool uniqueDependencyMapping = ObservationPropertyFieldDescriptionHelper.ValidateUniqueDependencyMapping();
 
             // Assert
-            unique.Should().BeTrue();
+            uniqueProperties.Should().BeTrue();
+            uniqueDependencyMapping.Should().BeTrue();
         }
     }
 }

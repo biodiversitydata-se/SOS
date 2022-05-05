@@ -121,6 +121,25 @@ namespace SOS.Lib.Helpers
             return true;
         }
 
+        public static bool ValidateUniqueDependencyMapping()
+        {
+            var dependencySet = new HashSet<string>();
+            HashSet<string> dependsOnDuplicates = new HashSet<string>();
+
+            foreach (var field in FieldsByFieldSet[OutputFieldSet.All])
+            {
+                if (dependencySet.Contains(field.DependsOn))
+                {
+                    dependsOnDuplicates.Add(field.DependsOn);
+                }
+
+                dependencySet.Add(field.DependsOn);
+            }
+
+            return dependsOnDuplicates.Count <= 0;
+        }
+
+
         private static Dictionary<OutputFieldSet, List<PropertyFieldDescription>> CreateFieldSetDictionary(
             List<PropertyFieldDescription> fields)
         {
