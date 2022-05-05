@@ -401,6 +401,49 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> HaveProjectInformation(
+            this IOperable<ArtportalenObservationVerbatim> operable)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>) operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile)
+                {
+                    if (verbatimObservation.Projects != null && verbatimObservation.Projects.Any())
+                    {
+                        var firstProject = verbatimObservation.Projects.First();
+
+                        if (firstProject.ProjectParameters != null && firstProject.ProjectParameters.Count > 0)
+                        {
+                            obs.Projects = verbatimObservation.Projects;
+                            return;
+                        }
+                    }
+                }
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveMediaInformation(
+            this IOperable<ArtportalenObservationVerbatim> operable)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile)
+                {
+                    if (verbatimObservation.Media != null && verbatimObservation.Media.Count() > 1)
+                    {
+                        obs.Media = verbatimObservation.Media;
+                        return;
+                    }
+                }
+            });
+
+            return operable;
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> IsInDateSpan(this IOperable<ArtportalenObservationVerbatim> operable, DateTime spanStartDate, DateTime spanEndDate)
         {
             var randomTest = new Random();

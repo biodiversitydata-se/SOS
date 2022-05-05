@@ -67,11 +67,8 @@ namespace SOS.Lib.IO.Excel
             try
             {
                 var nrObservations = 0;
-                var propertyFields = filter.OutputFields?.Any() ?? false ?
-                    ObservationPropertyFieldDescriptionHelper.FieldByPropertyPath
-                    .Where(f => filter.OutputFields.Contains(f.Key))
-                    .Select(f => f.Value) :
-                    ObservationPropertyFieldDescriptionHelper.AllFields;
+                var propertyFields =
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.OutputFields);
                 temporaryZipExportFolderPath = Path.Combine(exportPath, fileName);
                 if (!Directory.Exists(temporaryZipExportFolderPath))
                 {

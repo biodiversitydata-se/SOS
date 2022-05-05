@@ -16,6 +16,8 @@ namespace SOS.Lib.Helpers
         public static readonly Dictionary<string, PropertyFieldDescription> FieldByPropertyPath;
         public static readonly Dictionary<OutputFieldSet, List<PropertyFieldDescription>> FieldsByFieldSet;
         public static readonly Dictionary<OutputFieldSet, List<string>> OutputFieldsByFieldSet;
+        public static readonly Dictionary<OutputFieldSet, HashSet<string>> JsonFormatDependencyByFieldSet;
+        private static readonly Dictionary<string, string> ExportFormatFieldByJsonFormatField;
 
         static ObservationPropertyFieldDescriptionHelper()
         {
@@ -24,6 +26,8 @@ namespace SOS.Lib.Helpers
             FieldByPropertyPath = AllFields.ToDictionary(x => x.PropertyPath, x => x);
             FieldsByFieldSet = CreateFieldSetDictionary(AllFields);
             OutputFieldsByFieldSet = CreateOutputFieldsDictionary(FieldsByFieldSet);
+            JsonFormatDependencyByFieldSet = CreateJsonFormatDependencyDictionary(FieldsByFieldSet);
+            ExportFormatFieldByJsonFormatField = CreateExportFormatFieldByJsonFormatFieldDictionary(AllFields);
         }
 
         /// <summary>
@@ -130,7 +134,6 @@ namespace SOS.Lib.Helpers
             
             foreach (var field in fields)
             {
-                if (string.IsNullOrEmpty(field.FieldSet)) continue;
                 if (field.FieldSet == "Minimum")
                 {
                     fieldsByFieldSet[OutputFieldSet.Minimum].Add(field);
@@ -174,9 +177,62 @@ namespace SOS.Lib.Helpers
                     };
                     field.FieldSetEnum = OutputFieldSet.All;
                 }
+                else
+                {
+                    field.FieldSetEnum = OutputFieldSet.None;
+                }
             }
 
             return fieldsByFieldSet;
+        }
+
+        private static Dictionary<string, string> CreateExportFormatFieldByJsonFormatFieldDictionary(
+            List<PropertyFieldDescription> fields)
+        {
+            var exportFormatFieldByJsonFormatField = new Dictionary<string, string>();
+            foreach (var field in fields)
+            {
+                if (field.FieldSetEnum == OutputFieldSet.None) continue;
+
+                var dependentFields = field.GetJsonFormatDependsOn();
+                if (dependentFields.Length > 1)
+                {
+                    foreach (var dependentField in dependentFields)
+                    {
+                        exportFormatFieldByJsonFormatField.TryAdd(dependentField, field.PropertyPath);
+                    }
+                }
+            }
+            
+            return exportFormatFieldByJsonFormatField;
+        }
+
+        private static Dictionary<OutputFieldSet, HashSet<string>> CreateJsonFormatDependencyDictionary(
+            Dictionary<OutputFieldSet, List<PropertyFieldDescription>> fieldsByFieldSet)
+        {
+            var jsonFormatDependencyByFieldSet = new Dictionary<OutputFieldSet, HashSet<string>>
+            {
+                {OutputFieldSet.Minimum, new HashSet<string>()},
+                {OutputFieldSet.Extended, new HashSet<string>()}
+            };
+
+            foreach (var pair in fieldsByFieldSet)
+            {
+                if (pair.Key == OutputFieldSet.All || pair.Key == OutputFieldSet.AllWithValues)
+                {
+                    continue; // retrieve all fields from Elasticsearch
+                }
+
+                foreach (var field in pair.Value)
+                {
+                    foreach (var dependentField in field.GetJsonFormatDependsOn())
+                    {
+                        jsonFormatDependencyByFieldSet[pair.Key].Add(dependentField);
+                    }
+                }
+            }
+
+            return jsonFormatDependencyByFieldSet;
         }
 
         private static Dictionary<OutputFieldSet, List<string>> CreateOutputFieldsDictionary(
@@ -216,6 +272,35 @@ namespace SOS.Lib.Helpers
             using var fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
             var fields = System.Text.Json.JsonSerializer.DeserializeAsync<List<PropertyFieldDescription>>(fs).Result;
             return fields;
+        }
+
+        public static List<PropertyFieldDescription> GetExportFieldsFromOutputFields(List<string> outputFields)
+        {
+            if (outputFields == null || outputFields.Count == 0) return FieldsByFieldSet[OutputFieldSet.AllWithValues];
+
+            var fieldsSet = new HashSet<string>();
+            foreach (var outputField in outputFields)
+            {
+                if (ExportFormatFieldByJsonFormatField.TryGetValue(outputField, out string exportField))
+                {
+                    fieldsSet.Add(exportField);
+                }
+                else
+                {
+                    fieldsSet.Add(outputField);
+                }
+            }
+
+            var propertyFields = new List<PropertyFieldDescription>();
+            foreach (var field in fieldsSet)
+            {
+                if (FieldByPropertyPath.TryGetValue(field, out var propertyField))
+                {
+                    propertyFields.Add(propertyField);
+                }
+            }
+
+            return propertyFields;
         }
     }
 }

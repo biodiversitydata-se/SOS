@@ -15,9 +15,9 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             string strProjectParameters = ProjectParameters == null ? null : string.Join(", ", ProjectParameters);
             if (string.IsNullOrEmpty(strProjectParameters))
-                return $"{Name} [{Id}]";
+                return $"{Name} ({Id})";
             else
-                return $"{Name} [{Id}], Params: {strProjectParameters}";
+                return $"{Name} ({Id}) - {strProjectParameters}";
         }
     }
 }

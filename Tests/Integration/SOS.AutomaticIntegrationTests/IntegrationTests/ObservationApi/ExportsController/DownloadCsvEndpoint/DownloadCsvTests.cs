@@ -99,7 +99,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             {
                 Output = new OutputFilterDto
                 {
-                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
                 }
             };
 
@@ -144,7 +144,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             {
                 Output = new OutputFilterDto
                 {
-                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value" }
+                    Fields = new List<string> { "Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity" }
                 }
             };
 
@@ -190,11 +190,61 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             propertyNameEntries.First().Keys.Should()
                 .BeEquivalentTo("OccurrenceId", "DatasetName", "RecordedBy", "Activity");
             propertyPathEntries.First().Keys.Should()
-                .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity.Value");
+                .BeEquivalentTo("Occurrence.OccurrenceId", "DatasetName", "Occurrence.RecordedBy", "Occurrence.Activity");
             swedishEntries.First().Keys.Should()
                 .BeEquivalentTo("Observation GUID", "Datakälla", "Observatör", "Aktivitet");
             englishEntries.First().Keys.Should()
                 .BeEquivalentTo("Occurrence Id", "Dataset", "Recorded by", "Activity");
+        }
+
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task DownloadCsvFile_ExtendedFieldSet_with_project_parameters_and_media()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Create verbatim observations
+            //-----------------------------------------------------------------------------------------------------------            
+            const int sightingId = 123456;
+            const string occurrenceId = "urn:lsid:artportalen.se:sighting:123456";
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .TheFirst(1)
+                    .With(m => m.SightingId = sightingId)
+                    .HaveProjectInformation()
+                    .HaveMediaInformation()
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+
+            var searchFilter = new SearchFilterDto()
+            {
+                Output = new OutputFilterDto()
+                {
+                    FieldSet = OutputFieldSet.Extended,
+                    Fields = new List<string> { "Occurrence.Media"}
+                }
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var csvFileResult = await _fixture.ExportsController.DownloadCsv(
+                searchFilter,
+                PropertyLabelType.PropertyName,
+                "sv-SE",
+                false);
+
+            var file = (FileContentResult)csvFileResult;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            file.FileContents.Length.Should().BeGreaterThan(0);
+            var fileEntries = ReadCsvFile(file.FileContents);
+            var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
+            fileEntry["Projects"].Should().NotBeNullOrEmpty();
+            fileEntry["Media"].Should().NotBeNullOrEmpty();
         }
 
         private List<Dictionary<string, string>> ReadCsvFile(byte[] file)

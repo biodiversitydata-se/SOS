@@ -85,7 +85,7 @@
 
         public override string ToString()
         {
-            return $"{MeasurementType}={MeasurementValue}";
+            return $"[{MeasurementType}={MeasurementValue}]";
         }
     }
 }

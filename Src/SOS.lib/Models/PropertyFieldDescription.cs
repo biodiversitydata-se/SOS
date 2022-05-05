@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using SOS.Lib.Enums;
 
@@ -15,6 +16,7 @@ namespace SOS.Lib.Models
         public string DwcName { get; set; }
         public string DwcIdentifier { get; set; }
         public string DependsOn { get; set; }
+        public string JsonFormatDependsOn { get; set; }
         public string FieldSet { get; set; }
         [JsonIgnore]
         public OutputFieldSet FieldSetEnum { get; set; }
@@ -22,6 +24,24 @@ namespace SOS.Lib.Models
         public List<OutputFieldSet> FieldSets { get; set; }
         public string Comment { get; set; }
         public PropertyFieldDataType DataTypeEnum { get; set; }
+
+        private string[] _jsonFormatDependsOn;
+        public string[] GetJsonFormatDependsOn()
+        {
+            if (_jsonFormatDependsOn == null)
+            {
+                if (string.IsNullOrEmpty(JsonFormatDependsOn))
+                {
+                    _jsonFormatDependsOn = new []{ DependsOn } ;
+                }
+                else
+                {
+                    _jsonFormatDependsOn = JsonFormatDependsOn.Split(",").Select(m => m.Trim()).ToArray();
+                }
+            }
+
+            return _jsonFormatDependsOn;
+        }
         public string GetSwedishTitle()
         {
             return string.IsNullOrEmpty(SwedishTitle) ? PropertyName : SwedishTitle;

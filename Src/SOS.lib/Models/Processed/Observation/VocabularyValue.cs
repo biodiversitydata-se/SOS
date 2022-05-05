@@ -59,7 +59,7 @@ namespace SOS.Lib.Models.Processed.Observation
 
         public override string ToString()
         {
-            return $"{Value} [Id={Id}]";
+            return Value;
         }
     }
 }
