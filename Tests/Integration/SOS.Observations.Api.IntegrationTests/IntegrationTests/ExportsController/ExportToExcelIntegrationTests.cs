@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter,  PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -131,6 +131,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadExcel(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.Swedish, 
                 "sv-SE", 
                 false);                
@@ -177,7 +178,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadExcel(searchFilter,  PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadExcel(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------

@@ -56,6 +56,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.Swedish,
                 "sv-SE",
                 true);
@@ -92,6 +93,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
@@ -133,6 +135,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
@@ -174,6 +177,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadGeoJson(searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 true,
