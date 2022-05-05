@@ -54,6 +54,22 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        [HttpGet("{areaType}/{featureId}")]
+        [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+        {
+            try
+            {
+                return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting area {areaType} {featureId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
 
         /// <inheritdoc />
         [HttpGet("{areaType}/{featureId}/Export")]
