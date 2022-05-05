@@ -48,6 +48,26 @@ namespace SOS.Observations.Api.Controllers
         private int UserId => int.Parse(User?.Claims?.FirstOrDefault(c => c.Type.Contains("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value ?? "0");
 
         /// <summary>
+        /// Use outputFieldSet passed in query if no value is passed in filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="outputFieldSet"></param>
+        private void HandleOutputFieldSet(SearchFilterDto filter,
+              OutputFieldSet outputFieldSet)
+        {
+            if (outputFieldSet != OutputFieldSet.None)
+            {
+                filter = filter ?? new SearchFilterDto();
+                filter.Output = filter?.Output ?? new OutputFilterDto();
+
+                if ((filter.Output.FieldSet ?? OutputFieldSet.None) == OutputFieldSet.None)
+                {
+                    filter.Output.FieldSet = outputFieldSet;
+                }
+            }
+        }
+
+        /// <summary>
         /// Get user export info
         /// </summary>
         /// <returns></returns>
@@ -225,10 +245,12 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadCsv(
              [FromBody] SearchFilterDto filter,
+             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
              [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
              [FromQuery] string cultureCode = "sv-SE",
              [FromQuery] bool gzip = true)
         {
+            HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
             try
@@ -315,10 +337,12 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadExcel(
             [FromBody] SearchFilterDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool gzip = true)
         {
+            HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
             try
@@ -362,12 +386,14 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> DownloadGeoJson([FromBody] SearchFilterDto filter,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
             [FromQuery] bool excludeNullValues = true,
             [FromQuery] bool gzip = true)
         {
+            HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             FileExportResult fileExportResult = null;
             
@@ -419,11 +445,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderCsv([FromBody] SearchFilterDto filter,
             [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
@@ -520,11 +548,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderExcel([FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             [FromQuery] string cultureCode = "sv-SE")
         {
             try
             {
+                HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
@@ -574,6 +604,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> OrderGeoJson([FromBody] SearchFilterDto filter, 
             [FromQuery] string description,
+            [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             [FromQuery] string cultureCode = "sv-SE",
             [FromQuery] bool flat = true,
@@ -581,6 +612,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var validateResult = await OrderValidateAsync(filter, UserEmail, userExports);
