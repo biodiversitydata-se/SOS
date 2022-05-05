@@ -448,14 +448,13 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation(timerMessage);
                     }
                 }
-
+                
                 //-------------------------------
                 // 8. Return processing result
                 //-------------------------------
-                return success ? true : throw new Exception(
-                    $@"Failed to process observations. {result
-                        .Where(r => r.Value.Status != RunStatus.Success)
-                        .Select(r => $"Provider: {r.Key} - {r.Value.Status}")}");
+                return success ? true : throw new Exception($@"Failed to process observations. {string.Join(", ", result
+                    .Where(r => r.Value.Status != RunStatus.Success)
+                        .Select(r => $"Provider: {r.Key}-{r.Value.Status}"))}");
             }
             catch (JobAbortedException)
             {
