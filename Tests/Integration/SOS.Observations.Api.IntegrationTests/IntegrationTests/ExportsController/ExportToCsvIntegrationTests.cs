@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadCsv(searchFilter, PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadCsv(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ExportsController.DownloadCsv(searchFilter,  PropertyLabelType.Swedish, "sv-SE");
+            var response = await _fixture.ExportsController.DownloadCsv(searchFilter, OutputFieldSet.Minimum, PropertyLabelType.Swedish, "sv-SE");
             var bytes = response.GetFileContentResult();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -127,6 +127,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ExportsControll
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.Swedish, 
                 "sv-SE",
                 false);

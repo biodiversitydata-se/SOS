@@ -33,6 +33,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
             int skip, int take);
 
         /// <summary>
+        /// Get a single area
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId);
+
+        /// <summary>
         /// Get area as zip file in specified format.
         /// </summary>
         /// <param name="areaType"></param>

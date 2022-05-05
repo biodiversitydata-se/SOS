@@ -20,16 +20,17 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
         /// </summary>
         /// <param name="filter">The search filter</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadCsv(
-            [FromBody] SearchFilterDto filter,
-            [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
-            [FromQuery] string cultureCode = "sv-SE",
-            [FromQuery] bool gzip = true);
+            SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
+            PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            string cultureCode = "sv-SE",
+            bool gzip = true);
 
         /// <summary>
         /// Download DwC export file. The limit is 25 000 observations. If you need to download more observations, use the OrderDwC endpoint.
@@ -42,12 +43,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
         /// </summary>
         /// <param name="filter">The search filter</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadExcel(SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE",
             bool gzip = true);
@@ -56,7 +58,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
         /// </summary>
         /// <param name="filter">The search filter.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
@@ -64,6 +66,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="gzip">If true (default), the resulting file will be compressed by the GZIP file format.</param>
         /// <returns></returns>
         Task<IActionResult> DownloadGeoJson(SearchFilterDto filter,
+            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,
@@ -78,12 +81,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         Task<IActionResult> OrderCsv(SearchFilterDto filter,
             string description,
+            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE");
 
@@ -106,12 +110,13 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter">Search filter.</param>
         /// <param name="description">A summary of the dataset you request. The description will be included in the email. If empty, an automatic description will be created.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The column header type.</param>
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         Task<IActionResult> OrderExcel(SearchFilterDto filter, 
             string description,
+            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName, 
             string cultureCode = "sv-SE");
 
@@ -123,7 +128,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="description">A description of your download. Will be displayed in the email.</param>
-        /// <param name="outputFieldSet">The observation property field set.</param>
+        /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="propertyLabelType">The label type to use if flat=false.</param>
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
         /// <param name="flat">If true, the observations will be serialized as a flat JSON structure.</param>
@@ -131,6 +136,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <returns></returns>
         Task<IActionResult> OrderGeoJson(SearchFilterDto filter,
             string description,
+            OutputFieldSet outputFieldSet,
             PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
             string cultureCode = "sv-SE",
             bool flat = true,

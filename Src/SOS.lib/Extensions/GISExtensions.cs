@@ -191,48 +191,35 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static LinearRing TryMakeRingValid(this LinearRing linearRing)
         {
-            var count = linearRing?.NumPoints ?? 0;
-            if (count < 2)
+            var coordinates = TryMakeRingValid<Coordinate>(linearRing?.Coordinates);
+
+            if (coordinates?.Any() ?? false)
             {
-                return null;
+                return Geometry.DefaultFactory.CreateLinearRing(coordinates as Coordinate[]);
             }
 
-            // Use hash set, no duplicates will be added
-            var validatedCoordinates = new HashSet<Coordinate>();
-
-            for (var i = 0; i < count; i++)
-            {
-                validatedCoordinates.Add(linearRing.Coordinates[i]);
-            }
-
-            // Make sure last coordinate equals first
-            var newRingCoordinates = new Coordinate[validatedCoordinates.Count + 1];
-            validatedCoordinates.CopyTo(newRingCoordinates, 0);
-            new [] { new Coordinate(newRingCoordinates[0].X, newRingCoordinates[0].Y) }.CopyTo(newRingCoordinates, validatedCoordinates.Count);
-
-            return Geometry.DefaultFactory.CreateLinearRing(newRingCoordinates);
+            return null;
         }
 
         private static IEnumerable<GeoCoordinate> TryMakeRingValid(this IEnumerable<GeoCoordinate> linearRing)
         {
-            var count = linearRing?.Count() ?? 0;
-            if (count < 2)
+            return TryMakeRingValid<GeoCoordinate>(linearRing);
+        }
+
+        private static IEnumerable<T> TryMakeRingValid<T>(this IEnumerable<T> linearRing)
+        {
+            // Use hash set, no duplicates will be added
+            var validatedCoordinates = new HashSet<T>(linearRing);
+            var coordinateCount = validatedCoordinates.Count();
+            if (coordinateCount < 3)
             {
                 return null;
             }
 
-            // Use hash set, no duplicates will be added
-            var validatedCoordinates = new HashSet<GeoCoordinate>();
-
-            foreach (var coordinate in linearRing)
-            {
-                validatedCoordinates.Add(coordinate);
-            }
-
-            var newRingCoordinates = new GeoCoordinate[validatedCoordinates.Count + 1];
+            // Make sure last coordinate equals first
+            var newRingCoordinates = new T[validatedCoordinates.Count + 1];
             validatedCoordinates.CopyTo(newRingCoordinates, 0);
-            new[] {new GeoCoordinate(newRingCoordinates[0].Latitude, newRingCoordinates[0].Longitude)}.CopyTo(
-                newRingCoordinates, validatedCoordinates.Count);
+            new[] { newRingCoordinates[0] }.CopyTo(newRingCoordinates, coordinateCount);
 
             return newRingCoordinates;
         }
@@ -351,6 +338,10 @@ namespace SOS.Lib.Extensions
             if (point?.Coordinate == null || point.Coordinate.X <= 0 || point.Coordinate.Y <= 0)
             {
                 return null;
+            }
+            if (accuracy == 0)
+            {
+                accuracy = 1;
             }
 
             var shapeFactory = new GeometricShapeFactory();

@@ -60,6 +60,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             var csvFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -108,6 +109,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             var csvFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -153,6 +155,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             var propertyNameFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);
@@ -160,6 +163,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
 
             var propertyPathFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyPath,
                 "sv-SE",
                 false);
@@ -167,6 +171,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
 
             var swedishFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.Swedish,
                 "sv-SE",
                 false);
@@ -174,6 +179,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
 
             var englishFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.English,
                 "sv-SE",
                 false);
@@ -231,6 +237,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ExportsC
             //-----------------------------------------------------------------------------------------------------------
             var csvFileResult = await _fixture.ExportsController.DownloadCsv(
                 searchFilter,
+                OutputFieldSet.Minimum,
                 PropertyLabelType.PropertyName,
                 "sv-SE",
                 false);

@@ -141,6 +141,28 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <inheritdoc />
+        public async Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId)
+        {
+            try
+            {
+                var result = await _areaCache.GetAsync((AreaType)areaType, featureId);
+
+                return result == null ? null : new AreaBaseDto
+                {
+                    AreaType = (AreaTypeDto)result.AreaType,
+                    BoundingBox = result.BoundingBox,
+                    FeatureId = result.FeatureId,
+                    Name = result.Name
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get area from cache");
+                return null;
+            }
+        }
+
         public async Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format)
         {
             switch (format)
