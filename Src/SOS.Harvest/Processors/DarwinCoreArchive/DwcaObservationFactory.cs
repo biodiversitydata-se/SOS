@@ -175,7 +175,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 obs.Sensitive = true;
                 obs.Protected = true;
             }
-            
+
+            // Populate generic data
+            PopulateGenericData(obs);
+
             return obs;
         }
 

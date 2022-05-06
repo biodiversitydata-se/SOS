@@ -108,6 +108,8 @@ namespace SOS.Harvest.Processors.Shark
             Status => Occurrence.Status ?
 
              */
+            // Populate generic data
+            PopulateGenericData(obs);
 
             return obs;
         }

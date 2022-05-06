@@ -117,6 +117,9 @@ namespace SOS.Harvest.Processors.ObservationDatabase
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
+            // Populate generic data
+            PopulateGenericData(obs);
+
             return obs;
         }
     }

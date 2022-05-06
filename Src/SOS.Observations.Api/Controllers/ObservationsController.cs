@@ -20,7 +20,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
-using SOS.Observations.Api.Dtos.Enum;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -1654,6 +1653,86 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Get indication if taxon exists Internal error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("Internal/CurrentUser/YearMonthCount")]
+        [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetUserYearMonthCountAsync(
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false)
+        {
+            try
+            {
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var yearMonthCounts = await ObservationManager.GetUserYearMonthCountAsync(searchFilter);
+
+                return new OkObjectResult(yearMonthCounts);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TaxonValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year month count");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("Internal/CurrentUser/YearMonthDayCount")]
+        [ProducesResponseType(typeof(IEnumerable<YearMonthDayCountResultDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetUserYearMonthDayCountAsync(
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 20,
+            [FromQuery] bool validateSearchFilter = false)
+        {
+            try
+            {
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var yearMonthDayCounts = await ObservationManager.GetUserYearMonthDayCountAsync(searchFilter, skip, take);
+
+                return new OkObjectResult(yearMonthDayCounts);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TaxonValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year month count");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

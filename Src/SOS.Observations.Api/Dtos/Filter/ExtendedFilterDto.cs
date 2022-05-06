@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.Dtos.Filter
             IncludeNotPresent
         }
 
-        public enum MonthsFilterComparisonDto
+        public enum DateFilterComparisonDto
         {
             StartDate,
             EndDate,
@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         
         public bool UsePeriodForAllYears { get; set; }
         public IEnumerable<int> Months { get; set; }
-        public MonthsFilterComparisonDto MonthsComparison { get; set; } = MonthsFilterComparisonDto.StartDate;
+        public DateFilterComparisonDto MonthsComparison { get; set; } = DateFilterComparisonDto.StartDate;
         public IEnumerable<int> DiscoveryMethodIds { get; set; }
 
         public IEnumerable<int> LifeStageIds { get; set; }
@@ -151,5 +151,9 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<int> DatasourceIds { get; set; }
 
         public string LocationNameFilter { get; set; }
+
+        public IEnumerable<int> Years { get; set; }
+
+        public DateFilterComparisonDto YearsComparison { get; set; } = DateFilterComparisonDto.StartDate;
     }
 }

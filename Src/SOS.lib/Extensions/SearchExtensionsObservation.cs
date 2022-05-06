@@ -245,24 +245,35 @@ namespace SOS.Lib
 
             if (internalFilter.Months?.Any() ?? false)
             {
-                string monthStartDateScript = $@"
-                                    ZonedDateTime convertedStartDate = doc['event.startDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
-                string monthEndDateScript = $@"
-                                    ZonedDateTime convertedStartDate = doc['event.endDate'].value.withZoneSameInstant(ZoneId.of('Europe/Stockholm'));
-                                    return [{string.Join(',', internalFilter.Months.Select(m => $"{m}"))}].contains(convertedStartDate.getMonthValue());";
-                if (internalFilter.MonthsComparison == MonthsFilterComparison.StartDate)
+                switch (internalFilter.MonthsComparison)
                 {
-                    query.AddScript(monthStartDateScript);
+                    case DateFilterComparison.BothStartDateAndEndDate:
+                        query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
+                        query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
+                        break;
+                    case DateFilterComparison.EndDate:
+                        query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
+                        break;
+                    default:
+                        query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
+                        break;
                 }
-                else if (internalFilter.MonthsComparison == MonthsFilterComparison.EndDate)
+            }
+
+            if (internalFilter.Years?.Any() ?? false)
+            {
+                switch (internalFilter.YearsComparison)
                 {
-                    query.AddScript(monthEndDateScript);
-                }
-                else if (internalFilter.MonthsComparison == MonthsFilterComparison.BothStartDateAndEndDate)
-                {
-                    query.AddScript(monthStartDateScript);
-                    query.AddScript(monthEndDateScript);
+                    case DateFilterComparison.BothStartDateAndEndDate:
+                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
+                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
+                        break;
+                    case DateFilterComparison.EndDate:
+                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
+                        break;
+                    default:
+                        query.TryAddTermsCriteria("event.startYear", internalFilter.Years);
+                        break;
                 }
             }
 
@@ -768,7 +779,14 @@ namespace SOS.Lib
         public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> properties,
             bool isInternal)
         {
-            var projection = new SourceFilterDescriptor<dynamic>();
+            var projection = new SourceFilterDescriptor<dynamic>();/*.Excludes(e => e
+                .Field("event.endDay")
+                .Field("event.endMonth")
+                .Field("event.endYear")
+                .Field("event.startDay")
+                .Field("event.startMonth")
+                .Field("event.startYear")
+            );*/
             if (isInternal)
             {
                 projection.Excludes(e => e

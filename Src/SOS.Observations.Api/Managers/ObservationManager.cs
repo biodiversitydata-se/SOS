@@ -699,6 +699,62 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter = filter ?? new SearchFilter();
+                filter.ExtendedAuthorization = filter.ExtendedAuthorization ?? new ExtendedAuthorizationFilter();
+                filter.ExtendedAuthorization.ReportedByMe = true;
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                filter.ExtendedAuthorization.ProtectedObservations = false;
+                await _filterManager.PrepareFilter(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+
+                var result = await _processedObservationRepository.GetUserYearMonthCountAsync(filter);
+                return result?.ToDtos();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year, month count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter = filter ?? new SearchFilter();
+                filter.ExtendedAuthorization = filter.ExtendedAuthorization ?? new ExtendedAuthorizationFilter();
+                filter.ExtendedAuthorization.ReportedByMe = true;
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                filter.ExtendedAuthorization.ProtectedObservations = false;
+                await _filterManager.PrepareFilter(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+              
+                var result = await _processedObservationRepository.GetUserYearMonthDayCountAsync(filter, skip, take);
+                return result?.ToDtos();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year, month count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex)
         {
             return await _processedObservationRepository.HasIndexOccurrenceIdDuplicatesAsync(protectedIndex);

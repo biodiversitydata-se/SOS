@@ -213,6 +213,9 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
+            // Populate generic data
+            PopulateGenericData(obs);
+
             return obs;
         }
 

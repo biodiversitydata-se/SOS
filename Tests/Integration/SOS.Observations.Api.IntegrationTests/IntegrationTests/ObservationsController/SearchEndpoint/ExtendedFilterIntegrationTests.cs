@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
@@ -41,7 +39,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 ExtendedFilter = new ExtendedFilterDto()
                 {
                     Months = new List<int> {1,2,4},
-                    MonthsComparison = ExtendedFilterDto.MonthsFilterComparisonDto.BothStartDateAndEndDate
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.BothStartDateAndEndDate
                 },
                 Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
             };
@@ -94,7 +92,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
                 ExtendedFilter = new ExtendedFilterDto()
                 {
                     Months = new List<int> { 1, 2, 4 },
-                    MonthsComparison = ExtendedFilterDto.MonthsFilterComparisonDto.StartDate
+                    MonthsComparison = ExtendedFilterDto.DateFilterComparisonDto.StartDate
                 },
                 Output = new OutputFilterDto{ Fields = new[] { "Event" } } 
             };

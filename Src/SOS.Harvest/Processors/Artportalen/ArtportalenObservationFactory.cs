@@ -379,6 +379,9 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, VocabularyId.DeterminationMethod);
                 obs.MeasurementOrFacts = CreateMeasurementOrFacts(obs.Occurrence.OccurrenceId, verbatimObservation);
 
+                // Populate generic data
+                PopulateGenericData(obs);
+
                 return obs;
             }
             catch (Exception e)
