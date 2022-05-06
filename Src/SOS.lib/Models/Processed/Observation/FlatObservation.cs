@@ -275,9 +275,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? TaxonAttributesTaxonCategoryId => _observation?.Taxon?.Attributes?.TaxonCategory?.Id;
         public string TaxonAttributesTaxonCategoryValue => _observation?.Taxon?.Attributes?.TaxonCategory?.Value;
         public bool? TaxonAttributesIsRedlisted => _observation?.Taxon?.Attributes?.IsRedlisted;
-        public bool? TaxonAttributesIsInvasiveAccordingToEuRegulation => _observation?.Taxon?.Attributes?.InvasiveInfo?.IsInvasiveAccordingToEuRegulation;
-        public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.InvasiveInfo?.IsInvasiveInSweden;
-        public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveInfo?.RiskAssessmentCategory;
+        public bool? TaxonAttributesIsInvasiveAccordingToEuRegulation => _observation?.Taxon?.Attributes?.IsInvasiveAccordingToEuRegulation;
+        public bool? TaxonAttributesIsInvasiveInSweden => _observation?.Taxon?.Attributes?.IsInvasiveInSweden;
+        public string TaxonAttributesRiskAssessmentCategory => _observation?.Taxon?.Attributes?.InvasiveRiskAssessmentCategory;
         public string TaxonAttributesRedlistCategory => _observation?.Taxon?.Attributes?.RedlistCategory;
         public int? TaxonAttributesSortOrder => _observation?.Taxon?.Attributes?.SortOrder;
         public string TaxonAttributesSwedishHistory => _observation?.Taxon?.Attributes?.SwedishHistory;

@@ -27,8 +27,14 @@ namespace SOS.Harvest.Processors.Artportalen
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
-
-      
+        private int[] _verificationStatusIds = new[] {
+            (int) ValidationStatusId.ApprovedBasedOnReportersDocumentation,
+            (int) ValidationStatusId.ApprovedSpecimenCheckedByValidator,
+            (int) ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
+            (int) ValidationStatusId.ApprovedBasedOnReportersRarityForm,
+            (int) ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
+            (int) ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
+        };
 
         /// Cast verbatim area to processed area
         /// </summary>
@@ -183,24 +189,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Identification.DateIdentified = verbatimObservation.DeterminationYear.ToString();
                 obs.Identification.IdentifiedBy = verbatimObservation.DeterminedBy;
                 obs.Identification.VerifiedBy = verbatimObservation.VerifiedBy?.Clean();
-                obs.Identification.Validated = new[]
-                {
-                    (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
-                    (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator,
-                    (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
-                    (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm,
-                    (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
-                    (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
-                }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
-                obs.Identification.Verified = new[]
-                {
-                    (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation,
-                    (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator,
-                    (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
-                    (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm,
-                    (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
-                    (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
-                }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
+                obs.Identification.Verified = obs.Identification.Validated = _verificationStatusIds.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);                
                 obs.Identification.UncertainIdentification = verbatimObservation.UnsureDetermination;
                 obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
                

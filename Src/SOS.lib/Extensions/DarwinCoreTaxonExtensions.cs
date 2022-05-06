@@ -68,12 +68,9 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
-            taxon.Attributes.InvasiveInfo = new TaxonInvasiveInfo
-            {
-                IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false,
-                IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty),
-                RiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2)
-            };
+            taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
+            taxon.Attributes.IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty);
+            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);            
             taxon.Attributes.RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
             taxon.Attributes.IsRedlisted = _redlistCategories.Contains(taxon.Attributes.RedlistCategory?.ToLower() ?? string.Empty);
             taxon.Attributes.SortOrder = sourceTaxon.SortOrder;

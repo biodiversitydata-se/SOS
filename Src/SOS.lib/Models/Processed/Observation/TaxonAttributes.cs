@@ -25,9 +25,19 @@ namespace SOS.Lib.Models.Processed.Observation
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
-        /// Taxon risk assessment
+        /// True if invasive in sweden according to EU Regulation 1143/2014
         /// </summary>
-        public TaxonInvasiveInfo InvasiveInfo { get; set; }
+        public bool IsInvasiveAccordingToEuRegulation { get; set; }
+
+        /// <summary>
+        /// True if invasive in sweden 
+        /// </summary>
+        public bool IsInvasiveInSweden { get; set; }
+
+        /// <summary>
+        /// Risk assessment category
+        /// </summary>
+        public string InvasiveRiskAssessmentCategory { get; set; }        
 
         /// <summary>
         /// True if redlist category is one of CR, EN, VU, NT
