@@ -208,5 +208,43 @@ namespace SOS.Harvest.Processors
         {
             return observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage;            
         }
+
+        /// <summary>
+        /// Populate some generic data
+        /// </summary>
+        /// <param name="observation"></param>
+        protected void PopulateGenericData(Observation observation)
+        {
+            if (observation.Event?.StartDate != null)
+            {
+                var startDate = observation.Event.StartDate.Value.ToLocalTime();
+                observation.Event.StartYear = startDate.Year;
+                observation.Event.StartMonth = startDate.Month;
+                observation.Event.StartDay = startDate.Day;
+            }
+
+            if (observation.Event?.EndDate != null)
+            {
+                var endDate = observation.Event.EndDate.Value.ToLocalTime();
+                observation.Event.EndYear = endDate.Year;
+                observation.Event.EndMonth = endDate.Month;
+                observation.Event.EndDay = endDate.Day;
+            }
+
+            if (observation.Event?.StartDate == null ||
+                (observation.Taxon?.Id ?? 0) == 0 ||
+                (observation.Location?.DecimalLatitude ?? 0) == 0 ||
+                (observation.Location?.DecimalLongitude ?? 0) == 0)
+            {
+                return;
+            }
+            // Round coordinates to 5 decimals (roughly 1m)
+            var source = $"{observation.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation.Location.DecimalLongitude.Value, 5)}/{Math.Round(observation.Location.DecimalLatitude.Value, 5)}";
+
+            observation.DataQuality = new DataQuality
+            {
+                UniqueKey = source.ToHash()
+            };
+        }
     }
 }

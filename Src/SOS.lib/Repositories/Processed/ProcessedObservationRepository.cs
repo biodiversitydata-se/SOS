@@ -413,6 +413,30 @@ namespace SOS.Lib.Repositories.Processed
                                         )
                                     )
                                 )
+                                .Number(x => x
+                                    .Name(nm => nm.EndDay)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(x => x
+                                    .Name(nm => nm.EndMonth)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(x => x
+                                    .Name(nm => nm.EndYear)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(x => x
+                                    .Name(nm => nm.StartDay)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(x => x
+                                    .Name(nm => nm.StartMonth)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(x => x
+                                    .Name(nm => nm.StartYear)
+                                    .Type(NumberType.Integer)
+                                )
                                 .Object<VocabularyValue>(t => t
                                     .Name(nm => nm.DiscoveryMethod)
                                     .Properties(ps => ps
@@ -3163,6 +3187,230 @@ namespace SOS.Lib.Repositories.Processed
                 .Terms("taxon_group")
                 .Buckets
                 .Select(b => new TaxonAggregationItem { TaxonId = int.Parse(b.Key), ObservationCount = (int)(b.DocCount ?? 0) });
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                var (query, excludeQuery) = GetCoreQueries(filter);
+
+                var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                   .Index(new[] { PublicIndexName, ProtectedIndexName })
+                   .Size(0)
+                   .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                    .Aggregations(a => a
+                        .Composite("observationByYearMonth", c => c
+                            .Size(1200) // 12 months * 100 year
+                            .Sources(s => s
+                                .Terms("startYear", t => t
+                                    .Field("event.startYear")
+                                    .Order(SortOrder.Descending)
+                                )
+                                .Terms("startMonth", t => t
+                                    .Field("event.startMonth")
+                                    .Order(SortOrder.Descending)
+                                )
+                            )
+                            .Aggregations(a => a
+                                .Cardinality("unique_taxonids", c => c
+                                    .Field("taxon.id")
+                                )
+                            )
+                        )
+                    )
+                );
+
+                if (!searchResponse.IsValid)
+                {
+                    throw new InvalidOperationException(searchResponse.DebugInformation);
+                }
+
+                var result = new HashSet<YearMonthCountResult>();
+                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets)
+                {
+                    var key = bucket.Key;
+
+                    key.TryGetValue("startYear", out int startYear);
+                    key.TryGetValue("startMonth", out int startMonth);
+                    var count = bucket.DocCount;
+                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+
+                    result.Add(new YearMonthCountResult
+                    {
+                        Count = count ?? 0,
+                        Month = startMonth,
+                        TaxonCount = taxonCount,
+                        Year = startYear
+                    });
+                }
+
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Failed to get user year month count");
+                return null!;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<YearMonthDayCountResult>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take)
+        {
+            try
+            {
+                var (query, excludeQuery) = GetCoreQueries(filter);
+
+                var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                   .Index(new[] { PublicIndexName, ProtectedIndexName })
+                   .Size(0)
+                   .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                    .Aggregations(a => a
+                        .Composite("observationByYearMonth", c => c
+                            .Size(skip + take) // Take as few as possible
+                            .Sources(s => s
+                                .Terms("startYear", t => t
+                                    .Field("event.startYear")
+                                    .Order(SortOrder.Descending)
+                                )
+                                .Terms("startMonth", t => t
+                                    .Field("event.startMonth")
+                                    .Order(SortOrder.Descending)
+                                )
+                                .Terms("startDay", t => t
+                                    .Field("event.startDay")
+                                    .Order(SortOrder.Descending)
+                                )
+                            )
+                            .Aggregations(a => a
+                                .Cardinality("unique_taxonids", c => c
+                                    .Field("taxon.id")
+                                )
+                            )
+                        )
+                    )
+                );
+
+                if (!searchResponse.IsValid)
+                {
+                    throw new InvalidOperationException(searchResponse.DebugInformation);
+                }
+
+                var result = new Dictionary<string, YearMonthDayCountResult>();
+                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets.Skip(skip))
+                {
+                    var key = bucket.Key;
+
+                    key.TryGetValue("startYear", out int startYear);
+                    key.TryGetValue("startMonth", out int startMonth);
+                    key.TryGetValue("startDay", out int startDay);
+                    var count = bucket.DocCount;
+                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+
+                    result.Add($"{startYear}-{startMonth}-{startDay}", new YearMonthDayCountResult
+                    {
+                        Count = count ?? 0,
+                        Day = startDay,
+                        Localities = new HashSet<IdName<string>>(),
+                        Month = startMonth,
+                        TaxonCount = taxonCount,
+                        Year = startYear
+                    });
+                }
+
+                if (result.Any())
+                {
+                    var firstItem = result.First().Value;
+                    var maxDate = new DateTime(firstItem.Year, firstItem.Month, firstItem.Day);
+                    var lastItem = result.Last().Value;
+                    var minDate = new DateTime(lastItem.Year, lastItem.Month, lastItem.Day);
+
+                    filter.Date = filter.Date ?? new DateFilter();
+                    filter.Date.StartDate = minDate;
+                    filter.Date.EndDate = maxDate;
+                    filter.Date.DateFilterType = DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
+
+                    var searchResponseLocality = await Client.SearchAsync<dynamic>(s => s
+                       .Index(new[] { PublicIndexName, ProtectedIndexName })
+                       .Size(0)
+                       .Query(q => q
+                            .Bool(b => b
+                                .MustNot(excludeQuery)
+                                .Filter(query)
+                            )
+                        )
+                        .Aggregations(a => a
+                            .Composite("localityByYearMonth", c => c
+                                .Size((skip + take) * 10) // 10 locations for one day must be enought
+                                .Sources(s => s
+                                    .Terms("startYear", t => t
+                                        .Field("event.startYear")
+                                        .Order(SortOrder.Descending)
+                                    )
+                                    .Terms("startMonth", t => t
+                                        .Field("event.startMonth")
+                                        .Order(SortOrder.Descending)
+                                    )
+                                    .Terms("startDay", t => t
+                                        .Field("event.startDay")
+                                        .Order(SortOrder.Descending)
+                                    )
+                                     .Terms("locationId", t => t
+                                        .Field("location.locationId")
+                                        .Order(SortOrder.Descending)
+                                    )
+                                      .Terms("locality", t => t
+                                        .Field("location.locality")
+                                        .Order(SortOrder.Descending)
+                                    )
+                                )
+
+                            )
+                        )
+                    );
+
+                    if (!searchResponseLocality.IsValid)
+                    {
+                        throw new InvalidOperationException(searchResponseLocality.DebugInformation);
+                    }
+
+                    foreach (var bucket in searchResponseLocality.Aggregations.Composite("localityByYearMonth").Buckets)
+                    {
+                        var key = bucket.Key;
+
+                        key.TryGetValue("startYear", out int startYear);
+                        key.TryGetValue("startMonth", out int startMonth);
+                        key.TryGetValue("startDay", out int startDay);
+                        key.TryGetValue("locationId", out string locationId);
+                        key.TryGetValue("locality", out string locality);
+                        var itemKey = $"{startYear}-{startMonth}-{startDay}";
+
+                        if (result.TryGetValue(itemKey, out var item))
+                        {
+                            item.Localities.Add(new IdName<string> { Id = locationId, Name = locality });
+                        }                  
+                    }
+                }
+
+                return result.Values;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Failed to get user year month day count");
+                return null!;
+            }
         }
 
         /// <inheritdoc />

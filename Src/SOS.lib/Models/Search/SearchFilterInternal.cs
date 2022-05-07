@@ -89,7 +89,7 @@ namespace SOS.Lib.Models.Search
         
         public bool UsePeriodForAllYears { get; set; }
         public IEnumerable<int> Months { get; set; }
-        public MonthsFilterComparison MonthsComparison { get; set; } = MonthsFilterComparison.StartDate;
+        public DateFilterComparison MonthsComparison { get; set; } = DateFilterComparison.StartDate;
         public IEnumerable<int> DiscoveryMethodIds { get; set; }
 
         public IEnumerable<int> LifeStageIds { get; set; }
@@ -143,5 +143,9 @@ namespace SOS.Lib.Models.Search
         public string InstitutionId { get; set; }
 
         public IEnumerable<int> DatasourceIds { get; set; }
+
+        public IEnumerable<int> Years { get; set; }
+
+        public DateFilterComparison YearsComparison { get; set; } = DateFilterComparison.StartDate;
     }
 }

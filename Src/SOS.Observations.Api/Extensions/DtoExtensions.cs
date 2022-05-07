@@ -121,7 +121,7 @@ namespace SOS.Observations.Api.Extensions
                 internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ExtendedFilter.TypeFilter;
                 internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ExtendedFilter.UsePeriodForAllYears;
                 internalFilter.Months = searchFilterInternalDto.ExtendedFilter.Months;
-                internalFilter.MonthsComparison = (MonthsFilterComparison)searchFilterInternalDto.ExtendedFilter.MonthsComparison;
+                internalFilter.MonthsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.MonthsComparison;
                 internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
                 internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
                 internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;
@@ -171,6 +171,8 @@ namespace SOS.Observations.Api.Extensions
                     internalFilter.Taxa ??= new TaxonFilter();
                     internalFilter.Taxa.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
                 }
+                internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
+                internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
             }
         }
 
@@ -489,6 +491,54 @@ namespace SOS.Observations.Api.Extensions
             {
                 TaxonId = taxonAggregationItem.TaxonId,
                 ObservationCount = taxonAggregationItem.ObservationCount
+            };
+        }
+
+        public static IEnumerable<YearMonthCountResultDto> ToDtos(this IEnumerable<YearMonthCountResult> yearMonthCountResults)
+        {
+            return yearMonthCountResults.Select(item => item.ToDto());
+        }
+
+        public static YearMonthCountResultDto ToDto(this YearMonthCountResult yearMonthCountResult)
+        {
+            return new YearMonthCountResultDto
+            {
+                Count = yearMonthCountResult.Count,
+                Month = yearMonthCountResult.Month,
+                TaxonCount = yearMonthCountResult.TaxonCount,
+                Year = yearMonthCountResult.Year
+            };
+        }
+
+        public static IEnumerable<YearMonthDayCountResultDto> ToDtos(this IEnumerable<YearMonthDayCountResult> yearMonthDayCountResults)
+        {
+            return yearMonthDayCountResults.Select(item => item.ToDto());
+        }
+
+        public static YearMonthDayCountResultDto ToDto(this YearMonthDayCountResult yearMonthDayCountResult)
+        {
+            return new YearMonthDayCountResultDto
+            {
+                Count = yearMonthDayCountResult.Count,
+                Day = yearMonthDayCountResult.Day,
+                Month = yearMonthDayCountResult.Month,
+                Localities = yearMonthDayCountResult.Localities?.ToDtos(),
+                TaxonCount = yearMonthDayCountResult.TaxonCount,
+                Year = yearMonthDayCountResult.Year
+            };
+        }
+
+        public static IEnumerable<IdNameDto<T>> ToDtos<T>(this IEnumerable<IdName<T>> idNames)
+        {
+            return idNames.Select(item => item.ToDto());
+        }
+
+        public static IdNameDto<T> ToDto<T>(this IdName<T> idName)
+        {
+            return new IdNameDto<T>
+            {
+                Id = idName.Id,
+                Name = idName.Name
             };
         }
 

@@ -238,6 +238,22 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet, string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool ensureArtportalenUpdated);
 
         /// <summary>
+        /// Get user year month counts
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter);
+
+        /// <summary>
+        /// Count the number of user observations group by year, month and day
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
+
+        /// <summary>
         /// Signal search
         /// </summary>
         /// <param name="roleId"></param>

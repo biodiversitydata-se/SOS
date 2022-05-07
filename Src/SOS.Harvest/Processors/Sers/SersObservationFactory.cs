@@ -96,6 +96,9 @@ namespace SOS.Harvest.Processors.Sers
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
+            // Populate generic data
+            PopulateGenericData(obs);
+
             return obs;
         }
 

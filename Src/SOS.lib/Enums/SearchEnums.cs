@@ -103,7 +103,7 @@ namespace SOS.Lib.Enums
         IncludeNotPresent
     }
 
-    public enum MonthsFilterComparison
+    public enum DateFilterComparison
     {
         StartDate,
         EndDate,

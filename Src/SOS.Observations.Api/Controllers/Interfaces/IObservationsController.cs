@@ -189,6 +189,16 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             OutputFieldSet fieldSet,
             string translationCultureCode = "sv-SE",
             bool sensitiveObservations = false,
-            bool ensureArtportalenUpdated = false);        
+            bool ensureArtportalenUpdated = false);
+
+        /// <summary>
+        /// Count current users observations group by year and month
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetUserYearMonthCountAsync(
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false);
     }
 }

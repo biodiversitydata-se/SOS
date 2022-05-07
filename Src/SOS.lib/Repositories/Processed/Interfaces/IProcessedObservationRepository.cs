@@ -266,6 +266,22 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter);
 
         /// <summary>
+        /// Count the number of user observations group by year and month
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter);
+
+        /// <summary>
+        /// Count the number of user observations group by year, month and day
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<IEnumerable<YearMonthDayCountResult>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
+
+        /// <summary>
         /// Check if index have observations with same occurrence id
         /// </summary>
         /// <param name="protectedIndex"></param>

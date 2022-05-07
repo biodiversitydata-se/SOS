@@ -19,9 +19,39 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? StartDate { get; set; }
 
         /// <summary>
+        /// Start year of the event, Swedish localization
+        /// </summary>
+        public int? StartYear { get; set; }
+
+        /// <summary>
+        /// Start month of the event, Swedish localization
+        /// </summary>
+        public int? StartMonth { get; set; }
+
+        /// <summary>
+        /// Start day of the event, Swedish localization
+        /// </summary>
+        public int? StartDay { get; set; }
+
+        /// <summary>
         ///     End date/time of the event in W. Europe Standard Time.
         /// </summary>
         public DateTime? EndDate { get; set; }
+
+        /// <summary>
+        /// End year of the event, Swedish localization
+        /// </summary>
+        public int? EndYear { get; set; }
+
+        /// <summary>
+        /// End month of the event, Swedish localization
+        /// </summary>
+        public int? EndMonth { get; set; }
+
+        /// <summary>
+        /// End day of the event, Swedish localization
+        /// </summary>
+        public int? EndDay { get; set; }
 
         /// <summary>
         ///     Start date of the event in the format yyyy-MM-dd.

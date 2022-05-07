@@ -109,24 +109,6 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        private void PopulateDataQuality(Observation observation)
-        {
-            if (observation.Event?.StartDate == null ||
-                (observation.Taxon?.Id ?? 0) == 0 ||
-                (observation.Location?.DecimalLatitude ?? 0) == 0 ||
-                (observation.Location?.DecimalLongitude ?? 0) == 0)
-            {
-                return;
-            }
-            // Round coordinates to 5 decimals (roughly 1m)
-            var source = $"{observation.Event.StartDate.Value.ToUniversalTime().ToString("s")}-{observation.Taxon.Id}-{Math.Round(observation.Location.DecimalLongitude.Value, 5)}/{Math.Round(observation.Location.DecimalLatitude.Value, 5)}";
-           
-            observation.DataQuality = new DataQuality
-            {
-                UniqueKey = source.ToHash()
-            };
-        }
-
         /// <summary>
         ///  Process a batch of data
         /// </summary>
@@ -320,9 +302,6 @@ namespace SOS.Harvest.Processors
                         continue;
                     }
 
-                    // Populate data quality property
-                    PopulateDataQuality(observation);
-
                     if (_logGarbageCharFields)
                     {
                         var objectHelper = new ObjectHelper();
@@ -351,9 +330,6 @@ namespace SOS.Harvest.Processors
                         // Recreate observation, diffused if provider supports diffusing 
                         processTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ProcessObservation);
                         observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-
-                        // Populate data quality property
-                        PopulateDataQuality(observation);
 
                         TimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessObservation, processTimerSessionId);
 
