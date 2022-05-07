@@ -446,7 +446,7 @@ namespace SOS.Harvest.Processors
          
             var processedCount = await CommitBatchAsync(dataProvider, protectedObservations, observations, batchId);
             
-            if (mode == JobRunModes.Full && !protectedObservations)
+            if (mode == JobRunModes.Full && !protectedObservations && dwcArchiveFileWriterCoordinator.Enabled)
             {
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }

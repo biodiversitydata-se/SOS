@@ -31,6 +31,8 @@ namespace SOS.Lib.IO.DwcArchive
 
         private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
 
+        public bool Enabled => _dwcaFilesCreationConfiguration.IsEnabled;
+
         /// <summary>
         /// Simplified by only returning file size
         /// </summary>
