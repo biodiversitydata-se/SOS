@@ -37,7 +37,7 @@ namespace SOS.Lib
                     { "viewAccess", true }
                 });
             }
-
+            
             if (!filter.ProtectedObservations)
             {
                 return;
@@ -50,7 +50,7 @@ namespace SOS.Lib
                 foreach (var extendedAuthorization in filter.ExtendedAreas)
                 {
                     var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                    protectedQuery.TryAddTermCriteria("protected", true);
+                    protectedQuery.TryAddTermCriteria("sensitive", true);
                     protectedQuery.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
                     protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
                     TryAddGeographicalAreaFilter(protectedQuery, extendedAuthorization.GeographicAreas);
@@ -116,8 +116,8 @@ namespace SOS.Lib
 
             query.TryAddTermCriteria("artportalenInternal.checkListId", internalFilter.CheckListId);
             query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
-            query.TryAddTermCriteria("artportalenInternal.hasTriggeredValidationRules", internalFilter.HasTriggeredVerificationRule, true);
-            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
+            query.TryAddTermCriteria("artportalenInternal.hasTriggeredVerificationRules", internalFilter.HasTriggeredVerificationRule, true);
+            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredVerificationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
             query.TryAddTermCriteria("artportalenInternal.hasUserComments", internalFilter.OnlyWithUserComments, true);
 
             switch (internalFilter.UnspontaneousFilter)
@@ -183,7 +183,7 @@ namespace SOS.Lib
           
             query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
 
-            query.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.VerificationStatusIds);
+            query.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
             query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
 
             query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
@@ -340,7 +340,7 @@ namespace SOS.Lib
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            excludeQuery.TryAddTermsCriteria("identification.validationStatus.id", internalFilter.ExcludeVerificationStatusIds);
+            excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
         private static void AddSightingTypeFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
