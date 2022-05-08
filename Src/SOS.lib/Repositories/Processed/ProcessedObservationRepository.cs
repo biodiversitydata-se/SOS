@@ -209,6 +209,44 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                             )
                         )
+                        .Object<ProjectsSummary>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.ProjectsSummary)
+                            .Properties(ps => ps
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project1Name)
+                                    .Index(true) // WFS
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project1Category)
+                                    .Index(true) // WFS
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project1Url)
+                                    .Index(false)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project1Values)
+                                    .Index(false)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project2Name)
+                                    .Index(true) // WFS
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project2Category)
+                                    .Index(true) // WFS
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project2Url)
+                                    .Index(false)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Project2Values)
+                                    .Index(false)
+                                )
+                            )
+                        )
                         .Nested<Project>(n => n
                             .AutoMap()
                             .Name(nm => nm.Projects)
@@ -784,7 +822,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .GeoShape(gs => gs
                                     .Name(nn => nn.PointWithDisturbanceBuffer)
-                                )
+                                )                                
                                 .Keyword(kw => kw
                                     .Name(nm => nm.CountryCode)
                                     .Index(false)
@@ -831,6 +869,10 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.IslandGroup)
+                                    .Index(false)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.LocationRemarks)
                                     .Index(false)
                                 )
                                 .Keyword(kw => kw
@@ -895,6 +937,9 @@ namespace SOS.Lib.Repositories.Processed
                                 .Object<LocationAttributes>(c => c
                                     .Name(nm => nm.Attributes)
                                     .Properties(ps => ps
+                                        .Keyword(kw => kw
+                                            .Name(nm => nm.ExternalId)
+                                        )
                                         .Keyword(kw => kw
                                             .Name(nm => nm.CountyPartIdByCoordinate)
                                         )
@@ -1062,6 +1107,10 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OtherCatalogNumbers)
+                                    .Index(false)
+                                )
+                                .Keyword(kw => kw
+                                    .Name(nm => nm.Preparations)
                                     .Index(false)
                                 )
                                 .Keyword(kw => kw
