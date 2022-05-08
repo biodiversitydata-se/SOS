@@ -62,11 +62,11 @@ namespace SOS.Harvest.Processors
                             processedObservations);
                 }
 
-                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
+                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}{(protectedData ? " [protected]" : "")}");
                 var processedCount =
                     await ProcessedObservationRepository.AddManyAsync(processedObservations, protectedData);
 
-                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount}){(protectedData ? " [protected]" : "")}");
 
                 return processedCount;
             }
@@ -74,13 +74,13 @@ namespace SOS.Harvest.Processors
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
+                    Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}{(protectedData ? " [protected]" : "")}");
                     Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, protectedData, processedObservations, batchId, attempt);
                 }
 
-                Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}");
+                Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}{(protectedData ? " [protected]" : "")}");
                 throw;
             }
             finally
