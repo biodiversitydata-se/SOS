@@ -125,7 +125,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<UserInternal> OccurrenceVerifiedByInternal { get; set; }
 
         /// <summary>
-        ///     The original presentation name for ParisRegion from data provider.
+        ///     The original presentation name for ParishRegion from data provider.
         /// </summary>
         public string LocationPresentationNameParishRegion { get; set; }
 

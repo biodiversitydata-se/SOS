@@ -36,11 +36,11 @@ namespace SOS.Harvest.Processors
         {
             try
             {
-                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}");
+                Logger.LogDebug($"Checklist - Start storing {dataProvider.Identifier} batch: {batchId}");
                 var processedCount =
                     await ProcessedCheckListRepository.AddManyAsync(processedCheckLists);
 
-                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+                Logger.LogDebug($"Checklist - Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
 
                 return processedCount;
             }
@@ -48,13 +48,13 @@ namespace SOS.Harvest.Processors
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
+                    Logger.LogWarning(e, $"Checklist - Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
                     System.Threading.Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, processedCheckLists, batchId, attempt);
                 }
 
-                Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}");
+                Logger.LogError(e, $"Checklist - Failed to commit batch:{batchId} for {dataProvider}");
                 throw;
             }
 
@@ -81,16 +81,16 @@ namespace SOS.Harvest.Processors
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Checklist - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
                 var verbatimCheckListBatch = await checkListVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Checklist - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
 
                 if (!verbatimCheckListBatch?.Any() ?? true)
                 {
                     return 0;
                 }
 
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Checklist - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
                 var checkLists = new ConcurrentDictionary<string, CheckList>();
 
@@ -107,7 +107,7 @@ namespace SOS.Harvest.Processors
                     checkLists.TryAdd(checkList.Id, checkList);
                 }
                
-                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug($"Checklist - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
                 return await ValidateAndStoreObservations(dataProvider, checkLists.Values, $"{startId}-{endId}");
             }
@@ -118,7 +118,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Process {dataProvider.Identifier} check lists from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, $"Checklist - Process {dataProvider.Identifier} check lists from id: {startId} to id: {endId} failed");
                 throw;
             }
             finally
@@ -227,10 +227,10 @@ namespace SOS.Harvest.Processors
 
             try
             {
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} check lists");
+                Logger.LogDebug($"Checklist - Start processing {dataProvider.Identifier} check lists");
                 var processCount = await ProcessCheckListsAsync(dataProvider, cancellationToken);
 
-                Logger.LogInformation($"Finish processing {dataProvider.Identifier} check lists.");
+                Logger.LogInformation($"Checklist - Finish processing {dataProvider.Identifier} check lists.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount, 0, 0);
             }
