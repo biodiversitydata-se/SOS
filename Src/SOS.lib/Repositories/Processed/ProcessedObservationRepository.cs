@@ -920,7 +920,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerbatimLocality)
-                                    .Index(false)
+                                    .Index(true) // WFS
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerbatimLongitude)
@@ -1032,7 +1032,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Wildcard(wc => wc
                                     .Name(nm => nm.Locality)
-                                )
+                                )                                
                             )
                         )
                         .Object<MaterialSample>(c => c
