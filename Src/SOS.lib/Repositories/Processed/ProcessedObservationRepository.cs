@@ -3268,6 +3268,7 @@ namespace SOS.Lib.Repositories.Processed
             {
                 var (query, excludeQuery) = GetCoreQueries(filter);
 
+                // First get observations count and taxon count group by day
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
                    .Size(0)
@@ -3337,11 +3338,13 @@ namespace SOS.Lib.Repositories.Processed
                     var lastItem = result.Last().Value;
                     var minDate = new DateTime(lastItem.Year, lastItem.Month, lastItem.Day);
 
+                    // Limit search to only include time span we are interested in
                     filter.Date = filter.Date ?? new DateFilter();
                     filter.Date.StartDate = minDate;
                     filter.Date.EndDate = maxDate;
                     filter.Date.DateFilterType = DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate;
 
+                    // Second, get all locations group by day
                     var searchResponseLocality = await Client.SearchAsync<dynamic>(s => s
                        .Index(new[] { PublicIndexName, ProtectedIndexName })
                        .Size(0)
@@ -3386,6 +3389,7 @@ namespace SOS.Lib.Repositories.Processed
                         throw new InvalidOperationException(searchResponseLocality.DebugInformation);
                     }
 
+                    // Add locations to result
                     foreach (var bucket in searchResponseLocality.Aggregations.Composite("localityByYearMonth").Buckets)
                     {
                         var key = bucket.Key;

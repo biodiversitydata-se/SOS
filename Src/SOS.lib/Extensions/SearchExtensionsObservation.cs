@@ -265,7 +265,7 @@ namespace SOS.Lib
                 switch (internalFilter.YearsComparison)
                 {
                     case DateFilterComparison.BothStartDateAndEndDate:
-                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
+                        query.TryAddTermsCriteria("event.startYear", internalFilter.Years);
                         query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
                         break;
                     case DateFilterComparison.EndDate:
