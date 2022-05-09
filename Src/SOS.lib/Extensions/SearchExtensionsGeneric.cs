@@ -436,7 +436,7 @@ namespace SOS.Lib.Extensions
             {
                 return;
             }
-
+            
             if (filter.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
             {
                 query.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);

@@ -299,7 +299,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurrence id of the observation to fetch.</param>
-        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in path if any</param>
+        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in query if any</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">
@@ -701,7 +701,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="occurrenceId">The occurrence id of the observation to fetch.</param>
-        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in path if any</param>
+        /// <param name="id">Preferred way to pass occurrence id. Override occurrenceId passed in query if any</param>
         /// <param name="outputFieldSet">Define response output. Return Minimum, Extended or All properties</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
