@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Helpers;
+using SOS.Lib.Enums.Artportalen;
 
 namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 {
@@ -281,6 +282,8 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile);                
                 
                 obs.Id = _faker.IndexVariable++;
+                obs.NotPresent = false; // sourceObservation.NotPresent;
+                obs.SightingTypeSearchGroupId = (int)SightingTypeSearchGroup.Ordinary; // sourceObservation.SightingTypeSearchGroupId;                
                 obs.DatasourceId = ArtportalenDataSourceId;
                 obs.SightingId = _faker.IndexVariable++;
                 obs.DiscoveryMethod = sourceObservation.DiscoveryMethod;
@@ -295,8 +298,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.HasTriggeredValidationRules = sourceObservation.HasTriggeredValidationRules;
                 obs.HasAnyTriggeredValidationRuleWithWarning = sourceObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.NoteOfInterest = sourceObservation.NoteOfInterest;
-                obs.HasUserComments = sourceObservation.HasUserComments;
-                obs.NotPresent = sourceObservation.NotPresent;
+                obs.HasUserComments = sourceObservation.HasUserComments;                
                 obs.NotRecovered = sourceObservation.NotRecovered;
                 obs.ProtectedBySystem = sourceObservation.ProtectedBySystem;
                 obs.RightsHolder = sourceObservation.RightsHolder;
@@ -316,8 +318,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.ReportedByUserId = sourceObservation.ReportedByUserId;
                 obs.ReportedByUserServiceUserId = sourceObservation.ReportedByUserServiceUserId;
                 obs.ReportedByUserAlias = sourceObservation.ReportedByUserAlias;
-                obs.DeterminedBy = sourceObservation.DeterminedBy;
-                obs.SightingTypeSearchGroupId = sourceObservation.SightingTypeSearchGroupId;
+                obs.DeterminedBy = sourceObservation.DeterminedBy;                
                 obs.SpeciesFactsIds = sourceObservation.SpeciesFactsIds;
                 obs.Activity = sourceObservation.Activity;
                 obs.Biotope = sourceObservation.Biotope;

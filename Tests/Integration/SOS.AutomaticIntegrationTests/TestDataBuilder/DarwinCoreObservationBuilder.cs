@@ -55,7 +55,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 DateTime endDate = obsTimeSpan == null ? startDate : startDate.Add(obsTimeSpan.Value);
                 DateTime reportedDate = endDate.Add(_faker.Date.Timespan(TimeSpan.FromDays(5)));
                 DateTime editDate = reportedDate;
-                int sightingId = _faker.IndexVariable++;
+                int sightingId = _faker.IndexVariable++;                
 
                 // Record level
                 obs.Id = _faker.IndexVariable++;
@@ -277,14 +277,17 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 var sourceObservation = Pick<DwcObservationVerbatim>.RandomItemFrom(VerbatimDarwinCoreObservationsFromJsonFile);
+                int sightingId = _faker.IndexVariable++;
+                string occurrenceID = $"urn:lsid:artportalen.se:sighting:{sightingId}";
+
                 // Record level
                 obs.Id = sourceObservation.Id; //_faker.IndexVariable++;
                 obs.RecordId = sourceObservation.RecordId;
                 obs.DataProviderId = sourceObservation.DataProviderId; // 1;
-                obs.DataProviderIdentifier = sourceObservation.DataProviderIdentifier; ;
-                obs.DwcArchiveFilename = sourceObservation.DwcArchiveFilename; ;
-                obs.Type = sourceObservation.Type; ;
-                obs.Modified = sourceObservation.Modified; ;
+                obs.DataProviderIdentifier = sourceObservation.DataProviderIdentifier;
+                obs.DwcArchiveFilename = sourceObservation.DwcArchiveFilename;
+                obs.Type = sourceObservation.Type;
+                obs.Modified = sourceObservation.Modified;
                 obs.Language = sourceObservation.Language;
                 obs.License = sourceObservation.License;
                 obs.RightsHolder = sourceObservation.RightsHolder;
@@ -309,10 +312,10 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.ObservationMultimedia = sourceObservation.ObservationMultimedia;
 
                 // Occurrence
-                obs.OccurrenceID = sourceObservation.OccurrenceID;
+                obs.OccurrenceID = occurrenceID;
                 obs.OccurrenceRemarks = sourceObservation.OccurrenceRemarks;
                 obs.OccurrenceStatus = sourceObservation.OccurrenceStatus;
-                obs.CatalogNumber = sourceObservation.CatalogNumber;
+                obs.CatalogNumber = sightingId.ToString();
                 obs.RecordNumber = sourceObservation.RecordNumber;
                 obs.RecordedBy = sourceObservation.RecordedBy;
                 obs.IndividualCount = sourceObservation.IndividualCount;

@@ -115,10 +115,12 @@ namespace SOS.Lib.Repositories.Processed
                         .Keyword(kw => kw
                             .Name(nm => nm.DatasetName)
                             .Index(true) // WFS
+                            .IgnoreAbove(int.MaxValue)
                         )
                         .Keyword(kw => kw
                             .Name(nm => nm.InstitutionId)
                             .Index(true)
+                            .IgnoreAbove(int.MaxValue)
                         )
                         .Keyword(kw => kw
                             .Name(nm => nm.Language)
@@ -135,10 +137,12 @@ namespace SOS.Lib.Repositories.Processed
                         .Keyword(kw => kw
                             .Name(nm => nm.PrivateCollection)
                             .Index(true)
+                            .IgnoreAbove(int.MaxValue)
                         )
                         .Keyword(kw => kw
                             .Name(nm => nm.PublicCollection)
                             .Index(true)
+                            .IgnoreAbove(int.MaxValue)
                         )
                         .Keyword(kw => kw
                             .Name(nm => nm.References)
@@ -151,6 +155,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Keyword(kw => kw
                             .Name(nm => nm.SpeciesCollectionLabel)
                             .Index(true)
+                            .IgnoreAbove(int.MaxValue)
                         )
                         .Nested<ExtendedMeasurementOrFact>(n => n
                             .Name(nm => nm.MeasurementOrFacts)
@@ -216,10 +221,12 @@ namespace SOS.Lib.Repositories.Processed
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project1Name)
                                     .Index(true) // WFS
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project1Category)
                                     .Index(true) // WFS
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project1Url)
@@ -227,23 +234,27 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project1Values)
-                                    .Index(false)
+                                    .Index(true)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Name)
                                     .Index(true) // WFS
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Category)
                                     .Index(true) // WFS
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Url)
-                                    .Index(false)
+                                    .Index(false)                                    
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Values)
-                                    .Index(false)
+                                    .Index(true)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                             )
                         )
@@ -316,6 +327,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Properties(ps => ps
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Value)
+                                    .Index(false)
                                 )
                                 .Number(nr => nr
                                     .Name(nm => nm.Id)
@@ -329,6 +341,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Properties(ps => ps
                                 .Keyword(kw => kw
                                     .Name(nm => nm.LocationExternalId)
+                                    .Index(true)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.LocationPresentationNameParishRegion)
@@ -336,12 +349,15 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.ParentLocality)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.ReportedByUserAlias)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.SightingBarcodeURL)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Nested<UserInternal>(n => n
                                     .AutoMap()
@@ -358,6 +374,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
                                             .Name(nm => nm.UserAlias)
+                                            .IgnoreAbove(int.MaxValue)
                                         )
                                     )
                                 )
@@ -371,6 +388,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Properties(ps => ps
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Value)
+                                    .Index(false)
                                 )
                                 .Number(nr => nr
                                     .Name(nm => nm.Id)
@@ -413,6 +431,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.EventId)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.EventRemarks)
@@ -432,6 +451,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.ParentEventId)
+                                    .Index(false)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.PlainEndDate)
@@ -467,6 +487,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerbatimEventDate)
+                                    .Index(false)
                                 )
                                 .Nested<Multimedia>(n => n
                                     .AutoMap()
@@ -785,7 +806,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Name(nm => nm.VerificationStatus)
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
-                                            .Name(nm => nm.Value)
+                                            .Name(nm => nm.Value)                                            
                                         )
                                         .Number(nr => nr
                                             .Name(nm => nm.Id)
@@ -920,7 +941,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerbatimLocality)
-                                    .Index(false)
+                                    .Index(true) // WFS
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.VerbatimLongitude)
@@ -1032,7 +1053,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Wildcard(wc => wc
                                     .Name(nm => nm.Locality)
-                                )
+                                )                                
                             )
                         )
                         .Object<MaterialSample>(c => c
@@ -1054,10 +1075,12 @@ namespace SOS.Lib.Repositories.Processed
                                 .Keyword(kw => kw
                                     .Name(nm => nm.AssociatedMedia)
                                     .Index(true)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OccurrenceRemarks)
                                     .Index(true) // Because there is a OnlyWithNote search parameter. Todo - Add bool property, HasOccurrenceRemarks and set index to false?
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.AssociatedOccurrences)
@@ -1085,9 +1108,11 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.RecordedBy)
+                                    .IgnoreAbove(int.MaxValue)
                                 )                                
                                 .Keyword(kw => kw
                                     .Name(nm => nm.CatalogNumber)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Disposition)
@@ -1098,12 +1123,15 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OccurrenceId)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OccurrenceStatus)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OrganismQuantity)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.OtherCatalogNumbers)
@@ -1115,9 +1143,11 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.RecordNumber)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.ReportedBy)
+                                    .IgnoreAbove(int.MaxValue)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Url)
@@ -1230,6 +1260,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .Properties(ps => ps
                                         .Keyword(kw => kw
                                             .Name(nm => nm.Value)
+                                            .Index(false)
                                         )
                                         .Number(nr => nr
                                             .Name(nm => nm.Id)
