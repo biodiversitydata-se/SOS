@@ -1077,11 +1077,10 @@ namespace SOS.Lib.Repositories.Processed
                                     .Index(true)
                                     .IgnoreAbove(int.MaxValue)
                                 )
-                                .Keyword(kw => kw
+                                .Text(t => t
                                     .Name(nm => nm.OccurrenceRemarks)
-                                    .Index(true) // Because there is a OnlyWithNote search parameter. Todo - Add bool property, HasOccurrenceRemarks and set index to false?
-                                    .IgnoreAbove(int.MaxValue)
-                                )
+                                    .IndexOptions(IndexOptions.Docs)
+                                )                                
                                 .Keyword(kw => kw
                                     .Name(nm => nm.AssociatedOccurrences)
                                     .Index(false)
