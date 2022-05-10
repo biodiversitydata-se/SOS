@@ -257,7 +257,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<ObservationDatabaseProcessor>());
 
             var dataProviderCache = new DataProviderCache(new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()));
-            
+            var cacheManager = new CacheManager(new SosApiConfiguration(), new NullLogger<CacheManager>());
 
             var processJob = new ProcessObservationsJob(
                 processedObservationRepository,
@@ -275,6 +275,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 dwcaProcessor,
                 taxonCache,
                 dataProviderCache,
+                cacheManager,
                 processTimeManager,
                 validationManager,
                 processTaxaJob,

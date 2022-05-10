@@ -704,11 +704,9 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 // Make sure mandatory properties is set
-                filter = filter ?? new SearchFilter();
-                filter.ExtendedAuthorization = filter.ExtendedAuthorization ?? new ExtendedAuthorizationFilter();
                 filter.ExtendedAuthorization.ReportedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
-                filter.ExtendedAuthorization.ProtectedObservations = false;
                 await _filterManager.PrepareFilter(null, null, filter);
 
                 if (filter.ExtendedAuthorization.UserId == 0)
@@ -732,11 +730,9 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 // Make sure mandatory properties is set
-                filter = filter ?? new SearchFilter();
-                filter.ExtendedAuthorization = filter.ExtendedAuthorization ?? new ExtendedAuthorizationFilter();
                 filter.ExtendedAuthorization.ReportedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
-                filter.ExtendedAuthorization.ProtectedObservations = false;
                 await _filterManager.PrepareFilter(null, null, filter);
 
                 if (filter.ExtendedAuthorization.UserId == 0)

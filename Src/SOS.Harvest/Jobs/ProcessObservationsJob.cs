@@ -45,6 +45,7 @@ namespace SOS.Harvest.Jobs
         private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
         private readonly IDataProviderCache _dataProviderCache;
+        private readonly ICacheManager _cacheManager;
         private readonly IProcessTimeManager _processTimeManager;
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessObservationsJob> _logger;
@@ -425,6 +426,11 @@ namespace SOS.Harvest.Jobs
                         _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
+
+                        // Clear processed configuration cache in observation API
+                        _logger.LogInformation($"Start clear processed configuration cache at search api");
+                        await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
+                        _logger.LogInformation($"Finish clear processed configuration cache at search api");
                     }
                 }
 
@@ -721,6 +727,7 @@ namespace SOS.Harvest.Jobs
             IDwcaObservationProcessor dwcaObservationProcessor,
             ICache<int, Taxon> taxonCache,
             IDataProviderCache dataProviderCache,
+            ICacheManager cacheManager,
             IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
             IProcessTaxaJob processTaxaJob,
@@ -736,6 +743,7 @@ namespace SOS.Harvest.Jobs
                           throw new ArgumentNullException(nameof(taxonCache));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
+            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

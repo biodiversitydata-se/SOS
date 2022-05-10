@@ -2,9 +2,9 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
@@ -21,9 +21,10 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly IAreaCache _areaCache;
         private readonly IDataProviderCache _dataProvidersCache;
-        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         private readonly ICache<int, ProjectInfo> _projectsCache;
         private readonly ICache<int, TaxonList> _taxonListCache;
+        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private readonly ILogger<CachesController> _logger;
 
         /// <summary>
@@ -31,23 +32,27 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="areaCache"></param>
         /// <param name="dataProvidersCache"></param>
-        /// <param name="vocabularyCache"></param>
+        /// <param name="processedConfigurationCache"></param>
         /// <param name="projectsCache"></param>
         /// <param name="taxonListCache"></param>
+        /// <param name="vocabularyCache"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public CachesController(
             IAreaCache areaCache,
             IDataProviderCache dataProvidersCache,
-            ICache<VocabularyId, Vocabulary> vocabularyCache,
+            ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ICache<int, ProjectInfo> projectsCache,
             ICache<int, TaxonList> taxonListCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILogger<CachesController> logger)
         {
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
             _dataProvidersCache = dataProvidersCache ?? throw new ArgumentNullException(nameof(dataProvidersCache));
-            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
+            _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
             _projectsCache = projectsCache ?? throw new ArgumentNullException(nameof(projectsCache));
             _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
+            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -68,14 +73,17 @@ namespace SOS.Observations.Api.Controllers
                     case Cache.DataProviders:
                         _dataProvidersCache.Clear();
                         break;
-                    case Cache.Vocabulary:
-                        _vocabularyCache.Clear();
+                    case Cache.ProcessedConfiguration:
+                        _processedConfigurationCache.Clear();
                         break;
                     case Cache.Projects:
                         _projectsCache.Clear();
                         break;
                     case Cache.TaxonLists:
                         _taxonListCache.Clear();
+                        break;
+                    case Cache.Vocabulary:
+                        _vocabularyCache.Clear();
                         break;
                 }
 

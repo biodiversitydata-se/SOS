@@ -51,6 +51,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
+            _cacheManager = new Mock<ICacheManager>();
             _instanceManager = new Mock<IInstanceManager>();
             _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManager = new Mock<IValidationManager>();
@@ -87,6 +88,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<ICache<int, Taxon>> _taxonCache;
+        private readonly Mock<ICacheManager> _cacheManager;
         private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
         private readonly Mock<IValidationManager> _validationManager;
         private readonly Mock<IInstanceManager> _instanceManager;
@@ -113,6 +115,7 @@ namespace SOS.Process.UnitTests.Jobs
             _dwcaObservationProcessor.Object,
             _taxonCache.Object,
             _dataProviderCache.Object,
+            _cacheManager.Object,
             _processTimeManagerMock.Object,
             _validationManager.Object,
             _processTaxaJob.Object,

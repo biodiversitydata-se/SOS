@@ -4,8 +4,9 @@
     {
         Area,
         DataProviders,
-        Vocabulary,
+        ProcessedConfiguration,
         Projects,
-        TaxonLists
+        TaxonLists,
+        Vocabulary
     }
 }
