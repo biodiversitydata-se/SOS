@@ -91,6 +91,11 @@ namespace SOS.Harvest.Processors.Kul
                 OwnerInstitutionCode = verbatim.Owner,
                 Taxon = taxon
             };
+
+            if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
+            {
+                obs.Occurrence.OrganismQuantityInt = quantity;
+            }
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

@@ -87,7 +87,7 @@ namespace SOS.Harvest.Processors.Mvm
                     OccurrenceId = verbatim.OccurrenceId,
                     ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
-                    OrganismQuantity = verbatim.Quantity,
+                    OrganismQuantity = verbatim.Quantity,                    
                     OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
@@ -98,6 +98,11 @@ namespace SOS.Harvest.Processors.Mvm
                 Projects = verbatim.ProjectID == 0? null : new []{ new Project{ Id = verbatim.ProjectID, Name = verbatim.ProjectName} },
                 Taxon = taxon
             };
+
+            if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
+            {
+                obs.Occurrence.OrganismQuantityInt = quantity;
+            }
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
