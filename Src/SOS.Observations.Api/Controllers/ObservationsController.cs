@@ -1657,6 +1657,45 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        [HttpPost("Internal/CurrentUser/YearCount")]
+        [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetUserYearCountAsync(
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] bool validateSearchFilter = false)
+        {
+            try
+            {
+                var validationResult = validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success();
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var searchFilter = filter.ToSearchFilterInternal("sv-SE", true);
+                var yearCounts = await ObservationManager.GetUserYearCountAsync(searchFilter);
+
+                return new OkObjectResult(yearCounts);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TaxonValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year count");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpPost("Internal/CurrentUser/YearMonthCount")]
         [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

@@ -1,5 +1,4 @@
-﻿using System;
-using FizzWare.NBuilder;
+﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
 using System.Threading.Tasks;
@@ -18,22 +17,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
     {
         private readonly IntegrationTestFixture _fixture;
 
-        private async Task PopulateDataAsync()
-        {
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All()
-                .HaveValuesFromPredefinedObservations()
-                .TheFirst(20)
-                    .IsInDateSpan(DateTime.Parse("2000-01-01T00:00:00"), DateTime.Parse("2000-01-31T23:59:59"))
-                .TheNext(60)
-                    .IsInDateSpan(DateTime.Parse("2000-02-01T00:00:00"), DateTime.Parse("2000-02-29T23:59:59"))
-                .TheNext(20)
-                    .IsInDateSpan(DateTime.Parse("2000-03-01T00:00:00"), DateTime.Parse("2000-03-31T23:59:59"))
-                .Build();
-
-            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        }
-
         public GeographicsFilterTests(IntegrationTestFixture fixture)
         {
             _fixture = fixture;
@@ -41,22 +24,28 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task TestBetweenStartDateAndEndDateFilter()
+        public async Task TestSigleCountyMatchFilter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
 
-            await PopulateDataAsync();
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                .HaveValuesFromPredefinedObservations()
+                .TheFirst(60)
+                    .HaveAreaFeatureIds("X", "Y", "Z")
+                .TheNext(20)
+                    .HaveAreaFeatureIds("X", "Y", "Y")
+                .TheNext(20)
+                    .HaveAreaFeatureIds("X", "Y", "X")
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             var searchFilter = new SearchFilterDto
             {
-                Date = new DateFilterDto
-                {
-                    StartDate = DateTime.Parse("2000-02-01T00:00:00"),
-                    EndDate = DateTime.Parse("2000-02-29T23:59:59"),
-                    DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
-                }
+                Geographics = new GeographicsFilterDto { Areas = new [] { new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Z" } }}
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -79,21 +68,32 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task TestOverlappingStartDateAndEndDateFilter()
+        public async Task TestMultipleCountiesMatchFilter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
-            await PopulateDataAsync();
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .TheFirst(30)
+                    .HaveAreaFeatureIds("Px", "Cx", "Mx")
+                .TheNext(30)
+                    .HaveAreaFeatureIds("Px", "Cx", "My")
+                .TheNext(20)
+                   .HaveAreaFeatureIds("Px", "Cx", "Mz")
+                .TheNext(20)
+                    .HaveAreaFeatureIds("Px", "Cx", "Mv")
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             var searchFilter = new SearchFilterDto
             {
-                Date = new DateFilterDto
-                {
-                    StartDate = DateTime.Parse("2000-02-01T00:00:00"),
-                    EndDate = DateTime.Parse("2000-02-29T23:59:59"),
-                    DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
-                }
+                Geographics = new GeographicsFilterDto { Areas = new[] { 
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Mx" },
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "My" }
+                } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -116,21 +116,31 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task TestOnlyStartDateFilter()
+        public async Task TesCountyAndProvinceMatchFilter()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
-            await PopulateDataAsync();
+
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                .HaveValuesFromPredefinedObservations()
+                .TheFirst(60)
+                    .HaveAreaFeatureIds("X", "Y", "Z")
+                .TheNext(20)
+                    .HaveAreaFeatureIds("X", "Y", "X")
+                .TheNext(20)
+                     .HaveAreaFeatureIds("Y", "Y", "Z")
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             var searchFilter = new SearchFilterDto
             {
-                Date = new DateFilterDto
-                {
-                    StartDate = DateTime.Parse("2000-02-01T00:00:00"),
-                    EndDate = DateTime.Parse("2000-02-29T23:59:59"),
-                    DateFilterType = DateFilterTypeDto.OnlyStartDate
-                }
+                Geographics = new GeographicsFilterDto { Areas = new[] { 
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Province, FeatureId = "X" },
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Z" }
+                } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -151,41 +161,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             result.TotalCount.Should().Be(60);
         }
 
-        [Fact]
-        [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task TestOnlyEndDateFilter()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange - Create verbatim observations
-            //-----------------------------------------------------------------------------------------------------------            
-            await PopulateDataAsync();
-
-            var searchFilter = new SearchFilterDto
-            {
-                Date = new DateFilterDto
-                {
-                    StartDate = DateTime.Parse("2000-02-01T00:00:00"),
-                    EndDate = DateTime.Parse("2000-02-29T23:59:59"),
-                    DateFilterType = DateFilterTypeDto.OnlyEndDate
-                }
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act - Get observation by occurrenceId
-            //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.ObservationsController.ObservationsBySearch(
-                null,
-                null,
-                searchFilter,
-                0,
-                100);
-            var result = response.GetResult<PagedResultDto<Observation>>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------            
-            result.Should().NotBeNull();
-            result.TotalCount.Should().Be(60);
-        }
+       
     }
 }

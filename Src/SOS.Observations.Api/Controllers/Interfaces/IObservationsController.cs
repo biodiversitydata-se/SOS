@@ -192,13 +192,36 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             bool ensureArtportalenUpdated = false);
 
         /// <summary>
+        /// Count current users observations group by year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetUserYearCountAsync(
+           SearchFilterAggregationInternalDto filter,
+           bool validateSearchFilter = false);
+
+        /// <summary>
         /// Count current users observations group by year and month
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="validateSearchFilter"></param>
         /// <returns></returns>
         Task<IActionResult> GetUserYearMonthCountAsync(
-            [FromBody] SearchFilterAggregationInternalDto filter,
-            [FromQuery] bool validateSearchFilter = false);
+            SearchFilterAggregationInternalDto filter,
+            bool validateSearchFilter = false);
+
+        /// <summary>
+        /// Count current users observations group by year, month and day
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="validateSearchFilter"></param>
+        Task<IActionResult> GetUserYearMonthDayCountAsync(
+           SearchFilterAggregationInternalDto filter,
+           int skip = 0,
+           int take = 20,
+           bool validateSearchFilter = false);
     }
 }

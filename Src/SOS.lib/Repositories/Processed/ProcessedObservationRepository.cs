@@ -3704,6 +3704,71 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<YearCountResult>> GetUserYearCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                var (query, excludeQuery) = GetCoreQueries(filter);
+
+                var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                   .Index(new[] { PublicIndexName, ProtectedIndexName })
+                   .Size(0)
+                   .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                    .Aggregations(a => a
+                        .Composite("observationByYear", c => c
+                            .Size(100) // 100 years
+                            .Sources(s => s
+                                .Terms("startYear", t => t
+                                    .Field("event.startYear")
+                                    .Order(SortOrder.Descending)
+                                )
+                            )
+                            .Aggregations(a => a
+                                .Cardinality("unique_taxonids", c => c
+                                    .Field("taxon.id")
+                                )
+                            )
+                        )
+                    )
+                );
+
+                if (!searchResponse.IsValid)
+                {
+                    throw new InvalidOperationException(searchResponse.DebugInformation);
+                }
+
+                var result = new HashSet<YearCountResult>();
+                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYear").Buckets)
+                {
+                    var key = bucket.Key;
+
+                    key.TryGetValue("startYear", out int startYear);
+                    var count = bucket.DocCount;
+                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+
+                    result.Add(new YearCountResult
+                    {
+                        Count = count ?? 0,
+                        TaxonCount = taxonCount,
+                        Year = startYear
+                    });
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Failed to get user year count");
+                return null!;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter)
         {
             try

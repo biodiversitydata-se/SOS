@@ -699,6 +699,32 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(SearchFilter filter)
+        {
+            try
+            {
+                // Make sure mandatory properties is set
+                filter.ExtendedAuthorization.ReportedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
+                filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
+                await _filterManager.PrepareFilter(null, null, filter);
+
+                if (filter.ExtendedAuthorization.UserId == 0)
+                {
+                    throw new AuthenticationRequiredException("You have to login in order to use this end point");
+                }
+
+                var result = await _processedObservationRepository.GetUserYearCountAsync(filter);
+                return result?.ToDtos();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get user year count");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter)
         {
             try

@@ -402,6 +402,22 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> HaveAreaFeatureIds(this IOperable<ArtportalenObservationVerbatim> operable, 
+            string provinceFeatureId, 
+            string countyFeatureId, 
+            string municipalityFeatureId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Site.Province.FeatureId = provinceFeatureId;
+                obs.Site.County.FeatureId = countyFeatureId;
+                obs.Site.Municipality.FeatureId = municipalityFeatureId;
+            });
+
+            return operable;
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> HaveProjectInformation(
             this IOperable<ArtportalenObservationVerbatim> operable)
         {

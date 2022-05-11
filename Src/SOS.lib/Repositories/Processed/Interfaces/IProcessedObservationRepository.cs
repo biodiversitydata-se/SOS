@@ -266,6 +266,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchFilter filter);
 
         /// <summary>
+        /// Count the number of user observations group by year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<IEnumerable<YearCountResult>> GetUserYearCountAsync(SearchFilter filter);
+
+        /// <summary>
         /// Count the number of user observations group by year and month
         /// </summary>
         /// <param name="filter"></param>

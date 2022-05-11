@@ -494,6 +494,21 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
+        public static IEnumerable<YearCountResultDto> ToDtos(this IEnumerable<YearCountResult> yearMonthResults)
+        {
+            return yearMonthResults.Select(item => item.ToDto());
+        }
+
+        public static YearCountResultDto ToDto(this YearCountResult yearCountResult)
+        {
+            return new YearCountResultDto
+            {
+                Count = yearCountResult.Count,
+                TaxonCount = yearCountResult.TaxonCount,
+                Year = yearCountResult.Year
+            };
+        }
+
         public static IEnumerable<YearMonthCountResultDto> ToDtos(this IEnumerable<YearMonthCountResult> yearMonthCountResults)
         {
             return yearMonthCountResults.Select(item => item.ToDto());
