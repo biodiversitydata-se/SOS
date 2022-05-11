@@ -605,7 +605,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take, sortBy, sortOrder);
-                HttpContext.LogObservationCount(result.Records.Count());
+                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -1245,7 +1245,7 @@ namespace SOS.Observations.Api.Controllers
                     }
                 }
                 var result = await ObservationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations), skip, take, sortBy, sortOrder);
-                HttpContext.LogObservationCount(result.Records.Count());
+                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 return new OkObjectResult(dto);
             }
@@ -1415,7 +1415,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
-                HttpContext.LogObservationCount(result.Records.Count());
+                HttpContext.LogObservationCount(result?.Records?.Count() ?? 0);
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
                 return new OkObjectResult(dto);
             }

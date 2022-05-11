@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
+using NetTopologySuite.Geometries;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -416,6 +417,28 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 obs.Site.Municipality.FeatureId = municipalityFeatureId;
             });
 
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveCoordinates(this IOperable<ArtportalenObservationVerbatim> operable,
+           double longitude,
+           double latitude,
+           int accuracy)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                Point? wgs84Point = null;
+                if (longitude > 0 && latitude > 0)
+                {
+                    wgs84Point = new Point(longitude, latitude);
+                }
+
+                obs.Site.Point = wgs84Point?.ToGeoJson();
+                obs.Site.PointWithBuffer = wgs84Point.ToCircle(accuracy)?.ToGeoJson();
+                obs.Site.Accuracy = accuracy;
+
+            });
             return operable;
         }
 
