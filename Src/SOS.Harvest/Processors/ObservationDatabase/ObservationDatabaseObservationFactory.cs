@@ -112,6 +112,11 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Taxon = taxon
             };
 
+            obs.Occurrence.OrganismQuantity = obs.Occurrence.IndividualCount;
+            if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
+            {
+                obs.Occurrence.OrganismQuantityInt = quantity;
+            }
             AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v, 
                 verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 

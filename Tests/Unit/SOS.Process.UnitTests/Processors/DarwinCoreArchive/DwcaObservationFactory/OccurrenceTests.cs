@@ -245,5 +245,38 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             result.Occurrence.Sex.Should().BeNull();
         }
+
+        /// <remarks>
+        ///     Life Stage GBIF Vocabulary
+        ///     http://rs.gbif.org/vocabulary/gbif/life_stage.xml
+        /// </remarks>
+        [Theory]
+        [InlineData("1", 1)]
+        [InlineData("  254 ", 254)]
+        [InlineData("", null)]
+        [InlineData(null, null)]
+        public void OrganismQuantityInt_is_parsed_from_OrganismQuantity(
+            string organismQuantity,
+            int? expectedValue)
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithOrganismQuantity(organismQuantity)
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Occurrence.OrganismQuantityInt.Should().Be(expectedValue);
+        }
     }
 }

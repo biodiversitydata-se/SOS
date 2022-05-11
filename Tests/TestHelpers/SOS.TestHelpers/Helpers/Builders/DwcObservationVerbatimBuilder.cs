@@ -60,6 +60,11 @@ namespace SOS.TestHelpers.Helpers.Builders
             return With(entity => entity.LifeStage = lifeStage);
         }
 
+        public DwcObservationVerbatimBuilder WithOrganismQuantity(string organismQuantity)
+        {
+            return With(entity => entity.OrganismQuantity = organismQuantity);
+        }
+
         public DwcObservationVerbatimBuilder WithReproductiveCondition(string reproductiveCondition)
         {
             return With(entity => entity.ReproductiveCondition = reproductiveCondition);
