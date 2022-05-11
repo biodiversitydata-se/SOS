@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Enums.Artportalen;
 
@@ -38,15 +39,15 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimObservations_1000.json");                    
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                    var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
+                    var serializerSettings = new JsonSerializerSettings
                     {
-                        Converters = new List<Newtonsoft.Json.JsonConverter> { 
+                        Converters = new List<JsonConverter> { 
                             new TestHelpers.JsonConverters.ObjectIdConverter(),
                             new NewtonsoftGeoJsonGeometryConverter()                            
                         }
                     };
 
-                    _verbatimArtportalenObservationsFromJsonFile = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
+                    _verbatimArtportalenObservationsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
                 }
 
                 return _verbatimArtportalenObservationsFromJsonFile;
@@ -279,7 +280,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile);                
+                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile).Clone();                
                 
                 obs.Id = _faker.IndexVariable++;
                 obs.NotPresent = false; // sourceObservation.NotPresent;

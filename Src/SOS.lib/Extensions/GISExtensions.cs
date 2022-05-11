@@ -127,6 +127,11 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         private static GeoCoordinate[][] ToGeoShapePolygonCoordinates(this Polygon polygon)
         {
+            if ((polygon?.Coordinates?.Length ?? 0) == 0)
+            {
+                return null!;
+            }
+
             var coordinates = new List<GeoCoordinate[]>();
             var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray();
             var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)).ToArray()).ToArray();

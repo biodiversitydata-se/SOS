@@ -59,7 +59,7 @@ namespace SOS.Harvest.Services
                         query,
                         parameters,
                         transaction,
-                        5 * 60, // 5 minutes
+                        10 * 60, // 10 minutes. Test environemt is slow. Querys taking < 30 sek in prod can take +5 min in test
                         CommandType.Text,
                         CommandFlags.NoCache
                     )

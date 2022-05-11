@@ -1658,7 +1658,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         [HttpPost("Internal/CurrentUser/YearCount")]
-        [ProducesResponseType(typeof(IEnumerable<YearMonthCountResultDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<YearCountResultDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

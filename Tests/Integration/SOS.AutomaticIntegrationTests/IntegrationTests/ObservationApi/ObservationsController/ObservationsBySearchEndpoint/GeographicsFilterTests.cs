@@ -34,18 +34,18 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveAreaFeatureIds("X", "Y", "Z")
+                    .HaveAreaFeatureIds("P1", "C1", "M1")
                 .TheNext(20)
-                    .HaveAreaFeatureIds("X", "Y", "Y")
+                    .HaveAreaFeatureIds("P1", "C1", "M2")
                 .TheNext(20)
-                    .HaveAreaFeatureIds("X", "Y", "X")
+                    .HaveAreaFeatureIds("P1", "C1", "M3")
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             var searchFilter = new SearchFilterDto
             {
-                Geographics = new GeographicsFilterDto { Areas = new [] { new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Z" } }}
+                Geographics = new GeographicsFilterDto { Areas = new [] { new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "M1" } }}
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,13 +77,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(30)
-                    .HaveAreaFeatureIds("Px", "Cx", "Mx")
+                    .HaveAreaFeatureIds("P1", "C1", "M1")
                 .TheNext(30)
-                    .HaveAreaFeatureIds("Px", "Cx", "My")
+                    .HaveAreaFeatureIds("P1", "C1", "M2")
                 .TheNext(20)
-                   .HaveAreaFeatureIds("Px", "Cx", "Mz")
+                   .HaveAreaFeatureIds("P1", "C1", "M3")
                 .TheNext(20)
-                    .HaveAreaFeatureIds("Px", "Cx", "Mv")
+                    .HaveAreaFeatureIds("P1", "C1", "M4")
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -91,8 +91,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var searchFilter = new SearchFilterDto
             {
                 Geographics = new GeographicsFilterDto { Areas = new[] { 
-                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Mx" },
-                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "My" }
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "M1" },
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "M2" }
                 } }
             };
 
@@ -121,16 +121,15 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
-
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveAreaFeatureIds("X", "Y", "Z")
+                    .HaveAreaFeatureIds("P1", "C1", "M1")
                 .TheNext(20)
-                    .HaveAreaFeatureIds("X", "Y", "X")
+                    .HaveAreaFeatureIds("P1", "C1", "M2")
                 .TheNext(20)
-                     .HaveAreaFeatureIds("Y", "Y", "Z")
+                     .HaveAreaFeatureIds("P1", "C1", "M3")
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -138,8 +137,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var searchFilter = new SearchFilterDto
             {
                 Geographics = new GeographicsFilterDto { Areas = new[] { 
-                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Province, FeatureId = "X" },
-                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "Z" }
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Province, FeatureId = "P1" },
+                    new AreaFilterDto { AreaType = Observations.Api.Dtos.Enum.AreaTypeDto.Municipality, FeatureId = "M1" }
                 } }
             };
 
