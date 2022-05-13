@@ -892,6 +892,7 @@ namespace SOS.Observations.Api.Extensions
                     : new IdValueDto<string> { Id = location.County.FeatureId, Value = location.County.Name },
                 DecimalLatitude = location.DecimalLatitude,
                 DecimalLongitude = location.DecimalLongitude,
+                ExternalId = location.Attributes?.ExternalId,
                 Locality = location.Locality,
                 LocationAccordingTo = location.LocationAccordingTo,
                 LocationId = location.LocationId,
@@ -907,7 +908,8 @@ namespace SOS.Observations.Api.Extensions
                     : new IdValueDto<string> { Id = location.Parish.FeatureId, Value = location.Parish.Name },
                 Point = location.Point,
                 PointWithBuffer = location.PointWithBuffer,
-                PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer
+                PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer,
+                ProjectId = location.Attributes?.ProjectId
             };
         }
 

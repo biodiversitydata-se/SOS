@@ -100,6 +100,11 @@ namespace SOS.Observations.Api.Dtos
         public double? DecimalLongitude { get; set; }
 
         /// <summary>
+        ///     External Id of site
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
         ///     The specific description of the place. Less specific
         ///     geographic information can be provided in other
         ///     geographic terms (higherGeography, continent, country,
@@ -143,6 +148,11 @@ namespace SOS.Observations.Api.Dtos
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
+        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }        
+
+        /// <summary>
+        /// Id of project
+        /// </summary>
+        public int? ProjectId { get; set; }
     }
 }
