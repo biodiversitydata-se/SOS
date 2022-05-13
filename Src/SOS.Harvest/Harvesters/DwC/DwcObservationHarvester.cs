@@ -156,6 +156,28 @@ namespace SOS.Harvest.Harvesters.DwC
             throw new NotImplementedException("Not implemented for DwcA files");
         }
 
+        private async Task<int?> GetNumberOfObservationsInExistingCollectionAsync(DataProvider dataProvider)
+        {
+            using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
+                    dataProvider,
+                    _verbatimClient,
+                    _logger)
+            { TempMode = false };
+
+            try
+            {
+                bool collectionExists = await dwcArchiveVerbatimRepository.CheckIfCollectionExistsAsync();
+                if (!collectionExists) return null;
+                long count = await dwcArchiveVerbatimRepository.CountAllDocumentsAsync();
+                return Convert.ToInt32(count);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed count number of observations for {dataProvider.Identifier}");
+                return null;
+            }            
+        }
+
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
@@ -182,14 +204,18 @@ namespace SOS.Harvest.Harvesters.DwC
                             emlDocument.Root.Element("dataset").Element("pubDate").Value,
                             out var pubDate))
                         {
-                            // If data set not has changed since last harvest, don't harvest again
+                            // If dataset not has changed since last harvest and there exist observations in MongoDB, don't harvest again
                             if (provider.SourceDate == pubDate.ToUniversalTime())
                             {
-                                _logger.LogInformation($"Harvest of {provider.Identifier} canceled, No new data");
-                                harvestInfo.Status = RunStatus.CanceledSuccess;
-                                return harvestInfo;
+                                var nrExistingObservations = await GetNumberOfObservationsInExistingCollectionAsync(provider);
+                                if (nrExistingObservations.GetValueOrDefault() > 0)
+                                {
+                                    _logger.LogInformation($"Harvest of {provider.Identifier} canceled, No new data");
+                                    harvestInfo.Status = RunStatus.CanceledSuccess;
+                                    return harvestInfo;
+                                }
                             }
-
+                            
                             provider.SourceDate = pubDate;
                         };
                     }
