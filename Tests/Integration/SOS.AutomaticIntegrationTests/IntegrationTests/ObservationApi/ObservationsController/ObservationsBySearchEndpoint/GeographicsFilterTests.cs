@@ -172,14 +172,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                 .HaveValuesFromPredefinedObservations()
-                .TheFirst(30)
-                    .HaveCoordinates(1.00001, 1.00001, 10)
-                .TheNext(30)
-                    .HaveCoordinates(1.00009, 1.00009, 10)
+                .TheFirst(60)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                    .HaveCoordinates(2.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                     .HaveCoordinates(1.00001, 2.00001, 10)
+                     .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -224,11 +222,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveCoordinates(1.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                    .HaveCoordinates(1.00001, 1.00001, 20)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 20)
                 .TheNext(20)
-                     .HaveCoordinates(1.00001, 2.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -274,13 +272,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(30)
-                    .HaveCoordinates(1.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                 .TheNext(30)
-                    .HaveCoordinates(1.0001, 1.0009, 100)
+                .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 100)
                 .TheNext(20)
-                    .HaveCoordinates(2.00001, 1.00001, 10)
+                .HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                     .HaveCoordinates(1.00001, 2.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -326,16 +324,16 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(30)
-                    .HaveCoordinates(1.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                     .HaveTaxonId(100011)
                 .TheNext(30)
-                    .HaveCoordinates(1.001, 1.001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                      .HaveTaxonId(100009)
                 .TheNext(20)
-                    .HaveCoordinates(2.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
                     .HaveTaxonId(102933)
                 .TheNext(20)
-                     .HaveCoordinates(1.00001, 2.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
                      .HaveTaxonId(100009)
                 .Build();
 
@@ -381,14 +379,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                 .HaveValuesFromPredefinedObservations()
-                .TheFirst(30)
-                    .HaveCoordinates(1.00001, 1.00001, 10)
-                .TheNext(30)
-                    .HaveCoordinates(1.00009, 1.00009, 10)
+                .TheFirst(60)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                    .HaveCoordinates(2.00001, 1.00001, 10)
+                    .HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
                 .TheNext(20)
-                     .HaveCoordinates(1.00001, 2.00001, 10)
+                    .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

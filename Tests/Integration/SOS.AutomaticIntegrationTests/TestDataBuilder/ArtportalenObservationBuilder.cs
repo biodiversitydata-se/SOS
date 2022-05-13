@@ -420,14 +420,21 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
-        public static IOperable<ArtportalenObservationVerbatim> HaveCoordinates(this IOperable<ArtportalenObservationVerbatim> operable,
-           double longitude,
-           double latitude,
+        public static IOperable<ArtportalenObservationVerbatim> HaveCoordinatesInSpan(this IOperable<ArtportalenObservationVerbatim> operable,
+           double longitudeMin,
+           double longitudeMax,
+           double latitudeMin,
+           double latitudeMax,
            int accuracy)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            var random = new Random();
+            var precision = 1000000;
             builder.With((obs, index) =>
             {
+                var longitude = (double)random.Next((int)(longitudeMin * precision), (int)(longitudeMax * precision)) / precision;
+                var latitude = (double)random.Next((int)(latitudeMin * precision), (int)(latitudeMax * precision)) / precision;
+
                 Point? wgs84Point = null;
                 if (longitude > 0 && latitude > 0)
                 {

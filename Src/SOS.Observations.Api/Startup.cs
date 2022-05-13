@@ -413,6 +413,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IProcessedCheckListRepository, ProcessedCheckListRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();

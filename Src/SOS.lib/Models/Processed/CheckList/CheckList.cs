@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nest;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -27,11 +26,10 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// <summary>
         ///  Time spend to search
         /// </summary>
-        [Ignore]
         public string EffortTime => !string.IsNullOrEmpty(SamplingEffortTime) || Event?.EndDate == null || Event?.StartDate == null
             ? SamplingEffortTime
             : Event.EndDate.Value.Subtract(Event.StartDate.Value).ToString("g");
-
+        
         /// <summary>
         /// Check list end date 
         /// </summary>
@@ -91,7 +89,6 @@ namespace SOS.Lib.Models.Processed.CheckList
         // <summary>
         /// Taxon id's not found
         /// </summary>
-        [Ignore]
         public IEnumerable<int> TaxonIdsNotFound => TaxonIds?.Where(t => !TaxonIdsFound?.Contains(t) ?? true);
     }
 }

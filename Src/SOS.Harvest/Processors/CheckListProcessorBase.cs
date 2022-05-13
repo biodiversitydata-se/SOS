@@ -109,7 +109,7 @@ namespace SOS.Harvest.Processors
                
                 Logger.LogDebug($"Checklist - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
 
-                return await ValidateAndStoreObservations(dataProvider, checkLists.Values, $"{startId}-{endId}");
+                return await ValidateAndStoreCheckLists(dataProvider, checkLists.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException e)
             {
@@ -196,7 +196,7 @@ namespace SOS.Harvest.Processors
             return processBatchTasks.Sum(t => t.Result);
         }
 
-        protected async Task<int> ValidateAndStoreObservations(DataProvider dataProvider, ICollection<CheckList> checkLists, string batchId)
+        protected async Task<int> ValidateAndStoreCheckLists(DataProvider dataProvider, ICollection<CheckList> checkLists, string batchId)
         {
             if (!checkLists?.Any() ?? true)
             {
@@ -204,7 +204,6 @@ namespace SOS.Harvest.Processors
             }
 
             var processedCount = await CommitBatchAsync(dataProvider, checkLists, batchId);
-            checkLists.Clear();
 
             return processedCount;
         }

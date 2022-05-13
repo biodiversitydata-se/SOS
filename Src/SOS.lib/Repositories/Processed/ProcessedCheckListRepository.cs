@@ -13,6 +13,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.CheckList;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -43,7 +44,6 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
                 .Map<CheckList>(p => p
-                    .AutoMap()
                     .Properties(ps => ps
                         .Date(d => d
                             .Name(nm => nm.Modified)
@@ -51,12 +51,64 @@ namespace SOS.Lib.Repositories.Processed
                         .Date(d => d
                             .Name(nm => nm.RegisterDate)
                         )
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.Point))
-                        .GeoPoint(gp => gp
-                            .Name(nn => nn.Location.PointLocation))
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.PointWithBuffer)))));
+                        .Keyword(k => k
+                            .Name(nm => nm.Id)
+                        )
+                        .Keyword(k => k
+                            .Name(nm => nm.Name)
+                        )
+                        .Keyword(k => k
+                            .Name(nm => nm.OccurrenceIds)
+                        )
+                        .Keyword(k => k
+                            .Name(nm => nm.RecordedBy)
+                        )
+                        .Keyword(k => k
+                            .Name(nm => nm.SamplingEffortTime)
+                            .Index(false)
+                        )
+                        .Number(no => no
+                            .Name(nm => nm.DataProviderId)
+                            .Type(NumberType.Integer)
+                        )
+                        .Number(no => no
+                            .Name(nm => nm.TaxonIds)
+                            .Type(NumberType.Integer)
+                        )
+                        .Number(no => no
+                            .Name(nm => nm.TaxonIdsFound)
+                            .Type(NumberType.Integer)
+                        )
+                        .Object<ApInternal>(ai => ai
+                            .AutoMap()
+                            .Name(nm => nm.ArtportalenInternal)
+                        )
+                        .Object<string>(et => et
+                            .Name(nm => nm.EffortTime)
+                            .Enabled(false)
+                        )
+                        .Object<Event>(t => t
+                            .AutoMap()
+                            .Name(nm => nm.Event)
+                            .Properties(ps => ps.GetMapping())
+                        )
+                        .Object<Location>(l => l
+                            .AutoMap()
+                            .Name(nm => nm.Location)
+                            .Properties(ps => ps.GetMapping())
+                        )
+                        .Object<Project>(p => p
+                            .AutoMap()
+                            .Name(nm => nm.Project)
+                            .Properties(ps => ps.GetMapping())
+                        )
+                        .Object<IEnumerable<int>>(et => et
+                            .Name(nm => nm.TaxonIdsNotFound)
+                            .Enabled(false)
+                        )
+                    )
+                )
+            );
 
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create checklist index. Error: {createIndexResponse.DebugInformation}");
         }

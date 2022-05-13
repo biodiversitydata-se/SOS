@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
@@ -87,12 +87,12 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ProcessRepositoryBase(
-            IProcessClient client,
-            bool toggleable,
-            ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
-        )
+        IProcessClient client,
+        bool toggleable,
+        ICache<string, ProcessedConfiguration> processedConfigurationCache,
+        ElasticSearchConfiguration elasticConfiguration,
+        ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
+    )
         {
             _toggleable = toggleable;
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));

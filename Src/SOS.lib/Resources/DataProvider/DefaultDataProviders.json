@@ -6,6 +6,7 @@
         "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
         "IncludeInSearchByDefault": true,
+        "SupportCheckLists": true,
         "SupportIncrementalHarvest": true,
         "SupportDynamicEml": false,
         "HarvestFailPreventProcessing": true,
