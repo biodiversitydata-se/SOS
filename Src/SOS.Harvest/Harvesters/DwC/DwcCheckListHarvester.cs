@@ -202,9 +202,18 @@ namespace SOS.Harvest.Harvesters.DwC
             // Try to get DwcA file from IPT and store it locally
             var downloadUrl = provider.DownloadUrls
                 ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.CheckLists))?.Url;
+
+            if (string.IsNullOrEmpty(downloadUrl))
+            {
+                // Since download url is missing. Assume this provider is manually handled
+                harvestInfo.Count = -1; 
+                harvestInfo.Status = RunStatus.Success;
+                return harvestInfo;
+            }
+
             if (!await _fileDownloadService.GetFileAndStoreAsync(downloadUrl, path))
             {
-                return harvestInfo;
+                return harvestInfo;       
             }
 
             // Harvest file

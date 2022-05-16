@@ -33,7 +33,7 @@ namespace SOS.Harvest.Processors.Artportalen
             (int) ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
             (int) ValidationStatusId.ApprovedBasedOnReportersRarityForm,
             (int) ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
-            (int) ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
+            (int) ValidationStatusId.ApprovedBasedOnReportersOldRarityForm
         };
 
         /// Cast verbatim area to processed area

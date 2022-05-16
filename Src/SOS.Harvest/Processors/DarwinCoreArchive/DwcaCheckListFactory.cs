@@ -202,7 +202,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             if (!taxonIdStrings?.Any() ?? true)
             {
-                return null;
+                return null!;
             }
 
             var taxonIds = new HashSet<int>();
@@ -280,7 +280,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                         verbatimCheckList.Observations?.Select(o => o.OccurrenceID),
                     RecordedBy = verbatimCheckList.RecordedBy,
                     SamplingEffortTime = verbatimCheckList.SamplingEffortTime,
-                    TaxonIds = TryParseTaxonIds(verbatimCheckList.Taxa.Select(t => t.TaxonID)),
+                    TaxonIds = TryParseTaxonIds(verbatimCheckList.Taxa?.Select(t => t.TaxonID)),
                     TaxonIdsFound = TryParseTaxonIds(verbatimCheckList.Observations?.Select(o => o.TaxonID))?.Distinct()
                 };
 
