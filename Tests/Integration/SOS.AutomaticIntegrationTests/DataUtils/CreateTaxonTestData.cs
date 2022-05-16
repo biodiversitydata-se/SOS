@@ -42,6 +42,41 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
             string str = sb.ToString(); // Use this string in ProtectedSpeciesHelper.RedlistedTaxonIdsByCategory
         }
 
+
+        [Fact(Skip = "Intended to run on demand when needed")]
+        [Trait("Category", "DataUtil")]
+        public void CreateSensitiveSpeciesTestData()
+        {
+            var taxonIdsBySensitivityCategory = _fixture.Taxa
+                .Where(m => m.Attributes.SensitivityCategory != null && m.Attributes.SensitivityCategory.Id > 1)
+                .GroupBy(m => m.Attributes.SensitivityCategory.Id)
+                .ToDictionary(g => g.Key, g => g.Select(v => v.Id).ToList());
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var pair in taxonIdsBySensitivityCategory)
+            {                
+                sb.AppendLine($"{{ {pair.Key}, new[] {{ {string.Join(", ", pair.Value.Take(50))} }} }},");
+            }
+            string str = sb.ToString(); // Use this string in ProtectedSpeciesHelper.SensitiveSpeciesByCategory
+        }
+
+        [Fact(Skip = "Intended to run on demand when needed")]
+        [Trait("Category", "DataUtil")]
+        public void CreateSensitiveSpeciesTestDataVerbose()
+        {
+            var taxaBySensitivityCategory = _fixture.Taxa
+                .Where(m => m.Attributes.SensitivityCategory != null && m.Attributes.SensitivityCategory.Id > 1)
+                .GroupBy(m => m.Attributes.SensitivityCategory.Id)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var pair in taxaBySensitivityCategory)
+            {
+                sb.AppendLine($"{{ {pair.Key}, new[] {{ {string.Join(", ", pair.Value.Select(m => $"(TaxonId: {m.Id}, Name: \"{m.VernacularName}\")").Take(50))} }} }},");
+            }
+            string str = sb.ToString();
+        }
+
         [Fact(Skip = "Intended to run on demand when needed")]        
         [Trait("Category", "DataUtil")]
         public void CreateTaxonZipFile()

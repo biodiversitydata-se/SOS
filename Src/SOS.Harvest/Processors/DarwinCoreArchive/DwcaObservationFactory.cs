@@ -170,7 +170,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             //obs.IsInEconomicZoneOfSweden = true;
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
 
-            if (IsSensitiveObservation(obs))
+            if (obs.ShallBeProtected())
             {
                 obs.Sensitive = true;
                 obs.Protected = true;

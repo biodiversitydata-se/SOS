@@ -20,11 +20,14 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.Excel;
@@ -248,8 +251,24 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(_processClient);
+
+            // Taxonomy
             var taxonRepository = new TaxonRepository(_processClient, new NullLogger<TaxonRepository>());
-            var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache);
+            bool useTaxonZipCollection = GetUseTaxonZipCollection();
+            if (useTaxonZipCollection)
+            {
+                Taxa = GetTaxaFromZipFile();
+            }
+            else
+            {
+                Taxa = await taxonRepository.GetAllAsync();
+            }
+            _taxaById = Taxa.ToDictionary(m => m.Id, m => m);
+            TaxonTree<IBasicTaxon>? basicTaxonTree = TaxonTreeFactory.CreateTaxonTree(Taxa);
+            var taxonTreeCache = new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache);
+            taxonTreeCache.Set(basicTaxonTree);
+            var taxonManager = CreateTaxonManager(_processClient, taxonRepository, memoryCache, taxonTreeCache);
+
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, _processClient, memoryCache, taxonManager);
             _vocabularyRepository = new VocabularyRepository(_processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(_processClient, _vocabularyRepository);
@@ -298,17 +317,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager = new UserManager(userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
-            bool useTaxonZipCollection = GetUseTaxonZipCollection();
-            if (useTaxonZipCollection)
-            {
-                Taxa = GetTaxaFromZipFile();
-            }
-            else
-            {
-                Taxa = await taxonRepository.GetAllAsync();
-            }
+            
 
-            _taxaById = Taxa.ToDictionary(m => m.Id, m => m);
             _processTimeManager = new ProcessTimeManager(new ProcessConfiguration());            
             ArtportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
                 artportalenDataProvider,
@@ -367,11 +377,14 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return areaManager;
         }
 
-        private TaxonManager CreateTaxonManager(ProcessClient processClient, TaxonRepository taxonRepository, IMemoryCache memoryCache)
-        {
+        private TaxonManager CreateTaxonManager(ProcessClient processClient, 
+            TaxonRepository taxonRepository, 
+            IMemoryCache memoryCache, 
+            IClassCache<TaxonTree<IBasicTaxon>> taxonTreeCache)
+        {            
             var taxonListRepository = new TaxonListRepository(processClient, new NullLogger<TaxonListRepository>());
             var taxonManager = new TaxonManager(taxonRepository, taxonListRepository,
-                new ClassCache<TaxonTree<IBasicTaxon>>(memoryCache),
+                taxonTreeCache,
                 new ClassCache<TaxonListSetsById>(memoryCache),
                 new NullLogger<TaxonManager>());
             return taxonManager;
@@ -497,23 +510,46 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await ProcessedObservationRepository.ClearCollectionAsync(protectedIndex);
         }
 
+        public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+        {
+            var processedObservations = ProcessObservations(verbatimObservations);
+            await AddObservationsToElasticsearchAsync(processedObservations);
+        }
+
         public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
         {
-            const bool protectedIndex = false;
+            var publicObservations = new List<Observation>();
+            var protectedObservations = new List<Observation>();
+
+            foreach(var observation in observations)
+            {
+                if (observation.ShallBeProtected())
+                {
+                    protectedObservations.Add(observation);
+                }
+                else
+                {
+                    publicObservations.Add(observation);
+                }
+            }
+
+            await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
+            await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
+            
+            Thread.Sleep(1000);
+        }
+
+        private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations, 
+            bool protectedIndex,
+            bool clearExistingObservations = true)
+        {            
             if (clearExistingObservations)
             {
                 await ProcessedObservationRepository.DeleteAllDocumentsAsync(protectedIndex);
             }
             await ProcessedObservationRepository.DisableIndexingAsync(protectedIndex);
             await ProcessedObservationRepository.AddManyAsync(observations, protectedIndex);
-            await ProcessedObservationRepository.EnableIndexingAsync(protectedIndex);
-            Thread.Sleep(1000);
-        }
-
-        public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
-        {
-            var processedObservations = ProcessObservations(verbatimObservations);            
-            await AddObservationsToElasticsearchAsync(processedObservations);
+            await ProcessedObservationRepository.EnableIndexingAsync(protectedIndex);            
         }
 
         public List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
