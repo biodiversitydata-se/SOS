@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Enums.Artportalen;
@@ -404,6 +405,19 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> HaveActivity(this IOperable<ArtportalenObservationVerbatim> operable, int id, int categoryId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.Activity = new MetadataWithCategory(id, categoryId);
+            });
+
+            return operable;
+        }
+
+        
+
         public static IOperable<ArtportalenObservationVerbatim> HaveAreaFeatureIds(this IOperable<ArtportalenObservationVerbatim> operable, 
             string provinceFeatureId, 
             string countyFeatureId, 
@@ -473,6 +487,19 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> HaveProjectId(this IOperable<ArtportalenObservationVerbatim> operable,
+            int? projectId)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+
+                obs.Projects = !projectId.HasValue ? null : new[] { new Project() { Id = projectId.Value} };
+            });
+
+            return operable;
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> HaveMediaInformation(
             this IOperable<ArtportalenObservationVerbatim> operable)
         {
@@ -491,6 +518,57 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
             return operable;
         }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveRecoveredStatus(this IOperable<ArtportalenObservationVerbatim> operable,
+           bool recovered)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.NotRecovered = !recovered;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveStatus(this IOperable<ArtportalenObservationVerbatim> operable,
+           bool notPresent,
+           bool notRecovered)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.NotPresent = notPresent;
+                obs.NotRecovered = notRecovered;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveValidationStatus(this IOperable<ArtportalenObservationVerbatim> operable,
+            ValidationStatusId validationStatus)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.ValidationStatus = new Metadata((int) validationStatus);
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveDeterminationStatus(this IOperable<ArtportalenObservationVerbatim> operable,
+            bool unsureDetermination)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.UnsureDetermination = unsureDetermination;
+            });
+
+            return operable;
+        }
+
 
         public static IOperable<ArtportalenObservationVerbatim> IsInDateSpan(this IOperable<ArtportalenObservationVerbatim> operable, DateTime spanStartDate, DateTime spanEndDate)
         {

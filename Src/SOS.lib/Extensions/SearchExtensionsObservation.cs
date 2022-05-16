@@ -724,9 +724,9 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
 
             query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);                        
-            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);            
+            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds); 
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-
+            
             if (filter is SearchFilterInternal)
             {
                 query.AddInternalFilters(filter);

@@ -85,6 +85,11 @@ namespace SOS.Lib.Services
         {
             try
             {
+                if (string.IsNullOrEmpty(url))
+                {
+                    return false;
+                }
+
                 await using var fileStream = File.Create(path);
                 if (!fileStream?.CanWrite ?? true)
                 {

@@ -562,7 +562,10 @@ namespace SOS.Harvest.DarwinCore
             foreach (var eve in events)
             {
                 var notFoundTaxa = eve.Taxa?.Where(t => !(eve.Observations?.Any(o => o.TaxonID.Equals(t.TaxonID)) ?? false));
-
+                if (notFoundTaxa == null)
+                {
+                    continue;
+                }
                 foreach (var taxon in notFoundTaxa)
                 {
                     foreach (var field in occurrenceFileReader.FileMetaData.Fields)

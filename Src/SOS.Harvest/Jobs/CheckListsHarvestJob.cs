@@ -80,7 +80,7 @@ namespace SOS.Harvest.Jobs
                     var provider = task.Key;
                     var harvestInfo = task.Value.Result;
 
-                    if (harvestInfo.Status != RunStatus.CanceledSuccess)
+                    if (harvestInfo.Status != RunStatus.CanceledSuccess && harvestInfo.Count != -1) // Count -1 = Assume manually harvested, don't update harvest info 
                     {
                         harvestInfo.Id = provider.CheckListIdentifier;
                         await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
