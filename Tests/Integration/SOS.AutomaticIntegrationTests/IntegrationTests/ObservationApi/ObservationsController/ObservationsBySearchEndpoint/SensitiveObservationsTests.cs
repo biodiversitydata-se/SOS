@@ -13,6 +13,7 @@ using LinqStatistics;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
+using SOS.TestHelpers.Helpers.Builders;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.ObservationsBySearchEndpoint
 {
@@ -31,13 +32,20 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
         public async Task Search_sensitive_observations_without_permissions_returns_no_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
-            // Arrange - Create verbatim observations
+            // Arrange
             //-----------------------------------------------------------------------------------------------------------            
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                 .All()
                     .HaveValuesFromPredefinedObservations()
                     .HaveTaxonSensitivityCategory(3)
                 .Build();
+
+            var authorityBuilder = new UserAuthorizationTestBuilder();
+            var authority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(1)                
+                .Build();
+            _fixture.UseMockUserService(authority);
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
             var searchFilter = new SearchFilterDto
@@ -46,14 +54,15 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             };
 
             //-----------------------------------------------------------------------------------------------------------
-            // Act - Get observation by occurrenceId
+            // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ObservationsController.ObservationsBySearch(
                 null,
                 null,
                 searchFilter,
                 0,
-                100);
+                100,
+                sensitiveObservations: true);
             var result = response.GetResult<PagedResultDto<Observation>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -61,6 +70,57 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------            
             result.Should().NotBeNull();
             result.TotalCount.Should().Be(0);
+            _fixture.RestoreUserService();
+        }
+
+
+        [Fact]
+        [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task Search_sensitive_observations_with_permission_to_category3()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------            
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                .TheFirst(60)
+                    .HaveTaxonSensitivityCategory(3)
+                .TheNext(40)
+                    .HaveTaxonSensitivityCategory(4)
+                .Build();
+
+            var authorityBuilder = new UserAuthorizationTestBuilder();
+            var authority = authorityBuilder
+                .WithAuthorityIdentity("Sighting")
+                .WithMaxProtectionLevel(3)                
+                .Build();
+            _fixture.UseMockUserService(authority);
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var searchFilter = new SearchFilterDto
+            {
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.ObservationsBySearch(
+                null,
+                null,
+                searchFilter,
+                0,
+                100,
+                sensitiveObservations: true);
+            var result = response.GetResult<PagedResultDto<Observation>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            result.Should().NotBeNull();
+            result.TotalCount.Should().Be(60);
+            _fixture.RestoreUserService();
         }
     }
 }

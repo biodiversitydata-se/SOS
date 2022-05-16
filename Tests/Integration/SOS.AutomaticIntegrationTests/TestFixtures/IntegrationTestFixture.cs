@@ -74,7 +74,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
-        private DwcaObservationFactory _darwinCoreFactory;        
+        private DwcaObservationFactory _darwinCoreFactory;
+        private IUserService _userService;
 
         public DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper)
         {            
@@ -143,12 +144,14 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
 
             InstallationEnvironment = GetEnvironmentFromAppSettings();
             Initialize().Wait();
-            CreateIntegrationTestIndexAsync().Wait();
+            CreateIntegrationTestIndexAsync(false).Wait();
+            CreateIntegrationTestIndexAsync(true).Wait();
         }
 
         public void Dispose()
-        {
-            // Delete integration test database
+        {            
+            DeleteIntegrationTestIndexAsync(false).Wait();
+            DeleteIntegrationTestIndexAsync(true).Wait();
         }
 
         public void InitControllerHttpContext()
@@ -288,8 +291,8 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 _vocabularyValueResolver, new NullLogger<GeoJsonFileWriter>());
             var areaRepository = new AreaRepository(_processClient, new NullLogger<AreaRepository>());
             var areaCache = new AreaCache(areaRepository);
-            var userService = CreateUserService();
-            var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
+            _userService = CreateUserService();
+            var filterManager = new FilterManager(taxonManager, _userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
@@ -314,7 +317,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             SearchPerformanceHealthCheck = new SearchPerformanceHealthCheck(observationManager);
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration);
             SystemsController = new SystemsController(processInfoManager, processedObservationRepository, new NullLogger<SystemsController>());
-            _userManager = new UserManager(userService, new NullLogger<UserManager>());
+            _userManager = new UserManager(_userService, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
             
@@ -496,6 +499,10 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             ProcessedObservationRepository.HttpContextAccessor = contextAccessor;
         }
 
+        public void RestoreUserService()
+        {
+            _filterManager.UserService = _userService;
+        }
 
         public void UseUserServiceWithToken(string token)
         {
@@ -504,10 +511,14 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             _userManager.UserService = userService;
         }
 
-        private async Task CreateIntegrationTestIndexAsync()
-        {
-            const bool protectedIndex = false;
+        private async Task CreateIntegrationTestIndexAsync(bool protectedIndex)
+        {            
             await ProcessedObservationRepository.ClearCollectionAsync(protectedIndex);
+        }
+
+        private async Task DeleteIntegrationTestIndexAsync(bool protectedIndex)
+        {
+            await ProcessedObservationRepository.DeleteCollectionAsync(protectedIndex);
         }
 
         public async Task ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)

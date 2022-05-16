@@ -371,6 +371,12 @@ namespace SOS.Harvest.Processors.Artportalen
                 // Populate generic data
                 PopulateGenericData(obs);
 
+                if (obs.ShallBeProtected())
+                {
+                    obs.Sensitive = true;
+                    obs.Protected = true;
+                }
+
                 return obs;
             }
             catch (Exception e)
