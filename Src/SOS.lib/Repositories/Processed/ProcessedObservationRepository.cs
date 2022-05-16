@@ -1517,7 +1517,7 @@ namespace SOS.Lib.Repositories.Processed
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             _telemetry.StopOperation(operation);
-
+            
             var result = searchResponse
                 .Aggregations
                 .Terms("species")
@@ -1530,7 +1530,7 @@ namespace SOS.Lib.Repositories.Processed
                         VernacularName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.VernacularName ?? "",
                         ScientificNameAuthorship = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificNameAuthorship ?? "",
                         ScientificName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificName ?? "",
-                        RedlistCategory = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.RedlistCategory ?? ""
+                        RedlistCategory = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.Attributes.RedlistCategory ?? ""
                     })?
                 .Skip(skip)
                 .Take(take);

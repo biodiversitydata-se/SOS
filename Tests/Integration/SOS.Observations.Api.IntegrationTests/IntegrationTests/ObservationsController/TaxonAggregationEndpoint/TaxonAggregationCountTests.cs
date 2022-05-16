@@ -232,8 +232,35 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationsCon
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.TotalCount.Should().Be(0);
-            result.Records.Count().Should().Be(0);            
+            result.TotalCount.Should().Be(1, "only Biota is returned");            
+        }
+
+        [Fact]
+        [Trait("Category", "ApiIntegrationTest")]
+        public async Task TaxonAggregationCount_with_no_taxa_and_with_underlyingTaxa()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var taxonFilter = new TaxonFilterDto
+            {
+                IncludeUnderlyingTaxa = true
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.ObservationsController.TaxonSumAggregationInternal(taxonFilter);
+            var result = response.GetResult<PagedResultDto<TaxonSumAggregationItem>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.TotalCount.Should().BeGreaterThan(100000, "because there exists more than 100 000 taxa");
+            result.Records.Count().Should().BeGreaterThan(100000);
+            result.Records.First().TaxonId.Should().Be(TestData.TaxonIds.Biota, "because Biota should have the highest sum of observations");
+            result.Records.First().SumObservationCount.Should().BeGreaterThan(10000000, "because there are more than 10 000 000 present observations");
+            result.Records.First().SumProvinceCount.Should().BeGreaterOrEqualTo(34);
         }
 
         [Fact]
