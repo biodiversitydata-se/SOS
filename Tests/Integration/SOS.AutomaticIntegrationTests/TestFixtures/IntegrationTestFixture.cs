@@ -479,10 +479,10 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return processedObservationRepository;
         }
 
-        public void UseMockUserService(params AuthorityModel[] authorities)
+        public void UseMockUserService(int userId, params AuthorityModel[] authorities)
         {
             UserModel user = new UserModel();
-            user.Id = 15;
+            user.Id = userId;
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(userService => userService.GetUserAsync())
                 .ReturnsAsync(user);
