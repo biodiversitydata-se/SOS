@@ -387,7 +387,7 @@ namespace SOS.Lib.Managers
         {
             // Get user
             var user = await _userService.GetUserAsync();
-            filter.ExtendedAuthorization.UserId = user?.Id ?? 0;
+            (filter.ExtendedAuthorization ??= new ExtendedAuthorizationFilter()).UserId = user?.Id ?? 0;
 
             if (filter.ExtendedAuthorization.ProtectedObservations)
             {

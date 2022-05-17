@@ -277,14 +277,15 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult)
+        public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult, long totalGridCellCount)
         {
             return new GeoGridResultDto
             {
                 Zoom = geoGridTileResult.Zoom,
                 GridCellCount = geoGridTileResult.GridCellTileCount,
                 BoundingBox = geoGridTileResult.BoundingBox.ToLatLonBoundingBoxDto(),
-                GridCells = geoGridTileResult.GridCellTiles.Select(cell => cell.ToGeoGridCellDto())
+                GridCells = geoGridTileResult.GridCellTiles.Select(cell => cell.ToGeoGridCellDto()),
+                TotalGridCellCount = geoGridTileResult.GridCellTileCount > totalGridCellCount ? geoGridTileResult.GridCellTileCount : totalGridCellCount
             };
         }
 
