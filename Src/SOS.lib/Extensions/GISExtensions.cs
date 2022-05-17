@@ -232,6 +232,27 @@ namespace SOS.Lib.Extensions
 
         #region Public
 
+        public static long CalculateNumberOfTiles(this Envelope envelope,
+            int zoom)
+        {
+            if (envelope == null)
+            {
+                return 0;
+            }
+    
+            var tileWidthInDegrees = 360.0 / Math.Pow(2, zoom + 1);
+            var latCentre = (envelope.MaxY + envelope.MinY) / 2;
+            var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
+
+            var lonDiff = Math.Abs(envelope.MaxX - envelope.MinX);
+            var latDiff = Math.Abs(envelope.MaxY - envelope.MinY);
+            var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
+            var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
+            var maxTilesTot = (long)(maxLonTiles * maxLatTiles);
+
+            return maxTilesTot;
+        }
+
         /// <summary>
         ///     Get the EPSG code for the specified coordinate system.
         /// </summary>
@@ -798,11 +819,11 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///     Convert angle to radians
         /// </summary>
-        /// <param name="val"></param>
+        /// <param name="degrees"></param>
         /// <returns></returns>
-        public static double ToRadians(this double val)
+        public static double ToRadians(this double degrees)
         {
-            return Math.PI / 180 * val;
+            return degrees * Math.PI / 180;
         }
 
         /// <summary>

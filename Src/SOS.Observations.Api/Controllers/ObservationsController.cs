@@ -244,20 +244,7 @@ namespace SOS.Observations.Api.Controllers
             Envelope envelope,
             int zoom)
         {
-            if (envelope == null)
-            {
-                return Result.Success();
-            }
-
-            var tileWidthInDegrees = 360 / Math.Pow(2, zoom);
-            var latCentre = (envelope.MaxY + envelope.MinY) / 2;
-            var tileHeightInDegrees = tileWidthInDegrees * Math.Cos(latCentre.ToRadians());
-
-            var lonDiff = Math.Abs(envelope.MaxX - envelope.MinX);
-            var latDiff = Math.Abs(envelope.MaxY - envelope.MinY);
-            var maxLonTiles = Math.Ceiling(lonDiff / tileWidthInDegrees);
-            var maxLatTiles = Math.Ceiling(latDiff / tileHeightInDegrees);
-            var maxTilesTot = maxLonTiles * maxLatTiles;
+            var maxTilesTot = envelope.CalculateNumberOfTiles(zoom);
 
             if (maxTilesTot > _tilesLimit)
             {
@@ -472,7 +459,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(result.Error);
                 }
 
-                var dto = result.Value.ToGeoGridResultDto();
+                var dto = result.Value.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -935,7 +922,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(result.Error);
                 }
 
-                GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
+                GeoGridResultDto dto = result.Value.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)

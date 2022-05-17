@@ -1915,19 +1915,28 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Size(0)
-                .Aggregations(a => a.Filter("geotile_filter", g => g
-                        .Filter(f => f.GeoBoundingBox(bb => bb
-                        .Field("location.pointLocation")
-                        .BoundingBox(b => b.TopLeft(filter.Location.Geometries.BoundingBox.TopLeft.ToGeoLocation()).BottomRight(filter.Location.Geometries.BoundingBox.BottomRight.ToGeoLocation()))
-                   ))
-                    .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
-                        .Field("location.pointLocation")
-                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
-                        .Precision((GeoTilePrecision)zoom)
-                        .Aggregations(b => b
-                            .Cardinality("taxa_count", t => t
-                                .Field("taxon.id"))
-                        )))
+                .Aggregations(a => a
+                    .Filter("geotile_filter", g => g
+                        .Filter(f => f
+                            .GeoBoundingBox(bb => bb
+                                .Field("location.pointLocation")
+                                .BoundingBox(b => b
+                                    .TopLeft(filter.Location.Geometries.BoundingBox.TopLeft.ToGeoLocation())
+                                    .BottomRight(filter.Location.Geometries.BoundingBox.BottomRight.ToGeoLocation())
+                               )
+                            )
+                        )
+                        .Aggregations(ab => ab
+                            .GeoTile("geotile_grid", gg => gg
+                                .Field("location.pointLocation")
+                                .Size(MaxNrElasticSearchAggregationBuckets + 1)
+                                .Precision((GeoTilePrecision)(zoom))
+                                .Aggregations(b => b
+                                    .Cardinality("taxa_count", t => t
+                                    .Field("taxon.id"))
+                                )
+                            )
+                        )
                     )
                 )
                 .Query(q => q
@@ -1937,7 +1946,6 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-
 
             if (!searchResponse.IsValid)
             {

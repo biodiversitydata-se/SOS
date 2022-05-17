@@ -8,5 +8,7 @@ namespace SOS.Observations.Api.Dtos
         public int Zoom { get; set; }
         public int GridCellCount { get; set; }
         public IEnumerable<GeoGridCellDto> GridCells { get; set; }
+
+        public long TotalGridCellCount { get; set; }
     }
 }
