@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +79,9 @@ namespace SOS.Administration.Api.Controllers
                 }
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+                _logger.LogDebug("Start wait for DwC-A file transfer");
+                Thread.Sleep(TimeSpan.FromSeconds(60)); // fix for slow network disk
+                _logger.LogDebug("End wait for DwC-A file transfer");
 
                 // process uploaded file
                 BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job =>

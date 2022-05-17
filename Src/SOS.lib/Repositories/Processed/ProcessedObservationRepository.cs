@@ -812,7 +812,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
-        private async Task<bool> DeleteCollectionAsync(bool protectedIndex)
+        public async Task<bool> DeleteCollectionAsync(bool protectedIndex)
         {
             var res = await Client.Indices.DeleteAsync(protectedIndex ? ProtectedIndexName : PublicIndexName);
             return res.IsValid;

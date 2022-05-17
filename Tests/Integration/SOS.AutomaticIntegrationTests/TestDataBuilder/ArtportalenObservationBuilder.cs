@@ -589,5 +589,18 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
             return operable;
         }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveTaxonSensitivityCategory(this IOperable<ArtportalenObservationVerbatim> operable, int sensitivityCategory)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {                
+                obs.TaxonId = Pick<int>.RandomItemFrom(ProtectedSpeciesHelper.SensitiveSpeciesByCategory[sensitivityCategory]);                
+                obs.ProtectedBySystem = true;
+            });
+
+            return operable;
+        }
+
     } 
 }

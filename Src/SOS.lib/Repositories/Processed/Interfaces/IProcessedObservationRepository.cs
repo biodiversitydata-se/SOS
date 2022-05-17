@@ -40,6 +40,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> ClearCollectionAsync(bool protectedIndex);
 
         /// <summary>
+        /// Delete collection
+        /// </summary>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        Task<bool> DeleteCollectionAsync(bool protectedIndex);
+
+        /// <summary>
         /// Delete all documents.
         /// </summary>
         /// <param name="protectedIndex"></param>

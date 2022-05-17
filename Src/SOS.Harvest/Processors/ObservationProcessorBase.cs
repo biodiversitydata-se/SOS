@@ -314,7 +314,7 @@ namespace SOS.Harvest.Processors
                     }
                     
                     // If  observation is protected
-                    if (observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage)
+                    if (observation.ShallBeProtected())
                     {
                         observation.Protected = true;
                         observation.Sensitive = true;

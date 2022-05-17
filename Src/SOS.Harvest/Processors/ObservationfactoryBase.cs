@@ -204,11 +204,6 @@ namespace SOS.Harvest.Processors
             return AccessRightsId.FreeUsage;            
         }
 
-        protected bool IsSensitiveObservation(Observation observation)
-        {
-            return observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage;            
-        }
-
         /// <summary>
         /// Populate some generic data
         /// </summary>
