@@ -575,7 +575,7 @@ namespace SOS.Harvest.DarwinCore
                             "http://rs.tdwg.org/dwc/terms/basisOfRecord" => eve.BasisOfRecord,
                             "http://rs.tdwg.org/dwc/terms/eventID" => eve.EventID,
                             "http://rs.tdwg.org/dwc/terms/identificationVerificationStatus" => eve.IdentificationVerificationStatus,
-                            "http://rs.tdwg.org/dwc/terms/occurrenceStatus" => "not present",
+                            "http://rs.tdwg.org/dwc/terms/occurrenceStatus" => "absent",
                             "http://rs.tdwg.org/dwc/terms/recordedBy" => eve.RecordedBy,
                             "http://rs.tdwg.org/dwc/terms/taxonID" => taxon.TaxonID,
                             "http://rs.tdwg.org/dwc/terms/scientificName" => taxon.ScientificName,
