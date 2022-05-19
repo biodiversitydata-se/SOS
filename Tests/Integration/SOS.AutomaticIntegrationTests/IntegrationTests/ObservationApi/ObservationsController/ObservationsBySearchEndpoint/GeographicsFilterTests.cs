@@ -325,16 +325,16 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(30)
                     .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                    .HaveTaxonId(100011)
+                    .With(o => o.TaxonId = 100011)
                 .TheNext(30)
                     .HaveCoordinatesInSpan(1.00001, 1.00009, 1.00001, 1.00009, 10)
-                     .HaveTaxonId(100009)
+                    .With(o => o.TaxonId = 100009)
                 .TheNext(20)
                     .HaveCoordinatesInSpan(2.00001, 2.00009, 1.00001, 1.00009, 10)
-                    .HaveTaxonId(102933)
+                    .With(o => o.TaxonId = 102933)
                 .TheNext(20)
                     .HaveCoordinatesInSpan(1.00001, 1.00009, 2.00001, 2.00009, 10)
-                     .HaveTaxonId(100009)
+                    .With(o => o.TaxonId = 100009)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

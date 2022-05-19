@@ -1,10 +1,10 @@
-﻿using System;
-using FizzWare.NBuilder;
+﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
@@ -36,11 +36,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveProjectId(1)
+                    .With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 1 } })
                 .TheNext(20)
-                    .HaveProjectId(2)
+                    .With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 2 } })
                 .TheRest()
-                    .HaveProjectId(null)
+                    .With(o => o.Projects = null)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -80,13 +80,17 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveStatus(false, false)
+                    .With(o => o.NotPresent = false)
+                    .With(o => o.NotRecovered = false)
                 .TheNext(20)
-                     .HaveStatus(true, false)
+                    .With(o => o.NotPresent = true)
+                    .With(o => o.NotRecovered = false)
                 .TheNext(10)
-                     .HaveStatus(false, true)
+                    .With(o => o.NotPresent = false)
+                    .With(o => o.NotRecovered = true)
                 .TheRest()
-                    .HaveStatus(true, true)
+                    .With(o => o.NotPresent = true)
+                    .With(o => o.NotRecovered = true)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -126,13 +130,17 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(40)
-                    .HaveStatus(false, false)
+                    .With(o => o.NotPresent = false)
+                    .With(o => o.NotRecovered = false)
                 .TheNext(20)
-                     .HaveStatus(true, false)
+                    .With(o => o.NotPresent = true)
+                    .With(o => o.NotRecovered = false)
                 .TheNext(20)
-                     .HaveStatus(false, true)
+                    .With(o => o.NotPresent = false)
+                    .With(o => o.NotRecovered = true)
                  .TheNext(20)
-                     .HaveStatus(true, true)
+                    .With(o => o.NotPresent = true)
+                    .With(o => o.NotRecovered = true)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -172,33 +180,34 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(10)
-                    .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersDocumentation)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersDocumentation))
                 .TheNext(10)
-                      .HaveValidationStatus(ValidationStatusId.ApprovedSpecimenCheckedByValidator)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedSpecimenCheckedByValidator))
                 .TheNext(10)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording))
                 .TheNext(10)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersRarityForm)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersRarityForm))
                 .TheNext(10)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnDeterminatorsVerification)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification))
                  .TheNext(10)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersOldRarityForm)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm))
+
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DescriptionRequiredForTheNationalRaritiesCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DescriptionRequiredForTheNationalRaritiesCommittee))
                  .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DescriptionRequiredForTheRegionalRecordsCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DescriptionRequiredForTheRegionalRecordsCommittee))
                  .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DialogueAtReporterHiddenSighting)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DialogueAtReporterHiddenSighting))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.NotAbleToValidate)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.NotAbleToValidate))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Rejected)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Rejected))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.ReportTreatedRegionalForNationalRaritiesCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ReportTreatedRegionalForNationalRaritiesCommittee))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Verified)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Verified))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Unvalidated)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Unvalidated))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -238,42 +247,43 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(10)
-                    .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersDocumentation)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersDocumentation))
                 .TheNext(10)
-                      .HaveValidationStatus(ValidationStatusId.ApprovedSpecimenCheckedByValidator)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedSpecimenCheckedByValidator))
                 .TheNext(5)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording))
                 .TheNext(5)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersRarityForm)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersRarityForm))
                 .TheNext(5)
-                     .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnDeterminatorsVerification)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.ApprovedBasedOnReportersOldRarityForm)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm))
 
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DescriptionRequiredForTheNationalRaritiesCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DescriptionRequiredForTheNationalRaritiesCommittee))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DescriptionRequiredForTheRegionalRecordsCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DescriptionRequiredForTheRegionalRecordsCommittee))
                  .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DialogueAtReporterHiddenSighting)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DialogueAtReporterHiddenSighting))
                  .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DialogueWithReporter)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DialogueWithReporter))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DialogueWithValidator)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DialogueWithValidator))
+ 
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.DocumentationRequested)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.DocumentationRequested))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.NeedNotBeValidated)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.NeedNotBeValidated))
                  .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.NotAbleToValidate)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.NotAbleToValidate))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Rejected)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Rejected))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.ReportTreatedRegionalForNationalRaritiesCommittee)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.ReportTreatedRegionalForNationalRaritiesCommittee))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Verified)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Verified))
                 .TheNext(5)
-                    .HaveValidationStatus(ValidationStatusId.Unvalidated)
+                    .With(o => o.ValidationStatus = new Metadata((int)ValidationStatusId.Unvalidated))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -313,9 +323,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveDeterminationStatus(false)
+                    .With(o => o.UnsureDetermination = false)
                 .TheNext(40)
-                      .HaveDeterminationStatus(true)
+                    .With(o => o.UnsureDetermination = true)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -355,9 +365,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveDeterminationStatus(true)
+                    .With(o => o.UnsureDetermination = true)
                 .TheNext(40)
-                      .HaveDeterminationStatus(false)
+                    .With(o => o.UnsureDetermination = false)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -397,9 +407,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveRecoveredStatus(true)
+                    .With(o => o.NotRecovered = false)
                 .TheNext(40)
-                      .HaveRecoveredStatus(false)
+                     .With(o => o.NotRecovered = true)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -439,9 +449,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(60)
-                    .HaveRecoveredStatus(false)
+                    .With(o => o.NotRecovered = true)
                 .TheNext(40)
-                      .HaveRecoveredStatus(true)
+                    .With(o => o.NotRecovered = false)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -481,20 +491,20 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                 .HaveValuesFromPredefinedObservations()
                 .TheFirst(30)
-                    .HaveTaxonId(100102)
-                    .HaveActivity(1000, 1)
+                    .With(o => o.TaxonId = 100102)
+                    .With(o => o.Activity = new MetadataWithCategory(1000, 1))
                 .TheNext(30)
-                      .HaveTaxonId(102986)
-                      .HaveActivity(1000, 2)
+                      .With(o => o.TaxonId = 102986)
+                      .With(o => o.Activity = new MetadataWithCategory(1000, 2))
                 .TheNext(20)
-                      .HaveTaxonId(100102)
-                      .HaveActivity(2000, 1)
+                      .With(o => o.TaxonId = 100102)
+                      .With(o => o.Activity = new MetadataWithCategory(2000, 1))
                 .TheNext(10)
-                      .HaveTaxonId(102986)
-                      .HaveActivity(2000, 1)
+                      .With(o => o.TaxonId = 102986)
+                      .With(o => o.Activity = new MetadataWithCategory(2000, 2))
                 .TheNext(10)
-                     .HaveTaxonId(100102)
-                      .HaveActivity(1100, 1)
+                     .With(o => o.TaxonId = 100102)
+                     .With(o => o.Activity = new MetadataWithCategory(1100, 1))
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

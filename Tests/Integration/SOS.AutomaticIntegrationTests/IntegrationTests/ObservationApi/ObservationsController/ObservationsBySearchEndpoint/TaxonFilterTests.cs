@@ -83,15 +83,15 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(20)
-                    .HaveTaxonId(103032)  // Pica pica
+                    .With(o => o.TaxonId = 103032) // Pica pica
                 .TheNext(20)
-                    .HaveTaxonId(222135)  // Abies alba
+                    .With(o => o.TaxonId = 222135)  // Abies alba
                 .TheNext(20)
-                    .HaveTaxonId(221100)  // Impatiens glandulifera
+                    .With(o => o.TaxonId = 221100)  // Impatiens glandulifera
                 .TheNext(20)
-                    .HaveTaxonId(103026)  // Parus major
+                    .With(o => o.TaxonId = 103026)  // Parus major
                 .TheNext(20)
-                    .HaveTaxonId(103025)  // Cyanistes caeruleus
+                    .With(o => o.TaxonId = 103025)  // Cyanistes caeruleus
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -132,15 +132,15 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(20)
-                    .HaveTaxonId(103024)  // Svartmes
+                     .With(o => o.TaxonId = 103024) // Svartmes
                 .TheNext(20)
-                    .HaveTaxonId(103025)  // Blåmes
+                     .With(o => o.TaxonId = 103025) // Blåmes
                 .TheNext(20)
-                    .HaveTaxonId(103023)  // Tofsmes
+                     .With(o => o.TaxonId = 103023) // Tofsmes
                 .TheNext(20)
-                    .HaveTaxonId(221100)  // Jättebalsamin
+                     .With(o => o.TaxonId = 221100) // Jättebalsamin
                 .TheNext(20)
-                    .HaveTaxonId(100001)  // Duvhök
+                     .With(o => o.TaxonId = 100001)  // Duvhök
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -182,15 +182,15 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(20)
-                    .HaveTaxonId(103025)  // Blåmes
+                    .With(o => o.TaxonId = 103025) // Blåmes
                 .TheNext(20)
-                    .HaveTaxonId(100943)  // Asknätfjäril
+                    .With(o => o.TaxonId = 100943) // Asknätfjäril
                 .TheNext(20)
-                    .HaveTaxonId(101260)  // Svartfläckig blåvinge
+                    .With(o => o.TaxonId = 101260) // Svartfläckig blåvinge
                 .TheNext(20)
-                    .HaveTaxonId(221100)  // Jättebalsamin
+                    .With(o => o.TaxonId = 221100) // Jättebalsamin
                 .TheNext(20)
-                    .HaveTaxonId(219680)  // Jätteloka
+                    .With(o => o.TaxonId = 219680) // Jätteloka
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -233,13 +233,13 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(40)
-                    .HaveTaxonId(101248)  // Violett guldvinge
+                    .With(o => o.TaxonId = 101248) // Violett guldvinge
                 .TheNext(20)
-                    .HaveTaxonId(100943)  // Asknätfjäril
+                    .With(o => o.TaxonId = 100943) // Asknätfjäril
                 .TheNext(20)
-                    .HaveTaxonId(101260)  // Svartfläckig blåvinge
+                    .With(o => o.TaxonId = 101260) // Svartfläckig blåvinge
                 .TheNext(20)
-                    .HaveTaxonId(221100)  // Jättebalsamin
+                    .With(o => o.TaxonId = 221100) // Jättebalsamin
 
                 .Build();
 
