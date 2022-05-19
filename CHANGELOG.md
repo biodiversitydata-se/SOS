@@ -2,20 +2,23 @@
 
 ## [1.5]
 
-**Prod**: 
-
-**Test**:
+**Prod**: 2022-05-24 
 
 ### `Added`
-- Check lists
-- Added data validation reports for KUL, NORS and SERS
-- Taxon isRedlisted flag
-- Taxon attributes invasive information object
+- Artportalen Checklist support. New endpoints: `GET Checklists/{id}`, `POST Checklists/CalculateTrend`
+- `Observations/MetricGridAggregation` endpoint that creates grid aggregations using SWEREF99 TM coordinate system.
+- `SOS.Elasticsarch.Proxy` service that is used by WFS service (GeoServer).
+- New observation properties: `Location.Sweref99TmX`, `Location.Sweref99TmY`, `Location.Attributes.ExternalId`, `Location.Attributes.ProjectId`, `Taxon.Attributes.TaxonCategory`, `Taxon.Attributes.IsRedlisted`, `Taxon.Attributes.InvasiveInfo.IsInvasiveInSweden`, `Taxon.Attributes.InvasiveInfo.IsInvasiveAccordingToEuRegulation`, `Taxon.Attributes.InvasiveInfo.RiskAssessmentCategory`
 - Application insights harvest health check
 
 
 ### `Changed`
-
+ - The following fields are replaced
+    - `protected` replaced by `sensitive`
+    - `occurrence.protectectionLevel` replaced by `occurrence.sensitivityCategory`
+    - `taxon.attributes.protectionLevel` replaced by `taxon.attributes.sensitivityCategory`
+    - `identification.validated` replaced by `identification.verified`
+    - `identification.validationStatus` replaced by `identification.verificationStatus`
 
 ### `Fixed`
 - DwC-A file text encoding label typo
@@ -25,9 +28,7 @@
 
 ## [1.4.1]
 
-**Prod**: 
-
-**Test**: 2021-12-06
+**Prod**: 2022-03-08
 
 ### `Added`
 - Support for response compression. Use header : `Accept-Encoding: br` for Brotli compression or `Accept-Encoding: gzip` for GZIP compression. Brotli compression is usually the faster than GZIP.
@@ -37,8 +38,6 @@
 ## [1.4]
 
 **Prod**: 2021-12-02
-
-**Test**: 2021-12-06
 
 ### `Added`
 - New date and time properties : `Event.PlainStartTime`, `Event.PlainEndTime`, `Event.PlainStartDate`, `Event.PlainEndDate`. 
@@ -276,8 +275,6 @@ SortBy, sortOrder borttagna då den inte fyllde någon funktion
 ## [0.9.1] - 2020-11-30
 
 ### Releases
-
-**Test**: 2020-11-30
 
 **Prod**: 2020-11-30
 
