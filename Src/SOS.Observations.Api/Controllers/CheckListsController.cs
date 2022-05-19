@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Get a check list by eventId.
+        /// Get a checklist by eventId.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
