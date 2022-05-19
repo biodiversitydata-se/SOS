@@ -5,7 +5,7 @@ using SOS.Observations.Api.Dtos.Filter;
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
     /// <summary>
-    ///     Observations controller interface.
+    ///     Checklists controller controller interface.
     /// </summary>
     public interface ICheckListsController
     {
@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IActionResult> GetCheckListAsync(
+        Task<IActionResult> GetChecklistByIdAsync(
             string id);
 
     }
