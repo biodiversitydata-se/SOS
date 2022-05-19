@@ -128,11 +128,7 @@ namespace SOS.Harvest.Factories
             {
                 if (string.IsNullOrEmpty(pair.Value.Observers) && !string.IsNullOrEmpty(pair.Value.ReportedBy))
                 {
-                    pair.Value.Observers = "Via " + pair.Value.ReportedBy;
-                    pair.Value.ObserversInternal = new List<UserInternal>
-                    {
-                        new UserInternal {Id = pair.Value.ReportedByUserId, UserServiceUserId = pair.Value.ReportedByUserServiceUserId, UserAlias = pair.Value.ReportedByUserAlias, ViewAccess = true}
-                    };
+                    pair.Value.Observers = "Via " + pair.Value.ReportedBy;                    
                 }
             }
 
