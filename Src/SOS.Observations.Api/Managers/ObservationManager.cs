@@ -10,7 +10,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -712,8 +711,8 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 // Make sure mandatory properties is set
-                filter.ExtendedAuthorization.ReportedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilter(null, null, filter);
 
@@ -738,8 +737,8 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 // Make sure mandatory properties is set
-                filter.ExtendedAuthorization.ReportedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilter(null, null, filter);
 
@@ -764,8 +763,8 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 // Make sure mandatory properties is set
-                filter.ExtendedAuthorization.ReportedByMe = true;
-                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ReportedByMe, we don't need authorization check (always acces to own observations)
+                filter.ExtendedAuthorization.ObservedByMe = true;
+                filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
                 await _filterManager.PrepareFilter(null, null, filter);
 
