@@ -68,6 +68,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Resources\ArtportalenVerbatimChecklists_1000.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\ArtportalenVerbatimObservations_1000.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

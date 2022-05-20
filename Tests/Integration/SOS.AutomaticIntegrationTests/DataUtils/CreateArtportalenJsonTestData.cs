@@ -80,6 +80,54 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
             //var observations2 = System.Text.Json.JsonSerializer.Deserialize<List<ArtportalenObservationVerbatim>>(strJson2, jsonSerializerOptions);            
         }
 
+        [Fact(Skip = "Intended to run on demand when needed")]        
+        [Trait("Category", "DataUtil")]
+        public async Task CreateArtportalenVerbatimChecklistTestData()
+        {
+            // Read observations from MongoDB            
+            const int NrChecklistsToAdd = 1000;
+            long nrItemsInCollection = await _fixture.ArtportalenChecklistVerbatimRepository.CountAllDocumentsAsync();
+            int skipInterval = (int)nrItemsInCollection / NrChecklistsToAdd;
+            using var cursor = await _fixture.ArtportalenChecklistVerbatimRepository.GetAllByCursorAsync();
+            int skipCounter = skipInterval;
+            int nrChecklistsAdded = 0;
+            var verbatimChecklists = new List<ArtportalenCheckListVerbatim>();
+            while (await cursor.MoveNextAsync())
+            {
+                if (nrChecklistsAdded >= NrChecklistsToAdd) break;
+                foreach (var checklist in cursor.Current)
+                {
+                    if (nrChecklistsAdded >= NrChecklistsToAdd) break;
+                    skipCounter--;                    
+                    if (skipCounter <= 0)
+                    {
+                        //CleanObservation(observation);
+                        verbatimChecklists.Add(checklist);
+                        nrChecklistsAdded++;
+                        skipCounter = skipInterval;
+                    }                    
+                }
+            }
+
+            // Write observations to JSON
+
+            // Serialize using Newtonsoft.Json.JsonConvert
+            var serializerSettings = new Newtonsoft.Json.JsonSerializerSettings
+            {
+                Converters = new List<Newtonsoft.Json.JsonConverter> { new ObjectIdConverter() }
+            };
+            var strJson = Newtonsoft.Json.JsonConvert.SerializeObject(verbatimChecklists, serializerSettings);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimChecklists1000.json", strJson, Encoding.UTF8);
+
+            // Serialize using System.Text.Json.JsonSerializer
+            var jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+            jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+            jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
+            var strJson2 = System.Text.Json.JsonSerializer.Serialize(verbatimChecklists, jsonSerializerOptions);
+            System.IO.File.WriteAllText(@"C:\Temp\ArtportalenVerbatimChecklists1000_2.json", strJson2, Encoding.UTF8);            
+        }
+
+
         private bool IsObservationOk(ArtportalenObservationVerbatim obs)
         {
             if (obs.ProtectedBySystem) return false;

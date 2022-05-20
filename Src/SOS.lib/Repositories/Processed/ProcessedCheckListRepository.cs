@@ -109,7 +109,7 @@ namespace SOS.Lib.Repositories.Processed
         /// Delete collection
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> DeleteCollectionAsync()
+        public async Task<bool> DeleteCollectionAsync()
         {
             var res = await Client.Indices.DeleteAsync(IndexName);
             return res.IsValid;
@@ -196,6 +196,24 @@ namespace SOS.Lib.Repositories.Processed
             Logger.LogDebug("Finished indexing check list batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
+        }
+
+        public async Task<bool> DeleteAllDocumentsAsync()
+        {
+            try
+            {
+                var res = await Client.DeleteByQueryAsync<Observation>(q => q
+                    .Index(IndexName)
+                    .Query(q => q.MatchAll())
+                );
+
+                return res.IsValid;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         /// <inheritdoc />

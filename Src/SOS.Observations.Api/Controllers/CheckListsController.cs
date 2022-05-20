@@ -17,15 +17,15 @@ using SOS.Observations.Api.Swagger;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    ///     Area controller
+    ///     Checklists controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CheckListsController : ControllerBase, ICheckListsController
+    public class ChecklistsController : ControllerBase, ICheckListsController
     {
         private readonly ICheckListManager _checkListManager;
         private readonly ITaxonManager _taxonManager;
-        private readonly ILogger<CheckListsController> _logger;
+        private readonly ILogger<ChecklistsController> _logger;
 
         private Result ValidateTaxa(IEnumerable<int> taxonIds)
         {
@@ -43,19 +43,23 @@ namespace SOS.Observations.Api.Controllers
         /// Constructor
         /// </summary>
         /// <param name="checkListManager"></param>
-        /// <param name="_taxonManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
-        public CheckListsController(
+        public ChecklistsController(
             ICheckListManager checkListManager,
             ITaxonManager taxonManager,
-            ILogger<CheckListsController> logger)
+            ILogger<ChecklistsController> logger)
         {
             _checkListManager = checkListManager ?? throw new ArgumentNullException(nameof(checkListManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Calculate species trend as a quotient. Species trend = (Number of present observations) / (Number of present and absent observations)
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         [HttpPost("CalculateTrend")]
         [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -82,11 +86,15 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Get a checklist by eventId.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(CheckListDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetCheckListAsync([FromQuery] string id)
+        public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
         {
             try
             {
