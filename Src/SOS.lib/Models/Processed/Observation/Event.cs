@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SOS.Lib.Helpers;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -8,6 +9,53 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class Event
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        public Event(DateTime? startDate, DateTime? endDate)
+        {
+            EndDate = endDate?.ToUniversalTime();
+            PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
+            PlainEndTime = endDate?.ToString("HH\\:mm");
+            PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
+            PlainStartTime = startDate?.ToString("HH\\:mm");
+            StartDate = startDate?.ToUniversalTime();
+            VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
+
+            if (startDate != null)
+            {
+                var startDateLocal = startDate.Value.ToLocalTime();
+                StartYear = startDateLocal.Year;
+                StartMonth = startDateLocal.Month;
+                StartDay = startDateLocal.Day;
+            }
+
+            if (endDate != null)
+            {
+                var endDateLocal = endDate.Value.ToLocalTime();
+                EndYear = endDateLocal.Year;
+                EndMonth = endDateLocal.Month;
+                EndDay = endDateLocal.Day;
+            }
+        }
+
+        /// <summary>
+        /// Constructor with separat time
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endDate"></param>
+        /// <param name="endTime"></param>
+        public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
+        {
+            // Override start/end time 
+            PlainStartTime = startTime?.ToString("HH\\:mm");
+            PlainEndTime = endTime?.ToString("HH\\:mm");
+        }
+        
+
         /// <summary>
         ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
         /// </summary>

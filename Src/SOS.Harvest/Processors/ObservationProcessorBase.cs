@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -23,14 +22,12 @@ using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Processors
 {
-    public abstract class ObservationProcessorBase<TClass, TVerbatim, TVerbatimRepository> 
+    public abstract class ObservationProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
     {
         private readonly IDiffusionManager _diffusionManager;
-        private readonly IProcessManager _processManager;
         private readonly bool _logGarbageCharFields;
-        protected readonly IProcessTimeManager TimeManager;
 
         /// <summary>
         /// Commit batch
@@ -154,7 +151,7 @@ namespace SOS.Harvest.Processors
             }
             finally
             {
-                _processManager.Release();
+                ProcessManager.Release();
             }
         }
 
@@ -187,7 +184,6 @@ namespace SOS.Harvest.Processors
 
         protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IVocabularyValueResolver vocabularyValueResolver;
-        protected readonly ILogger<TClass> Logger;
         protected readonly IProcessedObservationRepository ProcessedObservationRepository;
         protected readonly IValidationManager ValidationManager;
 
@@ -215,7 +211,7 @@ namespace SOS.Harvest.Processors
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
-            ILogger<TClass> logger)
+            ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
         {
             ProcessedObservationRepository = processedObservationRepository ??
                                              throw new ArgumentNullException(nameof(processedObservationRepository));
@@ -228,9 +224,6 @@ namespace SOS.Harvest.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
-            _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
-            TimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservations(
@@ -253,7 +246,7 @@ namespace SOS.Harvest.Processors
 
             while (startId <= maxId)
             {
-                await _processManager.WaitAsync();
+                await ProcessManager.WaitAsync();
 
                 var batchEndId = startId + WriteBatchSize - 1;
                 processBatchTasks.Add(FetchAndProcessBatchAsync(

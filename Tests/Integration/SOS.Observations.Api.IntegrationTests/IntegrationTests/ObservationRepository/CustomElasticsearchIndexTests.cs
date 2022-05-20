@@ -30,11 +30,7 @@ namespace SOS.Observations.Api.IntegrationTests.IntegrationTests.ObservationRepo
             {
                 new Observation
                 {
-                    Event = new Event
-                    {
-                        PlainStartTime = new TimeSpan(10, 30, 0).ToString("hh\\:mm"),
-                        PlainEndTime = new TimeSpan(13, 0, 0).ToString("hh\\:mm")
-                    },
+                    Event = new Event(DateTime.Now.AddHours(-2), new TimeSpan(10, 30, 0), DateTime.Now.AddHours(-1), new TimeSpan(13, 0, 0)),
                     Occurrence = new Occurrence
                     {
                         OccurrenceId = "obs1"

@@ -156,16 +156,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
                 DatasetName = "Virtual Herbarium",
                 Defects = defects.Count == 0 ? null : defects,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
-                {
-                    EndDate = dateCollected?.ToUniversalTime(),
-                    StartDate = dateCollected?.ToUniversalTime(),
-                    PlainStartDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = dateCollected?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected?.ToLocalTime())
-                },
+                Event = new Event(dateCollected, null, dateCollected, null),
                 Identification = new Identification
                 {
                     UncertainIdentification = false,

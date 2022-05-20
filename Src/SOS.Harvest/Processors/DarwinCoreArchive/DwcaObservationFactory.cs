@@ -260,19 +260,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Event CreateProcessedEvent(DwcObservationVerbatim verbatim)
         {
-            var processedEvent = new Event();
-            processedEvent.EventId = verbatim.EventID;
-            processedEvent.ParentEventId = verbatim.ParentEventID;
-            processedEvent.EventRemarks = verbatim.EventRemarks;
-            processedEvent.FieldNotes = verbatim.FieldNotes;
-            processedEvent.FieldNumber = verbatim.FieldNumber;
-            processedEvent.Habitat = verbatim.Habitat;
-            processedEvent.SampleSizeUnit = verbatim.SampleSizeUnit;
-            processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
-            processedEvent.SamplingEffort = verbatim.SamplingEffort;
-            processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
-            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
-
             DwcParser.TryParseEventDate(
                 verbatim.EventDate,
                 verbatim.Year,
@@ -284,12 +271,18 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 out var startTime,
                 out var endTime);
 
-            processedEvent.StartDate = startDate?.ToUniversalTime();
-            processedEvent.EndDate = endDate?.ToUniversalTime();
-            processedEvent.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
-            processedEvent.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
-            processedEvent.PlainStartTime = startTime?.ToString("hh\\:mm");
-            processedEvent.PlainEndTime = endTime?.ToString("hh\\:mm");
+            var processedEvent = new Event(startDate, startTime, endDate, endTime);
+            processedEvent.EventId = verbatim.EventID;
+            processedEvent.ParentEventId = verbatim.ParentEventID;
+            processedEvent.EventRemarks = verbatim.EventRemarks;
+            processedEvent.FieldNotes = verbatim.FieldNotes;
+            processedEvent.FieldNumber = verbatim.FieldNumber;
+            processedEvent.Habitat = verbatim.Habitat;
+            processedEvent.SampleSizeUnit = verbatim.SampleSizeUnit;
+            processedEvent.SampleSizeValue = verbatim.SampleSizeValue;
+            processedEvent.SamplingEffort = verbatim.SamplingEffort;
+            processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
+            processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatim.EventMultimedia,

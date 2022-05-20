@@ -5,6 +5,7 @@ using SOS.Lib.Models.Processed.CheckList;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using Area = SOS.Lib.Models.Processed.Observation.Area;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
@@ -30,6 +31,17 @@ namespace SOS.Harvest.Processors.Artportalen
                 FeatureId = area.FeatureId,
                 Name = area.Name
             };
+        }
+
+        private Event CreateEvent(ArtportalenCheckListVerbatim verbatim, string id)
+        {
+            var evnt = new Event(verbatim.StartDate, verbatim.EndDate)
+            {
+                EventId = id,
+                SamplingProtocol = verbatim.Project?.SurveyMethod ?? verbatim.Project?.SurveyMethodUrl,
+            };
+
+            return evnt;
         }
 
         /// <summary>
@@ -77,7 +89,8 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="dataProvider"></param>
         public ArtportalenCheckListFactory(
-            DataProvider dataProvider) : base(dataProvider)
+            DataProvider dataProvider,
+            IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
         {
         }
 
@@ -106,12 +119,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     },
                     DataProviderId = DataProvider.Id,
                     Id = id,
-                    Event = new Event
-                    {
-                        EventId = id,
-                        EndDate = verbatimCheckList.EndDate,
-                        StartDate = verbatimCheckList.StartDate
-                    },
+                    Event = CreateEvent(verbatimCheckList, id),
                     Location = CreateLocation(verbatimCheckList),
                     Modified = verbatimCheckList.EditDate,
                     Name = verbatimCheckList.Name,

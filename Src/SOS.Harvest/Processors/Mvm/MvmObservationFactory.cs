@@ -49,15 +49,8 @@ namespace SOS.Harvest.Processors.Mvm
                 DatasetName = "MVM",
                 DynamicProperties = string.IsNullOrEmpty(verbatim.ProductName) ? null : @"{""productName"": " + verbatim.ProductName + "}",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
+                Event = new Event(verbatim.Start, null, verbatim.End, null)
                 {
-                    EndDate = verbatim.End.ToUniversalTime(),
-                    StartDate = verbatim.Start.ToUniversalTime(),
-                    PlainStartDate = verbatim.Start.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.End.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start.ToLocalTime(), verbatim.End.ToLocalTime()),
                     Habitat = verbatim.Habitat
                 },
                 Identification = new Identification

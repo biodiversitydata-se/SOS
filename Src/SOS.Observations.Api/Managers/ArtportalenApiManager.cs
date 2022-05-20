@@ -3,8 +3,6 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.ArtportalenApiService;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
@@ -267,17 +265,11 @@ namespace SOS.Observations.Api.Managers
             //        (int)UnitId.Individuals);
 
             // Event
-            obs.Event = new Event();
-            obs.Event.DiscoveryMethod = VocabularyValue.Create(sighting.DiscoveryMethod); // todo - Artportalen API is missing DiscoveryMethodId
-            obs.Event.StartDate = sighting.StartDate;
-            obs.Event.EndDate = sighting.EndDate;
-            obs.Event.PlainStartDate =  sighting.StartDate.ToLocalTime().ToString("yyyy-MM-dd");
-            obs.Event.PlainEndDate = sighting.EndDate.ToLocalTime().ToString("yyyy-MM-dd");
-            obs.Event.PlainStartTime = sighting.StartDate.TimeOfDay.ToString("hh\\:mm");
-            obs.Event.PlainEndTime = sighting.EndDate.TimeOfDay.ToString("hh\\:mm");
-            obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(sighting.StartDate.ToLocalTime(), sighting.EndDate.ToLocalTime());
-            //obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects); // todo - implement
-            obs.Event.SamplingProtocol = sighting.DiscoveryMethod;
+            obs.Event = new Event(sighting.StartDate, sighting.EndDate)
+            {
+                DiscoveryMethod = VocabularyValue.Create(sighting.DiscoveryMethod), // todo - Artportalen API is missing DiscoveryMethodId
+                SamplingProtocol = sighting.DiscoveryMethod
+            };
 
             // Location
             obs.Location = new Location();
