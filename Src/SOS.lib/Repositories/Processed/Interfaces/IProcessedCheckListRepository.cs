@@ -55,11 +55,25 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchSortOrder sortOrder);
 
         /// <summary>
-        /// Count matching documents used in trend calculation
+        /// Count number of checklists matching the search filter.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<long> GetTrendCountAsync(CheckListSearchFilter filter);
+        Task<int> GetChecklistCountAsync(CheckListSearchFilter filter);
+
+        /// <summary>
+        /// Count number of present observations matching the search filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<int> GetPresentCountAsync(CheckListSearchFilter filter);
+
+        /// <summary>
+        /// Count number of absent observations (Using taxonIdsFound property) matching the search filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<int> GetAbsentCountAsync(CheckListSearchFilter filter);     
 
         /// <summary>
         /// Name of index 

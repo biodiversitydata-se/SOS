@@ -674,21 +674,24 @@ namespace SOS.Observations.Api.Extensions
 
         public static (SearchFilter, CheckListSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)
         {
-            var observationFilter = new SearchFilter
-            {
-                DataProviderIds = searchFilterDto.Observation?.DataProvider?.Ids,
-                Date = PopulateDateFilter(searchFilterDto.Date),
-                ProjectIds = searchFilterDto.ProjectIds,
-                Taxa = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } },
-                VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
-            };
-            observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
+            var dateFilter = PopulateDateFilter(searchFilterDto.Date);
+            var taxonFilter = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } };
+            var locationFilter = PopulateLocationFilter(searchFilterDto.Geographics);
+            // todo - add this in next version
+            //var observationFilter = new SearchFilter
+            //{
+            //    DataProviderIds = searchFilterDto.Observation?.DataProvider?.Ids,
+            //    Date = PopulateDateFilter(searchFilterDto.Date),
+            //    Taxa = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } },
+            //    VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
+            //};
+            //observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
             var checkListFilter = new CheckListSearchFilter
             {
                 DataProviderIds = searchFilterDto.CheckList?.DataProvider?.Ids,
-                Date = observationFilter.Date as CheckListDateFilter,
-                Location = observationFilter.Location,
-                Taxa = observationFilter.Taxa
+                Date = dateFilter as CheckListDateFilter,
+                Location = locationFilter,
+                Taxa = taxonFilter
             };
 
             if (TimeSpan.TryParse(searchFilterDto.CheckList?.MinEffortTime, out var minEffortTime))
@@ -697,7 +700,8 @@ namespace SOS.Observations.Api.Extensions
                 checkListFilter.Date.MinEffortTime = minEffortTime;
             }
 
-            return (observationFilter, checkListFilter);
+            return (null, checkListFilter);
+            //return (observationFilter, checkListFilter);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto)

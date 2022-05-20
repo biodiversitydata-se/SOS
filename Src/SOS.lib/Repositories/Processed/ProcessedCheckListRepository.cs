@@ -301,8 +301,66 @@ namespace SOS.Lib.Repositories.Processed
             // When operation is disposed, telemetry item is sent.
         }
 
-        /// <inheritdoc />
-        public async Task<long> GetTrendCountAsync(CheckListSearchFilter filter)
+
+        /// <summary>
+        /// Count number of checklists matching the search filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<int> GetChecklistCountAsync(CheckListSearchFilter filter)
+        {
+            var query = filter.ToQuery<CheckList>();            
+
+            var countResponse = await Client.CountAsync<CheckList>(s => s
+                .Index(IndexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(query)                        
+                    )
+                )
+            );
+            if (!countResponse.IsValid)
+            {
+                throw new InvalidOperationException(countResponse.DebugInformation);
+            }
+
+            return Convert.ToInt32(countResponse.Count);
+        }
+
+        /// <summary>
+        /// Count number of present observations matching the search filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<int> GetPresentCountAsync(CheckListSearchFilter filter)
+        {
+            var query = filter.ToQuery<CheckList>();
+            var foundQuery = new List<Func<QueryContainerDescriptor<CheckList>, QueryContainer>>();
+            foundQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
+
+            var countResponse = await Client.CountAsync<CheckList>(s => s
+                .Index(IndexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(query)
+                        .Must(foundQuery)
+                    )
+                )
+            );
+            if (!countResponse.IsValid)
+            {
+                throw new InvalidOperationException(countResponse.DebugInformation);
+            }
+
+            return Convert.ToInt32(countResponse.Count);
+        }               
+
+        /// <summary>
+        /// Count number of absent observations (Using taxonIdsFound property) matching the search filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public async Task<int> GetAbsentCountAsync(CheckListSearchFilter filter)
         {
             var query = filter.ToQuery<CheckList>();
             var nonQuery = new List<Func<QueryContainerDescriptor<CheckList>, QueryContainer>>();
@@ -322,7 +380,7 @@ namespace SOS.Lib.Repositories.Processed
                 throw new InvalidOperationException(countResponse.DebugInformation);
             }
 
-            return countResponse.Count;
+            return Convert.ToInt32(countResponse.Count);
         }
 
         /// <inheritdoc />

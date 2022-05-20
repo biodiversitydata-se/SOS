@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.CheckList;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
@@ -39,17 +42,18 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<double> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter)
-        {
-            observationFilter.PositiveSightings = true;
-            var positiveObservationsCount = await _processedObservationRepository.GetMatchCountAsync(observationFilter);
+        public async Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter)
+        {            
+            // todo - use observationFilter in next version.
 
-            observationFilter.PositiveSightings = false;
-            var negativeObservationsCount = await _processedObservationRepository.GetMatchCountAsync(observationFilter);
+            var taxonTrendResult = new TaxonTrendResult();
+            taxonTrendResult.NrPresentObservations = await _processedCheckListRepository.GetPresentCountAsync(checkListSearchFilter);
+            taxonTrendResult.NrAbsentObservations = await _processedCheckListRepository.GetAbsentCountAsync(checkListSearchFilter);            
+            taxonTrendResult.NrChecklists = await _processedCheckListRepository.GetChecklistCountAsync(checkListSearchFilter);
+            taxonTrendResult.Quotient = taxonTrendResult.NrPresentObservations / (double)taxonTrendResult.NrChecklists;
+            taxonTrendResult.TaxonId = checkListSearchFilter.Taxa.Ids.First();
 
-            var negativeCheckListCount = await _processedCheckListRepository.GetTrendCountAsync(checkListSearchFilter);
-
-            return ((double)positiveObservationsCount) / ((double)(positiveObservationsCount + negativeObservationsCount + negativeCheckListCount));
+            return taxonTrendResult;
         }
 
         /// <inheritdoc />

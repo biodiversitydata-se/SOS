@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
@@ -60,7 +61,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost("CalculateTrend")]
-        [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
