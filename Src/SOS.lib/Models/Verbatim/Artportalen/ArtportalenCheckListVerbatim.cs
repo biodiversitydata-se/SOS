@@ -18,7 +18,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Id of controlling user
         /// </summary>
-        public int ControlingUserId { get; set; }
+        public int ControllingUserId { get; set; }
 
         /// <summary>
         /// Check list edit date 

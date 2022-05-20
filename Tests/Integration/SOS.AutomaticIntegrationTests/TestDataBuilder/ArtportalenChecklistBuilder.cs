@@ -55,7 +55,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 checklist.Id = sourceChecklist.Id;
                 checklist.Id = _faker.IndexVariable++;
                 checklist.ControllingUser = sourceChecklist.ControllingUser;
-                checklist.ControlingUserId = sourceChecklist.ControlingUserId;
+                checklist.ControllingUserId = sourceChecklist.ControllingUserId;
                 checklist.EditDate = sourceChecklist.EditDate;
                 checklist.EndDate = sourceChecklist.EndDate;
                 checklist.Name = sourceChecklist.Name;

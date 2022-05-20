@@ -12,6 +12,9 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         /// Id of controlling user
         /// </summary>
+        /// <remarks>
+        /// The property is probably misspelled in Artportalen Db.
+        /// </remarks>
         public int ControlingUserId { get; set; }
 
         /// <summary>

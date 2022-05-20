@@ -102,7 +102,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     {
                         ChecklistId = verbatimChecklist.Id,
                         ParentTaxonId = verbatimChecklist.ParentTaxonId,
-                        UserId = verbatimChecklist.ControlingUserId
+                        UserId = verbatimChecklist.ControllingUserId
                     },
                     DataProviderId = DataProvider.Id,
                     Id = id,

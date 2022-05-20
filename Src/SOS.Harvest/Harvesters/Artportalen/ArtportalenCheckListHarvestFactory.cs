@@ -35,7 +35,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 var checklistVerbatim = new ArtportalenChecklistVerbatim
                 {
-                    ControlingUserId = entity.ControlingUserId,
+                    ControllingUserId = entity.ControlingUserId,
                     ControllingUser = entity.ControllingUser,
                     EditDate = entity.EditDate,
                     EndDate = entity.EndDate,
