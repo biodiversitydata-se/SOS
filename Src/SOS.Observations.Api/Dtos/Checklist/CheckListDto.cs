@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Observations.Api.Dtos.Vocabulary;
 
-namespace SOS.Lib.Models.Processed.CheckList
+namespace SOS.Observations.Api.Dtos.Checklist
 {
-    public class CheckList : IEntity<string>
+    public class CheckListDto : IEntity<string>
     {
-        /// <summary>
-        /// Values used internal in Artportalen
-        /// </summary>
-        public ApInternal ArtportalenInternal { get; set; }
-
         /// <summary>
         /// Id of data provider
         /// </summary>
@@ -21,6 +18,11 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// Check list edit date 
         /// </summary>
         public DateTime Modified { get; set; }
+
+        /// <summary>
+        ///  Time spend to search
+        /// </summary>
+        public string EffortTime { get; set; }
 
         /// <summary>
         /// Check list end date 
@@ -35,7 +37,7 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// <summary>
         /// Location
         /// </summary>
-        public Location Location { get; set; }
+        public LocationDto Location { get; set; }
 
         /// <summary>
         /// Name of check list
@@ -50,7 +52,7 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// <summary>
         /// Project id
         /// </summary>
-        public Project Project { get; set; }
+        public ProjectDto Project { get; set; }
 
         /// <summary>
         /// Name of controlling user
@@ -63,11 +65,6 @@ namespace SOS.Lib.Models.Processed.CheckList
         public DateTime RegisterDate { get; set; }
 
         /// <summary>
-        /// If effort time is provided, we store it here and use it if we can't calulate it 
-        /// </summary>
-        public string SamplingEffortTime { get; set; }
-
-        /// <summary>
         /// Taxon id's
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
@@ -76,5 +73,10 @@ namespace SOS.Lib.Models.Processed.CheckList
         /// Taxon id's found
         /// </summary>
         public IEnumerable<int> TaxonIdsFound { get; set; }
+
+        // <summary>
+        /// Taxon id's not found
+        /// </summary>
+        public IEnumerable<int> TaxonIdsNotFound => TaxonIds?.Where(t => !TaxonIdsFound?.Contains(t) ?? true);
     }
 }

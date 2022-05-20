@@ -83,10 +83,6 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
                         )
-                        .Object<string>(et => et
-                            .Name(nm => nm.EffortTime)
-                            .Enabled(false)
-                        )
                         .Object<Event>(t => t
                             .AutoMap()
                             .Name(nm => nm.Event)
@@ -101,10 +97,6 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.Project)
                             .Properties(ps => ps.GetMapping())
-                        )
-                        .Object<IEnumerable<int>>(et => et
-                            .Name(nm => nm.TaxonIdsNotFound)
-                            .Enabled(false)
                         )
                     )
                 )
@@ -249,7 +241,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<CheckList> GetAsync(string id)
+        public async Task<CheckList> GetAsync(string id, bool internalCall)
         {
             var searchResponse = await Client.SearchAsync<CheckList>(s => s
                 .Index(IndexName)
@@ -259,7 +251,10 @@ namespace SOS.Lib.Repositories.Processed
                             .Field("_id")
                             .Value(id))))
                     )
-                );
+                .Source(s => s
+                    .Excludes(e => internalCall ? null : e.Field(f => f.ArtportalenInternal))
+                )
+            );
 
             if (!searchResponse.IsValid)
             {

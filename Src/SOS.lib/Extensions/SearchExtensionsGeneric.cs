@@ -249,6 +249,11 @@ namespace SOS.Lib.Extensions
         public static void TryAddNestedTermCriteria<TQueryContainer, TValue>(this
             ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string nestedPath, string field, TValue value) where TQueryContainer : class
         {
+            if (value == null)
+            {
+                return;
+            }
+
             query.Add(q => q
                 .Nested(n => n
                     .Path(nestedPath)

@@ -10,6 +10,7 @@ using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
 using SOS.Lib.Models.Processed.CheckList;
+using SOS.Observations.Api.Dtos.Checklist;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.GetObservationByIdEndpoint
 {
@@ -45,7 +46,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ChecklistsController.GetChecklistByIdAsync(eventId);
-            var resultChecklist = response.GetResultObject<CheckList>();
+            var resultChecklist = response.GetResultObject<CheckListDto>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

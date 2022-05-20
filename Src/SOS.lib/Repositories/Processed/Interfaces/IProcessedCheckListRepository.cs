@@ -39,8 +39,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Get a check list by it's id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="internalCall"></param>
         /// <returns></returns>
-        Task<CheckList> GetAsync(string id);
+        Task<CheckList> GetAsync(string id, bool internalCall);
 
         /// <summary>
         ///     Get chunk of objects from repository
