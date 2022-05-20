@@ -18,7 +18,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
     {
         private readonly IntegrationTestFixture _fixture;
         private static Bogus.Faker _faker = new Bogus.Faker();
-        private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");
 
         public ExtendedFilterTests(IntegrationTestFixture fixture)
         {

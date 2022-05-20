@@ -599,8 +599,13 @@ namespace SOS.Observations.Api.Extensions
             };
         }
 
-        public static ProjectDto ToProjectDto(this ProjectInfo projectInfo)
+        public static ProjectDto ToDto(this ProjectInfo projectInfo)
         {
+            if (projectInfo == null)
+            {
+                return null;
+            }
+
             return new ProjectDto
             {
                 Id = projectInfo.Id,
@@ -744,7 +749,7 @@ namespace SOS.Observations.Api.Extensions
 
         public static IEnumerable<ProjectDto> ToProjectDtos(this IEnumerable<ProjectInfo> projectInfos)
         {
-            return projectInfos.Select(vocabulary => vocabulary.ToProjectDto());
+            return projectInfos.Select(vocabulary => vocabulary.ToDto());
         }
 
         /// <summary>

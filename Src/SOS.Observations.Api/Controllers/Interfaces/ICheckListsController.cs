@@ -24,5 +24,12 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> GetCheckListAsync(
             string id);
 
+        /// <summary>
+        /// Get a check list
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetCheckListInternalAsync(
+            string id);
     }
 }

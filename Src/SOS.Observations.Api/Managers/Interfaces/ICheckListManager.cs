@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.CheckList;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos.Checklist;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -18,10 +18,17 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<double> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter);
 
         /// <summary>
-        /// Get a area check list
+        /// Get a check list
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<CheckList> GetCheckListAsync(string id);
+        Task<CheckListDto> GetCheckListAsync(string id);
+
+        /// <summary>
+        /// Get a internal check list
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<CheckListInternalDto> GetCheckListInternalAsync(string id);
     }
 }

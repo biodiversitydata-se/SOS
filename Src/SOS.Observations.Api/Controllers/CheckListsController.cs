@@ -7,11 +7,12 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -83,7 +84,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet]
-        [ProducesResponseType(typeof(CheckList), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CheckListDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetCheckListAsync([FromQuery] string id)
         {
@@ -97,5 +98,23 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpGet("internal")]
+        [ProducesResponseType(typeof(CheckListInternalDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetCheckListInternalAsync([FromQuery] string id)
+        {
+            try
+            {
+                return new OkObjectResult(await _checkListManager.GetCheckListInternalAsync(id));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting check list");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+       
     }
 }

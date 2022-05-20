@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Processed.CheckList;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Dtos.Checklist;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
@@ -53,12 +54,27 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<CheckList> GetCheckListAsync(string id)
+        public async Task<CheckListDto> GetCheckListAsync(string id)
         {
             try
             {
-                var checkList = await _processedCheckListRepository.GetAsync(id);
-                return checkList;
+                var checkList = await _processedCheckListRepository.GetAsync(id, false);
+                return checkList.ToDto();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to get check list with id: {id}");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<CheckListInternalDto> GetCheckListInternalAsync(string id)
+        {
+            try
+            {
+                var checkList = await _processedCheckListRepository.GetAsync(id, true);
+                return checkList.ToInternalDto();
             }
             catch (Exception e)
             {
