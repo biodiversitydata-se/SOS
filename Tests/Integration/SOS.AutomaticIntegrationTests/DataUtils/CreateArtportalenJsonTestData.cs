@@ -91,7 +91,7 @@ namespace SOS.AutomaticIntegrationTests.DataUtils
             using var cursor = await _fixture.ArtportalenChecklistVerbatimRepository.GetAllByCursorAsync();
             int skipCounter = skipInterval;
             int nrChecklistsAdded = 0;
-            var verbatimChecklists = new List<ArtportalenCheckListVerbatim>();
+            var verbatimChecklists = new List<ArtportalenChecklistVerbatim>();
             while (await cursor.MoveNextAsync())
             {
                 if (nrChecklistsAdded >= NrChecklistsToAdd) break;

@@ -3,9 +3,9 @@
 namespace SOS.Harvest.Processors.Artportalen.Interfaces
 {
     /// <summary>
-    ///     Artportalen check list processor
+    ///     Artportalen checklist processor
     /// </summary>
-    public interface IArtportalenCheckListProcessor : ICheckListProcessor
+    public interface IArtportalenChecklistProcessor : IChecklistProcessor
     {
     }
 }

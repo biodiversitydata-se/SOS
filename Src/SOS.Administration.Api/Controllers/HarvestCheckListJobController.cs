@@ -21,7 +21,7 @@ namespace SOS.Administration.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class HarvestCheckListJobController : ControllerBase, IHarvestCheckListJobController
+    public class HarvestChecklistJobController : ControllerBase, IHarvestChecklistJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly DwcaConfiguration _dwcaConfiguration;
@@ -33,7 +33,7 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="dataProviderManager"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
-        public HarvestCheckListJobController(IDataProviderManager dataProviderManager,
+        public HarvestChecklistJobController(IDataProviderManager dataProviderManager,
             DwcaConfiguration dwcaConfiguration,
             ILogger<HarvestObservationsJobController> logger)
         {

@@ -1,6 +1,6 @@
 ﻿namespace SOS.Observations.Api.Dtos.Checklist
 {
-    public class CheckListInternalDto : CheckListDto
+    public class ChecklistInternalDto : ChecklistDto
     {
         /// <summary>
         /// Values used internal in Artportalen

@@ -1,12 +1,12 @@
-﻿namespace SOS.Lib.Models.Processed.CheckList
+﻿namespace SOS.Lib.Models.Processed.Checklist
 {
     // Artportalen internal values
     public class ApInternal
     {
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
-        public int CheckListId { get; set; }
+        public int ChecklistId { get; set; }
 
         /// <summary>
         /// Parent taxon id

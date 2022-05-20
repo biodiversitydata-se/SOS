@@ -15,74 +15,74 @@ namespace SOS.Observations.Api.Managers
     /// <summary>
     ///     Area manager
     /// </summary>
-    public class CheckListManager : ICheckListManager
+    public class ChecklistManager : IChecklistManager
     {
-        private readonly IProcessedCheckListRepository _processedCheckListRepository;
+        private readonly IProcessedChecklistRepository _processedChecklistRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly ILogger<CheckListManager> _logger;
+        private readonly ILogger<ChecklistManager> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
-        public CheckListManager(
-            IProcessedCheckListRepository processedCheckListRepository,
+        public ChecklistManager(
+            IProcessedChecklistRepository processedChecklistRepository,
             IProcessedObservationRepository processedObservationRepository,
-            ILogger<CheckListManager> logger)
+            ILogger<ChecklistManager> logger)
         {
-            _processedCheckListRepository = processedCheckListRepository ?? throw new ArgumentNullException(nameof(processedCheckListRepository));
+            _processedChecklistRepository = processedChecklistRepository ?? throw new ArgumentNullException(nameof(processedChecklistRepository));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
-            _processedCheckListRepository.LiveMode = true;
+            _processedChecklistRepository.LiveMode = true;
             _processedObservationRepository.LiveMode = true;
         }
 
         /// <inheritdoc />
-        public async Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter)
+        public async Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, ChecklistSearchFilter checklistSearchFilter)
         {            
             // todo - use observationFilter in next version.
 
             var taxonTrendResult = new TaxonTrendResult();
-            taxonTrendResult.NrPresentObservations = await _processedCheckListRepository.GetPresentCountAsync(checkListSearchFilter);
-            taxonTrendResult.NrAbsentObservations = await _processedCheckListRepository.GetAbsentCountAsync(checkListSearchFilter);            
-            taxonTrendResult.NrChecklists = await _processedCheckListRepository.GetChecklistCountAsync(checkListSearchFilter);
+            taxonTrendResult.NrPresentObservations = await _processedChecklistRepository.GetPresentCountAsync(checklistSearchFilter);
+            taxonTrendResult.NrAbsentObservations = await _processedChecklistRepository.GetAbsentCountAsync(checklistSearchFilter);            
+            taxonTrendResult.NrChecklists = await _processedChecklistRepository.GetChecklistCountAsync(checklistSearchFilter);
             taxonTrendResult.Quotient = taxonTrendResult.NrPresentObservations / (double)taxonTrendResult.NrChecklists;
-            taxonTrendResult.TaxonId = checkListSearchFilter.Taxa.Ids.First();
+            taxonTrendResult.TaxonId = checklistSearchFilter.Taxa.Ids.First();
 
             return taxonTrendResult;
         }
 
         /// <inheritdoc />
-        public async Task<CheckListDto> GetCheckListAsync(string id)
+        public async Task<ChecklistDto> GetChecklistAsync(string id)
         {
             try
             {
-                var checkList = await _processedCheckListRepository.GetAsync(id, false);
-                return checkList.ToDto();
+                var checklist = await _processedChecklistRepository.GetAsync(id, false);
+                return checklist.ToDto();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to get check list with id: {id}");
+                _logger.LogError(e, $"Failed to get checklist with id: {id}");
                 return null;
             }
         }
 
         /// <inheritdoc />
-        public async Task<CheckListInternalDto> GetCheckListInternalAsync(string id)
+        public async Task<ChecklistInternalDto> GetChecklistInternalAsync(string id)
         {
             try
             {
-                var checkList = await _processedCheckListRepository.GetAsync(id, true);
-                return checkList.ToInternalDto();
+                var checklist = await _processedChecklistRepository.GetAsync(id, true);
+                return checklist.ToInternalDto();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to get check list with id: {id}");
+                _logger.LogError(e, $"Failed to get checklist with id: {id}");
                 return null;
             }
         }

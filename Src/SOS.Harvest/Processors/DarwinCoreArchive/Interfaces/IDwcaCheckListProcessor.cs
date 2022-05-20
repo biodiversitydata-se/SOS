@@ -3,9 +3,9 @@
 namespace SOS.Harvest.Processors.DarwinCoreArchive.Interfaces
 {
     /// <summary>
-    ///     Darwin core check list processor
+    ///     Darwin core checklist processor
     /// </summary>
-    public interface IDwcaCheckListProcessor : ICheckListProcessor
+    public interface IDwcaChecklistProcessor : IChecklistProcessor
     {
     }
 }

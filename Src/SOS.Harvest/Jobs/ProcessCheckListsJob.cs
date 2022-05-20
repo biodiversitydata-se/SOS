@@ -17,15 +17,15 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Jobs
 {
-    /// <inheritdoc cref="IProcessCheckListsJob"/>
-    public class ProcessCheckListsJob : ProcessJobBase, IProcessCheckListsJob
+    /// <inheritdoc cref="IProcessChecklistsJob"/>
+    public class ProcessChecklistsJob : ProcessJobBase, IProcessChecklistsJob
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IDataProviderCache _dataProviderCache;
-        private readonly IProcessedCheckListRepository _processedCheckListRepository;
-        private readonly ILogger<ProcessCheckListsJob> _logger;
+        private readonly IProcessedChecklistRepository _processedChecklistRepository;
+        private readonly ILogger<ProcessChecklistsJob> _logger;
 
-        private readonly Dictionary<DataProviderType, ICheckListProcessor> _processorByType;
+        private readonly Dictionary<DataProviderType, IChecklistProcessor> _processorByType;
 
 
         private async Task InitializeAreaHelperAsync()
@@ -38,11 +38,11 @@ namespace SOS.Harvest.Jobs
         private async Task InitializeElasticSearchAsync()
         {
             _logger.LogInformation(
-                $"Start clear ElasticSearch index: {_processedCheckListRepository.UniqueIndexName}");
-            await _processedCheckListRepository.ClearCollectionAsync();
+                $"Start clear ElasticSearch index: {_processedChecklistRepository.UniqueIndexName}");
+            await _processedChecklistRepository.ClearCollectionAsync();
 
             _logger.LogInformation(
-                $"Finish clear ElasticSearch index: {_processedCheckListRepository.UniqueIndexName}");
+                $"Finish clear ElasticSearch index: {_processedChecklistRepository.UniqueIndexName}");
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         private async Task DisableIndexingAsync()
         {
-            _logger.LogInformation($"Start disable indexing ({_processedCheckListRepository.UniqueIndexName})");
-            await _processedCheckListRepository.DisableIndexingAsync();
-            _logger.LogInformation($"Finish disable indexing ({_processedCheckListRepository.UniqueIndexName})");
+            _logger.LogInformation($"Start disable indexing ({_processedChecklistRepository.UniqueIndexName})");
+            await _processedChecklistRepository.DisableIndexingAsync();
+            _logger.LogInformation($"Finish disable indexing ({_processedChecklistRepository.UniqueIndexName})");
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         private async Task EnableIndexingAsync()
         {
-            _logger.LogInformation($"Start enable indexing ({_processedCheckListRepository.UniqueIndexName})");
-            await _processedCheckListRepository.EnableIndexingAsync();
-            _logger.LogInformation($"Finish enable indexing ({_processedCheckListRepository.UniqueIndexName})");
+            _logger.LogInformation($"Start enable indexing ({_processedChecklistRepository.UniqueIndexName})");
+            await _processedChecklistRepository.EnableIndexingAsync();
+            _logger.LogInformation($"Finish enable indexing ({_processedChecklistRepository.UniqueIndexName})");
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Jobs
                 //-----------------
                 // 1. Arrange
                 //-----------------
-                _processedCheckListRepository.LiveMode = false;
+                _processedChecklistRepository.LiveMode = false;
 
                 //-----------------
                 // 2. Validation
@@ -104,7 +104,7 @@ namespace SOS.Harvest.Jobs
                 await DisableIndexingAsync();
 
                 //------------------------------------------------------------------------
-                // 4. Create check lists processing tasks, and wait for them to complete
+                // 4. Create checklists processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
                 var success = await ProcessVerbatim(dataProvidersToProcess, cancellationToken);
 
@@ -117,8 +117,8 @@ namespace SOS.Harvest.Jobs
                     await EnableIndexingAsync();
 
                     // Toggle active instance if we are done
-                    _logger.LogInformation($"Toggle instance {_processedCheckListRepository.ActiveInstance} => {_processedCheckListRepository.InActiveInstance}");
-                    await _processedCheckListRepository.SetActiveInstanceAsync(_processedCheckListRepository
+                    _logger.LogInformation($"Toggle instance {_processedChecklistRepository.ActiveInstance} => {_processedChecklistRepository.InActiveInstance}");
+                    await _processedChecklistRepository.SetActiveInstanceAsync(_processedChecklistRepository
                         .InActiveInstance);
                 }
 
@@ -127,17 +127,17 @@ namespace SOS.Harvest.Jobs
                 //-------------------------------
                 // 8. Return processing result
                 //-------------------------------
-                return success ? true : throw new Exception("Failed to process check lists.");
+                return success ? true : throw new Exception("Failed to process checklists.");
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Process check lists job was cancelled.");
+                _logger.LogInformation("Process checklists job was cancelled.");
                 return false;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Process check lists job failed.");
-                throw new Exception("Process check lists job failed.");
+                _logger.LogError(e, "Process checklists job failed.");
+                throw new Exception("Process checklists job failed.");
             }
         }
 
@@ -202,7 +202,7 @@ namespace SOS.Harvest.Jobs
                 }
 
                 // Get harvest info and create a provider info object 
-                var harvestInfo = await GetHarvestInfoAsync(provider.CheckListIdentifier);
+                var harvestInfo = await GetHarvestInfoAsync(provider.ChecklistIdentifier);
                 var providerInfo = new ProviderInfo(provider)
                 {
                     HarvestCount = harvestInfo?.Count,
@@ -219,7 +219,7 @@ namespace SOS.Harvest.Jobs
 
                 providersInfo.Add(providerInfo);
 
-                var processInfo = new ProcessInfo(_processedCheckListRepository.UniqueIndexName, processStart)
+                var processInfo = new ProcessInfo(_processedChecklistRepository.UniqueIndexName, processStart)
                 {
                     PublicCount = processTaskByDataProvider.Sum(pi => pi.Value.Result.PublicCount),
                     End = DateTime.Now,
@@ -237,37 +237,37 @@ namespace SOS.Harvest.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
-        /// <param name="artportalenCheckListProcessor"></param>
-        /// <param name="dwcaCheckListProcessor"></param>
+        /// <param name="artportalenChecklistProcessor"></param>
+        /// <param name="dwcaChecklistProcessor"></param>
         /// <param name="dataProviderCache"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
-        public ProcessCheckListsJob(IProcessedCheckListRepository processedCheckListRepository,
+        public ProcessChecklistsJob(IProcessedChecklistRepository processedChecklistRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
-            IArtportalenCheckListProcessor artportalenCheckListProcessor,
-            IDwcaCheckListProcessor dwcaCheckListProcessor,
+            IArtportalenChecklistProcessor artportalenChecklistProcessor,
+            IDwcaChecklistProcessor dwcaChecklistProcessor,
             IDataProviderCache dataProviderCache,
             IAreaHelper areaHelper,
-            ILogger<ProcessCheckListsJob> logger) : base(harvestInfoRepository, processInfoRepository)
+            ILogger<ProcessChecklistsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _processedCheckListRepository = processedCheckListRepository ??
-                                            throw new ArgumentNullException(nameof(processedCheckListRepository));
+            _processedChecklistRepository = processedChecklistRepository ??
+                                            throw new ArgumentNullException(nameof(processedChecklistRepository));
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
 
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (artportalenCheckListProcessor == null)
-                throw new ArgumentNullException(nameof(artportalenCheckListProcessor));
+            if (artportalenChecklistProcessor == null)
+                throw new ArgumentNullException(nameof(artportalenChecklistProcessor));
 
-            _processorByType = new Dictionary<DataProviderType, ICheckListProcessor>
+            _processorByType = new Dictionary<DataProviderType, IChecklistProcessor>
             {
-                {DataProviderType.ArtportalenObservations, artportalenCheckListProcessor},
-                {DataProviderType.DwcA, dwcaCheckListProcessor}
+                {DataProviderType.ArtportalenObservations, artportalenChecklistProcessor},
+                {DataProviderType.DwcA, dwcaChecklistProcessor}
             };
         }
 
@@ -277,9 +277,9 @@ namespace SOS.Harvest.Jobs
             IEnumerable<string> dataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)
         {
-            var checkListDataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dp.IsActive && dp.SupportCheckLists);
+            var checklistDataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dp.IsActive && dp.SupportChecklists);
 
-            if (!checkListDataProviders?.Any() ?? true)
+            if (!checklistDataProviders?.Any() ?? true)
             {
                 return false;
             }
@@ -287,13 +287,13 @@ namespace SOS.Harvest.Jobs
             IEnumerable<DataProvider> dataProvidersToProcess;
             if (dataProviderIdOrIdentifiers?.Any() ?? false)
             {
-                dataProvidersToProcess = checkListDataProviders.Where(dataProvider =>
+                dataProvidersToProcess = checklistDataProviders.Where(dataProvider =>
                         dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
                     .ToArray();
             }
             else
             {
-                dataProvidersToProcess = checkListDataProviders
+                dataProvidersToProcess = checklistDataProviders
                     .ToArray();
             }
 

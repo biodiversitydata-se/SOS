@@ -9,7 +9,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
 using System;
 using SOS.Lib.Models.Statistics;
@@ -33,7 +33,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create checklist data
             //-----------------------------------------------------------------------------------------------------------                        
-            var verbatimChecklists = Builder<ArtportalenCheckListVerbatim>.CreateListOfSize(100)
+            var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(100)
                 .All()
                     .HaveValuesFromPredefinedChecklists()
                     .With(m => m.StartDate = DateTime.Now - TimeSpan.FromMinutes(30)) // 30 minutes search effort time.
@@ -55,7 +55,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------            
             var calculateTrendFilter = new CalculateTrendFilterDto
             {
-                CheckList = new TrendCheckListFilterDto
+                Checklist = new TrendChecklistFilterDto
                 {
                     MinEffortTime = "00:15:00"
                 },

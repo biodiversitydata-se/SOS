@@ -1,7 +1,7 @@
 ﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -11,7 +11,7 @@ using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
-    public class ArtportalenCheckListFactory : CheckListFactoryBase, ICheckListFactory<ArtportalenCheckListVerbatim>
+    public class ArtportalenChecklistFactory : ChecklistFactoryBase, IChecklistFactory<ArtportalenChecklistVerbatim>
     {
         /// <summary>
         /// Cast verbatim area to processed area
@@ -37,7 +37,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        private Location CreateLocation(ArtportalenCheckListVerbatim verbatim)
+        private Location CreateLocation(ArtportalenChecklistVerbatim verbatim)
         {
             var location = new Location();
 
@@ -76,57 +76,57 @@ namespace SOS.Harvest.Processors.Artportalen
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
-        public ArtportalenCheckListFactory(
+        public ArtportalenChecklistFactory(
             DataProvider dataProvider) : base(dataProvider)
         {
         }
 
         /// <summary>
-        ///     Cast verbatim check list to processed data model
+        ///     Cast verbatim checklist to processed data model
         /// </summary>
-        /// <param name="verbatimCheckList"></param>
+        /// <param name="verbatimChecklist"></param>
         /// <returns></returns>
-        public CheckList CreateProcessedCheckList(ArtportalenCheckListVerbatim verbatimCheckList)
+        public Checklist CreateProcessedChecklist(ArtportalenChecklistVerbatim verbatimChecklist)
         {
             try
             {
-                if (verbatimCheckList == null)
+                if (verbatimChecklist == null)
                 {
                     return null;
                 }
 
-                var id = $"urn:lsid:artportalen.se:Checklist:{verbatimCheckList.Id}";
-                return new CheckList
+                var id = $"urn:lsid:artportalen.se:Checklist:{verbatimChecklist.Id}";
+                return new Checklist
                 {
                     ArtportalenInternal = new ApInternal()
                     {
-                        CheckListId = verbatimCheckList.Id,
-                        ParentTaxonId = verbatimCheckList.ParentTaxonId,
-                        UserId = verbatimCheckList.ControlingUserId
+                        ChecklistId = verbatimChecklist.Id,
+                        ParentTaxonId = verbatimChecklist.ParentTaxonId,
+                        UserId = verbatimChecklist.ControlingUserId
                     },
                     DataProviderId = DataProvider.Id,
                     Id = id,
                     Event = new Event
                     {
                         EventId = id,
-                        EndDate = verbatimCheckList.EndDate,
-                        StartDate = verbatimCheckList.StartDate
+                        EndDate = verbatimChecklist.EndDate,
+                        StartDate = verbatimChecklist.StartDate
                     },
-                    Location = CreateLocation(verbatimCheckList),
-                    Modified = verbatimCheckList.EditDate,
-                    Name = verbatimCheckList.Name,
+                    Location = CreateLocation(verbatimChecklist),
+                    Modified = verbatimChecklist.EditDate,
+                    Name = verbatimChecklist.Name,
                     OccurrenceIds =
-                        verbatimCheckList.SightingIds?.Select(sId => $"urn:lsid:artportalen.se:Sighting:{sId}"),
-                    Project = ArtportalenFactoryHelper.CreateProcessedProject(verbatimCheckList.Project),
-                    RecordedBy = verbatimCheckList.ControllingUser,
-                    RegisterDate = verbatimCheckList.RegisterDate,
-                    TaxonIds = verbatimCheckList.TaxonIds,
-                    TaxonIdsFound = verbatimCheckList.TaxonIdsFound
+                        verbatimChecklist.SightingIds?.Select(sId => $"urn:lsid:artportalen.se:Sighting:{sId}"),
+                    Project = ArtportalenFactoryHelper.CreateProcessedProject(verbatimChecklist.Project),
+                    RecordedBy = verbatimChecklist.ControllingUser,
+                    RegisterDate = verbatimChecklist.RegisterDate,
+                    TaxonIds = verbatimChecklist.TaxonIds,
+                    TaxonIdsFound = verbatimChecklist.TaxonIdsFound
                 };
             }
             catch (Exception e)
             {
-                throw new Exception($"Error when processing Artportalen verbatim check list with Id={verbatimCheckList.Id}", e);
+                throw new Exception($"Error when processing Artportalen verbatim checklist with Id={verbatimChecklist.Id}", e);
             }
         }
     }

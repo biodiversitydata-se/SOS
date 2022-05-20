@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Models.Statistics

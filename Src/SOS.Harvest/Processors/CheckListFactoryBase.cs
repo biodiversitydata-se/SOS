@@ -13,7 +13,7 @@ namespace SOS.Harvest.Processors
     /// <summary>
     /// Base class for observation factories
     /// </summary>
-    public class CheckListFactoryBase
+    public class ChecklistFactoryBase
     {
         protected DataProvider DataProvider;
 
@@ -79,7 +79,7 @@ namespace SOS.Harvest.Processors
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected CheckListFactoryBase(DataProvider dataProvider)
+        protected ChecklistFactoryBase(DataProvider dataProvider)
         {
             DataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
         }

@@ -114,7 +114,7 @@ namespace SOS.Lib
         {
             var internalFilter = filter as SearchFilterInternal;
 
-            query.TryAddTermCriteria("artportalenInternal.checklistId", internalFilter.CheckListId);
+            query.TryAddTermCriteria("artportalenInternal.checklistId", internalFilter.ChecklistId);
             query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
             query.TryAddTermCriteria("artportalenInternal.hasTriggeredVerificationRules", internalFilter.HasTriggeredVerificationRule, true);
             query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredVerificationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);

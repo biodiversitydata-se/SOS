@@ -9,7 +9,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Observations.Api.Dtos.Checklist;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.GetObservationByIdEndpoint
@@ -33,7 +33,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             //-----------------------------------------------------------------------------------------------------------
             const int Id = 123456;
             const string eventId = $"urn:lsid:artportalen.se:Checklist:123456";
-            var verbatimChecklists = Builder<ArtportalenCheckListVerbatim>.CreateListOfSize(100)
+            var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(100)
                 .All()
                     .HaveValuesFromPredefinedChecklists()                    
                 .TheFirst(1)
@@ -46,7 +46,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             // Act - Get observation by occurrenceId
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.ChecklistsController.GetChecklistByIdAsync(eventId);
-            var resultChecklist = response.GetResultObject<CheckListDto>();
+            var resultChecklist = response.GetResultObject<ChecklistDto>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

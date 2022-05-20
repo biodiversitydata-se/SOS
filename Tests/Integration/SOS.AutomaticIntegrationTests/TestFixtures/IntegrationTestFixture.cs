@@ -35,7 +35,7 @@ using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -66,7 +66,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
     {
         public ArtportalenObservationProcessor ArtportalenObservationProcessor { get; set; }
         public ArtportalenObservationFactory ArtportalenObservationFactory { get; set; }
-        public ArtportalenCheckListFactory ArtportalenChecklistFactory { get; set; }
+        public ArtportalenChecklistFactory ArtportalenChecklistFactory { get; set; }
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public ChecklistsController ChecklistsController { get; private set; }
@@ -76,9 +76,9 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
-        public ProcessedCheckListRepository ProcessedChecklistRepository { get; set; }
+        public ProcessedChecklistRepository ProcessedChecklistRepository { get; set; }
         public ArtportalenVerbatimRepository ArtportalenVerbatimRepository { get; set; }
-        public ArtportalenCheckListVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }
+        public ArtportalenChecklistVerbatimRepository ArtportalenChecklistVerbatimRepository { get; set; }
         private DwcaObservationFactory _darwinCoreFactory;
         private IUserService _userService;
 
@@ -307,7 +307,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
-            var checklistManager = new CheckListManager(ProcessedChecklistRepository, processedObservationRepository, new NullLogger<CheckListManager>());
+            var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, new NullLogger<ChecklistManager>());
             ChecklistsController = new ChecklistsController(checklistManager, taxonManager, new NullLogger<ChecklistsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
@@ -340,7 +340,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 false,
                 "https://www.artportalen.se",
                 _processTimeManager);
-            ArtportalenChecklistFactory = new ArtportalenCheckListFactory(artportalenDataProvider);
+            ArtportalenChecklistFactory = new ArtportalenChecklistFactory(artportalenDataProvider);
             var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
             _importClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
@@ -348,7 +348,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
             ArtportalenVerbatimRepository = new ArtportalenVerbatimRepository(_importClient, new NullLogger<ArtportalenVerbatimRepository>());
-            ArtportalenChecklistVerbatimRepository = new ArtportalenCheckListVerbatimRepository(_importClient, new NullLogger<ArtportalenCheckListVerbatimRepository>());
+            ArtportalenChecklistVerbatimRepository = new ArtportalenChecklistVerbatimRepository(_importClient, new NullLogger<ArtportalenChecklistVerbatimRepository>());
             DwcArchiveOccurrenceCsvWriter = new DwcArchiveOccurrenceCsvWriter(_vocabularyValueResolver, new NullLogger<DwcArchiveOccurrenceCsvWriter>());
         }
 
@@ -491,17 +491,17 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return processedObservationRepository;
         }
 
-        private ProcessedCheckListRepository CreateProcessedChecklistRepository(
+        private ProcessedChecklistRepository CreateProcessedChecklistRepository(
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             IProcessClient processClient)
         {            
-            var processedChecklistRepository = new ProcessedCheckListRepository(
+            var processedChecklistRepository = new ProcessedChecklistRepository(
                 elasticClientManager,
                 processClient,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),                
-                new NullLogger<ProcessedCheckListRepository>());
+                new NullLogger<ProcessedChecklistRepository>());
             
             return processedChecklistRepository;
         }
@@ -564,7 +564,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await AddObservationsToElasticsearchAsync(processedObservations);
         }
 
-        public async Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenCheckListVerbatim> verbatimChecklists)
+        public async Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
         {
             var processedChecklists = ProcessChecklists(verbatimChecklists);
             await AddChecklistsToElasticsearchAsync(processedChecklists);
@@ -606,7 +606,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             await ProcessedObservationRepository.EnableIndexingAsync(protectedIndex);            
         }
 
-        public async Task AddChecklistsToElasticsearchAsync(IEnumerable<CheckList> checklists, bool clearExistingChecklists = true)
+        public async Task AddChecklistsToElasticsearchAsync(IEnumerable<Checklist> checklists, bool clearExistingChecklists = true)
         {
             if (clearExistingChecklists)
             {
@@ -634,12 +634,12 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         }
 
 
-        public List<CheckList> ProcessChecklists(IEnumerable<ArtportalenCheckListVerbatim> verbatimChecklists)
+        public List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists)
         {            
-            var checklists = new List<CheckList>();
+            var checklists = new List<Checklist>();
             foreach(var verbatimChecklist in verbatimChecklists)
             {
-                var checklist = ArtportalenChecklistFactory.CreateProcessedCheckList(verbatimChecklist);
+                var checklist = ArtportalenChecklistFactory.CreateProcessedChecklist(verbatimChecklist);
                 checklists.Add(checklist);
             }
 

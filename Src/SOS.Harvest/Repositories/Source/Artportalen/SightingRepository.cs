@@ -310,7 +310,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForCheckListsAsync(IEnumerable<int> checkListIds)
+        public async Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForChecklistsAsync(IEnumerable<int> checklistIds)
         {
             var query = $@"
 	        SELECT 
@@ -322,26 +322,26 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 INNER JOIN @tvp t ON s.ChecklistId = t.Id";
 
             var result = await QueryAsync<(int checklistId, int sightingId, int taxonId)>(query,
-                new { tvp = checkListIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+                new { tvp = checklistIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
             if (!result?.Any() ?? true)
             {
                 return null;
             }
 
-            var checkListsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
+            var checklistsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
 
             foreach (var item in result)
             {
-                if (!checkListsData.TryGetValue(item.checklistId, out var checkListData))
+                if (!checklistsData.TryGetValue(item.checklistId, out var checklistData))
                 {
-                    checkListData = new List<(int sightingId, int taxonId)>();
-                    checkListsData.Add(item.checklistId, checkListData);
+                    checklistData = new List<(int sightingId, int taxonId)>();
+                    checklistsData.Add(item.checklistId, checklistData);
                 }
-                checkListData.Add((item.sightingId, item.taxonId));
+                checklistData.Add((item.sightingId, item.taxonId));
             }
 
-            return checkListsData;
+            return checklistsData;
         }
 
         /// <inheritdoc />

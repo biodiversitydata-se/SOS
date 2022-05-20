@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Processed.CheckList;
+﻿using SOS.Lib.Models.Processed.Checklist;
 using SOS.Observations.Api.Dtos.Checklist;
 
 namespace SOS.Observations.Api.Extensions
@@ -14,20 +14,20 @@ namespace SOS.Observations.Api.Extensions
         {
             return apInternal == null ? null : new ApInternalDto
             {
-                CheckListId = apInternal.CheckListId,
+                ChecklistId = apInternal.ChecklistId,
                 ParentTaxonId = apInternal.ParentTaxonId,
                 UserId = apInternal.UserId
             };
         }
 
         /// <summary>
-        /// Cast check list to dto
+        /// Cast checklist to dto
         /// </summary>
         /// <param name="checklist"></param>
         /// <returns></returns>
-        public static CheckListDto ToDto(this CheckList checklist)
+        public static ChecklistDto ToDto(this Checklist checklist)
         {
-            return checklist == null ? null : new CheckListDto
+            return checklist == null ? null : new ChecklistDto
             {
                 DataProviderId = checklist.DataProviderId,
                 EffortTime = !string.IsNullOrEmpty(checklist.SamplingEffortTime) || checklist.Event?.EndDate == null || checklist.Event?.StartDate == null ?
@@ -47,13 +47,13 @@ namespace SOS.Observations.Api.Extensions
         }
 
         /// <summary>
-        /// Cast check list to internal dto
+        /// Cast checklist to internal dto
         /// </summary>
         /// <param name="checklist"></param>
         /// <returns></returns>
-        public static CheckListInternalDto ToInternalDto(this CheckList checklist)
+        public static ChecklistInternalDto ToInternalDto(this Checklist checklist)
         {
-            return checklist == null ? null : new CheckListInternalDto
+            return checklist == null ? null : new ChecklistInternalDto
             {
                 ArtportalenInternal = checklist.ArtportalenInternal.ToDto(),
                 DataProviderId = checklist.DataProviderId,

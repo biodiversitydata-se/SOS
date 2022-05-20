@@ -11,7 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -22,8 +22,8 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedCheckListRepository : ProcessRepositoryBase<CheckList, string>,
-        IProcessedCheckListRepository
+    public class ProcessedChecklistRepository : ProcessRepositoryBase<Checklist, string>,
+        IProcessedChecklistRepository
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
@@ -43,7 +43,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                .Map<CheckList>(p => p
+                .Map<Checklist>(p => p
                     .Properties(ps => ps
                         .Date(d => d
                             .Name(nm => nm.Modified)
@@ -120,7 +120,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<CheckList> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<Checklist> items)
         {
             if (!items.Any())
             {
@@ -164,7 +164,7 @@ namespace SOS.Lib.Repositories.Processed
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing check lists for search:{count += next.Items.Count}"); });
+                    next => { Logger.LogDebug($"Indexing checklists for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -175,12 +175,12 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="logger"></param>
-        public ProcessedCheckListRepository(
+        public ProcessedChecklistRepository(
             IElasticClientManager elasticClientManager,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedCheckListRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedChecklistRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
         {
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
@@ -188,12 +188,12 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<CheckList> items)
+        public async Task<int> AddManyAsync(IEnumerable<Checklist> items)
         {
             // Save valid processed data
-            Logger.LogDebug($"Start indexing check list batch for searching with {items.Count()} items");
+            Logger.LogDebug($"Start indexing checklist batch for searching with {items.Count()} items");
             var indexResult = WriteToElastic(items);
-            Logger.LogDebug("Finished indexing check list batch for searching");
+            Logger.LogDebug("Finished indexing checklist batch for searching");
             if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
             return items.Count();
         }
@@ -241,9 +241,9 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<CheckList> GetAsync(string id, bool internalCall)
+        public async Task<Checklist> GetAsync(string id, bool internalCall)
         {
-            var searchResponse = await Client.SearchAsync<CheckList>(s => s
+            var searchResponse = await Client.SearchAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -265,10 +265,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<CheckList>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+        public async Task<PagedResult<Checklist>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
-            var searchResponse = await Client.SearchAsync<CheckList>(s => s
+            var searchResponse = await Client.SearchAsync<Checklist>(s => s
                 .Index(IndexName)
                 .From(skip)
                 .Size(take)
@@ -285,7 +285,7 @@ namespace SOS.Lib.Repositories.Processed
                 throw new InvalidOperationException(searchResponse.DebugInformation);
             }
 
-            return new PagedResult<CheckList>
+            return new PagedResult<Checklist>
             {
                 Records = searchResponse.Documents,
                 Skip = skip,
@@ -302,11 +302,11 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public async Task<int> GetChecklistCountAsync(CheckListSearchFilter filter)
+        public async Task<int> GetChecklistCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<CheckList>();            
+            var query = filter.ToQuery<Checklist>();            
 
-            var countResponse = await Client.CountAsync<CheckList>(s => s
+            var countResponse = await Client.CountAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -327,13 +327,13 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public async Task<int> GetPresentCountAsync(CheckListSearchFilter filter)
+        public async Task<int> GetPresentCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<CheckList>();
-            var foundQuery = new List<Func<QueryContainerDescriptor<CheckList>, QueryContainer>>();
+            var query = filter.ToQuery<Checklist>();
+            var foundQuery = new List<Func<QueryContainerDescriptor<Checklist>, QueryContainer>>();
             foundQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
-            var countResponse = await Client.CountAsync<CheckList>(s => s
+            var countResponse = await Client.CountAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -355,13 +355,13 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public async Task<int> GetAbsentCountAsync(CheckListSearchFilter filter)
+        public async Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<CheckList>();
-            var nonQuery = new List<Func<QueryContainerDescriptor<CheckList>, QueryContainer>>();
+            var query = filter.ToQuery<Checklist>();
+            var nonQuery = new List<Func<QueryContainerDescriptor<Checklist>, QueryContainer>>();
             nonQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
-            var countResponse = await Client.CountAsync<CheckList>(s => s
+            var countResponse = await Client.CountAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
@@ -379,10 +379,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string IndexName => IndexHelper.GetIndexName<CheckList>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string IndexName => IndexHelper.GetIndexName<Checklist>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<CheckList>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<Checklist>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

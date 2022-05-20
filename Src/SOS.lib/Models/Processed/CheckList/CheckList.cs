@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
-namespace SOS.Lib.Models.Processed.CheckList
+namespace SOS.Lib.Models.Processed.Checklist
 {
-    public class CheckList : IEntity<string>
+    public class Checklist : IEntity<string>
     {
         /// <summary>
         /// Values used internal in Artportalen
@@ -28,7 +28,7 @@ namespace SOS.Lib.Models.Processed.CheckList
         public Event Event { get; set; }
 
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
         public string Id { get; set; }
 
@@ -38,7 +38,7 @@ namespace SOS.Lib.Models.Processed.CheckList
         public Location Location { get; set; }
 
         /// <summary>
-        /// Name of check list
+        /// Name of checklist
         /// </summary>
         public string Name { get; set; }
 

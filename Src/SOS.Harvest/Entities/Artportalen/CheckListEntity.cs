@@ -2,7 +2,7 @@
 
 namespace SOS.Harvest.Entities.Artportalen
 {
-    public class CheckListEntity
+    public class ChecklistEntity
     {
         /// <summary>
         /// Name of controlling user
@@ -25,12 +25,12 @@ namespace SOS.Harvest.Entities.Artportalen
         public DateTime EndDate { get; set; }
 
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of check list
+        /// Name of checklist
         /// </summary>
         public string Name { get; set; }
 

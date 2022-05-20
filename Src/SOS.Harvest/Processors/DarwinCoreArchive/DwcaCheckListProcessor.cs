@@ -17,15 +17,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation processor.
     /// </summary>
-    public class DwcaCheckListProcessor : CheckListProcessorBase<DwcaCheckListProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
-        IDwcaCheckListProcessor
+    public class DwcaChecklistProcessor : ChecklistProcessorBase<DwcaChecklistProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
+        IDwcaChecklistProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _vocabularyRepository;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessCheckListsAsync(
+        protected override async Task<int> ProcessChecklistsAsync(
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
@@ -34,11 +34,11 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 _verbatimClient,
                 Logger);
 
-            var checkListFactory = await DwcaCheckListFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper);
+            var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper);
 
-            return await base.ProcessCheckListsAsync(
+            return await base.ProcessChecklistsAsync(
                 dataProvider,
-                checkListFactory,
+                checklistFactory,
                 dwcArchiveVerbatimRepository,
                 cancellationToken);
         }
@@ -47,19 +47,19 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// Constructor
         /// </summary>
         /// <param name="verbatimClient"></param>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processManager"></param>
         /// <param name="areaHelper"></param>
         /// <param name="vocabularyRepository"></param>
         /// <param name="logger"></param>
-        public DwcaCheckListProcessor(
+        public DwcaChecklistProcessor(
             IVerbatimClient verbatimClient,
-            IProcessedCheckListRepository processedCheckListRepository,
+            IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IAreaHelper areaHelper,
             IVocabularyRepository vocabularyRepository,
-            ILogger<DwcaCheckListProcessor> logger) :
-                base(processedCheckListRepository, processManager, logger)
+            ILogger<DwcaChecklistProcessor> logger) :
+                base(processedChecklistRepository, processManager, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

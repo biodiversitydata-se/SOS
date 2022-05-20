@@ -235,7 +235,7 @@ namespace SOS.Harvest.IoC.Modules
 
             // Repositories source
             builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<CheckListRepository>().As<ICheckListRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ChecklistRepository>().As<IChecklistRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MediaRepository>().As<IMediaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseRepository>().As<IObservationDatabaseRepository>().InstancePerLifetimeScope();
@@ -262,7 +262,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<VocabularyRepository>().As<IVocabularyRepository>().InstancePerLifetimeScope();
 
             // Repositories verbatim
-            builder.RegisterType<ArtportalenCheckListVerbatimRepository>().As<IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int>>()
+            builder.RegisterType<ArtportalenChecklistVerbatimRepository>().As<IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int>>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
                 .InstancePerLifetimeScope();
@@ -286,7 +286,7 @@ namespace SOS.Harvest.IoC.Modules
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories processed 
-            builder.RegisterType<ProcessedCheckListRepository>().As<IProcessedCheckListRepository>()
+            builder.RegisterType<ProcessedChecklistRepository>().As<IProcessedChecklistRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
                 .InstancePerLifetimeScope();
@@ -315,10 +315,10 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>()
                 .InstancePerLifetimeScope();
 
-            // Add harvesters check lists
-            builder.RegisterType<ArtportalenCheckListHarvester>().As<IArtportalenCheckListHarvester>()
+            // Add harvesters checklists
+            builder.RegisterType<ArtportalenChecklistHarvester>().As<IArtportalenChecklistHarvester>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DwcCheckListHarvester>().As<IDwcCheckListHarvester>()
+            builder.RegisterType<DwcChecklistHarvester>().As<IDwcChecklistHarvester>()
                 .InstancePerLifetimeScope();
 
             // Add processors
@@ -338,10 +338,10 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
                 .InstancePerLifetimeScope();
 
-            // Add check list processors
-            builder.RegisterType<ArtportalenCheckListProcessor>().As<IArtportalenCheckListProcessor>()
+            // Add checklist processors
+            builder.RegisterType<ArtportalenChecklistProcessor>().As<IArtportalenChecklistProcessor>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DwcaCheckListProcessor>().As<IDwcaCheckListProcessor>()
+            builder.RegisterType<DwcaChecklistProcessor>().As<IDwcaChecklistProcessor>()
                 .InstancePerLifetimeScope();
 
             // Add Vocabulary Factories
@@ -421,10 +421,10 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<AreasHarvestJob>().As<IAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ApiUsageStatisticsHarvestJob>().As<IApiUsageStatisticsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<CheckListsHarvestJob>().As<ICheckListsHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ChecklistsHarvestJob>().As<IChecklistsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<DwcArchiveHarvestJob>().As<IDwcArchiveHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VocabulariesImportJob>().As<IVocabulariesImportJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessCheckListsJob>().As<IProcessCheckListsJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessChecklistsJob>().As<IProcessChecklistsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessObservationsJob>().As<IProcessObservationsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectsHarvestJob>().As<IProjectsHarvestJob>().InstancePerLifetimeScope();

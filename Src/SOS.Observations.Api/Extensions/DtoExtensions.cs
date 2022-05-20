@@ -106,7 +106,7 @@ namespace SOS.Observations.Api.Extensions
         {
             if (searchFilterInternalDto.ExtendedFilter != null)
             {
-                internalFilter.CheckListId = searchFilterInternalDto.ExtendedFilter.CheckListId;
+                internalFilter.ChecklistId = searchFilterInternalDto.ExtendedFilter.ChecklistId;
                 internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
                 internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
                 internalFilter.ReportedByUserServiceUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserServiceUserId;
@@ -677,7 +677,7 @@ namespace SOS.Observations.Api.Extensions
             return (SearchFilter)PopulateFilter(searchFilterDto, translationCultureCode, sensitiveObservations);
         }
 
-        public static (SearchFilter, CheckListSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)
+        public static (SearchFilter, ChecklistSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)
         {
             var dateFilter = PopulateDateFilter(searchFilterDto.Date);
             var taxonFilter = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } };
@@ -691,22 +691,22 @@ namespace SOS.Observations.Api.Extensions
             //    VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
             //};
             //observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
-            var checkListFilter = new CheckListSearchFilter
+            var checklistFilter = new ChecklistSearchFilter
             {
-                DataProviderIds = searchFilterDto.CheckList?.DataProvider?.Ids,
-                Date = dateFilter as CheckListDateFilter,
+                DataProviderIds = searchFilterDto.Checklist?.DataProvider?.Ids,
+                Date = dateFilter as ChecklistDateFilter,
                 Location = locationFilter,
                 Taxa = taxonFilter
             };
 
-            if (TimeSpan.TryParse(searchFilterDto.CheckList?.MinEffortTime, out var minEffortTime))
+            if (TimeSpan.TryParse(searchFilterDto.Checklist?.MinEffortTime, out var minEffortTime))
             {
-                checkListFilter.Date ??= new CheckListDateFilter();
-                checkListFilter.Date.MinEffortTime = minEffortTime;
+                checklistFilter.Date ??= new ChecklistDateFilter();
+                checklistFilter.Date.MinEffortTime = minEffortTime;
             }
 
-            return (null, checkListFilter);
-            //return (observationFilter, checkListFilter);
+            return (null, checklistFilter);
+            //return (observationFilter, checklistFilter);
         }
 
         public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto)

@@ -10,7 +10,7 @@ namespace SOS.Lib
     /// <summary>
     /// Observation specific search related extensions
     /// </summary>
-    public static class SearchExtensionsCheckList
+    public static class SearchExtensionsChecklist
     {
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace SOS.Lib
         /// <param name="filter"></param>
         /// <returns></returns>
         public static ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> ToQuery<TQueryContainer>(
-            this CheckListSearchFilter filter) where TQueryContainer : class
+            this ChecklistSearchFilter filter) where TQueryContainer : class
         {
             var query = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
 

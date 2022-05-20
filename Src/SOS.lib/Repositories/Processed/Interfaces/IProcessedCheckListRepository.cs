@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedCheckListRepository : IProcessRepositoryBase<CheckList, string>
+    public interface IProcessedChecklistRepository : IProcessRepositoryBase<Checklist, string>
     {
         /// <summary>
         ///  Add many items
         /// </summary>
-        /// <param name="checkLists"></param>
+        /// <param name="checklists"></param>
         /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<CheckList> checkLists);
+        Task<int> AddManyAsync(IEnumerable<Checklist> checklists);
 
         /// <summary>
         /// Clear the collection
@@ -36,12 +36,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task EnableIndexingAsync();
 
         /// <summary>
-        /// Get a check list by it's id
+        /// Get a checklist by it's id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="internalCall"></param>
         /// <returns></returns>
-        Task<CheckList> GetAsync(string id, bool internalCall);
+        Task<Checklist> GetAsync(string id, bool internalCall);
 
         /// <summary>
         ///     Get chunk of objects from repository
@@ -52,7 +52,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<CheckList>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+        Task<PagedResult<Checklist>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
         /// <summary>
@@ -60,21 +60,21 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<int> GetChecklistCountAsync(CheckListSearchFilter filter);
+        Task<int> GetChecklistCountAsync(ChecklistSearchFilter filter);
 
         /// <summary>
         /// Count number of present observations matching the search filter.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<int> GetPresentCountAsync(CheckListSearchFilter filter);
+        Task<int> GetPresentCountAsync(ChecklistSearchFilter filter);
 
         /// <summary>
         /// Count number of absent observations (Using taxonIdsFound property) matching the search filter.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<int> GetAbsentCountAsync(CheckListSearchFilter filter);     
+        Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter);     
 
         /// <summary>
         /// Name of index 

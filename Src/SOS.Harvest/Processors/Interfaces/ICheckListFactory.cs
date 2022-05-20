@@ -1,18 +1,18 @@
 ﻿using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 
 namespace SOS.Harvest.Processors.Interfaces
 {
     /// <summary>
-    /// Interface for check list factory
+    /// Interface for checklist factory
     /// </summary>
-    public interface ICheckListFactory<TEntity> where TEntity : IEntity<int>
+    public interface IChecklistFactory<TEntity> where TEntity : IEntity<int>
     {
         /// <summary>
-        /// Cast verbatim to CheckList
+        /// Cast verbatim to Checklist
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        CheckList CreateProcessedCheckList(TEntity verbatim);
+        Checklist CreateProcessedChecklist(TEntity verbatim);
     }
 }

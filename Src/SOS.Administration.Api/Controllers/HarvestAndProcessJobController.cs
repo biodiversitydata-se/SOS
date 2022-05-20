@@ -195,38 +195,38 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("CheckLists/Schedule/Daily")]
+        [HttpPost("Checklists/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyCheckListHarvestAndProcessJob([FromQuery] int hour, [FromQuery] int minute)
+        public IActionResult AddDailyChecklistHarvestAndProcessJob([FromQuery] int hour, [FromQuery] int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<ICheckListsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
+                RecurringJob.AddOrUpdate<IChecklistsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
                     job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Check lists harvest and process job added");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Adding check lists harvest and process job failed");
+                _logger.LogError(e, "Adding checklists harvest and process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("CheckLists/Run")]
+        [HttpPost("Checklists/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunCheckListHarvestAndProcessJob()
+        public IActionResult RunChecklistHarvestAndProcessJob()
         {
             try
             {
-                BackgroundJob.Enqueue<ICheckListsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IChecklistsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
                 return new OkObjectResult("Check lists harvest and process job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Enqueuing check lists harvest and process job failed");
+                _logger.LogError(e, "Enqueuing checklists harvest and process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

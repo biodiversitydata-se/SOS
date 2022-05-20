@@ -4,9 +4,9 @@
     public class ApInternalDto
     {
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
-        public int CheckListId { get; set; }
+        public int ChecklistId { get; set; }
 
         /// <summary>
         /// Parent taxon id

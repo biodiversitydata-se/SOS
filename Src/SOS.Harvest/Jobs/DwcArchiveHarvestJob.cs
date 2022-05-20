@@ -13,7 +13,7 @@ namespace SOS.Harvest.Jobs
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IDwcObservationHarvester _dwcObservationHarvester;
-        private readonly IDwcCheckListHarvester _dwcCheckListHarvester;
+        private readonly IDwcChecklistHarvester _dwcChecklistHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<DwcArchiveHarvestJob> _logger;
 
@@ -21,21 +21,21 @@ namespace SOS.Harvest.Jobs
         /// Constructor
         /// </summary>
         /// <param name="dwcObservationHarvester"></param>
-        /// <param name="dwcCheckListHarvester"></param>
+        /// <param name="dwcChecklistHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public DwcArchiveHarvestJob(
             IDwcObservationHarvester dwcObservationHarvester,
-            IDwcCheckListHarvester dwcCheckListHarvester,
+            IDwcChecklistHarvester dwcChecklistHarvester,
             IHarvestInfoRepository harvestInfoRepository,
             IDataProviderManager dataProviderManager,
             ILogger<DwcArchiveHarvestJob> logger)
         {
             _dwcObservationHarvester = dwcObservationHarvester ??
                                        throw new ArgumentNullException(nameof(dwcObservationHarvester));
-            _dwcCheckListHarvester =
-                dwcCheckListHarvester ?? throw new ArgumentNullException(nameof(dwcCheckListHarvester));
+            _dwcChecklistHarvester =
+                dwcChecklistHarvester ?? throw new ArgumentNullException(nameof(dwcChecklistHarvester));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
@@ -74,13 +74,13 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"DwC-A file is ready to be opened: {archivePath}");
 
                 var harvestInfoResult = target.Equals(DwcaTarget.Checklist) ?
-                    await _dwcCheckListHarvester.HarvestCheckListsAsync(archivePath, dataProvider, cancellationToken) :
+                    await _dwcChecklistHarvester.HarvestChecklistsAsync(archivePath, dataProvider, cancellationToken) :
                     await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
 
                 try
                 {
                     var emlDocument = target.Equals(DwcaTarget.Checklist) ?
-                        _dwcCheckListHarvester.GetEmlXmlDocument(archivePath) :
+                        _dwcChecklistHarvester.GetEmlXmlDocument(archivePath) :
                         _dwcObservationHarvester.GetEmlXmlDocument(archivePath);
                     await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, emlDocument);
                 }

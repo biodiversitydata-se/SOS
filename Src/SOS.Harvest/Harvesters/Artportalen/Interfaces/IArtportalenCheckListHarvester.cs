@@ -3,9 +3,9 @@
 namespace SOS.Harvest.Harvesters.Artportalen.Interfaces
 {
     /// <summary>
-    ///     Artportalen check list harvester interface
+    ///     Artportalen checklist harvester interface
     /// </summary>
-    public interface IArtportalenCheckListHarvester : ICheckListHarvester
+    public interface IArtportalenChecklistHarvester : IChecklistHarvester
     {
 
     }

@@ -47,7 +47,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Check list Id
         /// </summary>
-        public int? CheckListId { get; set; }
+        public int? ChecklistId { get; set; }
 
         /// <summary>
         /// Reported by Artportalen user id.

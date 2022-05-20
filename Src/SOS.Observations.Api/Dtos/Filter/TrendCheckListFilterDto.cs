@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
-    /// Observation specific filter
+    /// Checklist filter
     /// </summary>
-    public class TrendCheckListFilterDto
+    public class TrendChecklistFilterDto
     {
         private TimeSpan _minEffortTime;
 
@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// <summary>
         /// Checklist specific filter
         /// </summary>
-        public TrendCheckListFilterDto CheckList { get; set; }
+        public TrendChecklistFilterDto Checklist { get; set; }
 
         /// <summary>
         /// Date filter.

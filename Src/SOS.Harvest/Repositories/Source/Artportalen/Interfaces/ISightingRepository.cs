@@ -52,12 +52,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<(int SightingId, int ProjectId)>> GetSightingProjectIdsAsync(IEnumerable<int> sightingIds);
 
         /// <summary>
-        /// Get sighting and taxon id's for check list
+        /// Get sighting and taxon id's for checklist
         /// </summary>
-        /// <param name="checkListIds"></param>
+        /// <param name="checklistIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForCheckListsAsync(
-            IEnumerable<int> checkListIds);
+        Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForChecklistsAsync(
+            IEnumerable<int> checklistIds);
 
         /// <summary>
         /// True if live data base should be used
