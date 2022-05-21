@@ -15,7 +15,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(45)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        [DisplayName("Harvest Check Lists")]
+        [DisplayName("Harvest Checklists")]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
     }
 }
