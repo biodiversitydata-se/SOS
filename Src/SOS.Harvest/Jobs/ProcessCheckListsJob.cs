@@ -281,6 +281,7 @@ namespace SOS.Harvest.Jobs
 
             if (!checklistDataProviders?.Any() ?? true)
             {
+                _logger.LogInformation("No data providers support checklists");
                 return false;
             }
 
