@@ -51,7 +51,7 @@ namespace SOS.Administration.Gui.Controllers
             var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
             var queryBuilder = Builders<ProcessInfoDto>.Filter;
             var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
-            var processInfos = database.GetCollection<ProcessInfoDto>("processinfo")
+            var processInfos = database.GetCollection<ProcessInfoDto>("ProcessInfo")
             .Find(query)
             .SortByDescending(p => p.End);
 
