@@ -33,7 +33,7 @@ namespace SOS.Harvest.Processors.Artportalen
             };
         }
 
-        private Event CreateEvent(ArtportalenCheckListVerbatim verbatim, string id)
+        private Event CreateEvent(ArtportalenChecklistVerbatim verbatim, string id)
         {
             var evnt = new Event(verbatim.StartDate, verbatim.EndDate)
             {
@@ -88,7 +88,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
-        public ArtportalenCheckListFactory(
+        public ArtportalenChecklistFactory(
             DataProvider dataProvider,
             IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
         {
@@ -119,10 +119,10 @@ namespace SOS.Harvest.Processors.Artportalen
                     },
                     DataProviderId = DataProvider.Id,
                     Id = id,
-                    Event = CreateEvent(verbatimCheckList, id),
-                    Location = CreateLocation(verbatimCheckList),
-                    Modified = verbatimCheckList.EditDate,
-                    Name = verbatimCheckList.Name,
+                    Event = CreateEvent(verbatimChecklist, id),
+                    Location = CreateLocation(verbatimChecklist),
+                    Modified = verbatimChecklist.EditDate,
+                    Name = verbatimChecklist.Name,
                     OccurrenceIds =
                         verbatimChecklist.SightingIds?.Select(sId => $"urn:lsid:artportalen.se:Sighting:{sId}"),
                     Project = ArtportalenFactoryHelper.CreateProcessedProject(verbatimChecklist.Project),

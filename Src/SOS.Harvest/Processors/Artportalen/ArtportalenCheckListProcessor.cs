@@ -27,11 +27,11 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="processTimeManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ArtportalenCheckListProcessor(IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int> artportalenVerbatimRepository,
-            IProcessedCheckListRepository processedCheckListRepository,
+        public ArtportalenChecklistProcessor(IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenVerbatimRepository,
+            IProcessedChecklistRepository processedCheckListRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
-            ILogger<ArtportalenCheckListProcessor> logger) :
+            ILogger<ArtportalenChecklistProcessor> logger) :
                 base(processedCheckListRepository, processManager, processTimeManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
@@ -43,7 +43,7 @@ namespace SOS.Harvest.Processors.Artportalen
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
-            var checkListFactory = new ArtportalenCheckListFactory(dataProvider, TimeManager);
+            var checklistFactory = new ArtportalenChecklistFactory(dataProvider, TimeManager);
 
             return await base.ProcessChecklistsAsync(
                 dataProvider,

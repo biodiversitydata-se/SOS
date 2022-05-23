@@ -244,7 +244,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaCheckListFactory(dataProvider, vocabularyById, areaHelper, processTimeManager);
+            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper, processTimeManager);
         }
 
         /// <summary>

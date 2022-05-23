@@ -34,7 +34,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 _verbatimClient,
                 Logger);
 
-            var checkListFactory = await DwcaCheckListFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager);
+            var checklistFactory = await DwcaChecklistFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager);
 
             return await base.ProcessChecklistsAsync(
                 dataProvider,
@@ -54,15 +54,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <param name="vocabularyRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public DwcaCheckListProcessor(
+        public DwcaChecklistProcessor(
             IVerbatimClient verbatimClient,
             IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             IAreaHelper areaHelper,
             IVocabularyRepository vocabularyRepository,
-            ILogger<DwcaCheckListProcessor> logger) :
-                base(processedCheckListRepository, processManager, processTimeManager, logger)
+            ILogger<DwcaChecklistProcessor> logger) :
+                base(processedChecklistRepository, processManager, processTimeManager, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

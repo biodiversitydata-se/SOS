@@ -6,14 +6,14 @@ namespace SOS.Harvest.Processors
     /// <summary>
     /// Base class for observation factories
     /// </summary>
-    public class CheckListFactoryBase : FactoryBase
+    public class ChecklistFactoryBase : FactoryBase
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        protected CheckListFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
+        protected ChecklistFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
         {
            
         }

@@ -14,7 +14,7 @@ using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Processors
 {
-    public abstract class CheckListProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
+    public abstract class ChecklistProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
         where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
     {
@@ -125,7 +125,7 @@ namespace SOS.Harvest.Processors
             }
         }
 
-        protected readonly IProcessedCheckListRepository ProcessedCheckListRepository;
+        protected readonly IProcessedChecklistRepository ProcessedChecklistRepository;
 
         /// <summary>
         /// Constructor
@@ -139,8 +139,8 @@ namespace SOS.Harvest.Processors
             IProcessTimeManager processTimeManager,
             ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
         {
-            ProcessedCheckListRepository = processedCheckListRepository ??
-                                           throw new ArgumentNullException(nameof(processedCheckListRepository));
+            ProcessedChecklistRepository = processedChecklistRepository ??
+                                           throw new ArgumentNullException(nameof(processedChecklistRepository));
         }
 
         /// <summary>
