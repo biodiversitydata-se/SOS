@@ -203,8 +203,9 @@ namespace SOS.Observations.Api
             services.AddSwaggerGen(
                 swagger =>
                 {
+                    swagger.UseInlineDefinitionsForEnums();
                     foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
-                    {
+                    {                        
                         swagger.SwaggerDoc(
                             $"{InternalApiName}{description.GroupName}",
                             new OpenApiInfo()
@@ -509,7 +510,7 @@ namespace SOS.Observations.Api
                         $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
                         $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}");
 
-                    options.DisplayOperationId();
+                    options.DisplayOperationId();                    
                     options.DocExpansion(DocExpansion.None);
                 }
             });
