@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -94,6 +95,47 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, $"Error clearing {cache} cache");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />        
+        [HttpGet("{cache}")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> GetCache([FromRoute] Cache cache)
+        {
+            try
+            {
+                switch (cache)
+                {
+                    case Cache.Area:
+                        var areas = await _areaCache.GetAllAsync();
+                        return new OkObjectResult(areas);                        
+                    case Cache.DataProviders:
+                        var dataProviders = await _dataProvidersCache.GetAllAsync();
+                        return new OkObjectResult(dataProviders);
+                    case Cache.ProcessedConfiguration:
+                        var processedConfiguration = await _processedConfigurationCache.GetAllAsync();
+                        return new OkObjectResult(processedConfiguration);
+                    case Cache.Projects:
+                        var projects = await _projectsCache.GetAllAsync();
+                        return new OkObjectResult(projects);
+                    case Cache.TaxonLists:
+                        var taxonLists = await _taxonListCache.GetAllAsync();
+                        return new OkObjectResult(taxonLists);
+                    case Cache.Vocabulary:
+                        var vocabulary = await _vocabularyCache.GetAllAsync();
+                        return new OkObjectResult(vocabulary);
+                    default:
+                        _logger.LogError($"{cache} is not supported");
+                        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                }                
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting {cache} cache");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
     }
