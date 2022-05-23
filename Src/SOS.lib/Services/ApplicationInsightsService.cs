@@ -74,8 +74,7 @@ namespace SOS.Lib.Services
                         endpoint = substring(name, indexof(name, ' ')+1), 
                         user_AccountId,
                         user_AuthenticatedId,
-                        requestingSystem = tostring(customDimensions['Requesting-System']),
-                        requestingSystems = tostring(customDimensions['Requesting-Systems']),
+                        requestingSystem = tostring(customDimensions['Requesting-System']),                        
                         duration, 
                         success,
                         responseCount = toint(customDimensions['Response-count'])
@@ -89,8 +88,7 @@ namespace SOS.Lib.Services
                             endpoint,
                             user_AccountId,
                             user_AuthenticatedId,
-                            requestingSystem,
-                            requestingSystems";
+                            requestingSystem";
 
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
@@ -102,12 +100,11 @@ namespace SOS.Lib.Services
                     Endpoint = ((JsonElement)r[1]).GetString(),
                     AccountId = ((JsonElement)r[2]).GetString(),
                     UserId = ((JsonElement)r[3]).GetString(),
-                    RequestingSystem = ((JsonElement)r[4]).GetString(),
-                    RequestingSystems = ((JsonElement)r[5]).GetString(),
-                    RequestCount = ((JsonElement)r[6]).GetInt64(),
-                    FailureCount = ((JsonElement)r[7]).GetInt64(),
-                    AverageDuration = ((JsonElement)r[8]).GetInt64(),
-                    SumResponseCount = ((JsonElement)r[9]).GetInt64()
+                    RequestingSystem = ((JsonElement)r[4]).GetString(),                    
+                    RequestCount = ((JsonElement)r[5]).GetInt64(),
+                    FailureCount = ((JsonElement)r[6]).GetInt64(),
+                    AverageDuration = ((JsonElement)r[7]).GetInt64(),
+                    SumResponseCount = ((JsonElement)r[8]).GetInt64()
                 });
         }
 
@@ -133,8 +130,7 @@ namespace SOS.Lib.Services
                         requestBody = customDimensions['Request-body'], 
                         protectedObservations = customDimensions['Protected-observations'], 
                         responseCount = customDimensions['Response-count'],
-                        requestingSystem = tostring(customDimensions['Requesting-System']),
-                        requestingSystems = tostring(customDimensions['Requesting-Systems'])";
+                        requestingSystem = tostring(customDimensions['Requesting-System'])";
 
             var result = await QueryApplicationInsightsAsync<ApplicationInsightsQueryResponse>(query);
 
@@ -152,8 +148,7 @@ namespace SOS.Lib.Services
                     RequestBody = r[8] == null ? null : ((JsonElement)r[8]).GetString(),
                     ProtectedObservations = r[9] == null ? null : ((JsonElement)r[9]).GetString(),
                     ResponseCount = r[10] == null ? null : ((JsonElement)r[10]).GetString(),
-                    RequestingSystem = r[11] == null ? null : ((JsonElement)r[11]).GetString(),
-                    RequestingSystems = r[12] == null ? null : ((JsonElement)r[12]).GetString()
+                    RequestingSystem = r[11] == null ? null : ((JsonElement)r[11]).GetString()
                 });
         }
     }
