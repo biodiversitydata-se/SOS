@@ -5,7 +5,7 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Processed.CheckList;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -18,7 +18,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation factory.
     /// </summary>
-    public class DwcaCheckListFactory : CheckListFactoryBase, ICheckListFactory<DwcEventOccurrenceVerbatim>
+    public class DwcaChecklistFactory : ChecklistFactoryBase, IChecklistFactory<DwcEventOccurrenceVerbatim>
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
@@ -222,7 +222,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <param name="taxa"></param>
         /// <param name="vocabularyById"></param>
         /// <param name="areaHelper"></param>
-        public DwcaCheckListFactory(
+        public DwcaChecklistFactory(
             DataProvider dataProvider,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IAreaHelper areaHelper,
@@ -233,7 +233,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
 
-        public static async Task<DwcaCheckListFactory> CreateAsync(
+        public static async Task<DwcaChecklistFactory> CreateAsync(
             DataProvider dataProvider,
             IVocabularyRepository processedVocabularyRepository,
             IAreaHelper areaHelper,
@@ -248,53 +248,53 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        ///     Cast verbatim check list to processed data model
+        ///     Cast verbatim checklist to processed data model
         /// </summary>
-        /// <param name="verbatimCheckList"></param>
+        /// <param name="verbatimChecklist"></param>
         /// <returns></returns>
-        public CheckList CreateProcessedCheckList(DwcEventOccurrenceVerbatim verbatimCheckList)
+        public Checklist CreateProcessedChecklist(DwcEventOccurrenceVerbatim verbatimChecklist)
         {
             try
             {
-                if (verbatimCheckList == null)
+                if (verbatimChecklist == null)
                 {
                     return null;
                 }
 
-                var id = $"urn:lsid:{DataProvider.CheckListIdentifier}:Checklist:{verbatimCheckList.Id}";
+                var id = $"urn:lsid:{DataProvider.ChecklistIdentifier}:Checklist:{verbatimChecklist.Id}";
 
-                DateTime.TryParse(verbatimCheckList.EventDate, out var eventDate);
-                DateTime.TryParse(verbatimCheckList.Modified, out var modified);
+                DateTime.TryParse(verbatimChecklist.EventDate, out var eventDate);
+                DateTime.TryParse(verbatimChecklist.Modified, out var modified);
 
-                var checkList = new CheckList
+                var checklist = new Checklist
                 {
                     DataProviderId = DataProvider.Id,
                     Id = id,
-                    Event = CreateEvent(verbatimCheckList),
-                    Location = CreateLocation(verbatimCheckList),
+                    Event = CreateEvent(verbatimChecklist),
+                    Location = CreateLocation(verbatimChecklist),
                     Modified = modified,
-                    Name = $"{DataProvider.CheckListIdentifier}-{verbatimCheckList.EventID}",
+                    Name = $"{DataProvider.ChecklistIdentifier}-{verbatimChecklist.EventID}",
                     OccurrenceIds =
-                        verbatimCheckList.Observations?.Select(o => o.OccurrenceID),
-                    RecordedBy = verbatimCheckList.RecordedBy,
-                    SamplingEffortTime = verbatimCheckList.SamplingEffortTime,
-                    TaxonIds = TryParseTaxonIds(verbatimCheckList.Taxa?.Select(t => t.TaxonID)),
-                    TaxonIdsFound = TryParseTaxonIds(verbatimCheckList.Observations?.Select(o => o.TaxonID))?.Distinct()
+                        verbatimChecklist.Observations?.Select(o => o.OccurrenceID),
+                    RecordedBy = verbatimChecklist.RecordedBy,
+                    SamplingEffortTime = verbatimChecklist.SamplingEffortTime,
+                    TaxonIds = TryParseTaxonIds(verbatimChecklist.Taxa?.Select(t => t.TaxonID)),
+                    TaxonIdsFound = TryParseTaxonIds(verbatimChecklist.Observations?.Select(o => o.TaxonID))?.Distinct()
                 };
 
-                if (!GISExtensions.TryParseCoordinateSystem(verbatimCheckList.GeodeticDatum, out var coordinateSystem))
+                if (!GISExtensions.TryParseCoordinateSystem(verbatimChecklist.GeodeticDatum, out var coordinateSystem))
                 {
                     coordinateSystem = CoordinateSys.WGS84;
                 }
-                AddPositionData(checkList.Location, verbatimCheckList.DecimalLongitude.ParseDouble(), verbatimCheckList.DecimalLatitude.ParseDouble(),
-                    coordinateSystem, verbatimCheckList.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
-                _areaHelper.AddAreaDataToProcessedLocation(checkList.Location);
+                AddPositionData(checklist.Location, verbatimChecklist.DecimalLongitude.ParseDouble(), verbatimChecklist.DecimalLatitude.ParseDouble(),
+                    coordinateSystem, verbatimChecklist.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters, 0);
+                _areaHelper.AddAreaDataToProcessedLocation(checklist.Location);
 
-                return checkList;
+                return checklist;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error when processing DwC verbatim check list with Id={verbatimCheckList.Id}", e);
+                throw new Exception($"Error when processing DwC verbatim checklist with Id={verbatimChecklist.Id}", e);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace SOS.Harvest.Harvesters.DwC
     /// <summary>
     ///     DwC-A observation harvester.
     /// </summary>
-    public class DwcCheckListHarvester : IDwcCheckListHarvester
+    public class DwcChecklistHarvester : IDwcChecklistHarvester
     {
         private readonly IVerbatimClient _verbatimClient;
         private readonly IDwcArchiveReader _dwcArchiveReader;
@@ -27,7 +27,7 @@ namespace SOS.Harvest.Harvesters.DwC
         private readonly IFileService _fileService;
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly DwcaConfiguration _dwcaConfiguration;
-        private readonly ILogger<DwcCheckListHarvester> _logger;
+        private readonly ILogger<DwcChecklistHarvester> _logger;
 
         /// <summary>
         /// Constructor
@@ -39,14 +39,14 @@ namespace SOS.Harvest.Harvesters.DwC
         /// <param name="dataProviderRepository"></param>
         /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
-        public DwcCheckListHarvester(
+        public DwcChecklistHarvester(
             IVerbatimClient verbatimClient,
             IDwcArchiveReader dwcArchiveReader,
             IFileDownloadService fileDownloadService,
             IFileService fileService,
             IDataProviderRepository dataProviderRepository,
             DwcaConfiguration dwcaConfiguration,
-            ILogger<DwcCheckListHarvester> logger)
+            ILogger<DwcChecklistHarvester> logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
@@ -74,7 +74,7 @@ namespace SOS.Harvest.Harvesters.DwC
         ///     Harvest DwC Archive observations
         /// </summary>
         /// <returns></returns>
-        public async Task<HarvestInfo> HarvestCheckListsAsync(
+        public async Task<HarvestInfo> HarvestChecklistsAsync(
             string archivePath,
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
@@ -89,25 +89,25 @@ namespace SOS.Harvest.Harvesters.DwC
 
             try
             {
-                _logger.LogDebug($"Start clearing DwC-A check lists for {dataProvider.Identifier}");
+                _logger.LogDebug($"Start clearing DwC-A checklists for {dataProvider.Identifier}");
                 await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 await dwcArchiveVerbatimRepository.AddCollectionAsync();
-                _logger.LogDebug($"Finish clearing DwC-A check lists for {dataProvider.Identifier}");
+                _logger.LogDebug($"Finish clearing DwC-A checklists for {dataProvider.Identifier}");
 
-                _logger.LogDebug($"Start storing DwC-A check lists for {dataProvider.Identifier}");
+                _logger.LogDebug($"Start storing DwC-A checklists for {dataProvider.Identifier}");
 
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
 
-                var checkLists = await
+                var checklists = await
                     _dwcArchiveReader.ReadSamplingEventArchiveAsync(archiveReader, dataProvider);
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                var checkListCount = checkLists?.Count() ?? 0;
+                var checklistCount = checklists?.Count() ?? 0;
 
-                if (checkListCount != 0)
+                if (checklistCount != 0)
                 {
-                    await dwcArchiveVerbatimRepository.AddManyAsync(checkLists);
+                    await dwcArchiveVerbatimRepository.AddManyAsync(checklists);
 
                     if (dataProvider.UseVerbatimFileInExport)
                     {
@@ -123,7 +123,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
                     }
 
-                    _logger.LogDebug($"Finish storing DwC-A check lists for {dataProvider.Identifier}");
+                    _logger.LogDebug($"Finish storing DwC-A checklists for {dataProvider.Identifier}");
 
                     _logger.LogInformation($"Start permanentize temp collection for {dataProvider.Identifier}");
                     await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
@@ -133,7 +133,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
-                harvestInfo.Count = checkListCount;
+                harvestInfo.Count = checklistCount;
             }
             catch (JobAbortedException e)
             {
@@ -150,13 +150,13 @@ namespace SOS.Harvest.Harvesters.DwC
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestCheckListsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestChecklistsAsync(IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Not implemented for DwcA files");
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestCheckListsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now)
             {
@@ -165,7 +165,7 @@ namespace SOS.Harvest.Harvesters.DwC
             XDocument emlDocument = null;
 
             var downloadUrlEml = provider.DownloadUrls
-                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.CheckListEml))?.Url;
+                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.ChecklistEml))?.Url;
             if (!string.IsNullOrEmpty(downloadUrlEml))
             {
                 try
@@ -201,7 +201,7 @@ namespace SOS.Harvest.Harvesters.DwC
 
             // Try to get DwcA file from IPT and store it locally
             var downloadUrl = provider.DownloadUrls
-                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.CheckLists))?.Url;
+                ?.FirstOrDefault(p => p.Type.Equals(DownloadUrl.DownloadType.Checklists))?.Url;
 
             if (string.IsNullOrEmpty(downloadUrl))
             {
@@ -217,7 +217,7 @@ namespace SOS.Harvest.Harvesters.DwC
             }
 
             // Harvest file
-            harvestInfo = await HarvestCheckListsAsync(path, provider, cancellationToken);
+            harvestInfo = await HarvestChecklistsAsync(path, provider, cancellationToken);
 
             if (harvestInfo.Status == RunStatus.Success && emlDocument != null)
             {

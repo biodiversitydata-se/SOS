@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// <summary>
     ///     Sighting object
     /// </summary>
-    public class ArtportalenCheckListVerbatim : IEntity<int>
+    public class ArtportalenChecklistVerbatim : IEntity<int>
     {
         /// <summary>
         /// Name of controlling user
@@ -18,7 +18,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Id of controlling user
         /// </summary>
-        public int ControlingUserId { get; set; }
+        public int ControllingUserId { get; set; }
 
         /// <summary>
         /// Check list edit date 
@@ -31,12 +31,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public DateTime EndDate { get; set; }
 
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of check list
+        /// Name of checklist
         /// </summary>
         public string Name { get; set; }
 

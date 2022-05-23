@@ -18,14 +18,14 @@
             ObservationEml,
 
             /// <summary>
-            /// Url to check list file
+            /// Url to checklist file
             /// </summary>
-            CheckLists,
+            Checklists,
 
             /// <summary>
-            /// Url to check list eml file
+            /// Url to checklist eml file
             /// </summary>
-            CheckListEml
+            ChecklistEml
 
         }
 

@@ -17,15 +17,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// <summary>
     ///     DwC-A observation processor.
     /// </summary>
-    public class DwcaCheckListProcessor : CheckListProcessorBase<DwcaCheckListProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
-        IDwcaCheckListProcessor
+    public class DwcaChecklistProcessor : ChecklistProcessorBase<DwcaChecklistProcessor, DwcEventOccurrenceVerbatim, IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>>,
+        IDwcaChecklistProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
         private readonly IAreaHelper _areaHelper;
         private readonly IVocabularyRepository _vocabularyRepository;
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessCheckListsAsync(
+        protected override async Task<int> ProcessChecklistsAsync(
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
@@ -36,9 +36,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
             var checkListFactory = await DwcaCheckListFactory.CreateAsync(dataProvider, _vocabularyRepository, _areaHelper, TimeManager);
 
-            return await base.ProcessCheckListsAsync(
+            return await base.ProcessChecklistsAsync(
                 dataProvider,
-                checkListFactory,
+                checklistFactory,
                 dwcArchiveVerbatimRepository,
                 cancellationToken);
         }
@@ -47,7 +47,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// Constructor
         /// </summary>
         /// <param name="verbatimClient"></param>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processManager"></param>
         /// <param name="processTimeManager"></param>
         /// <param name="areaHelper"></param>
@@ -56,7 +56,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaCheckListProcessor(
             IVerbatimClient verbatimClient,
-            IProcessedCheckListRepository processedCheckListRepository,
+            IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
             IProcessTimeManager processTimeManager,
             IAreaHelper areaHelper,

@@ -7,6 +7,8 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Checklist;
+using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Dtos.Filter;
@@ -21,9 +23,9 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ChecklistsController : ControllerBase, ICheckListsController
+    public class ChecklistsController : ControllerBase, IChecklistsController
     {
-        private readonly ICheckListManager _checkListManager;
+        private readonly IChecklistManager _checklistManager;
         private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ChecklistsController> _logger;
 
@@ -42,15 +44,15 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="checkListManager"></param>
+        /// <param name="checklistManager"></param>
         /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ChecklistsController(
-            ICheckListManager checkListManager,
+            IChecklistManager checklistManager,
             ITaxonManager taxonManager,
             ILogger<ChecklistsController> logger)
         {
-            _checkListManager = checkListManager ?? throw new ArgumentNullException(nameof(checkListManager));
+            _checklistManager = checklistManager ?? throw new ArgumentNullException(nameof(checklistManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -61,7 +63,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost("CalculateTrend")]
-        [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
@@ -74,8 +76,8 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest(taxaValidation.Error);
                 }
-                var (observationFilter, checkListFilter) = filter.ToSearchFilters();
-                var trend = await _checkListManager.CalculateTrendAsync(observationFilter, checkListFilter);
+                var (observationFilter, checklistFilter) = filter.ToSearchFilters();
+                var trend = await _checklistManager.CalculateTrendAsync(observationFilter, checklistFilter);
 
                 return new OkObjectResult(trend);
             }
@@ -92,34 +94,34 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(typeof(CheckListDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ChecklistDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
         {
             try
             {
-                return new OkObjectResult(await _checkListManager.GetCheckListAsync(id));
+                return new OkObjectResult(await _checklistManager.GetChecklistAsync(id));
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting check list");
+                _logger.LogError(e, "Error getting checklist");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [HttpGet("internal")]
-        [ProducesResponseType(typeof(CheckListInternalDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ChecklistInternalDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetCheckListInternalAsync([FromQuery] string id)
+        public async Task<IActionResult> GetChecklistInternalAsync([FromQuery] string id)
         {
             try
             {
-                return new OkObjectResult(await _checkListManager.GetCheckListInternalAsync(id));
+                return new OkObjectResult(await _checklistManager.GetChecklistInternalAsync(id));
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting check list");
+                _logger.LogError(e, "Error getting checklist");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

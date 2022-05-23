@@ -7,7 +7,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     /// <summary>
     ///     Harvest observations job controller
     /// </summary>
-    public interface IHarvestCheckListJobController
+    public interface IHarvestChecklistJobController
     {
         /// <summary>
         /// Harvest observations from Darwin Core Archive file

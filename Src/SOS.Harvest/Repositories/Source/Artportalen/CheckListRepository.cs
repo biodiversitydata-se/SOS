@@ -11,21 +11,21 @@ using SOS.Lib.Extensions;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen
 {
-    public class CheckListRepository : BaseRepository<ICheckListRepository>, ICheckListRepository
+    public class ChecklistRepository : BaseRepository<IChecklistRepository>, IChecklistRepository
     {
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public CheckListRepository(IArtportalenDataService artportalenDataService, ILogger<CheckListRepository> logger) :
+        public ChecklistRepository(IArtportalenDataService artportalenDataService, ILogger<ChecklistRepository> logger) :
             base(artportalenDataService, logger)
         {
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<int>>> GetCheckListsTaxonIdsAsync(
-            IEnumerable<int> checkListIds)
+        public async Task<IDictionary<int, ICollection<int>>> GetChecklistsTaxonIdsAsync(
+            IEnumerable<int> checklistIds)
         {
             var query = $@"
 	        SELECT 
@@ -36,30 +36,30 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 INNER JOIN @tvp t ON clt.ChecklistId = t.Id";
 
             var result = await QueryAsync<(int checklistId, int taxonId)>(query,
-                new { tvp = checkListIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+                new { tvp = checklistIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
             if (!result?.Any() ?? true)
             {
                 return null;
             }
 
-            var checkListsTaxa = new Dictionary<int, ICollection<int>>();
+            var checklistsTaxa = new Dictionary<int, ICollection<int>>();
 
             foreach (var item in result)
             {
-                if (!checkListsTaxa.TryGetValue(item.checklistId, out var checkListTaxa))
+                if (!checklistsTaxa.TryGetValue(item.checklistId, out var checklistTaxa))
                 {
-                    checkListTaxa = new HashSet<int>();
-                    checkListsTaxa.Add(item.checklistId, checkListTaxa);
+                    checklistTaxa = new HashSet<int>();
+                    checklistsTaxa.Add(item.checklistId, checklistTaxa);
                 }
-                checkListTaxa.Add(item.taxonId);
+                checklistTaxa.Add(item.taxonId);
             }
 
-            return checkListsTaxa;
+            return checklistsTaxa;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<CheckListEntity>> GetChunkAsync(int startId, int maxRows)
+        public async Task<IEnumerable<ChecklistEntity>> GetChunkAsync(int startId, int maxRows)
         {
             try
             {
@@ -99,11 +99,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     WHERE 
                         cl.Id BETWEEN @StartId AND @EndId";
 
-                return await QueryAsync<CheckListEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }, Live);
+                return await QueryAsync<ChecklistEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }, Live);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error getting check lists");
+                Logger.LogError(e, "Error getting checklists");
 
                 return null;
             }

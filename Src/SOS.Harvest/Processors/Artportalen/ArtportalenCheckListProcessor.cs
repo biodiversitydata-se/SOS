@@ -13,16 +13,16 @@ namespace SOS.Harvest.Processors.Artportalen
     /// <summary>
     ///     Process factory class
     /// </summary>
-    public class ArtportalenCheckListProcessor : CheckListProcessorBase<ArtportalenCheckListProcessor, ArtportalenCheckListVerbatim, IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int>>,
-        IArtportalenCheckListProcessor
+    public class ArtportalenChecklistProcessor : ChecklistProcessorBase<ArtportalenChecklistProcessor, ArtportalenChecklistVerbatim, IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int>>,
+        IArtportalenChecklistProcessor
     {
-        private readonly IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int> _artportalenVerbatimRepository;
+        private readonly IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> _artportalenVerbatimRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenVerbatimRepository"></param>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processManager"></param>
         /// <param name="processTimeManager"></param>
         /// <param name="logger"></param>
@@ -39,15 +39,15 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
         /// <inheritdoc />
-        protected override async Task<int> ProcessCheckListsAsync(
+        protected override async Task<int> ProcessChecklistsAsync(
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
             var checkListFactory = new ArtportalenCheckListFactory(dataProvider, TimeManager);
 
-            return await base.ProcessCheckListsAsync(
+            return await base.ProcessChecklistsAsync(
                 dataProvider,
-                checkListFactory,
+                checklistFactory,
                 _artportalenVerbatimRepository,
                 cancellationToken);
         }

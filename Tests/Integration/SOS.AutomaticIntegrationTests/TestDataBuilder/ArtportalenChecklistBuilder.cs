@@ -21,7 +21,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
         private static Bogus.Faker _faker = new Bogus.Faker();
         private static Bogus.DataSets.Lorem _lorem = new Bogus.DataSets.Lorem("sv");        
 
-        public static List<ArtportalenCheckListVerbatim> VerbatimArtportalenChecklistsFromJsonFile
+        public static List<ArtportalenChecklistVerbatim> VerbatimArtportalenChecklistsFromJsonFile
         {
             get
             {
@@ -38,24 +38,24 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                         }
                     };
 
-                    _verbatimArtportalenChecklistsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenCheckListVerbatim>>(str, serializerSettings);
+                    _verbatimArtportalenChecklistsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenChecklistVerbatim>>(str, serializerSettings);
                 }
 
                 return _verbatimArtportalenChecklistsFromJsonFile;
             }
         }
-        private static List<ArtportalenCheckListVerbatim> _verbatimArtportalenChecklistsFromJsonFile;        
+        private static List<ArtportalenChecklistVerbatim> _verbatimArtportalenChecklistsFromJsonFile;        
        
-        public static IOperable<ArtportalenCheckListVerbatim> HaveValuesFromPredefinedChecklists(this IOperable<ArtportalenCheckListVerbatim> operable)
+        public static IOperable<ArtportalenChecklistVerbatim> HaveValuesFromPredefinedChecklists(this IOperable<ArtportalenChecklistVerbatim> operable)
         {
-            var builder = ((IDeclaration<ArtportalenCheckListVerbatim>)operable).ObjectBuilder;
+            var builder = ((IDeclaration<ArtportalenChecklistVerbatim>)operable).ObjectBuilder;
             builder.With((checklist, index) =>
             {
-                var sourceChecklist = Pick<ArtportalenCheckListVerbatim>.RandomItemFrom(VerbatimArtportalenChecklistsFromJsonFile).Clone();
+                var sourceChecklist = Pick<ArtportalenChecklistVerbatim>.RandomItemFrom(VerbatimArtportalenChecklistsFromJsonFile).Clone();
                 checklist.Id = sourceChecklist.Id;
                 checklist.Id = _faker.IndexVariable++;
                 checklist.ControllingUser = sourceChecklist.ControllingUser;
-                checklist.ControlingUserId = sourceChecklist.ControlingUserId;
+                checklist.ControllingUserId = sourceChecklist.ControllingUserId;
                 checklist.EditDate = sourceChecklist.EditDate;
                 checklist.EndDate = sourceChecklist.EndDate;
                 checklist.Name = sourceChecklist.Name;

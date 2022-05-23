@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;
 using SOS.Observations.Api.Extensions;
@@ -12,73 +15,74 @@ namespace SOS.Observations.Api.Managers
     /// <summary>
     ///     Area manager
     /// </summary>
-    public class CheckListManager : ICheckListManager
+    public class ChecklistManager : IChecklistManager
     {
-        private readonly IProcessedCheckListRepository _processedCheckListRepository;
+        private readonly IProcessedChecklistRepository _processedChecklistRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly ILogger<CheckListManager> _logger;
+        private readonly ILogger<ChecklistManager> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedCheckListRepository"></param>
+        /// <param name="processedChecklistRepository"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
-        public CheckListManager(
-            IProcessedCheckListRepository processedCheckListRepository,
+        public ChecklistManager(
+            IProcessedChecklistRepository processedChecklistRepository,
             IProcessedObservationRepository processedObservationRepository,
-            ILogger<CheckListManager> logger)
+            ILogger<ChecklistManager> logger)
         {
-            _processedCheckListRepository = processedCheckListRepository ?? throw new ArgumentNullException(nameof(processedCheckListRepository));
+            _processedChecklistRepository = processedChecklistRepository ?? throw new ArgumentNullException(nameof(processedChecklistRepository));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
-            _processedCheckListRepository.LiveMode = true;
+            _processedChecklistRepository.LiveMode = true;
             _processedObservationRepository.LiveMode = true;
         }
 
         /// <inheritdoc />
-        public async Task<double> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter)
-        {
-            observationFilter.PositiveSightings = true;
-            var positiveObservationsCount = await _processedObservationRepository.GetMatchCountAsync(observationFilter);
+        public async Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, ChecklistSearchFilter checklistSearchFilter)
+        {            
+            // todo - use observationFilter in next version.
 
-            observationFilter.PositiveSightings = false;
-            var negativeObservationsCount = await _processedObservationRepository.GetMatchCountAsync(observationFilter);
+            var taxonTrendResult = new TaxonTrendResult();
+            taxonTrendResult.NrPresentObservations = await _processedChecklistRepository.GetPresentCountAsync(checklistSearchFilter);
+            taxonTrendResult.NrAbsentObservations = await _processedChecklistRepository.GetAbsentCountAsync(checklistSearchFilter);            
+            taxonTrendResult.NrChecklists = await _processedChecklistRepository.GetChecklistCountAsync(checklistSearchFilter);
+            taxonTrendResult.Quotient = taxonTrendResult.NrPresentObservations / (double)taxonTrendResult.NrChecklists;
+            taxonTrendResult.TaxonId = checklistSearchFilter.Taxa.Ids.First();
 
-            var negativeCheckListCount = await _processedCheckListRepository.GetTrendCountAsync(checkListSearchFilter);
-
-            return ((double)positiveObservationsCount) / ((double)(positiveObservationsCount + negativeObservationsCount + negativeCheckListCount));
+            return taxonTrendResult;
         }
 
         /// <inheritdoc />
-        public async Task<CheckListDto> GetCheckListAsync(string id)
+        public async Task<ChecklistDto> GetChecklistAsync(string id)
         {
             try
             {
-                var checkList = await _processedCheckListRepository.GetAsync(id, false);
-                return checkList.ToDto();
+                var checklist = await _processedChecklistRepository.GetAsync(id, false);
+                return checklist.ToDto();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to get check list with id: {id}");
+                _logger.LogError(e, $"Failed to get checklist with id: {id}");
                 return null;
             }
         }
 
         /// <inheritdoc />
-        public async Task<CheckListInternalDto> GetCheckListInternalAsync(string id)
+        public async Task<ChecklistInternalDto> GetChecklistInternalAsync(string id)
         {
             try
             {
-                var checkList = await _processedCheckListRepository.GetAsync(id, true);
-                return checkList.ToInternalDto();
+                var checklist = await _processedChecklistRepository.GetAsync(id, true);
+                return checklist.ToInternalDto();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to get check list with id: {id}");
+                _logger.LogError(e, $"Failed to get checklist with id: {id}");
                 return null;
             }
         }

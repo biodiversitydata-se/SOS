@@ -31,9 +31,9 @@ namespace SOS.Lib.Configuration.Import
         public int IncrementalChunkSize { get; set; } = 25000;
 
         /// <summary>
-        ///     The number of check lists that will be fetched in each loop.
+        ///     The number of checklists that will be fetched in each loop.
         /// </summary>
-        public int ChunkSizeCheckLists { get; set; } = 100;
+        public int ChunkSizeChecklists { get; set; } = 100;
 
         /// <summary>
         ///     The number of sightings that should be harvested.
@@ -42,10 +42,10 @@ namespace SOS.Lib.Configuration.Import
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
 
         /// <summary>
-        ///     The number of check lists that should be harvested.
-        ///     If set to null all check lists will be fetched.
+        ///     The number of checklists that should be harvested.
+        ///     If set to null all checklists will be fetched.
         /// </summary>
-        public int? MaxNumberOfCheckListsHarvested { get; set; } = null;
+        public int? MaxNumberOfChecklistsHarvested { get; set; } = null;
 
         /// <summary>
         /// No of threads to run

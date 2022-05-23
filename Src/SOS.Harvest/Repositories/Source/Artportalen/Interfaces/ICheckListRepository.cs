@@ -7,23 +7,23 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
     /// <summary>
     ///     Check list repository interface
     /// </summary>
-    public interface ICheckListRepository
+    public interface IChecklistRepository
     {
         /// <summary>
-        /// Get all taxon id's for passed check lists
+        /// Get all taxon id's for passed checklists
         /// </summary>
-        /// <param name="checkListIds"></param>
+        /// <param name="checklistIds"></param>
         /// <returns></returns>
-        Task<IDictionary<int, ICollection<int>>> GetCheckListsTaxonIdsAsync(
-            IEnumerable<int> checkListIds);
+        Task<IDictionary<int, ICollection<int>>> GetChecklistsTaxonIdsAsync(
+            IEnumerable<int> checklistIds);
 
         /// <summary>
-        /// Get chunk of check lists from Artportalen
+        /// Get chunk of checklists from Artportalen
         /// </summary>
         /// <param name="startId"></param>
         /// <param name="maxRows"></param>
         /// <returns></returns>
-        Task<IEnumerable<CheckListEntity>> GetChunkAsync(int startId, int maxRows);
+        Task<IEnumerable<ChecklistEntity>> GetChunkAsync(int startId, int maxRows);
 
         /// <summary>
         ///     Get min and max id

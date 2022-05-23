@@ -5,9 +5,9 @@ using Hangfire;
 namespace SOS.Lib.Jobs.Process
 {
     /// <summary>
-    /// Process check lists job
+    /// Process checklists job
     /// </summary>
-    public interface IProcessCheckListsJob
+    public interface IProcessChecklistsJob
     {
         /// <summary>
         ///  Run full process job
@@ -15,7 +15,7 @@ namespace SOS.Lib.Jobs.Process
         /// <param name="dataProviderIdOrIdentifiers"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [JobDisplayName("Process check lists for passed providers")]
+        [JobDisplayName("Process checklists for passed providers")]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [Queue("high")]
         Task<bool> RunAsync(

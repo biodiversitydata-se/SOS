@@ -395,7 +395,7 @@ namespace SOS.Observations.Api
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
-            services.AddSingleton<ICheckListManager, CheckListManager>();
+            services.AddSingleton<IChecklistManager, ChecklistManager>();
             services.AddScoped<IDataProviderManager, DataProviderManager>();
             services.AddScoped<IDataQualityManager, DataQualityManager>();
             services.AddScoped<IUserManager, UserManager>();
@@ -413,7 +413,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-            services.AddScoped<IProcessedCheckListRepository, ProcessedCheckListRepository>();
+            services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();

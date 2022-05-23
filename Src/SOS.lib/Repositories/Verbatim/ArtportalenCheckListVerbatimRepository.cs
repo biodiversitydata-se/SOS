@@ -5,18 +5,18 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 namespace SOS.Lib.Repositories.Verbatim
 {
     /// <summary>
-    ///    Repository for check list verbatim
+    ///    Repository for checklist verbatim
     /// </summary>
-    public class ArtportalenCheckListVerbatimRepository : VerbatimRepositoryBase<ArtportalenCheckListVerbatim, int>
+    public class ArtportalenChecklistVerbatimRepository : VerbatimRepositoryBase<ArtportalenChecklistVerbatim, int>
     {
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
-        public ArtportalenCheckListVerbatimRepository(
+        public ArtportalenChecklistVerbatimRepository(
             IVerbatimClient importClient,
-            ILogger<ArtportalenCheckListVerbatimRepository> logger) : base(importClient, logger)
+            ILogger<ArtportalenChecklistVerbatimRepository> logger) : base(importClient, logger)
         {
         }
     }

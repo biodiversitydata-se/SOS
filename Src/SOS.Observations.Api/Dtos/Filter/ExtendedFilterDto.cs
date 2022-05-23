@@ -34,9 +34,9 @@ namespace SOS.Observations.Api.Dtos.Filter
         }
 
         /// <summary>
-        /// Check list Id
+        /// Checklist Id
         /// </summary>
-        public int? CheckListId { get; set; }
+        public int? ChecklistId { get; set; }
 
         /// <summary>
         /// Reported by Artportalen user id.

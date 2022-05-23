@@ -34,7 +34,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.A
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------            
-            var verbatimChecklists = Builder<ArtportalenCheckListVerbatim>.CreateListOfSize(100)
+            var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(100)
                 .All()
                     .HaveValuesFromPredefinedChecklists()                
                 .Build();            

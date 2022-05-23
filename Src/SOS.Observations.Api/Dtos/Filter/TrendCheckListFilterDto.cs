@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
-    /// Observation specific filter
+    /// Checklist filter
     /// </summary>
-    public class TrendCheckListFilterDto
+    public class TrendChecklistFilterDto
     {
         private TimeSpan _minEffortTime;
 
@@ -49,9 +49,9 @@ namespace SOS.Observations.Api.Dtos.Filter
     public class CalculateTrendFilterDto
     {
         /// <summary>
-        /// Observation specific filter
+        /// Checklist specific filter
         /// </summary>
-        public TrendCheckListFilterDto CheckList { get; set; }
+        public TrendChecklistFilterDto Checklist { get; set; }
 
         /// <summary>
         /// Date filter.
@@ -63,16 +63,12 @@ namespace SOS.Observations.Api.Dtos.Filter
         /// </summary>
         public GeographicsFilterDto Geographics { get; set; }
 
-        /// <summary>
-        /// Observation specific filter
-        /// </summary>
-        public TrendObservationFilterDto Observation { get; set; }
-
-        /// <summary>
-        /// Id's of projects
-        /// </summary>
-        public List<int> ProjectIds { get; set; }
-
+        // todo - add this in later version
+        ///// <summary>
+        ///// Observation specific filter
+        ///// </summary>
+        //public TrendObservationFilterDto Observation { get; set; }
+        
         /// <summary>
         /// Id of taxon
         /// </summary>

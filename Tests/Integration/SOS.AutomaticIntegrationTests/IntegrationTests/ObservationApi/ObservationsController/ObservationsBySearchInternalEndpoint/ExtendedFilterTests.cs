@@ -182,7 +182,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             {
                 ExtendedFilter = new ExtendedFilterDto
                 {
-                    CheckListId = 1
+                    ChecklistId = 1
                 }
             };
 

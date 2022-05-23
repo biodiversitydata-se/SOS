@@ -7,7 +7,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// <summary>
     ///     Checklists controller controller interface.
     /// </summary>
-    public interface ICheckListsController
+    public interface IChecklistsController
     {
         /// <summary>
         /// Calculate taxon trend
@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         Task<IActionResult> CalculateTrendAsync(CalculateTrendFilterDto filter);
 
         /// <summary>
-        /// Get a check list
+        /// Get a checklist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -25,11 +25,11 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             string id);
 
         /// <summary>
-        /// Get a check list
+        /// Get a checklist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IActionResult> GetCheckListInternalAsync(
+        Task<IActionResult> GetChecklistInternalAsync(
             string id);
     }
 }

@@ -6,7 +6,7 @@ using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {
-    public interface ICheckListsHarvestJob
+    public interface IChecklistsHarvestJob
     {
         /// <summary>
         ///     Full harvest of multiple sources, start processing when done

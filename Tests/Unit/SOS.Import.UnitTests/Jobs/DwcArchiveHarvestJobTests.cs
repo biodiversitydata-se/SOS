@@ -23,21 +23,21 @@ namespace SOS.Import.UnitTests.Managers
         public DwcArchiveHarvestJobTests()
         {
             _dwcObservationHarvesterMock = new Mock<IDwcObservationHarvester>();
-            _dwcCheckListHarvesterMock = new Mock<IDwcCheckListHarvester>();
+            _dwcChecklistHarvesterMock = new Mock<IDwcChecklistHarvester>();
             _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<DwcArchiveHarvestJob>>();
         }
 
         private readonly Mock<IDwcObservationHarvester> _dwcObservationHarvesterMock;
-        private readonly Mock<IDwcCheckListHarvester> _dwcCheckListHarvesterMock;
+        private readonly Mock<IDwcChecklistHarvester> _dwcChecklistHarvesterMock;
         private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<DwcArchiveHarvestJob>> _loggerMock;
 
         private DwcArchiveHarvestJob TestObject => new DwcArchiveHarvestJob(
             _dwcObservationHarvesterMock.Object,
-            _dwcCheckListHarvesterMock.Object,
+            _dwcChecklistHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
             _dataProviderManagerMock.Object,
             _loggerMock.Object);

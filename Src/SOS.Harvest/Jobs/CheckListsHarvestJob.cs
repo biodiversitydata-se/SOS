@@ -19,13 +19,13 @@ namespace SOS.Harvest.Jobs
     /// <summary>
     ///     Observation harvest job.
     /// </summary>
-    public class CheckListsHarvestJob : ICheckListsHarvestJob
+    public class ChecklistsHarvestJob : IChecklistsHarvestJob
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly IProcessCheckListsJob _processCheckListsJob;
-        private readonly ILogger<CheckListsHarvestJob> _logger;
-        private readonly IDictionary<DataProviderType, ICheckListHarvester> _harvestersByType;
+        private readonly IProcessChecklistsJob _processChecklistsJob;
+        private readonly ILogger<ChecklistsHarvestJob> _logger;
+        private readonly IDictionary<DataProviderType, IChecklistHarvester> _harvestersByType;
 
         /// <summary>
         /// Run job
@@ -39,7 +39,7 @@ namespace SOS.Harvest.Jobs
         {
             try
             {
-                _logger.LogInformation($"Start check list harvest jobs");
+                _logger.LogInformation($"Start checklist harvest jobs");
 
                 //------------------------------------------------------------------------
                 // 1. Ensure that any data provider is added
@@ -47,7 +47,7 @@ namespace SOS.Harvest.Jobs
                 if (!dataProviders.Any())
                 {
                     _logger.LogError(
-                        $"No data providers for check list harvest");
+                        $"No data providers for checklist harvest");
                     return false;
                 }
 
@@ -55,20 +55,20 @@ namespace SOS.Harvest.Jobs
                 // 2. Harvest observations 
                 //------------------------------------------------------------------------
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<HarvestInfo>>();
-                _logger.LogInformation("Start adding check list harvesters.");
+                _logger.LogInformation("Start adding checklist harvesters.");
                 foreach (var dataProvider in dataProviders.Where(dp => _harvestersByType.ContainsKey(dp.Type)))
                 {
                     var harvestJob = _harvestersByType[dataProvider.Type];
 
                     harvestTaskByDataProvider.Add(dataProvider, dataProvider.Type == DataProviderType.DwcA ?
-                        harvestJob.HarvestCheckListsAsync(dataProvider, cancellationToken) :
-                        harvestJob.HarvestCheckListsAsync(cancellationToken));
+                        harvestJob.HarvestChecklistsAsync(dataProvider, cancellationToken) :
+                        harvestJob.HarvestChecklistsAsync(cancellationToken));
 
-                    _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} check list harvest");
+                    _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} checklist harvest");
                 }
-                _logger.LogInformation($"Finish adding check list harvesters.");
+                _logger.LogInformation($"Finish adding checklist harvesters.");
 
-                _logger.LogInformation($"Start check list harvesting.");
+                _logger.LogInformation($"Start checklist harvesting.");
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
 
@@ -82,14 +82,14 @@ namespace SOS.Harvest.Jobs
 
                     if (harvestInfo.Status != RunStatus.CanceledSuccess && harvestInfo.Count != -1) // Count -1 = Assume manually harvested, don't update harvest info 
                     {
-                        harvestInfo.Id = provider.CheckListIdentifier;
+                        harvestInfo.Id = provider.ChecklistIdentifier;
                         await _harvestInfoRepository.AddOrUpdateAsync(harvestInfo);
                     }
                 }
 
                 var success = harvestTaskByDataProvider.All(r => r.Value.Result.Status == RunStatus.Success || r.Value.Result.Status == RunStatus.CanceledSuccess);
 
-                _logger.LogInformation($"Finish check list harvest jobs. Success: { success }");
+                _logger.LogInformation($"Finish checklist harvest jobs. Success: { success }");
 
                 return success;
             }
@@ -108,44 +108,44 @@ namespace SOS.Harvest.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="artportalenCheckListHarvester"></param>
-        /// <param name="dwcCheckListHarvester"></param>
+        /// <param name="artportalenChecklistHarvester"></param>
+        /// <param name="dwcChecklistHarvester"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="harvestInfoRepository"></param>
-        /// <param name="processCheckListsJob"></param>
+        /// <param name="processChecklistsJob"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public CheckListsHarvestJob(
-            IArtportalenCheckListHarvester artportalenCheckListHarvester,
-            IDwcCheckListHarvester dwcCheckListHarvester,
+        public ChecklistsHarvestJob(
+            IArtportalenChecklistHarvester artportalenChecklistHarvester,
+            IDwcChecklistHarvester dwcChecklistHarvester,
             IDataProviderManager dataProviderManager,
             IHarvestInfoRepository harvestInfoRepository,
-            IProcessCheckListsJob processCheckListsJob,
-            ILogger<CheckListsHarvestJob> logger)
+            IProcessChecklistsJob processChecklistsJob,
+            ILogger<ChecklistsHarvestJob> logger)
         {
-            if (artportalenCheckListHarvester == null) throw new ArgumentNullException(nameof(artportalenCheckListHarvester));
+            if (artportalenChecklistHarvester == null) throw new ArgumentNullException(nameof(artportalenChecklistHarvester));
 
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
 
-            _processCheckListsJob = processCheckListsJob ?? throw new ArgumentNullException(nameof(processCheckListsJob));
+            _processChecklistsJob = processChecklistsJob ?? throw new ArgumentNullException(nameof(processChecklistsJob));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _harvestersByType = new Dictionary<DataProviderType, ICheckListHarvester>
+            _harvestersByType = new Dictionary<DataProviderType, IChecklistHarvester>
             {
-                {DataProviderType.ArtportalenObservations, artportalenCheckListHarvester},
-                {DataProviderType.DwcA, dwcCheckListHarvester}
+                {DataProviderType.ArtportalenObservations, artportalenChecklistHarvester},
+                {DataProviderType.DwcA, dwcChecklistHarvester}
             };
         }
 
         /// <inheritdoc />
-        [DisplayName("Harvest and process check lists")]
+        [DisplayName("Harvest and process checklists")]
         public async Task<bool> RunAsync(
             IJobCancellationToken cancellationToken)
         {
-            var dataProviders = (await _dataProviderManager.GetAllDataProvidersAsync())?.Where(dp => dp.IsActive && dp.SupportCheckLists).ToArray();
+            var dataProviders = (await _dataProviderManager.GetAllDataProvidersAsync())?.Where(dp => dp.IsActive && dp.SupportChecklists).ToArray();
 
             if (!dataProviders?.Any() ?? true)
             {
@@ -153,7 +153,7 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            _logger.LogInformation($"Start check list harvest job");
+            _logger.LogInformation($"Start checklist harvest job");
 
             var success = await Harvest(dataProviders, cancellationToken);
 
@@ -163,9 +163,9 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            _logger.LogInformation("Finish check list harvest job");
+            _logger.LogInformation("Finish checklist harvest job");
             
-            return await _processCheckListsJob.RunAsync(
+            return await _processChecklistsJob.RunAsync(
                 dataProviders.Select(dataProvider => dataProvider.Identifier).ToArray(),
                 cancellationToken);
         }

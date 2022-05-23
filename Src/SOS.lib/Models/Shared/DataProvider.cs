@@ -108,15 +108,15 @@ namespace SOS.Lib.Models.Shared
         public DateTime? SourceDate { get; set; }
 
         /// <summary>
-        /// True if check list harvest is supported
+        /// True if checklist harvest is supported
         /// </summary>
-        public bool SupportCheckLists { get; set; } = false;
+        public bool SupportChecklists { get; set; } = false;
 
         /// <summary>
-        /// Get identifier used for check lists
+        /// Get identifier used for checklists
         /// </summary>
         [JsonIgnore]
-        public string CheckListIdentifier => $"{Identifier}-CheckList";
+        public string ChecklistIdentifier => $"{Identifier}-Checklist";
 
         /// <summary>
         /// Support dynamic update of eml meta data

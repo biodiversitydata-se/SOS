@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Dtos.Checklist;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -7,28 +8,28 @@ namespace SOS.Observations.Api.Managers.Interfaces
     /// <summary>
     ///     Area manager
     /// </summary>
-    public interface ICheckListManager
+    public interface IChecklistManager
     {
         /// <summary>
         /// Calculate taxon trend
         /// </summary>
         /// <param name="observationFilter"></param>
-        /// <param name="checkListSearchFilter"></param>
+        /// <param name="checklistSearchFilter"></param>
         /// <returns></returns>
-        Task<double> CalculateTrendAsync(SearchFilter observationFilter, CheckListSearchFilter checkListSearchFilter);
+        Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, ChecklistSearchFilter checklistSearchFilter);
 
         /// <summary>
-        /// Get a check list
+        /// Get a checklist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<CheckListDto> GetCheckListAsync(string id);
+        Task<ChecklistDto> GetChecklistAsync(string id);
 
         /// <summary>
-        /// Get a internal check list
+        /// Get a internal checklist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<CheckListInternalDto> GetCheckListInternalAsync(string id);
+        Task<ChecklistInternalDto> GetChecklistInternalAsync(string id);
     }
 }

@@ -17,17 +17,17 @@ namespace SOS.Harvest.Harvesters.Artportalen
     /// <summary>
     ///     Artportalen observation harvester
     /// </summary>
-    public class ArtportalenCheckListHarvester : IArtportalenCheckListHarvester
+    public class ArtportalenChecklistHarvester : IArtportalenChecklistHarvester
     {
         private readonly ArtportalenConfiguration _artportalenConfiguration;
         private readonly IAreaHelper _areaHelper;
         private readonly IProjectRepository _projectRepository;
         private readonly SemaphoreSlim _semaphore;
-        private readonly ICheckListRepository _checkListRepository;
+        private readonly IChecklistRepository _checklistRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
-        private readonly IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int> _artportalenCheckListVerbatimRepository;
-        private readonly ILogger<ArtportalenCheckListHarvester> _logger;
+        private readonly IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> _artportalenChecklistVerbatimRepository;
+        private readonly ILogger<ArtportalenChecklistHarvester> _logger;
 
         /// <summary>
         /// Harvest all sightings
@@ -35,12 +35,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="harvestFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> HarvestAllAsync(ArtportalenCheckListHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
+        private async Task<int> HarvestAllAsync(ArtportalenChecklistHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
         {
-            _checkListRepository.Live = false;
+            _checklistRepository.Live = false;
 
             // Get source min and max id
-            var (minId, maxId) = await _checkListRepository.GetIdSpanAsync();
+            var (minId, maxId) = await _checklistRepository.GetIdSpanAsync();
 
             // If minid is greater or equal to maxid
             if (minId >= maxId)
@@ -51,15 +51,15 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var currentId = minId;
             var harvestBatchTasks = new List<Task<int>>();
 
-            _logger.LogDebug($"Start getting Artportalen check lists");
+            _logger.LogDebug($"Start getting Artportalen checklists");
 
             var batchIndex = 0;
             // Loop until all sightings are fetched
             while (currentId <= maxId)
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                if (_artportalenConfiguration.MaxNumberOfCheckListsHarvested.HasValue &&
-                    currentId - minId >= _artportalenConfiguration.MaxNumberOfCheckListsHarvested)
+                if (_artportalenConfiguration.MaxNumberOfChecklistsHarvested.HasValue &&
+                    currentId - minId >= _artportalenConfiguration.MaxNumberOfChecklistsHarvested)
                 {
                     break;
                 }
@@ -69,11 +69,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 // Add batch task to list
                 harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
-                    _checkListRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSizeCheckLists),
+                    _checklistRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSizeChecklists),
                     batchIndex));
 
                 // Calculate start of next chunk
-                currentId += _artportalenConfiguration.ChunkSizeCheckLists;
+                currentId += _artportalenConfiguration.ChunkSizeChecklists;
             }
 
             // Execute harvest tasks, no of parallel threads running is handled by semaphore
@@ -82,7 +82,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen check lists ({ nrSightingsHarvested })");
+            _logger.LogDebug($"Finish getting Artportalen checklists ({ nrSightingsHarvested })");
 
             return nrSightingsHarvested;
 
@@ -97,39 +97,39 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="incremenatlMode"></param>
         /// <returns></returns>
         private async Task<int> HarvestBatchAsync(
-            ArtportalenCheckListHarvestFactory harvestFactory,
-            Task<IEnumerable<CheckListEntity>> getChunkTask,
+            ArtportalenChecklistHarvestFactory harvestFactory,
+            Task<IEnumerable<ChecklistEntity>> getChunkTask,
             int batchIndex
         )
         {
             try
             {
                 _logger.LogDebug(
-                    $"Start getting Artportalen check lists ({batchIndex})");
+                    $"Start getting Artportalen checklists ({batchIndex})");
                 // Get chunk of sightings
                 var chekLists = (await getChunkTask)?.ToArray();
                 _logger.LogDebug(
-                    $"Finish getting Artportalen check lists ({batchIndex})");
+                    $"Finish getting Artportalen checklists ({batchIndex})");
 
                 if (!chekLists?.Any() ?? true)
                 {
                     _logger.LogDebug(
-                    $"No check lists found ({batchIndex})");
+                    $"No checklists found ({batchIndex})");
                     return 0;
                 }
 
-                _logger.LogDebug($"Start casting check list entities to verbatim ({batchIndex})");
+                _logger.LogDebug($"Start casting checklist entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(chekLists);
 
-                _logger.LogDebug($"Finish casting check list entities to verbatim ({batchIndex})");
+                _logger.LogDebug($"Finish casting checklist entities to verbatim ({batchIndex})");
 
-                _logger.LogDebug($"Start storing check list batch ({batchIndex})");
+                _logger.LogDebug($"Start storing checklist batch ({batchIndex})");
                 // Add sightings to mongodb
 
-                await _artportalenCheckListVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug($"Finish storing check list batch ({batchIndex})");
+                await _artportalenChecklistVerbatimRepository.AddManyAsync(verbatimObservations);
+                _logger.LogDebug($"Finish storing checklist batch ({batchIndex})");
 
                 // If sleep is required to free resources to other systems
                 if (_artportalenConfiguration.SleepAfterBatch > 0)
@@ -142,8 +142,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
             catch (Exception e)
             {
                 _logger.LogError(e,
-                    $"Harvest Artportalen check lists ({batchIndex})");
-                throw new Exception("Harvest Artportalen check lists failed");
+                    $"Harvest Artportalen checklists ({batchIndex})");
+                throw new Exception("Harvest Artportalen checklists failed");
             }
             finally
             {
@@ -158,31 +158,31 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="artportalenConfiguration"></param>
         /// <param name="areaHelper"></param>
         /// <param name="projectRepository"></param>
-        /// <param name="checkListRepository"></param>
+        /// <param name="checklistRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
-        /// <param name="artportalenCheckListVerbatimRepository"></param>
+        /// <param name="artportalenChecklistVerbatimRepository"></param>
         /// <param name="logger"></param>
-        public ArtportalenCheckListHarvester(
+        public ArtportalenChecklistHarvester(
             ArtportalenConfiguration artportalenConfiguration,
             IAreaHelper areaHelper,
             IProjectRepository projectRepository,
-            ICheckListRepository checkListRepository,
+            IChecklistRepository checklistRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
-            IVerbatimRepositoryBase<ArtportalenCheckListVerbatim, int> artportalenCheckListVerbatimRepository,
-            ILogger<ArtportalenCheckListHarvester> logger)
+            IVerbatimRepositoryBase<ArtportalenChecklistVerbatim, int> artportalenChecklistVerbatimRepository,
+            ILogger<ArtportalenChecklistHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
                                         throw new ArgumentNullException(nameof(artportalenConfiguration));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
-            _checkListRepository = checkListRepository ?? throw new ArgumentNullException(nameof(checkListRepository));
+            _checklistRepository = checklistRepository ?? throw new ArgumentNullException(nameof(checklistRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
-            _artportalenCheckListVerbatimRepository = artportalenCheckListVerbatimRepository ??
+            _artportalenChecklistVerbatimRepository = artportalenChecklistVerbatimRepository ??
                                                       throw new ArgumentNullException(
-                                                          nameof(artportalenCheckListVerbatimRepository));
+                                                          nameof(artportalenChecklistVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
@@ -190,21 +190,21 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestCheckListsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestChecklistsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
 
             try
             {
                 // Populate data on full harvest or if it's not initialized
-                _logger.LogDebug("Start getting check list metadata");
+                _logger.LogDebug("Start getting checklist metadata");
                 var projectEntities = await _projectRepository.GetProjectsAsync();
-                _logger.LogDebug("Finish getting check list metadata");
+                _logger.LogDebug("Finish getting checklist metadata");
 
                 _logger.LogDebug("Start creating factory");
-                using var harvestFactory = new ArtportalenCheckListHarvestFactory(
+                using var harvestFactory = new ArtportalenChecklistHarvestFactory(
                     _areaHelper,
-                    _checkListRepository,
+                    _checklistRepository,
                     _siteRepository,
                     _sightingRepository,
                     projectEntities,
@@ -214,30 +214,30 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 _logger.LogDebug("Finish creating factory");
 
-                _artportalenCheckListVerbatimRepository.Mode = JobRunModes.Full;
+                _artportalenChecklistVerbatimRepository.Mode = JobRunModes.Full;
 
                 // Make sure we have an empty public collection
-                _logger.LogDebug("Start empty artportalen check list verbatim collection");
-                await _artportalenCheckListVerbatimRepository.DeleteCollectionAsync();
-                await _artportalenCheckListVerbatimRepository.AddCollectionAsync();
-                _logger.LogDebug("Finish empty artportalen check list verbatim collection");
+                _logger.LogDebug("Start empty artportalen checklist verbatim collection");
+                await _artportalenChecklistVerbatimRepository.DeleteCollectionAsync();
+                await _artportalenChecklistVerbatimRepository.AddCollectionAsync();
+                _logger.LogDebug("Finish empty artportalen checklist verbatim collection");
 
-                var nrCheckListsHarvested = await HarvestAllAsync(harvestFactory, cancellationToken);
+                var nrChecklistsHarvested = await HarvestAllAsync(harvestFactory, cancellationToken);
                
                 // Update harvest info
-                harvestInfo.Status = nrCheckListsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
+                harvestInfo.Status = nrChecklistsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
 
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Count = nrCheckListsHarvested;
+                harvestInfo.Count = nrChecklistsHarvested;
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Artportalen check list harvest was cancelled.");
+                _logger.LogInformation("Artportalen checklist harvest was cancelled.");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to harvest artportalen check lists");
+                _logger.LogError(e, "Failed to harvest artportalen checklists");
                 harvestInfo.Status = RunStatus.Failed;
             }
 
@@ -245,7 +245,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<HarvestInfo> HarvestCheckListsAsync(DataProvider provider,
+        public async Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider,
             IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Not implemented for this provider");

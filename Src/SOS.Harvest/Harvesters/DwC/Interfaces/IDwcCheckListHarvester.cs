@@ -6,7 +6,7 @@ using SOS.Harvest.Harvesters.Interfaces;
 
 namespace SOS.Harvest.Harvesters.DwC.Interfaces
 {
-    public interface IDwcCheckListHarvester : ICheckListHarvester
+    public interface IDwcChecklistHarvester : IChecklistHarvester
     {
         /// <summary>
         /// Get EML XML document.
@@ -16,13 +16,13 @@ namespace SOS.Harvest.Harvesters.DwC.Interfaces
         XDocument GetEmlXmlDocument(string archivePath);
 
         /// <summary>
-        /// Harvest check list from file
+        /// Harvest checklist from file
         /// </summary>
         /// <param name="archivePath"></param>
         /// <param name="dataProvider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestCheckListsAsync(
+        Task<HarvestInfo> HarvestChecklistsAsync(
             string archivePath,
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken);

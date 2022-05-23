@@ -7,7 +7,7 @@ namespace SOS.Harvest.Processors.Interfaces
     /// <summary>
     ///     Process base factory
     /// </summary>
-    public interface ICheckListProcessor
+    public interface IChecklistProcessor
     {
         /// <summary>
         /// Process observations

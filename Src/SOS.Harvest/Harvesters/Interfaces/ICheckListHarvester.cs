@@ -4,21 +4,21 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Harvest.Harvesters.Interfaces
 {
-    public interface ICheckListHarvester
+    public interface IChecklistHarvester
     {
         /// <summary>
         /// Harvest checklists based on mode
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestCheckListsAsync(IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestChecklistsAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
-        ///  Harvest check lists generic by provider
+        ///  Harvest checklists generic by provider
         /// </summary>
         /// <param name="provider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestCheckListsAsync(DataProvider provider, IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider, IJobCancellationToken cancellationToken);
     }
 }

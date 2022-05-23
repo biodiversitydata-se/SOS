@@ -7,7 +7,7 @@ using SOS.Observations.Api.Dtos.Vocabulary;
 
 namespace SOS.Observations.Api.Dtos.Checklist
 {
-    public class CheckListDto : IEntity<string>
+    public class ChecklistDto : IEntity<string>
     {
         /// <summary>
         /// Id of data provider
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.Dtos.Checklist
         public Event Event { get; set; }
 
         /// <summary>
-        /// Id of check list
+        /// Id of checklist
         /// </summary>
         public string Id { get; set; }
 
@@ -40,7 +40,7 @@ namespace SOS.Observations.Api.Dtos.Checklist
         public LocationDto Location { get; set; }
 
         /// <summary>
-        /// Name of check list
+        /// Name of checklist
         /// </summary>
         public string Name { get; set; }
 

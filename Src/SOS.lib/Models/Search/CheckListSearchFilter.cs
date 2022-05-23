@@ -4,9 +4,9 @@ using System.Text.Json;
 namespace SOS.Lib.Models.Search
 {
     /// <summary>
-    /// Search filter used to in check list search
+    /// Search filter used to in checklist search
     /// </summary>
-    public class CheckListSearchFilter
+    public class ChecklistSearchFilter
     {
         /// <summary>
         ///     Only get data from these providers
@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         ///     Which type of date filtering that should be used
         /// </summary>
-        public CheckListDateFilter Date { get; set; }
+        public ChecklistDateFilter Date { get; set; }
 
         /// <summary>
         /// Location filter

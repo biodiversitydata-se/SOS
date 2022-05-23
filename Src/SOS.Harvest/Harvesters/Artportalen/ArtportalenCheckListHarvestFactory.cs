@@ -8,21 +8,21 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Harvest.Harvesters.Artportalen
 {
-    internal class ArtportalenCheckListHarvestFactory : ArtportalenHarvestFactoryBase, IHarvestFactory<CheckListEntity[], ArtportalenCheckListVerbatim>
+    internal class ArtportalenChecklistHarvestFactory : ArtportalenHarvestFactoryBase, IHarvestFactory<ChecklistEntity[], ArtportalenChecklistVerbatim>
     {
         private readonly IDictionary<int, Project> _projects;
-        private readonly ICheckListRepository _checkListRepository;
+        private readonly IChecklistRepository _checklistRepository;
         private readonly ISightingRepository _sightingRepository;
-        private readonly ILogger<ArtportalenCheckListHarvester> _logger;
+        private readonly ILogger<ArtportalenChecklistHarvester> _logger;
 
         /// <summary>
-        /// Cast check list entity to model
+        /// Cast checklist entity to model
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="taxonIds"></param>
         /// <param name="sightingData"></param>
         /// <returns></returns>
-        private ArtportalenCheckListVerbatim CastEntityToVerbatim(CheckListEntity entity, Site site, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
+        private ArtportalenChecklistVerbatim CastEntityToVerbatim(ChecklistEntity entity, Site site, IEnumerable<int> taxonIds, IEnumerable<(int sightingId, int taxonId)> sightingData)
         {
             try
             {
@@ -33,9 +33,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 _projects.TryGetValue(entity.ProjectId ?? 0, out var project);
 
-                var checkListVerbatim = new ArtportalenCheckListVerbatim
+                var checklistVerbatim = new ArtportalenChecklistVerbatim
                 {
-                    ControlingUserId = entity.ControlingUserId,
+                    ControllingUserId = entity.ControlingUserId,
                     ControllingUser = entity.ControllingUser,
                     EditDate = entity.EditDate,
                     EndDate = entity.EndDate,
@@ -54,11 +54,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     TaxonIdsFound = sightingData?.Select(sd => sd.taxonId).Distinct()
                 };
 
-                return checkListVerbatim;
+                return checklistVerbatim;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to cast Artportalen check list entity with id:{entity.Id}");
+                _logger.LogError(ex, $"Failed to cast Artportalen checklist entity with id:{entity.Id}");
                 throw;
             }
         }
@@ -67,28 +67,28 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// Constructor
         /// </summary>
         /// <param name="areaHelper"></param>
-        /// <param name="checkListRepository"></param>
+        /// <param name="checklistRepository"></param>
         /// <param name="siteRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="projectEntities"></param>
         /// <param name="logger"></param>
-        public ArtportalenCheckListHarvestFactory(
+        public ArtportalenChecklistHarvestFactory(
             IAreaHelper areaHelper,
-            ICheckListRepository checkListRepository,
+            IChecklistRepository checklistRepository,
             ISiteRepository siteRepository,
             ISightingRepository sightingRepository,
             IEnumerable<ProjectEntity> projectEntities,
             int noOfThreads,
-            ILogger<ArtportalenCheckListHarvester> logger) : base(siteRepository, areaHelper, false, noOfThreads)
+            ILogger<ArtportalenChecklistHarvester> logger) : base(siteRepository, areaHelper, false, noOfThreads)
         {
-            _checkListRepository = checkListRepository ?? throw new ArgumentNullException(nameof(checkListRepository));
+            _checklistRepository = checklistRepository ?? throw new ArgumentNullException(nameof(checklistRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _projects = projectEntities?.ToDictionary(pe => pe.Id, pe => pe.ToVerbatim()) ?? new Dictionary<int, Project>();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenCheckListVerbatim>> CastEntitiesToVerbatimsAsync(CheckListEntity[] entities)
+        public async Task<IEnumerable<ArtportalenChecklistVerbatim>> CastEntitiesToVerbatimsAsync(ChecklistEntity[] entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -114,23 +114,23 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var sites = await GetBatchSitesAsync(batchSiteIds);
 
             _logger.LogDebug(
-                "Start getting check lists metadata");
+                "Start getting checklists metadata");
 
-            var checkListIds = entities.Select(cl => cl.Id);
-            var checkListsTaxonIds = await _checkListRepository.GetCheckListsTaxonIdsAsync(checkListIds);
-            var chekListsSightingsData =
-                await _sightingRepository.GetSightingsAndTaxonIdsForCheckListsAsync(checkListIds);
+            var checklistIds = entities.Select(cl => cl.Id);
+            var checklistsTaxonIds = await _checklistRepository.GetChecklistsTaxonIdsAsync(checklistIds);
+            var cheklistsSightingsData =
+                await _sightingRepository.GetSightingsAndTaxonIdsForChecklistsAsync(checklistIds);
 
             _logger.LogDebug(
-                "Finish getting check lists metadata");
+                "Finish getting checklists metadata");
 
-            var verbatims = new List<ArtportalenCheckListVerbatim>();
+            var verbatims = new List<ArtportalenChecklistVerbatim>();
             for (var i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];
                 sites.TryGetValue(entity.SiteId ?? 0, out var site);
-                checkListsTaxonIds.TryGetValue(entity.Id, out var taxonIds);
-                chekListsSightingsData.TryGetValue(entity.Id, out var sightingData);
+                checklistsTaxonIds.TryGetValue(entity.Id, out var taxonIds);
+                cheklistsSightingsData.TryGetValue(entity.Id, out var sightingData);
                 verbatims.Add(CastEntityToVerbatim(entity, site, taxonIds, sightingData));
             }
             // Clean up
