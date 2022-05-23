@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IActionResult> GetChecklistInternalAsync(
+        Task<IActionResult> GetChecklistByIdInternalAsync(
             string id);
     }
 }

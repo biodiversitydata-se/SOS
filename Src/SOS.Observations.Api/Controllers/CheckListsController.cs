@@ -113,7 +113,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(ChecklistInternalDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetChecklistInternalAsync([FromQuery] string id)
+        public async Task<IActionResult> GetChecklistByIdInternalAsync([FromQuery] string id)
         {
             try
             {

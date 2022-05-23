@@ -14,6 +14,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Harvest.Jobs
 {
@@ -21,6 +22,7 @@ namespace SOS.Harvest.Jobs
     public class ProcessChecklistsJob : ProcessJobBase, IProcessChecklistsJob
     {
         private readonly IAreaHelper _areaHelper;
+        private readonly ICacheManager _cacheManager;
         private readonly IDataProviderCache _dataProviderCache;
         private readonly IProcessedChecklistRepository _processedChecklistRepository;
         private readonly ILogger<ProcessChecklistsJob> _logger;
@@ -120,6 +122,11 @@ namespace SOS.Harvest.Jobs
                     _logger.LogInformation($"Toggle instance {_processedChecklistRepository.ActiveInstance} => {_processedChecklistRepository.InActiveInstance}");
                     await _processedChecklistRepository.SetActiveInstanceAsync(_processedChecklistRepository
                         .InActiveInstance);
+
+                    // Clear processed configuration cache in observation API
+                    _logger.LogInformation($"Start clear processed configuration cache at search api");
+                    await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
+                    _logger.LogInformation($"Finish clear processed configuration cache at search api");
                 }
 
                 _logger.LogInformation($"Processing done: {success}");
@@ -244,6 +251,7 @@ namespace SOS.Harvest.Jobs
         /// <param name="dwcaChecklistProcessor"></param>
         /// <param name="dataProviderCache"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="cacheManager"></param>
         /// <param name="logger"></param>
         public ProcessChecklistsJob(IProcessedChecklistRepository processedChecklistRepository,
             IProcessInfoRepository processInfoRepository,
@@ -252,6 +260,7 @@ namespace SOS.Harvest.Jobs
             IDwcaChecklistProcessor dwcaChecklistProcessor,
             IDataProviderCache dataProviderCache,
             IAreaHelper areaHelper,
+            ICacheManager cacheManager,
             ILogger<ProcessChecklistsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedChecklistRepository = processedChecklistRepository ??
@@ -259,6 +268,7 @@ namespace SOS.Harvest.Jobs
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
 
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             if (artportalenChecklistProcessor == null)
@@ -281,6 +291,7 @@ namespace SOS.Harvest.Jobs
 
             if (!checklistDataProviders?.Any() ?? true)
             {
+                _logger.LogInformation("No data providers support checklists");
                 return false;
             }
 
