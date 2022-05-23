@@ -12,23 +12,24 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "12.2.16",
-    "@angular/common": "12.2.16",
-    "@angular/compiler": "12.2.16",
-    "@angular/core": "12.2.16",
-    "@angular/forms": "12.2.16",
-    "@angular/platform-browser": "12.2.16",
-    "@angular/platform-browser-dynamic": "12.2.16",
-    "@angular/platform-server": "12.2.16",
-    "@angular/router": "12.2.16",
+    "@angular/animations": "13.3.9",
+    "@angular/common": "13.3.9",
+    "@angular/compiler": "13.3.9",
+    "@angular/core": "13.3.9",
+    "@angular/forms": "13.3.9",
+    "@angular/localize": "13.3.9",
+    "@angular/platform-browser": "13.3.9",
+    "@angular/platform-browser-dynamic": "13.3.9",
+    "@angular/platform-server": "13.3.9",
+    "@angular/router": "13.3.9",
     "@asymmetrik/ngx-leaflet": "8.1.0",
     "@asymmetrik/ngx-leaflet-markercluster": "5.0.1",
     "@auth0/angular-jwt": "5.0.2",
     "@popperjs/core": "2.9.1",
-    "@swimlane/ngx-datatable": "19.0.0",
+    "@swimlane/ngx-datatable": "20.0.0",
     "@types/leaflet.markercluster": "1.4.4",
-    "ag-grid-angular": "25.1.0",
-    "ag-grid-community": "25.1.0",
+    "ag-grid-angular": "27.3.0",
+    "ag-grid-community": "27.3.0",
     "angular-bootstrap-datetimepicker": "4.0.2",
     "angular-gauge": "4.0.0",
     "aspnet-prerendering": "3.0.1",
@@ -52,10 +53,10 @@
     "zone.js": "0.11.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "12.2.17",
-    "@angular/cli": "12.2.17",
-    "@angular/compiler-cli": "12.2.16",
-    "@angular/language-service": "12.2.16",
+    "@angular-devkit/build-angular": "13.3.6",
+    "@angular/cli": "13.3.6",
+    "@angular/compiler-cli": "13.3.9",
+    "@angular/language-service": "13.3.9",
     "@types/jasmine": "3.6.6",
     "@types/jasminewd2": "2.0.8",
     "@types/leaflet": "1.7.0",
@@ -68,11 +69,11 @@
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-jasmine": "4.0.1",
     "karma-jasmine-html-reporter": "1.5.4",
-    "typescript": "4.3.5"
+    "typescript": "4.6.4"
   },
   "optionalDependencies": {
-    "node-sass": "5.0.0",
+    "node-sass": "7.0.1",
     "protractor": "7.0.0",
-    "ts-node": "9.1.1"
+    "ts-node": "10.8.0"
   }
 }
