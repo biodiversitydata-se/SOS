@@ -38,7 +38,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
             var observation = new Observation
             {
                 Location = new Location(),
-                Event = new Event(),
+                Event = new Event(System.DateTime.Now.AddHours(-2), System.DateTime.Now.AddHours(-1)),
                 Identification = new Identification(),
                 MaterialSample = new MaterialSample(),
                 Occurrence = new Occurrence(),

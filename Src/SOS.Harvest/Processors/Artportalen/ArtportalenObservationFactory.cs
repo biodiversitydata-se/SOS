@@ -168,16 +168,9 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.Type = null;
 
                 // Event
-                obs.Event = new Event();
+                obs.Event = new Event(startDate, endDate);
                 obs.Event.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, VocabularyId.DiscoveryMethod);
-                obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
-                obs.Event.StartDate = startDate?.ToUniversalTime();
-                obs.Event.PlainStartDate = startDate?.ToLocalTime().ToString("yyyy-MM-dd");
-                obs.Event.PlainEndDate = endDate?.ToLocalTime().ToString("yyyy-MM-dd");
-                obs.Event.PlainStartTime = verbatimObservation.StartTime?.ToString("hh\\:mm");
-                obs.Event.PlainEndTime = verbatimObservation.EndTime?.ToString("hh\\:mm");
-                obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
                 obs.Event.SamplingProtocol = (verbatimObservation.DiscoveryMethod?.Id ?? 0) == 0
                     ? null
                     : verbatimObservation.DiscoveryMethod.Translate(Cultures.en_GB, Cultures.sv_SE);
@@ -545,46 +538,6 @@ namespace SOS.Harvest.Processors.Artportalen
                 { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
         }
 
-
-        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Project project)
-        {
-            if (project == null) return null;
-
-            return new Lib.Models.Processed.Observation.Project
-            {
-                IsPublic = project.IsPublic,
-                Category = project.Category,
-                CategorySwedish = project.CategorySwedish,
-                Description = project.Description,
-                EndDate = project.EndDate?.ToUniversalTime(),
-                Id = project.Id,
-                Name = project.Name,
-                Owner = project.Owner,
-                ProjectURL = project.ProjectURL,
-                StartDate =  project.StartDate?.ToUniversalTime(),
-                SurveyMethod = project.SurveyMethod,
-                SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(this.CreateProcessedProjectParameter)
-            };
-        }
-
-        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
-        {
-            if (projectParameter == null)
-            {
-                return null;
-            }
-
-            return new Lib.Models.Processed.Observation.ProjectParameter
-            {
-                Value = projectParameter.Value,
-                DataType = projectParameter.DataType,
-                Description = projectParameter.Description,
-                Name = projectParameter.Name,
-                Id = projectParameter.Id,
-                Unit = projectParameter.Unit
-            };
-        }
 
         private string GetSamplingProtocol(IEnumerable<Project> projects)
         {

@@ -340,7 +340,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 false,
                 "https://www.artportalen.se",
                 _processTimeManager);
-            ArtportalenChecklistFactory = new ArtportalenChecklistFactory(artportalenDataProvider);
+            ArtportalenChecklistFactory = new ArtportalenChecklistFactory(artportalenDataProvider, _processTimeManager);
             var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
             _importClient = new VerbatimClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),

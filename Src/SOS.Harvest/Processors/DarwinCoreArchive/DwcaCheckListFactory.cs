@@ -10,6 +10,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Processors.DarwinCoreArchive
@@ -31,7 +32,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
         private Event CreateEvent(DwcEventOccurrenceVerbatim verbatim)
         {
-            var processedEvent = new Event();
+            DwcParser.TryParseEventDate(
+                verbatim.EventDate,
+                verbatim.Year,
+                verbatim.Month,
+                verbatim.Day,
+                verbatim.EventTime,
+                out var startDate,
+                out var endDate);
+
+            var processedEvent = new Event(startDate, endDate);
             processedEvent.EventId = verbatim.EventID;
             processedEvent.ParentEventId = verbatim.ParentEventID;
             processedEvent.EventRemarks = verbatim.EventRemarks;
@@ -43,18 +53,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedEvent.SamplingEffort = verbatim.SamplingEffort;
             processedEvent.SamplingProtocol = verbatim.SamplingProtocol;
             processedEvent.VerbatimEventDate = verbatim.VerbatimEventDate;
-
-            DwcParser.TryParseEventDate(
-                verbatim.EventDate,
-                verbatim.Year,
-                verbatim.Month,
-                verbatim.Day,
-                verbatim.EventTime,
-                out var startDate,
-                out var endDate);
-
-            processedEvent.StartDate = startDate?.ToUniversalTime();
-            processedEvent.EndDate = endDate?.ToUniversalTime();
 
             return processedEvent;
         }
@@ -227,7 +225,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public DwcaChecklistFactory(
             DataProvider dataProvider,
             IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
-            IAreaHelper areaHelper) : base(dataProvider)
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
         {
             _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -237,14 +236,15 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public static async Task<DwcaChecklistFactory> CreateAsync(
             DataProvider dataProvider,
             IVocabularyRepository processedVocabularyRepository,
-            IAreaHelper areaHelper)
+            IAreaHelper areaHelper,
+            IProcessTimeManager processTimeManager)
         {
             var vocabularies = await processedVocabularyRepository.GetAllAsync();
             var vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);
-            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper);
+            return new DwcaChecklistFactory(dataProvider, vocabularyById, areaHelper, processTimeManager);
         }
 
         /// <summary>

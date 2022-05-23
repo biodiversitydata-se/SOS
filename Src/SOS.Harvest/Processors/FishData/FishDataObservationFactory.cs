@@ -46,16 +46,7 @@ namespace SOS.Harvest.Processors.FishData
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
                 DatasetName = "Fish data",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
-                {
-                    EndDate = verbatim.End.ToUniversalTime(),
-                    StartDate = verbatim.Start.ToUniversalTime(),
-                    PlainStartDate = verbatim.Start.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.End.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start.ToLocalTime(), verbatim.End.ToLocalTime())
-                },
+                Event = new Event(verbatim.Start, null, verbatim.End, null),
                 Identification = new Identification
                 {
                     UncertainIdentification = false,

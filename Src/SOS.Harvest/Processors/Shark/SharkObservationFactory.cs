@@ -51,16 +51,7 @@ namespace SOS.Harvest.Processors.Shark
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
-                {
-                    EndDate = verbatim.SampleDate?.ToUniversalTime(),
-                    StartDate = verbatim.SampleDate?.ToUniversalTime(),
-                    PlainStartDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.SampleDate?.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate?.ToLocalTime())
-                },
+                Event = new Event(verbatim.SampleDate, null, verbatim.SampleDate, null),
                 Identification = new Identification
                 {
                     IdentifiedBy = verbatim.AnalysedBy,

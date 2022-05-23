@@ -55,16 +55,10 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 DatasetId = $"urn:lsid:observationsdatabasen.se:dataprovider:{DataProviderIdentifiers.ObservationDatabase}",
                 DatasetName = "Observation database",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
+                Event = new Event(verbatim.StartDate, null, verbatim.EndDate, null)
                 {
-                    EndDate = verbatim.EndDate.ToUniversalTime(),
                     FieldNotes = verbatim.Origin?.Clean(), // Is there any better field for this?
                     Habitat = verbatim.Habitat?.Clean(),
-                    StartDate = verbatim.StartDate.ToUniversalTime(),
-                    PlainStartDate = verbatim.StartDate.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.EndDate.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
                     // Substrate = verbatim.Substrate, Todo map 
                     VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.StartDate.ToLocalTime(), verbatim.EndDate.ToLocalTime())
                 },

@@ -14,12 +14,10 @@ using SOS.Harvest.Processors.Interfaces;
 
 namespace SOS.Harvest.Processors
 {
-    public abstract class ChecklistProcessorBase<TClass, TVerbatim, TVerbatimRepository>
+    public abstract class ChecklistProcessorBase<TClass, TVerbatim, TVerbatimRepository> : ProcessorBase<TClass>
         where TVerbatim : IEntity<int>
-        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int>
+        where TVerbatimRepository : IVerbatimRepositoryBase<TVerbatim, int> 
     {
-        private readonly IProcessManager _processManager;
-
         /// <summary>
         /// Commit batch
         /// </summary>
@@ -123,12 +121,11 @@ namespace SOS.Harvest.Processors
             }
             finally
             {
-                _processManager.Release();
+                ProcessManager.Release();
             }
         }
 
         protected readonly IProcessedChecklistRepository ProcessedChecklistRepository;
-        protected readonly ILogger<TClass> Logger;
 
         /// <summary>
         /// Constructor
@@ -139,13 +136,11 @@ namespace SOS.Harvest.Processors
         protected ChecklistProcessorBase(
             IProcessedChecklistRepository processedChecklistRepository,
             IProcessManager processManager,
-            ILogger<TClass> logger)
+            IProcessTimeManager processTimeManager,
+            ILogger<TClass> logger) : base(processManager, processTimeManager, logger)
         {
             ProcessedChecklistRepository = processedChecklistRepository ??
                                            throw new ArgumentNullException(nameof(processedChecklistRepository));
-            _processManager = processManager ?? throw new ArgumentNullException(nameof(processManager));
-
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -178,7 +173,7 @@ namespace SOS.Harvest.Processors
 
             while (startId <= maxId)
             {
-                await _processManager.WaitAsync();
+                await ProcessManager.WaitAsync();
 
                 var batchEndId = startId + 1000 - 1;
                 processBatchTasks.Add(ProcessBatchAsync(

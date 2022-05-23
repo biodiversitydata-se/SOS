@@ -47,16 +47,7 @@ namespace SOS.Harvest.Processors.Kul
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.KUL}",
                 DatasetName = "KUL",
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-                Event = new Event
-                {
-                    EndDate = verbatim.End.ToUniversalTime(),
-                    StartDate = verbatim.Start.ToUniversalTime(),
-                    PlainStartDate = verbatim.Start.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainEndDate = verbatim.End.ToLocalTime().ToString("yyyy-MM-dd"),
-                    PlainStartTime = null,
-                    PlainEndTime = null,
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start.ToLocalTime(), verbatim.End.ToLocalTime())
-                },
+                Event = new Event(verbatim.Start, null, verbatim.End, null),
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
