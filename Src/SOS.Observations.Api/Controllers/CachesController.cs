@@ -87,6 +87,7 @@ namespace SOS.Observations.Api.Controllers
                         break;
                 }
 
+                _logger.LogInformation($"The {cache} was cleared");
                 return Ok(true);
             }
             catch (Exception e)
