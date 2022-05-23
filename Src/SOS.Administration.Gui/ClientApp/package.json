@@ -24,7 +24,6 @@
     "@asymmetrik/ngx-leaflet": "8.1.0",
     "@asymmetrik/ngx-leaflet-markercluster": "5.0.1",
     "@auth0/angular-jwt": "5.0.2",
-    "@nguniversal/module-map-ngfactory-loader": "8.1.1",
     "@popperjs/core": "2.9.1",
     "@swimlane/ngx-datatable": "19.0.0",
     "@types/leaflet.markercluster": "1.4.4",
