@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
@@ -27,8 +26,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithEventDate("2019-03-18T08:13:26.000Z")
-                .WithEventTime("08:13:26.000Z")
+                .WithEventDate("2019-03-18T14:13:26.000Z")
+                .WithEventTime("14:13:26.000Z")
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -39,7 +38,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18, 8, 13, 26), DateTimeKind.Utc));
+            result.Event.StartDate.Should().Be(DateTime.SpecifyKind(new DateTime(2019, 3, 18, 14, 13, 26), DateTimeKind.Utc));
         }
 
         [Fact]

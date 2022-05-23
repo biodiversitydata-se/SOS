@@ -51,8 +51,8 @@ namespace SOS.Lib.Models.Processed.Observation
         public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
         {
             // Override start/end time 
-            PlainStartTime = startTime?.ToString("HH\\:mm");
-            PlainEndTime = endTime?.ToString("HH\\:mm");
+            PlainStartTime = startTime?.ToString("hh\\:mm");
+            PlainEndTime = endTime?.ToString("hh\\:mm");
         }
         
 
