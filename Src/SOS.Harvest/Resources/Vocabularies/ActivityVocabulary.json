@@ -3064,11 +3064,11 @@
             ]
         },
         {
-            "_id": 104,
+            "Id": 104,
             "Value": "overnight stay",
             "Localized": true,
             "Category": {
-                "_id": 4,
+                "Id": 4,
                 "Name": "Stationary",
                 "Localized": true,
                 "Translations": [
@@ -3094,11 +3094,11 @@
             ]
         },
         {
-            "_id": 105,
+            "Id": 105,
             "Value": "active",
             "Localized": true,
             "Category": {
-                "_id": 4,
+                "Id": 4,
                 "Name": "Stationary",
                 "Localized": true,
                 "Translations": [
@@ -3124,11 +3124,11 @@
             ]
         },
         {
-            "_id": 106,
+            "Id": 106,
             "Value": "walking/running",
             "Localized": true,
             "Category": {
-                "_id": 4,
+                "Id": 4,
                 "Name": "Stationary",
                 "Localized": true,
                 "Translations": [
