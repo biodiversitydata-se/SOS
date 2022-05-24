@@ -25,14 +25,6 @@ namespace SOS.Observations.Api.Swagger
                 In = ParameterLocation.Header,
                 Required = false
             });
-
-            operation.Parameters.Add(new OpenApiParameter()
-            {
-                Name = "X-Requesting-Systems",
-                Description = "Used if request is done on behalf of other system. E.g system 1 => system 2",
-                In = ParameterLocation.Header,
-                Required = false
-            });
         }
     }
 }

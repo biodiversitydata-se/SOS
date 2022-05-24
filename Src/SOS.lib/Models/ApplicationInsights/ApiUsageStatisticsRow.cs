@@ -45,12 +45,7 @@ namespace SOS.Lib.Models.ApplicationInsights
         /// <summary>
         /// Name of system making the request
         /// </summary>
-        public string RequestingSystem { get; set; }
-
-        /// <summary>
-        /// Name of systems making the request
-        /// </summary>
-        public string RequestingSystems { get; set; }
+        public string RequestingSystem { get; set; }        
 
         /// <summary>
         /// Sum of observations returned

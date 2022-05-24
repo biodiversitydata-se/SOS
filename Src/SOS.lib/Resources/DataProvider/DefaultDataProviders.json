@@ -370,7 +370,7 @@
         "Id": 8,
         "Identifier": "SHARK",
         "IsActive": true,
-        "IncludeInScheduledHarvest": false,
+        "IncludeInScheduledHarvest": true,
         "IncludeInHealthCheck": true,
         "IncludeInSearchByDefault": true,
         "SupportIncrementalHarvest": false,
