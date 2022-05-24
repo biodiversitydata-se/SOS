@@ -331,7 +331,8 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.SightingBarcodeURL;
                 obs.ArtportalenInternal.SecondHandInformation =
                     (obs.Occurrence.RecordedBy?.StartsWith("Via", StringComparison.CurrentCultureIgnoreCase) ?? false) &&
-                    (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false);
+                    ((verbatimObservation.ObserversInternal == null || verbatimObservation.ObserversInternal.Count() == 0) ||
+                    (verbatimObservation.ObserversInternal?.Any(oi => oi.Id == verbatimObservation.ReportedByUserId) ?? false));
                 obs.ArtportalenInternal.TriggeredObservationRuleFrequencyId = verbatimObservation.FrequencyId;
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.ReproductionId;
 
