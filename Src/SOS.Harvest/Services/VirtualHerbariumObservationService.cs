@@ -95,11 +95,11 @@ namespace SOS.Harvest.Services
         private string CleanXml(string xmlString, Encoding encoding)
         {
             // Dropping the BOM
-            var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
+          /*  var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
             if (xmlString.StartsWith(_byteOrderMarkUtf8))
             {
                 xmlString = xmlString.Remove(0, _byteOrderMarkUtf8.Length).Replace("&gt50", "").Replace("&", "");
-            }
+            }*/
 
             // Replace bad data
             //  xmlString = xmlString.Replace("1920-0&-21", "1920-06-21");
