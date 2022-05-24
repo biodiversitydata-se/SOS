@@ -10,6 +10,14 @@ namespace SOS.Lib.Models.Processed.Observation
     public class Event
     {
         /// <summary>
+        /// Constructor.
+        /// </summary>
+        public Event()
+        {
+
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="startDate"></param>
