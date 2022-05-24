@@ -202,7 +202,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IChecklistsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
+                RecurringJob.AddOrUpdate<IChecklistsHarvestJob>($"{nameof(IChecklistsHarvestJob)}-Full",
                     job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Check lists harvest and process job added");
             }
