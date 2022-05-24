@@ -55,7 +55,6 @@ namespace SOS.Lib.Models.Processed.Observation
             PlainEndTime = endTime?.ToString("hh\\:mm");
         }
         
-
         /// <summary>
         ///     An identifier for the set of information associated with an Event (something that occurs at a place and time). 
         /// </summary>

@@ -7,7 +7,6 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;
