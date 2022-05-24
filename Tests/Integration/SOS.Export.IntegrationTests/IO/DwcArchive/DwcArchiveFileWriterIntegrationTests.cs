@@ -67,7 +67,6 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         {
             var processedObservationRepository = new ProcessedObservationRepository(
                 new ElasticClientManager(elasticConfiguration, true),
-                processClient,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),

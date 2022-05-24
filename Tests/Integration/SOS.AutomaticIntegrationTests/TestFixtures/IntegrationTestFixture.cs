@@ -481,7 +481,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var processedConfigurationCache = new ClassCache<ProcessedConfiguration>(memoryCache);
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
-                processClient,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new TelemetryClient(),
@@ -498,7 +497,6 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         {            
             var processedChecklistRepository = new ProcessedChecklistRepository(
                 elasticClientManager,
-                processClient,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),                
                 new NullLogger<ProcessedChecklistRepository>());

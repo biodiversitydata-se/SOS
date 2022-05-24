@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -80,14 +79,12 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ProcessRepositoryBase(
-        IProcessClient client,
         bool toggleable,
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
         ElasticSearchConfiguration elasticConfiguration,

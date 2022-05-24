@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -171,16 +170,14 @@ namespace SOS.Lib.Repositories.Processed
         /// Constructor
         /// </summary>
         /// <param name="elasticClientManager"></param>
-        /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="logger"></param>
         public ProcessedChecklistRepository(
             IElasticClientManager elasticClientManager,
-            IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedChecklistRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedChecklistRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
         {
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));

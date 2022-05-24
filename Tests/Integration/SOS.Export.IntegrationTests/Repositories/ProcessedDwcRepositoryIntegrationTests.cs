@@ -74,7 +74,6 @@ namespace SOS.Export.IntegrationTests.Repositories
             var processedObservationRepository =
                 new ProcessedObservationRepository(
                     new ElasticClientManager(elasticConfiguration, true),
-                    exportClient,
                     elasticConfiguration,
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,                    

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -12,7 +11,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
@@ -43,7 +41,6 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository = new ProcessedObservationRepository(
                 new ElasticClientManager(elasticSearchConfiguration, true),
-                exportClient,
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>())),
                 new Mock<ITaxonManager>().Object,

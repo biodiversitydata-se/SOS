@@ -64,7 +64,6 @@ namespace SOS.Export.IntegrationTests.Managers
 
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClientManager,
-                processClient,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository),
                 new TelemetryClient(),

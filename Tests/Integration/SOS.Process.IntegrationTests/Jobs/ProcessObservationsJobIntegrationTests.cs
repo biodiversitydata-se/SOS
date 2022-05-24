@@ -80,7 +80,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, processClient,
+                processedObservationRepository = new ProcessedObservationRepository(elasticClientManager, 
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,
@@ -216,7 +216,6 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var instanceManager = new InstanceManager(
                 new ProcessedObservationRepository(elasticClientManager, 
-                    processClient, 
                     new ElasticSearchConfiguration(), 
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
                     new Mock<ITaxonManager>().Object,

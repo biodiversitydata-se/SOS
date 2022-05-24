@@ -1256,7 +1256,6 @@ namespace SOS.Lib.Repositories.Processed
         /// Constructor used in public mode
         /// </summary>
         /// <param name="elasticClientManager"></param>
-        /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="telemetry"></param>
@@ -1265,13 +1264,12 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
-            IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = true;
 
@@ -1286,18 +1284,16 @@ namespace SOS.Lib.Repositories.Processed
         /// Constructor used in admin mode
         /// </summary>
         /// <param name="elasticClientManager"></param>
-        /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClientManager elasticClientManager,
-            IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(client, true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = false;
 
