@@ -76,7 +76,7 @@ namespace SOS.Lib.Repositories.Processed
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
-                
+
                 .Map<Observation>(m => m
                     .AutoMap<Observation>()
                     .Properties(ps => ps
@@ -249,7 +249,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Url)
-                                    .Index(false)                                    
+                                    .Index(false)
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Project2Values)
@@ -312,7 +312,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.BirdValidationAreaIds)
-                                )                                
+                                )
                             )
                         )
                         .Object<VocabularyValue>(c => c
@@ -510,7 +510,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<Occurrence>(t => t
                             .AutoMap()
                             .Name(nm => nm.Occurrence)
-                            .Properties(ps => ps                                
+                            .Properties(ps => ps
                                 .Date(d => d
                                     .Name(nm => nm.ReportedDate)
                                 )
@@ -522,7 +522,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Text(t => t
                                     .Name(nm => nm.OccurrenceRemarks)
                                     .IndexOptions(IndexOptions.Docs)
-                                )                                
+                                )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.AssociatedOccurrences)
                                     .Index(false)
@@ -550,7 +550,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Keyword(kw => kw
                                     .Name(nm => nm.RecordedBy)
                                     .IgnoreAbove(int.MaxValue)
-                                )                                
+                                )
                                 .Keyword(kw => kw
                                     .Name(nm => nm.CatalogNumber)
                                     .IgnoreAbove(int.MaxValue)
@@ -593,7 +593,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Keyword(kw => kw
                                     .Name(nm => nm.Url)
                                     .Index(false)
-                                )                                
+                                )
                                 .Nested<Multimedia>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.Media)
@@ -869,7 +869,7 @@ namespace SOS.Lib.Repositories.Processed
             ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
             ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
         {
-            List<TaxonProvinceItem> items = new List<TaxonProvinceItem>();            
+            List<TaxonProvinceItem> items = new List<TaxonProvinceItem>();
             CompositeKey nextPageKey = null;
             var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
             do
@@ -886,7 +886,7 @@ namespace SOS.Lib.Repositories.Processed
                         TaxonId = taxonId,
                         ProvinceId = provinceId,
                         ObservationCount = observationCount
-                    });                    
+                    });
                 }
 
                 nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
@@ -898,7 +898,7 @@ namespace SOS.Lib.Repositories.Processed
                 if (!dic.TryGetValue(item.TaxonId, out var taxonProvinceAgg))
                 {
                     taxonProvinceAgg = new TaxonProvinceAgg() { TaxonId = item.TaxonId };
-                    dic.Add(item.TaxonId, taxonProvinceAgg);                    
+                    dic.Add(item.TaxonId, taxonProvinceAgg);
                 }
 
                 taxonProvinceAgg.ObservationCount += item.ObservationCount;
@@ -1089,7 +1089,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Field("taxon.id"))
                             .Terms("provinceId", p => p
                                 .Field("location.province.featureId"))
-                            )))                            
+                            )))
                     .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -1226,7 +1226,7 @@ namespace SOS.Lib.Repositories.Processed
                 }
                 Logger.LogDebug(diskUsageDescription);
             }
-         
+
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
@@ -1247,8 +1247,9 @@ namespace SOS.Lib.Repositories.Processed
                     })
                 )
                 .Wait(TimeSpan.FromHours(1),
-                    next => { 
-                        Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); 
+                    next =>
+                    {
+                        Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
                     });
         }
 
@@ -1324,7 +1325,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<bool> DeleteAllDocumentsAsync(bool protectedIndex)
         {
             try
-            {                
+            {
                 var res = await Client.DeleteByQueryAsync<Observation>(q => q
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q.MatchAll())
@@ -1431,34 +1432,6 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
 
-            // Aggregation for distinct count
-            static IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
-                .Cardinality("species_count", c => c
-                    .Field("taxon.scientificName")
-                );
-
-            // Result-aggregation on taxon.id
-            static IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
-                .Terms("species", t => t
-                    .Script(s => s
-                        // Build a sortable key
-                        .Source("doc['taxon.attributes.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
-                    )
-                    .Order(o => o.KeyAscending())
-                    .Aggregations(thAgg => thAgg
-                        .TopHits("info", info => info
-                            .Size(1)
-                            .Source(src => src
-                                .Includes(inc => inc
-                                    .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.attributes.redlistCategory")
-                                )
-                            )
-                        )
-                    )
-                    .Order(o => o.KeyAscending())
-                    .Size(size)
-                );
-
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
@@ -1473,7 +1446,11 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
-                .Aggregations(AggregationCardinality)
+                .Aggregations(a => a
+                    .Cardinality("species_count", c => c
+                        .Field("taxon.scientificName")
+                    )
+                )
             );
 
             // Calculate size to fetch. If zero, get all
@@ -1507,13 +1484,33 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
-                .Aggregations(a => Aggregation(a, size))
+                .Aggregations(a => a
+                    .Terms("species", t => t
+                        .Script(s => s
+                            // Build a sortable key
+                            .Source("doc['taxon.attributes.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
+                        )
+                        .Order(o => o.KeyAscending())
+                        .Aggregations(thAgg => thAgg
+                            .TopHits("info", info => info
+                                .Size(1)
+                                .Source(src => src
+                                    .Includes(inc => inc
+                                        .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.attributes.redlistCategory")
+                                    )
+                                )
+                            )
+                        )
+                        .Order(o => o.KeyAscending())
+                        .Size(size)
+                    )
+                )
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             _telemetry.StopOperation(operation);
-            
+
             var result = searchResponse
                 .Aggregations
                 .Terms("species")
@@ -1549,24 +1546,10 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
 
-            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
-            IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg) => agg
-                .DateHistogram("aggregation", dh => dh
-                    .Field("event.startDate")
-                    .CalendarInterval(DateInterval.Day)
-                    .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
-                    .Format("yyyy-MM-dd")
-                    .Aggregations(a => a
-                        .Sum("quantity", sum => sum
-                            .Field("occurrence.organismQuantityInt")
-                        )
-                    )
-                );
-
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_Histogram");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Size(0)
                 .Index(indexNames)
@@ -1577,7 +1560,19 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
-                .Aggregations(Aggregation)
+                .Aggregations(a => a
+                    .DateHistogram("aggregation", dh => dh
+                        .Field("event.startDate")
+                        .CalendarInterval(DateInterval.Day)
+                        .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                        .Format("yyyy-MM-dd")
+                        .Aggregations(a => a
+                            .Sum("quantity", sum => sum
+                                .Field("occurrence.organismQuantityInt")
+                            )
+                        )
+                    )
+                )
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -2085,7 +2080,7 @@ namespace SOS.Lib.Repositories.Processed
                     _ => WaitForStatus.Red
                 };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.LogError("Failed to get ElasticSearch health", e);
                 return WaitForStatus.Red;
@@ -2450,7 +2445,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         private class TaxonAggregationTreeNodeSum
-        {   
+        {
             public int TopologicalIndex { get; set; }
             public TaxonTreeNode<IBasicTaxon> TreeNode { get; set; }
             public int ObservationCount { get; set; }
@@ -2483,7 +2478,7 @@ namespace SOS.Lib.Repositories.Processed
                 return base.ToString();
             }
         }
-       
+
         /// <inheritdoc />
         public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
             SearchFilter filter,
@@ -2498,9 +2493,9 @@ namespace SOS.Lib.Repositories.Processed
             }
             else
             {
-                observationCountByTaxonId = await GetTaxonAggregationAsync(filter);                
+                observationCountByTaxonId = await GetTaxonAggregationAsync(filter);
             }
-            
+
             // Update skip and take
             if (skip == null)
             {
@@ -2585,7 +2580,7 @@ namespace SOS.Lib.Repositories.Processed
                     foreach (var taxonId in taxonIds)
                     {
                         outputCountByTaxonId.TryAdd(taxonId, 0);
-                    }                    
+                    }
                 }
             }
             else
@@ -2597,12 +2592,12 @@ namespace SOS.Lib.Repositories.Processed
                     excludeQuery);
                 observationCountByTaxonId = outputCountByTaxonId;
             }
-            
+
             var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
-            var tree = _taxonManager.TaxonTree;            
+            var tree = _taxonManager.TaxonTree;
             foreach (var item in tree.TreeNodeById.Values)
             {
-                int observationCount = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);                
+                int observationCount = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);
                 var sumNode = new TaxonAggregationTreeNodeSum
                 {
                     TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
@@ -2610,13 +2605,13 @@ namespace SOS.Lib.Repositories.Processed
                     ObservationCount = observationCount,
                     SumObservationCount = observationCount,
                     DependentTaxonIds = new HashSet<int>() { item.TaxonId }
-                };                
+                };
                 treeNodeSumByTaxonId.Add(item.TaxonId, sumNode);
             }
-            
+
             var orderedTreeNodeSum = treeNodeSumByTaxonId.Values.OrderBy(m => m.TopologicalIndex).ToList();
             foreach (var sumNode in orderedTreeNodeSum)
-            {                
+            {
                 // Main parent
                 if (sumNode.TreeNode.Parent != null)
                 {
@@ -2630,7 +2625,7 @@ namespace SOS.Lib.Repositories.Processed
                         {
                             parentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
                         }
-                    }                    
+                    }
                 }
 
                 // Secondary parent
@@ -2648,7 +2643,7 @@ namespace SOS.Lib.Repositories.Processed
                             {
                                 secondaryParentSumNode.SumObservationCount += treeNodeSumByTaxonId[taxonId].ObservationCount;
                             }
-                        }                        
+                        }
                     }
                 }
             }
@@ -2668,7 +2663,7 @@ namespace SOS.Lib.Repositories.Processed
                     }
                 }
             }
-            
+
             return outputCountByTaxonId;
         }
 
@@ -2679,16 +2674,16 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         public async Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter)
         {
-            var indexName = GetCurrentIndex(filter);            
-            Dictionary<int, TaxonProvinceAgg> observationCountByTaxonId = null;            
-            
+            var indexName = GetCurrentIndex(filter);
+            Dictionary<int, TaxonProvinceAgg> observationCountByTaxonId = null;
+
             var filterWithoutTaxaFilter = filter.Clone();
             filterWithoutTaxaFilter.Taxa = null;
             var (queryWithoutTaxaFilter, excludeQueryWithoutTaxaFilter) = GetCoreQueries(filterWithoutTaxaFilter);
             observationCountByTaxonId = await GetElasticTaxonSumAggregationByTaxonIdAsync(
                 indexName,
                 queryWithoutTaxaFilter,
-                excludeQueryWithoutTaxaFilter);                       
+                excludeQueryWithoutTaxaFilter);
             var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
             var tree = _taxonManager.TaxonTree;
             foreach (var item in tree.TreeNodeById.Values)
@@ -2739,7 +2734,7 @@ namespace SOS.Lib.Repositories.Processed
                                 if (!parentSumNode.SumObservationCountByProvinceId.TryAdd(pair.Key, pair.Value))
                                 {
                                     parentSumNode.SumObservationCountByProvinceId[pair.Key] += pair.Value;
-                                }                                                           
+                                }
                             }
                         }
                     }
@@ -2772,7 +2767,7 @@ namespace SOS.Lib.Repositories.Processed
                     }
                 }
             }
-            
+
             var result = new Dictionary<int, TaxonSumAggregationItem>();
             foreach (var node in orderedTreeNodeSum)
             {
@@ -2783,12 +2778,12 @@ namespace SOS.Lib.Repositories.Processed
                     SumObservationCount = node.SumObservationCount,
                     ProvinceCount = node.ProvinceCount,
                     SumProvinceCount = node.SumProvinceCount,
-                    SumObservationCountByProvinceId = node.SumObservationCountByProvinceId                    
+                    SumObservationCountByProvinceId = node.SumObservationCountByProvinceId
                 };
 
                 result.Add(node.TreeNode.TaxonId, agg);
             }
-            
+
             return result;
         }
 
@@ -3105,7 +3100,7 @@ namespace SOS.Lib.Repositories.Processed
                         if (result.TryGetValue(itemKey, out var item))
                         {
                             item.Localities.Add(new IdName<string> { Id = locationId, Name = locality });
-                        }                  
+                        }
                     }
                 }
 
