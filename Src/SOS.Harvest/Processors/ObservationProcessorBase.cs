@@ -242,7 +242,8 @@ namespace SOS.Harvest.Processors
         {
             var startId = 1;
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
-            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
+            var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();            
+            Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}");
 
             while (startId <= maxId)
             {
