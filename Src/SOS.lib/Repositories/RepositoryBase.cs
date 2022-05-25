@@ -538,6 +538,7 @@ namespace SOS.Lib.Repositories
         {
             try
             {
+                Logger.LogDebug($"Try to get max id for ({mongoCollection.CollectionNamespace})");
                 var max = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     .Project(d => d.Id)

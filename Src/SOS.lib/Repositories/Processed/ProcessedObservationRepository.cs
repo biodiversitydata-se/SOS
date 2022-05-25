@@ -1515,16 +1515,18 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations
                 .Terms("species")
                 .Buckets?
-                .Select(b =>
-                    new AggregatedSpecies
-                    {
-                        TaxonId = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.Id ?? 0,
-                        DocCount = b.DocCount,
-                        VernacularName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.VernacularName ?? "",
-                        ScientificNameAuthorship = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificNameAuthorship ?? "",
-                        ScientificName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificName ?? "",
-                        RedlistCategory = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.Attributes.RedlistCategory ?? ""
-                    })?
+                .Select(b => (b.DocCount, b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon))
+                    .Select(p => 
+                        new AggregatedSpecies
+                        {
+                            TaxonId = p.Taxon?.Id ?? 0,
+                            DocCount = p.DocCount,
+                            VernacularName = p.Taxon?.VernacularName ?? "",
+                            ScientificNameAuthorship = p.Taxon?.ScientificNameAuthorship ?? "",
+                            ScientificName = p.Taxon?.ScientificName ?? "",
+                            RedlistCategory = p.Taxon?.Attributes?.RedlistCategory ?? ""
+                        }
+                    )?
                 .Skip(skip)
                 .Take(take);
 
