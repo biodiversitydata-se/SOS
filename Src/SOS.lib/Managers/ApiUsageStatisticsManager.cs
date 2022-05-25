@@ -149,10 +149,11 @@ namespace SOS.Lib.Managers
             private const int UserNameColumnIndex = 10;
             private const int UserEmailColumnIndex = 11;
             private const int UserEmailDomainColumnIndex = 12;
-            private const int RequestCountColumnIndex = 13;
-            private const int FailureCountColumnIndex = 14;
-            private const int AverageDurationColumnIndex = 15;
-            private const int SumResponseCountColumnIndex = 16;
+            private const int RequestingSystemColumnIndex = 13;
+            private const int RequestCountColumnIndex = 14;
+            private const int FailureCountColumnIndex = 15;
+            private const int AverageDurationColumnIndex = 16;
+            private const int SumResponseCountColumnIndex = 17;            
 
             public ApiUsageStatisticsExcelWriter(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
             {
@@ -198,6 +199,7 @@ namespace SOS.Lib.Managers
                         worksheet.Cells[rowIndex, FailureCountColumnIndex].Value = row.FailureCount;
                         worksheet.Cells[rowIndex, AverageDurationColumnIndex].Value = row.AverageDuration;
                         worksheet.Cells[rowIndex, SumResponseCountColumnIndex].Value = row.SumResponseCount;
+                        worksheet.Cells[rowIndex, RequestingSystemColumnIndex].Value = row.RequestingSystem;
 
                         rowIndex++;
                     }
@@ -229,10 +231,11 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, UserNameColumnIndex].Value = "UserName";
                 worksheet.Cells[1, UserEmailColumnIndex].Value = "UserEmail";
                 worksheet.Cells[1, UserEmailDomainColumnIndex].Value = "UserEmailDomain";
+                worksheet.Cells[1, RequestingSystemColumnIndex].Value = "RequestingSystem";
                 worksheet.Cells[1, RequestCountColumnIndex].Value = "RequestCount";
                 worksheet.Cells[1, FailureCountColumnIndex].Value = "FailureCount";
                 worksheet.Cells[1, AverageDurationColumnIndex].Value = "AverageDuration";
-                worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";
+                worksheet.Cells[1, SumResponseCountColumnIndex].Value = "ObservationCount";                
 
                 // Format style by columns in first row
                 using (var range = worksheet.Cells[1, 1, 1, SumResponseCountColumnIndex])
