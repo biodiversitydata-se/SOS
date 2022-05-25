@@ -40,9 +40,7 @@ namespace SOS.Harvest.Harvesters.Shark
                                                       nameof(sharkObservationVerbatimRepository));
             _sharkServiceConfiguration = sharkServiceConfiguration ??
                                          throw new ArgumentNullException(nameof(sharkServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _sharkObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
@@ -50,6 +48,7 @@ namespace SOS.Harvest.Harvesters.Shark
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
+            _sharkObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -164,6 +163,10 @@ namespace SOS.Harvest.Harvesters.Shark
                 _logger.LogError(e, "Failed to harvest SHARK");
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _sharkObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for SHARK data provider. Status={harvestInfo.Status}");

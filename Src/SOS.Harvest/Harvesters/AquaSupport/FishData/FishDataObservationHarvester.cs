@@ -42,15 +42,14 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                                                     nameof(fishDataObservationVerbatimRepository));
             _fishDataServiceConfiguration = fishDataServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _fishDataObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _fishDataObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -146,6 +145,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
             {
                 _logger.LogError(e, "Failed to harvest Fish Data");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _fishDataObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for Fish Data data provider. Status={harvestInfo.Status}");

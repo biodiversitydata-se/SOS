@@ -42,15 +42,14 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
                                                     nameof(kulObservationVerbatimRepository));
             _kulServiceConfiguration = kulServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(kulServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _kulObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _kulObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -136,6 +135,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
             {
                 _logger.LogError(e, "Failed to harvest KUL");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _kulObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for KUL data provider. Status={harvestInfo.Status}");

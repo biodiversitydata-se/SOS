@@ -148,15 +148,15 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                                                 throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);
-
-            _observationDatabaseVerbatimRepository.TempMode = true;
+            _semaphore = new SemaphoreSlim(_observationDatabaseConfiguration.NoOfThreads, _observationDatabaseConfiguration.NoOfThreads);            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _observationDatabaseVerbatimRepository.TempMode = true;
+
             try
             {
                 _logger.LogInformation("Start harvesting sightings for observation database provider");
@@ -228,6 +228,10 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             {
                 _logger.LogError(e, "Failed harvest of observation database");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _observationDatabaseVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for observation database provider. Status={harvestInfo.Status}");

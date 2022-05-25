@@ -41,9 +41,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
                                                     throw new ArgumentNullException(
                                                         nameof(virtualHerbariumServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _virtualHerbariumObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
@@ -52,6 +50,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             var harvestInfo = new HarvestInfo(DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
             var occurrenceIdsSet = new HashSet<string>();
+            _virtualHerbariumObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -141,6 +140,10 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                 _logger.LogError(e, "Failed to harvest Virtual Herbarium");
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _virtualHerbariumObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for Virtual Herbarium data provider. Status={harvestInfo.Status}");
