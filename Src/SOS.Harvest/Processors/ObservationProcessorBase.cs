@@ -253,7 +253,7 @@ namespace SOS.Harvest.Processors
             var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();            
             Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}");
 
-            Logger.LogDebug($"{dataProvider.Identifier} max id: ({maxId})");
+            Logger.LogDebug($"{dataProvider.Identifier}");
 
             while (startId <= maxId)
             {
