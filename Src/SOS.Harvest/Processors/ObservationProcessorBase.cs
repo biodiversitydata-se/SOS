@@ -477,7 +477,7 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);                
+                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);                
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
