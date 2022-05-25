@@ -250,8 +250,9 @@ namespace SOS.Harvest.Processors
         {
             var startId = 1;
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
+            var observationCount = await observationVerbatimRepository.CountAllDocumentsAsync();
             var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();            
-            Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}");
+            Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}, Count={observationCount}");
 
             Logger.LogDebug($"{dataProvider.Identifier}");
 
@@ -477,9 +478,8 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);
-
-                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. {processCount} observations processed.");
+                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);                
+                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
