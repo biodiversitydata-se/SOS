@@ -62,7 +62,7 @@ namespace SOS.Harvest.Processors.Artportalen
         }
 
         /// <inheritdoc />
-        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservations(
+        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             JobRunModes mode,

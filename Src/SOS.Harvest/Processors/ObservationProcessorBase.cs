@@ -226,7 +226,15 @@ namespace SOS.Harvest.Processors
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
         }
 
-        protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservations(
+        /// <summary>
+        /// Virtual function, must be overrided 
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="mode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
@@ -243,6 +251,8 @@ namespace SOS.Harvest.Processors
             var startId = 1;
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
             var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
+
+            Logger.LogDebug($"{dataProvider.Identifier} max id: ({maxId})");
 
             while (startId <= maxId)
             {
@@ -466,9 +476,9 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
+                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);
 
-                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data.");
+                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. {processCount} observations processed.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
