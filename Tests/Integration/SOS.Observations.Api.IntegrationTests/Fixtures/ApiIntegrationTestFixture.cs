@@ -34,6 +34,7 @@ using SOS.Lib.Models.UserService;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
@@ -48,7 +49,7 @@ using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 namespace SOS.Observations.Api.IntegrationTests.Fixtures
 {
     public class ApiIntegrationTestFixture : FixtureBase, IDisposable
-    {        
+    {
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
@@ -69,6 +70,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
         public SearchDataProvidersHealthCheck SearchDataProvidersHealthCheck { get; set; }
         public SearchPerformanceHealthCheck SearchPerformanceHealthCheck { get; set; }
         public AzureSearchHealthCheck AzureSearchHealthCheck { get; set; }
+        public SersObservationVerbatimRepository SersObservationVerbatimRepository { get; set; }
 
         public ApiIntegrationTestFixture()
         {
@@ -125,6 +127,14 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return mongoDbConfiguration;
         }
 
+        protected MongoDbConfiguration GetVerbatimMongoDbConfiguration()
+        {
+            var config = GetAppSettings();
+            var configPrefix = GetConfigPrefix(InstallationEnvironment);
+            var mongoDbConfiguration = config.GetSection($"{configPrefix}:VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            return mongoDbConfiguration;
+        }
+
         protected ElasticSearchConfiguration GetSearchDbConfiguration()
         {
             var config = GetAppSettings();
@@ -168,6 +178,9 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, mongoDbConfiguration.DatabaseName,
                 mongoDbConfiguration.ReadBatchSize, mongoDbConfiguration.WriteBatchSize);
+            var verbatimDbConfiguration = GetVerbatimMongoDbConfiguration();
+            var importClient = new VerbatimClient(verbatimDbConfiguration.GetMongoDbSettings(), 
+                verbatimDbConfiguration.DatabaseName, verbatimDbConfiguration.ReadBatchSize, verbatimDbConfiguration.WriteBatchSize);
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var areaManager = CreateAreaManager(processClient);
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
@@ -227,7 +240,8 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var artportalenDataProvider = new Lib.Models.Shared.DataProvider { Id = 1 };
             var taxa = await taxonRepository.GetAllAsync();
             var taxaById = taxa.ToDictionary(m => m.Id, m => m);
-            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());                       
+            var processTimeManager = new ProcessTimeManager(new ProcessConfiguration());
+            SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
