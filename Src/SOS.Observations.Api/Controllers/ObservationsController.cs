@@ -1288,7 +1288,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <returns></returns>
         [HttpPost("Internal/SearchAggregated")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<dynamic>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

@@ -1,8 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
