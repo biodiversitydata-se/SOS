@@ -1167,15 +1167,23 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                .All()
                    .HaveValuesFromPredefinedObservations()
-               .TheFirst(60)
+               .TheFirst(20) // true
                     .With(o => o.Observers = "Via Other User")
                     .With(o => o.ObserversInternal = new [] { new Lib.Models.Shared.UserInternal{ Id = 1 }  } )
                     .With(o => o.ReportedByUserId = 1 )
-                .TheNext(20)
+                .TheNext(20) // true
+                    .With(o => o.Observers = "Via Other User")
+                    .With(o => o.ObserversInternal = new Lib.Models.Shared.UserInternal[] { })
+                    .With(o => o.ReportedByUserId = 1)
+                .TheNext(20) // true
+                    .With(o => o.Observers = "Via Other User")
+                    .With(o => o.ObserversInternal = null)
+                    .With(o => o.ReportedByUserId = 1)
+                .TheNext(20) // false - different reporter and observer
                     .With(o => o.Observers = "Via Other User")
                     .With(o => o.ObserversInternal = new[] { new Lib.Models.Shared.UserInternal { Id = 2 } })
-                    .With(o => o.ReportedByUserId = 1)
-                .TheNext(20)
+                    .With(o => o.ReportedByUserId = 1)                
+                .TheNext(20) // false - no Via prefix
                     .With(o => o.Observers = "Some User")
                     .With(o => o.ObserversInternal = new[] { new Lib.Models.Shared.UserInternal { Id = 1 } })
                     .With(o => o.ReportedByUserId = 1)
