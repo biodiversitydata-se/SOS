@@ -88,12 +88,12 @@ namespace SOS.Observations.Api.Controllers
                         break;
                 }
 
-                _logger.LogInformation($"The {cache} was cleared");
+                _logger.LogInformation($"The {cache} cache was cleared");
                 return Ok(true);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error clearing {cache} cache");
+                _logger.LogError(e, $"Error clearing the {cache} cache");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
