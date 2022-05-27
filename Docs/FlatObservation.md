@@ -5,42 +5,44 @@ In exports you can specify what field set you want to use: [Minimum](#minimum), 
 
 You can also specify the kind of label (column header) you want to use: PropertyName, PropertyPath, Swedish or English.
 
-### Minimum
+## Minimum
 | Property Name | Property Path | Swedish | English | Data type | Field set |
 |:--- |:---	|:--- |:---	|:--- | :--- |
 | OccurrenceId | Occurrence.OccurrenceId | Observation GUID | Occurrence Id | String | Minimum |
 | DatasetName | DatasetName | Datakälla | Dataset | String | Minimum |
 | StartDate | Event.StartDate | Startdatum | Start date | DateTime | Minimum |
 | EndDate | Event.EndDate | Slutdatum | End date | DateTime | Minimum |
-| Validated | Identification.Validated | Validerad | Verified | Boolean | Minimum |
-| ValidationStatus | Identification.ValidationStatus.Value | Valideringsstatus | Verification status | String | Minimum |
+| Verified | Identification.Verified | Validerad | Verified | Boolean | Minimum |
+| UncertainIdentification | Identification.UncertainIdentification | Osäker artbestämning | Uncertain identification | Boolean | Minimum |
 | DecimalLatitude | Location.DecimalLatitude | Latitud | Decimal latitude | Double | Minimum |
 | DecimalLongitude | Location.DecimalLongitude | Longitud | Decimal longitude | Double | Minimum |
+| Sweref99TmX | Location.Sweref99TmX | SWEREF99TM X | SWEREF99TM X | Double | Minimum |
+| Sweref99TmY | Location.Sweref99TmY | SWEREF99TM Y | SWEREF99TM Y | Double | Minimum |
 | CoordinateUncertaintyInMeters | Location.CoordinateUncertaintyInMeters | Koordinatnoggrannhet (m) | Coordinate uncertainty (m) | Double | Minimum |
-| Municipality | Location.Municipality.Name | Kommun | Municipality | String | Minimum |
-| County | Location.County.Name | Län | County | String | Minimum |
+| Municipality | Location.Municipality | Kommun | Municipality | String | Minimum |
+| County | Location.County | Län | County | String | Minimum |
 | RecordedBy | Occurrence.RecordedBy | Observatör | Recorded by | String | Minimum |
 | ReportedBy | Occurrence.ReportedBy | Rapportör | Reported by | String | Minimum |
-| OccurrenceStatus | Occurrence.OccurrenceStatus.Value | Fyndstatus | Occurrence status | String | Minimum |
+| OccurrenceStatus | Occurrence.OccurrenceStatus | Fyndstatus | Occurrence status | String | Minimum |
 | IndividualCount | Occurrence.IndividualCount | Antal individer | Individual count | String | Minimum |
 | OrganismQuantity | Occurrence.OrganismQuantity | Organismkvantitet | Organism quantity | String | Minimum |
 | OrganismQuantityInt | Occurrence.OrganismQuantityInt | Organismkvantitet (heltal) | Organism quantity (integer) | Int32 | Minimum |
-| OrganismQuantityUnit | Occurrence.OrganismQuantityUnit.Value | Organismkvantitetsenhet | Organism quantity unit | String | Minimum |
+| OrganismQuantityUnit | Occurrence.OrganismQuantityUnit | Organismkvantitetsenhet | Organism quantity unit | String | Minimum |
 | DyntaxaTaxonId | Taxon.Id | Taxon Id | Taxon Id | Int32 | Minimum |
 | ScientificName | Taxon.ScientificName | Vetenskapligt namn | Scientific name | String | Minimum |
 | VernacularName | Taxon.VernacularName | Svenskt namn | Common name | String | Minimum |
 | OrganismGroup | Taxon.Attributes.OrganismGroup | Organismgrupp | Organism group | String | Minimum |
 
-### Extended
+## Extended
 All fields in the Minimum field set, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
 |:--- |:---	|:--- |:---	|:--- | :--- |
 | DataProviderId | DataProviderId | DataProviderId | DataProviderId | Int32 | Extended |
 | Modified | Modified | Modifierad datum | Modified date | DateTime | Extended |
-| BasisOfRecord | BasisOfRecord.Value | basisOfRecord | basisOfRecord | String | Extended |
+| BasisOfRecord | BasisOfRecord | basisOfRecord | basisOfRecord | String | Extended |
 | CollectionCode | CollectionCode | CollectionCode | CollectionCode | String | Extended |
-| InstitutionCode | InstitutionCode.Value | Institution | Institution | String | Extended |
+| InstitutionCode | InstitutionCode | Institution | Institution | String | Extended |
 | OwnerInstitutionCode | OwnerInstitutionCode | OwnerInstitutionCode | OwnerInstitutionCode | String | Extended |
 | RightsHolder | RightsHolder | Rättighetsinnehavare | Rights holder | String | Extended |
 | PlainStartDate | Event.PlainStartDate | Startdatum [datumdel] | Start date [date part] | String | Extended |
@@ -49,41 +51,40 @@ All fields in the Minimum field set, and also the following fields:
 | PlainEndTime | Event.PlainEndTime | Sluttid | End time | String | Extended |
 | EventRemarks | Event.EventRemarks | Besöksanmärkning | Event remarks | String | Extended |
 | Habitat | Event.Habitat | Habitat | Habitat | String | Extended |
-| DiscoveryMethod | Event.DiscoveryMethod.Value | Metod | Discovery method | String | Extended |
+| DiscoveryMethod | Event.DiscoveryMethod | Metod | Discovery method | String | Extended |
 | SamplingEffort | Event.SamplingEffort | SamplingEffort | SamplingEffort | String | Extended |
 | SamplingProtocol | Event.SamplingProtocol | SamplingProtocol | SamplingProtocol | String | Extended |
 | SampleSizeUnit | Event.SampleSizeUnit | SampleSizeUnit | SampleSizeUnit | String | Extended |
 | SampleSizeValue | Event.SampleSizeValue | SampleSizeValue | SampleSizeValue | String | Extended |
-| EventMedia | Event.Media | Event media | Event media | String | Extended |
 | EventMeasurementOrFacts | Event.MeasurementOrFacts | EventMeasurementOrFacts | EventMeasurementOrFacts | String | Extended |
+| VerificationStatus | Identification.VerificationStatus | Valideringsstatus | Verification status | String | Extended |
 | ConfirmedBy | Identification.ConfirmedBy | Konfirmerad av | Confirmed by | String | Extended |
 | IdentifiedBy | Identification.IdentifiedBy | Determinatör | Identified by | String | Extended |
-| UncertainIdentification | Identification.UncertainIdentification | Osäker artbestämning | Uncertain identification | Boolean | Extended |
-| DeterminationMethod | Identification.DeterminationMethod.Value | Bestämningsmetod | Determination method | String | Extended |
+| DeterminationMethod | Identification.DeterminationMethod | Bestämningsmetod | Determination method | String | Extended |
 | VerifiedBy | Identification.VerifiedBy | Validerad av | Verified by | String | Extended |
 | GeodeticDatum | Location.GeodeticDatum | Geodetiskt datum | Geodetic datum | String | Extended |
 | LocationId | Location.LocationId | Lokal Id | Location Id | String | Extended |
 | Locality | Location.Locality | Lokal | Locality | String | Extended |
-| Parish | Location.Parish.Name | Församling | Parish | String | Extended |
-| Province | Location.Province.Name | Landskap | Province | String | Extended |
+| Parish | Location.Parish | Församling | Parish | String | Extended |
+| Province | Location.Province | Landskap | Province | String | Extended |
 | IsNaturalOccurrence | Occurrence.IsNaturalOccurrence | Naturlig förekomst | IsNaturalOccurrence | Boolean | Extended |
 | IsNeverFoundObservation | Occurrence.IsNeverFoundObservation | Aldrig funnen | IsNeverFoundObservation | Boolean | Extended |
 | IsNotRediscoveredObservation | Occurrence.IsNotRediscoveredObservation | Ej återfunnen | IsNotRediscoveredObservation | Boolean | Extended |
 | IsPositiveObservation | Occurrence.IsPositiveObservation | Påträffad | IsPositiveObservation | Boolean | Extended |
 | OccurrenceRemarks | Occurrence.OccurrenceRemarks | Kommentarer | Occurrence remarks | String | Extended |
-| ProtectionLevel | Occurrence.ProtectionLevel | Säkerhetsklass | Protection level | Int32 | Extended |
-| Activity | Occurrence.Activity.Value | Aktivitet | Activity | String | Extended |
-| Behavior | Occurrence.Behavior.Value | Beteende | Behaviour | String | Extended |
-| Biotope | Occurrence.Biotope.Value | Biotop | Biotope | String | Extended |
+| SensitivityCategory | Occurrence.SensitivityCategory | Säkerhetsklass | Sensitivity category | Int32 | Extended |
+| Activity | Occurrence.Activity | Aktivitet | Activity | String | Extended |
+| Behavior | Occurrence.Behavior | Beteende | Behaviour | String | Extended |
+| Biotope | Occurrence.Biotope | Biotop | Biotope | String | Extended |
 | BiotopeDescription | Occurrence.BiotopeDescription | Biotopbeskrivning | Biotope description | String | Extended |
 | AssociatedMedia | Occurrence.AssociatedMedia | Associerad media | Associated media | String | Extended |
-| LifeStage | Occurrence.LifeStage.Value | Stadium | Life stage | String | Extended |
-| ReproductiveCondition | Occurrence.ReproductiveCondition.Value | Reproduktionsstatus | Reproductive condition | String | Extended |
-| Sex | Occurrence.Sex.Value | Kön | Sex | String | Extended |
+| LifeStage | Occurrence.LifeStage | Stadium | Life stage | String | Extended |
+| ReproductiveCondition | Occurrence.ReproductiveCondition | Reproduktionsstatus | Reproductive condition | String | Extended |
+| Sex | Occurrence.Sex | Kön | Sex | String | Extended |
 | Url | Occurrence.Url | Url | Url | String | Extended |
 | Length | Occurrence.Length | Längd (mm) | Length (mm) | Int32 | Extended |
 | Weight | Occurrence.Weight | Vikt (g) | Weight (g) | Int32 | Extended |
-| SubstrateName | Occurrence.Substrate.Name.Value | Substratnamn | Substrate name | String | Extended |
+| SubstrateName | Occurrence.Substrate.Name | Substratnamn | Substrate name | String | Extended |
 | Kingdom | Taxon.Kingdom | Rike | Kingdom | String | Extended |
 | Phylum | Taxon.Phylum | Fylum | Phylum | String | Extended |
 | Class | Taxon.Class | Klass | Class | String | Extended |
@@ -91,27 +92,32 @@ All fields in the Minimum field set, and also the following fields:
 | Family | Taxon.Family | Familj | Family | String | Extended |
 | Genus | Taxon.Genus | Släkte | Genus | String | Extended |
 | TaxonId | Taxon.TaxonId | Taxon GUID | Taxon Id (GUID) | String | Extended |
-| TaxonRank | Taxon.TaxonRank | Taxonkategori | Taxon rank | String | Extended |
+| TaxonCategory | Taxon.Attributes.TaxonCategory | Taxonkategori | Taxon category | String | Extended |
+| TaxonIsRedlisted | Taxon.Attributes.IsRedlisted | Rödlistad | Is redlisted | Boolean | Extended |
+| TaxonIsInvasiveEuRegulation | Taxon.Attributes.IsInvasiveAccordingToEuRegulation | Invasiv (EU-förordning) | Invasive (EU regulation) | Boolean | Extended |
+| TaxonIsInvasiveInSweden | Taxon.Attributes.IsInvasiveInSweden | Invasiv i Sverige | Invasive in Sweden | Boolean | Extended |
+| TaxonInvasiveRiskCategory | Taxon.Attributes.InvasiveRiskAssessmentCategory | Invasiv riskkategori | Invasive risk category | String | Extended |
 | ProtectedByLaw | Taxon.Attributes.ProtectedByLaw | Fridlyst | Protected by law | Boolean | Extended |
-| TaxonProtectionLevel | Taxon.Attributes.ProtectionLevel.Value | Artens säkerhetsklass | Species sensitivity category | String | Extended |
+| TaxonSensitivityCategory | Taxon.Attributes.SensitivityCategory | Artens säkerhetsklass | Species sensitivity category | String | Extended |
 | RedlistCategory | Taxon.Attributes.RedlistCategory | Rödlistekategori | Redlist category | String | Extended |
 | MeasurementOrFacts | MeasurementOrFacts | MeasurementOrFacts | MeasurementOrFacts | String | Extended |
 | Projects | Projects | Projekt | Projects | String | Extended |
 
-### AllWithValues
+## AllWithValues
 All fields in the Minimum and Extended field sets, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
 |:--- |:---	|:--- |:---	|:--- | :--- |
-| Protected | Protected | Skyddad | Protected | Boolean | AllWithValues |
+| Sensitive | Sensitive | Skyddad | Sensitive | Boolean | AllWithValues |
+| AccessRights | AccessRights | Åtkomsträttigheter | Access rights | String | AllWithValues |
 | AccessRightsId | AccessRights.Id | Åtkomsträttigheter Id | Access rights Id | Int32 | AllWithValues |
-| AccessRights | AccessRights.Value | Åtkomsträttigheter | Access rights | String | AllWithValues |
 | BasisOfRecordId | BasisOfRecord.Id | basisOfRecord Id | basisOfRecord Id | Int32 | AllWithValues |
 | InstitutionCodeId | InstitutionCode.Id | Institution Id | Institution Id | Int32 | AllWithValues |
 | EventId | Event.EventId | Event Id | Event Id | String | AllWithValues |
 | DiscoveryMethodId | Event.DiscoveryMethod.Id | Metod Id | Discovery method Id | Int32 | AllWithValues |
+| EventMedia | Event.Media | Event media | Event media | String | AllWithValues |
 | VerbatimEventDate | Event.VerbatimEventDate | Ursprunglig tidaangivelse för besöket | Verbatim event date | String | AllWithValues |
-| ValidationStatusId | Identification.ValidationStatus.Id | Valideringsstatus Id | Verification status Id | Int32 | AllWithValues |
+| VerificationStatusId | Identification.VerificationStatus.Id | Valideringsstatus Id | Verification status Id | Int32 | AllWithValues |
 | ConfirmedDate | Identification.ConfirmedDate | Konfirmationsdatum | Confirmed date | String | AllWithValues |
 | DateIdentified | Identification.DateIdentified | Datum för determination | Date identfied | String | AllWithValues |
 | DeterminationMethodId | Identification.DeterminationMethod.Id | Bestämningsmetod Id | Determination method Id | Int32 | AllWithValues |
@@ -122,10 +128,10 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | CountyId | Location.County.FeatureId | Län Id | County Id | String | AllWithValues |
 | ParishId | Location.Parish.FeatureId | Församling Id | Parish Id | String | AllWithValues |
 | ProvinceId | Location.Province.FeatureId | Landskap Id | Province Id | String | AllWithValues |
+| Continent | Location.Continent | Kontinent | Continent | String | AllWithValues |
 | ContinentId | Location.Continent.Id | Kontinent Id | Continent Id | Int32 | AllWithValues |
-| Continent | Location.Continent.Value | Kontinent | Continent | String | AllWithValues |
+| Country | Location.Country | Land | Country | String | AllWithValues |
 | CountryId | Location.Country.Id | Land Id | Country Id | Int32 | AllWithValues |
-| Country | Location.Country.Value | Land | Country | String | AllWithValues |
 | CountryCode | Location.CountryCode | Landkod | Country Code | String | AllWithValues |
 | GeoreferencedBy | Location.GeoreferencedBy | Koordinatsatt av | Georeferenced by | String | AllWithValues |
 | GeoreferencedDate | Location.GeoreferencedDate | Koordinatsatt datum | Georeferenced Date | String | AllWithValues |
@@ -175,6 +181,8 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | ParentNameUsageId | Taxon.ParentNameUsageId | ParentNameUsageId | ParentNameUsageId | String | AllWithValues |
 | SecondaryParentDyntaxaTaxonIds | Taxon.SecondaryParentDyntaxaTaxonIds | SecondaryParentDyntaxaTaxonIds | SecondaryParentDyntaxaTaxonIds | String | AllWithValues |
 | TaxonomicStatus | Taxon.TaxonomicStatus | Taxonomisk status | Taxonomic status | String | AllWithValues |
+| TaxonRank | Taxon.TaxonRank | Taxonkategori (Dwc) | Taxon rank (Dwc) | String | AllWithValues |
+| TaxonCategoryId | Taxon.Attributes.TaxonCategory.Id | Taxonkategori Id | Taxon category Id | Int32 | AllWithValues |
 | TaxonRemarks | Taxon.TaxonRemarks | Taxonkonceptetets definition | Taxon remarks | String | AllWithValues |
 | ActionPlan | Taxon.Attributes.ActionPlan | ÅGP | Action program | String | AllWithValues |
 | DisturbanceRadius | Taxon.Attributes.DisturbanceRadius | Artens störningsradie | Species disturbance radius | Int32 | AllWithValues |
@@ -183,7 +191,7 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | Natura2000HabitatsDirectiveArticle4 | Taxon.Attributes.Natura2000HabitatsDirectiveArticle4 | Habitatdirektivet bilaga 4 | Habitats directive Annex 4 | Boolean | AllWithValues |
 | Natura2000HabitatsDirectiveArticle5 | Taxon.Attributes.Natura2000HabitatsDirectiveArticle5 | Habitatdirektivet bilaga 5 | Habitats directive Annex 5 | Boolean | AllWithValues |
 | ParentDyntaxaTaxonId | Taxon.Attributes.ParentDyntaxaTaxonId | ParentDyntaxaTaxonId | ParentDyntaxaTaxonId | Int32 | AllWithValues |
-| TaxonProtectionLevelId | Taxon.Attributes.ProtectionLevel.Id | Artens säkerhetsklass Id | Species sensitivity category Id | Int32 | AllWithValues |
+| TaxonSensitivityCategoryId | Taxon.Attributes.SensitivityCategory.Id | Artens säkerhetsklass Id | Species sensitivity category Id | Int32 | AllWithValues |
 | SortOrder | Taxon.Attributes.SortOrder | Taxon sorteringsordning | Taxon sort order | Int32 | AllWithValues |
 | SwedishHistory | Taxon.Attributes.SwedishHistory | Invandringshistoria | Immigration history | String | AllWithValues |
 | SwedishOccurrence | Taxon.Attributes.SwedishOccurrence | Svensk förekomst | Swedish occurence | String | AllWithValues |
@@ -197,8 +205,9 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | PrivateCollection | PrivateCollection | Privat samling | Private collection | String | AllWithValues |
 | PublicCollection | PublicCollection | Publik samling | Public collection | String | AllWithValues |
 | SpeciesCollectionLabel | SpeciesCollectionLabel | SpeciesCollectionLabel | SpeciesCollectionLabel | String | AllWithValues |
+| Type | Type | Typ | Type | String | AllWithValues |
 
-### All
+## All
 All fields in the Minimum, Extended and AllWithValues field sets, and also the following fields:
 
 | Property Name | Property Path | Swedish | English | Data type | Field set |
@@ -231,8 +240,8 @@ All fields in the Minimum, Extended and AllWithValues field sets, and also the f
 | AssociatedSequences | Occurrence.AssociatedSequences | Genetiskt material | Associated Sequences | String | All |
 | AssociatedTaxa | Occurrence.AssociatedTaxa | Andra taxa | Associated taxa | String | All |
 | Disposition | Occurrence.Disposition | Disposition | Disposition | String | All |
+| EstablishmentMeans | Occurrence.EstablishmentMeans | Etableringssätt | Establishment means | String | All |
 | EstablishmentMeansId | Occurrence.EstablishmentMeans.Id | Etableringssätt Id | Establishment means Id | Int32 | All |
-| EstablishmentMeans | Occurrence.EstablishmentMeans.Value | Etableringssätt | Establishment means | String | All |
 | OtherCatalogNumbers | Occurrence.OtherCatalogNumbers | Övriga observationsId | Other catalog numbers | String | All |
 | AcceptedNameUsage | Taxon.AcceptedNameUsage | AcceptedNameUsage | AcceptedNameUsage | String | All |
 | InfraspecificEpithet | Taxon.InfraspecificEpithet | Undertaxonepitet | Infraspecific epitet | String | All |
@@ -254,7 +263,6 @@ All fields in the Minimum, Extended and AllWithValues field sets, and also the f
 | InformationWithheld | InformationWithheld | InformationWithheld | InformationWithheld | String | All |
 | References | References | Referenser | References | String | All |
 | TypeId | Type.Id | Typ Id | Type Id | Int32 | All |
-| Type | Type.Value | Typ | Type | String | All |
 | Bed | GeologicalContext.Bed | GeologicalBed | GeologicalBed | String | All |
 | EarliestAgeOrLowestStage | GeologicalContext.EarliestAgeOrLowestStage | EarliestAgeOrLowestStage | EarliestAgeOrLowestStage | String | All |
 | EarliestEonOrLowestEonothem | GeologicalContext.EarliestEonOrLowestEonothem | EarliestEonOrLowestEonothem | EarliestEonOrLowestEonothem | String | All |

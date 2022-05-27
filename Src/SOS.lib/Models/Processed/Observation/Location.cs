@@ -370,12 +370,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public string PointRadiusSpatialFit { get; set; }
 
         /// <summary>
-        /// X coordinate in Swe ref 99
+        /// X coordinate in SWEREF99 TM.
         /// </summary>
         public double? Sweref99TmX { get; set; }
 
         /// <summary>
-        /// Y coordinate in Swe ref 99
+        /// Y coordinate in SWEREF99 TM.
         /// </summary>
         public double? Sweref99TmY { get; set; }
 
