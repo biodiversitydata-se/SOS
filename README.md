@@ -23,7 +23,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Areas](Docs/Areas.md)
 
 ## API changes
-- [Change log](CHANGELOG.md)
+- [Changelog](CHANGELOG.md)
 
 ## Dev documentation
 - [How to install SOS on your own machine](Docs/Install.md)
