@@ -41,7 +41,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     Part of bird directive?
         /// </summary>
-        public bool? BirdDirective { get; set; }
+        public bool BirdDirective { get; set; }
 
         /// <summary>        
         ///     The full scientific name of the class in which

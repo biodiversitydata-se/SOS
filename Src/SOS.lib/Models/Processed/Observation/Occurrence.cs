@@ -126,7 +126,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Indicates if this species occurrence is natural or
         ///     if it is a result of human activity.
         /// </summary>
-        public bool? IsNaturalOccurrence { get; set; }
+        public bool IsNaturalOccurrence { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a never found observation.
@@ -134,7 +134,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     that the specified species was not found in a location
         ///     deemed appropriate for the species.
         /// </summary>
-        public bool? IsNeverFoundObservation { get; set; }
+        public bool IsNeverFoundObservation { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a
@@ -143,14 +143,14 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     that the specified species was not found in a location
         ///     where it has previously been observed.
         /// </summary>
-        public bool? IsNotRediscoveredObservation { get; set; }
+        public bool IsNotRediscoveredObservation { get; set; }
 
         /// <summary>
         ///     Indicates if this observation is a positive observation.
         ///     "Positive observation" is a normal observation indicating
         ///     that a species has been seen at a specified location.
         /// </summary>
-        public bool? IsPositiveObservation { get; set; }
+        public bool IsPositiveObservation { get; set; }
 
         /// <summary>
         ///     The age class or life stage of the biological individual(s)

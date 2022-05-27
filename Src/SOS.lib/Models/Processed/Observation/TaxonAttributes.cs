@@ -47,17 +47,17 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle2 { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 4.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle4 { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 5.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle5 { get; set; }
 
         /// <summary>
         /// Common name of the organism group that observed species
