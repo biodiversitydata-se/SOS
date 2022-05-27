@@ -11,6 +11,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Search filter parameters](Docs/SearchFilter.md)
 - [Exports](Docs/Exports.md)
 - [Authentication](Docs/Authentication.md)
+- [Checklists](Docs/Checklists.md)
 - [FAQ](Docs/FAQ.md)
 
 ## Data types and vocabularies
