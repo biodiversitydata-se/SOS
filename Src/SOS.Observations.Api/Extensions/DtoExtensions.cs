@@ -342,7 +342,7 @@ namespace SOS.Observations.Api.Extensions
                 };
                 featureCollection.Add(feature);
             }
-            
+           
             return featureCollection;
         }
 
