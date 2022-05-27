@@ -184,7 +184,7 @@ All fields that are part of an observation are listed on this page.
 | taxon.acceptedNameUsageID 	| string 	| "urn:lsid:dyntaxa.se:Taxon:221501" 	| An identifier for the name usage of the currently valid or accepted   taxon.    	| https://dwc.tdwg.org/terms/#dwc:acceptedNameUsageID 	|
 | taxon.vernacularName 	| string 	| "göknycklar" 	| Vernacular name. 	| https://dwc.tdwg.org/terms/#dwc:vernacularName 	|
 | taxon.taxonRank 	| string 	| "species" 	| The taxonomic rank of the most specific name in the scientificName.    	| https://dwc.tdwg.org/terms/#dwc:taxonRank 	|
-| taxon.birdDirective 	| boolean? 	| false 	| Indicates whether the taxon is part of bird directive.    	|  	|
+| taxon.birdDirective 	| boolean 	| false 	| Indicates whether the taxon is part of bird directive.    	|  	|
 | taxon.genus 	| string 	| "Anacamptis" 	| The full scientific name of the genus in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:genus 	|
 | taxon.family 	| string 	| "Orchidaceae" 	| The full scientific name of the family in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:family 	|
 | taxon.order 	| string 	| "Asparagales" 	| The full scientific name of the order in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:order 	|
@@ -202,9 +202,9 @@ All fields that are part of an observation are listed on this page.
 | taxon.attributes.disturbanceRadius 	| int32? 	| 500 	| Taxon disturbance radius.    	|  	|
 | taxon.attributes.dyntaxaTaxonId 	| int32    	| 221501 	| Taxon id value in Dyntaxa.    	|  	|
 | taxon.attributes.parentDyntaxaTaxonId 	| int32? 	| 1005661 	| Parent Dyntaxa TaxonId.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 2.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 4.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 5.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 2.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 4.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 5.    	|  	|
 | taxon.attributes.organismGroup 	| string 	| "Kärlväxter" 	| Common name of the organism group   that observed species belongs to. Classification of species groups is the   same as used in latest 'Red List of Swedish Species'.    	|  	|
 | taxon.attributes.protectedByLaw 	| boolean 	| true 	| Indicates whether the species is protected by the law in Sweden.    	|  	|
 | taxon.attributes.sensitivityCategory 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  	|
