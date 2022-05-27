@@ -39,15 +39,14 @@ namespace SOS.Harvest.Harvesters.Mvm
                                                     nameof(mvmObservationVerbatimRepository));
             _mvmServiceConfiguration = mvmServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(mvmServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _mvmObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _mvmObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -120,6 +119,10 @@ namespace SOS.Harvest.Harvesters.Mvm
             {
                 _logger.LogError(e, "Failed to harvest MVM");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _mvmObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for MVM data provider. Status={harvestInfo.Status}");

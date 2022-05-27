@@ -25,39 +25,39 @@ namespace SOS.Lib.Models.Processed.Observation
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
-        /// True if invasive in sweden according to EU Regulation 1143/2014
+        /// True if invasive in sweden according to EU Regulation 1143/2014.
         /// </summary>
         public bool IsInvasiveAccordingToEuRegulation { get; set; }
 
         /// <summary>
-        /// True if invasive in sweden 
+        /// True if invasive in sweden.
         /// </summary>
         public bool IsInvasiveInSweden { get; set; }
 
         /// <summary>
-        /// Risk assessment category
+        /// Invasive risk assessment category.
         /// </summary>
         public string InvasiveRiskAssessmentCategory { get; set; }        
 
         /// <summary>
-        /// True if redlist category is one of CR, EN, VU, NT
+        /// True if redlist category is one of CR, EN, VU, NT.
         /// </summary>
         public bool IsRedlisted { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 2.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle2 { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 4.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle4 { get; set; }
 
         /// <summary>
         /// Natura 2000, Habitats directive article 5.
         /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
+        public bool Natura2000HabitatsDirectiveArticle5 { get; set; }
 
         /// <summary>
         /// Common name of the organism group that observed species

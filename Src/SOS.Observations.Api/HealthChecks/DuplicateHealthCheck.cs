@@ -51,31 +51,41 @@ namespace SOS.Observations.Api.HealthChecks
                 var activePublicprotectedIndexDuplicates = healthTasks[1].Result;
                 var inActivePublicIndexDuplicates = healthTasks[2].Result;
                 var inActivePublicprotectedIndexDuplicates = healthTasks[3].Result;
+                bool unhealthy = false;
+                bool degraded = false;
 
                 var errors = new StringBuilder();
                 if (activePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active public index: {string.Concat(activePublicIndexDuplicates, ",")}...");
+                    errors.Append($"Duplicates found in active public index: { string.Concat(activePublicIndexDuplicates.ToArray(), ",") }...");
+                    unhealthy = true;
                 }
 
                 if (activePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active protected index: {string.Concat(activePublicprotectedIndexDuplicates, ",")}...");
+                    errors.Append($"Duplicates found in active protected index: { string.Concat(activePublicprotectedIndexDuplicates.ToArray(), ",") }...");
+                    unhealthy = true;
                 }
 
                 if (inActivePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in inactive public index: {string.Concat(inActivePublicIndexDuplicates, ",")}...");
+                    errors.Append($"Duplicates found in inactive public index: { string.Concat(inActivePublicIndexDuplicates.ToArray(), ",") }...");
+                    degraded = true;
                 }
 
                 if (inActivePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in inactive protected index: {string.Concat(inActivePublicprotectedIndexDuplicates, ",")}...");
+                    errors.Append($"Duplicates found in inactive protected index: { string.Concat(inActivePublicprotectedIndexDuplicates.ToArray(), ",") }...");
+                    degraded = true;
                 }
 
-                if (errors.Length != 0)
+                if (unhealthy)
                 {
                     return new HealthCheckResult(HealthStatus.Unhealthy, string.Join(", ", errors));
+                }
+                if (degraded)
+                {
+                    return new HealthCheckResult(HealthStatus.Degraded, string.Join(", ", errors));
                 }
 
                 return new HealthCheckResult(HealthStatus.Healthy, "No duplicate observations found");

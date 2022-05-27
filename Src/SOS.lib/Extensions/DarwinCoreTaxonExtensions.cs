@@ -29,7 +29,7 @@ namespace SOS.Lib.Extensions
             taxon.SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds;
             taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
             taxon.AcceptedNameUsageId = sourceTaxon.AcceptedNameUsageID;
-            taxon.BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective;
+            taxon.BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective == null ? false : sourceTaxon.DynamicProperties.BirdDirective.GetValueOrDefault();
             taxon.Class = sourceTaxon.Class;
             taxon.Family = sourceTaxon.Family;
             taxon.Genus = sourceTaxon.Genus;
@@ -60,9 +60,9 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan;
             taxon.Attributes.DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius;
             taxon.Attributes.DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0;
-            taxon.Attributes.Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2;
-            taxon.Attributes.Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4;
-            taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5;
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2.GetValueOrDefault();
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4.GetValueOrDefault();
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5.GetValueOrDefault();
             taxon.Attributes.OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup;
             taxon.Attributes.ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId;
             taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();

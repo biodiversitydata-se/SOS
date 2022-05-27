@@ -24,12 +24,13 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;event.startDate | DateTime? | "2008-07-07T11:00:00+02:00" |
 | &nbsp;&nbsp;event.endDate | DateTime? | "2008-07-07T12:30:00+02:00" |
 | **Identification** 	| 	|  	|  	|
-| &nbsp;&nbsp;~~identification.validated~~ **(Deprecated)** | boolean | true |
 | &nbsp;&nbsp;identification.verified | boolean | true |
 | &nbsp;&nbsp;identification.uncertainIdentification | boolean | false |
 | **Location** 	| 	|  	|  	|
 | &nbsp;&nbsp;location.decimalLatitude | double? | 57.4303 |
 | &nbsp;&nbsp;location.decimalLongitude | double? | 16.66547 |
+| &nbsp;&nbsp;location.Sweref99TmX | double? | 661035 |
+| &nbsp;&nbsp;location.Sweref99TmY | double? | 6569227 |
 | &nbsp;&nbsp;location.coordinateUncertaintyInMeters | int32? | 100 |
 | &nbsp;&nbsp;location.county | Area[\<county\>](Areas.md#County-Län) | \{ "featureId":"8", "name":"Kalmar" \} |
 | &nbsp;&nbsp;location.municipality | Area[\<municipality\>](Areas.md#Municipality-Kommun) | \{ "featureId":"882", "name":"Oskarshamn" \} |
@@ -73,7 +74,6 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;occurrence.lifeStage | VocabularyValue[\<lifeStage\>](Vocabularies.md#lifeStage) | \{ "id":24, "value":"larv/nymf" \} |
 | &nbsp;&nbsp;occurrence.reproductiveCondition | VocabularyValue[\<reproductiveCondition\>](Vocabularies.md#reproductiveCondition) | \{ "id":13, "value":"ruvfläckar" \} |
 | &nbsp;&nbsp;occurrence.sex | VocabularyValue[\<sex\>](Vocabularies.md#sex) | \{ "id":2, "value":"hona" \} |
-| &nbsp;&nbsp;~~occurrence.protectionLevel~~ **(Deprecated)** | int32 | 1 |
 | &nbsp;&nbsp;occurrence.sensitivityCategory | int32 | 1 |
 | &nbsp;&nbsp;occurrence.isNaturalOccurrence | boolean | true |
 | &nbsp;&nbsp;occurrence.isNeverFoundObservation | boolean | false |
@@ -97,10 +97,8 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;event.sampleSizeValue | string | "100" |
 | &nbsp;&nbsp;event.measurementOrFacts\[\]<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementID<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementType<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementValue<br/>&nbsp;&nbsp;&nbsp;&nbsp;.measurementUnit | Collection[\<ExtendedMeasurementOrFact\>](https://tools.gbif.org/dwca-validator/extension.do?id=http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact) | [\{<br/>&nbsp;"measurementType" : "Vegetationsyteareal",<br/>&nbsp;"measurementValue" : "100",<br/>&nbsp;"measurementUnit" : "m^2"<br/>\}] |
 | **Identification** 	| 	|  	|  	|
-| &nbsp;&nbsp;~~identification.validated~~ **(Deprecated)** | boolean | true |
 | &nbsp;&nbsp;identification.verified | boolean | true |
 | &nbsp;&nbsp;identification.uncertainIdentification | boolean | false |
-| &nbsp;&nbsp;~~identification.validationStatus~~ **(Deprecated)** | VocabularyValue[\<validationStatus\>](Vocabularies.md#verificationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
 | &nbsp;&nbsp;identification.verificationStatus | VocabularyValue[\<verificationStatus\>](Vocabularies.md#verificationStatus) | \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \} |
 | &nbsp;&nbsp;identification.confirmedBy | string | "Gerhard Boré" |
 | &nbsp;&nbsp;identification.identifiedBy | string | "Mårten Ilidasch" |
@@ -129,10 +127,14 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;taxon.phylum | string | "Tracheophyta" |
 | &nbsp;&nbsp;taxon.kingdom | string | "Plantae" |
 | &nbsp;&nbsp;taxon.taxonId | string | "urn:lsid:dyntaxa.se:Taxon:221501" |
-| &nbsp;&nbsp;~~taxon.attributes.protectionLevel~~ **(Deprecated)** | VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel) | \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \} |
 | &nbsp;&nbsp;taxon.attributes.sensitivityCategory | VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel) | \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \} |
 | &nbsp;&nbsp;taxon.attributes.redlistCategory | string | "LC" |
-| &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean? | true |
+| &nbsp;&nbsp;taxon.attributes.isRedlisted | boolean | true |
+| &nbsp;&nbsp;taxon.attributes.isInvasiveInSweden | boolean	| true	|
+| &nbsp;&nbsp;taxon.attributes.isInvasiveAccordingToEuRegulation | boolean	| true	|
+| &nbsp;&nbsp;taxon.attributes.invasiveRiskAssessmentCategory | string	| SE	|
+| &nbsp;&nbsp;taxon.attributes.protectedByLaw | boolean | true |
+| &nbsp;&nbsp;taxon.attributes.taxonCategory | VocabularyValue[\<taxonCategory\>](Vocabularies.md#taxonCategory)	| \{ "id":17, "value":"Art" \}	|
 
 ## AllWithValues
 All fields that are described on the [Observation documentation page](Observation.md) where there exist at least one value, i.e. all that contain an example value.

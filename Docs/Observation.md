@@ -1,19 +1,7 @@
 # Observation object
 All fields that are part of an observation are listed on this page.
 
-##### Deprecated fields
-These fields are deprecated and should not be used.
-
-| Deprecated field 	| Replaced by 	| Preliminary removal date 	|
-|:---	|:---	|:---	|
-| protected 	| sensitive 	| 2021-12-16 	|
-| occurrence.protectionLevel 	| occurrence.sensitivityCategory 	| 2021-12-16 	|
-| taxon.attributes.protectionLevel 	| taxon.attributes.sensitivityCategory 	| 2021-12-16 	|
-| identification.validated 	| identification.verified 	| 2021-12-16 	|
-| identification.validationStatus 	| identification.verificationStatus 	| 2021-12-16 	|
-
-
-### Fields
+## Fields
 
 | Field 	| Type 	| Example 	| Description | Darwin Core 	|
 |:---	|:---	|:---	|:---	|:---	|  
@@ -31,7 +19,6 @@ These fields are deprecated and should not be used.
 | license 	| string 	| "CC BY-NC 4.0" 	| A legal document giving official permission to do something with the resource. 	| https://dwc.tdwg.org/terms/#dwc:license 	|
 | rightsHolder 	| string 	| "Landsorts fågelstation" 	| A person or organization owning or managing rights over the resource. 	| https://dwc.tdwg.org/terms/#dwc:rightsHolder 	|
 | modified 	| DateTime? 	| "2008-07-18T13:19:00Z" 	| The most recent date-time on which the resource was changed (UTC). 	| https://dwc.tdwg.org/terms/#dwc:modified 	|
-| ~~protected~~ **(Deprecated)** 	| boolean 	| false 	| Indicates whether the observation is protected. 	| This property is replaced by *sensitive* 	|
 | sensitive 	| boolean 	| false 	| Indicates whether the observation is sensitive and therefore protected. 	|  	|
 | publicCollection 	| string 	| "Uppsala-Evolutionsmuseet" 	| Public collection name. 	|  	|
 | privateCollection 	| string 	| "Lennart Lasseman" 	| Private collection name. 	|  	|
@@ -97,7 +84,6 @@ These fields are deprecated and should not be used.
 | occurrence.isPositiveObservation 	| boolean 	| true 	| Indicates if this observation is a   positive observation. "Positive observation" is a normal   observation indicating that a species has been seen at a specified location.    	|  	|
 | occurrence.media 	| Collection[\<Multimedia\>](https://tools.gbif.org/dwca-validator/extension.do?id=gbif:Multimedia)	| [\{<br/>&nbsp;"type":"StillImage",<br/>&nbsp;"format":"image/jpeg",<br/>&nbsp;"identifier":"https://www.artportalen.se/MediaLibrary/2020/11/a268a815-67cc-4a97-8636-c18c6826f397_image.jpg",<br/>&nbsp;"references":"https://www.artportalen.se/Image/3139311",<br/>&nbsp;"created":"2020-11-03 16:15",<br/>&nbsp;"license":"© all rights reserved",<br/>&nbsp;"rightsHolder":"Tom Volgers"<br/>\}]	| Media associated with the observation. 	| https://tools.gbif.org/dwca-validator/extension.do?id=gbif:Multimedia 	|
 | occurrence.preparations 	| string 	| "alcohol" 	| A list of preparations and preservation methods for a specimen.    	| https://dwc.tdwg.org/terms/#dwc:preparations 	|
-| ~~occurrence.protectionLevel~~ **(Deprecated)** 	| int32    	| 1 	| Occurrence protection level. This is   a value between 1 to 5. 1 indicates public access and 5 is the highest used   security level.    	| This property is replaced by *occurrence.sensitivityCategory* 	|
 | occurrence.sensitivityCategory 	| int32    	| 1 	| Occurrence protection level. This is   a value between 1 to 5. 1 indicates public access and 5 is the highest used   security level.    	|  	|
 | occurrence.recordNumber 	| string 	| "200240" 	| An identifier given to the Occurrence at the time it was recorded. Often   serves as a link between field notes and an Occurrence record, such as a   specimen collector's number.    	| https://dwc.tdwg.org/terms/#dwc:recordNumber 	|
 | occurrence.substrate.description 	| string 	| "2 substratenheter # Dead tree stem # Grov granlåga # Picea   abies" 	| Description of substrate. 	|  	|
@@ -125,9 +111,7 @@ These fields are deprecated and should not be used.
 | identification.identifiedBy 	| string 	| "Mårten Ilidasch" 	| A list of names of people, groups, or organizations who assigned the   Taxon to the subject.    	| https://dwc.tdwg.org/terms/#dwc:identifiedBy 	|
 | identification.dateIdentified 	| string 	| "2016" 	| The date on which the subject was identified as representing the Taxon.    	| https://dwc.tdwg.org/terms/#dwc:dateIdentified 	|
 | identification.verifiedBy 	| string 	| "Lennart Lasseman" 	| A list of names of people, who verified the observation.    	|  	|
-| ~~identification.validated~~ **(Deprecated)** 	| boolean    	| true 	| Indicates whether the occurrence is validated.    	|  This property is replaced by *identification.verified*	|
 | identification.verified 	| boolean    	| true 	| Indicates whether the occurrence is verified.    	|  	|
-| ~~identification.validationStatus~~ **(Deprecated)** 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Validation status. 	|  This property is replaced by *identification.verificationStatus*	|
 | identification.verificationStatus 	| VocabularyValue[\<validationStatus\>](Vocabularies.md#validationStatus) 	| \{ "id":60, "value":"Godkänd baserat på observatörens uppgifter" \}	| Verification status. 	|  	|
 | identification.determinationMethod 	| VocabularyValue[\<determinationMethod\>](Vocabularies.md#determinationMethod) 	| \{ "id":3, "value":"stereolupp" \} | Method used in species determination. 	|  	|
 | identification.uncertainIdentification 	| boolean    	| false 	| True if determination is uncertain.    	|  	|
@@ -142,6 +126,8 @@ These fields are deprecated and should not be used.
 | location.decimalLongitude 	| double? 	| 16.66547 	| The geographic longitude of the geographic center of a Location (WGS84).    	| https://dwc.tdwg.org/terms/#dwc:decimalLongitude 	|
 | location.geodeticDatum 	| string 	| "EPSG:4326" 	| The ellipsoid, geodetic datum, or spatial reference system (SRS) upon   which the geographic coordinates given in decimalLatitude and   decimalLongitude as based.    	| https://dwc.tdwg.org/terms/#dwc:geodeticDatum 	|
 | location.coordinateUncertaintyInMeters 	| int32? 	| 100 	| The horizontal distance (in meters) from the given CoordinateX and   CoordinateY describing the smallest circle containing the whole of the   Location.    	| https://dwc.tdwg.org/terms/#dwc:coordinateUncertaintyInMeters 	|
+| location.Sweref99TmX 	| double? 	| 661035 	| X coordinate in SWEREF99 TM. |  	|
+| location.Sweref99TmY 	| double? 	| 6569227 	| Y coordinate in SWEREF99 TM. |  	|
 | location.locality 	| string 	| "Mosse 200 m SO om TÅNGEN, Vg" 	| The specific description of the place.    	| https://dwc.tdwg.org/terms/#dwc:locality 	|
 | location.continent 	| VocabularyValue[\<continent\>](Vocabularies.md#continent)	| \{ "id":4, "value":"Europe" \} | The name of the continent in which the Location occurs. 	| https://dwc.tdwg.org/terms/#dwc:continent 	|
 | location.country 	| VocabularyValue[\<country\>](Vocabularies.md#country) | \{ "id":0, "value":"Sweden" \} | The name of the country in which the Location occurs. 	| https://dwc.tdwg.org/terms/#dwc:country 	|
@@ -170,6 +156,8 @@ These fields are deprecated and should not be used.
 | location.attributes.provincePartIdByCoordinate 	| string 	| 9 	| Province part id.    	|  	|
 | location.attributes.verbatimProvince 	| string 	| "Småland" 	| The original StateProvince value from data provider.    	|  	|
 | location.attributes.verbatimMunicipality 	| string 	|  	| The original municipality value from data provider.    	|  	|
+| location.attributes.externalId 	| string 	|  	| External Id of an Artportalen site.    	|  	|
+| location.attributes.projectId 	| string 	|  	| Artportalen project id.    	|  	|
 | location.maximumDistanceAboveSurfaceInMeters 	| double? 	|  	| The greater distance in a range of distance from a reference surface in   the vertical direction, in meters.    	| https://dwc.tdwg.org/terms/#dwc:maximumDistanceAboveSurfaceInMeters 	|
 | location.coordinatePrecision 	| double? 	|  	| A decimal representation of the precision of the coordinates given in the   DecimalLatitude and DecimalLongitude.    	| https://dwc.tdwg.org/terms/#dwc:coordinatePrecision 	|
 | location.footprintSpatialFit 	| string 	|  	| The ratio of the area of the footprint (footprintWKT) to the area of the   true (original, or most specific) spatial representation of the Location.    	| https://dwc.tdwg.org/terms/#dwc:footprintSpatialFit 	|
@@ -196,7 +184,7 @@ These fields are deprecated and should not be used.
 | taxon.acceptedNameUsageID 	| string 	| "urn:lsid:dyntaxa.se:Taxon:221501" 	| An identifier for the name usage of the currently valid or accepted   taxon.    	| https://dwc.tdwg.org/terms/#dwc:acceptedNameUsageID 	|
 | taxon.vernacularName 	| string 	| "göknycklar" 	| Vernacular name. 	| https://dwc.tdwg.org/terms/#dwc:vernacularName 	|
 | taxon.taxonRank 	| string 	| "species" 	| The taxonomic rank of the most specific name in the scientificName.    	| https://dwc.tdwg.org/terms/#dwc:taxonRank 	|
-| taxon.birdDirective 	| boolean? 	| false 	| Indicates whether the taxon is part of bird directive.    	|  	|
+| taxon.birdDirective 	| boolean 	| false 	| Indicates whether the taxon is part of bird directive.    	|  	|
 | taxon.genus 	| string 	| "Anacamptis" 	| The full scientific name of the genus in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:genus 	|
 | taxon.family 	| string 	| "Orchidaceae" 	| The full scientific name of the family in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:family 	|
 | taxon.order 	| string 	| "Asparagales" 	| The full scientific name of the order in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:order 	|
@@ -214,14 +202,17 @@ These fields are deprecated and should not be used.
 | taxon.attributes.disturbanceRadius 	| int32? 	| 500 	| Taxon disturbance radius.    	|  	|
 | taxon.attributes.dyntaxaTaxonId 	| int32    	| 221501 	| Taxon id value in Dyntaxa.    	|  	|
 | taxon.attributes.parentDyntaxaTaxonId 	| int32? 	| 1005661 	| Parent Dyntaxa TaxonId.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 2.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 4.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean? 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 5.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 2.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 4.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean 	| false 	| Indicates whether the taxon is part of Natura 2000, Habitats directive   article 5.    	|  	|
 | taxon.attributes.organismGroup 	| string 	| "Kärlväxter" 	| Common name of the organism group   that observed species belongs to. Classification of species groups is the   same as used in latest 'Red List of Swedish Species'.    	|  	|
-| taxon.attributes.protectedByLaw 	| boolean? 	| true 	| Indicates whether the species is protected by the law in Sweden.    	|  	|
-| ~~taxon.attributes.protectionLevel~~ **(Deprecated)** 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  This property is replaced by *taxon.attributes.sensitivityCategory*	|
+| taxon.attributes.protectedByLaw 	| boolean 	| true 	| Indicates whether the species is protected by the law in Sweden.    	|  	|
 | taxon.attributes.sensitivityCategory 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected   information about a species is in Sweden. This is a value between 1 to 5. 1   indicates public access and 5 is the highest used security level. 	|  	|
 | taxon.attributes.redlistCategory 	| string 	| "LC" 	| Redlist category for redlisted   species. Possible redlist values are DD (Data Deficient), EX (Extinct), RE   (Regionally Extinct), CR (Critically Endangered), EN (Endangered), VU   (Vulnerable), NT (Near Threatened). Not redlisted species has no value in   this property.    	|  	|
+| taxon.attributes.isRedlisted 	| boolean 	| true | True if redlist category is one of CR, EN, VU, NT. 	|  	|
+| taxon.attributes.isInvasiveInSweden 	| boolean 	| true | True if invasive in sweden. 	|  	|
+| taxon.attributes.isInvasiveAccordingToEuRegulation 	| boolean 	| true | True if invasive in sweden according to EU Regulation 1143/2014. 	|  	|
+| taxon.attributes.invasiveRiskAssessmentCategory 	| string 	| SE | Invasive risk assessment category. 	|  	|
 | taxon.attributes.sortOrder 	| int32    	| 91415 	| Systematic sort order.    	|  	|
 | taxon.attributes.swedishHistory 	| string 	| "Spontan" 	| This property contains information about the species immigration history.    	|  	|
 | taxon.attributes.swedishOccurrence 	| string 	| "Bofast och reproducerande" 	| Information about the species   occurrence in Sweden. For example information about if the species reproduce   in sweden.    	|  	|

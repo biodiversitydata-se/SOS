@@ -43,14 +43,13 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
             _norsServiceConfiguration = norsServiceConfiguration ??
                                         throw new ArgumentNullException(nameof(norsServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _norsObservationVerbatimRepository.TempMode = true;
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _norsObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -146,6 +145,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Nors
             {
                 _logger.LogError(e, "Failed to harvest NORS");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _norsObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for NORS data provider. Status={harvestInfo.Status}");

@@ -42,15 +42,14 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
                                                      nameof(sersObservationVerbatimRepository));
             _sersServiceConfiguration = sersServiceConfiguration ??
                                         throw new ArgumentNullException(nameof(sersServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _sersObservationVerbatimRepository.TempMode = true;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
         }
 
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            _sersObservationVerbatimRepository.TempMode = true;
 
             try
             {
@@ -145,6 +144,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
             {
                 _logger.LogError(e, "Failed to harvest SERS");
                 harvestInfo.Status = RunStatus.Failed;
+            }
+            finally
+            {
+                _sersObservationVerbatimRepository.TempMode = false;
             }
 
             _logger.LogInformation($"Finish harvesting sightings for SERS data provider. Status={harvestInfo.Status}");

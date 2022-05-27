@@ -8,7 +8,7 @@
 - Artportalen Checklist support. New endpoints: `GET Checklists/{id}`, `POST Checklists/CalculateTrend`
 - `Observations/MetricGridAggregation` endpoint that creates grid aggregations using SWEREF99 TM coordinate system.
 - `SOS.Elasticsarch.Proxy` service that is used by WFS service (GeoServer).
-- New observation properties: `Location.Sweref99TmX`, `Location.Sweref99TmY`, `Location.Attributes.ExternalId`, `Location.Attributes.ProjectId`, `Taxon.Attributes.TaxonCategory`, `Taxon.Attributes.IsRedlisted`, `Taxon.Attributes.InvasiveInfo.IsInvasiveInSweden`, `Taxon.Attributes.InvasiveInfo.IsInvasiveAccordingToEuRegulation`, `Taxon.Attributes.InvasiveInfo.RiskAssessmentCategory`
+- New observation properties: `Location.Sweref99TmX`, `Location.Sweref99TmY`, `Location.Attributes.ExternalId`, `Location.Attributes.ProjectId`, `Taxon.Attributes.TaxonCategory`, `Taxon.Attributes.IsRedlisted`, `Taxon.Attributes.IsInvasiveInSweden`, `Taxon.Attributes.IsInvasiveAccordingToEuRegulation`, `Taxon.Attributes.InvasiveRiskAssessmentCategory`
 - Application insights harvest health check
 
 

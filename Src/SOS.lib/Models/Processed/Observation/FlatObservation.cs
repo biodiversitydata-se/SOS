@@ -875,11 +875,11 @@ namespace SOS.Lib.Models.Processed.Observation
                     return TaxonAttributesTaxonCategoryValue;
                 case "Taxon.Attributes.IsRedlisted":
                     return TaxonAttributesIsRedlisted;
-                case "Taxon.Attributes.InvasiveInfo.IsInvasiveAccordingToEuRegulation":
+                case "Taxon.Attributes.IsInvasiveAccordingToEuRegulation":
                     return TaxonAttributesIsInvasiveAccordingToEuRegulation;
-                case "Taxon.Attributes.InvasiveInfo.IsInvasiveInSweden":
+                case "Taxon.Attributes.IsInvasiveInSweden":
                     return TaxonAttributesIsInvasiveInSweden;
-                case "Taxon.Attributes.InvasiveInfo.RiskAssessmentCategory":
+                case "Taxon.Attributes.InvasiveRiskAssessmentCategory":
                     return TaxonAttributesRiskAssessmentCategory;
                 case "DatasetId":
                     return DatasetId;

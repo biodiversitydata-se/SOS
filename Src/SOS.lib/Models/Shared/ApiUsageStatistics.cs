@@ -71,6 +71,11 @@ namespace SOS.Lib.Models.Shared
         public long RequestCount { get; set; }
 
         /// <summary>
+        /// Name of system making the request
+        /// </summary>
+        public string RequestingSystem { get; set; }
+
+        /// <summary>
         /// Sum of observations returned
         /// </summary>
         public long SumResponseCount { get; set; }

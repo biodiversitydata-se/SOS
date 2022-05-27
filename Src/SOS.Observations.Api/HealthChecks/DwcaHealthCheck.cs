@@ -35,7 +35,7 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                const int maxDaysOld = 3;
+                const int maxDaysOld = 10;
                 var files = (await _blobStorageManager.GetExportFilesAsync()).ToArray();
                 if (!files.Any())
                 {
