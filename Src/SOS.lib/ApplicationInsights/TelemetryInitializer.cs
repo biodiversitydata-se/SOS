@@ -68,6 +68,13 @@ namespace SOS.Lib.ApplicationInsights
                     telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
                 }
             }
+            else if (platformContext.Request.Headers.TryGetValue("Requesting-System", out requestingSystem))
+            {
+                if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
+                {
+                    telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
+                }
+            }
         }
 
         /// <summary>
