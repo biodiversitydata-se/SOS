@@ -169,7 +169,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 if (media?.Any() ?? false)
                 {
                     observation.Media = media;
-                    observation.FirstImageId = media?.FirstOrDefault(m => m.FileType?.Equals("image", StringComparison.CurrentCultureIgnoreCase) ?? false)?.Id ?? 0;
+                    observation.FirstImageId = media?.FirstOrDefault()?.Id ?? 0;
                 }
 
                 return observation;
