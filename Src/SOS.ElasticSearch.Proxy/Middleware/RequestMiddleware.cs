@@ -129,79 +129,87 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
-            var requestStopwatch = Stopwatch.StartNew();
-            var targetUri = BuildTargetUri(context.Request);
-            
-            // Rewrite sort by _id to use sort by event.endDate
-            string query = StreamToString(context.Request.Body);
-            if (query.Contains("sort"))
+            try
             {
-                if (_proxyConfiguration.LogRequest)
-                {
-                    _logger.LogInformation($"Query before sort change: {query}");
-                }
-                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
-                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
-                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                if (_proxyConfiguration.LogRequest)
-                {
-                    _logger.LogInformation($"Query after sort change: {query}");
-                }
-                context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(query));
-                context.Request.ContentLength = query.Length;
-            }
-
-            if (targetUri != null)
-            {
-                if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
-                {
-                    string originalQuery = StreamToString(context.Request.Body);
-                    _logger.LogDebug($"OriginalQuery: {originalQuery}");
-                    var newQuery = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
-                    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newQuery));
-                    context.Request.ContentLength = newQuery.Length;
-                }
-
-                _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
-                var targetRequestMessage = CreateTargetMessage(context, targetUri);
-                if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
-                {
-                    string body = await targetRequestMessage.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"Request:\r\n{body}");
-                }
-                var httpClientHandler = new HttpClientHandler();
-                httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
-
-                using var httpClient = new HttpClient(httpClientHandler);
-                using var responseMessage = await httpClient.SendAsync(targetRequestMessage,
-                    HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+                var requestStopwatch = Stopwatch.StartNew();
+                var targetUri = BuildTargetUri(context.Request);
                 
-                context.Response.StatusCode = (int)responseMessage.StatusCode;
-                CopyFromTargetResponseHeaders(context, responseMessage);
-                if (_proxyConfiguration.LogResponse)
-                {
-                    string response = await responseMessage.Content.ReadAsStringAsync();
-                    _logger.LogInformation($"Response:\r\n{response.WithMaxLength(_proxyConfiguration.LogResponseMaxCharacters)}");
-                }
-                await responseMessage.Content.CopyToAsync(context.Response.Body);
+                // Rewrite sort by _id to use sort by event.endDate
+                //string query = StreamToString(context.Request.Body);
+                //if (query.Contains("sort"))
+                //{
+                //    if (_proxyConfiguration.LogRequest)
+                //    {
+                //        _logger.LogInformation($"Query before sort change: {query}");
+                //    }
+                //    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
+                //        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                //    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
+                //        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                //    if (_proxyConfiguration.LogRequest)
+                //    {
+                //        _logger.LogInformation($"Query after sort change: {query}");
+                //    }
+                //    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(query));
+                //    context.Request.ContentLength = query.Length;
+                //}
 
-                var match = Regex.Match(context.Request?.Path.Value ?? string.Empty, @"([^\/]+)$");
-                if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
+                if (targetUri != null)
                 {
-                    // Estimate number of observations returned 
-                    var observationCount = Math.Ceiling((context.Response.ContentLength ?? 0) / (double)_proxyConfiguration.AverageObservationSize);
-                    context.Items.Add("Observation-count", observationCount);
-                }
+                    if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
+                    {
+                        string originalQuery = StreamToString(context.Request.Body);
+                        _logger.LogDebug($"OriginalQuery: {originalQuery}");
+                        var newQuery = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
+                        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newQuery));
+                        context.Request.ContentLength = newQuery.Length;
+                    }
 
-                requestStopwatch.Stop();
-                if (_proxyConfiguration.LogPerformance)
-                {
-                    _logger.LogInformation($"Request time: {requestStopwatch.ElapsedMilliseconds}ms");
+                    _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
+                    var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                    if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
+                    {
+                        string body = await targetRequestMessage.Content.ReadAsStringAsync();
+                        _logger.LogInformation($"Request:\r\n{body}");
+                    }
+                    var httpClientHandler = new HttpClientHandler();
+                    httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
+
+                    using var httpClient = new HttpClient(httpClientHandler);
+                    using var responseMessage = await httpClient.SendAsync(targetRequestMessage,
+                        HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+                    
+                    context.Response.StatusCode = (int)responseMessage.StatusCode;
+                    CopyFromTargetResponseHeaders(context, responseMessage);
+                    if (_proxyConfiguration.LogResponse)
+                    {
+                        string response = await responseMessage.Content.ReadAsStringAsync();
+                        _logger.LogInformation($"Response:\r\n{response.WithMaxLength(_proxyConfiguration.LogResponseMaxCharacters)}");
+                    }
+                    await responseMessage.Content.CopyToAsync(context.Response.Body);
+
+                    var match = Regex.Match(context.Request?.Path.Value ?? string.Empty, @"([^\/]+)$");
+                    if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
+                    {
+                        // Estimate number of observations returned 
+                        var observationCount = Math.Ceiling((context.Response.ContentLength ?? 0) / (double)_proxyConfiguration.AverageObservationSize);
+                        context.Items.Add("Observation-count", observationCount);
+                    }
+
+                    requestStopwatch.Stop();
+                    if (_proxyConfiguration.LogPerformance)
+                    {
+                        _logger.LogInformation($"Request time: {requestStopwatch.ElapsedMilliseconds}ms");
+                    }
+                    return;
                 }
-                return;
+                await _nextMiddleware(context);
             }
-            await _nextMiddleware(context);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Errror in RequestMiddleware.Invoke()");
+                throw;
+            }
         }
     }
 }
