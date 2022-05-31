@@ -169,8 +169,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     var targetRequestMessage = CreateTargetMessage(context, targetUri, query);
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
-                        string body = await targetRequestMessage.Content.ReadAsStringAsync();
-                        _logger.LogInformation($"Request:\r\n{body}");
+                        _logger.LogInformation($"Request:\r\n{query}");
                     }
                     var httpClientHandler = new HttpClientHandler();
                     httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
