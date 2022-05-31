@@ -134,6 +134,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 var requestStopwatch = Stopwatch.StartNew();
                 var targetUri = BuildTargetUri(context.Request);
 
+                // Log some request information
+                foreach (var requestHeader in context.Request.Headers)
+                {
+                    _logger.LogDebug($"Header: {requestHeader.Key}={requestHeader.Value}");
+                }
+                _logger.LogDebug($"ContentType={context.Request.ContentType}");
+                _logger.LogDebug($"ContentLenght={context.Request.ContentLength}");
+
                 // Rewrite sort by _id to use sort by event.endDate
                 string query = StreamToString(context.Request.Body);
                 if (_proxyConfiguration.LogRequest)
