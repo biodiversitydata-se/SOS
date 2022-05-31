@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
@@ -32,7 +29,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                [Person] p
                     INNER JOIN [User] u ON p.Id = u.PersonId";
 
-                return await QueryAsync<PersonEntity>(query);
+                return await QueryAsync<PersonEntity>(query, null!);
             }
             catch (Exception e)
             {

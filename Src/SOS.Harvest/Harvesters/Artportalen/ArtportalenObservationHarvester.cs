@@ -102,7 +102,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 _speciesCollectionRepository,
                 _artportalenMetadataContainer,
                 _areaHelper,
-                mode != JobRunModes.Full,
                 _artportalenConfiguration.NoOfThreads,
                 _logger
             );
@@ -127,9 +126,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
         {
-            _processedObservationRepository.LiveMode = false;
-            _sightingRepository.Live = false;
-
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             { 
                 _logger.LogDebug("Start adding test sightings");
@@ -205,16 +201,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
-            // Make sure incremental mode is true to get max id from live instance
-            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
-            _sightingRepository.Live = true;
-
             // We start from last harvested sighting 
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
             
             // Get list of id's to Make sure we don't harvest more than #limit 
             var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
-            _logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest.Length}, lastModifiedQuery={lastModified} ({mode})");
+            _logger.LogDebug($"Number of Artportalen Ids to harvest: {idsToHarvest?.Length ?? 0}, lastModifiedQuery={lastModified} ({mode})");
 
             if (!idsToHarvest?.Any() ?? true)
             {
@@ -392,6 +384,25 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 metaDataTasks[8].Result);
         }
 
+        private void SetRepositoriesMode(JobRunModes mode)
+        {
+            // Use active index if it's a incremental active instance harvest 
+            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+            _artportalenVerbatimRepository.Mode = mode;
+
+            // Incremental harvest always use live AP data
+            var live = mode != JobRunModes.Full;
+            _mediaRepository.Live = live;
+            _metadataRepository.Live = live;
+            _personRepository.Live = live;
+            _projectRepository.Live = live;
+            _sightingRelationRepository.Live = live;
+            _sightingRepository.Live = live;
+            _siteRepository.Live = live;
+            _speciesCollectionRepository.Live = live;
+            _taxonRepository.Live = live;
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -465,9 +476,8 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             try
             {
+                SetRepositoriesMode(mode);
                 var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
-
-                _artportalenVerbatimRepository.Mode = mode;
 
                 // Make sure we have an empty public collection
                 _logger.LogDebug("Start empty artportalen verbatim collection");
@@ -522,9 +532,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
             try
             {
                var mode = JobRunModes.IncrementalActiveInstance;
+               SetRepositoriesMode(mode);
+
                using var harvestFactory = await GetHarvestFactoryAsync(mode, cancellationToken);
-                
-                _sightingRepository.Live = true;
 
                 return await GetVerbatimBatchAsync(harvestFactory,
                     _sightingRepository.GetChunkAsync(ids),

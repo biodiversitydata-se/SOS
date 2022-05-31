@@ -17,7 +17,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         ///<inheritdoc />
-        public async Task<IEnumerable<SpeciesCollectionItemEntity>?> GetBySightingAsync(IEnumerable<int> sightingIds, bool live = false)
+        public async Task<IEnumerable<SpeciesCollectionItemEntity>?> GetBySightingAsync(IEnumerable<int> sightingIds)
         {
             if (!sightingIds?.Any() ?? true)
             {
@@ -41,7 +41,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 FROM [SightingSpeciesCollectionItem] ssci
                 INNER JOIN @tvp t ON ssci.SightingId = t.Id";
 
-                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {

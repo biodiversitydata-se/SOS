@@ -42,13 +42,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         /// <param name="attempt"></param>
         /// <param name="live"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, bool live, int attempt)
+        private async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, int attempt)
         {
             try
             {
                 return await QueryAsync<SiteEntity>(GetSiteQuery(
                         $"INNER JOIN @tvp t ON s.Id = t.Id"),
-                    new { tvp = ids.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = ids.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {
@@ -56,10 +56,10 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 if (attempt < 2)
                 {
-                    return await GetByIdsAsync(ids, live, ++attempt);
+                    return await GetByIdsAsync(ids, ++attempt);
                 }
 
-                return null;
+                return null!;
             }
         }
 
@@ -74,7 +74,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds, bool live = false)
+        public async Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -97,7 +97,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     a.AreaDatasetId IN (1, 16, 18, 19, 21)";
 
                 var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
-                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
+                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
 
                 var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
                 if (siteAreaEntities?.Any() ?? false)
@@ -122,18 +122,18 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids, bool live = false)
+        public async Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids)
         {
             if (!ids?.Any() ?? true)
             {
                 return null;
             }
 
-            return await GetByIdsAsync(ids, live, 0);
+            return await GetByIdsAsync(ids, 0);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetFreqventlyUsedIdsAsync(bool live)
+        public async Task<IEnumerable<int>> GetFreqventlyUsedIdsAsync()
         {
             try
             {
@@ -147,17 +147,17 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                             {SightingWhereBasics}
                         GROUP BY
 	                        s.SiteId
-                        HAVING COUNT (s.SiteId) > 1", live);
+                        HAVING COUNT (s.SiteId) > 1");
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting frequently used sites");
-                return null;
+                return null!;
             }
         }
 
         /// <inheritdoc />
-        public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds, bool live = false)
+        public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds)
         {
             if (!siteIds?.Any() ?? true)
             {
@@ -183,7 +183,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                lg.rn = 1";
 
                 var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
-                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live))?.ToArray();
+                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
 
                 return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
             }

@@ -5,7 +5,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
     /// <summary>
     ///     Sighting repository interface
     /// </summary>
-    public interface ISightingRepository
+    public interface ISightingRepository : IBaseRepository<ISightingRepository>
     {
         /// <summary>
         /// Get chunk of sightings from Artportalen
@@ -58,10 +58,5 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// <returns></returns>
         Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForChecklistsAsync(
             IEnumerable<int> checklistIds);
-
-        /// <summary>
-        /// True if live data base should be used
-        /// </summary>
-        bool Live { get; set; }
     }
 }

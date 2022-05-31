@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
     /// <summary>
     ///     Check list repository interface
     /// </summary>
-    public interface IChecklistRepository
+    public interface IChecklistRepository : IBaseRepository<IChecklistRepository>
     {
         /// <summary>
         /// Get all taxon id's for passed checklists

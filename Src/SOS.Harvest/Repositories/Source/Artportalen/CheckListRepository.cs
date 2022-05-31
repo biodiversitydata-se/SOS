@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -99,7 +95,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     WHERE 
                         cl.Id BETWEEN @StartId AND @EndId";
 
-                return await QueryAsync<ChecklistEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }, Live);
+                return await QueryAsync<ChecklistEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 });
             }
             catch (Exception e)
             {
@@ -121,7 +117,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		        FROM 
 		            Checklist cl";
 
-                return (await QueryAsync<(int minId, int maxId)>(query, null, Live)).FirstOrDefault();
+                return (await QueryAsync<(int minId, int maxId)>(query, null)).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -130,8 +126,5 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 return default;
             }
         }
-
-        /// <inheritdoc />
-        public bool Live { get; set; }
     }
 }

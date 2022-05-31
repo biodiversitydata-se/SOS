@@ -9,9 +9,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
     {
-        
-
-        private string GetSightingQuery(int top, string where) => GetSightingQuery(top, null, where);
+        private string GetSightingQuery(int top, string where) => GetSightingQuery(top, null!, where);
 
 
         /// <summary>
@@ -143,19 +141,19 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(0, "AND s.SightingId BETWEEN @StartId AND @EndId");
 
-                var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live))?.ToArray();
+                var result = (await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
                 }
 
-                return result;
+                return result!;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null;
+                return null!;
             }
         }
 
@@ -166,19 +164,19 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, Live))?.ToArray();                
+                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();                
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds.Take(5))}");
                 }
 
-                return result;                
+                return result!;                
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null;
+                return null!;
             }
         }
 
@@ -189,7 +187,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
 
-                var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live))?.ToArray();
+                var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings.  Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
@@ -201,7 +199,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 Logger.LogError(e, "Error getting sightings");
 
-                return null;
+                return null!;
             }
         }
 
@@ -219,7 +217,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE 
                     {SightingWhereBasics}";
 
-                return (await QueryAsync<(int minId, int maxId)>(query, null, Live)).FirstOrDefault();
+                return (await QueryAsync<(int minId, int maxId)>(query, null!)).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -242,7 +240,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE
                     {SightingWhereBasics}";
 
-                return (await QueryAsync<DateTime?>(query, null, Live)).FirstOrDefault();
+                return (await QueryAsync<DateTime?>(query, null!)).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -267,19 +265,19 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 ORDER BY
                     s.EditDate";
 
-                var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);                
+                var result = await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() });                
                 Logger.LogDebug($"GetModifiedIdsAsync({modifiedSince}, {limit}, Live={Live}) returned { (result == null ? "null" : result.Count()) } sightingIds");
                 if ((result?.Count() ?? 0) == 0)
                 {                    
                     Logger.LogDebug($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}, Query: {query}");
                 }
-                return result;
+                return result!;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting modified id's");
 
-                return null;
+                return null!;
             }
         }
 
@@ -300,12 +298,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 return await QueryAsync<(int SightingId, int ProjectId)>(
                     query,
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, Live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sighting/project connections");
-                return null;
+                return null!;
             }
         }
 
@@ -326,7 +324,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
             if (!result?.Any() ?? true)
             {
-                return null;
+                return null!;
             }
 
             var checklistsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
@@ -343,8 +341,5 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
             return checklistsData;
         }
-
-        /// <inheritdoc />
-        public bool Live { get; set; }
     }
 }
