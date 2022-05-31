@@ -136,7 +136,6 @@ namespace SOS.ElasticSearch.Proxy.Middleware
 
                 // Rewrite sort by _id to use sort by event.endDate
                 string query = StreamToString(context.Request.Body);
-                _logger.LogDebug(query);
                 if (_proxyConfiguration.LogRequest)
                 {
                     _logger.LogInformation($"Query before sort change: {query}");
