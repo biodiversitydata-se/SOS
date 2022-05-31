@@ -140,10 +140,10 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 {
                     _logger.LogInformation($"Query before sort change: {query}");
                 }
-                query = query.Replace("\"sort\":[{ \"_id\":{ \"order\":\"asc\"} }",
-                    "\"sort\":[{\"event.endDate\":{ \"order\":\"desc\"} }");
-                query = query.Replace("\"sort\":[{ \"_id\":{ \"order\":\"desc\"} }",
-                    "\"sort\":[{\"event.endDate\":{ \"order\":\"desc\"} }");
+                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
+                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
+                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
                 if (_proxyConfiguration.LogRequest)
                 {
                     _logger.LogInformation($"Query after sort change: {query}");
