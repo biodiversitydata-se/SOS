@@ -133,26 +133,29 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             {
                 var requestStopwatch = Stopwatch.StartNew();
                 var targetUri = BuildTargetUri(context.Request);
-                
+
                 // Rewrite sort by _id to use sort by event.endDate
-                //string query = StreamToString(context.Request.Body);
-                //if (query.Contains("sort"))
-                //{
-                //    if (_proxyConfiguration.LogRequest)
-                //    {
-                //        _logger.LogInformation($"Query before sort change: {query}");
-                //    }
-                //    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
-                //        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                //    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
-                //        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                //    if (_proxyConfiguration.LogRequest)
-                //    {
-                //        _logger.LogInformation($"Query after sort change: {query}");
-                //    }
-                //    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(query));
-                //    context.Request.ContentLength = query.Length;
-                //}
+                string query = StreamToString(context.Request.Body);
+                _logger.LogDebug(query);
+                if (query != null && query.Contains("sort"))
+                {
+                    _logger.LogDebug("Try rewrite query");
+                    if (_proxyConfiguration.LogRequest)
+                    {
+                        _logger.LogInformation($"Query before sort change: {query}");
+                    }
+                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
+                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
+                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                    if (_proxyConfiguration.LogRequest)
+                    {
+                        _logger.LogInformation($"Query after sort change: {query}");
+                    }
+                    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(query));
+                    context.Request.ContentLength = query.Length;
+                }
+                _logger.LogDebug(query);
 
                 if (targetUri != null)
                 {
