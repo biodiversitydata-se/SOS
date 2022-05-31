@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -58,27 +54,27 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync(bool live = false)
+        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync()
         {
             try
             {
-                return await QueryAsync<ProjectEntity>(SelectSql, null, live);
+                return await QueryAsync<ProjectEntity>(SelectSql, null!);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting projects");
-                return null;
+                return null!;
             }
         }
 
         /// <inheritdoc />
-        public async Task<ProjectEntity> GetProjectAsync(int projectId, bool live = false)
+        public async Task<ProjectEntity> GetProjectAsync(int projectId)
         {
             try
             {
                 var query = $@"{SelectSql} WHERE p.Id = @ProjectId";
 
-                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }, live))?.FirstOrDefault();
+                return (await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId }))?.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -88,7 +84,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds, bool live = false)
+        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
         {
             try
             {
@@ -132,7 +128,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 return await QueryAsync<ProjectParameterEntity>(
                     query, 
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {

@@ -240,9 +240,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             try
             {
-                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds, Live);
-                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds, Live);
-                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds, Live);
+                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds);
+                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds);
+                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds);
 
                 var siteEntities = await getSitesTask;
                 var siteAreas = await getSitesAreasTask;
@@ -307,8 +307,6 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <returns></returns>
         protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
 
-        protected readonly bool Live;
-
         protected Site TryGetSite(int siteId) {
             _cachedSites.TryGetValue(siteId, out var site);
 
@@ -326,13 +324,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
         public ArtportalenHarvestFactoryBase(
             ISiteRepository siteRepository,
             IAreaHelper areaHelper,
-            bool live,
             int noOfThreads) : base()
         {
             _siteRepository = siteRepository;
             _areaHelper = areaHelper;
             _cachedSites = new ConcurrentDictionary<int, Site>();
-            Live = live;
             _semaphore = new SemaphoreSlim(noOfThreads, noOfThreads);
         }
 
@@ -345,7 +341,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Should only be called once
             if (!_cachedSites.Any())
             {
-                var siteIds = await _siteRepository.GetFreqventlyUsedIdsAsync(Live);
+                var siteIds = await _siteRepository.GetFreqventlyUsedIdsAsync();
                 await CacheSitesAsync(siteIds);
             }
         }

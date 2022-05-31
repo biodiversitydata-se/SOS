@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
@@ -18,7 +15,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         {
         }
 
-        public async Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds, bool live = false)
+        public async Task<IEnumerable<SightingRelationEntity>> GetAsync(IEnumerable<int> sightingIds)
         {
             try
             {
@@ -36,12 +33,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     INNER JOIN @tvp t ON sr.SightingId = t.Id AND sr.IsPublic = 1";
 
                 return await QueryAsync<SightingRelationEntity>(query,
-                    new {tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable")}, live);
+                    new {tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable")});
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sighting relations");
-                return null;
+                return null!;
             }
         }
     }

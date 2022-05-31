@@ -62,7 +62,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var taxonRepository = new TaxonRepository(artportalenDataService, new Mock<ILogger<TaxonRepository>>().Object);
 
             var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
-            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>())).ReturnsAsync(new List<SiteEntity>());
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>())).ReturnsAsync(new List<SiteEntity>());
 
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
@@ -125,7 +125,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
-            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()));
+            siteRepositoryMock.Setup(foo => foo.GetByIdsAsync(It.IsAny<IEnumerable<int>>()));
             var processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             var taxonRepositoryMock = new Mock<ITaxonRepository>().Object;
 

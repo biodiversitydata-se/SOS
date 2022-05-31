@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
+﻿namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
     /// <summary>
     ///     Base repository interface
@@ -16,6 +13,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// <param name="parameters"></param>
         /// <param name="live"></param>
         /// <returns></returns>
-        Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters, bool live = false);
+        Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters);
+
+        /// <summary>
+        /// True if live data base should be used
+        /// </summary>
+        bool Live { get; set; }
     }
 }

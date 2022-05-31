@@ -121,7 +121,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                         CultureCode = "sv-GB"
                     }
                 });
-            _mediaRepositoryMock.Setup(mdr => mdr.GetAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()))
+            _mediaRepositoryMock.Setup(mdr => mdr.GetAsync(It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(
                     new[] { new MediaEntity() { SightingId = 1, FileType = "image", UploadDateTime = DateTime.Now } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetBiotopesAsync())
@@ -140,8 +140,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _metadataRepositoryMock.Setup(mdr => mdr.GetValidationStatusAsync())
                 .ReturnsAsync(new[]
                     {new MetadataEntity {Id = 1, Translation = "ValidationStatus", CultureCode = Cultures.en_GB}});
-
-            _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync(false))
+            _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync())
                 .ReturnsAsync(new[] {new ProjectEntity {Id = 1, Name = "Project"}});
 
             _sightingRepositoryMock.Setup(sr => sr.GetIdSpanAsync())
@@ -152,7 +151,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sightingRepositoryMock.Setup(sr => sr.GetSightingProjectIdsAsync(It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(new[] {(SightingId: 1, ProjectId: 1)});
 
-            _siteRepositoryMockMock.Setup(sr => sr.GetByIdsAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<bool>()))
+            _siteRepositoryMockMock.Setup(sr => sr.GetByIdsAsync(It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(new[] {new SiteEntity {Id = 1, Name = "Site"}});
 
             _artportalenVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())

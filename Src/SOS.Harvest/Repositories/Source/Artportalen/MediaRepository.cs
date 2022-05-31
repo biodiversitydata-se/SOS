@@ -23,13 +23,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MediaEntity>> GetAsync(IEnumerable<int> sightingIds, bool live = false)
+        public async Task<IEnumerable<MediaEntity>> GetAsync(IEnumerable<int> sightingIds)
         {
             try
             {
                 if (!sightingIds?.Any() ?? true)
                 {
-                    return null;
+                    return null!;
                 }
 
                 var query = @"SELECT 
@@ -49,13 +49,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                       INNER JOIN @tvp tvp ON mf.SightingID = tvp.Id";
 
                 return await QueryAsync<MediaEntity>(query,
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }, live);
+                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting media files");
-                return null;
+                return null!;
             }
         }
     }

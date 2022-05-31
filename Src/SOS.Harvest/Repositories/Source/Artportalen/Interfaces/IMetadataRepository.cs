@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
     /// <summary>
     ///     Metadata repository interface
     /// </summary>
-    public interface IMetadataRepository
+    public interface IMetadataRepository : IBaseRepository<IMetadataRepository>
     {
         /// <summary>
         ///     Get all activities

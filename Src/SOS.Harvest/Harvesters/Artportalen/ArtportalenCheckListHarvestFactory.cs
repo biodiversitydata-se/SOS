@@ -79,7 +79,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             ISightingRepository sightingRepository,
             IEnumerable<ProjectEntity> projectEntities,
             int noOfThreads,
-            ILogger<ArtportalenChecklistHarvester> logger) : base(siteRepository, areaHelper, false, noOfThreads)
+            ILogger<ArtportalenChecklistHarvester> logger) : base(siteRepository, areaHelper, noOfThreads)
         {
             _checklistRepository = checklistRepository ?? throw new ArgumentNullException(nameof(checklistRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));

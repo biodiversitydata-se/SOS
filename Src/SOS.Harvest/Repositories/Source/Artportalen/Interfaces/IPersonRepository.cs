@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Harvest.Entities.Artportalen;
+﻿using SOS.Harvest.Entities.Artportalen;
 
 namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
 {
-    public interface IPersonRepository
+    public interface IPersonRepository : IBaseRepository<IPersonRepository>
     {
         Task<IEnumerable<PersonEntity>> GetAsync();
     }
