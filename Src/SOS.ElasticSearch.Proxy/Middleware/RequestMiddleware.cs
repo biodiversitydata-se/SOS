@@ -31,9 +31,9 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
                 _logger.LogDebug($"Body: {body}");
-                using var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
+                var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
                 _logger.LogDebug($"memStr length={memStr.Length}");
-                using var streamContent = new StreamContent(memStr);
+                var streamContent = new StreamContent(memStr);
 
                 foreach (var header in context.Request.Headers)
                 {
