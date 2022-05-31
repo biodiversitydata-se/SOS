@@ -30,9 +30,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsDelete(requestMessage.Method.Method) &&
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
-                _logger.LogDebug($"Body: {body}");
                 var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
-                _logger.LogDebug($"memStr length={memStr.Length}");
                 var streamContent = new StreamContent(memStr);
 
                 foreach (var header in context.Request.Headers)
@@ -45,7 +43,6 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     {
                         streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
                     }
-                    _logger.LogDebug($"Header: {header.Key}={header.Value}");
                 }
                 
                 requestMessage.Content = streamContent;
@@ -149,26 +146,21 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 context.Request.EnableBuffering();
                 var query = await new StreamReader(context.Request.Body).ReadToEndAsync();
                 context.Request.Body.Position = 0;
+                if (_proxyConfiguration.LogOriginalQuery)
+                {
+                    _logger.LogInformation($"Original query: {query}");
+                }
 
                 // Rewrite sort by _id to use sort by event.endDate
-                if (_proxyConfiguration.LogRequest)
-                {
-                    _logger.LogInformation($"Query before sort change: {query}");
-                }
                 query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
                     "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
                 query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
                     "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                if (_proxyConfiguration.LogRequest)
-                {
-                    _logger.LogInformation($"Query after sort change: {query}");
-                }
-                
+
                 if (targetUri != null)
                 {
                     if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
                     {
-                        _logger.LogDebug($"OriginalQuery: {query}");
                         query = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {query.Substring(1, query.Length - 1)}";
                     }
 
