@@ -37,7 +37,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
 
                 foreach (var header in context.Request.Headers)
                 {
-                    streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                    if (header.Key.ToLower() == "content-length")
+                    {
+                        streamContent.Headers.TryAddWithoutValidation("Content-Length", memStr.Length.ToString());
+                    }
+                    else
+                    {
+                        streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                    }
                     _logger.LogDebug($"Header: {header.Key}={header.Value}");
                 }
                 
@@ -207,7 +214,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Errror in RequestMiddleware.Invoke()");
+                _logger.LogError(e, "Error in RequestMiddleware.Invoke()");
                 throw;
             }
         }
