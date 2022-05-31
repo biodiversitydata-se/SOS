@@ -14,7 +14,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
 
-        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri)
+        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri, string body)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -30,12 +30,17 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsDelete(requestMessage.Method.Method) &&
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
-                var streamContent = new StreamContent(context.Request.Body);
+                _logger.LogDebug($"Body: {body}");
+                using var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
+                _logger.LogDebug($"memStr length={memStr.Length}");
+                using var streamContent = new StreamContent(memStr);
+
                 foreach (var header in context.Request.Headers)
                 {
                     streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                    _logger.LogDebug($"Header: {header.Key}={header.Value}");
                 }
-
+                
                 requestMessage.Content = streamContent;
             }
             
@@ -134,16 +139,11 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 var requestStopwatch = Stopwatch.StartNew();
                 var targetUri = BuildTargetUri(context.Request);
 
-                // Log some request information
-                foreach (var requestHeader in context.Request.Headers)
-                {
-                    _logger.LogDebug($"Header: {requestHeader.Key}={requestHeader.Value}");
-                }
-                _logger.LogDebug($"ContentType={context.Request.ContentType}");
-                _logger.LogDebug($"ContentLenght={context.Request.ContentLength}");
+                context.Request.EnableBuffering();
+                var query = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                context.Request.Body.Position = 0;
 
                 // Rewrite sort by _id to use sort by event.endDate
-                string query = StreamToString(context.Request.Body);
                 if (_proxyConfiguration.LogRequest)
                 {
                     _logger.LogInformation($"Query before sort change: {query}");
@@ -156,22 +156,17 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 {
                     _logger.LogInformation($"Query after sort change: {query}");
                 }
-                context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(query));
-                context.Request.ContentLength = query.Length;
-
+                
                 if (targetUri != null)
                 {
                     if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
                     {
-                        string originalQuery = StreamToString(context.Request.Body);
-                        _logger.LogDebug($"OriginalQuery: {originalQuery}");
-                        var newQuery = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {originalQuery.Substring(1, originalQuery.Length - 1)}";
-                        context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newQuery));
-                        context.Request.ContentLength = newQuery.Length;
+                        _logger.LogDebug($"OriginalQuery: {query}");
+                        query = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {query.Substring(1, query.Length - 1)}";
                     }
 
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
-                    var targetRequestMessage = CreateTargetMessage(context, targetUri);
+                    var targetRequestMessage = CreateTargetMessage(context, targetUri, query);
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
                         string body = await targetRequestMessage.Content.ReadAsStringAsync();
@@ -208,6 +203,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     }
                     return;
                 }
+
                 await _nextMiddleware(context);
             }
             catch (Exception e)
