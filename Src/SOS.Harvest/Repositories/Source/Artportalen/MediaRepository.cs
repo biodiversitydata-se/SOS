@@ -32,21 +32,29 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     return null!;
                 }
 
-                var query = @"SELECT 
-	                mf.Id,
+                var query = @" 
+                SELECT          
+                    mf.Id,
 	                mf.SightingID,
                     FileUri,
 	                UploadDateTime,
 	                CopyrightText,
 	                t.Value AS [FileType],
-	                p.FirstName + ' ' + p.LastName AS RightsHolder
-                  FROM MediaFile mf
-	                  LEFT JOIN MediaFileType mft ON mf.MediaFileTypeId = mft.Id 
-	                  LEFT JOIN Resource R ON mft.ResourceLabel = r.Label 
-	                  LEFT JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49
-	                  LEFT JOIN [User] u ON mf.UserId = u.Id
-	                  LEFT JOIN Person p ON u.PersonId = p.Id
-                      INNER JOIN @tvp tvp ON mf.SightingID = tvp.Id";
+	                p.FirstName + ' ' + p.LastName AS RightsHolder,
+					mfc.MessageText AS Comment,
+					mfc.CreationTime AS CommentCreated,
+					mp.FirstName + ' ' + mp.LastName AS CommentBy
+                 FROM 
+					MediaFile mf
+                    INNER JOIN @tvp tvp ON mf.SightingID = tvp.Id
+					LEFT JOIN MediaFileType mft ON mf.MediaFileTypeId = mft.Id
+	                LEFT JOIN Resource R ON mft.ResourceLabel = r.Label 
+	                LEFT JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49
+	                LEFT JOIN [User] u ON mf.UserId = u.Id
+	                LEFT JOIN Person p ON u.PersonId = p.Id
+					LEFT JOIN MediaFileComment mfc ON mfc.MediaFileId = mf.Id AND mfc.Deleted = 0
+					LEFT JOIN [User] mu ON mfc.UserId = mu.Id
+	                LEFT JOIN Person mp ON mu.PersonId = mp.Id";
 
                 return await QueryAsync<MediaEntity>(query,
                     new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });

@@ -284,6 +284,12 @@ namespace SOS.Harvest.Processors.Artportalen
                 {
                     obs.Occurrence.Media = verbatimObservation.Media.Select(m => new Multimedia
                     {
+                        Comments = m.Comments?.Select(c => new MultimediaComment
+                        {
+                            Comment = c.Comment,
+                            CommentBy = c.CommentBy,
+                            Created = c.CommentCreated
+                        }),
                         Created = m.UploadDateTime?.ToShortDateString(),
                         Format = (m.FileUri?.LastIndexOf('.') ?? -1) > 0 ? m.FileUri.Substring(m.FileUri.LastIndexOf('.')): string.Empty,
                         Identifier = GetMediaUrl(m.FileUri),

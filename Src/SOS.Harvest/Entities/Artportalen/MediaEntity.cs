@@ -1,13 +1,26 @@
-﻿using System;
-
-namespace SOS.Harvest.Entities.Artportalen
+﻿namespace SOS.Harvest.Entities.Artportalen
 {
     public class MediaEntity 
     {
         /// <summary>
+        /// Media comment
+        /// </summary>
+        public string? Comment { get; set; }
+
+        /// <summary>
+        /// User making the comment
+        /// </summary>
+        public string? CommentBy { get; set; }
+
+        /// <summary>
+        /// Media comment cration time
+        /// </summary>
+        public DateTime? CommentCreated { get; set; }
+
+        /// <summary>
         ///    Copyright text
         /// </summary>
-        public string CopyrightText { get; set; }
+        public string? CopyrightText { get; set; }
 
         /// <summary>
         ///     Id of media.
@@ -17,17 +30,17 @@ namespace SOS.Harvest.Entities.Artportalen
         /// <summary>
         /// Type of file
         /// </summary>
-        public string FileType { get; set; }
+        public string? FileType { get; set; }
 
         /// <summary>
         /// Uri to file
         /// </summary>
-        public string FileUri { get; set; }
+        public string? FileUri { get; set; }
 
         /// <summary>
         /// Rights holder
         /// </summary>
-        public string RightsHolder { get; set; }
+        public string? RightsHolder { get; set; }
 
         /// <summary>
         /// Id of sighting

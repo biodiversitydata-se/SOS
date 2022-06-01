@@ -204,54 +204,99 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
         #region Media
 
-        private async Task<Media> CastMediaEntityToVerbatimAsync(MediaEntity entity)
+        private IEnumerable<Media> CastMediaEntityToVerbatims(IEnumerable<MediaEntity> entities)
         {
-            if (entity == null)
+            if (!entities?.Any() ?? true)
+            {
+                return null!;
+            }
+            var mediaFiles = new Dictionary<int, Media>();
+
+            foreach(var entity in entities!)
+            {
+                if (!mediaFiles.TryGetValue(entity.Id, out var media))
+                {
+                    media = new Media
+                    {
+                        Comments = new List<MediaComment>(),
+                        CopyrightText = entity.CopyrightText,
+                        FileType = entity.FileType,
+                        FileUri = entity.FileUri,
+                        Id = entity.Id,
+                        RightsHolder = entity.RightsHolder,
+                        UploadDateTime = entity.UploadDateTime
+                    };
+                    mediaFiles.Add(media.Id, media);
+                }
+
+                if (!string.IsNullOrEmpty(entity.Comment))
+                {
+                    media.Comments.Add(new MediaComment
+                    {
+                        Comment = entity.Comment,
+                        CommentBy = entity.CommentBy,
+                        CommentCreated = entity.CommentCreated
+                    });
+                }
+            }
+
+            return mediaFiles.Values;
+        }
+
+        private async Task<IDictionary<int, Media[]>> GetSightingMediaAsync(IEnumerable<int> sightingIds)
+        {
+            var sightingsMedias = new Dictionary<int, IDictionary<int, Media>>();
+
+            if (!sightingIds?.Any() ?? true)
             {
                 return null!;
             }
 
-            return new Media
-            {
-                CopyrightText = entity.CopyrightText,
-                FileType = entity.FileType,
-                FileUri = entity.FileUri,
-                Id = entity.Id,
-                RightsHolder = entity.RightsHolder,
-                UploadDateTime = entity.UploadDateTime
-            };
-        }
+            var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds!);
 
-        private async Task<IDictionary<int, ICollection<Media>>> GetSightingMediaAsync(IEnumerable<int> sightingIds)
-        {
-            var sightingsMedias = new Dictionary<int, ICollection<Media>>();
-
-            if (!sightingIds?.Any() ?? true)
+            if (!sightingMediaEntities?.Any() ?? true)
             {
-                return sightingsMedias;
+                return null!;
             }
 
-            var sightingMediaEntities = await _mediaRepository.GetAsync(sightingIds);
-
-            if (sightingMediaEntities == null)
+            foreach (var sightingMediaEntity in sightingMediaEntities!)
             {
-                return sightingsMedias;
-            }
-
-            foreach (var sightingMediaEntity in sightingMediaEntities)
-            {
-                var media = await CastMediaEntityToVerbatimAsync(sightingMediaEntity);
-
+                // Check if a directory of sighting media exists. If not create it
                 if (!sightingsMedias.TryGetValue(sightingMediaEntity.SightingId, out var sightingMedia))
                 {
-                    sightingMedia = new List<Media>();
+                    sightingMedia = new Dictionary<int, Media>();
                     sightingsMedias.Add(sightingMediaEntity.SightingId, sightingMedia);
                 }
 
-                sightingMedia.Add(media);
+                // Check if the media file allready is added to the sighting collection, if not add it
+                if (!sightingMedia.TryGetValue(sightingMediaEntity.Id, out var media))
+                {
+                    media = new Media
+                    {
+                        Comments = new List<MediaComment>(),
+                        CopyrightText = sightingMediaEntity.CopyrightText,
+                        FileType = sightingMediaEntity.FileType,
+                        FileUri = sightingMediaEntity.FileUri,
+                        Id = sightingMediaEntity.Id,
+                        RightsHolder = sightingMediaEntity.RightsHolder,
+                        UploadDateTime = sightingMediaEntity.UploadDateTime
+                    };
+                    sightingMedia.Add(media.Id, media);
+                }
+
+                // If we have a media comment, add it to media
+                if (!string.IsNullOrEmpty(sightingMediaEntity.Comment))
+                {
+                    media.Comments.Add(new MediaComment
+                    {
+                        Comment = sightingMediaEntity.Comment,
+                        CommentBy = sightingMediaEntity.CommentBy,
+                        CommentCreated = sightingMediaEntity.CommentCreated
+                    });
+                }
             }
 
-            return sightingsMedias;
+            return sightingsMedias.ToDictionary(i => i.Key, v => v.Value.Select(m => m.Value).ToArray());
         }
         #endregion Media
 
@@ -503,7 +548,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 personSightings?.TryGetValue(entity.Id, out personSighting);
                 Project[]? projects = null;
                 sightingsProjects?.TryGetValue(entity.Id, out projects);
-                ICollection<Media>? media = null;
+                Media[]? media = null;
                 sightingsMedias?.TryGetValue(entity.Id, out media);
 
                 var verbatim = CastEntityToVerbatim(entity, site, speciesCollections, personSighting, projects, media);
