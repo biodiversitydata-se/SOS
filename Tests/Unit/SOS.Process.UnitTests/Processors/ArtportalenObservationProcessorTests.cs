@@ -18,6 +18,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -42,6 +43,7 @@ namespace SOS.Process.UnitTests.Processors
             _processManagerMock = new Mock<IProcessManager>();
             _processTimeManagerMock = new Mock<IProcessTimeManager>();
             _validationManagerMock = new Mock<IValidationManager>();
+            _sightingRepository = new Mock<ISightingRepository>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
@@ -56,6 +58,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
         private readonly Mock<IDiffusionManager> _diffusionManagerMock;
         private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
+        private readonly Mock<ISightingRepository> _sightingRepository;
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
             _artportalenVerbatimRepository.Object,
@@ -67,6 +70,7 @@ namespace SOS.Process.UnitTests.Processors
             _validationManagerMock.Object,
             _diffusionManagerMock.Object,
             _processTimeManagerMock.Object,
+            _sightingRepository.Object,
             _processConfiguration,
             _loggerMock.Object);
 

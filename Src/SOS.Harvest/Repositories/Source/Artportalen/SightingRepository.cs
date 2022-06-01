@@ -204,6 +204,22 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<int>> GetDeletedIdsAsync(DateTime from)
+        {
+            string query = @$"
+            SELECT 
+	            st.SightingId 
+            FROM 
+	            SightingState st
+            WHERE 
+	            st.StartDate > '{from.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'
+	            AND st.SightingStateTypeId = 50
+	            AND st.isactive = 1";
+
+            return await QueryAsync<int>(query, null!);
+        }
+
+        /// <inheritdoc />
         public async Task<(int minId, int maxId)> GetIdSpanAsync()
         {
             try
