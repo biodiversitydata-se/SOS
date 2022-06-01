@@ -62,9 +62,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.A
                 .OrderByDescending(m => m.Count)
                 .ToList()
                 .Should().BeEquivalentTo(
-                    new List<ItemCount<bool?>> {
-                        new ItemCount<bool?>(true, 60),
-                        new ItemCount<bool?>(false, 40) });
+                    new List<ItemCount<bool>> {
+                        new ItemCount<bool>(true, 60),
+                        new ItemCount<bool>(false, 40) });
         }
     }
 }

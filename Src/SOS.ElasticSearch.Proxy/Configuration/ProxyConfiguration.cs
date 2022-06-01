@@ -13,6 +13,11 @@
         public bool LogRequest { get; set; }
 
         /// <summary>
+        /// Log the Query rewrite information.
+        /// </summary>
+        public bool LogOriginalQuery { get; set; }
+
+        /// <summary>
         /// Log the response.
         /// </summary>
         public bool LogResponse { get; set; }
