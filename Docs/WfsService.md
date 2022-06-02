@@ -2,17 +2,16 @@
 All public observations that SOS harvest are available in a OGC Web Feature Service (WFS) described on this page.
 - [WFS service overview](#wfs-service-overview)
 - [Service details](#service-details)
-- [Fields](#fields)
 - [HTTP Request examples](#http-request-examples)
 - [QGIS query examples](#qgis-query-examples)
+- [Fields](#fields)
 
 ## WFS service overview
-
 | Name  	| Value 	|
 |:---	|:---	|
 | URL | https://sosgeo.artdata.slu.se/geoserver/SOS/ows |
 | Layer | SOS:SpeciesObservations |
-| Max features in request | 5 000 |
+| Max returned features in a request | 5 000 |
 | Max paging startIndex | 100 000 |
 
 ## Service details
@@ -21,8 +20,38 @@ All public observations that SOS harvest are available in a OGC Web Feature Serv
 - The maximum paging startIndex is 100 000. If you need to retrieve more observations, you need to use a filter.
 - The vocabulary values are always translated into swedish language.
 
-## Fields
+## HTTP Request examples
 
+### Get observations in GeoJSON format
+https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10
+
+### Get observations in SWEREF99 TM coordinate system
+https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10&srsName=EPSG:3006
+
+### Get observations of specific organism group by using CQL filter
+[https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10&CQL_Filter=organismGroup='Kärlväxter'](https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&CQL_Filter=organismGroup%20=%20%27K%C3%A4rlv%C3%A4xter%27&count=10)
+
+### Get observations by using paging
+https://sosgeo.artdata.slu.se/geoserver/SOS/ows?SERVICE=WFS&Request=GetFeature&Version=2.0.0&Typenames=SOS:SpeciesObservations&StartIndex=20&count=10&outputFormat=application/json
+
+## QGIS query examples
+
+### Get present observations
+`isPresentObservation = 1`
+
+### Get invasive observations in a municipality
+`(isInvasiveInSweden=1 OR isInvasiveEu=1) AND municipality='Ydre'`
+
+### Get observations between two dates
+`endDate >= '2022-05-01' AND endDate <= '2022-05-31'`
+
+### Get observations containing specific phrase in occurrenceRemarks
+`occurrenceRemarks LIKE '%björkstam%'`
+
+### Get observations that have project parameter values
+`project1Values IS NOT NULL`
+
+## Fields
 | Field 	| Type 	| Example value	| Description |
 |:---	|:---	|:---	|:---	|
 | occurrenceId | string	| "urn:lsid:artportalen.se:sighting:98072725" | A globally unique identifier for the observation. |
@@ -83,34 +112,3 @@ All public observations that SOS harvest are available in a OGC Web Feature Serv
 | project2Category | string |  | Project category (if the observation belongs to two projects). |
 | project2Url | string |  | Project URL (if the observation belongs to two projects). |
 | project2Values | string |  | Project parameter values (if the observation belongs to two projects). |
-
-## HTTP Request examples
-
-### Get observations in GeoJSON format
-https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10
-
-### Get observations in SWEREF99 TM coordinate system
-https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10&srsName=EPSG:3006
-
-### Get observations of specific organism group by using CQL filter
-https://sosgeo.artdata.slu.se/geoserver/SOS/ows?service=wfs&version=2.0.0&request=GetFeature&typeName=SOS:SpeciesObservations&outputFormat=application/json&count=10&CQL_Filter=organismGroup='Kärlväxter'
-
-### Get observations by using paging
-https://sosgeo.artdata.slu.se/geoserver/SOS/ows?SERVICE=WFS&Request=GetFeature&Version=2.0.0&Typenames=SOS:SpeciesObservations&StartIndex=20&count=10&outputFormat=application/json
-
-## QGIS query examples
-
-### Get present observations
-`isPresentObservation = 1`
-
-### Get invasive observations in a municipality
-`(isInvasiveInSweden=1 OR isInvasiveEu=1) AND municipality='Ydre'`
-
-### Get observations between two dates
-`endDate >= '2022-05-01' AND endDate <= '2022-05-31'`
-
-### Get observations containing specific phrase in occurrenceRemarks
-`occurrenceRemarks LIKE '%björkstam%'`
-
-### Get observations that have project parameter values
-`project1Values IS NOT NULL`
