@@ -24,7 +24,7 @@ All public observations that SOS harvest are available in a OGC Web Feature Serv
 ## Fields
 
 | Field 	| Type 	| Example value	| Description |
-|:---	|:---	|:---	|:---	|:---	|  
+|:---	|:---	|:---	|:---	|
 | occurrenceId | string	| "urn:lsid:artportalen.se:sighting:98072725" | A globally unique identifier for the observation. |
 | url | string | "https://www.artportalen.se/sighting/98072725" | URL to the observation. |
 | isPresentObservation | boolean | true | Indicates whether this observation is a present or absent observation (the species you were looking for was not seen). |
