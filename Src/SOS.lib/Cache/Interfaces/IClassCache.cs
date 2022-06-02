@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Cache.Interfaces
+﻿using System;
+
+namespace SOS.Lib.Cache.Interfaces
 {
     /// <summary>
     /// Class holding a entity 
@@ -6,6 +8,11 @@
     /// <typeparam name="TClass"></typeparam>
     public interface IClassCache<TClass>
     {
+        /// <summary>
+        /// Event raised when cache is released
+        /// </summary>
+        event EventHandler CacheReleased;
+
         /// <summary>
         /// Get cached entity
         /// </summary>
