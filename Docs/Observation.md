@@ -124,8 +124,8 @@ All fields that are part of an observation are listed on this page.
 | **Location** 	| 	|  	|  	|  	|  
 | location.decimalLatitude 	| double? 	| 57.4303 	| The geographic latitude of the geographic center of a Location (WGS84).    	| https://dwc.tdwg.org/terms/#dwc:decimalLatitude 	|
 | location.decimalLongitude 	| double? 	| 16.66547 	| The geographic longitude of the geographic center of a Location (WGS84).    	| https://dwc.tdwg.org/terms/#dwc:decimalLongitude 	|
-| location.geodeticDatum 	| string 	| "EPSG:4326" 	| The ellipsoid, geodetic datum, or spatial reference system (SRS) upon   which the geographic coordinates given in decimalLatitude and   decimalLongitude as based.    	| https://dwc.tdwg.org/terms/#dwc:geodeticDatum 	|
-| location.coordinateUncertaintyInMeters 	| int32? 	| 100 	| The horizontal distance (in meters) from the given CoordinateX and   CoordinateY describing the smallest circle containing the whole of the   Location.    	| https://dwc.tdwg.org/terms/#dwc:coordinateUncertaintyInMeters 	|
+| location.geodeticDatum 	| string 	| "EPSG:4326" 	| The ellipsoid, geodetic datum, or spatial reference system (SRS) upon   which the geographic coordinates given in decimalLatitude and decimalLongitude as based.    	| https://dwc.tdwg.org/terms/#dwc:geodeticDatum 	|
+| location.coordinateUncertaintyInMeters 	| int32? 	| 100 	| The horizontal distance (in meters) from the given CoordinateX and   CoordinateY describing the smallest circle containing the whole of the Location.    	| https://dwc.tdwg.org/terms/#dwc:coordinateUncertaintyInMeters 	|
 | location.Sweref99TmX 	| double? 	| 661035 	| X coordinate in SWEREF99 TM. |  	|
 | location.Sweref99TmY 	| double? 	| 6569227 	| Y coordinate in SWEREF99 TM. |  	|
 | location.locality 	| string 	| "Mosse 200 m SO om TÅNGEN, Vg" 	| The specific description of the place.    	| https://dwc.tdwg.org/terms/#dwc:locality 	|

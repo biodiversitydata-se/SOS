@@ -22,6 +22,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 - [type](#type)
 - [unit](#unit)
 - [verificationStatus](#verificationstatus)
+- [taxonCategory](#taxonCategory)
 
 ## accessRights
 | Id | Value |
