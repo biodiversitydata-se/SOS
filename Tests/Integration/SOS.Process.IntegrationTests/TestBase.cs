@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 
@@ -66,6 +67,19 @@ namespace SOS.Process.IntegrationTests
             var elasticConfiguration = config.GetSection("SearchDbConfiguration")
                 .Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
+        }
+
+        protected ArtportalenConfiguration GetArtportalenConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var artportalenConfiguration = config.GetSection("ArtportalenConfiguration")
+                .Get<ArtportalenConfiguration>();
+            return artportalenConfiguration;
         }
     }
 }

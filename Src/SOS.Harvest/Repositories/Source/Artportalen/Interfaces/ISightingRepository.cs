@@ -25,6 +25,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds);
 
         /// <summary>
+        /// Get list of sigthing id's deleted in AP
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
+        Task<IEnumerable<int>> GetDeletedIdsAsync(DateTime from);
+
+        /// <summary>
         ///     Get min and max id
         /// </summary>
         /// <returns></returns>

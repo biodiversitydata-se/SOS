@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     ///     Simple Multimedia extension
@@ -6,6 +8,7 @@
     /// </summary>
     public class Multimedia
     {
+        public IEnumerable<MultimediaComment> Comments { get; set; }
         public string Type { get; set; }
         public string Format { get; set; }
         public string Identifier { get; set; }

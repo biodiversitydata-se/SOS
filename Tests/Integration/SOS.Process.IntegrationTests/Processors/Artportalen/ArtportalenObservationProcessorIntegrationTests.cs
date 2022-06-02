@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Cache;
@@ -26,8 +25,12 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Services;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using Xunit;
 using SOS.Lib.Managers.Interfaces;
+using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
+using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 
 namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {
@@ -120,6 +123,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);
             var processTimeManager = new ProcessTimeManager(processConfiguration);
+            var artportalenConfiguration = GetArtportalenConfiguration();
+            var artportalenDataService = new ArtportalenDataService(artportalenConfiguration, new NullLogger<ArtportalenDataService>());
+            var sightingRepository = new SightingRepository(artportalenDataService, new NullLogger<SightingRepository>());
 
             return new ArtportalenObservationProcessor(
                 artportalenVerbatimRepository,
@@ -131,6 +137,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 validationManager,
                 diffusionManager,
                 processTimeManager,
+                sightingRepository,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
         }

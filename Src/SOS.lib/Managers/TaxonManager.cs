@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -19,12 +18,32 @@ namespace SOS.Lib.Managers
     /// </summary>
     public class TaxonManager : ITaxonManager
     {
-        private static readonly object InitLock = new object();
+        private static readonly object InitTaxonTreeLock = new object();
+        private static readonly object InitTaxonListLock = new object();
         private readonly ILogger<TaxonManager> _logger;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ITaxonListRepository _taxonListRepository;
         private readonly IClassCache<TaxonTree<IBasicTaxon>> _taxonTreeCache;
         private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
+
+        private void OnTaxonTreeCacheReleased(object sender, EventArgs e)
+        {
+            PopulateTaxonTreeCache();
+        }
+
+        /// <summary>
+        /// Populate taxon tree cache
+        /// </summary>
+        /// <returns></returns>
+        private TaxonTree<IBasicTaxon> PopulateTaxonTreeCache()
+        {
+            lock (InitTaxonTreeLock)
+            {
+                var taxonTree = GetTaxonTreeAsync().Result;
+                _taxonTreeCache.Set(taxonTree);
+                return taxonTree;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -48,6 +67,8 @@ namespace SOS.Lib.Managers
             _taxonTreeCache = taxonTreeCache ?? throw new ArgumentNullException(nameof(taxonTreeCache));
             _taxonListSetsByIdCache = taxonListSetsByIdCache ?? throw new ArgumentNullException(nameof(taxonListSetsByIdCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _taxonTreeCache.CacheReleased += OnTaxonTreeCacheReleased;
         }
 
         /// <summary>
@@ -56,17 +77,7 @@ namespace SOS.Lib.Managers
         {
             get
             {
-                var taxonTree = _taxonTreeCache.Get();
-                if (taxonTree == null)
-                {
-                    lock (InitLock)
-                    {
-                        taxonTree = GetTaxonTreeAsync().Result;
-                        _taxonTreeCache.Set(taxonTree);
-                    }
-                }
-
-                return taxonTree;
+                return _taxonTreeCache.Get() ?? PopulateTaxonTreeCache();
             }
         }
 
@@ -77,7 +88,7 @@ namespace SOS.Lib.Managers
                 var taxonListSetsById = _taxonListSetsByIdCache.Get();
                 if (taxonListSetsById == null)
                 {
-                    lock (InitLock)
+                    lock (InitTaxonListLock)
                     {
                         taxonListSetsById = GetTaxonListSetsAsync().Result;
                         _taxonListSetsByIdCache.Set(taxonListSetsById);
@@ -115,16 +126,22 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                const int batchSize = 200000;
+                var taxaCount = await _processedTaxonRepository.CountAllDocumentsAsync();
+                const int batchSize = 10000;
                 var skip = 0;
-                var tmpTaxa = await _processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize);
-                var taxa = new List<BasicTaxon>();
-
-                while (tmpTaxa?.Any() ?? false)
+                var tasks = new List<Task<IEnumerable<BasicTaxon>>>();
+               
+                while(skip < taxaCount)
                 {
-                    taxa.AddRange(tmpTaxa);
-                    skip += tmpTaxa.Count();
-                    tmpTaxa = await _processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize);
+                    tasks.Add(_processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize));
+                    skip += batchSize;
+                }
+           
+                await Task.WhenAll(tasks);
+                var taxa = new List<BasicTaxon>();
+                foreach (var task in tasks)
+                {
+                    taxa.AddRange(task.Result);
                 }
 
                 return taxa;

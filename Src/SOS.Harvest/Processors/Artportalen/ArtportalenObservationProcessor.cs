@@ -12,6 +12,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
+using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 
 namespace SOS.Harvest.Processors.Artportalen
 {
@@ -22,6 +23,7 @@ namespace SOS.Harvest.Processors.Artportalen
         IArtportalenObservationProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
+        private readonly ISightingRepository _sightingRepository;
         private readonly IVocabularyRepository _processedVocabularyRepository;
         private readonly string _artPortalenUrl;
 
@@ -37,6 +39,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="validationManager"></param>
         /// <param name="diffusionManager"></param>
         /// <param name="processTimeManager"></param>
+        /// <param name="sightingRepository"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -49,6 +52,7 @@ namespace SOS.Harvest.Processors.Artportalen
             IValidationManager validationManager,
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
+            ISightingRepository sightingRepository,
             ProcessConfiguration processConfiguration,
             ILogger<ArtportalenObservationProcessor> logger) : 
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
@@ -57,7 +61,7 @@ namespace SOS.Harvest.Processors.Artportalen
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedVocabularyRepository = processedVocabularyRepository ??
                                                throw new ArgumentNullException(nameof(processedVocabularyRepository));
-            
+            _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _artPortalenUrl = processConfiguration?.ArtportalenUrl ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
 
@@ -77,6 +81,25 @@ namespace SOS.Harvest.Processors.Artportalen
                     TimeManager);
             _artportalenVerbatimRepository.Mode = mode;
 
+            if (mode != JobRunModes.Full)
+            {
+                // If mode = IncrementalInactiveInstance, make sure we get all deleted since full harvest started. 24 hours should be more than enought.
+                // Else 1 hour shold do it since we run incremental harvest every 5 min
+                var idsToDelete = await _sightingRepository.GetDeletedIdsAsync(DateTime.Now.AddHours(mode == JobRunModes.IncrementalInactiveInstance ? -24 : -1));
+                if (idsToDelete?.Any() ?? false)
+                {
+                    Logger.LogDebug($"Start deleting {idsToDelete.Count():N0} Artportalen sightings ({mode})");
+                    var occurrenceIds = idsToDelete.Select(id => ArtportalenObservationFactory.GetOccurenceId(id));
+
+                    await Task.WhenAll(new[]
+                    {
+                        ProcessedObservationRepository.DeleteByOccurrenceIdAsync(occurrenceIds, false),
+                        ProcessedObservationRepository.DeleteByOccurrenceIdAsync(occurrenceIds, true)
+                    });
+                    Logger.LogDebug($"Finish deleting {idsToDelete.Count():N0} Artportalen sightings ({mode})");
+                }
+            }
+            
             return await base.ProcessObservationsAsync(
                 dataProvider,
                 mode,

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Cache;
@@ -34,15 +32,19 @@ using SOS.Harvest.Processors.ObservationDatabase;
 using SOS.Harvest.Processors.Sers;
 using SOS.Harvest.Processors.Shark;
 using SOS.Harvest.Processors.VirtualHerbarium;
+using SOS.Harvest.Repositories.Source.Artportalen;
+using SOS.Harvest.Services;
 using Xunit;
 using SOS.Lib.Managers.Interfaces;
-
+using AreaRepository = SOS.Lib.Repositories.Resource.AreaRepository;
+using TaxonRepository = SOS.Lib.Repositories.Resource.TaxonRepository;
 namespace SOS.Process.IntegrationTests.Jobs
 {
     public class ProcessObservationsJobIntegrationTests : TestBase
     {
         private ProcessObservationsJob CreateProcessJob(bool storeProcessed)
         {
+            
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
             var elasticClientManager = new ElasticClientManager(elasticConfiguration, true);
@@ -52,7 +54,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
-
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
@@ -68,8 +69,9 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var dataProviderRepository =
                 new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>());
-
-
+            var artportalenConfiguration = GetArtportalenConfiguration();
+            var artportalenDataService = new ArtportalenDataService(artportalenConfiguration, new NullLogger<ArtportalenDataService>());
+            var sightingRepository = new SightingRepository(artportalenDataService, new NullLogger<SightingRepository>());
             var taxonCache = new TaxonCache(taxonProcessedRepository);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
@@ -211,6 +213,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 validationManager,
                 diffusionManager,
                 processTimeManager,
+                sightingRepository,
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
 

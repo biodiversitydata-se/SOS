@@ -406,7 +406,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<IProjectManager, ProjectManager>();
             services.AddScoped<ITaxonListManager, TaxonListManager>();
-            services.AddScoped<ITaxonManager, TaxonManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IArtportalenApiManager, ArtportalenApiManager>();
 

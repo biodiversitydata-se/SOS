@@ -124,13 +124,6 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             _processedObservationRepository.LiveMode = true;
         }
 
-        private string StreamToString(Stream stream)
-        {
-            var streamContent = new StreamContent(stream);
-            var str = streamContent.ReadAsStringAsync().Result;
-            return str;
-        }
-
         /// <summary>
         /// Handle request
         /// </summary>
