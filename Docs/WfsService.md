@@ -87,9 +87,9 @@ https://sosgeo.artdata.slu.se/geoserver/SOS/ows?SERVICE=WFS&Request=GetFeature&V
 | isInvasiveEu | boolean | false | True if invasive in sweden according to EU Regulation 1143/2014. |
 | invasiveRiskCategory | string | "SE" | Invasive risk assessment category. |
 | actionPlan | string | "Fastställt" | Indicates whether the species is the subject of an action plan ('åtgärdsprogram' in swedish). |
-| isHabitatsDirectiveArticle2 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 2. |
-| isHabitatsDirectiveArticle4 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 4. |
-| isHabitatsDirectiveArticle5 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 5. |
+| isHabitatsDirectiveAnnex2 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 2. |
+| isHabitatsDirectiveAnnex4 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 4. |
+| isHabitatsDirectiveAnnex5 | boolean | false | Indicates whether the taxon is part of Habitats directive Annex 5. |
 | isVerified | boolean | true | Indicates whether the occurrence is verified. |
 | isUncertainIdentification | boolean | false | True if determination is uncertain. |
 | activity | string | "födosökande" | A description of the activity shown by the subject at the time the Occurrence was recorded. Uses values from the [Activity vocabulary](Vocabularies.md#activity) |
