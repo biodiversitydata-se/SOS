@@ -347,37 +347,31 @@ namespace SOS.Lib
         {
             var sightingTypeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
-            // Default DoNotShowMerged
-            var sightingTypeSearchGroupFilter = new[] { // 1, 4, 16, 32, 128
-                (int)SightingTypeSearchGroup.Ordinary,
-                (int)SightingTypeSearchGroup.Aggregated,
-                (int)SightingTypeSearchGroup.AssessmentChild,
-                (int)SightingTypeSearchGroup.Replacement,
-                (int)SightingTypeSearchGroup.OwnBreedingAssessment };
-
-            if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.ShowBoth)
+            // Search group 2 and 128 have no effect since we don't harvest sighting type 2,5,6,7,9,10 who are the types using these groups
+            var sightingTypeSearchGroupFilter = filter.TypeFilter switch
             {
-                sightingTypeSearchGroupFilter = new[] { // 1, 2, 4, 16, 32, 128
+                SearchFilterBase.SightingTypeFilter.ShowBoth => new[] { // 1, 2, 4, 16, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
                     (int)SightingTypeSearchGroup.Assessment,
                     (int)SightingTypeSearchGroup.Aggregated,
                     (int)SightingTypeSearchGroup.AssessmentChild,
                     (int)SightingTypeSearchGroup.Replacement,
-                    (int)SightingTypeSearchGroup.OwnBreedingAssessment };
-            }
-            else if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.ShowOnlyMerged)
-            {
-                sightingTypeSearchGroupFilter = new[] { (int)SightingTypeSearchGroup.Assessment }; // 2
-            }
-            else if (filter.TypeFilter == SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged)
-            {
-                sightingTypeSearchGroupFilter = new[] { // 1, 2, 4, 32, 128
+                    (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                SearchFilterBase.SightingTypeFilter.ShowOnlyMerged =>
+                    new[] { (int)SightingTypeSearchGroup.Assessment }, // 2
+                SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged => new[] { // 1, 2, 4, 32, 128
                     (int)SightingTypeSearchGroup.Ordinary,
                     (int)SightingTypeSearchGroup.Assessment,
                     (int)SightingTypeSearchGroup.Aggregated,
                     (int)SightingTypeSearchGroup.Replacement,
-                    (int)SightingTypeSearchGroup.OwnBreedingAssessment };
-            }
+                    (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                _ => new[] { // 1, 4, 16, 32, 128 Default DoNotShowMerged
+                    (int)SightingTypeSearchGroup.Ordinary,
+                    (int)SightingTypeSearchGroup.Aggregated,
+                    (int)SightingTypeSearchGroup.AssessmentChild,
+                    (int)SightingTypeSearchGroup.Replacement,
+                    (int)SightingTypeSearchGroup.OwnBreedingAssessment }
+            };
 
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
