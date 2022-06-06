@@ -415,6 +415,10 @@
               "SosId": 1
             },
             {
+              "Value": "Reportedbyexpert",
+              "SosId": 1
+            },
+            {
               "Value": "Ovaliderad",
               "SosId": 10
             },

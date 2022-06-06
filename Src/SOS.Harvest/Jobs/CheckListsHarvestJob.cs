@@ -56,7 +56,7 @@ namespace SOS.Harvest.Jobs
                 //------------------------------------------------------------------------
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<HarvestInfo>>();
                 _logger.LogInformation("Start adding checklist harvesters.");
-                foreach (var dataProvider in dataProviders.Where(dp => _harvestersByType.ContainsKey(dp.Type)))
+                foreach (var dataProvider in dataProviders.Where(dp => dp.Type != DataProviderType.DwcA && _harvestersByType.ContainsKey(dp.Type)))
                 {
                     var harvestJob = _harvestersByType[dataProvider.Type];
 
