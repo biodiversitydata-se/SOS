@@ -37,17 +37,6 @@ namespace SOS.Harvest.Processors
         }
 
         /// <summary>
-        /// Calculate protection level
-        /// </summary>
-        /// <param name="taxon"></param>
-        /// <param name="accessRightsId"></param>
-        /// <returns></returns>
-        protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon)
-        {
-            return CalculateProtectionLevel(taxon, null);
-        }
-
-        /// <summary>
         /// Populate some generic data
         /// </summary>
         /// <param name="observation"></param>

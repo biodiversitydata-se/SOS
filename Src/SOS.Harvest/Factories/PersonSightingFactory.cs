@@ -198,7 +198,7 @@ namespace SOS.Harvest.Factories
             {
                 var persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId))
                     .OrderByDescending(ob => ob.Sort)
-                    .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.Sort > 0, discover: v.Discover));
+                    .Select(v => (person: personsByUserId[v.UserId], viewAccess: v.SightingRelationTypeId.Equals(2), discover: v.Discover));
                 var observers = string.Join(", ", persons.Select(n => n.person.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key,
                     (observers, persons.Select(g => new UserInternal
