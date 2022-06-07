@@ -313,7 +313,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
             processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
             processedIdentification.Verified = GetIsValidated(processedIdentification.ValidationStatus);
-            processedIdentification.IdentifiedBy = verbatim.IdentifiedBy;
+            processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;
             return processedIdentification;
         }
