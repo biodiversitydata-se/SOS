@@ -80,6 +80,7 @@ namespace SOS.Harvest.Harvesters.DwC
             IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(DateTime.Now);
+            harvestInfo.Id = dataProvider.ChecklistIdentifier;
 
             using var dwcArchiveVerbatimRepository = new EventOccurrenceDarwinCoreArchiveVerbatimRepository(
                     dataProvider,
