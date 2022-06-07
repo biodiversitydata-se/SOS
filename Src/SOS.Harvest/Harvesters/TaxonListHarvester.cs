@@ -54,7 +54,7 @@ namespace SOS.Harvest.Harvesters
 
         public async Task<HarvestInfo> HarvestTaxonListsAsync()
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now) { Id = nameof(TaxonList) };
+            var harvestInfo = new HarvestInfo(nameof(TaxonList), DateTime.Now);
             try
             {
                 _logger.LogDebug("Start getting taxon lists");

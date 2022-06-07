@@ -46,7 +46,7 @@ namespace SOS.Harvest.Harvesters.Shark
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("SHARK", DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
             _sharkObservationVerbatimRepository.TempMode = true;
 

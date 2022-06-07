@@ -48,7 +48,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("KUL", DateTime.Now);
             _kulObservationVerbatimRepository.TempMode = true;
 
             try

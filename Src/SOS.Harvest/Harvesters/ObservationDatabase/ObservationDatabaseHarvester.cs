@@ -154,7 +154,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("ObservationDatabase", DateTime.Now);
             _observationDatabaseVerbatimRepository.TempMode = true;
 
             try

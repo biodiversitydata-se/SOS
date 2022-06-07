@@ -48,7 +48,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Sers
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("SERS", DateTime.Now);
             _sersObservationVerbatimRepository.TempMode = true;
 
             try

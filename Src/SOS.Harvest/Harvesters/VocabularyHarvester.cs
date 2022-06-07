@@ -124,7 +124,7 @@ namespace SOS.Harvest.Harvesters
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now){ Id = nameof(Vocabulary) };
+            var harvestInfo = new HarvestInfo(nameof(Vocabulary), DateTime.Now);
             var vocabularies = new List<Vocabulary>();
             try
             {

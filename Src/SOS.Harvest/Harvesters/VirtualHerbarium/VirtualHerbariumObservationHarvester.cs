@@ -47,7 +47,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("VirtualHerbarium", DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
             var occurrenceIdsSet = new HashSet<string>();
             _virtualHerbariumObservationVerbatimRepository.TempMode = true;

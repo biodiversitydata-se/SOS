@@ -104,7 +104,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(1);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now) {Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now) {Status = RunStatus.Success});
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
 

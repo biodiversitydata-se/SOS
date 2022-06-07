@@ -57,7 +57,7 @@ namespace SOS.Harvest.Harvesters
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now) { Id = nameof(Area) };
+            var harvestInfo = new HarvestInfo(nameof(Area), DateTime.Now);
             try
             {
                 _logger.LogDebug("Start getting areas");

@@ -192,7 +192,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestChecklistsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("Artportalen-Checklist", DateTime.Now);
 
             try
             {

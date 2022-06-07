@@ -79,7 +79,7 @@ namespace SOS.Harvest.Harvesters.DwC
             DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo(dataProvider.Identifier, DateTime.Now);
             harvestInfo.Id = dataProvider.ChecklistIdentifier;
 
             using var dwcArchiveVerbatimRepository = new EventOccurrenceDarwinCoreArchiveVerbatimRepository(
@@ -159,7 +159,7 @@ namespace SOS.Harvest.Harvesters.DwC
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestChecklistsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now)
+            var harvestInfo = new HarvestInfo(provider.ChecklistIdentifier, DateTime.Now)
             {
                 Status = RunStatus.Failed
             };

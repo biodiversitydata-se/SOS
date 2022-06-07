@@ -42,7 +42,7 @@ namespace SOS.Harvest.Harvesters
 
         public async Task<HarvestInfo> HarvestProjectsAsync()
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now) { Id = nameof(ProjectInfo) };
+            var harvestInfo = new HarvestInfo(nameof(ProjectInfo), DateTime.Now);
             try
             {
                 _logger.LogDebug("Start getting projects");

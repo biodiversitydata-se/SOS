@@ -48,7 +48,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
             using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(
                 dataProvider,

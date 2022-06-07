@@ -45,7 +45,7 @@ namespace SOS.Harvest.Harvesters.Mvm
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("MVM", DateTime.Now);
             _mvmObservationVerbatimRepository.TempMode = true;
 
             try

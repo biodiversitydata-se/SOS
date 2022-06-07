@@ -196,14 +196,14 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(true);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(DateTime.Now));
+                .ReturnsAsync(new HarvestInfo("Identifier", DateTime.Now));
             _artportalenProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),  JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
                     DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1, 1, 0));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(
+                .ReturnsAsync(new HarvestInfo("Identifier",
                     DateTime.Now));
             _kulProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(),JobRunModes.Full,  JobCancellationToken.Null))

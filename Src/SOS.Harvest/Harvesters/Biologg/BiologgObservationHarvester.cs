@@ -54,7 +54,7 @@ namespace SOS.Harvest.Harvesters.Biologg
         /// inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now)
+            var harvestInfo = new HarvestInfo("Biologg", DateTime.Now)
             {
                 Status = RunStatus.Failed
             };

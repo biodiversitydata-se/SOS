@@ -471,7 +471,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
         public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(DateTime.Now);
+            var harvestInfo = new HarvestInfo("Artportalen", DateTime.Now);
             _logger.LogInformation($"Start harvesting sightings for Artportalen data provider. Mode={mode}");
 
             try
