@@ -10,9 +10,9 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
+using Polly;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Exceptions;
@@ -32,7 +32,7 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
-using Area = SOS.Lib.Models.Processed.Observation.Area;
+using Policy = Polly.Policy;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -2280,31 +2280,36 @@ namespace SOS.Lib.Repositories.Processed
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
-            ISearchResponse<dynamic> searchResponse;
+            
+            // Retry policy by Polly
+            var retryPolicy = Policy.Handle<Exception>()
+                .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(100));
 
-            if (string.IsNullOrEmpty(scrollId))
+            var searchResponse = await retryPolicy.ExecuteAsync(async () =>
             {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(indexNames)
-                    .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
-                    .Size(take)
-                    .Scroll(_elasticConfiguration.ScrollTimeout)
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                var queryResponse = string.IsNullOrEmpty(scrollId) ?
+                    await Client.SearchAsync<dynamic>(s => s
+                        .Index(indexNames)
+                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                        .Size(take)
+                        .Scroll(_elasticConfiguration.ScrollTimeout)
+                        .Query(q => q
+                            .Bool(b => b
+                                .MustNot(excludeQuery)
+                                .Filter(query)
+                            )
                         )
-                    )
-                    .Sort(sort => sortDescriptor)
-                );
-            }
-            else
-            {
-                searchResponse = await Client
-                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
-            }
+                        .Sort(sort => sortDescriptor)
+                    ) : await Client
+                        .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                if (!queryResponse.IsValid) {
+                    throw new InvalidOperationException(queryResponse.DebugInformation);
+                }
+
+                return queryResponse;
+            });
+
             operation.Telemetry.Metrics["SpeciesObservationCount"] = searchResponse.Documents.Count;
 
             // Optional: explicitly send telemetry item:
@@ -3259,42 +3264,42 @@ namespace SOS.Lib.Repositories.Processed
             SearchFilterBase filter,
             string scrollId)
         {
-            ISearchResponse<dynamic> searchResponse;
+            // Retry policy by Polly
+            var retryPolicy = Policy.Handle<Exception>()
+                .WaitAndRetryAsync(retryCount: 3, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(100));
 
-            if (string.IsNullOrEmpty(scrollId))
+            var searchResponse = await retryPolicy.ExecuteAsync(async () =>
             {
-                var query = filter.ToQuery();
-                var projection = new SourceFilterDescriptor<dynamic>()
-                    .Excludes(e => e
-                        .Field("artportalenInternal")
-                        .Field("location.point")
-                        .Field("location.pointLocation")
-                        .Field("location.pointWithBuffer")
-                        .Field("location.pointWithDisturbanceBuffer")
-                    );
-                var indexNames = GetCurrentIndex(filter);
-                searchResponse = await Client
+                var queryResponse = string.IsNullOrEmpty(scrollId) ? await Client
                     .SearchAsync<dynamic>(s => s
-                        .Index(indexNames)
-                        .Source(p => projection)
+                        .Index(GetCurrentIndex(filter))
+                        .Source(p => new SourceFilterDescriptor<dynamic>()
+                            .Excludes(e => e
+                                .Field("artportalenInternal")
+                                .Field("location.point")
+                                .Field("location.pointLocation")
+                                .Field("location.pointWithBuffer")
+                                .Field("location.pointWithDisturbanceBuffer")
+                            ))
                         .Query(q => q
                             .Bool(b => b
-                                .Filter(query)
+                                .Filter(filter.ToQuery())
                             )
                         )
                         .Sort(s => s.Ascending(new Field("_doc")))
                         .Scroll(_elasticConfiguration.ScrollTimeout)
                         .Size(_elasticConfiguration.ScrollBatchSize)
-                    );
-
-            }
-            else
-            {
-                searchResponse = await Client
+                    ) :
+                     await Client
                     .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
-            }
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                if (!queryResponse.IsValid)
+                {
+                    throw new InvalidOperationException(queryResponse.DebugInformation);
+                }
+
+                return queryResponse;
+            });
 
             return new ScrollResult<Observation>
             {
