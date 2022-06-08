@@ -30,12 +30,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
         // Todo arguments for protected sightings       
         protected string SightingWhereBasics => @$" 
-            s.SightingTypeId IN ({string.Join(",", // s.SightingTypeId IN (0,1,3,8)
+            s.SightingTypeId IN ({string.Join(",", // s.SightingTypeId IN (0,1,3,8,10)
                 (int)SightingType.NormalSighting,
                 (int)SightingType.AggregationSighting,
                 (int)SightingType.ReplacementSighting,
-                (int)SightingType.CorrectionSighting)}) 
-            AND s.SightingTypeSearchGroupId IN ({string.Join(",", // s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128). 2 is unnecessary since we don't harvest SightingTypeId 2,5,6,7,9. 128 is unnecessary since we don't harvest SightingTypeId 10. Remove?
+                (int)SightingType.CorrectionSighting,
+                (int)SightingType.AssessmentSightingForOwnBreeding)}) 
+            AND s.SightingTypeSearchGroupId IN ({string.Join(",", // s.SightingTypeSearchGroupId IN (1, 2, 4, 16, 32, 128). 2 is unnecessary since we don't harvest SightingTypeId 2,5,6,7,9. Remove?
                 (int)SightingTypeSearchGroup.Ordinary,
                 (int)SightingTypeSearchGroup.Assessment,
                 (int)SightingTypeSearchGroup.Aggregated,
