@@ -73,28 +73,42 @@ namespace SOS.Harvest.Jobs
                 }
                 _logger.LogInformation($"DwC-A file is ready to be opened: {archivePath}");
 
-                var harvestInfoResult = target.Equals(DwcaTarget.Checklist) ?
-                    await _dwcChecklistHarvester.HarvestChecklistsAsync(archivePath, dataProvider, cancellationToken) :
-                    await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
+                if (target.Equals(DwcaTarget.Checklist))
+                {
+                    var checklistResult = await _dwcChecklistHarvester.HarvestChecklistsAsync(archivePath, dataProvider, cancellationToken);
+
+                    // Save check list harvest info
+                    await _harvestInfoRepository.AddOrUpdateAsync(checklistResult);
+                    if (checklistResult.Status != RunStatus.Success)
+                    {
+                        throw new Exception($"Checklist harvest status: {checklistResult.Status}");
+                    }
+
+                    try
+                    {
+                        await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, _dwcChecklistHarvester.GetEmlXmlDocument(archivePath));
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, $"Error when writing Checklist EML file for {dataProvider}");
+                    }
+                }
+                // Harvest observations
+                var harvestInfoResult = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
 
                 try
                 {
-                    var emlDocument = target.Equals(DwcaTarget.Checklist) ?
-                        _dwcChecklistHarvester.GetEmlXmlDocument(archivePath) :
-                        _dwcObservationHarvester.GetEmlXmlDocument(archivePath);
-                    await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, emlDocument);
+                    await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, _dwcObservationHarvester.GetEmlXmlDocument(archivePath));
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, $"Error when writing EML file for {dataProvider}");
+                    _logger.LogError(e, $"Error when writing observation EML file for {dataProvider}");
                 }
 
                 _logger.LogInformation($"End DwC-A Harvest Job. Status: {harvestInfoResult.Status}");
 
                 // Save harvest info
-                await _harvestInfoRepository
-                    .AddOrUpdateAsync(
-                        harvestInfoResult);
+                await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
 
                 return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
                     ? true
@@ -102,7 +116,7 @@ namespace SOS.Harvest.Jobs
             }
             finally
             {
-                if (System.IO.File.Exists(archivePath)) System.IO.File.Delete(archivePath);
+                if (File.Exists(archivePath)) File.Delete(archivePath);
             }
         }
 
