@@ -109,12 +109,13 @@ namespace SOS.Lib.Configuration.Shared
                 var uris = cluster.Hosts.Select(u => new Uri(u));
 
                 var connectionPool = new StaticConnectionPool(uris);
-                var settings = new ConnectionSettings(connectionPool);
-                settings.EnableHttpCompression(true);
-                settings.RequestTimeout(TimeSpan.FromSeconds(300));
-                settings.SniffOnStartup(true);
-                settings.SniffOnConnectionFault(true);
-                settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+                var settings = new ConnectionSettings(connectionPool)
+                    .EnableApiVersioningHeader()
+                    .EnableHttpCompression(true)
+                    .RequestTimeout(TimeSpan.FromSeconds(300))
+                    .SniffOnStartup(true)
+                    .SniffOnConnectionFault(true)
+                    .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
              
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {

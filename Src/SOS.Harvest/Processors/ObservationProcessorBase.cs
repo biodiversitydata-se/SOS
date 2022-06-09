@@ -51,14 +51,6 @@ namespace SOS.Harvest.Processors
                 elasticSearchWriteTimerSessionId =
                     TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticSearchWrite);
 
-                if (vocabularyValueResolver.Configuration.ResolveValues)
-                {
-                    // used for testing purpose for easier debugging of vocabulary mapped data.
-                    vocabularyValueResolver
-                        .ResolveVocabularyMappedValues(
-                            processedObservations);
-                }
-
                 Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}{(protectedData ? " [protected]" : "")}");
                 var processedCount =
                     await ProcessedObservationRepository.AddManyAsync(processedObservations, protectedData);
