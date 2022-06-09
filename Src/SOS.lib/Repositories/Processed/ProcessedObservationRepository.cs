@@ -10,8 +10,6 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nest;
-using Polly;
-using Polly.Retry;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -33,7 +31,6 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
-using Policy = Polly.Policy;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -1166,9 +1163,6 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        private AsyncRetryPolicy GetRetryPolicy(int retries, int sleepMs) => Policy.Handle<Exception>()
-                .WaitAndRetryAsync(retryCount: retries, sleepDurationProvider: _ => TimeSpan.FromMilliseconds(sleepMs));
-
         private async Task<ScrollResult<Observation>> ScrollObservationsWithCompleteObjectAsync(int dataProviderId, bool protectedIndex,
             string scrollId)
         {
@@ -2286,7 +2280,7 @@ namespace SOS.Lib.Repositories.Processed
             operation.Telemetry.Properties["Filter"] = filter.ToString();
             
             // Retry policy by Polly
-            var searchResponse = await GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = string.IsNullOrEmpty(scrollId) ?
                     await Client.SearchAsync<dynamic>(s => s
@@ -3266,7 +3260,7 @@ namespace SOS.Lib.Repositories.Processed
             string scrollId)
         {
             // Retry policy by Polly
-            var searchResponse = await GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = string.IsNullOrEmpty(scrollId) ? await Client
                     .SearchAsync<dynamic>(s => s
