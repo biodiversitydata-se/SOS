@@ -27,7 +27,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="authorizationUseDisturbanceRadius"></param>
         /// <param name="setDefaultProviders"></param>
         /// <returns></returns>
-        Task PrepareFilter(
+        Task PrepareFilterAsync(
             int? roleId,
             string authorizationApplicationIdentifier, 
             SearchFilterBase filter,
@@ -36,6 +36,13 @@ namespace SOS.Lib.Managers.Interfaces
             bool? authorizationUsePointAccuracy = false, 
             bool? authorizationUseDisturbanceRadius = false, 
             bool? setDefaultProviders = true);
+
+        /// <summary>
+        /// Add additional information if necessary
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task PrepareFilterAsync(ChecklistSearchFilter filter);
 
         /// <summary>
         /// Prepare taxon filter

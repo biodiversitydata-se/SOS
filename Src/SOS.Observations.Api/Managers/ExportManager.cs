@@ -266,7 +266,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
+                await _filterManager.PrepareFilterAsync(0,null, filter);
 
                 var fileExportResult = exportFormat switch
                 {

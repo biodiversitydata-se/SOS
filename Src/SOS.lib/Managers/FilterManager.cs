@@ -383,7 +383,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilter(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
         {
             // Get user
             var user = await _userService.GetUserAsync();
@@ -416,6 +416,15 @@ namespace SOS.Lib.Managers
             }
 
             PrepareTaxonFilter(filter.Taxa);
+        }
+
+        /// <inheritdoc />
+        public async Task PrepareFilterAsync(ChecklistSearchFilter filter)
+        {
+            if (filter.Location?.Areas != null)
+            {
+                filter.Location.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Location.Areas, 0, filter.Location.Geometries?.UsePointAccuracy ?? false, filter.Location.Geometries?.UseDisturbanceRadius ?? false);
+            }
         }
 
         public HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter)

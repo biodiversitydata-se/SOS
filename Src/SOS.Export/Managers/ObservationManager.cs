@@ -107,7 +107,7 @@ namespace SOS.Export.Managers
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
+                await _filterManager.PrepareFilterAsync(0,null, filter);
 
                 fileExportResult = exportFormat switch
                 {
@@ -152,7 +152,7 @@ namespace SOS.Export.Managers
             FileExportResult fileExportResult = null;
             try
             {
-                await _filterManager.PrepareFilter(0,null, filter);
+                await _filterManager.PrepareFilterAsync(0,null, filter);
                 fileExportResult = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case

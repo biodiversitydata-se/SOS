@@ -153,7 +153,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
@@ -183,7 +183,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, sortBy, sortOrder, scrollId);
                 PostProcessObservations(filter.ExtendedAuthorization.ProtectedObservations, processedObservations.Records, filter.FieldTranslationCultureCode);
@@ -208,7 +208,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
                 if(aggregationType.IsDateHistogram())
                     return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
@@ -235,7 +235,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision);
             }
             catch (Exception e)
@@ -250,7 +250,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
             }
             catch (Exception e)
@@ -266,7 +266,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellSizeInMeters);
             }
             catch (Exception e)
@@ -285,7 +285,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetCompleteGeoTileTaxaAggregationAsync(filter, zoom);
             }
             catch (Exception e)
@@ -306,7 +306,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 return await _processedObservationRepository.GetPageGeoTileTaxaAggregationAsync(filter, zoom, geoTilePage, taxonIdPage);
             }
             catch (Exception e)
@@ -333,13 +333,13 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
         private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
         {
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
@@ -402,7 +402,7 @@ namespace SOS.Observations.Api.Managers
                         _logger.LogInformation("Start create taxonSumAggregationCache");
                         var searchFilter = new SearchFilter();
                         searchFilter.PositiveSightings = true;
-                        _filterManager.PrepareFilter(null, null, searchFilter).Wait();
+                        _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
                         Stopwatch sp = Stopwatch.StartNew();
                         taxonAggregation = await _processedObservationRepository.GetTaxonSumAggregationAsync(searchFilter);
                         sp.Stop();
@@ -577,7 +577,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter);                
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                
                 return await _processedObservationRepository.GetTaxonAggregationAsync(filter, 
                     skip, 
                     take, 
@@ -598,7 +598,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", 0, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (filter?.Taxa?.Ids?.Count() > 10000)
                 {
@@ -625,7 +625,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
@@ -680,7 +680,7 @@ namespace SOS.Observations.Api.Managers
             filter.PopulateOutputFields(outputFieldSet);
             filter.ExtendedAuthorization.ProtectedObservations = protectedObservations;
 
-            await _filterManager.PrepareFilter(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
@@ -714,7 +714,7 @@ namespace SOS.Observations.Api.Managers
                 filter.ExtendedAuthorization.ObservedByMe = true;
                 filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
-                await _filterManager.PrepareFilter(null, null, filter);
+                await _filterManager.PrepareFilterAsync(null, null, filter);
 
                 if (filter.ExtendedAuthorization.UserId == 0)
                 {
@@ -740,7 +740,7 @@ namespace SOS.Observations.Api.Managers
                 filter.ExtendedAuthorization.ObservedByMe = true;
                 filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
-                await _filterManager.PrepareFilter(null, null, filter);
+                await _filterManager.PrepareFilterAsync(null, null, filter);
 
                 if (filter.ExtendedAuthorization.UserId == 0)
                 {
@@ -766,7 +766,7 @@ namespace SOS.Observations.Api.Managers
                 filter.ExtendedAuthorization.ObservedByMe = true;
                 filter.ExtendedAuthorization.ProtectedObservations = false; // Since we have set ObservedByMe, we don't need authorization check (always acces to own observations)
                 filter.DiffusionStatuses = new List<DiffusionStatus> { DiffusionStatus.NotDiffused };
-                await _filterManager.PrepareFilter(null, null, filter);
+                await _filterManager.PrepareFilterAsync(null, null, filter);
 
                 if (filter.ExtendedAuthorization.UserId == 0)
                 {

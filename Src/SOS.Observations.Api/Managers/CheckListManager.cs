@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -19,22 +19,27 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IProcessedChecklistRepository _processedChecklistRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IFilterManager _filterManager;
         private readonly ILogger<ChecklistManager> _logger;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="processedChecklistRepository"></param>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="filterManager"></param>
         /// <param name="logger"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ChecklistManager(
             IProcessedChecklistRepository processedChecklistRepository,
             IProcessedObservationRepository processedObservationRepository,
+            IFilterManager filterManager,
             ILogger<ChecklistManager> logger)
         {
             _processedChecklistRepository = processedChecklistRepository ?? throw new ArgumentNullException(nameof(processedChecklistRepository));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
+            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -44,9 +49,9 @@ namespace SOS.Observations.Api.Managers
 
         /// <inheritdoc />
         public async Task<TaxonTrendResult> CalculateTrendAsync(SearchFilter observationFilter, ChecklistSearchFilter checklistSearchFilter)
-        {            
+        {
             // todo - use observationFilter in next version.
-
+            await _filterManager.PrepareFilterAsync(checklistSearchFilter);
             var taxonTrendResult = new TaxonTrendResult();
             taxonTrendResult.NrPresentObservations = await _processedChecklistRepository.GetPresentCountAsync(checklistSearchFilter);
             taxonTrendResult.NrAbsentObservations = await _processedChecklistRepository.GetAbsentCountAsync(checklistSearchFilter);            
