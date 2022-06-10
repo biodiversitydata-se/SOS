@@ -374,7 +374,8 @@ namespace SOS.Observations.Api
                 .AddCheck<DataProviderHealthCheck>("Data providers", tags: new[] { "data providers", "meta data" })
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
-                .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
+                .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" })
+                .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" });
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -446,7 +447,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IGeoJsonFileWriter, GeoJsonFileWriter>();
 
             // Helpers, static data => single instance 
-            services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();                       
+            services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
         }
 
         /// <summary>
