@@ -144,14 +144,16 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     _logger.LogInformation($"Original query: {query}");
                 }
 
-                // Rewrite sort by _id to use sort by event.endDate
-                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
-                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
-                query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
-                    "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                context.Items.Add("Requesting-System", "WFS");
 
                 if (targetUri != null)
                 {
+                    // Rewrite sort by _id to use sort by event.endDate
+                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"asc\"}}",
+                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+                    query = query.Replace("\"sort\":[{\"_id\":{\"order\":\"desc\"}}",
+                        "\"sort\":[{\"event.endDate\":{\"order\":\"desc\"}}");
+
                     if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
                     {
                         query = $"{{ {_proxyConfiguration.ExcludeFieldsQuery} {query.Substring(1, query.Length - 1)}";
