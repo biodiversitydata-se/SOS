@@ -118,7 +118,8 @@ namespace SOS.Harvest.Jobs
 
             _logger.LogInformation($"Finish harvest job ({mode})");
 
-            if (!processOnSuccess || harvestCount == 0)
+            // Always process incremental active instance in order to delete removed observations 
+            if ((!processOnSuccess || harvestCount == 0) && mode != JobRunModes.IncrementalActiveInstance)
             {
                 return true;
             }

@@ -7,6 +7,7 @@ using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.Triangulate;
 using NetTopologySuite.Utilities;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
@@ -251,6 +252,88 @@ namespace SOS.Lib.Extensions
             var maxTilesTot = (long)(maxLonTiles * maxLatTiles);
 
             return maxTilesTot;
+        }
+
+        /// <summary>
+        /// Calculte concave hull for a list of polygons
+        /// </summary>
+        /// <param name="polygons">Boundig box as polygon</param>
+        /// <param name="alphaValue"></param>
+        /// <param name="useCenterPoint">Used when concave hull is calculated. Grid corner coordinates used when false</param>
+        /// <returns></returns>
+        public static Geometry ConcaveHull(this Polygon[] polygons, double alphaValue, bool useCenterPoint)
+        {
+            if (!polygons?.Any() ?? true)
+            {
+                return null;
+            }
+
+            Point[] points;
+            if (useCenterPoint)
+            {
+                //Create a geometry with all grid cell points, this is much faster than using the gridcells because it's less coordinates, the generated geometry will also look better
+                points = (from p in polygons select p.Centroid).ToArray();
+            }
+            else
+            {
+                var polygonCount = polygons.Count();
+                points = new Point[polygonCount * 4];
+
+                for (var i = 0; i < polygonCount; i++)
+                {
+                    var polygon = polygons[i];
+                    var boundigBox = polygon.Envelope;
+
+                    var startIndex = i * 4;
+                    points[startIndex] = new Point(new Coordinate(boundigBox.Coordinates[0].X, boundigBox.Coordinates[0].Y));
+                    points[startIndex + 1] = new Point(new Coordinate(boundigBox.Coordinates[1].X, boundigBox.Coordinates[1].Y));
+                    points[startIndex + 2] = new Point(new Coordinate(boundigBox.Coordinates[2].X, boundigBox.Coordinates[2].Y));
+                    points[startIndex + 3] = new Point(new Coordinate(boundigBox.Coordinates[3].X, boundigBox.Coordinates[3].Y));
+                }
+            }
+
+            //Triangulate all points
+            var triangulationBuilder = new ConformingDelaunayTriangulationBuilder();
+            triangulationBuilder.SetSites(new MultiPoint(points));
+
+            var geometryFactory = new GeometryFactory();
+            var triangles = triangulationBuilder.GetTriangles(geometryFactory);
+
+            Geometry alphaGeometry = null;
+            for (var i = 0; i < triangles.Count; i++)
+            {
+                var triangle = triangles[i];
+
+                var a = triangle.Coordinates[0].Distance(triangle.Coordinates[1]); // Length side a
+                var b = triangle.Coordinates[1].Distance(triangle.Coordinates[2]); // Length side b
+                var c = triangle.Coordinates[2].Distance(triangle.Coordinates[3]); // Length side c
+                var p = a + b + c; // Perimeter 
+                var area = 0.25 * Math.Sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
+                var radius = 2 * area / p;
+                radius = radius / 1000; //Div radius by 1000 to (commonly) keep alpha values in a range of 1 - 1000
+
+                if (radius < alphaValue)
+                {
+                    alphaGeometry = alphaGeometry == null ? triangle : alphaGeometry.Union(triangle);
+                }
+            }
+
+            return alphaGeometry;
+        }
+
+        /// <summary>
+        /// Get the convex hull for a list of polygons
+        /// </summary>
+        /// <param name="polygons">Boundig box as polygon</param>
+        /// <returns></returns>
+        public static Geometry ConvexHull(this Polygon[] polygons)
+        {
+            if (!polygons?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return new MultiPolygon(polygons).ConvexHull();
         }
 
         /// <summary>
@@ -899,7 +982,6 @@ namespace SOS.Lib.Extensions
 
             return false;
         }
-
         #endregion Public
     }
 }
