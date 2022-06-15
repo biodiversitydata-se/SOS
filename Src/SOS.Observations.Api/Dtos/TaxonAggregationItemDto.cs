@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Dtos
 {
     public class TaxonAggregationItemDto
     {
+        public DateTime? FirstSighting { get; set; }
+
+        public DateTime? LastSighting { get; set; }
         public int TaxonId { get; set; }
         public int ObservationCount { get; set; }
     }

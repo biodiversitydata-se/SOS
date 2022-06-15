@@ -43,9 +43,9 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                     .With(p => p.TaxonId = 100012)
                     .With(p => p.Site.Province = new GeographicalArea { FeatureId = "3" })
                 .TheNext(20)
-                    .With(p => p.TaxonId = 100013)
+                    .With(p => p.TaxonId = 100016)
                 .TheLast(20)
-                    .With(p => p.TaxonId = 100014)
+                    .With(p => p.TaxonId = 100017)
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

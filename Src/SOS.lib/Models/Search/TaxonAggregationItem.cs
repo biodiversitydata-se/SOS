@@ -1,14 +1,22 @@
-﻿namespace SOS.Lib.Models.Search
+﻿using System;
+
+namespace SOS.Lib.Models.Search
 {
     public class TaxonAggregationItem
     {
         public int TaxonId { get; set; }
         public int ObservationCount { get; set; }
 
-        public static TaxonAggregationItem Create(int taxonId, int count)
+        public DateTime? FirstSighting { get; set; }
+
+        public DateTime? LastSighting { get; set; }
+
+        public static TaxonAggregationItem Create(int taxonId, int count, DateTime? firstSighting, DateTime? lastSighting)
         {
             return new TaxonAggregationItem
             {
+                FirstSighting = firstSighting,
+                LastSighting = lastSighting,
                 TaxonId = taxonId,
                 ObservationCount = count
             };

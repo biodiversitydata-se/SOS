@@ -48,11 +48,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                     .With(p => p.StartDate = new DateTime(2000, 1, 30))
                     .With(p => p.EndDate = new DateTime(2000, 1, 30))
                 .TheNext(20)
-                    .With(p => p.TaxonId = 100011)
+                    .With(p => p.TaxonId = 100016)
                     .With(p => p.StartDate = new DateTime(2000, 1, 1))
                     .With(p => p.EndDate = new DateTime(2000, 2, 1))
                 .TheLast(20)
-                    .With(p => p.TaxonId = 100011)
+                    .With(p => p.TaxonId = 100016)
                     .With(p => p.StartDate = new DateTime(2000, 4, 1))
                     .With(p => p.EndDate = new DateTime(2000, 4, 15))
                 .Build();

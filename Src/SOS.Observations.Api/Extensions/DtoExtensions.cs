@@ -490,6 +490,8 @@ namespace SOS.Observations.Api.Extensions
         {
             return new TaxonAggregationItemDto
             {
+                FirstSighting = taxonAggregationItem.FirstSighting,
+                LastSighting = taxonAggregationItem.LastSighting,
                 TaxonId = taxonAggregationItem.TaxonId,
                 ObservationCount = taxonAggregationItem.ObservationCount
             };
