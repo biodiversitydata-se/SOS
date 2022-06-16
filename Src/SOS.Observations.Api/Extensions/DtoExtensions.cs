@@ -202,7 +202,7 @@ namespace SOS.Observations.Api.Extensions
             return new LocationFilter
             {
                 Areas = filter.Areas?.Select(a => new AreaFilter
-                { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }),
+                { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
                 Geometries = new GeographicsFilter
                 {
                     BoundingBox = filter.BoundingBox?.ToLatLonBoundingBox(),
