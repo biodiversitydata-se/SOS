@@ -135,6 +135,7 @@ namespace SOS.Observations.Api
                 {
                     options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
                     options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             // MongoDB conventions.
@@ -159,16 +160,6 @@ namespace SOS.Observations.Api
                     options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
                     options.TokenValidationParameters.RoleClaimType = "rname";
                 });
-
-            // Add Mvc Core services
-            services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
-                .AddApiExplorer()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
@@ -515,7 +506,7 @@ namespace SOS.Observations.Api
                     options.DocExpansion(DocExpansion.None);
                 }
             });
-
+         
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -572,6 +563,8 @@ namespace SOS.Observations.Api
             Task.Run(() => {                
                     observationManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
             });
+
+            
         }
         
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)

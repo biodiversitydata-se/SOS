@@ -356,7 +356,6 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-
                 var validationResult = Result.Combine(
                     validateSearchFilter ? ValidateSearchFilter(filter) : Result.Success());
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
