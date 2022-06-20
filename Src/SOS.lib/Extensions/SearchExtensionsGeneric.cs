@@ -5,7 +5,7 @@ using System.Reflection;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Extensions
 {

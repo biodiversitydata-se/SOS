@@ -5,7 +5,8 @@ using CSharpFunctionalExtensions;
 using SOS.Lib.Cache;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -146,13 +147,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<DateTime?> GetLatestModifiedDateForProviderAsync(int providerId);
-
-        /// <summary>
-        /// Get locations by id
-        /// </summary>
-        /// <param name="locationIds"></param>
-        /// <returns></returns>
-        Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds);
 
         Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
 

@@ -16,10 +16,10 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.Excel
 {

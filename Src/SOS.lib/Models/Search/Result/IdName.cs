@@ -1,10 +1,10 @@
-﻿namespace SOS.Lib.Models.Search
+﻿namespace SOS.Lib.Models.Search.Result
 {
     /// <summary>
     ///     Generic id name object
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class IdName<T> 
+    public class IdName<T>
     {
         /// <summary>
         ///     Id

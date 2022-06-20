@@ -13,7 +13,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 

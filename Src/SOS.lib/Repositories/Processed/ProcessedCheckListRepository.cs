@@ -13,7 +13,8 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Lib.Repositories.Processed
@@ -24,11 +25,6 @@ namespace SOS.Lib.Repositories.Processed
     public class ProcessedChecklistRepository : ProcessRepositoryBase<Checklist, string>,
         IProcessedChecklistRepository
     {
-        private readonly IElasticClientManager _elasticClientManager;
-        private readonly ElasticSearchConfiguration _elasticConfiguration;
-
-        private IElasticClient Client => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
-
         /// <summary>
         /// Add the collection
         /// </summary>
@@ -37,8 +33,8 @@ namespace SOS.Lib.Repositories.Processed
         {
             var createIndexResponse = await Client.Indices.CreateAsync(IndexName, s => s
                 .Settings(s => s
-                    .NumberOfShards(_elasticConfiguration.NumberOfShards)
-                    .NumberOfReplicas(_elasticConfiguration.NumberOfReplicas)
+                    .NumberOfShards(NumberOfShards)
+                    .NumberOfReplicas(NumberOfReplicas)
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
@@ -177,10 +173,8 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedChecklistRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedChecklistRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
-            _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             LiveMode = false;
         }
 
@@ -376,10 +370,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string IndexName => IndexHelper.GetIndexName<Checklist>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
-
-        /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<Checklist>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<Checklist>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

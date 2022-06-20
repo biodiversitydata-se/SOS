@@ -7,7 +7,7 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using static SOS.Lib.Extensions.SearchExtensionsGeneric;
 
 namespace SOS.Lib
@@ -534,10 +534,10 @@ namespace SOS.Lib
                 return;
             }
 
+            query.TryAddTermsCriteria("location.locationId", filter.LocationIds);
             query.TryAddGeographicalAreaFilter(filter.AreaGeographic);
             query.TryAddGeometryFilters(filter.Geometries);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-
         }
 
         /// <summary>

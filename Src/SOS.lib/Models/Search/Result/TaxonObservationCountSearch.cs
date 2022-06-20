@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SOS.Lib.Enums;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Result
 {
     /// <summary>
     /// Search query for calculating observation count for multiple taxa.

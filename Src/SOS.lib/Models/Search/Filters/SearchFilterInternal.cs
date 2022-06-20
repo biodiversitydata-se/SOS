@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SOS.Lib.Enums;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     ///     Search filter for the internal advanced search
@@ -70,7 +70,7 @@ namespace SOS.Lib.Models.Search
         public int? ObservedByUserServiceUserId { get; set; }
 
         public bool IncludeRealCount { get; set; }
-        
+
         /// <summary>
         /// Only include hits with media associated
         /// </summary>
@@ -86,7 +86,7 @@ namespace SOS.Lib.Models.Search
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-        
+
         public bool UsePeriodForAllYears { get; set; }
         public IEnumerable<int> Months { get; set; }
         public DateFilterComparison MonthsComparison { get; set; } = DateFilterComparison.StartDate;
@@ -117,11 +117,11 @@ namespace SOS.Lib.Models.Search
         public string PublicCollection { get; set; }
 
         public string PrivateCollection { get; set; }
-        
+
         public int? SubstrateSpeciesId { get; set; }
         public int? SubstrateId { get; set; }
 
-        public int?  BiotopeId { get; set; }
+        public int? BiotopeId { get; set; }
 
         public SightingNotPresentFilter NotPresentFilter { get; set; }
 

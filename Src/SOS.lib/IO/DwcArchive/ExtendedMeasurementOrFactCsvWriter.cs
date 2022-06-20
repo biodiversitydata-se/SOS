@@ -11,8 +11,8 @@ using SOS.Export.Models;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.DwcArchive
 {

@@ -13,12 +13,12 @@ using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 using Xunit;
 using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Export.UnitTests.Managers
 {

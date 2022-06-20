@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Managers
 {

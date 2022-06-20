@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Interfaces;
 

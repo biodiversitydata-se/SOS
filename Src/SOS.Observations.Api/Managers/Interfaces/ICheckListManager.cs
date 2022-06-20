@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.Dtos.Checklist;
 

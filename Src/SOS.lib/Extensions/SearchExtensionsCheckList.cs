@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nest;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib
 {

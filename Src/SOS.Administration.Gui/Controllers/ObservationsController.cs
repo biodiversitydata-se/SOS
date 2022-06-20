@@ -8,7 +8,7 @@ using MongoDB.Driver;
 using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Services;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Administration.Gui.Controllers

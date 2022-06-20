@@ -38,7 +38,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Extensions

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// Search filter used to in checklist search

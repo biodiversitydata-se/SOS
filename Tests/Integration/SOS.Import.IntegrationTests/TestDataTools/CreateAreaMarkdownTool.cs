@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.TestDataTools

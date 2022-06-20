@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Search
+﻿namespace SOS.Lib.Models.Search.Result
 {
     /// <summary>
     ///     Result returned by scroll query

@@ -2,7 +2,7 @@
 using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.IO.Excel.Interfaces
 {

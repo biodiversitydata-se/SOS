@@ -10,7 +10,8 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -165,13 +166,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
-        /// Get locations by id
-        /// </summary>
-        /// <param name="locationIds"></param>
-        /// <returns></returns>
-        Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds);
-
-        /// <summary>
         /// Get number of matches for query
         /// </summary>
         /// <param name="filter"></param>
@@ -313,11 +307,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<long> IndexCountAsync(bool protectedIndex);
-
-        /// <summary>
-        /// Max number of aggregation buckets in ElasticSearch.
-        /// </summary>
-        int MaxNrElasticSearchAggregationBuckets { get; }
 
         /// <summary>
         /// Name of public index 

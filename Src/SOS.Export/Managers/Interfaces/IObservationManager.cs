@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Export.Managers.Interfaces
 {

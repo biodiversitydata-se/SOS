@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.Jobs

@@ -30,14 +30,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         bool LiveMode { get; set; }
 
         /// <summary>
-        /// Batch size used for read
+        /// Max number of aggregation buckets in ElasticSearch.
         /// </summary>
-        int ReadBatchSize { get; }
+        int MaxNrElasticSearchAggregationBuckets { get; }
 
         /// <summary>
         /// Batch size used for read
         /// </summary>
-        int ScrollBatchSize { get; }
+        int ReadBatchSize { get; }
 
         /// <summary>
         /// Set active instance

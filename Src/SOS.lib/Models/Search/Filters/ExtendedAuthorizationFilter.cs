@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// Filter for extended authorization
@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Areas where user has extended authorization
         /// </summary>
-        public List<ExtendedAuthorizationAreaFilter> ExtendedAreas{ get; set; }
+        public List<ExtendedAuthorizationAreaFilter> ExtendedAreas { get; set; }
 
         /// <summary>
         /// Only get observations observed by me

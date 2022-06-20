@@ -9,11 +9,13 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
+using SOS.Observations.Api.Dtos.Location;
 using SOS.Observations.Api.Dtos.Vocabulary;
 using static SOS.Observations.Api.Dtos.Filter.SearchFilterBaseDto;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
@@ -211,6 +213,7 @@ namespace SOS.Observations.Api.Extensions
                     UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
                     UsePointAccuracy = filter.ConsiderObservationAccuracy,
                 },
+                LocationIds = filter.LocationIds,
                 MaxAccuracy = filter.MaxAccuracy
             };
         }
@@ -922,6 +925,25 @@ namespace SOS.Observations.Api.Extensions
                 PointWithBuffer = location.PointWithBuffer,
                 PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer,
                 ProjectId = location.Attributes?.ProjectId
+            };
+        }
+
+        public static LocationSearchResultDto ToDto(this LocationSearchResult locationSearchResult)
+        {
+            if (locationSearchResult == null)
+            {
+                return null;
+            }
+
+            return new LocationSearchResultDto
+            {
+                County = locationSearchResult.County,
+                Id = locationSearchResult.Id,
+                Latitude = locationSearchResult.Latitude,
+                Longitude = locationSearchResult.Longitude,
+                Municipality = locationSearchResult.Municipality,
+                Name = locationSearchResult.Name,
+                Parish = locationSearchResult.Parish
             };
         }
 

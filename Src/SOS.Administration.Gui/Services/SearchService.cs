@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Models.Search;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
 using SOS.Administration.Gui.Dtos;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Administration.Gui.Services
 {

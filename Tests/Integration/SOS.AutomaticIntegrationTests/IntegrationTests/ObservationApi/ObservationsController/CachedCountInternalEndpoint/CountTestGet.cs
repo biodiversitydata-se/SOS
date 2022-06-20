@@ -7,7 +7,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.ObservationsController.CashedCountInternalEndpoint
 {

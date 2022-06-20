@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.IntegrationTests.Fixtures;
 using Xunit;
 

@@ -25,7 +25,8 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -37,12 +38,10 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation, string>,
+    public class ProcessedObservationRepository : ProcessedObservationBaseRepository,
         IProcessedObservationRepository
     {
         private const int ElasticSearchMaxRecords = 10000;
-        private readonly IElasticClientManager _elasticClientManager;
-        private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly ITaxonManager _taxonManager;
@@ -56,9 +55,6 @@ namespace SOS.Lib.Repositories.Processed
             set => _httpContextAccessor = value;
         }
 
-        private IElasticClient Client => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
-
-        private IElasticClient InActiveClient => _elasticClientManager.Clients.Length == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
 
         /// <summary>
         /// Add the collection
@@ -69,8 +65,8 @@ namespace SOS.Lib.Repositories.Processed
         {
             var createIndexResponse = await Client.Indices.CreateAsync(protectedIndex ? ProtectedIndexName : PublicIndexName, s => s
                 .Settings(s => s
-                    .NumberOfShards(_elasticConfiguration.NumberOfShards)
-                    .NumberOfReplicas(_elasticConfiguration.NumberOfReplicas)
+                    .NumberOfShards(NumberOfShards)
+                    .NumberOfReplicas(NumberOfReplicas)
                     .Setting("max_terms_count", 110000)
                     .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
                 )
@@ -910,21 +906,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
-        /// Get core queries
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        private Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(SearchFilterBase filter)
-        {
-            var query = filter.ToQuery();
-            var excludeQuery = filter.ToExcludeQuery();
-
-            return new Tuple<ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>,
-                ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>>(query, excludeQuery);
-        }
-
-        /// <summary>
         /// Aggregate observations by GeoTile and Taxon.
         /// </summary>
         /// <param name="query"></param>
@@ -1099,32 +1080,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
-        /// Get public index name and also protected index name if user is authorized
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        private string GetCurrentIndex(SearchFilterBase filter)
-        {
-            if (((filter?.ExtendedAuthorization.ObservedByMe ?? false) || (filter?.ExtendedAuthorization.ReportedByMe ?? false) || (filter?.ExtendedAuthorization.ProtectedObservations ?? false)) &&
-                (filter?.ExtendedAuthorization.UserId ?? 0) == 0)
-            {
-                throw new AuthenticationRequiredException("Not authenticated");
-            }
-
-            if (!filter?.ExtendedAuthorization.ProtectedObservations ?? true)
-            {
-                return PublicIndexName;
-            }
-
-            if (!_httpContextAccessor?.HttpContext?.User?.HasAccessToScope(_elasticConfiguration.ProtectedScope) ?? true)
-            {
-                throw new AuthenticationRequiredException("Not authorized");
-            }
-
-            return ProtectedIndexName;
-        }
-
-        /// <summary>
         /// Get last modified date for provider
         /// </summary>
         /// <param name="providerId"></param>
@@ -1168,14 +1123,14 @@ namespace SOS.Lib.Repositories.Processed
                         .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
                         .Sort(s => s.Ascending(new Field("_doc")))
-                        .Scroll(_elasticConfiguration.ScrollTimeout)
-                        .Size(_elasticConfiguration.ScrollBatchSize)
+                        .Scroll(ScrollTimeout)
+                        .Size(ScrollBatchSize)
                     );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
             }
 
             return new ScrollResult<Observation>
@@ -1262,12 +1217,8 @@ namespace SOS.Lib.Repositories.Processed
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            LiveMode = true;
-
-            _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -1286,12 +1237,8 @@ namespace SOS.Lib.Repositories.Processed
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(true, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(false, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
-            LiveMode = false;
-
-            _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
@@ -2093,42 +2040,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds)
-        {
-            if (!locationIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var searchResponse = await Client.SearchAsync<Observation>(s => s
-                .Index($"{PublicIndexName}, {ProtectedIndexName}")
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(f => f
-                            .Terms(t => t
-                                .Field("location.locationId")
-                                .Terms(locationIds)
-                            )
-                        )
-                    )
-                )
-                .Collapse(c => c.Field("location.locationId"))
-               .Source(s => s
-                    .Includes(i => i
-                        .Field("location")
-                    )
-                )
-            );
-
-            if (!searchResponse.IsValid)
-            {
-                throw new InvalidOperationException(searchResponse.DebugInformation);
-            }
-
-            return searchResponse.Documents?.Select(d => d.Location);
-        }
-
-        /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(SearchFilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
@@ -2281,7 +2192,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Index(indexNames)
                         .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                         .Size(take)
-                        .Scroll(_elasticConfiguration.ScrollTimeout)
+                        .Scroll(ScrollTimeout)
                         .Query(q => q
                             .Bool(b => b
                                 .MustNot(excludeQuery)
@@ -2290,7 +2201,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                         .Sort(sort => sortDescriptor)
                     ) : await Client
-                        .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
+                        .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
                 if (!queryResponse.IsValid) {
                     throw new InvalidOperationException(queryResponse.DebugInformation);
@@ -3182,14 +3093,6 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
-
-        /// <inheritdoc />
-        public string PublicIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
-
-        /// <inheritdoc />
-        public string ProtectedIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, _elasticClientManager.Clients.Length == 1, LiveMode ? ActiveInstance : InActiveInstance, true);
-
         /// <inheritdoc />
         public async Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
             SearchFilterBase filter,
@@ -3211,14 +3114,14 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                     .Sort(s => s.Ascending(new Field("_doc")))
-                    .Scroll(_elasticConfiguration.ScrollTimeout)
-                    .Size(_elasticConfiguration.ScrollBatchSize)
+                    .Scroll(ScrollTimeout)
+                    .Size(ScrollBatchSize)
                 );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -3252,14 +3155,14 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                     .Sort(s => s.Ascending(new Field("_doc")))
-                    .Scroll(_elasticConfiguration.ScrollTimeout)
-                    .Size(_elasticConfiguration.ScrollBatchSize)
+                    .Scroll(ScrollTimeout)
+                    .Size(ScrollBatchSize)
                 );
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -3298,11 +3201,11 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                         .Sort(s => s.Ascending(new Field("_doc")))
-                        .Scroll(_elasticConfiguration.ScrollTimeout)
-                        .Size(_elasticConfiguration.ScrollBatchSize)
+                        .Scroll(ScrollTimeout)
+                        .Size(ScrollBatchSize)
                     ) :
                      await Client
-                    .ScrollAsync<Observation>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
 
                 if (!queryResponse.IsValid)
                 {
@@ -3348,15 +3251,15 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                         .Sort(s => s.Ascending(new Field("_doc")))
-                        .Scroll(_elasticConfiguration.ScrollTimeout)
-                        .Size(_elasticConfiguration.ScrollBatchSize)
+                        .Scroll(ScrollTimeout)
+                        .Size(ScrollBatchSize)
                     );
 
             }
             else
             {
                 searchResponse = await Client
-                    .ScrollAsync<dynamic>(_elasticConfiguration.ScrollTimeout, scrollId);
+                    .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -3427,10 +3330,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string UniquePublicIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniquePublicIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
-        public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(_elasticConfiguration.IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
+        public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
 
         /// <inheritdoc />
         public async Task<bool> ValidateProtectionLevelAsync(bool protectedIndex)

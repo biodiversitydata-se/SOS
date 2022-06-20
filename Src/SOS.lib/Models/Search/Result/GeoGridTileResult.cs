@@ -4,7 +4,7 @@ using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Result
 {
     public class GeoGridTileResult
     {
@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Search
         public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
         {
             var featureCollection = new FeatureCollection();
-            
+
             foreach (var gridCellTile in GridCellTiles)
             {
                 var feature = gridCellTile.GetFeature(coordinateSystem);

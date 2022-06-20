@@ -8,7 +8,7 @@ using SOS.Export.Jobs;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using Xunit;
 

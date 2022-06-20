@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Nest;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Search

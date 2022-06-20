@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using static SOS.Lib.Models.Search.DateFilter;
+using static SOS.Lib.Models.Search.Filters.DateFilter;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     ///     Base filter class

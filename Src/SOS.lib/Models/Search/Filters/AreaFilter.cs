@@ -1,6 +1,6 @@
 ﻿using SOS.Lib.Enums;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// Area filter.
@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.Search
         ///     Type of area
         /// </summary>
         public AreaType AreaType { get; set; }
-       
+
         /// <summary>
         ///    Feature
         /// </summary>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// Location related filter
@@ -21,6 +21,11 @@ namespace SOS.Lib.Models.Search
         /// Geometry filter
         /// </summary>
         public GeographicsFilter Geometries { get; set; }
+
+        /// <summary>
+        /// Filter on location id's
+        /// </summary>
+        public IEnumerable<string> LocationIds { get; set; }
 
         /// <summary>
         /// Limit observation accuracy. Only observations with accuracy less than this will be returned

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SOS.Lib.Models.Gis;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Result
 {
     /// <summary>
     /// Geo grid aggregation 

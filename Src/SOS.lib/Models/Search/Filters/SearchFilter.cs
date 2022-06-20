@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     /// 
@@ -25,7 +25,7 @@ namespace SOS.Lib.Models.Search
 
         public new SearchFilter Clone()
         {
-            var searchFilter = (SearchFilter) MemberwiseClone();
+            var searchFilter = (SearchFilter)MemberwiseClone();
             return searchFilter;
         }
     }

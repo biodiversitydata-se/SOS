@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
 using Quartz;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Administration.Api.Controllers
 {

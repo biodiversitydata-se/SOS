@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos.Checklist;

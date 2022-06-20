@@ -1,19 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
-using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using SOS.Observations.Api.Dtos.Filter;
-using SOS.Observations.Api.Dtos;
 using System.Linq;
-using LinqStatistics;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
-using SOS.AutomaticIntegrationTests.Extensions;
-using System.ComponentModel;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 using System.IO;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -54,7 +46,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationProcessing.D
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var nrObservations = await _fixture.DwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new Lib.Models.Search.SearchFilter(),
+                new Lib.Models.Search.Filters.SearchFilter(),
                 writeStream,
                 fieldDescriptions,
                 _fixture.ProcessedObservationRepository,

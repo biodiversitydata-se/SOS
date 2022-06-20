@@ -4,7 +4,7 @@ using System.Linq;
 using Nest;
 using SOS.Lib.Models.Gis;
 
-namespace SOS.Lib.Models.Search
+namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
     ///     Class used for geometry searches
@@ -54,7 +54,7 @@ namespace SOS.Lib.Models.Search
                     var valid = geom != null &&
                                 (geom.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) &&
                                  MaxDistanceFromPoint > 0.0 ||
-                                 new[] {"polygon", "multipolygon"}.Contains(geom.Type.ToLower()));
+                                 new[] { "polygon", "multipolygon" }.Contains(geom.Type.ToLower()));
                     if (!valid)
                     {
                         return valid;

@@ -55,7 +55,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
@@ -394,6 +394,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
+            services.AddScoped<ILocationManager, LocationManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<IProjectManager, ProjectManager>();
@@ -408,6 +409,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedChecklistRepository, ProcessedChecklistRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+            services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();

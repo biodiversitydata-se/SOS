@@ -11,7 +11,7 @@ using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;

@@ -21,7 +21,8 @@ using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Extensions;
@@ -322,13 +323,7 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(providerId);
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
-        {
-            var locations =  await _processedObservationRepository.GetLocationsAsync(locationIds);
-
-            return locations?.Select(l => l.ToDto());
-        }        
+        
 
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)

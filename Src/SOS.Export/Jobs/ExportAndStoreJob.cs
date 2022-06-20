@@ -5,7 +5,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Export.Jobs
 {
