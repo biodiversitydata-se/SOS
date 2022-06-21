@@ -150,6 +150,7 @@ namespace SOS.Observations.Api.Dtos.Filter
 
         public IEnumerable<int> DatasourceIds { get; set; }
 
+        [Obsolete("Use geographics.locationNameFilter")]
         public string LocationNameFilter { get; set; }
 
         public IEnumerable<int> Years { get; set; }

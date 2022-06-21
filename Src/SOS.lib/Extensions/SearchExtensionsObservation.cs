@@ -187,7 +187,7 @@ namespace SOS.Lib
             query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
 
             query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
-            query.TryAddWildcardCriteria("location.locality", internalFilter?.Location?.NameFilter);
+            
 
             query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
             
@@ -535,6 +535,7 @@ namespace SOS.Lib
             }
 
             query.TryAddTermsCriteria("location.locationId", filter.LocationIds);
+            query.TryAddWildcardCriteria("location.locality", filter.NameFilter);
             query.TryAddGeographicalAreaFilter(filter.AreaGeographic);
             query.TryAddGeometryFilters(filter.Geometries);
             query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);

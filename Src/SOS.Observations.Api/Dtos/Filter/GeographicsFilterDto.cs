@@ -50,6 +50,11 @@ namespace SOS.Observations.Api.Dtos.Filter
         public IEnumerable<string> LocationIds { get; set; }
 
         /// <summary>
+        /// Location name wild card filter
+        /// </summary>
+        public string LocationNameFilter { get; set; }
+
+        /// <summary>
         /// Limit observation accuracy. Only observations with accuracy less than this will be returned
         /// </summary>
         public int? MaxAccuracy { get; set; }

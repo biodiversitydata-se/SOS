@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +22,13 @@ namespace SOS.Export.Jobs
         private readonly IObservationManager _observationManager;
         private readonly IUserExportRepository _userExportRepository;
         private readonly ILogger<ExportAndSendJob> _logger;
+
+        private async Task RemoveOnGoingJobAsync(int userId, string jobId)
+        {
+            var userExport = await _userExportRepository.GetAsync(userId);
+            userExport.OnGoingJobIds.Remove(jobId);
+            await _userExportRepository.UpdateAsync(userId, userExport);
+        }
 
         /// <summary>
         /// Constructor
@@ -72,15 +78,13 @@ namespace SOS.Export.Jobs
             catch (Exception ex)
             {
                 await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
+                await RemoveOnGoingJobAsync(userId, context?.BackgroundJob?.Id);
                 _logger.LogError(ex, "Export failure.");
-                throw ex;
+                throw;
             }
             finally
             {
-                var jobId = context?.BackgroundJob?.Id;
-                var userExport = await _userExportRepository.GetAsync(userId);
-                userExport.OnGoingJobIds.Remove(jobId);
-                await _userExportRepository.UpdateAsync(userId, userExport);
+                await RemoveOnGoingJobAsync(userId, context?.BackgroundJob?.Id);
             }
         }
 

@@ -214,6 +214,7 @@ namespace SOS.Observations.Api.Extensions
                     UsePointAccuracy = filter.ConsiderObservationAccuracy,
                 },
                 LocationIds = filter.LocationIds,
+                NameFilter = filter.LocationNameFilter,
                 MaxAccuracy = filter.MaxAccuracy
             };
         }
