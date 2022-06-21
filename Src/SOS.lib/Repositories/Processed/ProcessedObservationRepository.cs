@@ -836,6 +836,7 @@ namespace SOS.Lib.Repositories.Processed
                     var taxonId = Convert.ToInt32((long)bucket.Key["taxonId"]);
                     var firstSighting = DateTime.Parse(bucket.Min("firstSighting").ValueAsString);
                     var lastSighting = DateTime.Parse(bucket.Max("lastSighting").ValueAsString);
+                   
                     observationCountByTaxonId.Add(taxonId, (Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0)), firstSighting, lastSighting));
                 }
 
@@ -1001,6 +1002,15 @@ namespace SOS.Lib.Repositories.Processed
                             .Max("lastSighting", m => m
                                 .Field("event.startDate")
                             )
+                           /* .TopHits("latestRecordedOccurrenceIds", th => th
+                                .Size(10)
+                                .Source(src => src
+                                    .Includes(inc => inc
+                                        .Fields("event.startDate", "occurrence.occurrenceId")
+                                    )
+                                )
+                                .Sort(s => s.Descending("event.startDate"))
+                            )*/
                         )
                     )
                 )
@@ -2539,11 +2549,11 @@ namespace SOS.Lib.Repositories.Processed
                         {
                             var childSumNode = treeNodeSumByTaxonId[taxonId];
                             parentSumNode.SumObservationCount += childSumNode.ObservationCount;
-                            if (parentSumNode.FirstSighting > childSumNode.FirstSighting)
+                            if (parentSumNode.FirstSighting == null || parentSumNode.FirstSighting > childSumNode.FirstSighting)
                             {
                                 parentSumNode.FirstSighting = childSumNode.FirstSighting;
                             }
-                            if (parentSumNode.LastSighting < childSumNode.LastSighting)
+                            if (parentSumNode.LastSighting == null || parentSumNode.LastSighting < childSumNode.LastSighting)
                             {
                                 parentSumNode.LastSighting = childSumNode.LastSighting;
                             }
