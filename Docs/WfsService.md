@@ -5,6 +5,7 @@ All public observations that SOS harvests are available in a OGC Web Feature Ser
 - [HTTP Request examples](#http-request-examples)
 - [QGIS query examples](#qgis-query-examples)
 - [Fields](#fields)
+- [INSPIRE](#inspire)
 
 ## WFS service overview
 | Name  	| Value 	|
@@ -112,3 +113,10 @@ https://sosgeo.artdata.slu.se/geoserver/SOS/ows?SERVICE=WFS&Request=GetFeature&V
 | project2Category | string |  | Project category (if the observation belongs to two projects). |
 | project2Url | string |  | Project URL (if the observation belongs to two projects). |
 | project2Values | string |  | Project parameter values (if the observation belongs to two projects). |
+
+## INSPIRE
+The INSPIRE layers: SpeciesDistribution and HabitatsDistribution are available using the following URL:
+
+| Name  	| Value 	|
+|:---	|:---	|
+| URL | https://sosgeo.artdata.slu.se/geoserver/wfs |
