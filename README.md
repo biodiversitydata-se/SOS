@@ -13,6 +13,7 @@ Go to [Artdatabanken developer portal](https://api-portal.artdatabanken.se/) and
 - [Authentication](Docs/Authentication.md)
 - [Checklists](Docs/Checklists.md)
 - [FAQ](Docs/FAQ.md)
+- [Web Feature Service (WFS)](Docs/WfsService.md)
 
 ## Data types and vocabularies
 - [Observation](Docs/Observation.md)
