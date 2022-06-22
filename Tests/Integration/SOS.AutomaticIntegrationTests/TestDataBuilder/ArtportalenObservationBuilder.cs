@@ -31,14 +31,13 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             (6, 0.05f)
         };
 
-        public static List<ArtportalenObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile
+        public static List<ArtportalenObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
         {
-            get
-            {
+            
                 if (_verbatimArtportalenObservationsFromJsonFile == null)
                 {
                     var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    var filePath = System.IO.Path.Combine(assemblyPath, @"Resources\ArtportalenVerbatimObservations_1000.json");                    
+                    var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
                     string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
                     var serializerSettings = new JsonSerializerSettings
                     {
@@ -52,8 +51,9 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
                 }
 
                 return _verbatimArtportalenObservationsFromJsonFile;
-            }
+            
         }
+
         private static List<ArtportalenObservationVerbatim> _verbatimArtportalenObservationsFromJsonFile;        
 
         private static UserInternal GetRandomUserInternal()
@@ -276,12 +276,12 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
-        public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromPredefinedObservations(this IOperable<ArtportalenObservationVerbatim> operable)
+        public static IOperable<ArtportalenObservationVerbatim> HaveValuesFromPredefinedObservations(this IOperable<ArtportalenObservationVerbatim> operable, bool sensitive = false)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile).Clone();                
+                var sourceObservation = Pick<ArtportalenObservationVerbatim>.RandomItemFrom(VerbatimArtportalenObservationsFromJsonFile(sensitive)).Clone();                
                 
                 obs.Id = _faker.IndexVariable++;
                 obs.NotPresent = false; // sourceObservation.NotPresent;
@@ -439,12 +439,12 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
         }
 
         public static IOperable<ArtportalenObservationVerbatim> HaveProjectInformation(
-            this IOperable<ArtportalenObservationVerbatim> operable)
+            this IOperable<ArtportalenObservationVerbatim> operable, bool sensitive = false)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>) operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile)
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive))
                 {
                     if (verbatimObservation.Projects != null && verbatimObservation.Projects.Any())
                     {
@@ -463,12 +463,12 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
         }
 
         public static IOperable<ArtportalenObservationVerbatim> HaveMediaInformation(
-            this IOperable<ArtportalenObservationVerbatim> operable)
+            this IOperable<ArtportalenObservationVerbatim> operable, bool sensitive = false)
         {
             var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
             builder.With((obs, index) =>
             {
-                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile)
+                foreach (var verbatimObservation in VerbatimArtportalenObservationsFromJsonFile(sensitive))
                 {
                     if (verbatimObservation.Media != null && verbatimObservation.Media.Count() > 1)
                     {

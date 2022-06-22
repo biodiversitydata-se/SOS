@@ -752,7 +752,6 @@ namespace SOS.Observations.Api.Extensions
                 Taxa = searchFilterDto.Taxon?.ToTaxonFilter(),
                 UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
             };
-            searchFilter.ExtendedAuthorization.ProtectedObservations = true;
 
             return searchFilter;
         }

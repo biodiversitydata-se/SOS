@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
-using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.TestHelpers.Gis;
 
 namespace SOS.TestHelpers.Helpers.Builders
 {
