@@ -1,15 +1,11 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Dtos;
-using System.Linq;
-using LinqStatistics;
 using SOS.AutomaticIntegrationTests.TestFixtures;
 using SOS.AutomaticIntegrationTests.TestDataBuilder;
 using SOS.AutomaticIntegrationTests.Extensions;

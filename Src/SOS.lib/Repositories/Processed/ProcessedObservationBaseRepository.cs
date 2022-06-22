@@ -20,7 +20,7 @@ namespace SOS.Lib.Repositories.Processed
     /// </summary>
     public class ProcessedObservationBaseRepository : ProcessRepositoryBase<Observation, string>
     {
-        private IHttpContextAccessor _httpContextAccessor;
+       
 
         /// <summary>
         /// Get core queries
@@ -53,7 +53,7 @@ namespace SOS.Lib.Repositories.Processed
                 return PublicIndexName;
             }
 
-            if (!_httpContextAccessor?.HttpContext?.User?.HasAccessToScope(ProtectedScope) ?? true)
+            if (!HttpContextAccessor?.HttpContext?.User?.HasAccessToScope(ProtectedScope) ?? true)
             {
                 throw new AuthenticationRequiredException("Not authorized");
             }
@@ -64,11 +64,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <summary>
         /// Http context accessor.
         /// </summary>
-        public IHttpContextAccessor HttpContextAccessor
-        {
-            get => _httpContextAccessor;
-            set => _httpContextAccessor = value;
-        }
+        public IHttpContextAccessor HttpContextAccessor { get; set; }
+        
 
         /// <summary>
         /// Constructor used in public mode
@@ -89,7 +86,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = liveMode;
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <summary>

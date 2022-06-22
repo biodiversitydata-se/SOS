@@ -14,7 +14,6 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
@@ -43,18 +42,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private const int ElasticSearchMaxRecords = 10000;
         private readonly TelemetryClient _telemetry;
-        private IHttpContextAccessor _httpContextAccessor;
         private readonly ITaxonManager _taxonManager;
-
-        /// <summary>
-        /// Http context accessor.
-        /// </summary>
-        public IHttpContextAccessor HttpContextAccessor
-        {
-            get => _httpContextAccessor;
-            set => _httpContextAccessor = value;
-        }
-
 
         /// <summary>
         /// Add the collection
@@ -922,49 +910,26 @@ namespace SOS.Lib.Repositories.Processed
         {
             ISearchResponse<dynamic> searchResponse;
 
-            if (nextPage == null) // First request
-            {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(PublicIndexName)
-                    .Size(0)
-                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
-                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
-                        .Sources(src => src
-                            .GeoTileGrid("geoTile", h => h
-                                .Field("location.pointLocation")
-                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
-                            .Terms("taxon", tt => tt
-                                .Field("taxon.id").Order(SortOrder.Ascending)
-                            ))))
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
-                        )
-                    ));
-            }
-            else
-            {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(PublicIndexName)
-                    .Size(0)
-                    .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
-                        .Size(MaxNrElasticSearchAggregationBuckets + 1)
-                        .After(nextPage)
-                        .Sources(src => src
-                            .GeoTileGrid("geoTile", h => h
-                                .Field("location.pointLocation")
-                                .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
-                            .Terms("taxon", tt => tt
-                                .Field("taxon.id").Order(SortOrder.Ascending)
-                            ))))
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
-                        )
-                    ));
-            }
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(PublicIndexName)
+                .Size(0)
+                .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
+                    .Size(MaxNrElasticSearchAggregationBuckets + 1)
+                    .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "geoTile", "0/0/0" }, { "taxon", 0 } }))
+                    .Sources(src => src
+                        .GeoTileGrid("geoTile", h => h
+                            .Field("location.pointLocation")
+                            .Precision((GeoTilePrecision)zoom).Order(SortOrder.Ascending))
+                        .Terms("taxon", tt => tt
+                            .Field("taxon.id").Order(SortOrder.Ascending)
+                        ))))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                ));
+        
 
             if (!searchResponse.IsValid)
             {
@@ -1039,47 +1004,25 @@ namespace SOS.Lib.Repositories.Processed
         {
             ISearchResponse<dynamic> searchResponse;
 
-            if (nextPage == null) // First request
-            {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(indexName)
-                    .Size(0)
-                    .Aggregations(a => a.Composite("taxonComposite", g => g
-                        .Size(take)
-                        .Sources(src => src
-                            .Terms("taxonId", tt => tt
-                                .Field("taxon.id"))
-                            .Terms("provinceId", p => p
-                                .Field("location.province.featureId"))
-                            )))
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
-                        )
-                    ));
-            }
-            else
-            {
-                searchResponse = await Client.SearchAsync<dynamic>(s => s
-                    .Index(indexName)
-                    .Size(0)
-                    .Aggregations(a => a.Composite("taxonComposite", g => g
-                        .Size(take)
-                        .After(nextPage)
-                        .Sources(src => src
-                            .Terms("taxonId", tt => tt
-                                .Field("taxon.id"))
-                            .Terms("provinceId", p => p
-                                .Field("location.province.featureId"))
-                            )))
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
-                        )
-                    ));
-            }
+            searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Size(0)
+                .Aggregations(a => a.Composite("taxonComposite", g => g
+                    .Size(take)
+                    .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "taxonId", 0 }, { "provinceId", "" } }))
+                    .Sources(src => src
+                        .Terms("taxonId", tt => tt
+                            .Field("taxon.id"))
+                        .Terms("provinceId", p => p
+                            .Field("location.province.featureId"))
+                        )))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                ));
+      
 
             if (!searchResponse.IsValid)
             {
@@ -1231,7 +1174,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            HttpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         /// <summary>
