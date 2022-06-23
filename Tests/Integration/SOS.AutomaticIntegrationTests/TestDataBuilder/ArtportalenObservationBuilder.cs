@@ -33,28 +33,29 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
         public static List<ArtportalenObservationVerbatim> VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
         {
-            
-                if (_verbatimArtportalenObservationsFromJsonFile == null)
+            if (_verbatimArtportalenObservationsFromJsonFile == null || !sensitive.Equals(_sensitiveLoaded))
+            {
+                var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
+                string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
+                var serializerSettings = new JsonSerializerSettings
                 {
-                    var assemblyPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    var filePath = System.IO.Path.Combine(assemblyPath, string.Format($@"Resources\{(sensitive ? "ArtportalenVerbatimProtectedObservations_1000" : "ArtportalenVerbatimObservations_1000")}.json") );                    
-                    string str = System.IO.File.ReadAllText(filePath, Encoding.UTF8);
-                    var serializerSettings = new JsonSerializerSettings
-                    {
-                        Converters = new List<JsonConverter> { 
-                            new TestHelpers.JsonConverters.ObjectIdConverter(),
-                            new NewtonsoftGeoJsonGeometryConverter()                            
-                        }
-                    };
+                    Converters = new List<JsonConverter> { 
+                        new TestHelpers.JsonConverters.ObjectIdConverter(),
+                        new NewtonsoftGeoJsonGeometryConverter()                            
+                    }
+                };
 
-                    _verbatimArtportalenObservationsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
-                }
+                _verbatimArtportalenObservationsFromJsonFile = JsonConvert.DeserializeObject<List<ArtportalenObservationVerbatim>>(str, serializerSettings);
+                _sensitiveLoaded = sensitive;
+            }
 
-                return _verbatimArtportalenObservationsFromJsonFile;
+            return _verbatimArtportalenObservationsFromJsonFile;
             
         }
 
-        private static List<ArtportalenObservationVerbatim> _verbatimArtportalenObservationsFromJsonFile;        
+        private static List<ArtportalenObservationVerbatim> _verbatimArtportalenObservationsFromJsonFile;
+        private static bool _sensitiveLoaded;
 
         private static UserInternal GetRandomUserInternal()
         {

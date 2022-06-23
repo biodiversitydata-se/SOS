@@ -75,8 +75,8 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.Observat
                 {
                    BoundingBox = new LatLonBoundingBoxDto
                    {
-                       BottomRight = new LatLonCoordinateDto { Latitude = 50, Longitude = 18 },
-                       TopLeft = new LatLonCoordinateDto { Latitude = 80, Longitude = 9 },
+                       BottomRight = new LatLonCoordinateDto { Latitude = 50, Longitude = 25 },
+                       TopLeft = new LatLonCoordinateDto { Latitude = 70, Longitude = 9 },
                    }
                 },
                 Taxon = new TaxonFilterBaseDto
