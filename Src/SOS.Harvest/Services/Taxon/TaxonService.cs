@@ -100,11 +100,11 @@ namespace SOS.Harvest.Services.Taxon
 
         private IVariableLengthReaderBuilder<TaxonProperties<string>> TaxonPropertiesMapping => new VariableLengthReaderBuilder<TaxonProperties<string>>()
             .Map(t => t.TaxonId, indexColumn: 0)
-            .Map(t => t.SortOrder, 1)
-            .Map(t => t.TaxonCategoryId, 2)
-            .Map(t => t.TaxonCategorySwedishName, 3)
-            .Map(t => t.TaxonCategoryEnglishName, 4)
-            .Map(t => t.TaxonCategoryDarwinCoreName, 5);
+            .Map(t => t.SortOrder, 3)
+            .Map(t => t.TaxonCategoryId, 4)
+            .Map(t => t.TaxonCategorySwedishName, 5)
+            .Map(t => t.TaxonCategoryEnglishName, 6)
+            .Map(t => t.TaxonCategoryDarwinCoreName, 7);
 
         private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
             new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
