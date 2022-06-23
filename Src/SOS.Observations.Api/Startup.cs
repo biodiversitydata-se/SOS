@@ -395,6 +395,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IExportManager, ExportManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddScoped<ILocationManager, LocationManager>();
+            services.AddScoped<IUserStatisticsManager, UserStatisticsManager>();
             services.AddScoped<IObservationManager, ObservationManager>();
             services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
             services.AddScoped<IProjectManager, ProjectManager>();

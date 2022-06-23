@@ -29,24 +29,28 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class UserStatisticsController : ObservationBaseController
+    public class UserStatisticsController : SearchBaseController
     {
         private readonly ILogger<UserStatisticsController> _logger;
+        private readonly IUserStatisticsManager _userStatisticsManager;
+        private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="observationManager"></param>
+        /// <param name="userStatisticsManager"></param>
         /// <param name="taxonManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public UserStatisticsController(
-            IObservationManager observationManager,
+            IUserStatisticsManager userStatisticsManager,
             ITaxonManager taxonManager,
             IAreaManager areaManager,
-            ILogger<UserStatisticsController> logger) : base(observationManager, areaManager, taxonManager)
+            ILogger<UserStatisticsController> logger) : base(areaManager)
         {
+            _userStatisticsManager = userStatisticsManager ?? throw new ArgumentNullException(nameof(userStatisticsManager));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -103,21 +107,7 @@ namespace SOS.Observations.Api.Controllers
                 //    return BadRequest(result.Error);
                 //}
 
-                PagedResult<UserStatisticsItem> result = new PagedResult<UserStatisticsItem>()
-                {
-                    Skip = 0,
-                    Take = 5,
-                    TotalCount = 5,
-                    Records = new List<UserStatisticsItem>()
-                    {
-                        new() {UserId = 1, SpeciesCount = 5},
-                        new() {UserId = 2, SpeciesCount = 4},
-                        new() {UserId = 3, SpeciesCount = 4},
-                        new() {UserId = 4, SpeciesCount = 2},
-                        new() {UserId = 5, SpeciesCount = 1}
-                    }
-                };
-
+                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(skip, take);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -175,15 +165,7 @@ namespace SOS.Observations.Api.Controllers
                 //    return BadRequest(result.Error);
                 //}
 
-                var result = new List<UserStatisticsItem>
-                {
-                    new() {UserId = 1, SpeciesCount = 5},
-                    new() {UserId = 2, SpeciesCount = 4},
-                    new() {UserId = 3, SpeciesCount = 4},
-                    new() {UserId = 4, SpeciesCount = 2},
-                    new() {UserId = 5, SpeciesCount = 1}
-                };
-                
+                var result = await _userStatisticsManager.SpeciesCountSearchAsync();
                 return new OkObjectResult(result);
             }
             catch (Exception e)
