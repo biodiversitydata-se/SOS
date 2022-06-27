@@ -366,8 +366,9 @@ namespace SOS.Observations.Api
                 .AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" })
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                 .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" })
-                .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" });
-
+                .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" })
+                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs, elasticsearch" });
+            
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
