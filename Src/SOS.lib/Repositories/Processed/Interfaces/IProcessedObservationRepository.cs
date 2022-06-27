@@ -206,6 +206,42 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds, bool protectedIndex);
 
+        /// <summary>
+        /// Get measurement or facts by using search after
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="searchAfter"></param>
+        /// <returns></returns>
+        Task<SearchAfterResult<ExtendedMeasurementOrFactRow>> GetMeasurementOrFactsBySearchAfterAsync(
+            SearchFilterBase filter,
+            string pointInTimeId = null,
+            IEnumerable<object> searchAfter = null);
+
+        /// <summary>
+        /// Get multimedia  by using search after
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="searchAfter"></param>
+        /// <returns></returns>
+        Task<SearchAfterResult<SimpleMultimediaRow>> GetMultimediaBySearchAfterAsync(
+            SearchFilterBase filter,
+            string pointInTimeId = null,
+            IEnumerable<object> searchAfter = null);
+
+        /// <summary>
+        /// Get observations by using search after
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="searchAfter"></param>
+        /// <returns></returns>
+        Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
+            SearchFilterBase filter,
+            string pointInTimeId = null,
+            IEnumerable<object> searchAfter = null);
+
         Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
             SearchFilter filter,
             int take,
@@ -317,40 +353,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Name of protected index 
         /// </summary>
         string ProtectedIndexName { get; }
-
-        /// <summary>
-        /// Get measurementOrFacts.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="scrollId"></param>
-        /// <returns></returns>
-        Task<ScrollResult<ExtendedMeasurementOrFactRow>> ScrollMeasurementOrFactsAsync(
-            SearchFilterBase filter,
-            string scrollId);
-
-        /// <summary>
-        ///     Get multimedia.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="scrollId"></param>
-        /// <returns></returns>
-        Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
-            SearchFilterBase filter,
-            string scrollId);
-
-        /// <summary>
-        ///     Get observation by scroll. 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="scrollId"></param>
-        /// <returns></returns>
-        Task<ScrollResult<Observation>> ScrollObservationsAsync(
-            SearchFilterBase filter,
-            string scrollId);
-
-        Task<ScrollResult<dynamic>> ScrollObservationsAsDynamicAsync(
-            SearchFilter filter,
-            string scrollId);
 
         /// <summary>
         /// Signal search
