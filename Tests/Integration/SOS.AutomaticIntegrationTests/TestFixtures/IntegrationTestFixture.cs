@@ -69,6 +69,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
         public ArtportalenChecklistFactory ArtportalenChecklistFactory { get; set; }
         public InstallationEnvironment InstallationEnvironment { get; private set; }
         public ObservationsController ObservationsController { get; private set; }
+        public UserStatisticsController UserStatisticsController { get; private set; }
         public ChecklistsController ChecklistsController { get; private set; }
         public ExportsController ExportsController { get; private set; }
         public SystemsController SystemsController { get; private set; }
@@ -307,6 +308,10 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
             ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
+            var userStatisticsManager = new UserStatisticsManager(processedObservationRepository, filterManager,
+                new NullLogger<UserStatisticsManager>());
+            UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
+                new NullLogger<UserStatisticsController>());
             var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, filterManager, new NullLogger<ChecklistManager>());
             ChecklistsController = new ChecklistsController(checklistManager, taxonManager, new NullLogger<ChecklistsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());

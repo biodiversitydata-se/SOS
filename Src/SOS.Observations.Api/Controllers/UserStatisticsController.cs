@@ -129,7 +129,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="userIds"></param>
         /// <returns></returns>
         [HttpGet("SpeciesCountAggregation")]
-        [ProducesResponseType(typeof(List<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

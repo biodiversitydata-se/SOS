@@ -514,5 +514,16 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> HaveObserversWithId(this IOperable<ArtportalenObservationVerbatim> operable, params int[] userIds)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                obs.ObserversInternal =
+                    userIds.Select(userId => new UserInternal() {Id = userId, UserServiceUserId = userId});
+            });
+
+            return operable;
+        }
     } 
 }
