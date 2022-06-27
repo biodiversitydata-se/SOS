@@ -75,19 +75,19 @@ namespace SOS.Lib.IO.Excel
                     Directory.CreateDirectory(temporaryZipExportFolderPath);
                 }
 
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, null);
+                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = scrollResult.Records.ToArray();
+                    var processedObservations = searchResult.Records.ToArray();
                     
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -139,7 +139,7 @@ namespace SOS.Lib.IO.Excel
 
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
                 
                 // If we have a package, save it

@@ -16,6 +16,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 
@@ -51,7 +52,7 @@ namespace SOS.Lib.IO.DwcArchive
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
                 elasticRetrievalStopwatch.Start();
                 processedObservationRepository.LiveMode = true;
-                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
+                var searchResult = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
                 elasticRetrievalStopwatch.Stop();
 
                 using var csvFileHelper = new CsvFileHelper();
@@ -60,13 +61,13 @@ namespace SOS.Lib.IO.DwcArchive
                 // Write header row
                 WriteHeaderRow(csvFileHelper, fieldDescriptions);
 
-                while (scrollResult?.Records?.Any() ?? false)
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
                     elasticRetrievalStopwatch.Start();
-                    var processedObservations = scrollResult.Records.ToArray();
+                    var processedObservations = searchResult.Records.ToArray();
                     elasticRetrievalStopwatch.Stop();
 
                     // Convert observations to DwC format.
@@ -86,7 +87,7 @@ namespace SOS.Lib.IO.DwcArchive
 
                     // Get next batch of observations.
                     elasticRetrievalStopwatch.Start();
-                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    searchResult = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                     elasticRetrievalStopwatch.Stop();
                 }
                 csvFileHelper.FinishWrite();

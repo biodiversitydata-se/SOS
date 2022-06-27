@@ -116,7 +116,7 @@ namespace SOS.Lib.IO.DwcArchive
             DataProvider dataProvider,
             string batchId = "")
         {
-            if (!_dwcaFilesCreationConfiguration.IsEnabled || !(processedObservations?.Any() ?? false))
+            if (!Enabled || !(processedObservations?.Any() ?? false))
             {
                 return true;
             }
@@ -159,7 +159,7 @@ namespace SOS.Lib.IO.DwcArchive
         {
             try
             {
-                if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
+                if (!Enabled) return null;
                 var dwcaCreationTasks = new Dictionary<DataProvider, Task<string>>();
                 foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {

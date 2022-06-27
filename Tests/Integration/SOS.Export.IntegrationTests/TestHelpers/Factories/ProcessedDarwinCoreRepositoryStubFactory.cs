@@ -21,13 +21,13 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             var stub = new Mock<IProcessedObservationRepository>();
             var observations = LoadObservations(fileName);
             stub
-                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
+                .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
                 .ReturnsAsync(observations);
 
             return stub;
         }
 
-        private static ScrollResult<Observation> LoadObservations(string fileName)
+        private static SearchAfterResult<Observation> LoadObservations(string fileName)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -38,7 +38,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             };
 
             var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
-            return new ScrollResult<Observation> {Records = observations};
+            return new SearchAfterResult<Observation> {Records = observations};
         }
     }
 }

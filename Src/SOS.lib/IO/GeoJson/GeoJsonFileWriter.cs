@@ -83,14 +83,14 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
 
-                var scrollResult = await _processedObservationRepository.ScrollObservationsAsDynamicAsync(filter, null);
-                while (scrollResult?.Records?.Any() ?? false)
+                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+                while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     if (flatOut)
                     {
-                        var processedObservations = CastDynamicsToObservations(scrollResult.Records);
+                        var processedObservations = CastDynamicsToObservations(searchResult.Records);
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         
@@ -102,7 +102,7 @@ namespace SOS.Lib.IO.GeoJson
                     }
                     else
                     {
-                        var processedRecords = scrollResult.Records.Cast<IDictionary<string, object>>();
+                        var processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
                         
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                        
@@ -113,9 +113,9 @@ namespace SOS.Lib.IO.GeoJson
                         }
                     }
 
-                    nrObservations += scrollResult.Records.Count();
+                    nrObservations += searchResult.Records.Count();
                     // Get next batch of observations.
-                    scrollResult = await _processedObservationRepository.ScrollObservationsAsDynamicAsync(filter, scrollResult.ScrollId);
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
                 jsonWriter.WriteEndArray();
                 jsonWriter.WriteEndObject();
