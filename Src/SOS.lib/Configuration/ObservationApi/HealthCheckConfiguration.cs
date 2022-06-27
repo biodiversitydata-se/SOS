@@ -26,6 +26,11 @@
         public string AzureApiUrl { get; set; }
 
         /// <summary>
+        /// Elasticsearch Proxy URL.
+        /// </summary>
+        public string ElasticsearchProxyUrl { get; set; }
+
+        /// <summary>
         /// Azure API Subscription key.
         /// </summary>
         public string AzureSubscriptionKey { get; set; }
