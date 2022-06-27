@@ -21,7 +21,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             var stub = new Mock<IProcessedObservationRepository>();
             var observations = LoadObservations(fileName);
             stub
-                .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
+                .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
                 .ReturnsAsync(observations);
 
             return stub;
