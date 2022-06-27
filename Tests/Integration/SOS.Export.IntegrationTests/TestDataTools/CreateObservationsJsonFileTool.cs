@@ -11,6 +11,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
@@ -49,7 +50,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync(new SearchFilter());
+            var observations = await processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(new SearchFilter());
 
             var serializerSettings = new JsonSerializerSettings
             {
