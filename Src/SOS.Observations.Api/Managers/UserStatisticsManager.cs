@@ -18,6 +18,8 @@ namespace SOS.Observations.Api.Managers
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFilterManager _filterManager;
         private readonly ILogger<UserStatisticsManager> _logger;
+        private Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCache = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
+
 
         /// <summary>
         /// Constructor
@@ -40,8 +42,13 @@ namespace SOS.Observations.Api.Managers
             _processedObservationRepository.LiveMode = true;
         }
 
-        public async Task<IEnumerable<UserStatisticsItem>> SpeciesCountSearchAsync()
+        public async Task<IEnumerable<UserStatisticsItem>> SpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, bool useCache = true)
         {
+            if (useCache && _userStatisticsItemsCache.ContainsKey(query))
+            {
+                return _userStatisticsItemsCache[query];
+            }
+            
             // todo - implement logic
             //await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             //var result = await _processedLocationRepository.SearchUserSpeciesCountAsync(filter, skip, take);
@@ -54,10 +61,18 @@ namespace SOS.Observations.Api.Managers
                 new() {UserId = 5, SpeciesCount = 1}
             };
 
+            if (useCache)
+            {
+                _userStatisticsItemsCache.Add(query, result); // todo - fix proper caching solution and concurrency handling.
+            }
+
             return result;
         }
 
-        public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(int? skip, int? take)
+        public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, 
+            int? skip, 
+            int? take,
+            bool useCache = true)
         {
             // todo - implement logic
             //await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);

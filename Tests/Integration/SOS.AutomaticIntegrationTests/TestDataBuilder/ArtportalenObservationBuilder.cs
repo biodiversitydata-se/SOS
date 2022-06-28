@@ -520,10 +520,47 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
             builder.With((obs, index) =>
             {
                 obs.ObserversInternal =
-                    userIds.Select(userId => new UserInternal() {Id = userId, UserServiceUserId = userId});
+                    userIds.Select(userId => new UserInternal {Id = userId, UserServiceUserId = userId});
             });
 
             return operable;
         }
-    } 
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveProperties(this IOperable<ArtportalenObservationVerbatim> operable,
+            params ObservationProperties[] properties)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                var item = properties[index];
+
+                obs.ObserversInternal = new List<UserInternal> { new() { Id = item.UserId, UserServiceUserId = item.UserId } };
+                obs.TaxonId = item.TaxonId;
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveProperties(this IOperable<ArtportalenObservationVerbatim> operable,
+            int userId,
+            params ObservationProperties[] properties)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            builder.With((obs, index) =>
+            {
+                var item = properties[index];
+
+                obs.ObserversInternal = new List<UserInternal> { new() { Id = userId, UserServiceUserId = userId } };
+                obs.TaxonId = item.TaxonId;
+            });
+
+            return operable;
+        }
+    }
+
+    public class ObservationProperties
+    {
+        public int UserId { get; set; }
+        public int TaxonId { get; set; }
+    }
 }

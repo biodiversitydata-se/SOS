@@ -31,25 +31,45 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(18)
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(20)
                 .All()
                     .HaveValuesFromPredefinedObservations()
-                .TheFirst(5)
-                    .HaveObserversWithId(1)
-                .TheNext(4)
-                    .HaveObserversWithId(2)
-                .TheNext(4)
-                    .HaveObserversWithId(3)
-                .TheNext(2)
-                    .HaveObserversWithId(4)
-                .TheLast(1)
-                    .HaveObserversWithId(5)
+                .TheFirst(6) // 6 observations, 5 taxa (TaxonId 1 duplicate)
+                    .HaveProperties(1,
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 2 },
+                        new() { TaxonId = 3 },
+                        new() { TaxonId = 4 },
+                        new() { TaxonId = 5 })
+                .TheNext(4) // 4 observations , 4 taxa
+                    .HaveProperties(2,
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 2 },
+                        new() { TaxonId = 3 },
+                        new() { TaxonId = 4 })
+                .TheNext(5) // 5 observations , 4 taxa (TaxonId 2 duplicate)
+                    .HaveProperties(3,
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 2 },
+                        new() { TaxonId = 2 },
+                        new() { TaxonId = 3 },
+                        new() { TaxonId = 4 })
+                .TheNext(2) // 2 observations , 2 taxa
+                    .HaveProperties(4,
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 2 })
+                .TheNext(3) // 3 observations , 1 taxa (TaxonId 1 duplicate)
+                    .HaveProperties(5,
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 1 },
+                        new() { TaxonId = 1 })
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
 
             //-----------------------------------------------------------------------------------------------------------
-            // Act - Get observation by occurrenceId
+            // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(0,5);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
