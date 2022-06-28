@@ -402,6 +402,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProjectManager, ProjectManager>();
             services.AddScoped<ITaxonListManager, TaxonListManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddScoped<ITaxonSearchManager, TaxonSearchManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddScoped<IArtportalenApiManager, ArtportalenApiManager>();
 
@@ -413,6 +414,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedLocationRepository, ProcessedLocationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedTaxonRepository, ProcessedTaxonRepository>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
@@ -563,9 +565,9 @@ namespace SOS.Observations.Api
             }
 
             var serviceProvider = app.ApplicationServices;
-            var observationManager = serviceProvider.GetService<IObservationManager>();
-            Task.Run(() => {                
-                    observationManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
+            var taxonSearchManager = serviceProvider.GetService<ITaxonSearchManager>();
+            Task.Run(() => {
+                taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { 0 });                
             });
 
             

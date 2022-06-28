@@ -15,7 +15,6 @@ namespace SOS.Observations.Api.Controllers
     public class ObservationBaseController : SearchBaseController
     {
         private readonly ITaxonManager _taxonManager;
-
         protected readonly IObservationManager ObservationManager;
 
         /// <summary>

@@ -36,6 +36,7 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class ObservationsController : ObservationBaseController, IObservationsController
     {
+        private readonly ITaxonSearchManager _taxonSearchManager;
         private readonly int _tilesLimit;
         private readonly IEnumerable<int> _signalSearchTaxonListIds;
         private readonly ILogger<ObservationsController> _logger;
@@ -267,12 +268,14 @@ namespace SOS.Observations.Api.Controllers
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
             IObservationManager observationManager,
+            ITaxonSearchManager taxonSearchManager,
             ITaxonManager taxonManager,
             IAreaManager areaManager,
             ObservationApiConfiguration observationApiConfiguration,
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ObservationsController> logger) : base(observationManager, areaManager, taxonManager)
         {
+            _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
             _tilesLimit = elasticConfiguration?.MaxNrAggregationBuckets ??
                           throw new ArgumentNullException(nameof(observationApiConfiguration));
 
@@ -657,7 +660,7 @@ namespace SOS.Observations.Api.Controllers
 
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(
+                var result = await _taxonSearchManager.GetTaxonAggregationAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     searchFilter,
@@ -799,7 +802,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var result = await ObservationManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
+                var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
                 if (!result.Any())
                     return NoContent();
 
@@ -828,7 +831,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var result = await ObservationManager.GetCachedTaxonSumAggregationItemsAsync(taxonIds);
+                var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(taxonIds);
                 if (!result.Any())
                     return NoContent();
 
@@ -1080,7 +1083,7 @@ namespace SOS.Observations.Api.Controllers
 
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
-                var result = await ObservationManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
+                var result = await _taxonSearchManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(translationCultureCode, false), zoom, geoTilePage, taxonIdPage);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -1509,7 +1512,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations);
                 searchFilter.OverrideBoundingBox(LatLonBoundingBox.Create(boundingBox));
 
-                var result = await ObservationManager.GetTaxonAggregationAsync(roleId,
+                var result = await _taxonSearchManager.GetTaxonAggregationAsync(roleId,
                     authorizationApplicationIdentifier,
                     filter.ToSearchFilterInternal(translationCultureCode, sensitiveObservations),
                     skip,
@@ -1562,7 +1565,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var result = await ObservationManager.GetTaxonSumAggregationAsync(
+                var result = await _taxonSearchManager.GetTaxonSumAggregationAsync(
                     taxonFilter.ToTaxonFilterFilter(),
                     skip,
                     take,
@@ -1625,7 +1628,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal("sv-SE", sensitiveObservations);
-                var taxonFound = await ObservationManager.GetTaxonExistsIndicationAsync(roleId, authorizationApplicationIdentifier, searchFilter);
+                var taxonFound = await _taxonSearchManager.GetTaxonExistsIndicationAsync(roleId, authorizationApplicationIdentifier, searchFilter);
 
                 return new OkObjectResult(taxonFound);
             }
