@@ -8,5 +8,7 @@ namespace SOS.Lib.Configuration.Shared
         /// Observations API address.
         /// </summary>
         public IEnumerable<string> ObservationsApiAddresses { get; set; }
+
+        public IEnumerable<string> ElasticSearchProxyAddresses { get; set; }
     }
 }

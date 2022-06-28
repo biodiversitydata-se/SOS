@@ -122,24 +122,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
-        Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
-            SearchFilter filter,
-            int zoom);
-
         /// <summary>
         /// Get a data quality report for passed organism group
         /// </summary>
         /// <param name="organismGroup"></param>
         /// <returns></returns>
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="precision"></param>
-        /// <returns></returns>
-        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision);
 
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
 
@@ -249,13 +237,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             SearchSortOrder sortOrder,
             string scrollId);
 
-        
-        Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
-            SearchFilter filter,
-            int zoom,
-            string geoTilePage,
-            int? taxonIdPage);
-
         /// <summary>
         /// Get provider meta data
         /// </summary>
@@ -272,35 +253,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<IEnumerable<Observation>> GetRandomObservationsAsync(int take, bool protectedIndex);
-
-        /// <summary>
-        /// Aggregate observations by taxon. Sort by observation count descending.
-        /// </summary>
-        /// <param name="filter"></param>        
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="sumUnderlyingTaxa"></param>
-        /// <returns></returns>
-        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
-            SearchFilter filter,
-            int? skip,
-            int? take,
-            bool sumUnderlyingTaxa = false);        
-
-        /// <summary>
-        /// Get taxon sum aggregation. Including underlying taxa and province count.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
-
-        /// <summary>
-        /// Get indication if taxa exists in specified area
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
-            SearchFilter filter);
 
         /// <summary>
         /// Count the number of user observations group by year

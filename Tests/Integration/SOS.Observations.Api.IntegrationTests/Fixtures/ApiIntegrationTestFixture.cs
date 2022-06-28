@@ -186,6 +186,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
             var processedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
+            var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var vocabularyManger = CreateVocabularyManager(processClient, vocabularyRepository);
             var projectManger = CreateProjectManager(processClient);
@@ -208,11 +209,12 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, vocabularyValueResolver, processClient, filterManager);
+            var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
 
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
+            ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
             DataProvidersController = new DataProvidersController(dataproviderManager, observationManager, new NullLogger<DataProvidersController>());
             ExportsController = new ExportsController(observationManager, blobStorageManagerMock.Object, areaManager,
@@ -224,7 +226,7 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             ElasticSearchConfiguration customElasticConfiguration = GetCustomSearchDbConfiguration();
             CustomProcessedObservationRepository = CreateProcessedObservationRepository(customElasticConfiguration, elasticClientManager, processClient, memoryCache, taxonManager);
             var customObservationManager = CreateObservationManager((ProcessedObservationRepository)CustomProcessedObservationRepository, vocabularyValueResolver, processClient, filterManager);
-            CustomObservationsController = new ObservationsController(customObservationManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
+            CustomObservationsController = new ObservationsController(customObservationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, customElasticConfiguration, new NullLogger<ObservationsController>());
             DwcArchiveFileWriter = dwcArchiveFileWriter;
             var healthCheckConfiguration = new HealthCheckConfiguration
             {
@@ -303,6 +305,19 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
             return observationsManager;
         }
 
+        
+        private TaxonSearchManager CreateTaxonSearchManager(
+            ProcessedTaxonRepository processedTaxonRepository,
+            FilterManager filterManager)
+        {
+            var taxonSearchManager = new TaxonSearchManager(processedTaxonRepository,
+                filterManager,
+                new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(4) },
+                new NullLogger<TaxonSearchManager>());
+
+            return taxonSearchManager;
+        }
+
         protected virtual IUserService CreateUserService()
         {
             var userServiceConfiguration = GetUserServiceConfiguration();
@@ -355,6 +370,21 @@ namespace SOS.Observations.Api.IntegrationTests.Fixtures
                 taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
+        }
+
+        private ProcessedTaxonRepository CreateProcessedTaxonRepository(
+            ElasticSearchConfiguration elasticConfiguration,
+            IElasticClientManager elasticClientManager,
+            IProcessClient processClient,
+            ITaxonManager taxonManager)
+        {
+            var processedTaxonRepository = new ProcessedTaxonRepository(
+                elasticClientManager,
+                elasticConfiguration,
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                taxonManager,
+                new NullLogger<ProcessedTaxonRepository>());
+            return processedTaxonRepository;
         }
 
         public void UseMockUserService(params AuthorityModel[] authorities)

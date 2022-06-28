@@ -15,6 +15,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
 	</PropertyGroup>
+	
+	<ItemGroup>
+	  <None Remove="web.txt" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Include="web.txt" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />

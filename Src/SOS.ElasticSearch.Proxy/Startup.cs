@@ -89,7 +89,6 @@ namespace SOS.ElasticSearch.Proxy
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(Configuration.GetSection("ProxyConfiguration").Get<ProxyConfiguration>());
 
-
             // Add Caches
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
 
@@ -108,13 +107,12 @@ namespace SOS.ElasticSearch.Proxy
         }
 
         /// <summary>
-        ///  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
         public void Configure(
             IApplicationBuilder app)
         {
-
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
@@ -123,6 +121,16 @@ namespace SOS.ElasticSearch.Proxy
             {
                 app.UseHsts();
             }
+
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/caches"),
+                    builder => builder
+                    .UseRouting()
+                    .UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    }
+                )
+            );
 
             app.UseMiddleware<RequestMiddleware>();
         }

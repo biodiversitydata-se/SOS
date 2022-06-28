@@ -304,14 +304,16 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var filterManager = new FilterManager(taxonManager, _userService, areaCache, dataProviderCache);
             _filterManager = filterManager;
             var observationManager = CreateObservationManager(processedObservationRepository, _vocabularyValueResolver, _processClient, filterManager);
+            var taxonProcessedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, _processClient, taxonManager);
+            var taxonSearchManager = CreateTaxonSearchManager(taxonProcessedTaxonRepository, filterManager);
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
-            ObservationsController = new ObservationsController(observationManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             var userStatisticsManager = new UserStatisticsManager(processedObservationRepository, filterManager,
                 new NullLogger<UserStatisticsManager>());
             UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
                 new NullLogger<UserStatisticsController>());
+            ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());
             var checklistManager = new ChecklistManager(ProcessedChecklistRepository, processedObservationRepository, filterManager, new NullLogger<ChecklistManager>());
             ChecklistsController = new ChecklistsController(checklistManager, taxonManager, new NullLogger<ChecklistsController>());
             VocabulariesController = new VocabulariesController(vocabularyManger, projectManger, new NullLogger<VocabulariesController>());
@@ -438,6 +440,18 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             return observationsManager;
         }
 
+        private TaxonSearchManager CreateTaxonSearchManager(
+           ProcessedTaxonRepository processedTaxonRepository,
+           FilterManager filterManager)
+        {
+            var taxonSearchManager = new TaxonSearchManager(processedTaxonRepository,
+                filterManager,
+                new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions())) { CacheDuration = TimeSpan.FromHours(4) },
+                new NullLogger<TaxonSearchManager>());
+
+            return taxonSearchManager;
+        }
+
         protected virtual IUserService CreateUserService()
         {
             var userServiceConfiguration = GetUserServiceConfiguration();
@@ -493,6 +507,21 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 taxonManager,
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
+        }
+
+        private ProcessedTaxonRepository CreateProcessedTaxonRepository(
+            ElasticSearchConfiguration elasticConfiguration,
+            IElasticClientManager elasticClientManager,
+            IProcessClient processClient,
+            ITaxonManager taxonManager)
+        {
+            var processedTaxonRepository = new ProcessedTaxonRepository(
+                elasticClientManager,
+                elasticConfiguration,
+                new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                taxonManager,
+                new NullLogger<ProcessedTaxonRepository>());
+            return processedTaxonRepository;
         }
 
         private ProcessedChecklistRepository CreateProcessedChecklistRepository(
