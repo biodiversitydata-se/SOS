@@ -15,29 +15,29 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class UserStatisticsManager : IUserStatisticsManager
     {
-        private readonly IProcessedLocationRepository _processedLocationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFilterManager _filterManager;
         private readonly ILogger<UserStatisticsManager> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedLocationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public UserStatisticsManager(
-            IProcessedLocationRepository processedLocationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IFilterManager filterManager,
             ILogger<UserStatisticsManager> logger)
         {
-            _processedLocationRepository = processedLocationRepository ??
-                                              throw new ArgumentNullException(nameof(processedLocationRepository));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
-            _processedLocationRepository.LiveMode = true;
+            _processedObservationRepository.LiveMode = true;
         }
 
         public async Task<IEnumerable<UserStatisticsItem>> SpeciesCountSearchAsync()
