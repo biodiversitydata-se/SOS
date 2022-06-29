@@ -93,7 +93,17 @@ namespace SOS.Lib.Managers
                 providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
             }
 
-            if ((!providers?.Any() ?? true) && !datproviderIds.Contains(-1))
+            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-1))
+            {
+                providers.Add(DataProvider.CompleteSosDataProvider);
+            }
+
+            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-2))
+            {
+                providers.Add(DataProvider.FilterSubsetDataProvider);
+            }
+
+            if (!providers?.Any() ?? true)
             {
                 message = "No providers found";
                 _logger.LogWarning(message);
@@ -102,11 +112,6 @@ namespace SOS.Lib.Managers
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var emlDirectory = Path.Combine(assemblyPath, @"Resources\DataProvider\Eml");
-
-            if ((datproviderIds?.Any() ?? false) || datproviderIds.Contains(-1))
-            {
-               providers.Add(DataProvider.CompleteSosDataProvider);
-            }
 
             foreach (var provider in providers)
             {

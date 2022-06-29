@@ -36,7 +36,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         public async Task<int> CreateOccurrenceCsvFileAsync(
-            SearchFilterBase filter,
+            SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,

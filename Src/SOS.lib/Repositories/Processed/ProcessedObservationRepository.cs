@@ -20,14 +20,12 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.AggregatedResult;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using DateTime = System.DateTime;
 using Result = CSharpFunctionalExtensions.Result;
@@ -768,21 +766,6 @@ namespace SOS.Lib.Repositories.Processed
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
-        private class TaxonProvinceItem
-        {
-            public int TaxonId { get; set; }
-            public string ProvinceId { get; set; }
-            public int ObservationCount { get; set; }
-        }
-
-        private class TaxonProvinceAgg
-        {
-            public int TaxonId { get; set; }
-            public List<string> ProvinceIds { get; set; } = new List<string>();
-            public Dictionary<string, int> ObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
-            public int ObservationCount { get; set; }
-        }
-
         /// <summary>
         /// Get last modified date for provider
         /// </summary>
@@ -804,6 +787,9 @@ namespace SOS.Lib.Repositories.Processed
                             .Field(f => f.Modified)
                         )
                     )
+                    .Size(0)
+                    .Source(s => s.ExcludeAll())
+                    .TrackTotalHits(false)
                 );
 
                 var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
@@ -816,41 +802,13 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        private async Task<ScrollResult<Observation>> ScrollObservationsWithCompleteObjectAsync(int dataProviderId, bool protectedIndex,
-            string scrollId)
-        {
-            ISearchResponse<Observation> searchResponse;
-            if (string.IsNullOrEmpty(scrollId))
-            {
-                searchResponse = await Client
-                    .SearchAsync<Observation>(s => s
-                        .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
-                        .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
-                        .Sort(s => s.Ascending(new Field("_doc")))
-                        .Scroll(ScrollTimeout)
-                        .Size(ScrollBatchSize)
-                    );
-            }
-            else
-            {
-                searchResponse = await Client
-                    .ScrollAsync<Observation>(ScrollTimeout, scrollId);
-            }
-
-            return new ScrollResult<Observation>
-            {
-                Records = searchResponse.Documents,
-                ScrollId = searchResponse.ScrollId,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
-            };
-        }
-
         private async Task<ISearchResponse<T>> SearchAfterAsync<T>(
            string searchIndex,
            SearchDescriptor<T> searchDescriptor,
            string pointInTimeId = null,
            IEnumerable<object> searchAfter = null) where T : class
         {
+            
             if (string.IsNullOrEmpty(pointInTimeId))
             {
                 var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
@@ -866,7 +824,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = await Client.SearchAsync<T>(searchDescriptor
-                   .Sort(s => s.Ascending(new Field("_shard_doc")))
+                   .Sort(s => s.Ascending(SortSpecialField.ShardDocumentOrder))
                    .PointInTime(pointInTimeId)
                    .SearchAfter(searchAfter)
                    .Size(ScrollBatchSize)
@@ -881,7 +839,7 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            if ((searchResponse?.Hits?.Count ?? 0) == 0)
+            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
             {
                 await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
             }
@@ -1039,27 +997,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider, bool protectedIndex)
-        {
-            var scrollResult = await ScrollObservationsWithCompleteObjectAsync(dataProvider.Id, protectedIndex, null);
-
-            while (scrollResult?.Records?.Any() ?? false)
-            {
-                var processedObservations = scrollResult.Records;
-                var indexResult = WriteToElastic(processedObservations, false);
-
-                if (indexResult.TotalNumberOfFailedBuffers != 0)
-                {
-                    return false;
-                }
-
-                scrollResult = await ScrollObservationsWithCompleteObjectAsync(dataProvider.Id, protectedIndex, scrollResult.ScrollId);
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc />
         public async Task<bool> DeleteByOccurrenceIdAsync(IEnumerable<string> occurenceIds, bool protectedIndex)
         {
             try
@@ -1135,10 +1072,7 @@ namespace SOS.Lib.Repositories.Processed
 
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
-                .Size(0)
-                .TrackTotalHits(false)
                 .Index(indexNames)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
@@ -1150,6 +1084,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Field("taxon.scientificName")
                     )
                 )
+                .Size(0)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .TrackTotalHits(false)
             );
 
             var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
@@ -1175,10 +1112,7 @@ namespace SOS.Lib.Repositories.Processed
 
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Size(0)
-                .TrackTotalHits(false)
                 .Index(indexNames)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
@@ -1213,6 +1147,9 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1258,9 +1195,7 @@ namespace SOS.Lib.Repositories.Processed
             operation.Telemetry.Properties["Filter"] = filter.ToString();
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Size(0)
                 .Index(indexNames)
-                .Source(s => s.ExcludeAll())
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
@@ -1280,6 +1215,8 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1385,7 +1322,6 @@ namespace SOS.Lib.Repositories.Processed
             var index = PublicIndexName;
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Size(0)
                 .Index(index)
                 .Query(q => q
                     .Bool(b => b
@@ -1401,6 +1337,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Size(65536)
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1426,6 +1365,14 @@ namespace SOS.Lib.Repositories.Processed
                 {
                     searchResponse = await Client.SearchAsync<dynamic>(s => s
                         .Index(index)
+                        .Query(q => q
+                            .Bool(b => b
+                                .Filter(f => f.Term(t => t
+                                    .Field("dataQuality.uniqueKey")
+                                    .Value(duplicate.UniqueKey)))
+                            )
+                        )
+                        .Sort(sort => sort.Field(f => f.Field("dataProviderId")))
                         .Size(10000)
                         .Source(s => s.Includes(i => i
                             .Field("dataProviderId")
@@ -1436,14 +1383,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Field("taxon.id")
                             .Field("taxon.scientificName")
                         ))
-                        .Query(q => q
-                            .Bool(b => b
-                                .Filter(f => f.Term(t => t
-                                    .Field("dataQuality.uniqueKey")
-                                    .Value(duplicate.UniqueKey)))
-                            )
-                        )
-                        .Sort(sort => sort.Field(f => f.Field("dataProviderId")))
+                        .TrackTotalHits(false)
                     );
 
                     if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1501,7 +1441,6 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Size(0)
                 .Aggregations(a => a
                     .Filter("geotile_filter", g => g
                         .Filter(f => f
@@ -1532,6 +1471,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query)
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -1585,7 +1527,6 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Size(0)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
@@ -1616,6 +1557,9 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -1722,7 +1666,6 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Size(0)
                 .Aggregations(a => a.Cardinality("provinceCount", c => c
                     .Field("location.province.featureId")))
                 .Query(q => q
@@ -1730,7 +1673,11 @@ namespace SOS.Lib.Repositories.Processed
                         .MustNot(excludeQuery)
                         .Filter(query)
                     )
-                ));
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
             int provinceCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("provinceCount").Value);
@@ -1749,13 +1696,16 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
                         .Filter(query)
                     )
                 )
+                .Size(1)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1774,15 +1724,17 @@ namespace SOS.Lib.Repositories.Processed
             {
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
                     .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
-                    .Source(s => s
-                        .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
-                    )
                     .Query(q => q
                         .Terms(t => t
                             .Field(f => f.Occurrence.OccurrenceId)
                             .Terms(occurrenceIds)
                         )
                     )
+                    .Size(occurrenceIds?.Count() ?? 0)
+                    .Source(s => s
+                        .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
+                    )
+                    .TrackTotalHits(false)
                 );
 
                 if (!searchResponse.IsValid)
@@ -1813,10 +1765,15 @@ namespace SOS.Lib.Repositories.Processed
                         .Terms(occurrenceIds)
                     )
                 )
+                .Size(occurrenceIds?.Count() ?? 0)
                 .Source(p => p
                     .Includes(i => i
                         .Fields(outputFields
-                            .Select(f => new Field(f)))))
+                            .Select(f => new Field(f))
+                        )
+                    )
+                )
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -1831,25 +1788,25 @@ namespace SOS.Lib.Repositories.Processed
            IEnumerable<object> searchAfter = null)
         {
             var searchIndex = GetCurrentIndex(filter);
-
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
-                    .Source(source => source
-                        .Includes(fieldsDescriptor => fieldsDescriptor
-                            .Field("occurrence.occurrenceId")
-                            .Field("measurementOrFacts")))
-                    .Query(query => query
-                        .Bool(boolQueryDescriptor => boolQueryDescriptor
-                            .Filter(filter.ToMeasurementOrFactsQuery())
-                        )
-                    ), 
-                    pointInTimeId, 
-                    searchAfter);
+                .Query(query => query
+                    .Bool(boolQueryDescriptor => boolQueryDescriptor
+                        .Filter(filter.ToMeasurementOrFactsQuery())
+                    )
+                )
+                .Source(source => source
+                    .Includes(fieldsDescriptor => fieldsDescriptor
+                        .Field("occurrence.occurrenceId")
+                        .Field("measurementOrFacts"))), 
+                pointInTimeId, 
+                searchAfter
+            );
 
             return new SearchAfterResult<ExtendedMeasurementOrFactRow>
             {
                 Records = CastDynamicsToObservations(searchResponse.Documents)?.ToExtendedMeasurementOrFactRows(),
-                PointInTimeId = pointInTimeId,
+                PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };
         }
@@ -1864,13 +1821,15 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
-                .Source(source => source
-                    .Includes(fieldsDescriptor => fieldsDescriptor
-                        .Field("occurrence.occurrenceId")
-                        .Field("media")))
                 .Query(query => query
                     .Bool(boolQueryDescriptor => boolQueryDescriptor
                         .Filter(filter.ToMultimediaQuery())
+                    )
+                )
+                .Source(source => source
+                    .Includes(fieldsDescriptor => fieldsDescriptor
+                        .Field("occurrence.occurrenceId")
+                        .Field("media")
                     )
                 ),
                 pointInTimeId,
@@ -1879,14 +1838,14 @@ namespace SOS.Lib.Repositories.Processed
             return new SearchAfterResult<SimpleMultimediaRow>
             {
                 Records = CastDynamicsToObservations(searchResponse.Documents)?.ToSimpleMultimediaRows(),
-                PointInTimeId = pointInTimeId,
+                PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };
         }
 
         /// <inheritdoc />
         public async Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
-            SearchFilterBase filter,
+            SearchFilter filter,
             string pointInTimeId = null,
             IEnumerable<object> searchAfter = null) 
         {
@@ -1894,26 +1853,19 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchDescriptor<dynamic>()
                 .Index(searchIndex)
-                .Source(p => new SourceFilterDescriptor<dynamic>()
-                            .Excludes(e => e
-                                .Field("artportalenInternal")
-                                .Field("location.point")
-                                .Field("location.pointLocation")
-                                .Field("location.pointWithBuffer")
-                                .Field("location.pointWithDisturbanceBuffer")
-                            ))
-                        .Query(q => q
-                            .Bool(b => b
-                                .Filter(filter.ToQuery())
-                            )
-                        ),
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                    .Query(q => q
+                        .Bool(b => b
+                            .Filter(filter.ToQuery())
+                        )
+                    ),
                 pointInTimeId,
                 searchAfter);
 
             return new SearchAfterResult<T>
             {
                 Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? CastDynamicsToObservations(searchResponse.Documents) : searchResponse.Documents),
-                PointInTimeId = pointInTimeId,
+                PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };
         }
@@ -1939,9 +1891,6 @@ namespace SOS.Lib.Repositories.Processed
                 var queryResponse = string.IsNullOrEmpty(scrollId) ?
                     await Client.SearchAsync<dynamic>(s => s
                         .Index(indexNames)
-                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
-                        .Size(take)
-                        .Scroll(ScrollTimeout)
                         .Query(q => q
                             .Bool(b => b
                                 .MustNot(excludeQuery)
@@ -1949,13 +1898,16 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                         .Sort(sort => sortDescriptor)
+                        .Size(take)
+                        .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                        .Scroll(ScrollTimeout)
                     ) : await Client
                         .ScrollAsync<dynamic>(ScrollTimeout, scrollId);
 
                 if (!queryResponse.IsValid) {
                     throw new InvalidOperationException(queryResponse.DebugInformation);
                 }
-
+                
                 return queryResponse;
             });
 
@@ -1996,6 +1948,9 @@ namespace SOS.Lib.Repositories.Processed
                         .WrapLongitude()
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             var defaultGeoBounds = new GeoBounds
@@ -2027,10 +1982,11 @@ namespace SOS.Lib.Repositories.Processed
                                 .RandomScore(rs => rs
                                     .Seed(DateTime.Now.ToBinary())
                                     .Field(p => p.Occurrence.OccurrenceId)))))
+                    .Size(take)
                     .Source(s => s
                         .Includes(i => i.Fields(f => f.Occurrence, f => f.Location))
                     )
-                    .Size(take)
+                    .TrackTotalHits(false)
                 );
 
                 if (!searchResponse.IsValid)
@@ -2056,7 +2012,6 @@ namespace SOS.Lib.Repositories.Processed
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
-                   .Size(0)
                    .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -2079,6 +2034,9 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                     )
+                    .Size(0)
+                    .Source(s => s.ExcludeAll())
+                    .TrackTotalHits(false)
                 );
 
                 if (!searchResponse.IsValid)
@@ -2121,7 +2079,6 @@ namespace SOS.Lib.Repositories.Processed
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
-                   .Size(0)
                    .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -2148,6 +2105,9 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                     )
+                    .Size(0)
+                    .Source(s => s.ExcludeAll())
+                    .TrackTotalHits(false)
                 );
 
                 if (!searchResponse.IsValid)
@@ -2194,7 +2154,6 @@ namespace SOS.Lib.Repositories.Processed
                 // First get observations count and taxon count group by day
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
-                   .Size(0)
                    .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery)
@@ -2225,6 +2184,9 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         )
                     )
+                    .Size(0)
+                    .Source(s => s.ExcludeAll())
+                    .TrackTotalHits(false)
                 );
 
                 if (!searchResponse.IsValid)
@@ -2270,7 +2232,6 @@ namespace SOS.Lib.Repositories.Processed
                     // Second, get all locations group by day
                     var searchResponseLocality = await Client.SearchAsync<dynamic>(s => s
                        .Index(new[] { PublicIndexName, ProtectedIndexName })
-                       .Size(0)
                        .Query(q => q
                             .Bool(b => b
                                 .MustNot(excludeQuery)
@@ -2305,6 +2266,9 @@ namespace SOS.Lib.Repositories.Processed
 
                             )
                         )
+                        .Size(0)
+                        .Source(s => s.ExcludeAll())
+                        .TrackTotalHits(false)
                     );
 
                     if (!searchResponseLocality.IsValid)
@@ -2344,7 +2308,6 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<bool> HasIndexOccurrenceIdDuplicatesAsync(bool protectedIndex)
         {
             var searchResponse = await Client.SearchAsync<Observation>(s => s
-                .Size(0)
                 .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 .Aggregations(a => a
                     .Terms("uniqueOccurrenceIdCount", t => t
@@ -2353,6 +2316,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Size(1)
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -2425,9 +2391,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems)
         {
             var searchResponse = await (activeInstance ? Client : InActiveClient).SearchAsync<dynamic>(s => s
-                .Size(0)
                 .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
-                .Source(s => s.ExcludeAll())
                 .Aggregations(a => a
                     .Terms("OccurrenceIdDuplicatesExists", f => f
                         .Field("occurrence.occurrenceId")
@@ -2435,6 +2399,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Size(maxReturnedItems)
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)

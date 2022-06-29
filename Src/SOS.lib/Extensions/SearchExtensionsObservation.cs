@@ -767,9 +767,10 @@ namespace SOS.Lib
         }
 
         /// <summary>
-        ///     Build a projection string
+        /// Build a projection string
         /// </summary>
-        /// <param name="fields"></param>
+        /// <param name="properties"></param>
+        /// <param name="isInternal"></param>
         /// <returns></returns>
         public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> properties,
             bool isInternal)

@@ -159,7 +159,6 @@ namespace SOS.Lib.Helpers
         /// <summary>
         /// Write field
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="field"></param>
         public void WriteField(string field)
         {

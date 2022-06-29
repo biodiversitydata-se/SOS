@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.Managers
         {
             var eml = await _dataProviderCache.GetEmlAsync(providerId);
 
-            return await eml?.ToBytesAsync();
+            return await eml?.ToBytesAsync() ?? Array.Empty<byte>();
         }
     }
 }

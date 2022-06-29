@@ -53,7 +53,7 @@ namespace SOS.Lib.IO.Excel
                                        throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         public async Task<FileExportResult> CreateFileAync(SearchFilter filter, 
             string exportPath,
             string fileName, 
@@ -80,8 +80,8 @@ namespace SOS.Lib.IO.Excel
                 using var csvFileHelper = new CsvFileHelper();
                 csvFileHelper.InitializeWrite(fileStream, "\t");
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
-               
                 var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+               
                 while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -96,11 +96,10 @@ namespace SOS.Lib.IO.Excel
                     foreach (var observation in processedObservations)
                     {
                         var flatObservation = new FlatObservation(observation);
-                        
+                        var fields = new List<string>();
                         foreach (var propertyField in propertyFields)
                         {
                             var value = flatObservation.GetValue(propertyField);
-
                             var stringValue = value == null ? string.Empty : propertyField.DataTypeEnum switch
                             {
                                 PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),
@@ -111,16 +110,16 @@ namespace SOS.Lib.IO.Excel
                                 PropertyFieldDataType.TimeSpan => ((TimeSpan?)value)?.ToString("hh\\:mm"),
                                 _ => (string)value
                             };
-
-                            csvFileHelper.WriteField(stringValue);
+                            fields.Add(stringValue);
                         }
-                        csvFileHelper.NextRecord();
+                        csvFileHelper.WriteRow(fields);
                     }
 
                     nrObservations += processedObservations.Length;
                     // Get next batch of observations.
                     searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
+
                 csvFileHelper.FinishWrite();
 
                 if (gzip)
