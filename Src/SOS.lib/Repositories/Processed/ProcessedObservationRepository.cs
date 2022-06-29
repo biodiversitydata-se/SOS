@@ -1136,6 +1136,7 @@ namespace SOS.Lib.Repositories.Processed
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
                 .Size(0)
+                .TrackTotalHits(false)
                 .Index(indexNames)
                 .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
@@ -1151,15 +1152,8 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
 
-            // Calculate size to fetch. If zero, get all
             var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
-            var size = skip + take < maxResult ? skip + take : maxResult == 0 ? 1 : maxResult;
-            if (skip == 0 && take == -1)
-            {
-                size = maxResult == 0 ? 1 : maxResult;
-                take = maxResult;
-            }
-
+            
             if (aggregationType == AggregationType.SpeciesSightingsListTaxonCount)
             {
                 return new PagedResult<dynamic>
@@ -1171,9 +1165,18 @@ namespace SOS.Lib.Repositories.Processed
                 };
             }
 
+            // Calculate size to fetch. If zero, get all
+            var size = skip + take < maxResult ? skip + take : maxResult == 0 ? 1 : maxResult;
+            if (skip == 0 && take == -1)
+            {
+                size = maxResult == 0 ? 1 : maxResult;
+                take = maxResult;
+            }
+
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Size(0)
+                .TrackTotalHits(false)
                 .Index(indexNames)
                 .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
@@ -1183,24 +1186,31 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Aggregations(a => a
-                    .Terms("species", t => t
-                        .Script(s => s
-                            // Build a sortable key
-                            .Source("doc['taxon.attributes.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
-                        )
-                        .Order(o => o.KeyAscending())
-                        .Aggregations(thAgg => thAgg
-                            .TopHits("info", info => info
-                                .Size(1)
-                                .Source(src => src
-                                    .Includes(inc => inc
-                                        .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.attributes.redlistCategory")
-                                    )
-                                )
+                    .Composite("species", c => c
+                        .Size(size)
+                        .Sources(s => s
+                            .Terms("sortOrder", t => t
+                                .Field("taxon.attributes.sortOrder")
+                             )
+                            .Terms("scientificName", t => t
+                                .Field("taxon.scientificName")
+                             )
+                            .Terms("id", t => t
+                                .Field("taxon.id")
+                            )
+                            .Terms("vernacularName", t => t
+                                .Field("taxon.vernacularName")
+                                .MissingBucket(true)
+                            )
+                            .Terms("scientificNameAuthorship", t => t
+                                .Field("taxon.scientificNameAuthorship")
+                                .MissingBucket(true)
+                            )
+                            .Terms("redlistCategory", t => t
+                                .Field("taxon.attributes.redlistCategory")
+                                .MissingBucket(true)
                             )
                         )
-                        .Order(o => o.KeyAscending())
-                        .Size(size)
                     )
                 )
             );
@@ -1211,18 +1221,17 @@ namespace SOS.Lib.Repositories.Processed
 
             var result = searchResponse
                 .Aggregations
-                .Terms("species")
+                .Composite("species")
                 .Buckets?
-                .Select(b => (b.DocCount, b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon))
-                    .Select(p => 
+                .Select(b =>
                         new AggregatedSpecies
                         {
-                            TaxonId = p.Taxon?.Id ?? 0,
-                            DocCount = p.DocCount,
-                            VernacularName = p.Taxon?.VernacularName ?? "",
-                            ScientificNameAuthorship = p.Taxon?.ScientificNameAuthorship ?? "",
-                            ScientificName = p.Taxon?.ScientificName ?? "",
-                            RedlistCategory = p.Taxon?.Attributes?.RedlistCategory ?? ""
+                            DocCount = b.DocCount,
+                            RedlistCategory = b.Key["redlistCategory"]?.ToString() ?? "",
+                            ScientificNameAuthorship = b.Key["scientificNameAuthorship"]?.ToString() ?? "",
+                            ScientificName = b.Key["scientificName"]?.ToString() ?? "",
+                            TaxonId = int.Parse(b.Key["id"].ToString()),
+                            VernacularName = b.Key["vernacularName"]?.ToString() ?? ""
                         }
                     )?
                 .Skip(skip)
@@ -1235,8 +1244,6 @@ namespace SOS.Lib.Repositories.Processed
                 Take = take,
                 TotalCount = maxResult
             };
-
-            // When operation is disposed, telemetry item is sent.
         }
 
         /// <inheritdoc />
