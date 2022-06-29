@@ -350,7 +350,12 @@ namespace SOS.Lib.Repositories.Processed
          
             searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(PublicIndexName)
-                .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
                 .Aggregations(a => a.Composite("geoTileTaxonComposite", g => g
                     .Size(MaxNrElasticSearchAggregationBuckets + 1)
                     .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "geoTile", "0/0/0" }, { "taxon", 0 } }))
@@ -361,12 +366,10 @@ namespace SOS.Lib.Repositories.Processed
                         .Terms("taxon", tt => tt
                             .Field("taxon.id").Order(SortOrder.Ascending)
                         ))))
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
+                
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -388,7 +391,12 @@ namespace SOS.Lib.Repositories.Processed
 
             searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
-                .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
                 .Aggregations(a => a
                     .Composite("taxonComposite", g => g
                         .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "taxonId", 0 } }))
@@ -417,12 +425,9 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                 )
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -444,7 +449,12 @@ namespace SOS.Lib.Repositories.Processed
 
             searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
-                .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
                 .Aggregations(a => a.Composite("taxonComposite", g => g
                     .Size(take)
                     .After(nextPage ?? new CompositeKey(new Dictionary<string, object>() { { "taxonId", 0 }, { "provinceId", "" } }))
@@ -454,14 +464,12 @@ namespace SOS.Lib.Repositories.Processed
                         .Terms("provinceId", p => p
                             .Field("location.province.featureId"))
                         )))
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                ));
-      
-
+                
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+ 
             if (!searchResponse.IsValid)
             {
                 throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -757,7 +765,6 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Size(0)
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
@@ -767,10 +774,13 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a => a
                     .Terms("taxon_group", t => t
-                        .Size(filter.Taxa?.Ids?.Count()) // Size can never be grater than number of taxon id's
+                        .Size(filter.Taxa?.Ids?.Count() ?? 0) // Size can never be grater than number of taxon id's
                         .Field("taxon.id")
                     )
                 )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);

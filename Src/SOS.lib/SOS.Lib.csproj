@@ -55,6 +55,9 @@
 		<None Update="Resources\DataProvider\Eml\Biologg.eml.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Resources\DataProvider\Eml\SosFilterSubset.eml.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\DataProvider\Eml\SosDataProvidersCombined.eml.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

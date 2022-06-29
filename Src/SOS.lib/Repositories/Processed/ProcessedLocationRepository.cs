@@ -58,11 +58,16 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Collapse(c => c.Field("location.locationId"))
+               .Size(locationIds.Count())
                .Source(s => s
                     .Includes(i => i
                         .Field("location")
                     )
+                    .Excludes(e => e
+                        .Field("location.pointLocation")
+                    )
                 )
+               .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -81,7 +86,12 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
-                .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
                 .Aggregations(a => a
                     .Composite("locations", g => g
                         .Size(skip + take)
@@ -110,12 +120,9 @@ namespace SOS.Lib.Repositories.Processed
                         )
                     )
                 )
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)

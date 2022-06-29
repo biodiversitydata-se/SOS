@@ -242,9 +242,12 @@ namespace SOS.Lib.Repositories.Processed
                             .Field("_id")
                             .Value(id))))
                     )
+                
+                .Size(1)
                 .Source(s => s
                     .Excludes(e => internalCall ? null : e.Field(f => f.ArtportalenInternal))
                 )
+                .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid)
@@ -261,14 +264,14 @@ namespace SOS.Lib.Repositories.Processed
         {
             var searchResponse = await Client.SearchAsync<Checklist>(s => s
                 .Index(IndexName)
-                .From(skip)
-                .Size(take)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(f => f.Exists(e => e.Field(f => f.Id)))
                     )
                 )
                 .Sort(sort => sort.Field(f => f.Field(f => f.Name)))
+                .From(skip)
+                .Size(take)
             );
 
             if (!searchResponse.IsValid)

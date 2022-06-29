@@ -55,14 +55,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteAllDocumentsAsync(bool protectedIndex);
 
         /// <summary>
-        /// Copy provider data from active instance to inactive instance.
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="protectedIndex"></param>
-        /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(DataProvider dataProvider, bool protectedIndex);
-
-        /// <summary>
         ///  Delete observations by occurence id
         /// </summary>
         /// <param name="occurenceIds"></param>
@@ -226,7 +218,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="searchAfter"></param>
         /// <returns></returns>
         Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
-            SearchFilterBase filter,
+            SearchFilter filter,
             string pointInTimeId = null,
             IEnumerable<object> searchAfter = null);
 

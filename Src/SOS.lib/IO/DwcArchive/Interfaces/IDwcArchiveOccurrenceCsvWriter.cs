@@ -23,7 +23,7 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
         /// <param name="leaveStreamOpen"></param>
         /// <returns></returns>
         Task<int> CreateOccurrenceCsvFileAsync(
-            SearchFilterBase filter,
+            SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,

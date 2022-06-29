@@ -36,7 +36,7 @@ namespace SOS.Lib.IO.DwcArchive
         }
 
         public async Task<bool> CreateEventCsvFileAsync(
-            SearchFilterBase filter,
+            SearchFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
