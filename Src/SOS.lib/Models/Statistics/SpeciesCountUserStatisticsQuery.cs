@@ -11,11 +11,12 @@ public class SpeciesCountUserStatisticsQuery
     public AreaType? AreaType { get; set; }
     public string FeatureId { get; set; }
     public int? SiteId { get; set; }
+    public bool IncludeOtherAreasSpeciesCount { get; set; }
 
     public string CacheKey => this.ToString();
     public override string ToString()
     {
-        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}";
+        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
     }
 
     protected bool Equals(SpeciesCountUserStatisticsQuery other)

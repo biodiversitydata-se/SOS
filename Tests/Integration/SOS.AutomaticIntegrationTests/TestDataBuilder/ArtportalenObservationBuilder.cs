@@ -536,6 +536,14 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
 
                 obs.ObserversInternal = new List<UserInternal> { new() { Id = item.UserId, UserServiceUserId = item.UserId } };
                 obs.TaxonId = item.TaxonId;
+                if (!string.IsNullOrEmpty(item.ProvinceId))
+                {
+                    obs.Site.Province.FeatureId = item.ProvinceId;
+                }
+                if (!string.IsNullOrEmpty(item.MunicipalityId))
+                {
+                    obs.Site.Municipality.FeatureId = item.MunicipalityId;
+                }
             });
 
             return operable;
@@ -562,5 +570,7 @@ namespace SOS.AutomaticIntegrationTests.TestDataBuilder
     {
         public int UserId { get; set; }
         public int TaxonId { get; set; }
+        public string ProvinceId { get; set; }
+        public string MunicipalityId { get; set; }
     }
 }

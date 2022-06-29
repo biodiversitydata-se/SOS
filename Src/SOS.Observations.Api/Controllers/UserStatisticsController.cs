@@ -68,7 +68,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
         /// <param name="siteId"></param>
-        /// <param name="addAreaTypeSpeciesCount">Add user species count for all areas in specified Area Type.</param>
+        /// <param name="includeOtherAreasSpeciesCount">Add user species count for all areas in specified Area Type.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
         [HttpGet("PagedSpeciesCountAggregation")]
@@ -86,13 +86,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] AreaType? areaType = null,
             [FromQuery] string featureId = null,
             [FromQuery] int? siteId = null,
-            [FromQuery] bool addAreaTypeSpeciesCount = false,
+            [FromQuery] bool includeOtherAreasSpeciesCount = false,
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-
                 var query = new SpeciesCountUserStatisticsQuery
                 {
                     TaxonId = taxonId,
@@ -100,10 +99,11 @@ namespace SOS.Observations.Api.Controllers
                     SpeciesGroup = speciesGroup,
                     AreaType = areaType,
                     FeatureId = featureId,
-                    SiteId = siteId
+                    SiteId = siteId,
+                    IncludeOtherAreasSpeciesCount = includeOtherAreasSpeciesCount
                 };
 
-                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, useCache);
+                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }

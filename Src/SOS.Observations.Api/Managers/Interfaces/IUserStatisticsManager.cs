@@ -11,6 +11,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IUserStatisticsManager
     {
         Task<IEnumerable<UserStatisticsItem>> SpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, bool useCache = true);
-        Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, int? skip, int? take, bool useCache = true);
+        Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, 
+            int? skip, 
+            int? take,
+            string sortBy,
+            bool useCache = true);
     }
 }
