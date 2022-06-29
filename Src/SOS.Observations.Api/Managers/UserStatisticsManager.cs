@@ -80,11 +80,19 @@ namespace SOS.Observations.Api.Managers
                 if (!query.IncludeOtherAreasSpeciesCount)
                 {
                     // todo - implement logic. For caching purpose: Load all records, not just the ones returned by skip and take.
+                    // Perhaps loading all records could be slow. One solution could be to only records for the selected page
+                    // (30 persons in Artportalen), but also start another thread with a query for all persons and store
+                    // that result in cache when its ready.
+                    // The number of threads should probably be limited by using a semaphore.
                     records = PredefinedRecords;
                 }
                 else
                 {
-                    // todo - implement logic. For caching purpose: Load all records, not just the ones returned by skip and take.
+                    // todo - implement logic. For caching purpose: Load all records, not just the ones returned by skip and take?
+                    // Perhaps loading all records for other areas (provinces) could be really slow. One solution could be to only
+                    // load other areas for the selected page (30 persons in Artportalen), but also start another thread with a
+                    // query for all persons and store that result in cache when its ready.
+                    // The number of threads should probably be limited by using a semaphore.
                     records = PredefinedRecordsWithAreas;
                 }
             }

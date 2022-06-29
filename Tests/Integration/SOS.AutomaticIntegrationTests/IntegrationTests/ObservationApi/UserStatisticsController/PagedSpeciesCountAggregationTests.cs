@@ -16,6 +16,21 @@ using SOS.Observations.Api.Dtos;
 
 namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStatisticsController
 {
+    /// <summary>
+    /// Tests that should be created.
+    ///  - Handling observations with multiple observers.
+    ///  - Test caching (The second request should be much faster)
+    ///  - Test caching limit (There should be a limit of how much RAM that could be used by the cache)
+    ///  - Test skip and take
+    ///  - Test Taxon filter
+    ///  - Test Year filter
+    ///  - Test SpeciesGroup filter
+    ///  - Test (AreaType, FeatureId) filter
+    ///  - Test SiteId filter
+    ///  - Test ProjectId filter
+    ///  - Test combination of filter. I.e. (Taxon, Year), (SpeciesGroup, SiteId)
+    ///  - Test SortBy
+    /// </summary>
     [Collection(Constants.IntegrationTestsCollectionName)]
     public class PagedSpeciesCountAggregationTests
     {
