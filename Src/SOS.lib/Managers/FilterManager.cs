@@ -169,7 +169,7 @@ namespace SOS.Lib.Managers
                 }
             }
 
-            return taxaIds?.ToList();
+            return taxaIds?.Distinct().ToList();
         }
 
         private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds, IEnumerable<int> listIds, TaxonFilter.TaxonListOp listOperator)
