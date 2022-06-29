@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Observations.Api.HealthChecks
@@ -12,14 +13,17 @@ namespace SOS.Observations.Api.HealthChecks
     public class WFSHealthCheck : IHealthCheck
     {
         private readonly IHttpClientService _httpClientService;
+        private readonly ILogger<WFSHealthCheck> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="httpClientService"></param>
-        public WFSHealthCheck(IHttpClientService httpClientService)
+        /// <param name="logger"></param>
+        public WFSHealthCheck(IHttpClientService httpClientService, ILogger<WFSHealthCheck> logger)
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -62,7 +66,8 @@ namespace SOS.Observations.Api.HealthChecks
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "WFS health check failed");
+                _logger.LogError(e, "WFS Health check error");
+                return new HealthCheckResult(HealthStatus.Unhealthy, $"WFS health check failed. {e.Message}, {e.StackTrace}");
             }
         }
     }

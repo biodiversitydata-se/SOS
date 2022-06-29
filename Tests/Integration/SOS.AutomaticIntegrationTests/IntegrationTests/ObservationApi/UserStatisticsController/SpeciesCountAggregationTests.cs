@@ -25,7 +25,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task SpeciesCountAggregationTest()
+        public async Task TestSpeciesCountAggregation()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
@@ -66,11 +66,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            
+            var query = new SpeciesCountUserStatisticsQuery();
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.UserStatisticsController.SpeciesCountAggregation();
+            var response = await _fixture.UserStatisticsController.SpeciesCountAggregation(query);
             var result = response.GetResultObject<IEnumerable<UserStatisticsItem>>();
 
             //-----------------------------------------------------------------------------------------------------------

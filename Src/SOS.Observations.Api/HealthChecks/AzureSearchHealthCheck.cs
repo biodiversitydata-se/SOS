@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -14,14 +15,16 @@ namespace SOS.Observations.Api.HealthChecks
     public partial class AzureSearchHealthCheck : IHealthCheck
     {
         private readonly SosAzureClient _sosAzureClient;
+        private readonly ILogger<AzureSearchHealthCheck> _logger;
         private readonly bool _initialized; // true if Azure API URL and subscription key is set.
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="healthCheckConfiguration"></param>
-        public AzureSearchHealthCheck(HealthCheckConfiguration healthCheckConfiguration)
+        public AzureSearchHealthCheck(HealthCheckConfiguration healthCheckConfiguration, ILogger<AzureSearchHealthCheck> logger)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (healthCheckConfiguration != null && !string.IsNullOrEmpty(healthCheckConfiguration.AzureApiUrl) && !string.IsNullOrEmpty(healthCheckConfiguration.AzureSubscriptionKey))
             {
                 _sosAzureClient = new SosAzureClient(healthCheckConfiguration.AzureApiUrl, healthCheckConfiguration.AzureSubscriptionKey);
@@ -99,7 +102,8 @@ namespace SOS.Observations.Api.HealthChecks
             }
             catch (Exception e)
             {
-                return new HealthCheckResult(HealthStatus.Degraded, "Azure API Health check failed", e);
+                _logger.LogError(e, "Azure Health Check failed");
+                return new HealthCheckResult(HealthStatus.Degraded, $"Azure API Health check failed. Message: {e.Message}, StackTrace: {e.StackTrace}", e);
             }
         }
     }
