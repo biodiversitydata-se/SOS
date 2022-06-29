@@ -2,6 +2,7 @@
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -172,44 +173,45 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             //-----------------------------------------------------------------------------------------------------------            
             var expected = new List<UserStatisticsItem>
             {
-                new()
-                {
-                    UserId = 1, SpeciesCount = 5, SpeciesCountByFeatureId = new Dictionary<string, int>
-                    {
-                        {"P1", 5}, {"P2", 2}, {"P3", 2}
-                    }
-                },
-                new()
-                {
-                    UserId = 2, SpeciesCount = 4, SpeciesCountByFeatureId = new Dictionary<string, int>
-                    {
-                        {"P1", 4}, {"P2", 3}, {"P3", 2}
-                    }
-                },
-                new()
-                {
-                    UserId = 3, SpeciesCount = 3, SpeciesCountByFeatureId = new Dictionary<string, int>
-                    {
-                        {"P1", 3}, {"P2", 1}, {"P3", 1}
-                    }
-                },
-                new()
-                {
-                    UserId = 4, SpeciesCount = 2, SpeciesCountByFeatureId = new Dictionary<string, int>
-                    {
-                        {"P1", 2}, {"P2", 2}
-                    }
-                },
-                new()
-                {
-                    UserId = 5, SpeciesCount = 1, SpeciesCountByFeatureId = new Dictionary<string, int>
-                    {
-                        {"P1", 1}, {"P4", 1}
-                    }
-                }
+                new() { UserId = 1, SpeciesCount = 5, SpeciesCountByFeatureId = new Dictionary<string, int> {{"P1", 5}, {"P2", 2}, {"P3", 2}} },
+                new() { UserId = 2, SpeciesCount = 4, SpeciesCountByFeatureId = new Dictionary<string, int> {{"P1", 4}, {"P2", 3}, {"P3", 2}} },
+                new() { UserId = 3, SpeciesCount = 3, SpeciesCountByFeatureId = new Dictionary<string, int> {{"P1", 3}, {"P2", 1}, {"P3", 1}} },
+                new() { UserId = 4, SpeciesCount = 2, SpeciesCountByFeatureId = new Dictionary<string, int> {{"P1", 2}, {"P2", 2}} },
+                new() { UserId = 5, SpeciesCount = 1, SpeciesCountByFeatureId = new Dictionary<string, int> {{"P1", 1}, {"P4", 1}} }
             };
 
             result.Records.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact(Skip="Implementation in controller is not ready yet. Because this test creates a lots of documents it should probably only be run on demand.")]
+        [Trait("Category", "AutomaticIntegrationTest")]
+        public async Task Test_ElasticsearchBucketSize65535IsNoProblem()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Create verbatim observations
+            //-----------------------------------------------------------------------------------------------------------
+            const int UsersCount = 100000;
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(UsersCount)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                    .HaveUniqueUserId()
+                .Build();
+
+            await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var query = new SpeciesCountUserStatisticsQuery();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(query, 0, UsersCount);
+            var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------            
+            result.TotalCount.Should().Be(UsersCount);
+            result.Records.Count().Should().Be(UsersCount);
+            result.Records.Should().OnlyHaveUniqueItems();
         }
     }
 }
