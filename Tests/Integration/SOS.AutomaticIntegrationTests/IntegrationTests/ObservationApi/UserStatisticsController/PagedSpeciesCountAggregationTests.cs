@@ -27,7 +27,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task PagedSpeciesCountAggregationTest()
+        public async Task Test_PagedSpeciesCountAggregation()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
@@ -68,11 +68,12 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var query = new SpeciesCountUserStatisticsQuery();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(0,5);
+            var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(query, 0,5);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
 
         [Fact]
         [Trait("Category", "AutomaticIntegrationTest")]
-        public async Task PagedSpeciesCountAggregation_with_multiple_provinces_Test()
+        public async Task Test_PagedSpeciesCountAggregation_with_IncludeOtherAreasSpeciesCount()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create verbatim observations
@@ -150,15 +151,19 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
                 .Build();
 
             await _fixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var query = new SpeciesCountUserStatisticsQuery
+            {
+                AreaType = AreaType.Province,
+                IncludeOtherAreasSpeciesCount = true
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(
+                query,
                 0, 
                 5,
-                areaType: AreaType.Province,
-                includeOtherAreasSpeciesCount: true,
                 useCache: true);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
 

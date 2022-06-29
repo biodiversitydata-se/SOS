@@ -59,50 +59,27 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Aggregates taxon by user.
         /// </summary>
+        /// <param name="query">The query.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
         /// <param name="sortBy">Sort by sum or featureId.</param>
-        /// <param name="taxonId"></param>
-        /// <param name="year"></param>
-        /// <param name="speciesGroup"></param>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <param name="siteId"></param>
-        /// <param name="includeOtherAreasSpeciesCount">Add user species count for all areas in specified Area Type.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
-        [HttpGet("PagedSpeciesCountAggregation")]
+        [HttpPost("PagedSpeciesCountAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PagedSpeciesCountAggregation(
+            [FromBody] SpeciesCountUserStatisticsQuery query,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
             [FromQuery] string sortBy = "sum",
-            [FromQuery] int? taxonId = null,
-            [FromQuery] int? year = null,
-            [FromQuery] SpeciesGroup? speciesGroup = null,
-            [FromQuery] AreaType? areaType = null,
-            [FromQuery] string featureId = null,
-            [FromQuery] int? siteId = null,
-            [FromQuery] bool includeOtherAreasSpeciesCount = false,
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var query = new SpeciesCountUserStatisticsQuery
-                {
-                    TaxonId = taxonId,
-                    Year = year,
-                    SpeciesGroup = speciesGroup,
-                    AreaType = areaType,
-                    FeatureId = featureId,
-                    SiteId = siteId,
-                    IncludeOtherAreasSpeciesCount = includeOtherAreasSpeciesCount
-                };
-
                 var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
@@ -114,35 +91,18 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        [HttpGet("SpeciesCountAggregation")]
+        [HttpPost("SpeciesCountAggregation")]
         [ProducesResponseType(typeof(IEnumerable<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SpeciesCountAggregation(
-            [FromQuery] int? taxonId = null,
-            [FromQuery] int? year = null,
-            [FromQuery] SpeciesGroup? speciesGroup = null,
-            [FromQuery] AreaType? areaType = null,
-            [FromQuery] string featureId = null,
-            [FromQuery] int? siteId = null,
-            [FromQuery] List<int> userIds = null,
+            [FromBody] SpeciesCountUserStatisticsQuery query,
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-
-                var query = new SpeciesCountUserStatisticsQuery
-                {
-                    TaxonId = taxonId,
-                    Year = year,
-                    SpeciesGroup = speciesGroup,
-                    AreaType = areaType,
-                    FeatureId = featureId,
-                    SiteId = siteId
-                };
-
                 var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, useCache);
                 return new OkObjectResult(result);
             }
