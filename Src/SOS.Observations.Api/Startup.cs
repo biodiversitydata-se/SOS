@@ -367,7 +367,7 @@ namespace SOS.Observations.Api
                 .AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                 .AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" })
                 .AddCheck<WFSHealthCheck>("WFS", tags: new [] { "wfs" })
-                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs, elasticsearch" });
+                .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" });
             
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();

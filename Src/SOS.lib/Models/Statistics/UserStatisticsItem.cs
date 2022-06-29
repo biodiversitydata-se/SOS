@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
 using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Statistics
@@ -18,16 +20,16 @@ namespace SOS.Lib.Models.Statistics
         /// <summary>
         /// Experimental. Perhaps move to another class.
         /// </summary>
-        public Dictionary<(AreaType AreaType, string FeatureId), int> SpeciesCountByArea { get; set; }
-
-        /// <summary>
-        /// Experimental. Perhaps move to another class.
-        /// </summary>
         public int ObservationCount { get; set; }
 
         /// <summary>
         /// Experimental. Perhaps move to another class.
         /// </summary>
         public int ReportCount { get; set; }
+
+        /// <summary>
+        /// Experimental. Perhaps move to another class.
+        /// </summary>
+        public Dictionary<string, int> SpeciesCountByFeatureId { get; set; }
     }
 }

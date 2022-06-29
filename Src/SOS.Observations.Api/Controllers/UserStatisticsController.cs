@@ -35,6 +35,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly IUserStatisticsManager _userStatisticsManager;
         private readonly ITaxonManager _taxonManager;
 
+        // Observatörsligan och Artlistan för en person är viktigast att uppdatera så snart som möjligt.
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -65,7 +67,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="speciesGroup"></param>
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
-        /// <param name="addAreaTypeSpeciesCount">Add user species count for all areas in specified Area Type.</param>
+        /// <param name="siteId"></param>
+        /// <param name="includeOtherAreasSpeciesCount">Add user species count for all areas in specified Area Type.</param>
+        /// <param name="useCache"></param>
         /// <returns></returns>
         [HttpGet("PagedSpeciesCountAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
@@ -81,33 +85,25 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SpeciesGroup? speciesGroup = null,
             [FromQuery] AreaType? areaType = null,
             [FromQuery] string featureId = null,
-            [FromQuery] bool addAreaTypeSpeciesCount = false)
+            [FromQuery] int? siteId = null,
+            [FromQuery] bool includeOtherAreasSpeciesCount = false,
+            [FromQuery] bool useCache = true)
         {
             try
             {
-                // todo - add more validation
-                var validationResult = Result.Combine(
-                    ValidateTaxonAggregationPagingArguments(skip, take));
-
-                if (validationResult.IsFailure)
+                // todo - add validation
+                var query = new SpeciesCountUserStatisticsQuery
                 {
-                    return BadRequest(validationResult.Error);
-                }
+                    TaxonId = taxonId,
+                    Year = year,
+                    SpeciesGroup = speciesGroup,
+                    AreaType = areaType,
+                    FeatureId = featureId,
+                    SiteId = siteId,
+                    IncludeOtherAreasSpeciesCount = includeOtherAreasSpeciesCount
+                };
 
-                // todo - implement logic
-                //var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
-                //var result = await ObservationManager.GetTaxonAggregationAsync(
-                //    roleId,
-                //    authorizationApplicationIdentifier,
-                //    searchFilter,
-                //    skip,
-                //    take);
-                //if (result.IsFailure)
-                //{
-                //    return BadRequest(result.Error);
-                //}
-
-                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(skip, take);
+                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -118,16 +114,6 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Aggregates taxon by user.
-        /// </summary>
-        /// <param name="taxonId"></param>
-        /// <param name="year"></param>
-        /// <param name="speciesGroup"></param>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <param name="userIds"></param>
-        /// <returns></returns>
         [HttpGet("SpeciesCountAggregation")]
         [ProducesResponseType(typeof(IEnumerable<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -139,33 +125,25 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] SpeciesGroup? speciesGroup = null,
             [FromQuery] AreaType? areaType = null,
             [FromQuery] string featureId = null,
-            [FromQuery] List<int> userIds = null)
+            [FromQuery] int? siteId = null,
+            [FromQuery] List<int> userIds = null,
+            [FromQuery] bool useCache = true)
         {
             try
             {
-                // todo - add validation?
-                //var validationResult = Result.Combine(
-                //    ValidateTaxonAggregationPagingArguments(skip, take));
+                // todo - add validation
 
-                //if (validationResult.IsFailure)
-                //{
-                //    return BadRequest(validationResult.Error);
-                //}
+                var query = new SpeciesCountUserStatisticsQuery
+                {
+                    TaxonId = taxonId,
+                    Year = year,
+                    SpeciesGroup = speciesGroup,
+                    AreaType = areaType,
+                    FeatureId = featureId,
+                    SiteId = siteId
+                };
 
-                // todo - implement logic
-                //var searchFilter = filter.ToSearchFilter(translationCultureCode, sensitiveObservations);
-                //var result = await ObservationManager.GetTaxonAggregationAsync(
-                //    roleId,
-                //    authorizationApplicationIdentifier,
-                //    searchFilter,
-                //    skip,
-                //    take);
-                //if (result.IsFailure)
-                //{
-                //    return BadRequest(result.Error);
-                //}
-
-                var result = await _userStatisticsManager.SpeciesCountSearchAsync();
+                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, useCache);
                 return new OkObjectResult(result);
             }
             catch (Exception e)
@@ -173,6 +151,49 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "SpeciesCountAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+        
+        [HttpGet("SpeciesCountByMonthAggregation")]
+        [ProducesResponseType(typeof(IEnumerable<UserStatisticsByMonthItem>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SpeciesCountByMonthAggregation(
+            [FromQuery] int? taxonId = null,
+            [FromQuery] int? year = null,
+            [FromQuery] SpeciesGroup? speciesGroup = null)
+        {
+            throw new NotImplementedException("Not implemented yet.");
+        }
+
+        [HttpGet("SpeciesCountByYearAndMonthAggregation")]
+        [ProducesResponseType(typeof(IEnumerable<UserStatisticsByMonthItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SpeciesCountByYearAndMonthAggregation(
+            [FromQuery] int? taxonId = null,
+            [FromQuery] int? year = null,
+            [FromQuery] SpeciesGroup? speciesGroup = null)
+        {
+            throw new NotImplementedException("Not implemented yet.");
+        }
+
+        [HttpGet("SpeciesListSummary")]
+        [ProducesResponseType(typeof(IEnumerable<UserStatisticsByMonthItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> SpeciesListSummary(
+            [FromQuery] int? taxonId = null,
+            [FromQuery] int? year = null,
+            [FromQuery] SpeciesGroup? speciesGroup = null,
+            [FromQuery] AreaType? areaType = null,
+            [FromQuery] string featureId = null,
+            [FromQuery] int? siteId = null,
+            [FromQuery] string sortBy = "date")
+        {
+            throw new NotImplementedException("Not implemented yet.");
         }
     }
 }
