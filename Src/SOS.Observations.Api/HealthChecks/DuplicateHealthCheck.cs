@@ -57,25 +57,25 @@ namespace SOS.Observations.Api.HealthChecks
                 var errors = new StringBuilder();
                 if (activePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active public index: { string.Concat(activePublicIndexDuplicates.ToArray(), ",") }...");
+                    errors.Append($"Duplicates found in active public index: { string.Join(", ", activePublicIndexDuplicates) }...");
                     unhealthy = true;
                 }
 
                 if (activePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in active protected index: { string.Concat(activePublicprotectedIndexDuplicates.ToArray(), ",") }...");
+                    errors.Append($"Duplicates found in active protected index: { string.Join(", ", activePublicprotectedIndexDuplicates) }...");
                     unhealthy = true;
                 }
 
                 if (inActivePublicIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in inactive public index: { string.Concat(inActivePublicIndexDuplicates.ToArray(), ",") }...");
+                    errors.Append($"Duplicates found in inactive public index: { string.Join(", ", inActivePublicIndexDuplicates) }...");
                     degraded = true;
                 }
 
                 if (inActivePublicprotectedIndexDuplicates?.Any() ?? false)
                 {
-                    errors.Append($"Duplicates found in inactive protected index: { string.Concat(inActivePublicprotectedIndexDuplicates.ToArray(), ",") }...");
+                    errors.Append($"Duplicates found in inactive protected index: { string.Join(", ", inActivePublicprotectedIndexDuplicates) }...");
                     degraded = true;
                 }
 
