@@ -365,7 +365,7 @@ namespace SOS.Harvest.Jobs
                 //------------------------------------------------------------------------                
                 var result = await ProcessVerbatim(dataProvidersToProcess, mode, taxonById, cancellationToken);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
-
+                
                 //---------------------------------
                 // 6. Create ElasticSearch index
                 //---------------------------------
@@ -379,8 +379,18 @@ namespace SOS.Harvest.Jobs
                         // Enable indexing for public and protected index
                         await EnableIndexingAsync();
 
-                        Thread.Sleep(TimeSpan.FromMinutes(1)); // Wait for Elasticsearch indexing to finish.
-
+                        var processCount = result.Sum(s => s.Value.PublicCount);
+                        var docCount = await _processedObservationRepository.IndexCountAsync(false);
+                        var iterations = 0;
+                        // Compare number of documents processed with acctually db count
+                        // If docCoumt is less than process count, indexing is not ready yet
+                        while (docCount < processCount && iterations < 100)
+                        {
+                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
+                            iterations++; // Safty to prevent infinite loop.
+                            docCount = await _processedObservationRepository.IndexCountAsync(false);
+                        }
+                       
                         if (_runIncrementalAfterFull)
                         {
                             // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
@@ -409,7 +419,10 @@ namespace SOS.Harvest.Jobs
                         }
                     }
 
-                    //await _processedObservationRepository.EnsureNoDuplicatesAsync();
+                    if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
+                    {
+                        _logger.LogError($"Failed to delete duplicates");
+                    }
 
                     // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||

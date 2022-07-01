@@ -792,7 +792,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Ascending("occurrence.occurrenceId")
                             .Descending("modified")
                          )
-                        .Size(duplicates.Count())
+                        .Size(duplicates.Count() * 3) // It's not likely that average numbers of duplicates exceeds 3
                         .Source(s => s.ExcludeAll())
                         .TrackTotalHits(false)
                     );
@@ -1101,6 +1101,8 @@ namespace SOS.Lib.Repositories.Processed
                             .Terms(Ids)
                         )
                     )
+                    .Refresh(true)
+                    .WaitForCompletion(true)
                 );
 
                 return res.IsValid;
