@@ -185,13 +185,11 @@ namespace SOS.Harvest.Services.Taxon
 
                     taxon.Synonyms = synonymeNames;
                 }
-            }
 
-            foreach (var taxon in taxonByTaxonId.Values)
-            {
                 taxon.DynamicProperties = new TaxonDynamicProperties();
                 taxon.Id = taxon.DynamicProperties.DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(taxon.TaxonID);
             }
+           
             _logger.LogDebug("Finish adding taxon core data");
             return taxonByTaxonId;
         }

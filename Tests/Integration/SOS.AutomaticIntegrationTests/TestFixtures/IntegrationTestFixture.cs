@@ -519,6 +519,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
                 elasticClientManager,
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>())),
+                new HttpContextAccessor(),
                 taxonManager,
                 new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;

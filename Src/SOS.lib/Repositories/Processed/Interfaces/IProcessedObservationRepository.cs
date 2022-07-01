@@ -85,6 +85,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task EnableIndexingAsync(bool protectedIndex);
 
         /// <summary>
+        /// Ensure there are no duplictes in the index
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> EnsureNoDuplicatesAsync();
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="filter"></param>
@@ -131,12 +137,15 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<Result<GeoGridMetricResult>> GetMetricGridAggregationAsync(
             SearchFilter filter, int gridCellSizeInMeters);
+
         /// <summary>
         /// Get index health status
         /// </summary>
+        /// <param name="activeInstance"></param>
         /// <param name="waitForStatus"></param>
+        /// <param name="waitForSeconds"></param>
         /// <returns></returns>
-        Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus);
+        Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus, int waitForSeconds);
 
         /// <summary>
         /// Get latest data modified date for passed provider 
@@ -311,11 +320,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <summary>
         /// Look for duplicates
         /// </summary>
-        /// <param name="activeInstance"></param>
         /// <param name="protectedIndex"></param>
         /// <param name="maxReturnedItems"></param>
         /// <returns></returns>
-        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems);
+        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems);
 
         /// <summary>
         /// Unique name of public index 

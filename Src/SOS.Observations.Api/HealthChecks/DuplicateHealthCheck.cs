@@ -39,10 +39,8 @@ namespace SOS.Observations.Api.HealthChecks
                 const int maxItems = 20;
                 var healthTasks = new[]
                 {
-                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(true, false, maxItems),
-                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(true, true, maxItems),
-                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(false, false, maxItems),
-                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(false, true, maxItems)
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(false, maxItems),
+                    _observationManager.TryToGetOccurenceIdDuplicatesAsync(true, maxItems),
                 };
 
                 await Task.WhenAll(healthTasks);

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using SOS.Lib.Cache;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Dtos;
@@ -19,11 +17,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Look for duplicates
         /// </summary>
-        /// <param name="activeInstance"></param>
         /// <param name="protectedIndex"></param>
         /// <param name="maxReturnedItems"></param>
         /// <returns></returns>
-        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex,
+        Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex,
             int maxReturnedItems);
 
         /// <summary>

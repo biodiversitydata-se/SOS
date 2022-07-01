@@ -172,7 +172,7 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         private async Task<bool> ValidateIndexesAsync()
         {
-            var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green);
+            var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green, 1);
             if (healthStatus == WaitForStatus.Red)
             {
                 _logger.LogError("Elastich health status: Red");
@@ -221,7 +221,7 @@ namespace SOS.Harvest.Jobs
             const int maxItems = 20;
 
             var publicIndexDuplicates =
-                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, false, maxItems))?.ToArray();
+                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, maxItems))?.ToArray();
             if (publicIndexDuplicates?.Any() ?? false)
             {
                 _logger.LogError($"Public index ({_processedObservationRepository.PublicIndexName}) contains multiple documents with same occurrenceId. " + 
@@ -230,7 +230,7 @@ namespace SOS.Harvest.Jobs
             }
 
             var protectedIndexDuplicates =
-                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(false, true, maxItems))?.ToArray();
+                (await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(true, maxItems))?.ToArray();
             if (protectedIndexDuplicates?.Any() ?? false)
             {
                 _logger.LogError($"Protected index ({_processedObservationRepository.ProtectedIndexName}) contains multiple documents with same occurrenceId. " +
@@ -378,6 +378,7 @@ namespace SOS.Harvest.Jobs
                     {
                         // Enable indexing for public and protected index
                         await EnableIndexingAsync();
+
                         Thread.Sleep(TimeSpan.FromMinutes(1)); // Wait for Elasticsearch indexing to finish.
 
                         if (_runIncrementalAfterFull)
@@ -408,18 +409,19 @@ namespace SOS.Harvest.Jobs
                         }
                     }
 
+                    //await _processedObservationRepository.EnsureNoDuplicatesAsync();
+
                     // When we do a incremental harvest to live index, there is no meaning to do validation since the data is already live
                     if (mode == JobRunModes.Full && !_runIncrementalAfterFull ||
                         mode == JobRunModes.IncrementalInactiveInstance)
                     {
-                        _logger.LogInformation($"Start validate indexes");
                         var validateIndexTimerSessionId = _processTimeManager.Start(ProcessTimeManager.TimerTypes.ValidateIndex);
+                        _logger.LogInformation($"Start validate indexes");
                         if (!await ValidateIndexesAsync())
                         {
                             throw new Exception("Validation of processed indexes failed. Job stopped to prevent leak of protected data");
                         }
                         _logger.LogInformation($"Finish validate indexes");
-
                         _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateIndex, validateIndexTimerSessionId);
 
                         // Toggle active instance if we are done

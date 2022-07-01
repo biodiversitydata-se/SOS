@@ -351,10 +351,9 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems)
+        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems)
         {
-            return await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(activeInstance,
-                protectedIndex, maxReturnedItems);
+            return await _processedObservationRepository.TryToGetOccurenceIdDuplicatesAsync(protectedIndex, maxReturnedItems);
         }
 
         /// <inheritdoc />

@@ -372,7 +372,6 @@ namespace SOS.Harvest.Processors
                         DeleteBatchAsync(true, occurrenceIds)
                     };
                     var deleteResult = await Task.WhenAll(deleteTasks);
-
                     TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
 
                     Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");

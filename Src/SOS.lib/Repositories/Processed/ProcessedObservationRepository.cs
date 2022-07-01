@@ -767,6 +767,66 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Make sure no duplicates of occurrence id's exists in index
+        /// </summary>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        private async Task<bool> EnsureNoDuplicates(bool protectedIndex)
+        {
+            try
+            {
+                const int maxReturnedItems = 1000;
+                var duplicates = await TryToGetOccurenceIdDuplicatesAsync(protectedIndex, maxReturnedItems);
+
+                while (duplicates?.Any() ?? false)
+                {
+                    var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                        .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                        .Query(q => q
+                            .Terms(t => t
+                                .Field("occurrence.occurrenceId")
+                                .Terms(duplicates)
+                            )
+                        )
+                        .Sort(s => s
+                            .Ascending("occurrence.occurrenceId")
+                            .Descending("modified")
+                         )
+                        .Size(duplicates.Count())
+                        .Source(s => s.ExcludeAll())
+                        .TrackTotalHits(false)
+                    );
+
+                    if (!searchResponse.IsValid)
+                    {
+                        throw new InvalidOperationException(searchResponse.DebugInformation);
+                    }
+                    var observations = searchResponse.Documents.Cast<IDictionary<string, object>>().ToArray();
+                    var idsToRemove = new HashSet<string>();
+                    var prevOccurrenceId = string.Empty;
+                    foreach (var hit in searchResponse.Hits)
+                    {
+                        var occurrenceId = hit.Sorts.First().ToString();
+                        // Remove all but first occurrence of occurrenceId (latest data)
+                        if (occurrenceId == prevOccurrenceId)
+                        {
+                            idsToRemove.Add(hit.Id);
+                        }
+                        prevOccurrenceId = occurrenceId;
+                    }
+                    await DeleteByIdsAsync(idsToRemove, protectedIndex);
+                    duplicates = await TryToGetOccurenceIdDuplicatesAsync(protectedIndex, maxReturnedItems);
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Get last modified date for provider
         /// </summary>
         /// <param name="providerId"></param>
@@ -923,7 +983,7 @@ namespace SOS.Lib.Repositories.Processed
             TelemetryClient telemetry,
             IHttpContextAccessor httpContextAccessor,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, httpContextAccessor, elasticConfiguration, logger)
         {
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
@@ -1021,6 +1081,37 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        /// <summary>
+        /// Delete observations by id's
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <param name="activeInstance"></param>
+        /// <param name="protectedIndex"></param>
+        /// <returns></returns>
+        private async Task<bool> DeleteByIdsAsync(IEnumerable<string> Ids, bool protectedIndex)
+        {
+            try
+            {
+                // Create the collection
+                var res = await Client.DeleteByQueryAsync<Observation>(q => q
+                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Query(q => q
+                        .Terms(t => t
+                            .Field("_id")
+                            .Terms(Ids)
+                        )
+                    )
+                );
+
+                return res.IsValid;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
         /// <inheritdoc />
         public async Task<bool> DeleteProviderDataAsync(DataProvider dataProvider, bool protectedIndex)
         {
@@ -1058,6 +1149,19 @@ namespace SOS.Lib.Repositories.Processed
         {
             await Client.Indices.UpdateSettingsAsync(protectedIndex ? ProtectedIndexName : PublicIndexName,
                 p => p.IndexSettings(g => g.RefreshInterval(1)));
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> EnsureNoDuplicatesAsync()
+        {
+            var tasks = new[] {
+                EnsureNoDuplicates(false),
+                EnsureNoDuplicates(true)
+            };
+
+            await Task.WhenAll(tasks);
+
+            return tasks.All(t => t.Result);
         }
 
         /// <inheritdoc />
@@ -1604,11 +1708,16 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus)
+        public async Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus, int waitForSeconds)
         {
             try
             {
-                var response = await Client.Cluster.HealthAsync(new ClusterHealthRequest() { WaitForStatus = waitForStatus });
+                var response = await Client.Cluster
+                        .HealthAsync(new []{ Indices.Index(PublicIndexName), Indices.Index(ProtectedIndexName) }, chr => chr
+                            .Level(Level.Indices)
+                            .Timeout(TimeSpan.FromSeconds(waitForSeconds))
+                            .WaitForStatus(waitForStatus)
+                        );
 
                 var healthColor = response.Status.ToString().ToLower();
 
@@ -2388,9 +2497,9 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool activeInstance, bool protectedIndex, int maxReturnedItems)
+        public async Task<IEnumerable<string>> TryToGetOccurenceIdDuplicatesAsync(bool protectedIndex, int maxReturnedItems)
         {
-            var searchResponse = await (activeInstance ? Client : InActiveClient).SearchAsync<dynamic>(s => s
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 .Aggregations(a => a
                     .Terms("OccurrenceIdDuplicatesExists", f => f
