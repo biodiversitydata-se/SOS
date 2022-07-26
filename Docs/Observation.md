@@ -202,12 +202,12 @@ All fields that are part of an observation are listed on this page.
 | taxon.attributes.disturbanceRadius 	| int32? 	| 500 	| Taxon disturbance radius.    	|  	|
 | taxon.attributes.dyntaxaTaxonId 	| int32    	| 221501 	| Taxon id value in Dyntaxa.    	|  	|
 | taxon.attributes.parentDyntaxaTaxonId 	| int32? 	| 1005661 	| Parent Dyntaxa TaxonId.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 2.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 4.    	|  	|
-| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 5.    	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle2 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 2. https://eunis.eea.europa.eu/references/2325/species   	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle4 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 4. https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/564569/annex-IVa-animals.pdf   	|  	|
+| taxon.attributes.natura2000HabitatsDirectiveArticle5 	| boolean 	| false 	| Indicates whether the taxon is part of Habitats Directive Annex 5. https://registry.nbnatlas.org/public/show/dr2407   	|  	|
 | taxon.attributes.organismGroup 	| string 	| "Kärlväxter" 	| Common name of the organism group   that observed species belongs to. Classification of species groups is the   same as used in latest 'Red List of Swedish Species'.    	|  	|
 | taxon.attributes.protectedByLaw 	| boolean 	| true 	| Indicates whether the species is protected by the law in Sweden.    	|  	|
-| taxon.attributes.sensitivityCategory 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected (sensitivity level) a species is in Sweden. This is a value between 1 to 5. 1 indicates public access and 5 is the highest used sensitivity level. 	|  	|
+| taxon.attributes.sensitivityCategory 	| VocabularyValue[\<protectionLevel\>](Vocabularies.md#protectionLevel)	| \{ "id":1, "value":"Fullständig åtkomst och fri användning för alla" \}	| Information about how protected (sensitivity level) a species is in Sweden. This is a value between 1 to 5. 1 indicates public access and 5 is the highest used sensitivity level. https://www.artdatabanken.se/var-verksamhet/fynddata/skyddsklassade-arter/	|  	|
 | taxon.attributes.redlistCategory 	| string 	| "LC" 	| Redlist category for redlisted   species. Possible redlist values are DD (Data Deficient), EX (Extinct), RE   (Regionally Extinct), CR (Critically Endangered), EN (Endangered), VU   (Vulnerable), NT (Near Threatened). Not redlisted species have no value in   this property.    	|  	|
 | taxon.attributes.isRedlisted 	| boolean 	| true | True if redlist category is one of CR, EN, VU, NT. 	|  	|
 | taxon.attributes.isInvasiveInSweden 	| boolean 	| true | True if invasive in sweden. 	|  	|
