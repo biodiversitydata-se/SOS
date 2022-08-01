@@ -49,6 +49,24 @@ namespace SOS.Lib.Enums
             }.Contains(aggregationType);
         }
 
+        public static bool IsYearHistogram(this AggregationType aggregationType)
+        {
+            return new List<AggregationType>
+            {
+                AggregationType.QuantityPerYear,
+                AggregationType.SightingsPerYear
+            }.Contains(aggregationType);
+        }
+
+        public static bool IsWeekHistogram(this AggregationType aggregationType)
+        {
+            return new List<AggregationType>
+            {
+                AggregationType.QuantityPerWeek,
+                AggregationType.SightingsPerWeek,
+            }.Contains(aggregationType);
+        }
+
         public static bool IsSpeciesSightingsList(this AggregationType aggregationType)
         {
             return new List<AggregationType>
