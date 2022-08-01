@@ -386,8 +386,9 @@ namespace SOS.Harvest.Jobs
                         // If docCoumt is less than process count, indexing is not ready yet
                         while (docCount < processCount && iterations < 100)
                         {
-                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
                             iterations++; // Safty to prevent infinite loop.
+                            _logger.LogInformation($"Waiting for indexing to be done {iterations}");
+                            Thread.Sleep(TimeSpan.FromSeconds(6)); // Wait for Elasticsearch indexing to finish.
                             docCount = await _processedObservationRepository.IndexCountAsync(false);
                         }
                        

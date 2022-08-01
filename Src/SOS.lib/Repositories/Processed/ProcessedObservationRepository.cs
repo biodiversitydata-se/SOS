@@ -1311,7 +1311,14 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .DateHistogram("aggregation", dh => dh
                         .Field("event.startDate")
-                        .CalendarInterval(DateInterval.Day)
+                        .CalendarInterval(aggregationType switch {
+                            AggregationType.QuantityPerYear  => DateInterval.Year,
+                            AggregationType.SightingsPerYear => DateInterval.Year,
+                            AggregationType.QuantityPerWeek => DateInterval.Week,
+                            AggregationType.SightingsPerWeek => DateInterval.Week,
+                            _ => DateInterval.Day
+                        }  
+                        )
                         .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                         .Format("yyyy-MM-dd")
                         .Aggregations(a => a
