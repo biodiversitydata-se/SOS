@@ -219,6 +219,22 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             return await QueryAsync<int>(query, null!);
         }
 
+        public async Task<IEnumerable<int>> GetRejectedIdsAsync(DateTime modifiedSince)
+        {
+            string query = @$"
+            SELECT 
+	            s.Id 
+            FROM 
+	            Sighting s
+            WHERE 
+                s.ValidationStatusId = 50
+	            AND s.EditDate > '{modifiedSince.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'
+	        ORDER BY 
+                s.EditDate";
+
+            return await QueryAsync<int>(query, null!);
+        }
+
         /// <inheritdoc />
         public async Task<(int minId, int maxId)> GetIdSpanAsync()
         {
