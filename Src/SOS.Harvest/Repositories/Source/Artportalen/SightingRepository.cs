@@ -228,9 +228,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	            Sighting s
             WHERE 
                 s.ValidationStatusId = 50
-	            AND s.EditDate > '{modifiedSince.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'
-	        ORDER BY 
-                s.EditDate";
+	            AND s.EditDate > '{modifiedSince.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'";
 
             return await QueryAsync<int>(query, null!);
         }

@@ -32,6 +32,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<int>> GetDeletedIdsAsync(DateTime from);
 
         /// <summary>
+        /// Get id's of rejected sightings 
+        /// </summary>
+        /// <param name="modifiedSince"></param>
+        /// <returns></returns>
+        Task<IEnumerable<int>> GetRejectedIdsAsync(DateTime modifiedSince);
+
+        /// <summary>
         ///     Get min and max id
         /// </summary>
         /// <returns></returns>
