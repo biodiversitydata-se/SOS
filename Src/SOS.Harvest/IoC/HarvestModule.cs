@@ -286,6 +286,8 @@ namespace SOS.Harvest.IoC.Modules
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories processed 
+            builder.RegisterType<UserObservationRepository>().As<IUserObservationRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedChecklistRepository>().As<IProcessedChecklistRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()

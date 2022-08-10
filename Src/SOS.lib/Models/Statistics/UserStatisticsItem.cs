@@ -18,18 +18,27 @@ namespace SOS.Lib.Models.Statistics
         public int SpeciesCount { get; set; }
 
         /// <summary>
-        /// Experimental. Perhaps move to another class.
+        /// Number of observations.
         /// </summary>
         public int ObservationCount { get; set; }
 
         /// <summary>
-        /// Experimental. Perhaps move to another class.
+        /// Number of species (taxa) per area.
         /// </summary>
-        public int ReportCount { get; set; }
+        public List<AreaSpeciesCount> AreaCounts { get; set; }
+    }
 
-        /// <summary>
-        /// Experimental. Perhaps move to another class.
-        /// </summary>
-        public Dictionary<string, int> SpeciesCountByFeatureId { get; set; }
+    public class AreaSpeciesCount
+    {
+        public string FeatureId { get; set; }
+        public int SpeciesCount { get; set; }
+
+        public AreaSpeciesCount() {}
+
+        public AreaSpeciesCount(string featureId, int speciesCount)
+        {
+            FeatureId = featureId;
+            SpeciesCount = speciesCount;
+        }
     }
 }

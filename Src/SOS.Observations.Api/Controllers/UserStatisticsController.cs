@@ -61,7 +61,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
         /// <param name="sortBy">Sort by sum or featureId.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
@@ -91,20 +91,33 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Aggregates taxon by user.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
+        /// <param name="sortBy">Sort by sum or featureId.</param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
         [HttpPost("SpeciesCountAggregation")]
-        [ProducesResponseType(typeof(IEnumerable<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> SpeciesCountAggregation(
             [FromBody] SpeciesCountUserStatisticsQuery query,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
+            [FromQuery] string sortBy = "sum",
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, useCache);
-                return new OkObjectResult(result);
+                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
+                PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {

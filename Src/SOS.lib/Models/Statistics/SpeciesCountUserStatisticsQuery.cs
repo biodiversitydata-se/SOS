@@ -19,6 +19,7 @@ public class SpeciesCountUserStatisticsQuery
     public bool IncludeOtherAreasSpeciesCount { get; set; }
 
     public string CacheKey => this.ToString();
+
     public override string ToString()
     {
         return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
