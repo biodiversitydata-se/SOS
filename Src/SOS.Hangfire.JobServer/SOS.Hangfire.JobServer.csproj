@@ -61,9 +61,9 @@
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="1.5.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="1.5.3" />
-		<PackageReference Include="HangFire" Version="1.7.29" />
+		<PackageReference Include="HangFire" Version="1.7.30" />
 		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
-		<PackageReference Include="HangFire.Mongo" Version="1.7.1" />
+		<PackageReference Include="HangFire.Mongo" Version="1.7.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
@@ -73,9 +73,9 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.16.1" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.1.0" />
 		<PackageReference Include="Topshelf" Version="4.3.0" />
 	</ItemGroup>
 
