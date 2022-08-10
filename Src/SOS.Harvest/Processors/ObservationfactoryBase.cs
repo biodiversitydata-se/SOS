@@ -11,6 +11,7 @@ namespace SOS.Harvest.Processors
     public class ObservationFactoryBase : FactoryBase
     {
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        protected IDictionary<string, Lib.Models.Processed.Observation.Taxon> TaxaByName { get; }
 
         /// <summary>
         /// Constructor
@@ -22,6 +23,16 @@ namespace SOS.Harvest.Processors
         protected ObservationFactoryBase(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa, IProcessTimeManager processTimeManager) : base(dataProvider, processTimeManager)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+
+            TaxaByName = new Dictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            foreach(var taxon in taxa.Values)
+            {
+                var taxonName = taxon.ScientificName.ToLower();
+                if (!TaxaByName.ContainsKey(taxonName))
+                {
+                    TaxaByName.Add(taxonName, taxon);
+                }
+            }
         }
         
         /// <summary>
@@ -29,9 +40,20 @@ namespace SOS.Harvest.Processors
         /// </summary>
         /// <param name="taxonId"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!)
         {
             Taxa.TryGetValue(taxonId, out var taxon);
+
+            // If we can't find taxon by id, try by scientific name if passed
+            if (taxon == null && (names?.Any() ?? false))
+            {
+                foreach(var name in names)
+                {
+                    if(!string.IsNullOrEmpty(name) && TaxaByName.TryGetValue(name?.ToLower() ?? string.Empty, out taxon)){
+                        break;
+                    }
+                }
+            }
 
             return taxon ?? new Lib.Models.Processed.Observation.Taxon { Id = -1, VerbatimId = taxonId.ToString() };
         }

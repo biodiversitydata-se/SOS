@@ -2,7 +2,6 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -41,9 +40,9 @@ namespace SOS.Harvest.Processors.Shark
         /// <returns></returns>
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1);            
-            var sharkSampleId = $"{verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId}-{verbatim.DyntaxaId}-{verbatim.Parameter}-{verbatim.Value}".RemoveWhiteSpace();
-            
+            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] {verbatim.ScientificName, verbatim.ReportedScientificName}.Distinct());
+            var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}".RemoveWhiteSpace();
+
             var obs = new Observation
             {                
                 DataProviderId = DataProvider.Id,
@@ -66,6 +65,12 @@ namespace SOS.Harvest.Processors.Shark
                     MaximumDepthInMeters = verbatim.WaterDepthM,
                     MinimumDepthInMeters = verbatim.WaterDepthM
                 },
+                MeasurementOrFacts = verbatim.Parameters?.Select(p => new ExtendedMeasurementOrFact
+                {
+                    MeasurementType = p.Name,
+                    MeasurementUnit = p.Unit,
+                    MeasurementValue = p.Value
+                })?.ToArray(),
                 Occurrence = new Occurrence
                 {
                     BirdNestActivityId = 0,

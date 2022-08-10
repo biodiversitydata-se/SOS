@@ -15,12 +15,12 @@
 
   <ItemGroup>
 	  <PackageReference Include="Autofac" Version="6.4.0" />
-	  <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
-	  <PackageReference Include="Hangfire.Core" Version="1.7.29" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
+	  <PackageReference Include="Hangfire.Core" Version="1.7.30" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="2.16.0" />
-	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.16.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.17.1" />
 	  <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 

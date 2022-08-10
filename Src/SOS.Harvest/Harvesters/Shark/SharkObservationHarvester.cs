@@ -5,7 +5,6 @@ using SOS.Harvest.Harvesters.Shark.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
@@ -121,24 +120,10 @@ namespace SOS.Harvest.Harvesters.Shark
                     }
 
                     var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(data))?.ToArray() ?? Array.Empty<SharkObservationVerbatim>();
-                    var distinctVerbatims = new List<SharkObservationVerbatim>();
-                    foreach (var verbatim in verbatims)
-                    {
-                        var sharkSampleId = $"{verbatim.Sharksampleidmd5 ?? verbatim.SharkSampleId}-{verbatim.DyntaxaId}-{verbatim.Parameter}-{verbatim.Value}".RemoveWhiteSpace();
-
-                        if (harvestedSharkSampleIds.Contains(sharkSampleId))
-                        {
-                            _logger.LogWarning($"Duplicate observation found in Shark: {sharkSampleId}");
-                            continue;
-                        }
-                        distinctVerbatims.Add(verbatim);
-                        harvestedSharkSampleIds.Add(sharkSampleId);
-                    }
-                    verbatims = null;
-                    nrSightingsHarvested += distinctVerbatims?.Count() ?? 0;
+                    nrSightingsHarvested += verbatims?.Count() ?? 0;
 
                     // Add sightings to MongoDb
-                    await _sharkObservationVerbatimRepository.AddManyAsync(distinctVerbatims);
+                    await _sharkObservationVerbatimRepository.AddManyAsync(verbatims);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for SHARK data provider");
