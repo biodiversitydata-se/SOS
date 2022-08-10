@@ -14,43 +14,6 @@ namespace SOS.Harvest.Harvesters.Shark
             new DecoderExceptionFallback()
         );
 
-        /// <summary>
-        /// </summary>
-        /// <param name="rowData"></param>
-        /// <param name="propertyMapping"></param>
-        /// <returns></returns>
-        private SharkObservationVerbatim CastEntityToVerbatim(IReadOnlyList<string> rowData,
-            IDictionary<string, int> propertyMapping)
-        {
-            if (propertyMapping.TryGetValue("value", out var valueIndex))
-            {
-                if (!double.TryParse(rowData[valueIndex], NumberStyles.Number, CultureInfo.InvariantCulture, out var value) || value == 0)
-                {
-                    return null;
-                }
-
-                var observation = new SharkObservationVerbatim
-                {
-                    Id = NextId
-                };
-                foreach (var propertyName in propertyMapping)
-                {
-                    var propertyValue = Utf8Encoder.GetString(Utf8Encoder.GetBytes(rowData[propertyName.Value]));
-
-                    if (string.IsNullOrEmpty(propertyValue))
-                    {
-                        continue;
-                    }
-
-                    observation.SetProperty(propertyName.Key, propertyValue);
-                }
-
-                return observation;
-            }
-
-            return null;
-        }
-
         /// <inheritdoc />
         public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
         {
@@ -58,26 +21,113 @@ namespace SOS.Harvest.Harvesters.Shark
             {
                 if ((!fileData?.Header?.Any() ?? true) || (!fileData?.Rows?.Any() ?? true))
                 {
-                    return null;
+                    return null!;
                 }
 
-                var header = fileData.Header.ToArray();
-                var propertyMapping = new Dictionary<string, int>();
+                var header = fileData!.Header.ToArray();
+                var propertyMappings = new Dictionary<string, int>();
                 for (var i = 0; i < header.Length; i++)
                 {
-                    propertyMapping.Add(header[i].Replace("_", "").ToLower(), i);
+                    propertyMappings.Add(header[i].Replace("_", "").ToLower(), i);
                 }
 
-                // If file don't contains taxon id there's no reason to go on 
-                if (!propertyMapping.ContainsKey("dyntaxaid"))
+                propertyMappings.TryGetValue("sampleid", out var sampleIdIndex);
+                propertyMappings.TryGetValue("sharksampleidmd5", out var sharksampleidmd5Index);
+                propertyMappings.TryGetValue("dyntaxaid", out var dyntaxaidIndex);
+                propertyMappings.TryGetValue("scientificname", out var scientificnameIndex);
+                propertyMappings.TryGetValue("reportedscientificname", out var reportedscientificnameIndex);
+
+                // If file don't contains taxon id or sample id there's no reason to go on 
+                if (
+                    (sampleIdIndex.Equals(0) && sharksampleidmd5Index.Equals(0)) || 
+                    (dyntaxaidIndex.Equals(0) && scientificnameIndex.Equals(0) && reportedscientificnameIndex.Equals(0)) 
+                )
                 {
-                    return null;
+                    return null!;
                 }
 
-                var verbatims = from r in fileData.Rows
-                    select CastEntityToVerbatim(r.ToArray(), propertyMapping);
+                propertyMappings.TryGetValue("parameter", out var parameterIndex);
+                propertyMappings.TryGetValue("value", out var valueIndex);
+                propertyMappings.TryGetValue("unit", out var unitIndex);
 
-                return from v in verbatims where v != null select v;
+                var verbatims = new Dictionary<string, SharkObservationVerbatim>();
+
+                foreach (IReadOnlyList<string> row in fileData.Rows)
+                {
+                    var sampleId = string.Empty;
+                    // If we have md5 col, try get sample id from it
+                    if (!sharksampleidmd5Index.Equals(0))
+                    { 
+                        sampleId = row[sharksampleidmd5Index];
+                    }
+                    // No md5 id, try sample id 
+                    if (string.IsNullOrEmpty(sampleId) && !sampleIdIndex.Equals(0))
+                    {
+                        sampleId = row[sampleIdIndex];
+                    }
+
+                    var sampleIdSuffix = string.Empty;
+                    // If we have taxon id col, try get taxon id as suffix
+                    if (!dyntaxaidIndex.Equals(0))
+                    {
+                        sampleIdSuffix = row[dyntaxaidIndex];
+                    }
+                    // If no taxon id found, try scientific name 
+                    if (string.IsNullOrEmpty(sampleIdSuffix) && !scientificnameIndex.Equals(0))
+                    {
+                        sampleIdSuffix = row[scientificnameIndex];
+                    }
+                    // Still no suffix? try reported scientific name
+                    if (string.IsNullOrEmpty(sampleIdSuffix) && !reportedscientificnameIndex.Equals(0))
+                    {
+                        sampleIdSuffix = row[reportedscientificnameIndex];
+                    }
+
+                    // If sample id or suffix is missing we can't do anything more
+                    if (string.IsNullOrEmpty(sampleId) || string.IsNullOrEmpty(sampleIdSuffix))
+                    {
+                        continue;
+                    }
+
+                    sampleId = $"{sampleId}-{sampleIdSuffix}";
+
+                    if (!verbatims.TryGetValue(sampleId, out var verbatim))
+                    {
+                        verbatim = new SharkObservationVerbatim
+                        {
+                            Id = NextId,
+                            Parameters = new List<SharkParameter>()
+                        };
+
+                        foreach (var propertyMapping in propertyMappings)
+                        {
+                            if (new[] { parameterIndex, valueIndex, unitIndex }.Contains(propertyMapping.Value))
+                            {
+                                continue;
+                            }
+
+                            var propertyValue = Utf8Encoder.GetString(Utf8Encoder.GetBytes(row[propertyMapping.Value]));
+
+                            if (string.IsNullOrEmpty(propertyValue))
+                            {
+                                continue;
+                            }
+
+                            verbatim.SetProperty(propertyMapping.Key, propertyValue);
+                        }
+
+                        verbatims.Add(sampleId, verbatim);
+                    }
+                    
+                    verbatim.Parameters.Add(new SharkParameter
+                    {
+                        Name = parameterIndex == 0 ? "N/A" : row[parameterIndex],
+                        Unit = unitIndex == 0 ? "" : row[unitIndex],
+                        Value = valueIndex == 0 ? "" : row[valueIndex]
+                    });
+                }
+
+                return verbatims!.Values;
             });
         }
     }
