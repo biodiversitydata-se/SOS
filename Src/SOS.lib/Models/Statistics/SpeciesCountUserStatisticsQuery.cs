@@ -42,4 +42,9 @@ public class SpeciesCountUserStatisticsQuery
     {
         return HashCode.Combine(TaxonId, Year, SpeciesGroup, AreaType, FeatureId, SiteId, ProjectId, IncludeOtherAreasSpeciesCount);
     }
+
+    public SpeciesCountUserStatisticsQuery Clone()
+    {
+        return (SpeciesCountUserStatisticsQuery) this.MemberwiseClone();
+    }
 }

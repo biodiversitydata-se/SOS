@@ -59,10 +59,24 @@ namespace SOS.Observations.Api.Managers
             }
             else
             {
-                var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(query, skip, take, sortBy);
+                var sortQuery = query;
+                if (!string.IsNullOrEmpty(sortBy) && sortBy.ToLower() != "sum")
+                {
+                    sortQuery = query.Clone();
+                    sortQuery.FeatureId = sortBy;
+                }
+
+                var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take, sortBy);
                 var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
-                var updatedRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
-                pagedResult.Records = updatedRecords;
+                var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
+                var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
+                List<UserStatisticsItem> records = new List<UserStatisticsItem>(pagedResult.Records.Count());
+                foreach (var item in pagedResult.Records)
+                {
+                    records.Add(areaRecordsByUserId[item.UserId]);
+                }
+
+                pagedResult.Records = records;
                 result = pagedResult;
             }
             
