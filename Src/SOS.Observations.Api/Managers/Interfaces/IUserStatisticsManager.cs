@@ -13,12 +13,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, 
             int? skip, 
             int? take,
-            string sortBy,
             bool useCache = true);
         Task<PagedResult<UserStatisticsItem>> SpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
             int? skip,
             int? take,
-            string sortBy,
             bool useCache = true);
     }
 }

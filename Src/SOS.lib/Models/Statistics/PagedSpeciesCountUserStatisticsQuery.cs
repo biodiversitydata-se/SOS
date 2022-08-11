@@ -6,16 +6,15 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
 {
     public int? Skip { get; set; }
     public int? Take { get; set; }
-    public string SortBy { get; set; }
 
     public override string ToString()
     {
-        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortBy)}: {SortBy}, {nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(CacheKey)}: {CacheKey}";
+        return $"{nameof(Skip)}: {Skip}, {nameof(Take)}: {Take}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(CacheKey)}: {CacheKey}";
     }
 
     protected bool Equals(PagedSpeciesCountUserStatisticsQuery other)
     {
-        return Skip == other.Skip && Take == other.Take && SortBy == other.SortBy && TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount;
+        return Skip == other.Skip && Take == other.Take && SortByFeatureId == other.SortByFeatureId && TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount;
     }
 
     public override bool Equals(object obj)
@@ -31,7 +30,6 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
         var hashCode = new HashCode();
         hashCode.Add(Skip);
         hashCode.Add(Take);
-        hashCode.Add(SortBy);
         hashCode.Add(TaxonId);
         hashCode.Add(Year);
         hashCode.Add(SpeciesGroup);
@@ -40,16 +38,15 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
         hashCode.Add(SiteId);
         hashCode.Add(ProjectId);
         hashCode.Add(IncludeOtherAreasSpeciesCount);
+        hashCode.Add(SortByFeatureId);
         return hashCode.ToHashCode();
     }
 
-    public static PagedSpeciesCountUserStatisticsQuery Create(SpeciesCountUserStatisticsQuery query, int? skip,
-        int? take, string sortBy)
+    public static PagedSpeciesCountUserStatisticsQuery Create(SpeciesCountUserStatisticsQuery query, int? skip, int? take)
     {
         var pagedQuery = new PagedSpeciesCountUserStatisticsQuery();
         pagedQuery.Skip = skip;
         pagedQuery.Take = take;
-        pagedQuery.SortBy = sortBy;
         pagedQuery.FeatureId = query.FeatureId;
         pagedQuery.SiteId = query.SiteId;
         pagedQuery.ProjectId = query.ProjectId;
@@ -58,6 +55,7 @@ public class PagedSpeciesCountUserStatisticsQuery : SpeciesCountUserStatisticsQu
         pagedQuery.Year = query.Year;
         pagedQuery.TaxonId = query.TaxonId;
         pagedQuery.SpeciesGroup = query.SpeciesGroup;
+        pagedQuery.SortByFeatureId =query.SortByFeatureId;
 
         return pagedQuery;
     }

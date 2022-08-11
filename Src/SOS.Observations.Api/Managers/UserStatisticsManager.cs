@@ -42,11 +42,10 @@ namespace SOS.Observations.Api.Managers
         public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query, 
             int? skip, 
             int? take,
-            string sortBy,
             bool useCache = true)
         {
             PagedResult<UserStatisticsItem> result;
-            var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take, sortBy);
+            var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
             if (useCache && _pagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
             {
                 result = _pagedUserStatisticsItemsCache[pagedQuery];
@@ -55,18 +54,18 @@ namespace SOS.Observations.Api.Managers
 
             if (!query.IncludeOtherAreasSpeciesCount)
             {
-                result = await _userObservationRepository.PagedSpeciesCountSearchAsync(query, skip, take, sortBy);
+                result = await _userObservationRepository.PagedSpeciesCountSearchAsync(query, skip, take);
             }
             else
             {
                 var sortQuery = query;
-                if (!string.IsNullOrEmpty(sortBy) && sortBy.ToLower() != "sum")
+                if (!string.IsNullOrEmpty(query.SortByFeatureId))
                 {
                     sortQuery = query.Clone();
-                    sortQuery.FeatureId = sortBy;
+                    sortQuery.FeatureId = query.SortByFeatureId;
                 }
 
-                var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take, sortBy);
+                var pagedResult = await _userObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take);
                 var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
                 var areaRecords = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
                 var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
@@ -91,7 +90,6 @@ namespace SOS.Observations.Api.Managers
         public async Task<PagedResult<UserStatisticsItem>> SpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
             int? skip,
             int? take,
-            string sortBy,
             bool useCache = true)
         {
             List<UserStatisticsItem> records;

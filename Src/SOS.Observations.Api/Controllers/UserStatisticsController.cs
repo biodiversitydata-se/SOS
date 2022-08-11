@@ -62,7 +62,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="query">The query.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of records to return. Max number of records is 100.</param>
-        /// <param name="sortBy">Sort by sum or featureId.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
         [HttpPost("PagedSpeciesCountAggregation")]
@@ -74,13 +73,12 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SpeciesCountUserStatisticsQuery query,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
-            [FromQuery] string sortBy = "sum",
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
+                var result = await _userStatisticsManager.PagedSpeciesCountSearchAsync(query, skip, take, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }
@@ -109,13 +107,12 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SpeciesCountUserStatisticsQuery query,
             [FromQuery] int? skip = null,
             [FromQuery] int? take = null,
-            [FromQuery] string sortBy = "sum",
             [FromQuery] bool useCache = true)
         {
             try
             {
                 // todo - add validation
-                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, skip, take, sortBy, useCache);
+                var result = await _userStatisticsManager.SpeciesCountSearchAsync(query, skip, take, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
                 return new OkObjectResult(dto);
             }

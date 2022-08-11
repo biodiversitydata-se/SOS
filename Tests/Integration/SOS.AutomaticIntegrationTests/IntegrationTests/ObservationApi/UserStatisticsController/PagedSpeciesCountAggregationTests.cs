@@ -50,7 +50,6 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             // Arrange - Create verbatim observations
             //-----------------------------------------------------------------------------------------------------------
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(20)
-            //var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(16)
                 .All()
                     .HaveValuesFromPredefinedObservations()
                 .TheFirst(6) // 6 observations, 5 taxa
@@ -180,8 +179,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(
                 query,
                 0, 
-                5,
-                useCache: true);
+                5);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -266,11 +264,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
                 new SpeciesCountUserStatisticsQuery
                 {
                     AreaType = AreaType.Province,
-                    IncludeOtherAreasSpeciesCount = true
+                    IncludeOtherAreasSpeciesCount = true,
+                    SortByFeatureId = "P2"
                 },
                 0,
-                5,
-                sortBy: "P2");
+                5);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -430,7 +428,7 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(query, 0, 5, useCache:false);
+            var response = await _fixture.UserStatisticsController.PagedSpeciesCountAggregation(query, 0, 5);
             var result = response.GetResultObject<PagedResultDto<UserStatisticsItem>>();
 
             //-----------------------------------------------------------------------------------------------------------

@@ -213,10 +213,9 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, int? skip, int? take, string sortBy)
+        public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, int? skip, int? take)
         {
             var query = filter.ToQuery<UserObservation>();
             var searchResponse = await Client.SearchAsync<UserObservation>(s => s

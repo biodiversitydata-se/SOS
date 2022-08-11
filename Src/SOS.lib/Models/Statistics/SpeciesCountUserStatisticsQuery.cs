@@ -17,17 +17,18 @@ public class SpeciesCountUserStatisticsQuery
     /// Include user species count for all areas in specified AreaType.
     /// </summary>
     public bool IncludeOtherAreasSpeciesCount { get; set; }
+    public string SortByFeatureId { get; set; }
 
     public string CacheKey => this.ToString();
 
     public override string ToString()
     {
-        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}";
+        return $"{nameof(TaxonId)}: {TaxonId}, {nameof(Year)}: {Year}, {nameof(SpeciesGroup)}: {SpeciesGroup}, {nameof(AreaType)}: {AreaType}, {nameof(FeatureId)}: {FeatureId}, {nameof(SiteId)}: {SiteId}, {nameof(ProjectId)}: {ProjectId}, {nameof(IncludeOtherAreasSpeciesCount)}: {IncludeOtherAreasSpeciesCount}, {nameof(SortByFeatureId)}: {SortByFeatureId}, {nameof(CacheKey)}: {CacheKey}";
     }
 
     protected bool Equals(SpeciesCountUserStatisticsQuery other)
     {
-        return TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount;
+        return TaxonId == other.TaxonId && Year == other.Year && SpeciesGroup == other.SpeciesGroup && AreaType == other.AreaType && FeatureId == other.FeatureId && SiteId == other.SiteId && ProjectId == other.ProjectId && IncludeOtherAreasSpeciesCount == other.IncludeOtherAreasSpeciesCount && SortByFeatureId == other.SortByFeatureId;
     }
 
     public override bool Equals(object obj)
@@ -40,7 +41,17 @@ public class SpeciesCountUserStatisticsQuery
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TaxonId, Year, SpeciesGroup, AreaType, FeatureId, SiteId, ProjectId, IncludeOtherAreasSpeciesCount);
+        var hashCode = new HashCode();
+        hashCode.Add(TaxonId);
+        hashCode.Add(Year);
+        hashCode.Add(SpeciesGroup);
+        hashCode.Add(AreaType);
+        hashCode.Add(FeatureId);
+        hashCode.Add(SiteId);
+        hashCode.Add(ProjectId);
+        hashCode.Add(IncludeOtherAreasSpeciesCount);
+        hashCode.Add(SortByFeatureId);
+        return hashCode.ToHashCode();
     }
 
     public SpeciesCountUserStatisticsQuery Clone()
