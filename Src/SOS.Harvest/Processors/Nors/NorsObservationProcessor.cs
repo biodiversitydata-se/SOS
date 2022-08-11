@@ -67,7 +67,7 @@ namespace SOS.Harvest.Processors.Nors
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<NorsObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(

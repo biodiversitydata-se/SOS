@@ -50,6 +50,8 @@ namespace SOS.Harvest.Jobs
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessObservationsJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IUserObservationRepository _userObservationRepository;
+        private readonly ProcessConfiguration _processConfiguration;
         private readonly ICache<int, Taxon> _taxonCache;
         private readonly Dictionary<DataProviderType, IObservationProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
@@ -121,6 +123,16 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation(
                     $"Finish clear ElasticSearch index: {_processedObservationRepository.ProtectedIndexName}");
+
+                if (_processConfiguration.ProcessUserObservation)
+                {
+                    _logger.LogInformation(
+                        $"Start clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
+                    await _userObservationRepository.ClearCollectionAsync();
+
+                    _logger.LogInformation(
+                        $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
+                }
             }
             else
             {
@@ -720,12 +732,14 @@ namespace SOS.Harvest.Jobs
         /// <param name="dwcaObservationProcessor"></param>
         /// <param name="taxonCache"></param>
         /// <param name="dataProviderCache"></param>
+        /// <param name="cacheManager"></param>
         /// <param name="processTimeManager"></param>
         /// <param name="validationManager"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="processConfiguration"></param>
+        /// <param name="userObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ProcessObservationsJob(IProcessedObservationRepository processedObservationRepository,
@@ -750,6 +764,7 @@ namespace SOS.Harvest.Jobs
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ProcessConfiguration processConfiguration,
+            IUserObservationRepository userObservationRepository,
             ILogger<ProcessObservationsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -798,6 +813,8 @@ namespace SOS.Harvest.Jobs
             _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
             _minObservationCount = processConfiguration.MinObservationCount;
             _enableTimeManager = processConfiguration.EnableTimeManager;
+            _processConfiguration = processConfiguration;
+            _userObservationRepository = userObservationRepository ?? throw new ArgumentNullException(nameof(userObservationRepository));
         }
 
         /// <inheritdoc />

@@ -40,6 +40,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <param name="diffusionManager"></param>
         /// <param name="processTimeManager"></param>
         /// <param name="sightingRepository"></param>
+        /// <param name="userObservationRepository"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
@@ -53,9 +54,10 @@ namespace SOS.Harvest.Processors.Artportalen
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
             ISightingRepository sightingRepository,
+            IUserObservationRepository userObservationRepository,
             ProcessConfiguration processConfiguration,
             ILogger<ArtportalenObservationProcessor> logger) : 
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, userObservationRepository, processConfiguration, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));

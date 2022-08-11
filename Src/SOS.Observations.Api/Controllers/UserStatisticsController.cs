@@ -95,7 +95,6 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="query">The query.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
         /// <param name="take">Max number of records to return. Max number of records is 100.</param>
-        /// <param name="sortBy">Sort by sum or featureId.</param>
         /// <param name="useCache"></param>
         /// <returns></returns>
         [HttpPost("SpeciesCountAggregation")]

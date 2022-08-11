@@ -19,5 +19,7 @@
         public const string ForestInventory = "ForestInventory";
         public const string ObservationDatabase = "ObservationDatabase";
         public const string Biologg = "Biologg";
+
+        public const int ArtportalenId = 1;
     }
 }

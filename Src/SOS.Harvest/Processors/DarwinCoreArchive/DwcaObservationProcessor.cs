@@ -82,7 +82,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaObservationProcessor> logger) :
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _processedVocabularyRepository = processedVocabularyRepository ??

@@ -9,7 +9,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Result;
@@ -53,7 +52,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
             
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create checklist index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create user observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
         /// <summary>
@@ -111,11 +110,11 @@ namespace SOS.Lib.Repositories.Processed
                     .Size(WriteBatchSize)
                     .DroppedDocumentCallback((r, o) =>
                     {
-                        Logger.LogError($"Check list id: {o?.Id}, Error: {r.Error.Reason}");
+                        Logger.LogError($"User observation id: {o?.Id}, Error: {r.Error.Reason}");
                     })
                 )
                 .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing checklists for search:{count += next.Items.Count}"); });
+                    next => { Logger.LogDebug($"Indexing user observations for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public string UniqueIndexName => IndexHelper.GetIndexName<Checklist>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
+        public string UniqueIndexName => IndexHelper.GetIndexName<UserObservation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

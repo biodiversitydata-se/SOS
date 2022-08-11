@@ -66,7 +66,7 @@ namespace SOS.Harvest.Processors.Sers
             IDiffusionManager diffusionManager,
             ProcessConfiguration processConfiguration,
             ILogger<SersObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, processConfiguration, logger)
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
             _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(
