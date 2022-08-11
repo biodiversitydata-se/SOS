@@ -228,7 +228,7 @@ namespace SOS.Harvest.Processors
 
             EnableDiffusion = processConfiguration?.Diffusion ?? false;
             _logGarbageCharFields = processConfiguration?.LogGarbageCharFields ?? false;
-            _userObservationRepository = userObservationRepository ?? throw new ArgumentNullException(nameof(userObservationRepository));
+            _userObservationRepository = userObservationRepository;
             _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
         }
 
