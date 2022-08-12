@@ -51,8 +51,8 @@ namespace SOS.Lib.Extensions
                 userObservation.SightingId = observation.ArtportalenInternal.SightingId;
                 userObservation.TaxonId = observation.Taxon.Id;
                 //userObservation.TaxonSpeciesGroupId = // todo
-                userObservation.ProvinceFeatureId = observation.Location.Province.FeatureId; // int.Parse(observation.Location.Province.FeatureId);
-                userObservation.MunicipalityFeatureId = observation.Location.Municipality.FeatureId; // int.Parse(observation.Location.Municipality.FeatureId);
+                userObservation.ProvinceFeatureId = observation?.Location?.Province?.FeatureId; // int.Parse(observation.Location.Province.FeatureId);
+                userObservation.MunicipalityFeatureId = observation?.Location?.Municipality?.FeatureId; // int.Parse(observation.Location.Municipality.FeatureId);
                 //userObservation.CountryRegionFeatureId = // todo
                 //userObservation.SiteId = observation.Location.LocationId // todo
                 userObservation.StartDate = observation.Event.StartDate.Value;
@@ -68,7 +68,7 @@ namespace SOS.Lib.Extensions
             {
                 int sightingId = observation?.ArtportalenInternal?.SightingId ?? -1;
                 string provinceId = observation?.Location?.Province?.FeatureId ?? "null";
-                string municipalityId = observation?.Location?.Province?.FeatureId ?? "null";
+                string municipalityId = observation?.Location?.Municipality?.FeatureId ?? "null";
                 throw new Exception($"ToUserObservation exception. userId={userId}, sightingId={sightingId}, provinceId={provinceId}, municipalityId={municipalityId}", e);
             }
         }
