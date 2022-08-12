@@ -34,6 +34,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Harvest.Jobs
 {
@@ -126,8 +127,13 @@ namespace SOS.Harvest.Jobs
 
                 if (_processConfiguration.ProcessUserObservation)
                 {
+                    _logger.LogInformation($"_processedObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+                    _logger.LogInformation($"_userObservationRepository.LiveMode={_userObservationRepository.LiveMode}");
+                    _userObservationRepository.LiveMode = _processedObservationRepository.LiveMode;
+                    _logger.LogInformation($"Set _userObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
+
                     _logger.LogInformation(
-                        $"Start clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
+                        $"Start clear ElasticSearch index: UniqueIndexName={_userObservationRepository.UniqueIndexName}, IndexName={_userObservationRepository.IndexName}");
                     await _userObservationRepository.ClearCollectionAsync();
 
                     _logger.LogInformation(
