@@ -2615,7 +2615,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Aggregations(ag => ag
                             .Terms("taxaCountByUserId", t => t
                                 .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                                .Size(skip+take)
+                                .Size(65536)
                                 .Aggregations(a => a
                                     .ReverseNested("recorder", rn => rn
                                         .Aggregations(aa => aa
