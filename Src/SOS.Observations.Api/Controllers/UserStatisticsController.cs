@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -145,8 +146,14 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 // todo - add validation
+                Stopwatch sw = Stopwatch.StartNew();
+                _logger.LogInformation(
+                    $"Start ProcessedObservationPagedSpeciesCountAggregation(skip={skip}, take={take}, useCache={useCache})");
                 var result = await _userStatisticsManager.ProcessedObservationPagedSpeciesCountSearchAsync(query, skip, take, useCache);
                 PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
+                sw.Stop();
+                _logger.LogInformation(
+                    $"Finish ProcessedObservationPagedSpeciesCountAggregation(skip={skip}, take={take}, useCache={useCache}). Elapsed ms: {sw.ElapsedMilliseconds}");
                 return new OkObjectResult(dto);
             }
             catch (Exception e)

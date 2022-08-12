@@ -19,9 +19,9 @@ namespace SOS.Observations.Api.Managers
         private readonly IUserObservationRepository _userObservationRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ILogger<UserStatisticsManager> _logger;
-        private readonly Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCache = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
-        private readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _pagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
-        private readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _processedObservationPagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
+        private static readonly Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCache = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
+        private static readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _pagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
+        private static readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _processedObservationPagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
 
 
         /// <summary>
@@ -148,6 +148,7 @@ namespace SOS.Observations.Api.Managers
             var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
             if (useCache && _processedObservationPagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
             {
+                _logger.LogInformation("Return result from cache");
                 result = _processedObservationPagedUserStatisticsItemsCache[pagedQuery];
                 return result;
             }
@@ -181,6 +182,7 @@ namespace SOS.Observations.Api.Managers
 
             if (useCache && !_processedObservationPagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
             {
+                _logger.LogInformation("Add item to cache");
                 _processedObservationPagedUserStatisticsItemsCache.Add(pagedQuery, result); // todo - fix proper caching solution and concurrency handling.
             }
 
