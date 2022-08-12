@@ -437,7 +437,7 @@ namespace SOS.Harvest.Processors
                 await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId);
             }
 
-            if (_processConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId)
+            if (_processConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !protectedObservations)
             {
                 Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={protectedObservations}, Count={observations.Count}");
                 var userObservations = observations.ToUserObservations();

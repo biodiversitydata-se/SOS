@@ -42,25 +42,33 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static UserObservation ToUserObservation(this Observation observation, int userId, int? userServiceUserId)
         {
-            var userObservation = new UserObservation();
-            userObservation.Id = UserObservation.CreateId();
-            userObservation.UserId = userId;
-            userObservation.UserServiceUserId = userServiceUserId;
-            userObservation.SightingId = observation.ArtportalenInternal.SightingId;
-            userObservation.TaxonId = observation.Taxon.Id;
-            //userObservation.TaxonSpeciesGroupId = // todo
-            userObservation.ProvinceFeatureId = observation.Location.Province.FeatureId; // int.Parse(observation.Location.Province.FeatureId);
-            userObservation.MunicipalityFeatureId = observation.Location.Municipality.FeatureId; // int.Parse(observation.Location.Municipality.FeatureId);
-            //userObservation.CountryRegionFeatureId = // todo
-            //userObservation.SiteId = observation.Location.LocationId // todo
-            userObservation.StartDate = observation.Event.StartDate.Value;
-            userObservation.ObservationYear = userObservation.StartDate.Year;
-            userObservation.ObservationMonth = userObservation.StartDate.Month;
-            //userObservation.ProjectId = // todo - handle multiple projects?
-            userObservation.ProtectedBySystem = observation.Sensitive;
-            //userObservation.ProtectedByUser = // todo
+            try
+            {
+                var userObservation = new UserObservation();
+                userObservation.Id = UserObservation.CreateId();
+                userObservation.UserId = userId;
+                userObservation.UserServiceUserId = userServiceUserId;
+                userObservation.SightingId = observation.ArtportalenInternal.SightingId;
+                userObservation.TaxonId = observation.Taxon.Id;
+                //userObservation.TaxonSpeciesGroupId = // todo
+                userObservation.ProvinceFeatureId = observation.Location.Province.FeatureId; // int.Parse(observation.Location.Province.FeatureId);
+                userObservation.MunicipalityFeatureId = observation.Location.Municipality.FeatureId; // int.Parse(observation.Location.Municipality.FeatureId);
+                //userObservation.CountryRegionFeatureId = // todo
+                //userObservation.SiteId = observation.Location.LocationId // todo
+                userObservation.StartDate = observation.Event.StartDate.Value;
+                userObservation.ObservationYear = userObservation.StartDate.Year;
+                userObservation.ObservationMonth = userObservation.StartDate.Month;
+                //userObservation.ProjectId = // todo - handle multiple projects?
+                userObservation.ProtectedBySystem = observation.Sensitive;
+                //userObservation.ProtectedByUser = // todo
 
-            return userObservation;
+                return userObservation;
+            }
+            catch (Exception e)
+            {
+                int sightingId = observation?.ArtportalenInternal?.SightingId ?? -1;
+                throw new Exception($"ToUserObservation exception. userId={userId}, sightingId={sightingId}", e);
+            }
         }
     }
 }

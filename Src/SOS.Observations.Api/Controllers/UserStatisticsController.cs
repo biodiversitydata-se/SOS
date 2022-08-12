@@ -121,7 +121,41 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        
+
+        /// <summary>
+        /// Experimental. The functionality should be the same as PagedSpeciesCountAggregation but without the need to create a new index.
+        /// Aggregates taxon by user. 
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
+        /// <param name="take">Max number of records to return. Max number of records is 100.</param>
+        /// <param name="useCache"></param>
+        /// <returns></returns>
+        [HttpPost("ProcessedObservationPagedSpeciesCountAggregation")]
+        [ProducesResponseType(typeof(PagedResultDto<UserStatisticsItem>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ProcessedObservationPagedSpeciesCountAggregation(
+            [FromBody] SpeciesCountUserStatisticsQuery query,
+            [FromQuery] int? skip = null,
+            [FromQuery] int? take = null,
+            [FromQuery] bool useCache = true)
+        {
+            try
+            {
+                // todo - add validation
+                var result = await _userStatisticsManager.ProcessedObservationPagedSpeciesCountSearchAsync(query, skip, take, useCache);
+                PagedResultDto<UserStatisticsItem> dto = result.ToPagedResultDto(result.Records);
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "PagedSpeciesCountAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpGet("SpeciesCountByMonthAggregation")]
         [ProducesResponseType(typeof(IEnumerable<UserStatisticsByMonthItem>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]

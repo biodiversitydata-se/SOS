@@ -313,7 +313,7 @@ namespace SOS.AutomaticIntegrationTests.TestFixtures
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, excelFileWriter, geojsonFileWriter,
                 processedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(_processClient, new NullLogger<UserExportRepository>());
-            var userStatisticsManager = new UserStatisticsManager(UserObservationRepository, new NullLogger<UserStatisticsManager>());
+            var userStatisticsManager = new UserStatisticsManager(UserObservationRepository, processedObservationRepository, new NullLogger<UserStatisticsManager>());
             UserStatisticsController = new UserStatisticsController(userStatisticsManager, taxonManager, areaManager,
                 new NullLogger<UserStatisticsController>());
             ObservationsController = new ObservationsController(observationManager, taxonSearchManager, taxonManager, areaManager, observationApiConfiguration, elasticConfiguration, new NullLogger<ObservationsController>());

@@ -17,22 +17,29 @@ namespace SOS.Observations.Api.Managers
     public class UserStatisticsManager : IUserStatisticsManager
     {
         private readonly IUserObservationRepository _userObservationRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly ILogger<UserStatisticsManager> _logger;
         private readonly Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>> _userStatisticsItemsCache = new Dictionary<SpeciesCountUserStatisticsQuery, List<UserStatisticsItem>>(); // todo - use proper cache solution.
         private readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _pagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
+        private readonly Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>> _processedObservationPagedUserStatisticsItemsCache = new Dictionary<PagedSpeciesCountUserStatisticsQuery, PagedResult<UserStatisticsItem>>(); // todo - use proper cache solution.
+
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="userObservationRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public UserStatisticsManager(
             IUserObservationRepository userObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             ILogger<UserStatisticsManager> logger)
         {
             _userObservationRepository = userObservationRepository ??
                                               throw new ArgumentNullException(nameof(userObservationRepository));
+            _processedObservationRepository = processedObservationRepository ??
+                                         throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -131,6 +138,55 @@ namespace SOS.Observations.Api.Managers
 
             return result;
         }
+
+        public async Task<PagedResult<UserStatisticsItem>> ProcessedObservationPagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
+            int? skip,
+            int? take,
+            bool useCache = true)
+        {
+            PagedResult<UserStatisticsItem> result;
+            var pagedQuery = PagedSpeciesCountUserStatisticsQuery.Create(query, skip, take);
+            if (useCache && _processedObservationPagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
+            {
+                result = _processedObservationPagedUserStatisticsItemsCache[pagedQuery];
+                return result;
+            }
+
+            if (!query.IncludeOtherAreasSpeciesCount)
+            {
+                result = await _processedObservationRepository.PagedSpeciesCountSearchAsync(query, skip, take);
+            }
+            else
+            {
+                var sortQuery = query;
+                if (!string.IsNullOrEmpty(query.SortByFeatureId))
+                {
+                    sortQuery = query.Clone();
+                    sortQuery.FeatureId = query.SortByFeatureId;
+                }
+
+                var pagedResult = await _processedObservationRepository.PagedSpeciesCountSearchAsync(sortQuery, skip, take);
+                var userIds = pagedResult.Records.Select(m => m.UserId).ToList();
+                var areaRecords = await _processedObservationRepository.AreaSpeciesCountSearchAsync(query, userIds);
+                var areaRecordsByUserId = areaRecords.ToDictionary(m => m.UserId, m => m);
+                List<UserStatisticsItem> records = new List<UserStatisticsItem>(pagedResult.Records.Count());
+                foreach (var item in pagedResult.Records)
+                {
+                    records.Add(areaRecordsByUserId[item.UserId]);
+                }
+
+                pagedResult.Records = records;
+                result = pagedResult;
+            }
+
+            if (useCache && !_processedObservationPagedUserStatisticsItemsCache.ContainsKey(pagedQuery))
+            {
+                _processedObservationPagedUserStatisticsItemsCache.Add(pagedQuery, result); // todo - fix proper caching solution and concurrency handling.
+            }
+
+            return result;
+        }
+
 
 
         private static void UpdateSkipAndTake(ref int? skip, ref int? take, int recordCount)

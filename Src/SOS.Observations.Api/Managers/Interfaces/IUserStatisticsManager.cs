@@ -18,5 +18,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
             int? skip,
             int? take,
             bool useCache = true);
+
+        Task<PagedResult<UserStatisticsItem>> ProcessedObservationPagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery query,
+            int? skip,
+            int? take,
+            bool useCache = true);
     }
 }
