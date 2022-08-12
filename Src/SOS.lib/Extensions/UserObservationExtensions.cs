@@ -67,7 +67,9 @@ namespace SOS.Lib.Extensions
             catch (Exception e)
             {
                 int sightingId = observation?.ArtportalenInternal?.SightingId ?? -1;
-                throw new Exception($"ToUserObservation exception. userId={userId}, sightingId={sightingId}", e);
+                string provinceId = observation?.Location?.Province?.FeatureId ?? "null";
+                string municipalityId = observation?.Location?.Province?.FeatureId ?? "null";
+                throw new Exception($"ToUserObservation exception. userId={userId}, sightingId={sightingId}, provinceId={provinceId}, municipalityId={municipalityId}", e);
             }
         }
     }
