@@ -131,6 +131,7 @@ namespace SOS.Lib.Repositories.Processed
             ILogger<UserObservationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
         {
             LiveMode = false;
+            _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.
         }
 
         /// <inheritdoc />

@@ -167,6 +167,13 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation($"Start disable indexing ({_processedObservationRepository.ProtectedIndexName})");
             await _processedObservationRepository.DisableIndexingAsync(true);
             _logger.LogInformation($"Finish disable indexing ({_processedObservationRepository.ProtectedIndexName})");
+
+            if (_processConfiguration.ProcessUserObservation)
+            {
+                _logger.LogInformation($"Start disable indexing ({_userObservationRepository.UniqueIndexName})");
+                await _userObservationRepository.DisableIndexingAsync();
+                _logger.LogInformation($"Finish disable indexing ({_userObservationRepository.UniqueIndexName})");
+            }
         }
 
         /// <summary>
@@ -182,6 +189,13 @@ namespace SOS.Harvest.Jobs
             _logger.LogInformation($"Start enable indexing ({_processedObservationRepository.ProtectedIndexName})");
             await _processedObservationRepository.EnableIndexingAsync(true);
             _logger.LogInformation($"Finish enable indexing ({_processedObservationRepository.ProtectedIndexName})");
+
+            if (_processConfiguration.ProcessUserObservation)
+            {
+                _logger.LogInformation($"Start enable indexing ({_userObservationRepository.UniqueIndexName})");
+                await _userObservationRepository.EnableIndexingAsync();
+                _logger.LogInformation($"Finish enable indexing ({_userObservationRepository.UniqueIndexName})");
+            }
         }
 
         /// <summary>
