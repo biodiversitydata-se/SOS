@@ -109,17 +109,38 @@ namespace SOS.Observations.Api.Managers
                 if (!query.IncludeOtherAreasSpeciesCount)
                 {
                     records = await _userObservationRepository.SpeciesCountSearchAsync(query);
+                    records = records
+                        .OrderByDescending(m => m.SpeciesCount)
+                        .ThenBy(m => m.UserId)
+                        .ToList();
                 }
                 else
                 {
-                    // todo - implement logic. Calculate taxa count for each user and province.
-                    records = null;
+                    // todo - use composite aggregation in order to be sure that the aggregation is correct?
+                    records = await _userObservationRepository.AreaSpeciesCountSearchAsync(query, null);
+                    records = records
+                        .OrderByDescending(m => m.SpeciesCount)
+                        .ThenBy(m => m.UserId)
+                        .ToList();
                 }
             }
 
-            UpdateSkipAndTake(ref skip, ref take, records.Count);
-            var selectedRecords = records
-                .OrderByDescending(m => m.SpeciesCount) // todo - use sortBy to decide sort property
+            IEnumerable<UserStatisticsItem> orderedRecords;
+            if (!string.IsNullOrEmpty(query.SortByFeatureId))
+            {
+                // todo - fix fast sorting by introducing a dictionary property for AreaCounts.
+                orderedRecords = records
+                    .Where(m => m.AreaCounts.Any(a => a.FeatureId == "P2"))
+                    .OrderByDescending(v => v.AreaCounts.Single(a => a.FeatureId == "P2").SpeciesCount)
+                    .ThenBy(m => m.UserId);
+            }
+            else
+            {
+                orderedRecords = records;
+            }
+
+            UpdateSkipAndTake(ref skip, ref take, orderedRecords.Count());
+            var selectedRecords = orderedRecords
                 .Skip(skip.GetValueOrDefault())
                 .Take(take.GetValueOrDefault());
 
@@ -127,7 +148,7 @@ namespace SOS.Observations.Api.Managers
             {
                 Skip = skip.GetValueOrDefault(),
                 Take = take.GetValueOrDefault(),
-                TotalCount = records.Count,
+                TotalCount = orderedRecords.Count(),
                 Records = selectedRecords
             };
 
