@@ -337,10 +337,10 @@ namespace SOS.Lib.Repositories.Processed
                     UserId = Convert.ToInt32(b.Key), 
                     ObservationCount = Convert.ToInt32(b.DocCount ?? 0),
                     SpeciesCount = Convert.ToInt32(b.Cardinality("sumTaxaCount").Value.GetValueOrDefault()),
-                    AreaCounts = b
+                    SpeciesCountByFeatureId = b
                         .Terms("provinceGroup")
                         .Buckets
-                        .Select(bu => new AreaSpeciesCount { FeatureId = bu.Key, SpeciesCount = Convert.ToInt32(bu.Cardinality("taxaCount").Value.GetValueOrDefault())}).ToList(),
+                        .ToDictionary(bu => bu.Key, bu => Convert.ToInt32(bu.Cardinality("taxaCount").Value.GetValueOrDefault()))
                 }).ToList();
             
             return items;

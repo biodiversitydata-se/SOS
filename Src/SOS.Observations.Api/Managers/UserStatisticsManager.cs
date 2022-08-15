@@ -100,6 +100,8 @@ namespace SOS.Observations.Api.Managers
             bool useCache = true)
         {
             List<UserStatisticsItem> records;
+            string sortByFeatureId = query.SortByFeatureId; // todo - temporary hack in order to exclude SortByFeatureId in cache key. Sorting is done in memory.
+            query.SortByFeatureId = null;
             if (useCache && _userStatisticsItemsCache.ContainsKey(query))
             {
                 records = _userStatisticsItemsCache[query];
@@ -126,12 +128,11 @@ namespace SOS.Observations.Api.Managers
             }
 
             IEnumerable<UserStatisticsItem> orderedRecords;
-            if (!string.IsNullOrEmpty(query.SortByFeatureId))
+            if (!string.IsNullOrEmpty(sortByFeatureId))
             {
-                // todo - fix fast sorting by introducing a dictionary property for AreaCounts.
                 orderedRecords = records
-                    .Where(m => m.AreaCounts.Any(a => a.FeatureId == "P2"))
-                    .OrderByDescending(v => v.AreaCounts.Single(a => a.FeatureId == "P2").SpeciesCount)
+                    .Where(m => m.SpeciesCountByFeatureId.ContainsKey(sortByFeatureId))
+                    .OrderByDescending(v => v.SpeciesCountByFeatureId[sortByFeatureId])
                     .ThenBy(m => m.UserId);
             }
             else

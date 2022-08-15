@@ -2741,11 +2741,11 @@ namespace SOS.Lib.Repositories.Processed
                     UserId = Convert.ToInt32(b.Key), 
                     ObservationCount = Convert.ToInt32(b.DocCount ?? 0), 
                     SpeciesCount = Convert.ToInt32(b.ReverseNested("recorder").Cardinality("sumTaxaCount").Value),
-                    AreaCounts = b
+                    SpeciesCountByFeatureId = b
                         .ReverseNested("recorder")
                         .Terms("province")
                         .Buckets
-                        .Select(bu => new AreaSpeciesCount { FeatureId = bu.Key, SpeciesCount = Convert.ToInt32(bu.Cardinality("taxonCount").Value.GetValueOrDefault()) }).ToList()
+                        .ToDictionary(bu => bu.Key, bu => Convert.ToInt32(bu.Cardinality("taxonCount").Value.GetValueOrDefault()))
                 }).ToList();
 
             return items;

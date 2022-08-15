@@ -187,11 +187,11 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             //-----------------------------------------------------------------------------------------------------------            
             var expected = new List<UserStatisticsItem>
             {
-                new() { UserId = 1, SpeciesCount = 5, ObservationCount = 11, AreaCounts = new List<AreaSpeciesCount> { new("P1", 5), new("P2", 2), new("P3", 2) }},
-                new() { UserId = 2, SpeciesCount = 4, ObservationCount = 9, AreaCounts = new List<AreaSpeciesCount> { new("P1", 4), new ("P2", 3), new ("P3", 2) }},
-                new() { UserId = 3, SpeciesCount = 3, ObservationCount = 8, AreaCounts = new List<AreaSpeciesCount> { new("P1", 3), new ("P2", 1), new ("P3", 1) }},
-                new() { UserId = 4, SpeciesCount = 2, ObservationCount = 4, AreaCounts = new List<AreaSpeciesCount> { new("P1", 2), new ("P2", 2) }},
-                new() { UserId = 5, SpeciesCount = 1, ObservationCount = 4, AreaCounts = new List<AreaSpeciesCount> { new("P1", 1), new ("P4", 1) }},
+                new() { UserId = 1, SpeciesCount = 5, ObservationCount = 11, SpeciesCountByFeatureId = new Dictionary<string, int> { {"P1", 5}, {"P2", 2}, {"P3", 2} }},
+                new() { UserId = 2, SpeciesCount = 4, ObservationCount = 9, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 4}, {"P2", 3}, {"P3", 2} }},
+                new() { UserId = 3, SpeciesCount = 3, ObservationCount = 8, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 3}, {"P2", 1}, {"P3", 1} }},
+                new() { UserId = 4, SpeciesCount = 2, ObservationCount = 4, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 2}, {"P2", 2} }},
+                new() { UserId = 5, SpeciesCount = 1, ObservationCount = 4, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 1}, {"P4", 1} }},
             };
 
             result.Records.Should().BeEquivalentTo(expected);
@@ -276,10 +276,10 @@ namespace SOS.AutomaticIntegrationTests.IntegrationTests.ObservationApi.UserStat
             //-----------------------------------------------------------------------------------------------------------            
             var expected = new List<UserStatisticsItem>
             {
-                new() { UserId = 2, SpeciesCount = 4, ObservationCount = 9, AreaCounts = new List<AreaSpeciesCount> { new("P1", 4), new ("P2", 3), new ("P3", 2) }},
-                new() { UserId = 1, SpeciesCount = 5, ObservationCount = 11, AreaCounts = new List<AreaSpeciesCount> { new("P1", 5), new("P2", 2), new("P3", 2) }},
-                new() { UserId = 4, SpeciesCount = 2, ObservationCount = 4, AreaCounts = new List<AreaSpeciesCount> { new("P1", 2), new ("P2", 2) }},
-                new() { UserId = 3, SpeciesCount = 3, ObservationCount = 8, AreaCounts = new List<AreaSpeciesCount> { new("P1", 3), new ("P2", 1), new ("P3", 1) }},
+                new() { UserId = 2, SpeciesCount = 4, ObservationCount = 9, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 4}, {"P2", 3}, {"P3", 2} }},
+                new() { UserId = 1, SpeciesCount = 5, ObservationCount = 11, SpeciesCountByFeatureId = new Dictionary<string, int> { {"P1", 5}, {"P2", 2}, {"P3", 2} }},
+                new() { UserId = 4, SpeciesCount = 2, ObservationCount = 4, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 2}, {"P2", 2} }},
+                new() { UserId = 3, SpeciesCount = 3, ObservationCount = 8, SpeciesCountByFeatureId = new Dictionary<string, int>  { {"P1", 3}, {"P2", 1}, {"P3", 1} }},
                 //new() { UserId = 5, SpeciesCount = 1, ObservationCount = 4 }, // This user doesn't have any observations in P2, so it is excluded in the result
             };
             result.Records.Should().BeEquivalentTo(expected);
