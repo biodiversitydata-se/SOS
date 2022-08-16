@@ -1,0 +1,48 @@
+﻿@page "/artportalentoplist"
+@using SOS.Blazor.Shared
+@inject HttpClient _httpClient
+@inject NavigationManager _navManager
+
+<h3>Artportalens topplista</h3>
+<div class="page-size-chooser">
+    Sidstorlek:
+    <select @bind="@_pagination.ItemsPerPage">
+        <option>10</option>
+        <option>20</option>
+        <option>30</option>
+    </select>
+</div>
+
+<div class="grid">
+    <QuickGrid ItemsProvider="@_userStatisticsProvider" Pagination="@_pagination">
+        <PropertyColumn Property="@(u => u.UserId)"/>
+        <PropertyColumn Property="@(u => u.SpeciesCount)"/>
+        <PropertyColumn Property="@(u => u.ObservationCount)"/>
+    </QuickGrid>
+</div>
+<Paginator Value="@_pagination"/>
+
+
+@code {
+    GridItemsProvider<UserStatisticsItem>? _userStatisticsProvider;
+    PaginationState _pagination = new PaginationState { ItemsPerPage = 20 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userStatisticsProvider = async req =>
+        {
+            var url = _navManager.GetUriWithQueryParameters("UserStatistics/PagedSpeciesCountAggregation", new Dictionary<string, object?> {
+                { "skip", req.StartIndex },
+                { "take", req.Count }
+            });
+            var query = new SpeciesCountUserStatisticsQuery();
+            var response = await _httpClient.PostAsJsonAsync(url, query);
+            var pagedResult = await response.Content.ReadFromJsonAsync<PagedResultDto<UserStatisticsItem>>();
+            return GridItemsProviderResult.From(
+                items: pagedResult!.Records.ToList(),
+                totalItemCount: (int)pagedResult!.TotalCount);
+        };
+
+        await base.OnInitializedAsync();
+    }
+}
